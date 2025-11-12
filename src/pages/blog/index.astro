@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = [
+  {
+    title: '2025 室內設計趨勢',
+    slug: '2025-interior-design-trends',
+    date: '2025-11-01',
+    summary: '探索今年最熱門的室內設計風格與配色'
+  },
+  {
+    title: '小坪數空間規劃技巧',
+    slug: 'small-space-tips',
+    date: '2025-10-15',
+    summary: '教你如何讓小空間發揮最大效益'
+  },
+  {
+    title: '裝修預算分配指南',
+    slug: 'budget-guide',
+    date: '2025-10-01',
+    summary: '聰明分配裝修預算,避免超支'
+  }
+];
+---
+
+<BaseLayout title="知識分享 - 室內設計公司">
+  <div class="container mx-auto px-4 py-16">
+    <h1 class="text-4xl font-bold text-center mb-12">知識分享</h1>
+    <div class="max-w-3xl mx-auto space-y-8">
+      {posts.map(post => (
+        <article class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow">
+          <a href={`/blog/${post.slug}`}>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2 hover:text-blue-600">{post.title}</h2>
+            <p class="text-gray-500 text-sm mb-3">{post.date}</p>
+            <p class="text-gray-700">{post.summary}</p>
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

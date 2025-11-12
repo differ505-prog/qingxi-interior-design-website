@@ -1,0 +1,41 @@
+---
+const { title = '室內設計公司' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- 導覽列 -->
+  <nav class="bg-white shadow-md">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold text-gray-800">室內設計</a>
+        <div class="hidden md:flex space-x-6">
+          <a href="/" class="text-gray-600 hover:text-gray-900">首頁</a>
+          <a href="/portfolio" class="text-gray-600 hover:text-gray-900">作品集</a>
+          <a href="/blog" class="text-gray-600 hover:text-gray-900">知識分享</a>
+          <a href="/tools" class="text-gray-600 hover:text-gray-900">裝修工具</a>
+          <a href="/contact" class="text-gray-600 hover:text-gray-900">聯絡我</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 主要內容 -->
+  <main class="flex-grow">
+    <slot />
+  </main>
+
+  <!-- 頁尾 -->
+  <footer class="bg-gray-800 text-white py-8">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2025 室內設計公司. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+// 暫時的假資料（之後會從 CMS 取得）
+const projects = [
+  {
+    title: '現代北歐風公寓',
+    coverImage: 'https://images.unsplash.com/photo-1556912167-f556f1f39faa?w=800',
+    summary: '25坪的溫馨小宅，充滿自然光線',
+    slug: 'modern-nordic-apartment'
+  },
+  {
+    title: '工業風loft住宅',
+    coverImage: 'https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800',
+    summary: '挑高空間搭配復古元素',
+    slug: 'industrial-loft'
+  },
+  {
+    title: '簡約日式禪風',
+    coverImage: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
+    summary: '寧靜舒適的居家氛圍',
+    slug: 'minimalist-japanese'
+  }
+];
+---
+
+<BaseLayout title="作品集 - 室內設計公司">
+  <div class="container mx-auto px-4 py-16">
+    <h1 class="text-4xl font-bold text-center mb-12">我們的作品</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {projects.map(project => (
+        <ProjectCard {...project} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
