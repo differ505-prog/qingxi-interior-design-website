@@ -7,35 +7,51 @@ const { title = '室內設計公司' } = Astro.props;
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">  
   <title>{title}</title>
+<style>
+  :root {
+    --primary: #2C3E50;
+    --primary-light: #34495E;
+    --primary-dark: #1A252F;
+    --secondary: #E8D5C4;
+    --secondary-light: #F5EBE0;
+    --accent: #C19A6B;
+  }
+  
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+</style>
 </head>
-<body class="min-h-screen flex flex-col">
-  <!-- 導覽列 -->
-  <nav class="bg-white shadow-md">
-    <div class="container mx-auto px-4 py-4">
-      <div class="flex justify-between items-center">
-        <a href="/" class="text-2xl font-bold text-gray-800">室內設計</a>
-        <div class="hidden md:flex space-x-6">
-          <a href="/" class="text-gray-600 hover:text-gray-900">首頁</a>
-          <a href="/portfolio" class="text-gray-600 hover:text-gray-900">作品集</a>
-          <a href="/blog" class="text-gray-600 hover:text-gray-900">知識分享</a>
-          <a href="/tools" class="text-gray-600 hover:text-gray-900">裝修工具</a>
-          <a href="/contact" class="text-gray-600 hover:text-gray-900">聯絡我</a>
+<body style="min-height: 100vh; display: flex; flex-direction: column; margin: 0; font-family: 'Noto Sans TC', sans-serif;">  <!-- 導覽列 -->
+  <nav style="background: var(--primary); color: white; box-shadow: 0 10px 15px rgba(0,0,0,0.1);">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="/" style="font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none;">青曦空間設計</a>
+        <div style="display: flex; gap: 1.5rem;">
+          <a href="/" style="color: white; text-decoration: none;">首頁</a>
+<a href="/portfolio" style="color: white; text-decoration: none;">作品集</a>
+<a href="/blog" style="color: white; text-decoration: none;">知識分享</a>
+<a href="/tools" style="color: white; text-decoration: none;">裝修工具</a>
+<a href="/contact" style="color: white; text-decoration: none;">聯絡我</a>
         </div>
       </div>
     </div>
   </nav>
 
   <!-- 主要內容 -->
-  <main class="flex-grow">
+  <main style="flex: 1;">
     <slot />
   </main>
 
   <!-- 頁尾 -->
-  <footer class="bg-gray-800 text-white py-8">
-    <div class="container mx-auto px-4 text-center">
-      <p>&copy; 2025 室內設計公司. All rights reserved.</p>
+  <footer style="background: var(--primary-dark); color: white; padding: 2rem 0;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem; text-align: center;">
+      <p>&copy; 2025 青曦空間設計. All rights reserved.</p>
     </div>
-  </footer>
+</footer>
 </body>
 </html>
