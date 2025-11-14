@@ -3,22 +3,36 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const posts = [
   {
+    title: '第一章：畫出家的神經系統——全屋開關與插座的最適定位',
+    slug: 'whole-house-switch-socket-positioning',
+    date: '2025-11-12',
+    summary: '掌握開關插座定位的黃金法則，避開90%的裝修遺憾',
+    coverImage: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600',
+    category: '水電篇'
+  },
+  {
     title: '2025 室內設計趨勢',
     slug: '2025-interior-design-trends',
     date: '2025-11-01',
-    summary: '探索今年最熱門的室內設計風格與配色'
+    summary: '探索今年最熱門的室內設計風格與配色',
+    coverImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600',
+    category: '設計篇'
   },
   {
     title: '小坪數空間規劃技巧',
     slug: 'small-space-tips',
     date: '2025-10-15',
-    summary: '教你如何讓小空間發揮最大效益'
+    summary: '教你如何讓小空間發揮最大效益',
+    coverImage: 'https://images.unsplash.com/photo-1556912167-f556f1f39faa?w=600',
+    category: '設計篇'
   },
   {
     title: '裝修預算分配指南',
     slug: 'budget-guide',
     date: '2025-10-01',
-    summary: '聰明分配裝修預算,避免超支'
+    summary: '聰明分配裝修預算,避免超支',
+    coverImage: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600',
+    category: '估價篇'
   }
 ];
 ---
@@ -29,37 +43,193 @@ const posts = [
     color: #2C3E50;
   }
   
-  h2 {
-    font-weight: 600;
+  .category-filters {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
   }
   
-  a {
+  .category-btn {
+    padding: 0.5rem 1.25rem;
+    border: 2px solid #E8D5C4;
+    background: white;
+    color: #2C3E50;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .category-btn:hover {
+    background: #E8D5C4;
+    color: #2C3E50;
+    transform: translateY(-2px);
+  }
+  
+  .category-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  
+  .blog-list {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .post-card {
+    display: flex;
+    gap: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
     text-decoration: none;
     color: inherit;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
   }
   
-  a:visited {
-    color: inherit;
+  .post-card:hover {
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    transform: translateY(-4px);
   }
   
-  article:hover h2 {
+  .post-image {
+    width: 280px;
+    height: 200px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .post-card:hover .post-image img {
+    transform: scale(1.1);
+  }
+  
+  .post-content {
+    flex: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .post-category {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    width: fit-content;
+  }
+  
+  .post-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2C3E50;
+    margin-bottom: 0.5rem;
+  }
+  
+  .post-card:hover .post-title {
     color: #C19A6B;
+  }
+  
+  .post-date {
+    font-size: 0.9rem;
+    color: #6B7280;
+    margin-bottom: 0.75rem;
+  }
+  
+  .post-summary {
+    font-size: 1rem;
+    color: #4B5563;
+    line-height: 1.6;
+  }
+  
+  @media (max-width: 768px) {
+    .post-card {
+      flex-direction: column;
+    }
+    
+    .post-image {
+      width: 100%;
+      height: 200px;
+    }
+    
+    .category-filters {
+      padding: 0 1rem;
+    }
   }
 </style>
 
-<BaseLayout title="知識分享 - 室內設計公司">
-  <div class="container mx-auto px-4 py-16">
-    <h1 class="text-4xl font-bold text-center mb-12">知識分享</h1>
-    <div class="max-w-3xl mx-auto space-y-8">
+<BaseLayout title="知識分享 - 青曦空間設計">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 4rem 1rem;">
+    <h1 style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 2rem; color: #2C3E50;">知識分享</h1>
+    
+    <div class="category-filters">
+      <button class="category-btn active" data-category="全部">全部</button>
+      <button class="category-btn" data-category="水電篇">水電篇</button>
+      <button class="category-btn" data-category="木工篇">木工篇</button>
+      <button class="category-btn" data-category="泥作篇">泥作篇</button>
+      <button class="category-btn" data-category="油漆篇">油漆篇</button>
+      <button class="category-btn" data-category="估價篇">估價篇</button>
+      <button class="category-btn" data-category="設計篇">設計篇</button>
+    </div>
+    
+    <div class="blog-list">
       {posts.map(post => (
-        <article class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow">
-          <a href={`/blog/${post.slug}`}>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2 hover:text-blue-600">{post.title}</h2>
-            <p class="text-gray-500 text-sm mb-3">{post.date}</p>
-            <p class="text-gray-700">{post.summary}</p>
-          </a>
-        </article>
+        <a href={`/blog/${post.slug}`} class="post-card" data-post-category={post.category}>
+          <div class="post-image">
+            <img src={post.coverImage} alt={post.title} />
+          </div>
+          <div class="post-content">
+            <span class="post-category">{post.category}</span>
+            <h2 class="post-title">{post.title}</h2>
+            <p class="post-date">{post.date}</p>
+            <p class="post-summary">{post.summary}</p>
+          </div>
+        </a>
       ))}
     </div>
   </div>
+  
+  <script>
+    const categoryButtons = document.querySelectorAll('.category-btn');
+    const postCards = document.querySelectorAll('.post-card');
+    
+    categoryButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const selectedCategory = button.dataset.category;
+        
+        // 更新按鈕狀態
+        categoryButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        // 篩選文章
+        postCards.forEach(card => {
+          const postCategory = card.dataset.postCategory;
+          
+          if (selectedCategory === '全部' || postCategory === selectedCategory) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
 </BaseLayout>
