@@ -1,41 +1,32 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import * as contentful from 'contentful';
 
-const posts = [
-  {
-    title: '第一章：畫出家的神經系統——全屋開關與插座的最適定位',
-    slug: 'whole-house-switch-socket-positioning',
-    date: '2025-11-12',
-    summary: '掌握開關插座定位的黃金法則，避開90%的裝修遺憾',
-    coverImage: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600',
-    category: '水電篇'
-  },
-  {
-    title: '2025 室內設計趨勢',
-    slug: '2025-interior-design-trends',
-    date: '2025-11-01',
-    summary: '探索今年最熱門的室內設計風格與配色',
-    coverImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600',
-    category: '設計篇'
-  },
-  {
-    title: '小坪數空間規劃技巧',
-    slug: 'small-space-tips',
-    date: '2025-10-15',
-    summary: '教你如何讓小空間發揮最大效益',
-    coverImage: 'https://images.unsplash.com/photo-1556912167-f556f1f39faa?w=600',
-    category: '設計篇'
-  },
-  {
-    title: '裝修預算分配指南',
-    slug: 'budget-guide',
-    date: '2025-10-01',
-    summary: '聰明分配裝修預算,避免超支',
-    coverImage: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600',
-    category: '估價篇'
-  }
-];
+// 連接 Contentful
+const client = contentful.createClient({
+  space: import.meta.env.CONTENTFUL_SPACE_ID,
+  accessToken: import.meta.env.CONTENTFUL_ACCESS_TOKEN,
+  environment: 'master',
+});
+
+// 獲取所有文章
+const response = await client.getEntries({
+  content_type: 'blogPost',
+  order: ['-fields.date'],
+});
+
+const posts = response.items.map((item: any) => ({
+  title: item.fields.title,
+  slug: item.fields.slug,
+  date: new Date(item.fields.date).toISOString().split('T')[0],
+  summary: item.fields.summary,
+  category: item.fields.category,
+  coverImage: item.fields.coverImage?.fields?.file?.url 
+    ? `https:${item.fields.coverImage.fields.file.url}` 
+    : 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600'
+}));
 ---
+cat >> src/pages/blog/index.astro << 'EOF'
 
 <style>
   h1 {
@@ -215,11 +206,9 @@ const posts = [
       button.addEventListener('click', () => {
         const selectedCategory = button.dataset.category;
         
-        // 更新按鈕狀態
         categoryButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
         
-        // 篩選文章
         postCards.forEach(card => {
           const postCategory = card.dataset.postCategory;
           
