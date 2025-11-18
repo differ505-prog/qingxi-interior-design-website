@@ -89,42 +89,80 @@ const { title = '室內設計公司' } = Astro.props;
       align-items: center;
     }
 
-    /* 手機版樣式 */
-    @media (max-width: 768px) {
-      .logo {
-        font-size: 1.2rem !important;
-      }
-
-      .nav-links {
-        gap: 0.8rem;
-      }
-
-      .nav-item {
-        min-width: 50px;
-        height: 20px;
-      }
-
-      .nav-link {
-        font-size: 0.8rem;
-      }
+    /* 漢堡選單按鈕 */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
     }
 
-    @media (max-width: 480px) {
-      .logo {
-        font-size: 1rem !important;
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: white;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(8px, 8px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    /* 手機版樣式 */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
       }
 
       .nav-links {
-        gap: 0.5rem;
+        position: fixed;
+        top: 60px;
+        right: -100%;
+        width: 250px;
+        height: calc(100vh - 60px);
+        background: var(--primary);
+        flex-direction: column;
+        gap: 0;
+        padding: 2rem 0;
+        transition: right 0.3s ease;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+        z-index: 999;
+      }
+
+      .nav-links.active {
+        right: 0;
       }
 
       .nav-item {
-        min-width: 40px;
-        height: 18px;
+        width: 100%;
+        min-width: unset;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
       }
 
       .nav-link {
-        font-size: 0.7rem;
+        width: 100%;
+        padding: 1rem;
+        font-size: 1.1rem;
+      }
+
+      .nav-text {
+        justify-content: center;
       }
     }
   </style>
@@ -134,8 +172,17 @@ const { title = '室內設計公司' } = Astro.props;
   <nav style="background: var(--primary); color: white; box-shadow: 0 10px 15px rgba(0,0,0,0.1);">
     <div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <a href="/" class="logo" style="font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none;">青曦空間設計</a>
-        <div class="nav-links">
+        <a href="/" style="font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none;">青曦空間設計</a>
+        
+        <!-- 漢堡選單按鈕 -->
+        <button class="hamburger" id="hamburger" aria-label="選單">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <!-- 導覽連結 -->
+        <div class="nav-links" id="navLinks">
           <span class="nav-item">
             <a href="/" class="nav-link">
               <div class="nav-text-container">
@@ -192,5 +239,23 @@ const { title = '室內設計公司' } = Astro.props;
       <p>&copy; 2025 青曦空間設計. All rights reserved.</p>
     </div>
   </footer>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+
+    hamburger?.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navLinks?.classList.toggle('active');
+    });
+
+    // 點擊連結後關閉選單
+    navLinks?.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger?.classList.remove('active');
+        navLinks?.classList.remove('active');
+      });
+    });
+  </script>
 </body>
 </html>
