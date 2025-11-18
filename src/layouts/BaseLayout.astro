@@ -46,6 +46,7 @@ const { title = '室內設計公司' } = Astro.props;
       text-decoration: none;
       color: white;
       transition: color 0.3s ease;
+      font-size: 1rem;
     }
     
     .nav-text-container {
@@ -81,6 +82,51 @@ const { title = '室內設計公司' } = Astro.props;
     .nav-link:hover {
       color: var(--accent);
     }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    /* 手機版樣式 */
+    @media (max-width: 768px) {
+      .logo {
+        font-size: 1.2rem !important;
+      }
+
+      .nav-links {
+        gap: 0.8rem;
+      }
+
+      .nav-item {
+        min-width: 50px;
+        height: 20px;
+      }
+
+      .nav-link {
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 1rem !important;
+      }
+
+      .nav-links {
+        gap: 0.5rem;
+      }
+
+      .nav-item {
+        min-width: 40px;
+        height: 18px;
+      }
+
+      .nav-link {
+        font-size: 0.7rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -88,8 +134,8 @@ const { title = '室內設計公司' } = Astro.props;
   <nav style="background: var(--primary); color: white; box-shadow: 0 10px 15px rgba(0,0,0,0.1);">
     <div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <a href="/" style="font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none;">青曦空間設計</a>
-        <div style="display: flex; gap: 2rem; align-items: center;">
+        <a href="/" class="logo" style="font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none;">青曦空間設計</a>
+        <div class="nav-links">
           <span class="nav-item">
             <a href="/" class="nav-link">
               <div class="nav-text-container">
