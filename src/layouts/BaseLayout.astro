@@ -7,36 +7,129 @@ const { title = '室內設計公司' } = Astro.props;
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">  
   <title>{title}</title>
-<style>
-  :root {
-    --primary: #2C3E50;
-    --primary-light: #34495E;
-    --primary-dark: #1A252F;
-    --secondary: #E8D5C4;
-    --secondary-light: #F5EBE0;
-    --accent: #C19A6B;
-  }
-  
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-  }
-</style>
+  <style>
+    :root {
+      --primary: #2C3E50;
+      --primary-light: #34495E;
+      --primary-dark: #1A252F;
+      --secondary: #E8D5C4;
+      --secondary-light: #F5EBE0;
+      --accent: #C19A6B;
+    }
+    
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+    }
+
+    /* 導覽列拉霸機效果 */
+    .nav-item {
+      position: relative;
+      height: 24px;
+      min-width: 80px;
+      display: inline-block;
+      overflow: hidden;
+    }
+    
+    .nav-link {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+      color: white;
+      transition: color 0.3s ease;
+    }
+    
+    .nav-text-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .nav-text {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    
+    .nav-text-en {
+      position: absolute;
+      top: 0;
+    }
+    
+    .nav-text-zh {
+      position: absolute;
+      top: 100%;
+    }
+    
+    .nav-link:hover .nav-text-container {
+      transform: translateY(-100%);
+    }
+    
+    .nav-link:hover {
+      color: var(--accent);
+    }
+  </style>
 </head>
-<body style="min-height: 100vh; display: flex; flex-direction: column; margin: 0; font-family: 'Noto Sans TC', sans-serif;">  <!-- 導覽列 -->
+<body>
+  <!-- 導覽列 -->
   <nav style="background: var(--primary); color: white; box-shadow: 0 10px 15px rgba(0,0,0,0.1);">
     <div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
         <a href="/" style="font-size: 1.5rem; font-weight: bold; color: white; text-decoration: none;">青曦空間設計</a>
-        <div style="display: flex; gap: 1.5rem;">
-          <a href="/" style="color: white; text-decoration: none;">首頁</a>
-<a href="/portfolio" style="color: white; text-decoration: none;">作品集</a>
-<a href="/blog" style="color: white; text-decoration: none;">知識分享</a>
-<a href="/tools" style="color: white; text-decoration: none;">裝修工具</a>
-<a href="/contact" style="color: white; text-decoration: none;">聯絡我</a>
+        <div style="display: flex; gap: 2rem; align-items: center;">
+          <span class="nav-item">
+            <a href="/" class="nav-link">
+              <div class="nav-text-container">
+                <span class="nav-text nav-text-en">Home</span>
+                <span class="nav-text nav-text-zh">首頁</span>
+              </div>
+            </a>
+          </span>
+          <span class="nav-item">
+            <a href="/portfolio" class="nav-link">
+              <div class="nav-text-container">
+                <span class="nav-text nav-text-en">Portfolio</span>
+                <span class="nav-text nav-text-zh">作品集</span>
+              </div>
+            </a>
+          </span>
+          <span class="nav-item">
+            <a href="/blog" class="nav-link">
+              <div class="nav-text-container">
+                <span class="nav-text nav-text-en">Blog</span>
+                <span class="nav-text nav-text-zh">知識分享</span>
+              </div>
+            </a>
+          </span>
+          <span class="nav-item">
+            <a href="/tools" class="nav-link">
+              <div class="nav-text-container">
+                <span class="nav-text nav-text-en">Tools</span>
+                <span class="nav-text nav-text-zh">裝修工具</span>
+              </div>
+            </a>
+          </span>
+          <span class="nav-item">
+            <a href="/contact" class="nav-link">
+              <div class="nav-text-container">
+                <span class="nav-text nav-text-en">Contact</span>
+                <span class="nav-text nav-text-zh">聯絡我</span>
+              </div>
+            </a>
+          </span>
         </div>
       </div>
     </div>
@@ -52,6 +145,6 @@ const { title = '室內設計公司' } = Astro.props;
     <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem; text-align: center;">
       <p>&copy; 2025 青曦空間設計. All rights reserved.</p>
     </div>
-</footer>
+  </footer>
 </body>
 </html>
