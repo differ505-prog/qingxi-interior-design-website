@@ -2,14 +2,239 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<BaseLayout title="聯絡我們 - 室內設計公司">
-  <div class="container mx-auto px-4 py-16 max-w-2xl">
-    <h1 class="text-4xl font-bold text-center mb-12">聯絡我們</h1>
-    
-    <div class="bg-white rounded-lg shadow-md p-8">
-      <p class="text-gray-700 mb-4">電話：02-1234-5678</p>
-      <p class="text-gray-700 mb-4">Email：info@interior-design.com</p>
-      <p class="text-gray-700">地址：台北市中正區信義路一號</p>
+<BaseLayout title="聯絡我們 - 青曦空間設計">
+  <div class="contact-container">
+    <div class="content-wrapper">
+      <h1>CONTACT</h1>
+      <p class="subtitle">預約諮詢</p>
+      
+      <p class="description">
+        讓我們一起打造您的夢想空間
+      </p>
+
+      <!-- 兩大主要按鈕 -->
+      <div class="main-ctas">
+        <!-- LINE -->
+        <a href="https://line.me/R/ti/p/@example" target="_blank" class="cta-card">
+          <div class="card-icon line-color">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"></path>
+            </svg>
+          </div>
+          <p class="card-title">加入官方 LINE</p>
+        </a>
+
+        <!-- 線上需求表 -->
+        <a href="https://forms.google.com/your-form-id" target="_blank" class="cta-card">
+          <div class="card-icon form-color">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <line x1="10" y1="9" x2="8" y2="9"></line>
+            </svg>
+          </div>
+          <p class="card-title">線上需求表</p>
+        </a>
+      </div>
+
+      <!-- 社群連結（底部圓形圖示） -->
+      <div class="social-section">
+        <a href="mailto:hello@qingxi-design.com" class="social-icon-small" aria-label="Email">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+        </a>
+
+        <a href="https://www.facebook.com/profile.php?id=61562661642204" target="_blank" class="social-icon-small" aria-label="Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </a>
+
+        <a href="https://www.instagram.com/qingxi.ds/" target="_blank" class="social-icon-small" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+        </a>
+
+        <a href="https://www.threads.net/@qingxi.ds?hl=zh-tw" target="_blank" class="social-icon-small" aria-label="Threads">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.781 3.631 2.695 6.541 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 013.02.142l-.126.742a12.986 12.986 0 00-2.877-.12c-1.112.061-2.024.399-2.716.997-.644.558-.968 1.283-.91 2.042.046.739.427 1.361 1.03 1.696.562.312 1.29.467 2.16.433 1.197-.065 2.124-.493 2.75-1.275.528-.66.863-1.552.998-2.652.047-.385.076-.774.088-1.166.002-.138.008-.276.008-.413a8.97 8.97 0 00-.084-1.207c-.096-.689-.263-1.331-.494-1.909a4.692 4.692 0 00-.934-1.443c-.37-.404-.8-.727-1.277-.966a4.978 4.978 0 00-1.608-.436c-.606-.056-1.227-.045-1.848.034-1.396.177-2.695.663-3.859 1.443-1.165.78-2.033 1.754-2.584 2.896-.55 1.142-.832 2.408-.84 3.766.008 1.358.29 2.624.84 3.766.551 1.142 1.42 2.116 2.584 2.896 1.164.78 2.463 1.266 3.859 1.443.621.079 1.242.09 1.848.034.606-.056 1.182-.197 1.725-.423.544-.227 1.048-.525 1.512-.895l1.382 1.465c-.593.472-1.228.866-1.903 1.181-.674.315-1.393.543-2.152.682-.76.14-1.554.203-2.382.19z"/>
+          </svg>
+        </a>
+
+        <a href="https://www.xiaohongshu.com/search_result?keyword=%E9%9D%92%E6%9B%A6&source=unknown" target="_blank" class="social-icon-small" aria-label="小紅書">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.018 17.563c-.623.4-1.359.637-2.118.637-1.953 0-3.537-1.584-3.537-3.537v-3.726c0-1.953 1.584-3.537 3.537-3.537.759 0 1.495.237 2.118.637V6.3c-.677-.258-1.401-.4-2.159-.4-3.037 0-5.5 2.463-5.5 5.5v3.2c0 3.037 2.463 5.5 5.5 5.5.758 0 1.482-.142 2.159-.4v-1.737z"/>
+          </svg>
+        </a>
+      </div>
     </div>
   </div>
 </BaseLayout>
+
+<style>
+  .contact-container {
+    min-height: calc(100vh - 80px);
+    margin-top: 80px;
+    padding: 4rem 2rem;
+    background: #FAFAFA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .content-wrapper {
+    max-width: 900px;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #2C3E50;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.3em;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    color: #78909C;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .description {
+    text-align: center;
+    color: #546E7A;
+    line-height: 1.8;
+    margin-bottom: 3rem;
+  }
+
+  /* 兩大主按鈕 */
+  .main-ctas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .cta-card {
+    background: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    padding: 3rem 2rem;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    aspect-ratio: 1;
+  }
+
+  .cta-card:hover {
+    border-color: #2C3E50;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .line-color {
+    color: #C0C0C0;
+  }
+
+  .form-color {
+    color: #C0C0C0;
+  }
+
+  .cta-card:hover .line-color {
+    color: #06C755;
+  }
+
+  .cta-card:hover .form-color {
+    color: #4A90E2;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    color: #2C3E50;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  /* 底部社群圖示 */
+  .social-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .social-icon-small {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    border-radius: 50%;
+    color: #909090;
+    transition: all 0.3s ease;
+  }
+
+  .social-icon-small:hover {
+    background: #2C3E50;
+    border-color: #2C3E50;
+    color: white;
+    transform: translateY(-3px);
+  }
+
+  /* 手機版 */
+  @media (max-width: 768px) {
+    .contact-container {
+      margin-top: 60px;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .main-ctas {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .cta-card {
+      aspect-ratio: auto;
+      padding: 2.5rem 2rem;
+    }
+
+    .card-icon {
+      width: 60px;
+      height: 60px;
+    }
+
+    .social-icon-small {
+      width: 48px;
+      height: 48px;
+    }
+
+    .social-section {
+      gap: 0.75rem;
+    }
+  }
+</style>
