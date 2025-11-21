@@ -515,7 +515,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     left: 0;
     width: 100%;
     height: 100vh;
-    background: #f5f5f5;
+    background: var(--off-white);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -532,8 +532,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .spinner {
     width: 50px;
     height: 50px;
-    border: 4px solid #e0e0e0;
-    border-top-color: #333;
+    border: 4px solid var(--gray-lighter);
+    border-top-color: var(--tiffany-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
   }
@@ -551,7 +551,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     left: 0;
     width: 100%;
     height: 100vh;
-    background: #ffffff;
+    background: linear-gradient(135deg, var(--white) 0%, var(--off-white) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -578,12 +578,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .main-title {
     font-size: 36px;
     font-weight: 500;
-    color: #333;
+    color: var(--gray-dark);
     letter-spacing: 4px;
     text-align: center;
     opacity: 0;
     transform: translateY(20px);
     animation: slideUpFadeTitle 1s ease-out 0.3s forwards;
+    position: relative;
+  }
+
+  .main-title::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: var(--tiffany-primary);
   }
 
   @keyframes slideUpFadeTitle {
@@ -601,7 +613,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     min-height: calc(100vh - 80px);
     margin-top: 80px;
     padding: 40px 20px;
-    background: #f5f5f5;
+    background: var(--gray-bg);
     font-family: 'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif;
     opacity: 0;
     animation: fadeIn 0.8s ease-out forwards;
@@ -643,22 +655,23 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .form-header h1 {
     font-size: 32px;
     font-weight: 500;
-    color: #333;
+    color: var(--gray-dark);
     margin-bottom: 10px;
     letter-spacing: 2px;
   }
 
   .form-subtitle {
-    color: #666;
+    color: var(--gray-medium);
     font-size: 16px;
     font-weight: 400;
   }
 
   .requirement-form {
-    background: #ffffff;
+    background: var(--white);
     padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(129, 199, 212, 0.1);
+    border: 2px solid var(--gray-lighter);
     opacity: 0;
     transform: translateY(20px);
     animation: slideUpFade 0.8s ease-out 0.4s forwards;
@@ -678,7 +691,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .form-section {
     margin-bottom: 40px;
     padding-bottom: 30px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--gray-lighter);
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.6s ease-out, transform 0.6s ease-out;
@@ -696,10 +709,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .section-title {
     font-size: 20px;
     font-weight: 500;
-    color: #333;
+    color: var(--gray-dark);
     margin-bottom: 25px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid var(--gray-dark);
+    position: relative;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: var(--tiffany-primary);
   }
 
   .form-group {
@@ -715,9 +739,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   label {
     display: block;
     margin-bottom: 8px;
-    color: #333;
+    color: var(--gray-dark);
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
   }
 
   .required {
@@ -733,20 +757,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   select {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: 2px solid var(--gray-bg);
+    border-radius: 6px;
     font-size: 14px;
     font-family: 'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif;
-    color: #333;
-    background: #fff;
-    transition: border-color 0.2s;
+    color: var(--gray-dark);
+    background: var(--white);
+    transition: all 0.3s ease;
   }
 
   input:focus,
   textarea:focus,
   select:focus {
     outline: none;
-    border-color: #666;
+    border-color: var(--tiffany-primary);
+    box-shadow: 0 0 0 3px rgba(129, 199, 212, 0.1);
   }
 
   textarea {
@@ -758,7 +783,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   select {
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2381C7D4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 35px;
@@ -779,7 +804,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     cursor: pointer;
     font-weight: 400;
     font-size: 14px;
-    color: #333;
+    color: var(--gray-dark);
+    transition: color 0.2s ease;
+  }
+
+  .radio-label:hover,
+  .checkbox-label:hover {
+    color: var(--tiffany-primary);
   }
 
   .radio-label input[type="radio"],
@@ -787,7 +818,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     width: auto;
     margin: 0;
     cursor: pointer;
-    accent-color: #333;
+    accent-color: var(--tiffany-primary);
   }
 
   .checkbox-grid {
@@ -799,9 +830,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .conditional-section {
     margin-top: 15px;
     padding: 20px;
-    background: #f9f9f9;
-    border-radius: 4px;
-    border-left: 3px solid #666;
+    background: var(--off-white);
+    border-radius: 8px;
+    border-left: 4px solid var(--tiffany-primary);
   }
 
   .conditional-input {
@@ -809,12 +840,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .form-notice {
-    background: #fff9e6;
-    padding: 20px;
-    border-radius: 4px;
+    background: var(--tiffany-pale);
+    padding: 25px;
+    border-radius: 8px;
     margin: 30px 0;
     text-align: center;
-    border: 1px solid #ffd54f;
+    border: 2px solid var(--tiffany-light);
     opacity: 0;
     transform: scale(0.95);
     animation: scaleFade 0.6s ease-out 0.8s forwards;
@@ -833,7 +864,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .form-notice p {
     margin-bottom: 15px;
-    color: #333;
+    color: var(--gray-dark);
     font-size: 14px;
     line-height: 1.6;
   }
@@ -860,11 +891,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .submit-button {
-    padding: 12px 40px;
-    background: #333;
-    color: #fff;
+    padding: 14px 45px;
+    background: linear-gradient(135deg, var(--tiffany-primary) 0%, var(--tiffany-dark) 100%);
+    color: var(--white);
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
@@ -885,7 +916,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
   }
@@ -896,21 +927,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .submit-button:hover {
-    background: #555;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, var(--tiffany-dark) 0%, var(--gray-dark) 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(129, 199, 212, 0.4);
   }
 
   .submit-button:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
   }
 
   .space-detail-section {
     margin-top: 20px;
     padding: 20px;
-    background: #f9f9f9;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+    background: var(--off-white);
+    border-radius: 8px;
+    border: 2px solid var(--gray-lighter);
     opacity: 0;
     transform: translateY(20px);
     animation: slideUpFade 0.5s ease-out forwards;
@@ -919,10 +950,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .space-detail-title {
     font-size: 16px;
     font-weight: 500;
-    color: #333;
+    color: var(--gray-dark);
     margin-bottom: 15px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 2px solid var(--gray-lighter);
   }
 
   .space-detail-section .checkbox-group {

@@ -119,8 +119,8 @@ const carouselItems = await getHeroCarousel();
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(129, 199, 212, 0.3);
+    border: 2px solid rgba(129, 199, 212, 0.6);
     color: white;
     width: 60px;
     height: 60px;
@@ -131,12 +131,14 @@ const carouselItems = await getHeroCarousel();
     display: flex;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(8px);
   }
   
   .carousel-btn:hover {
-    background: rgba(255, 255, 255, 0.4);
-    border-color: rgba(255, 255, 255, 0.8);
-    transform: translateY(-50%) scale(1.1);
+    background: rgba(129, 199, 212, 0.6);
+    border-color: rgba(129, 199, 212, 0.9);
+    transform: translateY(-50%) scale(1.15);
+    box-shadow: 0 4px 15px rgba(129, 199, 212, 0.4);
   }
   
   .carousel-btn.prev {

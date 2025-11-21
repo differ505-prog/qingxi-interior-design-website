@@ -5,4 +5,633 @@ import HeroCarousel from '../components/HeroCarousel.astro';
 
 <BaseLayout title="首頁 - 青曦空間設計">
   <HeroCarousel />
+  
+  <!-- 服務項目 Section -->
+  <section class="service-section">
+    <div class="service-container">
+      <div class="section-header">
+        <h6 class="section-subtitle">SERVICE</h6>
+        <h2 class="section-title">服務項目</h2>
+      </div>
+      
+      <ul class="service-grid">
+        <li class="service-item" data-animate="scale">
+          <a href="/portfolio?category=residential" class="service-card">
+            <figure class="service-content">
+              <div class="service-text">
+                <p>住宅</p>
+              </div>
+              <div class="service-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+              </div>
+            </figure>
+          </a>
+        </li>
+        
+        <li class="service-item" data-animate="scale">
+          <a href="/portfolio?category=commercial" class="service-card">
+            <figure class="service-content">
+              <div class="service-text">
+                <p>商業空間</p>
+              </div>
+              <div class="service-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+              </div>
+            </figure>
+          </a>
+        </li>
+        
+        <li class="service-item" data-animate="scale">
+          <a href="/portfolio?category=community" class="service-card">
+            <figure class="service-content">
+              <div class="service-text">
+                <p>社區公設</p>
+              </div>
+              <div class="service-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+            </figure>
+          </a>
+        </li>
+        
+        <li class="service-item" data-animate="scale">
+          <a href="/contact" class="service-card">
+            <figure class="service-content">
+              <div class="service-text">
+                <p>室內設計<br>&<br>工程施作</p>
+              </div>
+              <div class="service-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+              </div>
+            </figure>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 服務區域 Section -->
+  <section class="area-section">
+    <div class="area-container">
+      <article class="area-content" data-animate="left">
+        <div class="area-header">
+          <h6 class="section-subtitle">AREA</h6>
+          <h2 class="section-title">服務區域</h2>
+        </div>
+        <p class="area-text">大台北地區及周邊區域</p>
+      </article>
+      <div class="area-map">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="10" r="3"></circle>
+          <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"></path>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 服務流程 Section -->
+  <section id="workflow" class="workflow-section">
+    <div class="workflow-container">
+      <div class="workflow-header">
+        <h6 class="section-subtitle">WORKFLOW</h6>
+        <h2 class="section-title">服務流程</h2>
+      </div>
+      
+      <ul class="workflow-list">
+        <li class="workflow-item" data-animate="left">
+          <div class="workflow-number">01</div>
+          <div class="workflow-content">
+            <h3>初步接洽</h3>
+            <p>了解您的需求、預算與期望，讓我們更進一步認識彼此，為您量身打造專屬的設計方案。</p>
+          </div>
+        </li>
+        
+        <li class="workflow-item" data-animate="right">
+          <div class="workflow-number">02</div>
+          <div class="workflow-content">
+            <h3>現場丈量</h3>
+            <p>專業團隊至現場進行詳細測量，記錄空間尺寸與現況，確保設計圖的精確度。</p>
+          </div>
+        </li>
+        
+        <li class="workflow-item" data-animate="left">
+          <div class="workflow-number">03</div>
+          <div class="workflow-content">
+            <h3>平面規劃提案</h3>
+            <p>依據您的需求規劃平面圖，提供風格方向建議及初步預算評估，讓您對未來的家有清晰的想像。</p>
+          </div>
+        </li>
+        
+        <li class="workflow-item" data-animate="right">
+          <div class="workflow-number">04</div>
+          <div class="workflow-content">
+            <h3>設計委任</h3>
+            <p>簽訂設計合約後，進行深入的設計規劃。若為預售屋，將協助客變諮詢與陪同服務。</p>
+          </div>
+        </li>
+        
+        <li class="workflow-item" data-animate="left">
+          <div class="workflow-number">05</div>
+          <div class="workflow-content">
+            <h3>細部設計</h3>
+            <p>平面定案後，進行3D立面設計與詳細施工圖繪製，與您同步討論每個細節。</p>
+          </div>
+        </li>
+        
+        <li class="workflow-item" data-animate="right">
+          <div class="workflow-number">06</div>
+          <div class="workflow-content">
+            <h3>工程報價</h3>
+            <p>依據最終設計圖與選材，提供詳細的工程預算報價，確保透明公開。</p>
+          </div>
+        </li>
+        
+        <li class="workflow-item" data-animate="left">
+          <div class="workflow-number">07</div>
+          <div class="workflow-content">
+            <h3>工程施作</h3>
+            <p>簽訂工程合約，製作詳細的工程進度表，專業團隊進場施工並嚴格監督品質。</p>
+          </div>
+        </li>
+        
+        <li class="workflow-item" data-animate="right">
+          <div class="workflow-number">08</div>
+          <div class="workflow-content">
+            <h3>完工交屋</h3>
+            <p>陪同您進行最終驗收，確認所有細節符合期待後交屋，並提供完善的售後服務。</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <style>
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Adjust scroll position for fixed header */
+    section[id] {
+      scroll-margin-top: 80px;
+    }
+
+    .service-section {
+      padding: 5rem 2rem;
+      background: var(--off-white);
+    }
+
+    .service-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .section-subtitle {
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: var(--gray-medium);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 400;
+      color: var(--gray-dark);
+      letter-spacing: 0.05em;
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .service-item {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .service-item.animate-in {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .service-card {
+      display: block;
+      background: var(--white);
+      border: 2px solid var(--gray-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s ease;
+      height: 100%;
+      position: relative;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--tiffany-pale) 0%, var(--tiffany-light) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 0;
+    }
+
+    .service-card:hover::before {
+      opacity: 0.15;
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(129, 199, 212, 0.2);
+      border-color: var(--tiffany-primary);
+    }
+
+    .service-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      min-height: 280px;
+    }
+
+    .service-text {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .service-text p {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--gray-dark);
+      line-height: 1.6;
+      margin: 0;
+      letter-spacing: 0.05em;
+    }
+
+    .service-icon {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .service-icon svg {
+      width: 100%;
+      height: 100%;
+      color: var(--gray-medium);
+      transition: all 0.3s ease;
+    }
+
+    .service-card:hover .service-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .service-card:hover .service-icon svg {
+      color: var(--tiffany-primary);
+    }
+
+    @media (max-width: 768px) {
+      .service-section {
+        padding: 3rem 1.5rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .service-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .service-content {
+        padding: 2rem 1.5rem;
+        min-height: 240px;
+      }
+
+      .service-text p {
+        font-size: 1.25rem;
+      }
+
+      .service-icon {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .service-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Area Section Styles */
+    .area-section {
+      padding: 5rem 2rem;
+      background: var(--white);
+    }
+
+    .area-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4rem;
+    }
+
+    .area-content {
+      flex: 1;
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: all 0.8s ease;
+    }
+
+    .area-content.animate-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .area-header {
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+
+    .area-header .section-subtitle {
+      text-align: left;
+    }
+
+    .area-header .section-title {
+      font-size: 2rem;
+      text-align: left;
+    }
+
+    .area-header::after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(to right, var(--tiffany-primary) 0%, transparent 100%);
+      margin-top: 1rem;
+    }
+
+    .area-text {
+      font-size: 1.125rem;
+      color: var(--gray-medium);
+      line-height: 1.8;
+      letter-spacing: 0.05em;
+    }
+
+    .area-map {
+      flex: 0 0 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .area-map svg {
+      width: 150px;
+      height: 150px;
+      color: var(--tiffany-primary);
+      filter: drop-shadow(0 4px 6px rgba(129, 199, 212, 0.3));
+    }
+
+    /* Workflow Section Styles */
+    .workflow-section {
+      padding: 5rem 2rem;
+      background: var(--gray-bg);
+    }
+
+    .workflow-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .workflow-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .workflow-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    .workflow-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+      opacity: 0;
+      transition: all 0.8s ease;
+    }
+
+    .workflow-item[data-animate="left"] {
+      transform: translateX(-50px);
+    }
+
+    .workflow-item[data-animate="right"] {
+      transform: translateX(50px);
+      flex-direction: row-reverse;
+    }
+
+    .workflow-item.animate-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .workflow-number {
+      flex: 0 0 80px;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--tiffany-primary) 0%, var(--tiffany-dark) 100%);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      font-weight: 600;
+      font-family: 'Noto Sans', sans-serif;
+      box-shadow: 0 4px 15px rgba(129, 199, 212, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .workflow-item:hover .workflow-number {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 6px 20px rgba(129, 199, 212, 0.5);
+      background: linear-gradient(135deg, var(--gray-dark) 0%, var(--gray-darkest) 100%);
+    }
+
+    .workflow-content {
+      flex: 1;
+      padding-top: 0.5rem;
+    }
+
+    .workflow-content h3 {
+      font-size: 1.5rem;
+      color: var(--gray-dark);
+      margin-bottom: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+
+    .workflow-content p {
+      font-size: 1rem;
+      color: var(--gray-medium);
+      line-height: 1.8;
+      letter-spacing: 0.03em;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .area-container {
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .area-header .section-title {
+        font-size: 1.75rem;
+      }
+
+      .area-map {
+        flex: 0 0 150px;
+      }
+
+      .area-map svg {
+        width: 120px;
+        height: 120px;
+      }
+
+      .workflow-section {
+        padding: 3rem 1.5rem;
+      }
+
+      .workflow-item {
+        gap: 1.5rem;
+      }
+
+      .workflow-item[data-animate="right"] {
+        flex-direction: row;
+      }
+
+      .workflow-number {
+        flex: 0 0 60px;
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+
+      .workflow-content h3 {
+        font-size: 1.25rem;
+      }
+
+      .workflow-content p {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .area-section {
+        padding: 3rem 1.5rem;
+      }
+
+      .workflow-item {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1rem;
+      }
+
+      .workflow-item[data-animate="right"] {
+        flex-direction: column;
+      }
+
+      .workflow-content {
+        padding-top: 0;
+      }
+    }
+  </style>
+
+  <script>
+    // Intersection Observer for scroll animations
+    document.addEventListener('DOMContentLoaded', () => {
+      const observerOptions = {
+        threshold: 0.2,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('animate-in');
+            }, index * 100); // Stagger animation
+          }
+        });
+      }, observerOptions);
+
+      // Observe service items
+      const serviceItems = document.querySelectorAll('.service-item');
+      serviceItems.forEach(item => observer.observe(item));
+
+      // Observe area content
+      const areaContent = document.querySelector('.area-content');
+      if (areaContent) observer.observe(areaContent);
+
+      // Observe workflow items
+      const workflowItems = document.querySelectorAll('.workflow-item');
+      workflowItems.forEach((item, index) => {
+        const itemObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                entry.target.classList.add('animate-in');
+              }, index * 150); // Stagger workflow items
+            }
+          });
+        }, observerOptions);
+        itemObserver.observe(item);
+      });
+    });
+  </script>
 </BaseLayout>
