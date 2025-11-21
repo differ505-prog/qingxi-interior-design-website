@@ -1,0 +1,9 @@
+# 建置期間：阻止所有搜索引擎索引
+User-agent: *
+Disallow: /
+
+# 如果網站上線後，改為：
+# User-agent: *
+# Allow: /
+# Disallow: /coming-soon
+
