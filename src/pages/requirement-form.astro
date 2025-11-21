@@ -488,13 +488,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
         <!-- 提示訊息 -->
         <div class="form-notice">
-          <p>請務必通知官方Line小編「已填寫表單」才能在Line上聯繫您喔^^</p>
+          <p>填寫完成後，請透過官方 LINE 告知我們「已完成需求表填寫」，以便我們能盡快為您提供服務</p>
           <a href="https://line.me/R/ti/p/@example" target="_blank" class="line-button">加入官方LINE</a>
         </div>
 
         <!-- 提交按鈕 -->
         <div class="form-submit">
-          <button type="submit" class="submit-button">感謝您的耐心填寫，點此送出業主需求表</button>
+          <button type="submit" class="submit-button">確認送出需求表</button>
         </div>
       </form>
     </div>
@@ -1348,6 +1348,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                     </div>
                   </div>
                 `;
+              } else if (option.value === 'other') {
+                // 其他選項：需要輸入框
+                optionsHtml += `
+                  <div style="margin-bottom: 10px;">
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="${spaceValue}-details" value="${option.value}" class="other-check" data-space="${spaceValue}">
+                      <span>${option.label}</span>
+                    </label>
+                    <div class="other-input-wrapper" style="display: none; margin-top: 8px;">
+                      <input type="text" name="${spaceValue}-other-details" placeholder="請說明其他需求" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: 'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif;">
+                    </div>
+                  </div>
+                `;
               } else {
                 optionsHtml += `
                   <label class="checkbox-label">
@@ -1384,6 +1397,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 }
               });
             }
+
+            // 處理所有「其他」選項的輸入框顯示/隱藏
+            const otherChecks = section.querySelectorAll('.other-check');
+            otherChecks.forEach(otherCheck => {
+              const otherInputWrapper = otherCheck.closest('div').querySelector('.other-input-wrapper');
+              if (otherInputWrapper) {
+                otherCheck.addEventListener('change', function() {
+                  if (this.checked) {
+                    otherInputWrapper.style.display = 'block';
+                  } else {
+                    otherInputWrapper.style.display = 'none';
+                    // 清空輸入框內容
+                    const input = otherInputWrapper.querySelector('input');
+                    if (input) input.value = '';
+                  }
+                });
+              }
+            });
           }
         }
       });
