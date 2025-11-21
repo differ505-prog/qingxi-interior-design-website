@@ -1,0 +1,1138 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="設計需求表 - 青曦空間設計">
+  <div class="form-container">
+    <div class="form-wrapper">
+      <div class="form-header">
+        <h1>設計需求表</h1>
+        <p class="form-subtitle">請詳細填寫以下資訊，讓我們更了解您的需求</p>
+      </div>
+
+      <form 
+        id="requirement-form" 
+        action="https://formspree.io/f/YOUR_FORM_ID" 
+        method="POST"
+        class="requirement-form"
+      >
+        <!-- 基本資料 -->
+        <section class="form-section">
+          <h2 class="section-title">基本資料</h2>
+          
+          <div class="form-group">
+            <label for="name">姓名 <span class="required">*</span></label>
+            <input type="text" id="name" name="name" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="age">年齡</label>
+              <input type="text" id="age" name="age">
+            </div>
+
+            <div class="form-group">
+              <label for="occupation">職業</label>
+              <input type="text" id="occupation" name="occupation">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>婚姻狀況</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="marital-status" value="married" id="married-yes">
+                <span>有</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="marital-status" value="single" id="married-no">
+                <span>無</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="spouse-details" class="conditional-section" style="display: none;">
+            <div class="form-group">
+              <label for="spouse-name">配偶/伴侶姓名</label>
+              <input type="text" id="spouse-name" name="spouse-name">
+            </div>
+
+            <div class="form-group">
+              <label for="spouse-occupation">配偶/伴侶職業</label>
+              <input type="text" id="spouse-occupation" name="spouse-occupation">
+            </div>
+
+            <div class="form-group">
+              <label for="spouse-phone">配偶/伴侶電話</label>
+              <input type="tel" id="spouse-phone" name="spouse-phone">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">電話 <span class="required">*</span></label>
+            <input type="tel" id="phone" name="phone" required>
+          </div>
+
+          <div class="form-group">
+            <label for="line-id">Line ID</label>
+            <input type="text" id="line-id" name="line-id">
+          </div>
+
+          <div class="form-group">
+            <label for="line-name">Line 名稱</label>
+            <input type="text" id="line-name" name="line-name">
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input type="email" id="email" name="email" required>
+          </div>
+
+          <div class="form-group">
+            <label for="other-notes-basic">其他備註</label>
+            <textarea id="other-notes-basic" name="other-notes-basic" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="residents">居住人數</label>
+            <select id="residents" name="residents">
+              <option value="">請選擇</option>
+              <option value="1">1人</option>
+              <option value="2">2人</option>
+              <option value="3">3人</option>
+              <option value="4">4人</option>
+              <option value="5">5人</option>
+              <option value="6">6人以上</option>
+            </select>
+          </div>
+
+          <div id="family-members-section" class="conditional-section" style="display: none;">
+            <div class="form-group">
+              <label>家庭成員</label>
+              <div id="family-members-list"></div>
+            </div>
+
+            <div class="form-group">
+              <label>成員年齡</label>
+              <div id="family-ages-list"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>假日</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="holidays" value="home">
+                <span>在家休息</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="holidays" value="outdoor">
+                <span>戶外活動</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="holidays" value="shopping">
+                <span>購物</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="holidays" value="travel">
+                <span>旅遊</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="holidays" value="other" id="holidays-other-check">
+                <span>其他</span>
+              </label>
+            </div>
+            <div id="holidays-other-input" class="conditional-input" style="display: none;">
+              <input type="text" name="holidays-other" placeholder="請說明">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>如何得知青曦設計？</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="source" value="facebook">
+                <span>Facebook</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="source" value="instagram">
+                <span>Instagram</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="source" value="google">
+                <span>Google 搜尋</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="source" value="friend">
+                <span>親友介紹</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="source" value="other" id="source-other-check">
+                <span>其他</span>
+              </label>
+            </div>
+            <div id="source-other-input" class="conditional-input" style="display: none;">
+              <input type="text" name="source-other" placeholder="請說明">
+            </div>
+          </div>
+        </section>
+
+        <!-- 房屋資料 -->
+        <section class="form-section">
+          <h2 class="section-title">房屋資料</h2>
+          
+          <div class="form-group">
+            <label for="address">裝修地址 <span class="required">*</span></label>
+            <input type="text" id="address" name="address" required>
+          </div>
+
+          <div class="form-group">
+            <label for="community">社區案名</label>
+            <input type="text" id="community" name="community">
+          </div>
+
+          <div class="form-group">
+            <label for="house-age">屋齡</label>
+            <input type="text" id="house-age" name="house-age">
+          </div>
+
+          <div class="form-group">
+            <label>外牆漏水/壁癌</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="wall-issue" value="yes">
+                <span>有</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="wall-issue" value="no">
+                <span>無</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>是否為預售屋</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="presale" value="yes" id="presale-yes">
+                <span>是</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="presale" value="no" id="presale-no">
+                <span>否</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="presale-details" class="conditional-section" style="display: none;">
+            <div class="form-group">
+              <label>是否需要客變</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="customer-change" value="yes">
+                  <span>是</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="customer-change" value="no">
+                  <span>否</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="change-deadline">客變到期日</label>
+              <input type="date" id="change-deadline" name="change-deadline">
+            </div>
+
+            <div class="form-group">
+              <label for="presale-notes">備註</label>
+              <textarea id="presale-notes" name="presale-notes" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="handover-date">交屋日期</label>
+            <input type="date" id="handover-date" name="handover-date">
+          </div>
+
+          <div class="form-group">
+            <label for="house-height">室內屋高</label>
+            <input type="text" id="house-height" name="house-height">
+          </div>
+
+          <div class="form-group">
+            <label for="interior-area">室內總坪數約（含陽台、衛浴）</label>
+            <input type="text" id="interior-area" name="interior-area">
+          </div>
+
+          <div class="form-group">
+            <label for="building-area">建物坪數</label>
+            <input type="text" id="building-area" name="building-area">
+          </div>
+
+          <div class="form-group">
+            <label for="deed-area">權狀坪數（不含車位）</label>
+            <input type="text" id="deed-area" name="deed-area">
+          </div>
+
+          <div class="form-group">
+            <label>是否為毛胚屋</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="house-status" value="raw">
+                <span>是</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="house-status" value="renovated">
+                <span>否</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="house-status" value="other">
+                <span>其他</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>是否需要衛浴裝修</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="bathroom-renovation" value="yes">
+                <span>是</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="bathroom-renovation" value="no">
+                <span>否</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="bathroom-renovation" value="notes" id="bathroom-notes-radio">
+                <span>備註</span>
+              </label>
+            </div>
+            <div id="bathroom-notes-input" class="conditional-input" style="display: none;">
+              <textarea name="bathroom-renovation-notes" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>是否需要廚房裝修</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="kitchen-renovation" value="yes">
+                <span>是</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="kitchen-renovation" value="no">
+                <span>否</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="kitchen-renovation" value="notes" id="kitchen-notes-radio">
+                <span>備註</span>
+              </label>
+            </div>
+            <div id="kitchen-notes-input" class="conditional-input" style="display: none;">
+              <textarea name="kitchen-renovation-notes" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="budget">期望裝修預算</label>
+            <select id="budget" name="budget">
+              <option value="">請選擇</option>
+              <option value="under-50">50萬以下</option>
+              <option value="50-100">50-100萬</option>
+              <option value="100-200">100-200萬</option>
+              <option value="200-300">200-300萬</option>
+              <option value="300-500">300-500萬</option>
+              <option value="500-800">500-800萬</option>
+              <option value="over-800">800萬以上</option>
+              <option value="other">其他</option>
+            </select>
+            <div id="budget-other-input" class="conditional-input" style="display: none;">
+              <input type="text" name="budget-other" placeholder="請填寫預算金額">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="max-budget">最高可接受預算</label>
+            <select id="max-budget" name="max-budget">
+              <option value="">請選擇</option>
+              <option value="under-50">50萬以下</option>
+              <option value="50-100">50-100萬</option>
+              <option value="100-200">100-200萬</option>
+              <option value="200-300">200-300萬</option>
+              <option value="300-500">300-500萬</option>
+              <option value="500-800">500-800萬</option>
+              <option value="over-800">800萬以上</option>
+              <option value="other">其他</option>
+            </select>
+            <div id="max-budget-other-input" class="conditional-input" style="display: none;">
+              <input type="text" name="max-budget-other" placeholder="請填寫最高預算金額">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="budget-notes">預算備註</label>
+            <textarea id="budget-notes" name="budget-notes" rows="3"></textarea>
+          </div>
+        </section>
+
+        <!-- 空間配置需求 -->
+        <section class="form-section">
+          <h2 class="section-title">空間配置需求</h2>
+          
+          <div class="form-group">
+            <label for="expected-completion">期望完工時間</label>
+            <input type="date" id="expected-completion" name="expected-completion">
+          </div>
+
+          <div class="form-group">
+            <label for="latest-completion">最晚可接受完工時間</label>
+            <input type="date" id="latest-completion" name="latest-completion">
+          </div>
+
+          <div class="form-group">
+            <label for="completion-notes">完工日期備註</label>
+            <textarea id="completion-notes" name="completion-notes" rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>已有 CAD 檔</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="cad-file" value="yes">
+                <span>是</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="cad-file" value="no">
+                <span>否</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="cad-file" value="notes" id="cad-notes-radio">
+                <span>備註</span>
+              </label>
+            </div>
+            <div id="cad-notes-input" class="conditional-input" style="display: none;">
+              <textarea name="cad-file-notes" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>請勾選需要的空間配置</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="living-room" class="space-checkbox">
+                <span>客廳</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="dining-room" class="space-checkbox">
+                <span>餐廳</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="bathroom" class="space-checkbox">
+                <span>浴廁</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="kitchen" class="space-checkbox">
+                <span>廚房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="master-bedroom" class="space-checkbox">
+                <span>主臥房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="children-room" class="space-checkbox">
+                <span>小孩房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="guest-room" class="space-checkbox">
+                <span>客房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="elderly-room" class="space-checkbox">
+                <span>孝親房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="study-room" class="space-checkbox">
+                <span>書房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="walk-in-closet" class="space-checkbox">
+                <span>更衣室</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="storage" class="space-checkbox">
+                <span>儲藏室</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="tatami-room" class="space-checkbox">
+                <span>和室</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- 各空間需求（條件顯示） -->
+        <div id="space-details-container"></div>
+
+        <!-- 提示訊息 -->
+        <div class="form-notice">
+          <p>請務必通知官方Line小編「已填寫表單」才能在Line上聯繫您喔^^</p>
+          <a href="https://line.me/R/ti/p/@example" target="_blank" class="line-button">加入官方LINE</a>
+        </div>
+
+        <!-- 提交按鈕 -->
+        <div class="form-submit">
+          <button type="submit" class="submit-button">感謝您的耐心填寫，點此送出業主需求表</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .form-container {
+    min-height: calc(100vh - 80px);
+    margin-top: 80px;
+    padding: 40px 20px;
+    background: #f5f5f5;
+    font-family: 'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif;
+  }
+
+  .form-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .form-header h1 {
+    font-size: 32px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+  }
+
+  .form-subtitle {
+    color: #666;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .requirement-form {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .form-section {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .form-section:last-of-type {
+    border-bottom: none;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #333;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .required {
+    color: #e53935;
+    margin-left: 3px;
+  }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="date"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif;
+    color: #333;
+    background: #fff;
+    transition: border-color 0.2s;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: #666;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.6;
+  }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 35px;
+  }
+
+  .radio-group,
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .radio-label,
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .radio-label input[type="radio"],
+  .checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #333;
+  }
+
+  .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .conditional-section {
+    margin-top: 15px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    border-left: 3px solid #666;
+  }
+
+  .conditional-input {
+    margin-top: 10px;
+  }
+
+  .form-notice {
+    background: #fff9e6;
+    padding: 20px;
+    border-radius: 4px;
+    margin: 30px 0;
+    text-align: center;
+    border: 1px solid #ffd54f;
+  }
+
+  .form-notice p {
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .line-button {
+    display: inline-block;
+    padding: 10px 25px;
+    background: #06c755;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+
+  .line-button:hover {
+    background: #05b048;
+  }
+
+  .form-submit {
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .submit-button {
+    padding: 12px 40px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif;
+  }
+
+  .submit-button:hover {
+    background: #555;
+  }
+
+  .space-detail-section {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+
+  .space-detail-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .space-detail-section .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .space-detail-section .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* 餐桌人數輸入框特殊樣式 */
+  .dining-table-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .dining-table-input-wrapper input {
+    width: 80px;
+  }
+
+  @media (max-width: 768px) {
+    .form-container {
+      padding: 20px 15px;
+      margin-top: 60px;
+    }
+
+    .requirement-form {
+      padding: 25px 20px;
+    }
+
+    .form-header h1 {
+      font-size: 24px;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .checkbox-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .radio-group,
+    .checkbox-group {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 預售屋相關欄位
+    const presaleYes = document.getElementById('presale-yes');
+    const presaleNo = document.getElementById('presale-no');
+    const presaleDetails = document.getElementById('presale-details');
+
+    function togglePresaleDetails() {
+      if (presaleYes.checked) {
+        presaleDetails.style.display = 'block';
+      } else {
+        presaleDetails.style.display = 'none';
+      }
+    }
+
+    presaleYes?.addEventListener('change', togglePresaleDetails);
+    presaleNo?.addEventListener('change', togglePresaleDetails);
+
+    // 婚姻狀況相關欄位
+    const marriedYes = document.getElementById('married-yes');
+    const marriedNo = document.getElementById('married-no');
+    const spouseDetails = document.getElementById('spouse-details');
+
+    function toggleSpouseDetails() {
+      if (marriedYes.checked) {
+        spouseDetails.style.display = 'block';
+      } else {
+        spouseDetails.style.display = 'none';
+      }
+    }
+
+    marriedYes?.addEventListener('change', toggleSpouseDetails);
+    marriedNo?.addEventListener('change', toggleSpouseDetails);
+
+    // 居住人數相關欄位
+    const residentsSelect = document.getElementById('residents');
+    const familyMembersSection = document.getElementById('family-members-section');
+    const familyMembersList = document.getElementById('family-members-list');
+    const familyAgesList = document.getElementById('family-ages-list');
+
+    residentsSelect?.addEventListener('change', function() {
+      const count = parseInt(this.value);
+      if (count > 0) {
+        familyMembersSection.style.display = 'block';
+        familyMembersList.innerHTML = '';
+        familyAgesList.innerHTML = '';
+        
+        for (let i = 1; i <= count; i++) {
+          const memberInput = document.createElement('input');
+          memberInput.type = 'text';
+          memberInput.name = `family-member-${i}`;
+          memberInput.placeholder = `成員 ${i} 姓名`;
+          memberInput.style.width = '100%';
+          memberInput.style.padding = '10px 12px';
+          memberInput.style.border = '1px solid #ddd';
+          memberInput.style.borderRadius = '4px';
+          memberInput.style.marginBottom = '10px';
+          memberInput.style.fontSize = '14px';
+          memberInput.style.fontFamily = "'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif";
+          familyMembersList.appendChild(memberInput);
+
+          const ageInput = document.createElement('input');
+          ageInput.type = 'text';
+          ageInput.name = `family-age-${i}`;
+          ageInput.placeholder = `成員 ${i} 年齡`;
+          ageInput.style.width = '100%';
+          ageInput.style.padding = '10px 12px';
+          ageInput.style.border = '1px solid #ddd';
+          ageInput.style.borderRadius = '4px';
+          ageInput.style.marginBottom = '10px';
+          ageInput.style.fontSize = '14px';
+          ageInput.style.fontFamily = "'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif";
+          familyAgesList.appendChild(ageInput);
+        }
+      } else {
+        familyMembersSection.style.display = 'none';
+      }
+    });
+
+    // 假日其他選項
+    const holidaysOtherCheck = document.getElementById('holidays-other-check');
+    const holidaysOtherInput = document.getElementById('holidays-other-input');
+    
+    holidaysOtherCheck?.addEventListener('change', function() {
+      if (this.checked) {
+        holidaysOtherInput.style.display = 'block';
+      } else {
+        holidaysOtherInput.style.display = 'none';
+      }
+    });
+
+    // 來源其他選項
+    const sourceOtherCheck = document.getElementById('source-other-check');
+    const sourceOtherInput = document.getElementById('source-other-input');
+    
+    sourceOtherCheck?.addEventListener('change', function() {
+      if (this.checked) {
+        sourceOtherInput.style.display = 'block';
+      } else {
+        sourceOtherInput.style.display = 'none';
+      }
+    });
+
+    // 預算其他選項
+    const budgetSelect = document.getElementById('budget');
+    const budgetOtherInput = document.getElementById('budget-other-input');
+    
+    budgetSelect?.addEventListener('change', function() {
+      if (this.value === 'other') {
+        budgetOtherInput.style.display = 'block';
+      } else {
+        budgetOtherInput.style.display = 'none';
+      }
+    });
+
+    // 最高預算其他選項
+    const maxBudgetSelect = document.getElementById('max-budget');
+    const maxBudgetOtherInput = document.getElementById('max-budget-other-input');
+    
+    maxBudgetSelect?.addEventListener('change', function() {
+      if (this.value === 'other') {
+        maxBudgetOtherInput.style.display = 'block';
+      } else {
+        maxBudgetOtherInput.style.display = 'none';
+      }
+    });
+
+    // 廚房裝修備註
+    const kitchenNotesRadio = document.getElementById('kitchen-notes-radio');
+    const kitchenNotesInput = document.getElementById('kitchen-notes-input');
+    
+    document.querySelectorAll('input[name="kitchen-renovation"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'notes') {
+          kitchenNotesInput.style.display = 'block';
+        } else {
+          kitchenNotesInput.style.display = 'none';
+        }
+      });
+    });
+
+    // 衛浴裝修備註
+    const bathroomNotesRadio = document.getElementById('bathroom-notes-radio');
+    const bathroomNotesInput = document.getElementById('bathroom-notes-input');
+    
+    document.querySelectorAll('input[name="bathroom-renovation"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'notes') {
+          bathroomNotesInput.style.display = 'block';
+        } else {
+          bathroomNotesInput.style.display = 'none';
+        }
+      });
+    });
+
+    // CAD 檔案備註
+    const cadNotesRadio = document.getElementById('cad-notes-radio');
+    const cadNotesInput = document.getElementById('cad-notes-input');
+    
+    document.querySelectorAll('input[name="cad-file"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'notes') {
+          cadNotesInput.style.display = 'block';
+        } else {
+          cadNotesInput.style.display = 'none';
+        }
+      });
+    });
+
+    // 空間詳細需求
+    const spaceCheckboxes = document.querySelectorAll('.space-checkbox');
+    const spaceDetailsContainer = document.getElementById('space-details-container');
+
+    const spaceDetails = {
+      'living-room': {
+        title: '客廳',
+        options: [
+          { label: '造型電視牆', value: 'tv-wall' },
+          { label: '收納櫃', value: 'storage-cabinet' },
+          { label: '展示櫃', value: 'display-cabinet' },
+          { label: 'L型沙發', value: 'l-sofa' },
+          { label: '一字型沙發', value: 'straight-sofa' },
+          { label: '其他', value: 'other' }
+        ]
+      },
+      'dining-room': {
+        title: '餐廳',
+        options: [
+          { label: '電器櫃', value: 'appliance-cabinet' },
+          { label: '餐櫃', value: 'dining-cabinet' },
+          { label: '中島', value: 'island' },
+          { label: '餐桌', value: 'dining-table', hasInput: true, inputLabel: '人餐桌' },
+          { label: '一字型沙發', value: 'straight-sofa' },
+          { label: '其他', value: 'other' }
+        ]
+      },
+      'bathroom': {
+        title: '浴廁',
+        options: [
+          { label: '主衛浴鏡櫃', value: 'master-mirror' },
+          { label: '客衛浴鏡櫃', value: 'guest-mirror' },
+          { label: '主衛浴浴缸', value: 'master-bathtub' },
+          { label: '客衛浴浴缸', value: 'guest-bathtub' },
+          { label: '其他', value: 'other' }
+        ]
+      },
+      'kitchen': {
+        title: '廚房',
+        options: [
+          { label: '電器櫃', value: 'appliance-cabinet' },
+          { label: '冰箱櫃', value: 'refrigerator-cabinet' },
+          { label: '中島', value: 'island' },
+          { label: '吧台', value: 'bar-counter' },
+          { label: '其他', value: 'other' }
+        ]
+      },
+      'master-bedroom': {
+        title: '主臥房',
+        options: [
+          { label: '各種床尺寸', value: 'bed-size' },
+          { label: '化妝桌', value: 'makeup-table' },
+          { label: '書桌', value: 'desk' },
+          { label: '更衣室', value: 'walk-in-closet' },
+          { label: '電視', value: 'tv' },
+          { label: '窗簾需全遮光才有辦法入睡', value: 'blackout-curtain' }
+        ]
+      },
+      'children-room': {
+        title: '小孩房',
+        options: [
+          { label: '各種床尺寸', value: 'bed-size' },
+          { label: '化妝桌', value: 'makeup-table' },
+          { label: '書桌', value: 'desk' },
+          { label: '更衣室', value: 'walk-in-closet' },
+          { label: '電視', value: 'tv' },
+          { label: '窗簾需全遮光才有辦法入睡', value: 'blackout-curtain' }
+        ]
+      },
+      'guest-room': {
+        title: '客房',
+        options: [
+          { label: '各種床尺寸', value: 'bed-size' },
+          { label: '化妝桌', value: 'makeup-table' },
+          { label: '書桌', value: 'desk' },
+          { label: '更衣室', value: 'walk-in-closet' },
+          { label: '電視', value: 'tv' },
+          { label: '窗簾需全遮光才有辦法入睡', value: 'blackout-curtain' }
+        ]
+      },
+      'elderly-room': {
+        title: '孝親房',
+        options: [
+          { label: '各種床尺寸', value: 'bed-size' },
+          { label: '化妝桌', value: 'makeup-table' },
+          { label: '書桌', value: 'desk' },
+          { label: '更衣室', value: 'walk-in-closet' },
+          { label: '電視', value: 'tv' },
+          { label: '窗簾需全遮光才有辦法入睡', value: 'blackout-curtain' }
+        ]
+      },
+      'study-room': {
+        title: '書房',
+        options: [
+          { label: '各種床尺寸', value: 'bed-size' },
+          { label: '化妝桌', value: 'makeup-table' },
+          { label: '書桌', value: 'desk' },
+          { label: '更衣室', value: 'walk-in-closet' },
+          { label: '電視', value: 'tv' },
+          { label: '窗簾需全遮光才有辦法入睡', value: 'blackout-curtain' }
+        ]
+      },
+      'tatami-room': {
+        title: '和室',
+        options: [
+          { label: '書桌', value: 'desk' },
+          { label: '自動升降桌', value: 'lift-table' },
+          { label: '活動茶桌', value: 'tea-table' },
+          { label: '電視', value: 'tv' }
+        ]
+      }
+    };
+
+    function updateSpaceDetails() {
+      spaceDetailsContainer.innerHTML = '';
+      
+      spaceCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          const spaceValue = checkbox.value;
+          const details = spaceDetails[spaceValue];
+          
+          if (details) {
+            const section = document.createElement('div');
+            section.className = 'space-detail-section';
+            
+            let optionsHtml = '';
+            details.options.forEach(option => {
+              if (option.hasInput) {
+                // 餐桌特殊處理：需要輸入人數
+                optionsHtml += `
+                  <div style="margin-bottom: 10px;">
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="${spaceValue}-details" value="${option.value}" class="dining-table-check">
+                      <span>${option.label}</span>
+                    </label>
+                    <div class="dining-table-input-wrapper" style="display: none;">
+                      <input type="text" name="${spaceValue}-dining-table-people" placeholder="人數" style="width: 80px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                      <span>人餐桌</span>
+                    </div>
+                  </div>
+                `;
+              } else {
+                optionsHtml += `
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="${spaceValue}-details" value="${option.value}">
+                    <span>${option.label}</span>
+                  </label>
+                `;
+              }
+            });
+            
+            section.innerHTML = `
+              <h3 class="space-detail-title">${details.title}</h3>
+              <div class="checkbox-group">
+                ${optionsHtml}
+              </div>
+            `;
+            spaceDetailsContainer.appendChild(section);
+            
+            // 處理餐桌輸入框的顯示/隱藏
+            const diningTableCheck = section.querySelector('.dining-table-check');
+            const diningTableInput = section.querySelector('.dining-table-input-wrapper');
+            if (diningTableCheck && diningTableInput) {
+              diningTableCheck.addEventListener('change', function() {
+                if (this.checked) {
+                  diningTableInput.style.display = 'flex';
+                } else {
+                  diningTableInput.style.display = 'none';
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+
+    spaceCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateSpaceDetails);
+    });
+  });
+</script>
