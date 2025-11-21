@@ -4,6 +4,16 @@ const {
   description = '青曦空間設計提供大台北地區專業室內設計服務，包含住宅、商業空間、社區公設等。從設計規劃到工程施作，為您打造理想空間。',
   ogImage = '/images/og-default.jpg'
 } = Astro.props;
+
+// 維護模式檢查（服務器端）
+const MAINTENANCE_MODE = import.meta.env.MAINTENANCE_MODE === 'true' || 
+                         import.meta.env.PUBLIC_MAINTENANCE_MODE === 'true' ||
+                         true; // ⚠️ 與 middleware.ts 保持一致
+
+// 如果不是建置中頁面且維護模式開啟，重定向
+if (MAINTENANCE_MODE && Astro.url.pathname !== '/coming-soon') {
+  return Astro.redirect('/coming-soon', 307);
+}
 ---
 
 <!DOCTYPE html>
