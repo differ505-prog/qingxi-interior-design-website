@@ -33,9 +33,9 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     return next();
   }
 
-  // 重定向到建置中頁面
-  // 使用絕對路徑確保重定向到正確的域名
-  const redirectUrl = new URL('/coming-soon', context.url.origin);
-  return Response.redirect(redirectUrl.toString(), 307);
+  // ⚠️ 臨時禁用 middleware 重定向，改用客戶端重定向
+  // 因為 middleware 在 Vercel 上可能會有 URL 構建問題
+  // 讓 BaseLayout 中的客戶端腳本來處理重定向
+  return next();
 };
 
