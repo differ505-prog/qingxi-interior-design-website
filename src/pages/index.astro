@@ -6,6 +6,74 @@ import HeroCarousel from '../components/HeroCarousel.astro';
 <BaseLayout title="首頁 - 青曦空間設計">
   <HeroCarousel />
   
+  <!-- 關於我們 Section -->
+  <section class="about-section">
+    <div class="about-container">
+      <div class="about-content" data-animate="left">
+        <h6 class="section-subtitle">ABOUT US</h6>
+        <h2 class="section-title">關於青曦</h2>
+        <p class="about-text">
+          青曦空間設計，致力於為大台北地區的客戶提供專業的室內設計服務。我們相信，每個空間都有其獨特的故事，而我們的使命就是將您的生活理念與空間美學完美結合。
+        </p>
+        <p class="about-text">
+          從初步諮詢、設計規劃到工程施作，我們提供一站式的完整服務。秉持著「用心傾聽、用設計說話」的理念，以新銳的視角和專業的態度，為每一位客戶量身打造專屬的理想空間。
+        </p>
+        <div class="about-values">
+          <div class="value-item">
+            <div class="value-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <span>專業團隊</span>
+          </div>
+          <div class="value-item">
+            <div class="value-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+            </div>
+            <span>品質保證</span>
+          </div>
+          <div class="value-item">
+            <div class="value-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+            </div>
+            <span>用心服務</span>
+          </div>
+        </div>
+      </div>
+      <div class="about-image" data-animate="right">
+        <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800" alt="青曦空間設計理念" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 核心優勢 Section -->
+  <section class="stats-section">
+    <div class="stats-container">
+      <div class="stat-item" data-animate="scale">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">客製化設計</div>
+      </div>
+      <div class="stat-item" data-animate="scale">
+        <div class="stat-number">1年</div>
+        <div class="stat-label">工程保固</div>
+      </div>
+      <div class="stat-item" data-animate="scale">
+        <div class="stat-number">免費</div>
+        <div class="stat-label">初步諮詢</div>
+      </div>
+      <div class="stat-item" data-animate="scale">
+        <div class="stat-number">透明</div>
+        <div class="stat-label">報價流程</div>
+      </div>
+    </div>
+  </section>
+  
   <!-- 服務項目 Section -->
   <section class="service-section">
     <div class="service-container">
@@ -178,6 +246,130 @@ import HeroCarousel from '../components/HeroCarousel.astro';
     </div>
   </section>
 
+  <!-- 服務承諾 Section -->
+  <section class="testimonial-section">
+    <div class="testimonial-container">
+      <div class="section-header">
+        <h6 class="section-subtitle">OUR PROMISE</h6>
+        <h2 class="section-title">我們的承諾</h2>
+      </div>
+      
+      <div class="testimonial-grid">
+        <div class="testimonial-card" data-animate="scale">
+          <div class="promise-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h3 class="promise-title">用心傾聽</h3>
+          <p class="testimonial-text">
+            每個空間都有獨特的故事，我們會仔細聆聽您的生活需求與期待，將您的想法轉化為實際的設計方案。
+          </p>
+        </div>
+
+        <div class="testimonial-card" data-animate="scale">
+          <div class="promise-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="promise-title">品質保證</h3>
+          <p class="testimonial-text">
+            從材料選擇到施工細節，每個環節都嚴格把關。我們提供一年工程保固，讓您住得安心、放心。
+          </p>
+        </div>
+
+        <div class="testimonial-card" data-animate="scale">
+          <div class="promise-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <h3 class="promise-title">準時交付</h3>
+          <p class="testimonial-text">
+            我們重視您的時間，會在初期提供詳細的工程進度表，並嚴格控管時程，確保如期完工交屋。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="faq-container">
+      <div class="section-header">
+        <h6 class="section-subtitle">FAQ</h6>
+        <h2 class="section-title">常見問題</h2>
+      </div>
+      
+      <div class="faq-list">
+        <div class="faq-item" data-animate="left">
+          <button class="faq-question">
+            <span>設計費用如何計算？</span>
+            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>設計費用會依據空間坪數、設計複雜度等因素評估。一般住宅設計費用約為每坪 NT$ 3,000-6,000 元。我們提供免費初步諮詢，會在了解您的需求後提供詳細報價。</p>
+          </div>
+        </div>
+
+        <div class="faq-item" data-animate="right">
+          <button class="faq-question">
+            <span>從設計到完工需要多久時間？</span>
+            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>整體時程約 3-6 個月，包含設計規劃 1-2 個月，工程施作 2-4 個月。實際時間會依據空間大小、設計複雜度及工程項目而有所不同。</p>
+          </div>
+        </div>
+
+        <div class="faq-item" data-animate="left">
+          <button class="faq-question">
+            <span>可以只做設計不做工程嗎？</span>
+            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>可以的！我們提供純設計服務，會提供完整的施工圖及 3D 效果圖，您可以自行發包施工。不過我們也建議選擇設計+工程統包，品質更有保障。</p>
+          </div>
+        </div>
+
+        <div class="faq-item" data-animate="right">
+          <button class="faq-question">
+            <span>預售屋可以提供客變服務嗎？</span>
+            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>可以！我們有豐富的預售屋客變經驗，會協助您評估哪些項目適合客變，並提供專業建議。我們也提供陪同建商討論的服務，確保客變順利進行。</p>
+          </div>
+        </div>
+
+        <div class="faq-item" data-animate="left">
+          <button class="faq-question">
+            <span>工程保固期多久？</span>
+            <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="faq-answer">
+            <p>我們提供一年的工程保固服務。保固期內如有施工瑕疵，我們會免費修復。此外，我們也提供終身維修服務，讓您住得更安心。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <style>
     /* Smooth scrolling */
     html {
@@ -187,6 +379,416 @@ import HeroCarousel from '../components/HeroCarousel.astro';
     /* Adjust scroll position for fixed header */
     section[id] {
       scroll-margin-top: 80px;
+    }
+
+    /* About Section Styles */
+    .about-section {
+      padding: 5rem 2rem;
+      background: var(--white);
+    }
+
+    .about-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about-content {
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: all 0.8s ease;
+    }
+
+    .about-content.animate-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .about-text {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--gray-medium);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.03em;
+    }
+
+    .about-values {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2.5rem;
+    }
+
+    .value-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+    }
+
+    .value-icon {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--tiffany-pale);
+      border-radius: 50%;
+      color: var(--tiffany-primary);
+      transition: all 0.3s ease;
+    }
+
+    .value-item:hover .value-icon {
+      background: var(--tiffany-primary);
+      color: var(--white);
+      transform: scale(1.1);
+    }
+
+    .value-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .value-item span {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--gray-dark);
+    }
+
+    .about-image {
+      opacity: 0;
+      transform: translateX(50px);
+      transition: all 0.8s ease;
+    }
+
+    .about-image.animate-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .about-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Stats Section Styles */
+    .stats-section {
+      padding: 4rem 2rem;
+      background: var(--gray-darkest);
+      color: var(--white);
+    }
+
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3rem;
+    }
+
+    .stat-item {
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.6s ease;
+    }
+
+    .stat-item.animate-in {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--tiffany-primary);
+      margin-bottom: 0.5rem;
+      font-family: 'Noto Sans', sans-serif;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      color: var(--gray-light);
+      letter-spacing: 0.05em;
+    }
+
+    /* Testimonial Section Styles */
+    .testimonial-section {
+      padding: 5rem 2rem;
+      background: var(--off-white);
+    }
+
+    .testimonial-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .testimonial-card {
+      background: var(--white);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 2px solid var(--gray-bg);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: scale(0.9);
+    }
+
+    .testimonial-card.animate-in {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .testimonial-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(129, 199, 212, 0.15);
+      border-color: var(--tiffany-light);
+    }
+
+    .testimonial-rating {
+      margin-bottom: 1rem;
+    }
+
+    .star {
+      color: var(--tiffany-primary);
+      font-size: 1.2rem;
+      margin-right: 0.2rem;
+    }
+
+    .promise-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--tiffany-pale);
+      border-radius: 50%;
+      color: var(--tiffany-primary);
+      transition: all 0.3s ease;
+    }
+
+    .testimonial-card:hover .promise-icon {
+      background: var(--tiffany-primary);
+      color: var(--white);
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .promise-icon svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .promise-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--gray-dark);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .testimonial-text {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--gray-medium);
+      margin-bottom: 0;
+      text-align: center;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .author-avatar {
+      width: 48px;
+      height: 48px;
+      background: var(--tiffany-primary);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .author-name {
+      font-weight: 600;
+      color: var(--gray-dark);
+      margin-bottom: 0.25rem;
+    }
+
+    .author-project {
+      font-size: 0.85rem;
+      color: var(--gray-medium);
+    }
+
+    /* FAQ Section Styles */
+    .faq-section {
+      padding: 5rem 2rem;
+      background: var(--white);
+    }
+
+    .faq-container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .faq-item {
+      background: var(--off-white);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--gray-bg);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .faq-item[data-animate="left"] {
+      transform: translateX(-30px);
+    }
+
+    .faq-item[data-animate="right"] {
+      transform: translateX(30px);
+    }
+
+    .faq-item.animate-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .faq-item:hover {
+      border-color: var(--tiffany-light);
+    }
+
+    .faq-item.active {
+      border-color: var(--tiffany-primary);
+    }
+
+    .faq-question {
+      width: 100%;
+      padding: 1.5rem 2rem;
+      background: none;
+      border: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--gray-dark);
+      text-align: left;
+      transition: all 0.3s ease;
+    }
+
+    .faq-question:hover {
+      color: var(--tiffany-primary);
+    }
+
+    .faq-icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+      color: var(--gray-medium);
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(180deg);
+      color: var(--tiffany-primary);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 300px;
+    }
+
+    .faq-answer p {
+      padding: 0 2rem 1.5rem 2rem;
+      color: var(--gray-medium);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+      .about-container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .about-image {
+        order: -1;
+      }
+
+      .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+      }
+
+      .testimonial-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .about-section,
+      .testimonial-section,
+      .faq-section {
+        padding: 3rem 1.5rem;
+      }
+
+      .about-values {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .stats-section {
+        padding: 3rem 1.5rem;
+      }
+
+      .stats-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .stat-number {
+        font-size: 2.5rem;
+      }
+
+      .faq-question {
+        padding: 1.25rem 1.5rem;
+        font-size: 1rem;
+      }
+
+      .faq-answer p {
+        padding: 0 1.5rem 1.25rem 1.5rem;
+      }
     }
 
     .service-section {
@@ -610,6 +1212,27 @@ import HeroCarousel from '../components/HeroCarousel.astro';
         });
       }, observerOptions);
 
+      // Observe about section
+      const aboutContent = document.querySelector('.about-content');
+      const aboutImage = document.querySelector('.about-image');
+      if (aboutContent) observer.observe(aboutContent);
+      if (aboutImage) observer.observe(aboutImage);
+
+      // Observe stats
+      const statItems = document.querySelectorAll('.stat-item');
+      statItems.forEach((item, index) => {
+        const statObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                entry.target.classList.add('animate-in');
+              }, index * 100);
+            }
+          });
+        }, observerOptions);
+        statObserver.observe(item);
+      });
+
       // Observe service items
       const serviceItems = document.querySelectorAll('.service-item');
       serviceItems.forEach(item => observer.observe(item));
@@ -631,6 +1254,55 @@ import HeroCarousel from '../components/HeroCarousel.astro';
           });
         }, observerOptions);
         itemObserver.observe(item);
+      });
+
+      // Observe testimonials
+      const testimonialCards = document.querySelectorAll('.testimonial-card');
+      testimonialCards.forEach((card, index) => {
+        const cardObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                entry.target.classList.add('animate-in');
+              }, index * 150);
+            }
+          });
+        }, observerOptions);
+        cardObserver.observe(card);
+      });
+
+      // Observe FAQ items
+      const faqItems = document.querySelectorAll('.faq-item');
+      faqItems.forEach((item, index) => {
+        const faqObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                entry.target.classList.add('animate-in');
+              }, index * 100);
+            }
+          });
+        }, observerOptions);
+        faqObserver.observe(item);
+      });
+
+      // FAQ Toggle
+      const faqQuestions = document.querySelectorAll('.faq-question');
+      faqQuestions.forEach(question => {
+        question.addEventListener('click', () => {
+          const faqItem = question.parentElement;
+          const isActive = faqItem.classList.contains('active');
+          
+          // Close all FAQ items
+          document.querySelectorAll('.faq-item').forEach(item => {
+            item.classList.remove('active');
+          });
+          
+          // Toggle current item
+          if (!isActive) {
+            faqItem.classList.add('active');
+          }
+        });
       });
     });
   </script>

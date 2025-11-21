@@ -1,5 +1,9 @@
 ---
-const { title = '室內設計公司' } = Astro.props;
+const { 
+  title = '青曦空間設計 - 大台北專業室內設計',
+  description = '青曦空間設計提供大台北地區專業室內設計服務，包含住宅、商業空間、社區公設等。從設計規劃到工程施作，為您打造理想空間。',
+  ogImage = '/images/og-default.jpg'
+} = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -7,10 +11,33 @@ const { title = '室內設計公司' } = Astro.props;
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO Meta Tags -->
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <meta name="keywords" content="室內設計,大台北,住宅設計,商業空間設計,裝潢,工程施作,青曦空間設計">
+  <meta name="author" content="青曦空間設計">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content={Astro.url}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:image" content={ogImage}>
+  <meta property="og:locale" content="zh_TW">
+  <meta property="og:site_name" content="青曦空間設計">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content={Astro.url}>
+  <meta property="twitter:title" content={title}>
+  <meta property="twitter:description" content={description}>
+  <meta property="twitter:image" content={ogImage}>
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">  
-  <title>{title}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
       /* 灰色系 - 主基调 */

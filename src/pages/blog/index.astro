@@ -31,7 +31,7 @@ cat >> src/pages/blog/index.astro << 'EOF'
 <style>
   h1 {
     font-weight: 600;
-    color: #2C3E50;
+    color: var(--gray-dark);
   }
   
   .category-filters {
@@ -44,9 +44,9 @@ cat >> src/pages/blog/index.astro << 'EOF'
   
   .category-btn {
     padding: 0.5rem 1.25rem;
-    border: 2px solid #E8D5C4;
-    background: white;
-    color: #2C3E50;
+    border: 2px solid var(--gray-lighter);
+    background: var(--white);
+    color: var(--gray-dark);
     border-radius: 25px;
     font-size: 0.95rem;
     font-weight: 500;
@@ -56,15 +56,16 @@ cat >> src/pages/blog/index.astro << 'EOF'
   }
   
   .category-btn:hover {
-    background: #E8D5C4;
-    color: #2C3E50;
+    background: var(--tiffany-pale);
+    color: var(--gray-dark);
+    border-color: var(--tiffany-light);
     transform: translateY(-2px);
   }
   
   .category-btn.active {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
+    background: var(--tiffany-primary);
+    color: var(--white);
+    border-color: var(--tiffany-primary);
   }
   
   .blog-list {
@@ -75,9 +76,10 @@ cat >> src/pages/blog/index.astro << 'EOF'
   .post-card {
     display: flex;
     gap: 1.5rem;
-    background: white;
+    background: var(--white);
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    border: 2px solid var(--gray-bg);
     overflow: hidden;
     text-decoration: none;
     color: inherit;
@@ -86,7 +88,8 @@ cat >> src/pages/blog/index.astro << 'EOF'
   }
   
   .post-card:hover {
-    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    box-shadow: 0 12px 24px rgba(129, 199, 212, 0.2);
+    border-color: var(--tiffany-light);
     transform: translateY(-4px);
   }
   
@@ -118,8 +121,8 @@ cat >> src/pages/blog/index.astro << 'EOF'
   
   .post-category {
     display: inline-block;
-    background: var(--accent);
-    color: white;
+    background: var(--tiffany-primary);
+    color: var(--white);
     padding: 0.25rem 0.75rem;
     border-radius: 4px;
     font-size: 0.85rem;
@@ -131,23 +134,23 @@ cat >> src/pages/blog/index.astro << 'EOF'
   .post-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #2C3E50;
+    color: var(--gray-dark);
     margin-bottom: 0.5rem;
   }
   
   .post-card:hover .post-title {
-    color: #C19A6B;
+    color: var(--tiffany-dark);
   }
   
   .post-date {
     font-size: 0.9rem;
-    color: #6B7280;
+    color: var(--gray-medium);
     margin-bottom: 0.75rem;
   }
   
   .post-summary {
     font-size: 1rem;
-    color: #4B5563;
+    color: var(--gray-medium);
     line-height: 1.6;
   }
   
@@ -169,7 +172,7 @@ cat >> src/pages/blog/index.astro << 'EOF'
 
 <BaseLayout title="知識分享 - 青曦空間設計">
   <div style="max-width: 1200px; margin: 0 auto; padding: 4rem 1rem;">
-    <h1 style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 2rem; color: #2C3E50;">知識分享</h1>
+    <h1 style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 2rem; color: var(--gray-dark);">知識分享</h1>
     
     <div class="category-filters">
       <button class="category-btn active" data-category="全部">全部</button>

@@ -19,6 +19,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="form-header">
         <h1>設計需求表</h1>
         <p class="form-subtitle">請詳細填寫以下資訊，讓我們更了解您的需求</p>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-text">
+            <span>完成度：</span>
+            <span id="progress-percentage">0%</span>
+          </div>
+        </div>
       </div>
 
       <form 
@@ -639,6 +650,41 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     opacity: 0;
     transform: translateY(-20px);
     animation: slideDownFade 0.8s ease-out 0.2s forwards;
+  }
+
+  .progress-container {
+    margin-top: 30px;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--gray-lighter);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--tiffany-primary) 0%, var(--tiffany-dark) 100%);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--gray-medium);
+  }
+
+  .progress-text span:last-child {
+    font-weight: 600;
+    color: var(--tiffany-primary);
   }
 
   @keyframes slideDownFade {
@@ -1454,5 +1500,55 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     spaceCheckboxes.forEach(checkbox => {
       checkbox.addEventListener('change', updateSpaceDetails);
     });
+
+    // 進度條功能
+    function updateProgress() {
+      const form = document.getElementById('requirement-form');
+      if (!form) return;
+
+      const allInputs = form.querySelectorAll('input:not([type="hidden"]), select, textarea');
+      const requiredInputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+      
+      let totalFields = allInputs.length;
+      let filledFields = 0;
+
+      allInputs.forEach(input => {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+          const name = input.name;
+          if (name && form.querySelector(`input[name="${name}"]:checked`)) {
+            const checkedCount = form.querySelectorAll(`input[name="${name}"]:checked`).length;
+            if (checkedCount > 0) filledFields++;
+          }
+          // 避免重複計算同名的radio/checkbox
+          const siblings = form.querySelectorAll(`input[name="${name}"]`);
+          if (siblings.length > 1 && input !== siblings[0]) {
+            totalFields--;
+          }
+        } else if (input.value && input.value.trim() !== '') {
+          filledFields++;
+        }
+      });
+
+      const percentage = Math.round((filledFields / totalFields) * 100);
+      const progressFill = document.getElementById('progress-fill');
+      const progressPercentage = document.getElementById('progress-percentage');
+      
+      if (progressFill) {
+        progressFill.style.width = percentage + '%';
+      }
+      if (progressPercentage) {
+        progressPercentage.textContent = percentage + '%';
+      }
+    }
+
+    // 監聽所有輸入變化
+    const form = document.getElementById('requirement-form');
+    if (form) {
+      form.addEventListener('input', updateProgress);
+      form.addEventListener('change', updateProgress);
+      
+      // 初始化進度
+      setTimeout(updateProgress, 500);
+    }
   });
 </script>
