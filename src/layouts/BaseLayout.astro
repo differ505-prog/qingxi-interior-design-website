@@ -5,15 +5,10 @@ const {
   ogImage = '/images/og-default.jpg'
 } = Astro.props;
 
-// 維護模式檢查（服務器端）
+// 維護模式檢查（用於注入到 HTML 中）
 const MAINTENANCE_MODE = import.meta.env.MAINTENANCE_MODE === 'true' || 
                          import.meta.env.PUBLIC_MAINTENANCE_MODE === 'true' ||
                          true; // ⚠️ 與 middleware.ts 保持一致
-
-// 如果不是建置中頁面且維護模式開啟，重定向
-if (MAINTENANCE_MODE && Astro.url.pathname !== '/coming-soon') {
-  return Astro.redirect('/coming-soon', 307);
-}
 ---
 
 <!DOCTYPE html>
@@ -306,7 +301,12 @@ if (MAINTENANCE_MODE && Astro.url.pathname !== '/coming-soon') {
     </div>
   </footer>
 
-  <script>
+  <script define:vars={{ maintenanceMode: MAINTENANCE_MODE }}>
+    // 維護模式檢查（客戶端重定向，作為 middleware 的備用方案）
+    if (maintenanceMode && window.location.pathname !== '/coming-soon') {
+      window.location.replace('/coming-soon');
+    }
+
     const hamburger = document.getElementById('hamburger');
     const navLinks = document.getElementById('navLinks');
 
