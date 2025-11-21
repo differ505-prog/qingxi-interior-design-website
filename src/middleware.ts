@@ -34,6 +34,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   }
 
   // 重定向到建置中頁面
-  return Response.redirect(new URL('/coming-soon', context.url), 307);
+  // 使用絕對路徑確保重定向到正確的域名
+  const redirectUrl = new URL('/coming-soon', context.url.origin);
+  return Response.redirect(redirectUrl.toString(), 307);
 };
 
