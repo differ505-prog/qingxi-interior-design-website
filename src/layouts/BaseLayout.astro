@@ -1,327 +1,607 @@
 ---
-const { 
-  title = '青曦空間設計 - 大台北專業室內設計',
-  description = '青曦空間設計提供大台北地區專業室內設計服務，包含住宅、商業空間、社區公設等。從設計規劃到工程施作，為您打造理想空間。',
-  ogImage = '/images/og-default.jpg'
+const {
+  title = "夏洛克Villa民宿 - 花蓮莊園型度假民宿｜5000坪私人湖泊泳池",
+  description = "花蓮吉安5000坪莊園民宿，擁有私人人工湖與戶外泳池。豪華雙人房、家庭套房、湖景套房、獨棟別墅，適合情侶蜜月、家庭度假、團體包棟。距太魯閣30分鐘，七星潭20分鐘。立即線上訂房。",
+  ogImage = "/images/og-default.jpg",
 } = Astro.props;
 
 // 維護模式檢查（用於注入到 HTML 中）
-const MAINTENANCE_MODE = import.meta.env.MAINTENANCE_MODE === 'true' || 
-                         import.meta.env.PUBLIC_MAINTENANCE_MODE === 'true' ||
-                         false; // 預設為 false，線上部署時在 Vercel 設置環境變數為 true
+const MAINTENANCE_MODE =
+  import.meta.env.MAINTENANCE_MODE === "true" ||
+  import.meta.env.PUBLIC_MAINTENANCE_MODE === "true" ||
+  false; // 預設為 false，線上部署時在 Vercel 設置環境變數為 true
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- SEO Meta Tags -->
-  <title>{title}</title>
-  <meta name="description" content={description}>
-  <meta name="keywords" content="室內設計,大台北,住宅設計,商業空間設計,裝潢,工程施作,青曦空間設計">
-  <meta name="author" content="青曦空間設計">
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content={Astro.url}>
-  <meta property="og:title" content={title}>
-  <meta property="og:description" content={description}>
-  <meta property="og:image" content={ogImage}>
-  <meta property="og:locale" content="zh_TW">
-  <meta property="og:site_name" content="青曦空間設計">
-  
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content={Astro.url}>
-  <meta property="twitter:title" content={title}>
-  <meta property="twitter:description" content={description}>
-  <meta property="twitter:image" content={ogImage}>
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      /* 灰色系 - 主基调 */
-      --gray-darkest: #2F2F2F;
-      --gray-dark: #4A4A4A;
-      --gray-medium: #7A7A7A;
-      --gray-light: #B0B0B0;
-      --gray-lighter: #D8D8D8;
-      --gray-bg: #F5F5F5;
-      
-      /* 白色系 */
-      --white: #FFFFFF;
-      --off-white: #FAFAFA;
-      
-      /* Tiffany绿色系 - 点缀色 */
-      --tiffany-primary: #81C7D4;
-      --tiffany-dark: #69B8C4;
-      --tiffany-light: #A0D9D9;
-      --tiffany-pale: #E6F5F7;
-      
-      /* 语义化颜色 */
-      --primary: var(--gray-dark);
-      --accent: var(--tiffany-primary);
-    }
-    
-    html {
-      scroll-behavior: smooth;
-    }
-    
-    body {
-      font-family: 'Noto Sans TC', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      margin: 0;
-      color: var(--gray-dark);
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    /* 導覽列拉霸機效果 */
-    .nav-item {
-      position: relative;
-      height: 24px;
-      min-width: 80px;
-      display: inline-block;
-      overflow: hidden;
-    }
-    
-    .nav-link {
-      position: relative;
-      display: block;
-      width: 100%;
-      height: 100%;
-      text-decoration: none;
-      color: var(--gray-dark);
-      transition: color 0.3s ease;
-      font-size: 1rem;
-    }
-    
-    .nav-text-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    
-    .nav-text {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap;
-    }
-    
-    .nav-text-en {
-      position: absolute;
-      top: 0;
-    }
-    
-    .nav-text-zh {
-      position: absolute;
-      top: 100%;
-    }
-    
-    .nav-link:hover .nav-text-container {
-      transform: translateY(-100%);
-    }
-    
-    .nav-link:hover {
-      color: var(--tiffany-primary);
-    }
+    <!-- SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta name="googlebot" content="index, follow" />
+    <meta
+      name="keywords"
+      content="花蓮民宿,吉安民宿,莊園民宿,度假民宿,私人湖泊,泳池民宿,家庭旅遊,夏洛克villa,花蓮住宿,太魯閣民宿,七星潭住宿,獨棟別墅,包棟民宿"
+    />
+    <meta name="author" content="夏洛克Villa民宿" />
 
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      align-items: center;
-    }
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:site_name" content="夏洛克Villa民宿" />
 
-    /* 漢堡選單按鈕 */
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 5px;
-    }
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={ogImage} />
 
-    .hamburger span {
-      width: 25px;
-      height: 3px;
-      background: var(--gray-dark);
-      transition: all 0.3s ease;
-      border-radius: 2px;
-    }
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LodgingBusiness",
+        "name": "夏洛兌Villa民宿",
+        "alternateName": "SummerRock Villa",
+        "description": "花蓮吟安莊園型度假民宿，擁有5000坪莊園、私人人工湖與戶外泳池。提供精緻客房，適合家庭度假、團體聚會。",
+        "image": [
+          "https://summerrockvilla.vercel.app/deluxe-room.png",
+          "https://summerrockvilla.vercel.app/family-suite.png",
+          "https://summerrockvilla.vercel.app/lake-suite.png",
+          "https://summerrockvilla.vercel.app/villa-room.png"
+        ],
+        "@id": "https://summerrockvilla.vercel.app",
+        "url": "https://summerrockvilla.vercel.app",
+        "telephone": "+886-3-8541633",
+        "email": "summerrocker2014@gmail.com",
+        "priceRange": "NT$3,200 - NT$12,000",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "干城二街25巷12號",
+          "addressLocality": "吟安鄉",
+          "addressRegion": "花蓮縣",
+          "postalCode": "973",
+          "addressCountry": "TW"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 23.9739,
+          "longitude": 121.5694
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "00:00",
+          "closes": "23:59"
+        },
+        "checkinTime": "15:00",
+        "checkoutTime": "11:00",
+        "amenityFeature": [
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "戶外泳池",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "免費 WiFi",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "免費停車",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "私人湖泊",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "庭園景觀",
+            "value": true
+          }
+        ],
+        "starRating": {
+          "@type": "Rating",
+          "ratingValue": "5"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "127"
+        },
+        "sameAs": [
+          "https://www.facebook.com/summerrocker2014",
+          "https://booking.owlting.com/summerrockvilla"
+        ]
+      }
+    </script>
 
-    .hamburger.active span:nth-child(1) {
-      transform: rotate(45deg) translate(8px, 8px);
-    }
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* 灰色系 - 主基调 */
+        --gray-darkest: #2f2f2f;
+        --gray-dark: #4a4a4a;
+        --gray-medium: #7a7a7a;
+        --gray-light: #b0b0b0;
+        --gray-lighter: #d8d8d8;
+        --gray-bg: #f5f5f5;
 
-    .hamburger.active span:nth-child(2) {
-      opacity: 0;
-    }
+        /* 白色系 */
+        --white: #ffffff;
+        --off-white: #faf9f6;
 
-    .hamburger.active span:nth-child(3) {
-      transform: rotate(-45deg) translate(7px, -7px);
-    }
+        /* 度假民宿色系 - 溫暖大地色調 */
+        --resort-primary: #8aa387; /* 柔和鼠尾草綠 */
+        --resort-dark: #6b8e6b; /* 深綠 */
+        --resort-light: #b8c9b5; /* 淺綠 */
+        --resort-pale: #e8ede7; /* 極淺綠背景 */
+        --resort-accent: #d4a574; /* 溫暖陶土色點綴 */
+        --resort-accent-light: #e8c9a1; /* 淺陶土色 */
 
-    /* 手機版樣式 */
-    @media (max-width: 768px) {
-      .hamburger {
-        display: flex;
+        /* 语义化颜色 */
+        --primary: var(--gray-dark);
+        --accent: var(--resort-primary);
       }
 
-      .nav-links {
-        position: fixed;
-        top: 60px;
-        right: -100%;
-        width: 250px;
-        height: calc(100vh - 60px);
-        background: var(--white);
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Noto Sans TC", sans-serif;
+        min-height: 100vh;
+        display: flex;
         flex-direction: column;
-        gap: 0;
-        padding: 2rem 0;
-        transition: right 0.3s ease;
-        box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-        z-index: 999;
-        border-left: 2px solid var(--tiffany-primary);
+        margin: 0;
+        color: var(--gray-dark);
       }
 
-      .nav-links.active {
-        right: 0;
+      /* Page Transition Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
+      main {
+        animation: fadeIn 0.4s ease;
+      }
+
+      /* Smooth link transitions */
+      a {
+        transition: all 0.3s ease;
+      }
+
+      /* 導覽列拉霸機效果 */
       .nav-item {
-        width: 100%;
-        min-width: unset;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        position: relative;
+        height: 24px;
+        min-width: 80px;
+        display: inline-block;
+        overflow: hidden;
       }
 
       .nav-link {
+        position: relative;
+        display: block;
         width: 100%;
-        padding: 1rem;
-        font-size: 1.1rem;
+        height: 100%;
+        text-decoration: none;
+        color: var(--gray-dark);
+        transition: color 0.3s ease;
+        font-size: 1rem;
+      }
+
+      .nav-text-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       }
 
       .nav-text {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
         justify-content: center;
+        white-space: nowrap;
       }
-    }
-  </style>
-</head>
-<body>
-  <!-- 導覽列 -->
-  <nav style="background: var(--white); color: var(--gray-dark); box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-bottom: 2px solid var(--tiffany-primary);">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <a href="/" style="font-size: 1.5rem; font-weight: bold; color: var(--gray-dark); text-decoration: none;">青曦空間設計</a>
-        
-        <!-- 漢堡選單按鈕 -->
-        <button class="hamburger" id="hamburger" aria-label="選單">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
 
-        <!-- 導覽連結 -->
-        <div class="nav-links" id="navLinks">
-          <span class="nav-item">
-            <a href="/" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Home</span>
-                <span class="nav-text nav-text-zh">首頁</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/portfolio" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Portfolio</span>
-                <span class="nav-text nav-text-zh">作品集</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/blog" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Blog</span>
-                <span class="nav-text nav-text-zh">知識分享</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/tools" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Tools</span>
-                <span class="nav-text nav-text-zh">裝修工具</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/#workflow" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Workflow</span>
-                <span class="nav-text nav-text-zh">服務流程</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/contact" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Contact</span>
-                <span class="nav-text nav-text-zh">聯絡我</span>
-              </div>
-            </a>
-          </span>
+      .nav-text-en {
+        position: absolute;
+        top: 0;
+      }
+
+      .nav-text-zh {
+        position: absolute;
+        top: 100%;
+      }
+
+      .nav-link:hover .nav-text-container {
+        transform: translateY(-100%);
+      }
+
+      .nav-link:hover {
+        color: var(--resort-primary);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+      }
+
+      /* 漢堡選單按鈕 */
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .hamburger span {
+        width: 25px;
+        height: 3px;
+        background: var(--gray-dark);
+        transition: all 0.3s ease;
+        border-radius: 2px;
+      }
+
+      .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(8px, 8px);
+      }
+
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -7px);
+      }
+
+      /* 手機版樣式 */
+      @media (max-width: 768px) {
+        .hamburger {
+          display: flex;
+        }
+
+        .nav-links {
+          position: fixed;
+          top: 60px;
+          right: -100%;
+          width: 250px;
+          height: calc(100vh - 60px);
+          background: var(--white);
+          flex-direction: column;
+          gap: 0;
+          padding: 2rem 0;
+          transition: right 0.3s ease;
+          box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+          z-index: 999;
+          border-left: 2px solid var(--resort-primary);
+        }
+
+        .nav-links.active {
+          right: 0;
+        }
+
+        .nav-item {
+          width: 100%;
+          min-width: unset;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link {
+          width: 100%;
+          padding: 1rem;
+          font-size: 1.1rem;
+        }
+
+        .nav-text {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 導覽列 -->
+    <nav
+      style="background: var(--white); color: var(--gray-dark); box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-bottom: 2px solid var(--resort-primary);"
+    >
+      <div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
+        <div
+          style="display: flex; justify-content: space-between; align-items: center;"
+        >
+          <a
+            href="/"
+            style="font-size: 1.5rem; font-weight: bold; color: var(--gray-dark); text-decoration: none;"
+            >夏洛克Villa民宿</a
+          >
+
+          <!-- 漢堡選單按鈕 -->
+          <button class="hamburger" id="hamburger" aria-label="選單">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <!-- 導覽連結 -->
+          <div class="nav-links" id="navLinks">
+            <span class="nav-item">
+              <a href="/" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Home</span>
+                  <span class="nav-text nav-text-zh">首頁</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a href="/portfolio" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Rooms</span>
+                  <span class="nav-text nav-text-zh">房型介紹</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a href="/transportation" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Transport</span>
+                  <span class="nav-text nav-text-zh">交通資訊</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a href="/attractions" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Attractions</span>
+                  <span class="nav-text nav-text-zh">周邊景點</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a
+                href="https://booking.owlting.com/summerrockvilla"
+                target="_blank"
+                class="nav-link"
+              >
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Booking</span>
+                  <span class="nav-text nav-text-zh">線上訂房</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a href="/contact" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Contact</span>
+                  <span class="nav-text nav-text-zh">聯絡我們</span>
+                </div>
+              </a>
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
+    </nav>
 
-  <!-- 主要內容 -->
-  <main style="flex: 1;">
-    <slot />
-  </main>
+    <!-- 主要內容 -->
+    <main style="flex: 1;">
+      <slot />
+    </main>
 
-  <!-- 頁尾 -->
-  <footer style="background: var(--gray-darkest); color: white; padding: 2rem 0; border-top: 3px solid var(--tiffany-primary);">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem; text-align: center;">
-      <p style="margin: 0; color: var(--gray-light);">&copy; 2025 青曦空間設計. All rights reserved.</p>
-    </div>
-  </footer>
+    <!-- 頁尾 -->
+    <footer
+      style="background: var(--gray-darkest); color: white; padding: 3rem 0; border-top: 3px solid var(--resort-primary);"
+    >
+      <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem;"
+        >
+          <div>
+            <h3 style="color: var(--resort-primary); margin-bottom: 1rem;">
+              夏洛克Villa民宿
+            </h3>
+            <p style="color: var(--gray-light); line-height: 1.6;">
+              坐落於花蓮的莊園型度假民宿，擁有5000坪庭園、私人湖泊與泳池，提供悠閒舒適的度假體驗。
+            </p>
+          </div>
+          <div>
+            <h4
+              style="color: var(--resort-primary); margin-bottom: 1rem; font-size: 1.1rem;"
+            >
+              聯絡資訊
+            </h4>
+            <p style="color: var(--gray-light); margin: 0.5rem 0;">
+              <span style="color: var(--resort-light);">📍</span> 花蓮縣吉安鄉干城二街125巷12號
+            </p>
+            <p style="color: var(--gray-light); margin: 0.5rem 0;">
+              <span style="color: var(--resort-light);">📞</span> 03-8541633
+            </p>
+            <p style="color: var(--gray-light); margin: 0.5rem 0;">
+              <span style="color: var(--resort-light);">✉️</span> summerrocker2014@gmail.com
+            </p>
+          </div>
+          <div>
+            <h4
+              style="color: var(--resort-primary); margin-bottom: 1rem; font-size: 1.1rem;"
+            >
+              快速連結
+            </h4>
+            <p style="margin: 0.5rem 0;">
+              <a
+                href="https://booking.owlting.com/summerrockvilla"
+                target="_blank"
+                style="color: var(--gray-light); text-decoration: none;"
+                >線上訂房</a
+              >
+            </p>
+            <p style="margin: 0.5rem 0;">
+              <a
+                href="https://www.facebook.com/summerrocker2014"
+                target="_blank"
+                style="color: var(--gray-light); text-decoration: none;"
+                >Facebook</a
+              >
+            </p>
+            <p style="margin: 0.5rem 0;">
+              <a
+                href="/contact"
+                style="color: var(--gray-light); text-decoration: none;"
+                >聯絡我們</a
+              >
+            </p>
+          </div>
+        </div>
+        <div
+          style="text-align: center; padding-top: 2rem; border-top: 1px solid var(--gray-dark);"
+        >
+          <p style="margin: 0; color: var(--gray-light);">
+            &copy; 2025 夏洛克Villa民宿. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </footer>
 
-  <script define:vars={{ maintenanceMode: MAINTENANCE_MODE }}>
-    // 維護模式檢查（客戶端重定向，作為 middleware 的備用方案）
-    if (maintenanceMode && window.location.pathname !== '/coming-soon') {
-      window.location.replace('/coming-soon');
-    }
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top" aria-label="返回頂部">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
 
-    const hamburger = document.getElementById('hamburger');
-    const navLinks = document.getElementById('navLinks');
+    <style>
+      .back-to-top {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 50px;
+        height: 50px;
+        background: var(--resort-primary);
+        color: var(--white);
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(138, 163, 135, 0.3);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 999;
+      }
 
-    hamburger?.addEventListener('click', () => {
-      hamburger.classList.toggle('active');
-      navLinks?.classList.toggle('active');
-    });
+      .back-to-top.visible {
+        opacity: 1;
+        visibility: visible;
+      }
 
-    // 點擊連結後關閉選單
-    navLinks?.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        hamburger?.classList.remove('active');
-        navLinks?.classList.remove('active');
+      .back-to-top:hover {
+        background: var(--resort-dark);
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(138, 163, 135, 0.4);
+      }
+
+      @media (max-width: 768px) {
+        .back-to-top {
+          bottom: 1.5rem;
+          right: 1.5rem;
+          width: 45px;
+          height: 45px;
+        }
+      }
+    </style>
+
+    <script define:vars={{ maintenanceMode: MAINTENANCE_MODE }}>
+      // 維護模式檢查（客戶端重定向，作為 middleware 的備用方案）
+      if (maintenanceMode && window.location.pathname !== "/coming-soon") {
+        window.location.replace("/coming-soon");
+      }
+
+      const hamburger = document.getElementById("hamburger");
+      const navLinks = document.getElementById("navLinks");
+
+      hamburger?.addEventListener("click", () => {
+        hamburger.classList.toggle("active");
+        navLinks?.classList.toggle("active");
       });
-    });
-  </script>
-</body>
+
+      // 點擊連結後關閉選單
+      navLinks?.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          hamburger?.classList.remove("active");
+          navLinks?.classList.remove("active");
+        });
+      });
+
+      // Back to Top Button
+      const backToTop = document.getElementById("backToTop");
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 300) {
+          backToTop?.classList.add("visible");
+        } else {
+          backToTop?.classList.remove("visible");
+        }
+      });
+
+      backToTop?.addEventListener("click", () => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      });
+    </script>
+  </body>
 </html>

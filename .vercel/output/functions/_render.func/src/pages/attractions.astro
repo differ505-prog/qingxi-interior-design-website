@@ -1,0 +1,663 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="周邊景點 - 夏洛克Villa民宿">
+    <div class="attractions-container">
+        <div class="content-wrapper">
+            <div class="header-section">
+                <h6 class="section-subtitle">NEARBY ATTRACTIONS</h6>
+                <h1>周邊景點</h1>
+                <p class="subtitle">探索花蓮的自然美景與人文風情</p>
+            </div>
+
+            <!-- 景點分類 -->
+            <div class="category-tabs">
+                <button class="tab-btn active" data-category="all"
+                    >全部景點</button
+                >
+                <button class="tab-btn" data-category="nature">自然景觀</button>
+                <button class="tab-btn" data-category="cultural"
+                    >人文歷史</button
+                >
+                <button class="tab-btn" data-category="food">美食小吃</button>
+            </div>
+
+            <!-- 景點網格 -->
+            <div class="attractions-grid">
+                <!-- 太魯閣國家公園 -->
+                <article class="attraction-card" data-category="nature">
+                    <div class="attraction-image">
+                        <img
+                            src="https://images.unsplash.com/photo-1589898578795-17c1b3dc47e9?w=600"
+                            alt="太魯閣峽谷"
+                        />
+                        <div class="distance-badge">30分鐘車程</div>
+                    </div>
+                    <div class="attraction-content">
+                        <h3>太魯閣國家公園</h3>
+                        <div class="attraction-meta">
+                            <span class="category">🏔️ 自然景觀</span>
+                            <span class="distance">📍 約 30 公里</span>
+                        </div>
+                        <p class="description">
+                            世界級的大理石峽谷景觀，壯麗的斷崖峭壁與清澈的立霧溪水交織，必訪景點包括燕子口、九曲洞、長春祠等。
+                        </p>
+                        <div class="highlights">
+                            <span class="highlight-tag">燕子口步道</span>
+                            <span class="highlight-tag">九曲洞</span>
+                            <span class="highlight-tag">長春祠</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 七星潭 -->
+                <article class="attraction-card" data-category="nature">
+                    <div class="attraction-image">
+                        <img
+                            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600"
+                            alt="七星潭海灘"
+                        />
+                        <div class="distance-badge">20分鐘車程</div>
+                    </div>
+                    <div class="attraction-content">
+                        <h3>七星潭風景區</h3>
+                        <div class="attraction-meta">
+                            <span class="category">🌊 自然景觀</span>
+                            <span class="distance">📍 約 12 公里</span>
+                        </div>
+                        <p class="description">
+                            花蓮最美的海灣之一，綿延的礫石灣與湛藍太平洋相映，日出、觀星的絕佳地點，傍晚時分尤其浪漫。
+                        </p>
+                        <div class="highlights">
+                            <span class="highlight-tag">看日出</span>
+                            <span class="highlight-tag">騎自行車</span>
+                            <span class="highlight-tag">撿石頭</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 清水斷崖 -->
+                <article class="attraction-card" data-category="nature">
+                    <div class="attraction-image">
+                        <img
+                            src="https://images.unsplash.com/photo-1564760290292-23341e4df6ec?w=600"
+                            alt="清水斷崖"
+                        />
+                        <div class="distance-badge">40分鐘車程</div>
+                    </div>
+                    <div class="attraction-content">
+                        <h3>清水斷崖</h3>
+                        <div class="attraction-meta">
+                            <span class="category">🏔️ 自然景觀</span>
+                            <span class="distance">📍 約 35 公里</span>
+                        </div>
+                        <p class="description">
+                            台灣八大奇景之一，高達數百公尺的斷崖直插太平洋，藍天碧海與峭壁交織的壯麗景色令人震撼。
+                        </p>
+                        <div class="highlights">
+                            <span class="highlight-tag">觀景台</span>
+                            <span class="highlight-tag">攝影聖地</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 松園別館 -->
+                <article class="attraction-card" data-category="cultural">
+                    <div class="attraction-image">
+                        <img
+                            src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600"
+                            alt="日式建築"
+                        />
+                        <div class="distance-badge">15分鐘車程</div>
+                    </div>
+                    <div class="attraction-content">
+                        <h3>松園別館</h3>
+                        <div class="attraction-meta">
+                            <span class="category">🏛️ 人文歷史</span>
+                            <span class="distance">📍 約 8 公里</span>
+                        </div>
+                        <p class="description">
+                            日治時期軍事建築，保存完整的日式庭園與建築，可眺望花蓮港與太平洋美景，適合文青漫步。
+                        </p>
+                        <div class="highlights">
+                            <span class="highlight-tag">日式建築</span>
+                            <span class="highlight-tag">藝文展覽</span>
+                            <span class="highlight-tag">下午茶</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 花蓮文創園區 -->
+                <article class="attraction-card" data-category="cultural">
+                    <div class="attraction-image">
+                        <img
+                            src="https://images.unsplash.com/photo-1515036551567-bf1198cccc35?w=600"
+                            alt="文創園區"
+                        />
+                        <div class="distance-badge">10分鐘車程</div>
+                    </div>
+                    <div class="attraction-content">
+                        <h3>花蓮文創園區</h3>
+                        <div class="attraction-meta">
+                            <span class="category">🎨 人文歷史</span>
+                            <span class="distance">📍 約 5 公里</span>
+                        </div>
+                        <p class="description">
+                            前身為酒廠的文創基地，結合歷史建築與當代藝術，常有市集、展覽、音樂表演等活動。
+                        </p>
+                        <div class="highlights">
+                            <span class="highlight-tag">文創市集</span>
+                            <span class="highlight-tag">展覽活動</span>
+                            <span class="highlight-tag">特色餐廳</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 東大門夜市 -->
+                <article class="attraction-card" data-category="food">
+                    <div class="attraction-image">
+                        <img
+                            src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600"
+                            alt="夜市美食"
+                        />
+                        <div class="distance-badge">10分鐘車程</div>
+                    </div>
+                    <div class="attraction-content">
+                        <h3>東大門夜市</h3>
+                        <div class="attraction-meta">
+                            <span class="category">🍜 美食小吃</span>
+                            <span class="distance">📍 約 6 公里</span>
+                        </div>
+                        <p class="description">
+                            花蓮最大的觀光夜市，集結原住民一條街、各省一條街、福町夜市等，超過400個攤位，美食選擇豐富。
+                        </p>
+                        <div class="highlights">
+                            <span class="highlight-tag">原住民美食</span>
+                            <span class="highlight-tag">炸彈蔥油餅</span>
+                            <span class="highlight-tag">遊戲攤位</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 公正包子 -->
+                <article class="attraction-card" data-category="food">
+                    <div class="attraction-image">
+                        <img
+                            src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=600"
+                            alt="包子"
+                        />
+                        <div class="distance-badge">12分鐘車程</div>
+                    </div>
+                    <div class="attraction-content">
+                        <h3>公正包子店</h3>
+                        <div class="attraction-meta">
+                            <span class="category">🥟 美食小吃</span>
+                            <span class="distance">📍 約 7 公里</span>
+                        </div>
+                        <p class="description">
+                            花蓮必吃美食，蒸籠現蒸的小籠包與肉包，皮薄餡多汁，24小時營業，無論何時都大排長龍。
+                        </p>
+                        <div class="highlights">
+                            <span class="highlight-tag">小籠包</span>
+                            <span class="highlight-tag">24H營業</span>
+                            <span class="highlight-tag">在地名店</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 鯉魚潭 -->
+                <article class="attraction-card" data-category="nature">
+                    <div class="attraction-image">
+                        <img
+                            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600"
+                            alt="湖泊"
+                        />
+                        <div class="distance-badge">25分鐘車程</div>
+                    </div>
+                    <div class="attraction-content">
+                        <h3>鯉魚潭</h3>
+                        <div class="attraction-meta">
+                            <span class="category">🚣 自然景觀</span>
+                            <span class="distance">📍 約 18 公里</span>
+                        </div>
+                        <p class="description">
+                            花蓮最大的內陸湖泊，可租借天鵝船、腳踏車環湖，湖光山色美不勝收，適合親子同遊。
+                        </p>
+                        <div class="highlights">
+                            <span class="highlight-tag">划船</span>
+                            <span class="highlight-tag">騎車環湖</span>
+                            <span class="highlight-tag">賞螢火蟲</span>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 慕谷慕魚 -->
+                <article class="attraction-card" data-category="nature">
+                    <div class="attraction-image">
+                        <img
+                            src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600"
+                            alt="溪谷"
+                        />
+                        <div class="distance-badge">35分鐘車程</div>
+                    </div>
+                    <div class="attraction-content">
+                        <h3>慕谷慕魚</h3>
+                        <div class="attraction-meta">
+                            <span class="category">💧 自然景觀</span>
+                            <span class="distance">📍 約 25 公里</span>
+                        </div>
+                        <p class="description">
+                            清澈見底的木瓜溪谷，碧綠溪水與大理石峽谷交織，夏天戲水的秘境，需事先申請入山證。
+                        </p>
+                        <div class="highlights">
+                            <span class="highlight-tag">需申請</span>
+                            <span class="highlight-tag">戲水</span>
+                            <span class="highlight-tag">秘境</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <!-- 行程建議 -->
+            <div class="itinerary-section">
+                <h2>推薦行程</h2>
+                <div class="itinerary-grid">
+                    <div class="itinerary-card">
+                        <h3>🌅 一日遊行程</h3>
+                        <ol class="itinerary-list">
+                            <li>
+                                <strong>早上：</strong>七星潭看日出 →
+                                公正包子早餐
+                            </li>
+                            <li>
+                                <strong>上午：</strong
+                                >太魯閣國家公園（燕子口、九曲洞）
+                            </li>
+                            <li><strong>中午：</strong>天祥午餐</li>
+                            <li><strong>下午：</strong>清水斷崖觀景</li>
+                            <li><strong>傍晚：</strong>返回民宿休息</li>
+                            <li><strong>晚上：</strong>東大門夜市</li>
+                        </ol>
+                    </div>
+
+                    <div class="itinerary-card">
+                        <h3>🏖️ 兩日遊行程</h3>
+                        <ol class="itinerary-list">
+                            <li><strong>Day1 上午：</strong>花蓮文創園區</li>
+                            <li>
+                                <strong>Day1 下午：</strong>七星潭、松園別館
+                            </li>
+                            <li><strong>Day1 晚上：</strong>東大門夜市</li>
+                            <li><strong>Day2 早上：</strong>太魯閣國家公園</li>
+                            <li><strong>Day2 中午：</strong>清水斷崖</li>
+                            <li><strong>Day2 下午：</strong>鯉魚潭環湖</li>
+                        </ol>
+                    </div>
+
+                    <div class="itinerary-card">
+                        <h3>👨‍👩‍👧‍👦 親子遊行程</h3>
+                        <ol class="itinerary-list">
+                            <li><strong>早上：</strong>鯉魚潭划船</li>
+                            <li><strong>中午：</strong>潭邊餐廳午餐</li>
+                            <li><strong>下午：</strong>回民宿泳池戲水</li>
+                            <li><strong>傍晚：</strong>七星潭海邊散步</li>
+                            <li><strong>晚上：</strong>夜市美食與遊戲</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 貼心提醒 -->
+            <div class="tips-box">
+                <h3>💡 旅遊小提醒</h3>
+                <ul>
+                    <li>太魯閣部分景點需申請入園證，建議提前上網申請</li>
+                    <li>夏季建議攜帶防曬用品，山區早晚溫差大需備外套</li>
+                    <li>租車遊玩較為方便，民宿可協助推薦租車行</li>
+                    <li>部分景點手機訊號較弱，建議事先下載離線地圖</li>
+                    <li>花蓮美食眾多，建議保留充足時間品嚐在地小吃</li>
+                </ul>
+            </div>
+
+            <!-- CTA -->
+            <div class="cta-section">
+                <h3>以民宿為據點，展開您的花蓮之旅</h3>
+                <a
+                    href="https://booking.owlting.com/summerrockvilla"
+                    target="_blank"
+                    class="booking-btn"
+                >
+                    立即預訂
+                </a>
+            </div>
+        </div>
+    </div>
+</BaseLayout>
+
+<style>
+    .attractions-container {
+        min-height: calc(100vh - 80px);
+        margin-top: 80px;
+        padding: 4rem 2rem;
+        background: var(--off-white);
+    }
+
+    .content-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header-section {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .section-subtitle {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        color: var(--gray-medium);
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 400;
+        color: var(--gray-dark);
+        margin-bottom: 1rem;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+        color: var(--gray-medium);
+    }
+
+    /* 分類標籤 */
+    .category-tabs {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 3rem;
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        padding: 0.75rem 1.5rem;
+        background: var(--white);
+        border: 2px solid var(--gray-bg);
+        border-radius: 25px;
+        color: var(--gray-medium);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+        border-color: var(--resort-light);
+        color: var(--resort-dark);
+    }
+
+    .tab-btn.active {
+        background: var(--resort-primary);
+        border-color: var(--resort-primary);
+        color: var(--white);
+    }
+
+    /* 景點網格 */
+    .attractions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .attraction-card {
+        background: var(--white);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 2px solid var(--gray-bg);
+        transition: all 0.3s ease;
+    }
+
+    .attraction-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(138, 163, 135, 0.15);
+        border-color: var(--resort-light);
+    }
+
+    .attraction-image {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+
+    .attraction-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .attraction-card:hover .attraction-image img {
+        transform: scale(1.05);
+    }
+
+    .distance-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(138, 163, 135, 0.95);
+        color: var(--white);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+    }
+
+    .attraction-content {
+        padding: 1.5rem;
+    }
+
+    .attraction-content h3 {
+        font-size: 1.4rem;
+        color: var(--gray-dark);
+        margin-bottom: 0.75rem;
+    }
+
+    .attraction-meta {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .category,
+    .distance {
+        font-size: 0.85rem;
+        color: var(--resort-dark);
+        font-weight: 500;
+    }
+
+    .description {
+        color: var(--gray-medium);
+        line-height: 1.7;
+        margin-bottom: 1rem;
+    }
+
+    .highlights {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .highlight-tag {
+        background: var(--resort-pale);
+        color: var(--resort-dark);
+        padding: 0.35rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+    }
+
+    /* 行程建議 */
+    .itinerary-section {
+        margin-bottom: 4rem;
+    }
+
+    .itinerary-section h2 {
+        font-size: 2rem;
+        color: var(--gray-dark);
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .itinerary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2rem;
+    }
+
+    .itinerary-card {
+        background: var(--white);
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid var(--resort-accent);
+    }
+
+    .itinerary-card h3 {
+        font-size: 1.3rem;
+        color: var(--gray-dark);
+        margin-bottom: 1.5rem;
+    }
+
+    .itinerary-list {
+        padding-left: 1.5rem;
+        margin: 0;
+    }
+
+    .itinerary-list li {
+        color: var(--gray-medium);
+        line-height: 2;
+        margin: 0.75rem 0;
+    }
+
+    .itinerary-list strong {
+        color: var(--resort-dark);
+    }
+
+    /* 提醒區塊 */
+    .tips-box {
+        background: var(--resort-pale);
+        padding: 2rem;
+        border-radius: 12px;
+        border-left: 4px solid var(--resort-primary);
+        margin-bottom: 3rem;
+    }
+
+    .tips-box h3 {
+        font-size: 1.3rem;
+        color: var(--resort-dark);
+        margin-bottom: 1rem;
+    }
+
+    .tips-box ul {
+        padding-left: 1.5rem;
+        margin: 0;
+    }
+
+    .tips-box li {
+        color: var(--gray-medium);
+        line-height: 1.8;
+        margin: 0.75rem 0;
+    }
+
+    /* CTA */
+    .cta-section {
+        text-align: center;
+        background: var(--white);
+        padding: 3rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .cta-section h3 {
+        font-size: 1.8rem;
+        color: var(--gray-dark);
+        margin-bottom: 2rem;
+    }
+
+    .booking-btn {
+        display: inline-block;
+        padding: 1rem 3rem;
+        background: var(--resort-primary);
+        color: var(--white);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .booking-btn:hover {
+        background: var(--resort-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(138, 163, 135, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .attractions-container {
+            margin-top: 60px;
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .attractions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .itinerary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cta-section {
+            padding: 2rem 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    // 分類篩選功能
+    document.addEventListener("DOMContentLoaded", () => {
+        const tabs = document.querySelectorAll(".tab-btn");
+        const cards = document.querySelectorAll(".attraction-card");
+
+        tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                const category = tab.dataset.category;
+
+                // 更新 active 狀態
+                tabs.forEach((t) => t.classList.remove("active"));
+                tab.classList.add("active");
+
+                // 篩選卡片
+                cards.forEach((card) => {
+                    if (
+                        category === "all" ||
+                        card.dataset.category === category
+                    ) {
+                        card.style.display = "block";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+            });
+        });
+    });
+</script>

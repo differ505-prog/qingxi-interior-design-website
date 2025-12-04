@@ -1,0 +1,577 @@
+---
+// Room Comparison Component
+const rooms = [
+    {
+        id: "deluxe",
+        name: "豪華雙人房",
+        image: "/deluxe-room.png",
+        price: "from NT$3,200",
+        capacity: "2人",
+        size: "12坪",
+        bed: "King Size",
+        view: "庭園景觀",
+        bathroom: "淋浴",
+        features: [
+            "獨立衛浴",
+            "冷氣空調",
+            "液晶電視",
+            "WiFi",
+            "吹風機",
+            "咖啡機",
+            "保險箱",
+            "Mini吧",
+        ],
+        url: "/rooms/deluxe-room",
+    },
+    {
+        id: "family",
+        name: "家庭套房",
+        image: "/family-suite.png",
+        price: "from NT$4,800",
+        capacity: "4人",
+        size: "18坪",
+        bed: "2張雙人床",
+        view: "庭園景觀",
+        bathroom: "淋浴+浴缸",
+        features: [
+            "獨立客廳",
+            "大浴室",
+            "冷氣空調",
+            "55吋電視",
+            "WiFi",
+            "咖啡吧",
+            "兒童友善",
+            "用餐區",
+        ],
+        url: "/rooms/family-suite",
+    },
+    {
+        id: "lake",
+        name: "湖景套房",
+        image: "/lake-suite.png",
+        price: "from NT$4,200",
+        capacity: "2-3人",
+        size: "15坪",
+        bed: "King Size",
+        view: "私人湖景",
+        bathroom: "淋浴+浴缸",
+        features: [
+            "觀景陽台",
+            "獨立浴缸",
+            "Nespresso",
+            "雨淋花灑",
+            "WiFi",
+            "液晶電視",
+            "日出日落景觀",
+            "高級備品",
+        ],
+        url: "/rooms/lake-suite",
+    },
+    {
+        id: "villa",
+        name: "獨棟別墅",
+        image: "/villa-room.png",
+        price: "from NT$12,000",
+        capacity: "6-8人",
+        size: "40坪",
+        bed: "3臥室",
+        view: "私人庭園",
+        bathroom: "2.5間衛浴",
+        features: [
+            "獨棟建築",
+            "私人庭園",
+            "完整廚房",
+            "客廳餐廳",
+            "壁爐",
+            "洗衣機",
+            "專屬停車位",
+            "烤肉區",
+        ],
+        url: "/rooms/villa",
+    },
+];
+---
+
+<div class="comparison-tool">
+    <div class="comparison-header">
+        <h2>房型比較</h2>
+        <p>選擇最多3個房型進行比較，找到最適合您的選擇</p>
+    </div>
+
+    <div class="room-selector">
+        {
+            rooms.map((room) => (
+                <label class="room-checkbox">
+                    <input
+                        type="checkbox"
+                        name="room"
+                        value={room.id}
+                        data-room-name={room.name}
+                    />
+                    <span class="checkbox-label">
+                        <img src={room.image} alt={room.name} loading="lazy" />
+                        <span class="room-name">{room.name}</span>
+                    </span>
+                </label>
+            ))
+        }
+    </div>
+
+    <div class="comparison-actions">
+        <button class="compare-btn" id="compareBtn" disabled>
+            開始比較 (<span id="selectedCount">0</span>/3)
+        </button>
+        <button class="reset-btn" id="resetBtn">重置選擇</button>
+    </div>
+
+    <div
+        class="comparison-table-container"
+        id="comparisonTableContainer"
+        style="display: none;"
+    >
+        <table class="comparison-table" id="comparisonTable">
+            <thead>
+                <tr>
+                    <th class="feature-col">項目</th>
+                    <!-- Dynamic columns will be inserted here -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic rows will be inserted here -->
+            </tbody>
+        </table>
+        <div class="comparison-footer">
+            <button class="close-comparison" id="closeComparison"
+                >關閉比較</button
+            >
+        </div>
+    </div>
+</div>
+
+<style>
+    .comparison-tool {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3rem 2rem;
+    }
+
+    .comparison-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .comparison-header h2 {
+        font-size: 2rem;
+        color: var(--gray-dark);
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+    }
+
+    .comparison-header p {
+        color: var(--gray-medium);
+        font-size: 1.05rem;
+    }
+
+    .room-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .room-checkbox {
+        cursor: pointer;
+    }
+
+    .room-checkbox input[type="checkbox"] {
+        display: none;
+    }
+
+    .checkbox-label {
+        display: block;
+        border: 2px solid var(--gray-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background: var(--white);
+    }
+
+    .room-checkbox:hover .checkbox-label {
+        border-color: var(--resort-light);
+        box-shadow: 0 4px 12px rgba(138, 163, 135, 0.15);
+    }
+
+    .room-checkbox input[type="checkbox"]:checked + .checkbox-label {
+        border-color: var(--resort-primary);
+        box-shadow: 0 6px 20px rgba(138, 163, 135, 0.25);
+    }
+
+    .checkbox-label img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .room-name {
+        display: block;
+        padding: 1rem;
+        text-align: center;
+        font-weight: 500;
+        color: var(--gray-dark);
+    }
+
+    .room-checkbox input[type="checkbox"]:checked + .checkbox-label .room-name {
+        background: var(--resort-pale);
+        color: var(--resort-primary);
+    }
+
+    .comparison-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 3rem;
+    }
+
+    .compare-btn,
+    .reset-btn,
+    .close-comparison {
+        padding: 1rem 2.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .compare-btn {
+        background: var(--resort-primary);
+        color: var(--white);
+    }
+
+    .compare-btn:hover:not(:disabled) {
+        background: var(--resort-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(138, 163, 135, 0.3);
+    }
+
+    .compare-btn:disabled {
+        background: var(--gray-light);
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .reset-btn {
+        background: var(--white);
+        color: var(--gray-dark);
+        border: 2px solid var(--gray-bg);
+    }
+
+    .reset-btn:hover {
+        border-color: var(--resort-primary);
+        color: var(--resort-primary);
+    }
+
+    .comparison-table-container {
+        animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--white);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+        padding: 1.25rem;
+        text-align: left;
+        border-bottom: 1px solid var(--gray-bg);
+    }
+
+    .comparison-table thead {
+        background: var(--resort-primary);
+        color: var(--white);
+    }
+
+    .comparison-table thead th {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .feature-col {
+        width: 180px;
+        font-weight: 600;
+        color: var(--gray-dark);
+        background: var(--off-white);
+    }
+
+    .comparison-table tbody tr:hover {
+        background: var(--resort-pale);
+    }
+
+    .room-image {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .room-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--gray-dark);
+        margin-top: 0.5rem;
+    }
+
+    .price-tag {
+        color: var(--resort-primary);
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-top: 0.25rem;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .feature-list li {
+        padding: 0.25rem 0;
+        color: var(--gray-medium);
+    }
+
+    .feature-list li::before {
+        content: "✓ ";
+        color: var(--resort-primary);
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+
+    .view-room-btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: var(--resort-primary);
+        color: var(--white);
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .view-room-btn:hover {
+        background: var(--resort-dark);
+        transform: translateY(-2px);
+    }
+
+    .comparison-footer {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .close-comparison {
+        background: var(--gray-dark);
+        color: var(--white);
+    }
+
+    .close-comparison:hover {
+        background: var(--gray-darkest);
+    }
+
+    @media (max-width: 768px) {
+        .room-selector {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .comparison-actions {
+            flex-direction: column;
+        }
+
+        .compare-btn,
+        .reset-btn {
+            width: 100%;
+        }
+
+        .comparison-table {
+            font-size: 0.9rem;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .feature-col {
+            width: 100px;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .room-selector {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script define:vars={{ rooms }}>
+    document.addEventListener("DOMContentLoaded", () => {
+        const checkboxes = document.querySelectorAll('input[name="room"]');
+        const compareBtn = document.getElementById("compareBtn");
+        const resetBtn = document.getElementById("resetBtn");
+        const selectedCount = document.getElementById("selectedCount");
+        const comparisonTableContainer = document.getElementById(
+            "comparisonTableContainer",
+        );
+        const comparisonTable = document.getElementById("comparisonTable");
+        const closeComparisonBtn = document.getElementById("closeComparison");
+
+        let selected = [];
+
+        function updateSelection() {
+            selected = Array.from(checkboxes)
+                .filter((cb) => cb.checked)
+                .map((cb) => cb.value);
+
+            selectedCount.textContent = selected.length;
+            compareBtn.disabled = selected.length < 2;
+
+            // Limit to 3 selections
+            if (selected.length >= 3) {
+                checkboxes.forEach((cb) => {
+                    if (!cb.checked) cb.disabled = true;
+                });
+            } else {
+                checkboxes.forEach((cb) => (cb.disabled = false));
+            }
+        }
+
+        function showComparison() {
+            const selectedRooms = rooms.filter((room) =>
+                selected.includes(room.id),
+            );
+
+            // Build table header
+            const thead = comparisonTable.querySelector("thead tr");
+            thead.innerHTML = '<th class="feature-col">項目</th>';
+            selectedRooms.forEach((room) => {
+                thead.innerHTML += `<th>${room.name}</th>`;
+            });
+
+            // Build table body
+            const tbody = comparisonTable.querySelector("tbody");
+            tbody.innerHTML = `
+        <tr>
+          <td class="feature-col">圖片</td>
+          ${selectedRooms
+              .map(
+                  (room) => `
+            <td><img src="${room.image}" alt="${room.name}" class="room-image" /></td>
+          `,
+              )
+              .join("")}
+        </tr>
+        <tr>
+          <td class="feature-col">價格</td>
+          ${selectedRooms
+              .map(
+                  (room) => `
+            <td class="price-tag">${room.price}</td>
+          `,
+              )
+              .join("")}
+        </tr>
+        <tr>
+          <td class="feature-col">容納人數</td>
+          ${selectedRooms.map((room) => `<td>${room.capacity}</td>`).join("")}
+        </tr>
+        <tr>
+          <td class="feature-col">坪數</td>
+          ${selectedRooms.map((room) => `<td>${room.size}</td>`).join("")}
+        </tr>
+        <tr>
+          <td class="feature-col">床型</td>
+          ${selectedRooms.map((room) => `<td>${room.bed}</td>`).join("")}
+        </tr>
+        <tr>
+          <td class="feature-col">景觀</td>
+          ${selectedRooms.map((room) => `<td>${room.view}</td>`).join("")}
+        </tr>
+        <tr>
+          <td class="feature-col">衛浴</td>
+          ${selectedRooms.map((room) => `<td>${room.bathroom}</td>`).join("")}
+        </tr>
+        <tr>
+          <td class="feature-col">主要設施</td>
+          ${selectedRooms
+              .map(
+                  (room) => `
+            <td>
+              <ul class="feature-list">
+                ${room.features
+                    .slice(0, 6)
+                    .map((f) => `<li>${f}</li>`)
+                    .join("")}
+              </ul>
+            </td>
+          `,
+              )
+              .join("")}
+        </tr>
+        <tr>
+          <td class="feature-col">查看詳情</td>
+          ${selectedRooms
+              .map(
+                  (room) => `
+            <td><a href="${room.url}" class="view-room-btn">查看房型</a></td>
+          `,
+              )
+              .join("")}
+        </tr>
+      `;
+
+            comparisonTableContainer.style.display = "block";
+            comparisonTableContainer.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }
+
+        function resetSelection() {
+            checkboxes.forEach((cb) => {
+                cb.checked = false;
+                cb.disabled = false;
+            });
+            selected = [];
+            updateSelection();
+            comparisonTableContainer.style.display = "none";
+        }
+
+        checkboxes.forEach((cb) => {
+            cb.addEventListener("change", updateSelection);
+        });
+
+        compareBtn?.addEventListener("click", showComparison);
+        resetBtn?.addEventListener("click", resetSelection);
+        closeComparisonBtn?.addEventListener("click", () => {
+            comparisonTableContainer.style.display = "none";
+        });
+
+        updateSelection();
+    });
+</script>

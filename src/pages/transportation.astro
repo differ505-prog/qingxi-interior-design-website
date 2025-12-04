@@ -1,0 +1,540 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="交通資訊 - 夏洛克Villa民宿">
+    <div class="transport-container">
+        <div class="content-wrapper">
+            <div class="header-section">
+                <h6 class="section-subtitle">GETTING HERE</h6>
+                <h1>交通資訊</h1>
+                <p class="subtitle">多種交通方式，輕鬆抵達夏洛克</p>
+            </div>
+
+            <!-- 地址資訊 -->
+            <div class="address-section">
+                <div class="address-card">
+                    <div class="icon">📍</div>
+                    <h3>民宿地址</h3>
+                    <p class="address-text">花蓮縣吉安鄉干城二街125巷12號</p>
+                    <a
+                        href="https://maps.app.goo.gl/Xje2NCzoQfbtvRmJ9"
+                        target="_blank"
+                        class="map-btn"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                            ></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        開啟 Google 地圖
+                    </a>
+                </div>
+            </div>
+
+            <!-- 交通方式 -->
+            <div class="transport-methods">
+                <h2>如何抵達</h2>
+
+                <div class="method-grid">
+                    <!-- 自行開車 -->
+                    <div class="method-card">
+                        <div class="method-icon">🚗</div>
+                        <h3>自行開車</h3>
+                        <div class="route-info">
+                            <h4>從台北出發</h4>
+                            <ol>
+                                <li>國道5號（雪山隧道）→ 蘇澳</li>
+                                <li>台9線（蘇花公路）→ 花蓮市</li>
+                                <li>台9線轉吉安鄉方向</li>
+                                <li>抵達干城二街125巷</li>
+                            </ol>
+                            <p class="time-info">⏱️ 車程約 3.5-4 小時</p>
+                        </div>
+                        <div class="route-info">
+                            <h4>從花蓮火車站出發</h4>
+                            <ol>
+                                <li>沿中山路往南行駛</li>
+                                <li>右轉進入吉安鄉</li>
+                                <li>依導航指示前往干城二街</li>
+                            </ol>
+                            <p class="time-info">⏱️ 車程約 15 分鐘</p>
+                        </div>
+                        <div class="highlight-box">
+                            <strong>停車資訊：</strong>民宿提供免費專屬停車位
+                        </div>
+                    </div>
+
+                    <!-- 大眾運輸 -->
+                    <div class="method-card">
+                        <div class="method-icon">🚆</div>
+                        <h3>火車 + 接駁</h3>
+                        <div class="route-info">
+                            <h4>搭乘火車</h4>
+                            <ol>
+                                <li>搭乘台鐵至<strong>花蓮火車站</strong></li>
+                                <li>出站後可選擇以下方式：</li>
+                            </ol>
+
+                            <div class="sub-options">
+                                <div class="sub-option">
+                                    <strong>🚕 計程車</strong>
+                                    <p>車程約15分鐘，車資約 NT$250-300</p>
+                                </div>
+                                <div class="sub-option">
+                                    <strong>🚌 公車</strong>
+                                    <p>搭乘花蓮客運往吉安方向</p>
+                                    <p>於干城站下車步行約8分鐘</p>
+                                </div>
+                                <div class="sub-option">
+                                    <strong>🚐 民宿接駁</strong>
+                                    <p>提供付費接駁服務（需提前預約）</p>
+                                    <p>費用：NT$300/趟</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 機場接駁 -->
+                    <div class="method-card">
+                        <div class="method-icon">✈️</div>
+                        <h3>飛機 + 接駁</h3>
+                        <div class="route-info">
+                            <h4>花蓮機場</h4>
+                            <ol>
+                                <li>抵達花蓮機場</li>
+                                <li>距離民宿約 8 公里</li>
+                                <li>建議搭乘計程車或預約接駁</li>
+                            </ol>
+                            <p class="time-info">⏱️ 車程約 15 分鐘</p>
+                        </div>
+                        <div class="highlight-box">
+                            <strong>機場接駁：</strong>提供付費接駁服務
+                            NT$400/趟<br />
+                            <small>請於訂房時或入住前一天預約</small>
+                        </div>
+                    </div>
+
+                    <!-- 租車資訊 -->
+                    <div class="method-card">
+                        <div class="method-icon">🔑</div>
+                        <h3>租車建議</h3>
+                        <div class="route-info">
+                            <p class="intro-text">
+                                建議在花蓮租車，方便遊覽周邊景點
+                            </p>
+
+                            <h4>火車站附近租車行</h4>
+                            <ul class="simple-list">
+                                <li>格上租車（花蓮站）</li>
+                                <li>和運租車（花蓮站）</li>
+                                <li>中租租車（花蓮站）</li>
+                            </ul>
+
+                            <h4>機車租賃</h4>
+                            <ul class="simple-list">
+                                <li>花蓮火車站周邊多家機車行</li>
+                                <li>費用約 NT$300-500/天</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            💡 <strong>小提醒：</strong
+                            >花蓮地區景點分散，建議租車遊玩更方便
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 重要提醒 -->
+            <div class="tips-section">
+                <h2>交通小提醒</h2>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon">⚠️</div>
+                        <h4>蘇花公路注意</h4>
+                        <p>
+                            行駛蘇花公路請小心駕駛，建議白天行車。雨天或颱風期間請隨時注意路況。
+                        </p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">📱</div>
+                        <h4>導航建議</h4>
+                        <p>
+                            使用 Google Maps
+                            導航至「夏洛克Villa民宿」或輸入完整地址。抵達前可來電確認路線。
+                        </p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">🕐</div>
+                        <h4>預估時間</h4>
+                        <p>
+                            建議預留充足時間，考慮塞車與休息。連假期間蘇花公路較易壅塞。
+                        </p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon">☎️</div>
+                        <div>路途需要協助？</div>
+                        <p>請隨時來電：<strong>03-8541633</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="cta-section">
+                <h3>準備好出發了嗎？</h3>
+                <p>預訂您的夏洛克假期</p>
+                <a
+                    href="https://booking.owlting.com/summerrockvilla"
+                    target="_blank"
+                    class="booking-btn"
+                >
+                    立即訂房
+                </a>
+            </div>
+        </div>
+    </div>
+</BaseLayout>
+
+<style>
+    .transport-container {
+        min-height: calc(100vh - 80px);
+        margin-top: 80px;
+        padding: 4rem 2rem;
+        background: var(--off-white);
+    }
+
+    .content-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header-section {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-subtitle {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        color: var(--gray-medium);
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 400;
+        color: var(--gray-dark);
+        margin-bottom: 1rem;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+        color: var(--gray-medium);
+    }
+
+    /* 地址區塊 */
+    .address-section {
+        margin-bottom: 4rem;
+    }
+
+    .address-card {
+        background: var(--white);
+        padding: 3rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .address-card .icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .address-card h3 {
+        font-size: 1.5rem;
+        color: var(--resort-primary);
+        margin-bottom: 1rem;
+    }
+
+    .address-text {
+        font-size: 1.2rem;
+        color: var(--gray-dark);
+        margin-bottom: 1.5rem;
+    }
+
+    .map-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 2rem;
+        background: var(--resort-primary);
+        color: var(--white);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .map-btn:hover {
+        background: var(--resort-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(138, 163, 135, 0.3);
+    }
+
+    /* 交通方式 */
+    .transport-methods {
+        margin-bottom: 4rem;
+    }
+
+    .transport-methods h2 {
+        font-size: 2rem;
+        color: var(--gray-dark);
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .method-grid {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .method-card {
+        background: var(--white);
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 2px solid var(--gray-bg);
+        transition: all 0.3s ease;
+    }
+
+    .method-card:hover {
+        border-color: var(--resort-light);
+        transform: translateY(-2px);
+    }
+
+    .method-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .method-card h3 {
+        font-size: 1.6rem;
+        color: var(--gray-dark);
+        margin-bottom: 1.5rem;
+    }
+
+    .route-info {
+        margin-bottom: 1.5rem;
+    }
+
+    .route-info h4 {
+        font-size: 1.1rem;
+        color: var(--resort-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .route-info ol,
+    .route-info ul {
+        padding-left: 1.5rem;
+        margin: 0.75rem 0;
+    }
+
+    .route-info li {
+        color: var(--gray-medium);
+        line-height: 1.8;
+        margin: 0.5rem 0;
+    }
+
+    .time-info {
+        color: var(--resort-dark);
+        font-weight: 500;
+        margin-top: 0.75rem;
+    }
+
+    .intro-text {
+        color: var(--gray-medium);
+        line-height: 1.8;
+        margin-bottom: 1rem;
+    }
+
+    .simple-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .simple-list li {
+        padding: 0.4rem 0;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+
+    .simple-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--resort-primary);
+        font-weight: bold;
+    }
+
+    .sub-options {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .sub-option {
+        background: var(--resort-pale);
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 3px solid var(--resort-primary);
+    }
+
+    .sub-option strong {
+        color: var(--resort-dark);
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .sub-option p {
+        color: var(--gray-medium);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 0.25rem 0;
+    }
+
+    .highlight-box {
+        background: var(--resort-pale);
+        padding: 1.25rem;
+        border-radius: 8px;
+        border-left: 4px solid var(--resort-accent);
+        margin-top: 1.5rem;
+    }
+
+    .highlight-box strong {
+        color: var(--resort-dark);
+    }
+
+    .highlight-box small {
+        color: var(--gray-medium);
+        font-size: 0.9rem;
+    }
+
+    /* 提醒區塊 */
+    .tips-section {
+        margin-bottom: 4rem;
+    }
+
+    .tips-section h2 {
+        font-size: 2rem;
+        color: var(--gray-dark);
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .tip-card {
+        background: var(--white);
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border-top: 3px solid var(--resort-accent);
+    }
+
+    .tip-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .tip-card h4 {
+        font-size: 1.1rem;
+        color: var(--gray-dark);
+        margin-bottom: 0.75rem;
+    }
+
+    .tip-card p {
+        color: var(--gray-medium);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    /* CTA */
+    .cta-section {
+        text-align: center;
+        background: var(--white);
+        padding: 3rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .cta-section h3 {
+        font-size: 1.8rem;
+        color: var(--gray-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .cta-section p {
+        color: var(--gray-medium);
+        margin-bottom: 2rem;
+    }
+
+    .booking-btn {
+        display: inline-block;
+        padding: 1rem 3rem;
+        background: var(--resort-primary);
+        color: var(--white);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .booking-btn:hover {
+        background: var(--resort-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(138, 163, 135, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .transport-container {
+            margin-top: 60px;
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .address-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .method-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .cta-section {
+            padding: 2rem 1.5rem;
+        }
+
+        .tips-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

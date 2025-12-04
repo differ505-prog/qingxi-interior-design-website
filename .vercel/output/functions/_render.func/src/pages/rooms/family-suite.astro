@@ -1,0 +1,741 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const roomData = {
+    name: "家庭套房",
+    englishName: "Family Suite",
+    description:
+        "專為家庭設計的寬敞套房，提供充裕的居住空間讓全家人都能舒適放鬆。兩張雙人床配置可容納4人入住，獨立的起居空間設有沙發與茶几，讓您有更多活動與交流的場所。大面窗戶可欣賞園區美麗的庭園景觀。",
+    capacity: "4人",
+    size: "約18坪（60平方米）",
+    bedType: "兩張雙人床（各150x200cm）",
+    images: [
+        { src: "/family-suite.png", alt: "家庭套房全景" },
+        { src: "/family-suite.png", alt: "家庭套房臥室區" },
+        { src: "/family-suite.png", alt: "家庭套房客廳區" },
+        { src: "/family-suite.png", alt: "家庭套房衛浴" },
+    ],
+    amenities: [
+        {
+            icon: "🛏️",
+            name: "雙床配置",
+            description: "兩張150x200cm雙人床，舒適床墊",
+        },
+        {
+            icon: "🛋️",
+            name: "獨立客廳",
+            description: "舒適沙發、茶几，完整起居空間",
+        },
+        {
+            icon: "🚿",
+            name: "大浴室",
+            description: "乾濕分離，浴缸與淋浴設備齊全",
+        },
+        {
+            icon: "🌳",
+            name: "庭園景觀",
+            description: "大面窗戶，欣賞園區綠意盎然",
+        },
+        { icon: "❄️", name: "冷氣空調", description: "雙區獨立控制冷暖空調" },
+        {
+            icon: "📺",
+            name: "55吋電視",
+            description: "大螢幕智慧電視，支援串流",
+        },
+        {
+            icon: "🌐",
+            name: "高速WiFi",
+            description: "免費無線網路，多設備連接",
+        },
+        {
+            icon: "☕",
+            name: "茶水吧",
+            description: "咖啡機、快煮壺、茶包、咖啡",
+        },
+        { icon: "🔒", name: "電子鎖", description: "安全電子門鎖系統" },
+        { icon: "🧴", name: "盥洗用品", description: "全套環保沐浴備品" },
+        { icon: "💨", name: "吹風機", description: "專業級吹風機" },
+        { icon: "🪑", name: "用餐區", description: "小型餐桌椅，可於房內用餐" },
+        { icon: "🔌", name: "多插座", description: "房間多處配置充電插座" },
+        { icon: "🧸", name: "兒童友善", description: "可提供嬰兒床、兒童備品" },
+    ],
+    highlights: [
+        "寬敞18坪家庭專屬空間",
+        "獨立客廳區域，家人共享時光",
+        "兩張雙人床，舒適睡眠品質",
+        "大浴室配浴缸，適合親子使用",
+        "庭園景觀窗，自然採光佳",
+        "兒童友善設施與備品",
+        "可容納4人，適合家庭旅遊",
+    ],
+    policies: [
+        "入住時間：下午3:00 PM之後",
+        "退房時間：上午11:00 AM之前",
+        "禁止吸菸（室外設有吸菸區）",
+        "不可攜帶寵物",
+        "可免費加一位12歲以下兒童（不佔床）",
+        "可提供嬰兒床與兒童備品（需提前預約）",
+        "提供免費停車位",
+    ],
+};
+---
+
+<BaseLayout
+    title={`${roomData.name} - 夏洛克Villa民宿`}
+    description={`${roomData.description} ${roomData.size}的家庭空間，提供${roomData.bedType}，適合${roomData.capacity}入住。`}
+>
+    <div class="room-detail-container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="/">首頁</a>
+            <span class="separator">›</span>
+            <a href="/portfolio">房型介紹</a>
+            <span class="separator">›</span>
+            <span class="current">{roomData.name}</span>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1>{roomData.name}</h1>
+                <p class="english-name">{roomData.englishName}</p>
+                <p class="room-description">{roomData.description}</p>
+
+                <div class="room-quick-info">
+                    <div class="info-badge">
+                        <span class="icon">👨‍👩‍👧‍👦</span>
+                        <span>{roomData.capacity}</span>
+                    </div>
+                    <div class="info-badge">
+                        <span class="icon">📏</span>
+                        <span>{roomData.size}</span>
+                    </div>
+                    <div class="info-badge">
+                        <span class="icon">🛏️</span>
+                        <span>{roomData.bedType}</span>
+                    </div>
+                </div>
+
+                <a
+                    href="https://booking.owlting.com/summerrockvilla"
+                    target="_blank"
+                    class="main-cta-btn"
+                >
+                    立即預訂此房型
+                </a>
+            </div>
+
+            <div class="hero-image">
+                <img
+                    src={roomData.images[0].src}
+                    alt={roomData.images[0].alt}
+                />
+                <div class="room-badge family">家庭首選</div>
+            </div>
+        </section>
+
+        <!-- Image Gallery -->
+        <section class="gallery-section">
+            <h2 class="section-title">房間照片</h2>
+            <div class="image-grid">
+                {
+                    roomData.images.slice(1).map((image) => (
+                        <div class="gallery-item">
+                            <img
+                                src={image.src}
+                                alt={image.alt}
+                                loading="lazy"
+                            />
+                        </div>
+                    ))
+                }
+            </div>
+        </section>
+
+        <!-- Room Amenities -->
+        <section class="amenities-section">
+            <h2 class="section-title">房間設施</h2>
+            <div class="amenities-grid">
+                {
+                    roomData.amenities.map((amenity) => (
+                        <div class="amenity-card">
+                            <div class="amenity-icon">{amenity.icon}</div>
+                            <h3>{amenity.name}</h3>
+                            <p>{amenity.description}</p>
+                        </div>
+                    ))
+                }
+            </div>
+        </section>
+
+        <!-- Highlights -->
+        <section class="highlights-section">
+            <h2 class="section-title">房型亮點</h2>
+            <ul class="highlights-list">
+                {
+                    roomData.highlights.map((highlight) => (
+                        <li>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            {highlight}
+                        </li>
+                    ))
+                }
+            </ul>
+        </section>
+
+        <!-- Policies -->
+        <section class="policies-section">
+            <h2 class="section-title">入住須知</h2>
+            <ul class="policies-list">
+                {
+                    roomData.policies.map((policy) => (
+                        <li>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="16" x2="12" y2="12" />
+                                <line x1="12" y1="8" x2="12.01" y2="8" />
+                            </svg>
+                            {policy}
+                        </li>
+                    ))
+                }
+            </ul>
+            <p class="policies-note">
+                更多詳細規定請參考 <a href="/policies">房規與政策頁面</a>
+            </p>
+        </section>
+
+        <!-- Booking CTA -->
+        <section class="cta-section">
+            <div class="cta-card">
+                <h2>準備好預訂了嗎？</h2>
+                <p>立即線上預訂，享受舒適假期</p>
+                <div class="cta-buttons">
+                    <a
+                        href="https://booking.owlting.com/summerrockvilla"
+                        target="_blank"
+                        class="primary-btn"
+                    >
+                        線上訂房
+                    </a>
+                    <a href="/contact" class="secondary-btn"> 聯絡我們 </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Rooms -->
+        <section class="other-rooms-section">
+            <h2 class="section-title">其他房型</h2>
+            <div class="other-rooms-grid">
+                <a href="/rooms/deluxe-room" class="other-room-card">
+                    <img
+                        src="/deluxe-room.png"
+                        alt="豪華雙人房"
+                        loading="lazy"
+                    />
+                    <h3>豪華雙人房</h3>
+                    <p>浪漫雙人，溫馨舒適</p>
+                </a>
+                <a href="/rooms/lake-suite" class="other-room-card">
+                    <img src="/lake-suite.png" alt="湖景套房" loading="lazy" />
+                    <h3>湖景套房</h3>
+                    <p>私人湖景，浪漫氛圍</p>
+                </a>
+                <a href="/rooms/villa" class="other-room-card">
+                    <img src="/villa-room.png" alt="獨棟別墅" loading="lazy" />
+                    <h3>獨棟別墅</h3>
+                    <p>6-8人，獨立空間</p>
+                </a>
+            </div>
+        </section>
+    </div>
+</BaseLayout>
+
+<style>
+    .room-detail-container {
+        min-height: calc(100vh - 80px);
+        margin-top: 80px;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 2rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .breadcrumb a {
+        color: var(--gray-medium);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .breadcrumb a:hover {
+        color: var(--resort-primary);
+    }
+
+    .breadcrumb .separator {
+        color: var(--gray-light);
+    }
+
+    .breadcrumb .current {
+        color: var(--gray-dark);
+        font-weight: 500;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 2rem 4rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+        color: var(--gray-dark);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .english-name {
+        font-size: 1.1rem;
+        color: var(--resort-primary);
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+    }
+
+    .room-description {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: var(--gray-medium);
+        margin-bottom: 2rem;
+    }
+
+    .room-quick-info {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .info-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: var(--resort-pale);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        color: var(--gray-dark);
+    }
+
+    .info-badge .icon {
+        font-size: 1.2rem;
+    }
+
+    .main-cta-btn {
+        display: inline-block;
+        padding: 1rem 2.5rem;
+        background: var(--resort-primary);
+        color: var(--white);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .main-cta-btn:hover {
+        background: var(--resort-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(138, 163, 135, 0.3);
+    }
+
+    .hero-image {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .hero-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+
+    .room-badge {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: var(--resort-accent);
+        color: var(--white);
+        padding: 0.6rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .room-badge.family {
+        background: #e88d67;
+    }
+
+    /* Section Common Styles */
+    section {
+        padding: 4rem 2rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        color: var(--gray-dark);
+        text-align: center;
+        margin-bottom: 3rem;
+        font-weight: 500;
+    }
+
+    /* Gallery Section */
+    .gallery-section {
+        background: var(--gray-bg);
+    }
+
+    .image-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .gallery-item {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        cursor: pointer;
+    }
+
+    .gallery-item:hover {
+        transform: scale(1.05);
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Amenities Section */
+    .amenities-section {
+        background: var(--white);
+    }
+
+    .amenities-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+    }
+
+    .amenity-card {
+        text-align: center;
+        padding: 1.5rem;
+        background: var(--off-white);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .amenity-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .amenity-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .amenity-card h3 {
+        font-size: 1.1rem;
+        color: var(--gray-dark);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .amenity-card p {
+        font-size: 0.9rem;
+        color: var(--gray-medium);
+        line-height: 1.6;
+    }
+
+    /* Highlights Section */
+    .highlights-section {
+        background: var(--resort-pale);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .highlights-list {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .highlights-list li {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: var(--white);
+        border-radius: 8px;
+        font-size: 1rem;
+        color: var(--gray-dark);
+    }
+
+    .highlights-list svg {
+        color: var(--resort-primary);
+        flex-shrink: 0;
+    }
+
+    /* Policies Section */
+    .policies-section {
+        background: var(--white);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .policies-list {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .policies-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        font-size: 1rem;
+        color: var(--gray-dark);
+        line-height: 1.6;
+    }
+
+    .policies-list svg {
+        color: var(--resort-primary);
+        flex-shrink: 0;
+        margin-top: 0.2rem;
+    }
+
+    .policies-note {
+        text-align: center;
+        color: var(--gray-medium);
+        font-size: 0.95rem;
+    }
+
+    .policies-note a {
+        color: var(--resort-primary);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .policies-note a:hover {
+        text-decoration: underline;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        background: linear-gradient(
+            135deg,
+            var(--resort-primary) 0%,
+            var(--resort-dark) 100%
+        );
+        color: var(--white);
+    }
+
+    .cta-card {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .cta-card h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+
+    .cta-card p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+        padding: 1rem 2.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+
+    .primary-btn {
+        background: var(--white);
+        color: var(--resort-primary);
+    }
+
+    .primary-btn:hover {
+        background: var(--off-white);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .secondary-btn {
+        background: transparent;
+        color: var(--white);
+        border: 2px solid var(--white);
+    }
+
+    .secondary-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    /* Other Rooms Section */
+    .other-rooms-section {
+        background: var(--gray-bg);
+    }
+
+    .other-rooms-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+
+    .other-room-card {
+        background: var(--white);
+        border-radius: 12px;
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .other-room-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(138, 163, 135, 0.2);
+    }
+
+    .other-room-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .other-room-card h3 {
+        padding: 1rem 1.5rem 0.5rem;
+        font-size: 1.3rem;
+        color: var(--gray-dark);
+        font-weight: 500;
+    }
+
+    .other-room-card p {
+        padding: 0 1.5rem 1.5rem;
+        color: var(--gray-medium);
+        font-size: 0.95rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 968px) {
+        .hero-section {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .image-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .highlights-list {
+            grid-template-columns: 1fr;
+        }
+
+        .other-rooms-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .room-detail-container {
+            margin-top: 60px;
+        }
+
+        .hero-content h1 {
+            font-size: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+        }
+
+        .amenities-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .image-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+        }
+
+        .primary-btn,
+        .secondary-btn {
+            width: 100%;
+        }
+    }
+</style>
