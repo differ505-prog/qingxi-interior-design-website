@@ -1,0 +1,42 @@
+---
+// 臨時調試頁面 - 檢查環境變數
+const check = {
+    process_env_preview_protection:
+        process.env.PREVIEW_PROTECTION_ENABLED || "undefined",
+    process_env_preview_password: process.env.PREVIEW_PASSWORD
+        ? "SET"
+        : "NOT SET",
+    import_meta_preview_protection:
+        import.meta.env.PREVIEW_PROTECTION_ENABLED || "undefined",
+    import_meta_preview_password: import.meta.env.PREVIEW_PASSWORD
+        ? "SET"
+        : "NOT SET",
+    final_enabled:
+        process.env.PREVIEW_PROTECTION_ENABLED === "true" ||
+        import.meta.env.PREVIEW_PROTECTION_ENABLED === "true"
+            ? "YES"
+            : "NO",
+};
+---
+
+<!doctype html>
+<html>
+    <head>
+        <title>Environment Check</title>
+        <style>
+            body {
+                font-family: monospace;
+                padding: 2rem;
+            }
+            pre {
+                background: #f4f4f4;
+                padding: 1rem;
+                border-radius: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Environment Variables Debug</h1>
+        <pre>{JSON.stringify(check, null, 2)}</pre>
+    </body>
+</html>
