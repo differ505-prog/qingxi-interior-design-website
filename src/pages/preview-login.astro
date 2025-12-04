@@ -1,20 +1,21 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { PASSWORD_PROTECTION_CONFIG } from "../lib/password-config";
 
 // 處理登錄邏輯
-const PREVIEW_PASSWORD =
-    import.meta.env.PUBLIC_PREVIEW_PASSWORD || "preview2024";
+const PREVIEW_PASSWORD = PASSWORD_PROTECTION_CONFIG.password;
 
 if (Astro.request.method === "POST") {
     const formData = await Astro.request.formData();
     const password = formData.get("password");
 
     if (password === PREVIEW_PASSWORD) {
-        // 設置 Cookie，有效期 7 天
+        // 設置 Cookie，有效期依照配置
+        const maxAge = PASSWORD_PROTECTION_CONFIG.cookieMaxAge * 24 * 60 * 60;
         const response = Astro.redirect("/");
         response.headers.set(
             "Set-Cookie",
-            `preview_auth=true; Path=/; Max-Age=${60 * 60 * 24 * 7}; HttpOnly; SameSite=Strict`,
+            `preview_auth=true; Path=/; Max-Age=${maxAge}; HttpOnly; SameSite=Strict`,
         );
         return response;
     }
