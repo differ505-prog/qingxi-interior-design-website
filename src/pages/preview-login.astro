@@ -2,11 +2,8 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 // 處理登錄邏輯
-// 在 Vercel 中使用 process.env 來讀取環境變數
 const PREVIEW_PASSWORD =
-    process.env.PREVIEW_PASSWORD ||
-    import.meta.env.PREVIEW_PASSWORD ||
-    "preview2024";
+    import.meta.env.PUBLIC_PREVIEW_PASSWORD || "preview2024";
 
 if (Astro.request.method === "POST") {
     const formData = await Astro.request.formData();

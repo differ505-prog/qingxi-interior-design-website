@@ -1,19 +1,13 @@
 ---
 // 臨時調試頁面 - 檢查環境變數
 const check = {
-    process_env_preview_protection:
-        process.env.PREVIEW_PROTECTION_ENABLED || "undefined",
-    process_env_preview_password: process.env.PREVIEW_PASSWORD
-        ? "SET"
-        : "NOT SET",
-    import_meta_preview_protection:
-        import.meta.env.PREVIEW_PROTECTION_ENABLED || "undefined",
-    import_meta_preview_password: import.meta.env.PREVIEW_PASSWORD
+    public_preview_protection:
+        import.meta.env.PUBLIC_PREVIEW_PROTECTION_ENABLED || "undefined",
+    public_preview_password: import.meta.env.PUBLIC_PREVIEW_PASSWORD
         ? "SET"
         : "NOT SET",
     final_enabled:
-        process.env.PREVIEW_PROTECTION_ENABLED === "true" ||
-        import.meta.env.PREVIEW_PROTECTION_ENABLED === "true"
+        import.meta.env.PUBLIC_PREVIEW_PROTECTION_ENABLED === "true"
             ? "YES"
             : "NO",
 };

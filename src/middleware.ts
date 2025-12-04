@@ -2,31 +2,18 @@ import type { MiddlewareHandler } from 'astro';
 
 // ==================== 預覽密碼保護 ====================
 // 設為 true 時，訪客需要輸入密碼才能訪問網站
-// 在 Vercel 中使用 process.env 來讀取環境變數
 const PREVIEW_PROTECTION_ENABLED =
-  process.env.PREVIEW_PROTECTION_ENABLED === 'true' ||
-  import.meta.env.PREVIEW_PROTECTION_ENABLED === 'true' ||
+  import.meta.env.PUBLIC_PREVIEW_PROTECTION_ENABLED === 'true' ||
   false;
-
-// Debug: 輸出環境變數狀態（僅在開發時）
-console.log('[Middleware Debug] PREVIEW_PROTECTION_ENABLED:', PREVIEW_PROTECTION_ENABLED);
-console.log('[Middleware Debug] process.env.PREVIEW_PROTECTION_ENABLED:', process.env.PREVIEW_PROTECTION_ENABLED);
-console.log('[Middleware Debug] import.meta.env.PREVIEW_PROTECTION_ENABLED:', import.meta.env.PREVIEW_PROTECTION_ENABLED);
 
 // ==================== 維護模式 ====================
 // 設為 true 時，所有訪客（除了特定IP）都會看到建置中頁面
 const MAINTENANCE_MODE =
-  process.env.MAINTENANCE_MODE === 'true' ||
-  import.meta.env.MAINTENANCE_MODE === 'true' ||
-  process.env.PUBLIC_MAINTENANCE_MODE === 'true' ||
   import.meta.env.PUBLIC_MAINTENANCE_MODE === 'true' ||
   false;
 
 // 允許訪問的IP列表（可選，用於測試）
 const ALLOWED_IPS = (
-  process.env.ALLOWED_IPS ||
-  import.meta.env.ALLOWED_IPS ||
-  process.env.PUBLIC_ALLOWED_IPS ||
   import.meta.env.PUBLIC_ALLOWED_IPS ||
   '').split(',').filter(Boolean);
 
