@@ -8,7 +8,7 @@ const {
 // 維護模式檢查（用於注入到 HTML 中）
 const MAINTENANCE_MODE = import.meta.env.MAINTENANCE_MODE === 'true' || 
                          import.meta.env.PUBLIC_MAINTENANCE_MODE === 'true' ||
-                         true; // ⚠️ 與 middleware.ts 保持一致
+                         false; // 預設為 false，線上部署時在 Vercel 設置環境變數為 true
 ---
 
 <!DOCTYPE html>

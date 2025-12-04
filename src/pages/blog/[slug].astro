@@ -5,19 +5,37 @@ import { documentToHtmlString } from '@contentful/rich-text-html-renderer';
 
 // getStaticPaths 函數 - 告訴 Astro 有哪些路徑
 export async function getStaticPaths() {
-  const client = contentful.createClient({
-    space: import.meta.env.CONTENTFUL_SPACE_ID,
-    accessToken: import.meta.env.CONTENTFUL_ACCESS_TOKEN,
-    environment: 'master',
-  });
+  // 檢查是否有 Contentful 配置
+  if (!import.meta.env.CONTENTFUL_SPACE_ID || !import.meta.env.CONTENTFUL_ACCESS_TOKEN) {
+    return []; // 沒有配置時返回空數組
+  }
 
-  const response = await client.getEntries({
-    content_type: 'blogPost',
-  });
+  try {
+    const client = contentful.createClient({
+      space: import.meta.env.CONTENTFUL_SPACE_ID,
+      accessToken: import.meta.env.CONTENTFUL_ACCESS_TOKEN,
+      environment: 'master',
+    });
 
-  return response.items.map((item: any) => ({
-    params: { slug: item.fields.slug },
-  }));
+    const response = await client.getEntries({
+      content_type: 'blogPost',
+    });
+
+    return response.items.map((item: any) => ({
+      params: { slug: item.fields.slug },
+    }));
+  } catch (error) {
+    console.error('Contentful 連接錯誤:', error);
+    return []; // 連接失敗時返回空數組
+  }
+}
+
+// 獲取 URL 參數
+const { slug } = Astro.params;
+
+// 檢查是否有 Contentful 配置
+if (!import.meta.env.CONTENTFUL_SPACE_ID || !import.meta.env.CONTENTFUL_ACCESS_TOKEN) {
+  return Astro.redirect('/blog');
 }
 
 // 連接 Contentful
@@ -27,15 +45,18 @@ const client = contentful.createClient({
   environment: 'master',
 });
 
-// 獲取 URL 參數
-const { slug } = Astro.params;
-
 // 根據 slug 獲取文章
-const response = await client.getEntries({
-  content_type: 'blogPost',
-  'fields.slug': slug,
-  limit: 1,
-});
+let response;
+try {
+  response = await client.getEntries({
+    content_type: 'blogPost',
+    'fields.slug': slug,
+    limit: 1,
+  });
+} catch (error) {
+  console.error('Contentful 連接錯誤:', error);
+  return Astro.redirect('/blog');
+}
 
 if (response.items.length === 0) {
   return Astro.redirect('/404');

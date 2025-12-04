@@ -1,39 +1,63 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import * as contentful from 'contentful';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import * as contentful from "contentful";
 
-// 連接 Contentful
-const client = contentful.createClient({
-  space: import.meta.env.CONTENTFUL_SPACE_ID,
-  accessToken: import.meta.env.CONTENTFUL_ACCESS_TOKEN,
-  environment: 'master',
-});
+// 獲取所有文章（帶錯誤處理）
+let posts = [];
+let errorMessage = "";
 
-// 獲取所有文章
-const response = await client.getEntries({
-  content_type: 'blogPost',
-  order: ['-fields.date'],
-});
+try {
+  // 連接 Contentful（恢復原來的邏輯，不檢查環境變數是否存在）
+  const client = contentful.createClient({
+    space: import.meta.env.CONTENTFUL_SPACE_ID,
+    accessToken: import.meta.env.CONTENTFUL_ACCESS_TOKEN,
+    environment: "master",
+  });
 
-const posts = response.items.map((item: any) => ({
-  title: item.fields.title,
-  slug: item.fields.slug,
-  date: new Date(item.fields.date).toISOString().split('T')[0],
-  summary: item.fields.summary,
-  category: item.fields.category,
-  coverImage: item.fields.coverImage?.fields?.file?.url 
-    ? `https:${item.fields.coverImage.fields.file.url}` 
-    : 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600'
-}));
+  // 獲取所有文章
+  const response = await client.getEntries({
+    content_type: "blogPost",
+    order: ["-fields.date"],
+  });
+
+  posts = response.items.map((item: any) => ({
+    title: item.fields.title,
+    slug: item.fields.slug,
+    date: new Date(item.fields.date).toISOString().split("T")[0],
+    summary: item.fields.summary,
+    category: item.fields.category,
+    coverImage: item.fields.coverImage?.fields?.file?.url
+      ? `https:${item.fields.coverImage.fields.file.url}`
+      : "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600",
+  }));
+} catch (error: any) {
+  console.error("Contentful 連接錯誤:", error);
+  console.error(
+    "CONTENTFUL_SPACE_ID:",
+    import.meta.env.CONTENTFUL_SPACE_ID ? "已設置" : "未設置",
+  );
+  console.error(
+    "CONTENTFUL_ACCESS_TOKEN:",
+    import.meta.env.CONTENTFUL_ACCESS_TOKEN ? "已設置" : "未設置",
+  );
+
+  // 如果沒有配置或連接失敗，顯示友好提示
+  if (error.message && error.message.includes("Expected parameter")) {
+    errorMessage =
+      "缺少 Contentful 配置。請在 .env 文件中設置 CONTENTFUL_SPACE_ID 和 CONTENTFUL_ACCESS_TOKEN。如果配置在 Vercel 上，請複製到本地 .env 文件。";
+  } else {
+    errorMessage = `連接 Contentful 時發生錯誤: ${error.message || "未知錯誤"}`;
+  }
+  // 如果連接失敗，posts 保持為空數組
+}
 ---
-cat >> src/pages/blog/index.astro << 'EOF'
 
 <style>
   h1 {
     font-weight: 600;
     color: var(--gray-dark);
   }
-  
+
   .category-filters {
     display: flex;
     gap: 0.75rem;
@@ -41,7 +65,7 @@ cat >> src/pages/blog/index.astro << 'EOF'
     margin-bottom: 3rem;
     flex-wrap: wrap;
   }
-  
+
   .category-btn {
     padding: 0.5rem 1.25rem;
     border: 2px solid var(--gray-lighter);
@@ -54,31 +78,31 @@ cat >> src/pages/blog/index.astro << 'EOF'
     transition: all 0.3s ease;
     text-decoration: none;
   }
-  
+
   .category-btn:hover {
     background: var(--tiffany-pale);
     color: var(--gray-dark);
     border-color: var(--tiffany-light);
     transform: translateY(-2px);
   }
-  
+
   .category-btn.active {
     background: var(--tiffany-primary);
     color: var(--white);
     border-color: var(--tiffany-primary);
   }
-  
+
   .blog-list {
     max-width: 900px;
     margin: 0 auto;
   }
-  
+
   .post-card {
     display: flex;
     gap: 1.5rem;
     background: var(--white);
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
     border: 2px solid var(--gray-bg);
     overflow: hidden;
     text-decoration: none;
@@ -86,31 +110,31 @@ cat >> src/pages/blog/index.astro << 'EOF'
     transition: all 0.3s ease;
     margin-bottom: 2rem;
   }
-  
+
   .post-card:hover {
     box-shadow: 0 12px 24px rgba(129, 199, 212, 0.2);
     border-color: var(--tiffany-light);
     transform: translateY(-4px);
   }
-  
+
   .post-image {
     width: 280px;
     height: 200px;
     flex-shrink: 0;
     overflow: hidden;
   }
-  
+
   .post-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
   }
-  
+
   .post-card:hover .post-image img {
     transform: scale(1.1);
   }
-  
+
   .post-content {
     flex: 1;
     padding: 1.5rem;
@@ -118,7 +142,7 @@ cat >> src/pages/blog/index.astro << 'EOF'
     flex-direction: column;
     justify-content: center;
   }
-  
+
   .post-category {
     display: inline-block;
     background: var(--tiffany-primary);
@@ -130,40 +154,40 @@ cat >> src/pages/blog/index.astro << 'EOF'
     margin-bottom: 0.5rem;
     width: fit-content;
   }
-  
+
   .post-title {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--gray-dark);
     margin-bottom: 0.5rem;
   }
-  
+
   .post-card:hover .post-title {
     color: var(--tiffany-dark);
   }
-  
+
   .post-date {
     font-size: 0.9rem;
     color: var(--gray-medium);
     margin-bottom: 0.75rem;
   }
-  
+
   .post-summary {
     font-size: 1rem;
     color: var(--gray-medium);
     line-height: 1.6;
   }
-  
+
   @media (max-width: 768px) {
     .post-card {
       flex-direction: column;
     }
-    
+
     .post-image {
       width: 100%;
       height: 200px;
     }
-    
+
     .category-filters {
       padding: 0 1rem;
     }
@@ -172,8 +196,12 @@ cat >> src/pages/blog/index.astro << 'EOF'
 
 <BaseLayout title="知識分享 - 青曦空間設計">
   <div style="max-width: 1200px; margin: 0 auto; padding: 4rem 1rem;">
-    <h1 style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 2rem; color: var(--gray-dark);">知識分享</h1>
-    
+    <h1
+      style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 2rem; color: var(--gray-dark);"
+    >
+      知識分享
+    </h1>
+
     <div class="category-filters">
       <button class="category-btn active" data-category="全部">全部</button>
       <button class="category-btn" data-category="水電篇">水電篇</button>
@@ -182,43 +210,80 @@ cat >> src/pages/blog/index.astro << 'EOF'
       <button class="category-btn" data-category="油漆篇">油漆篇</button>
       <button class="category-btn" data-category="估價篇">估價篇</button>
       <button class="category-btn" data-category="設計篇">設計篇</button>
+      <button class="category-btn" data-category="軟裝佈置">軟裝佈置</button>
     </div>
-    
+
     <div class="blog-list">
-      {posts.map(post => (
-        <a href={`/blog/${post.slug}`} class="post-card" data-post-category={post.category}>
-          <div class="post-image">
-            <img src={post.coverImage} alt={post.title} />
+      {
+        posts.length > 0 ? (
+          posts.map((post) => (
+            <a
+              href={`/blog/${post.slug}`}
+              class="post-card"
+              data-post-category={post.category}
+            >
+              <div class="post-image">
+                <img src={post.coverImage} alt={post.title} />
+              </div>
+              <div class="post-content">
+                <span class="post-category">{post.category}</span>
+                <h2 class="post-title">{post.title}</h2>
+                <p class="post-date">{post.date}</p>
+                <p class="post-summary">{post.summary}</p>
+              </div>
+            </a>
+          ))
+        ) : (
+          <div style="text-align: center; padding: 4rem 2rem; color: var(--gray-medium);">
+            <p style="font-size: 1.2rem; margin-bottom: 1rem;">
+              目前還沒有文章
+            </p>
+            {errorMessage ? (
+              <>
+                <p style="font-size: 0.95rem; color: var(--gray-dark); margin-bottom: 0.5rem;">
+                  {errorMessage}
+                </p>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--gray-light);">
+                  請檢查 .env 文件或 Vercel 環境變數設置
+                </p>
+              </>
+            ) : (
+              <>
+                <p style="font-size: 0.95rem;">
+                  請在 .env 文件中配置 Contentful 環境變數以連接內容管理系統
+                </p>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--gray-light);">
+                  需要設置：CONTENTFUL_SPACE_ID 和 CONTENTFUL_ACCESS_TOKEN
+                </p>
+              </>
+            )}
           </div>
-          <div class="post-content">
-            <span class="post-category">{post.category}</span>
-            <h2 class="post-title">{post.title}</h2>
-            <p class="post-date">{post.date}</p>
-            <p class="post-summary">{post.summary}</p>
-          </div>
-        </a>
-      ))}
+        )
+      }
     </div>
   </div>
-  
+
   <script>
-    const categoryButtons = document.querySelectorAll('.category-btn');
-    const postCards = document.querySelectorAll('.post-card');
-    
-    categoryButtons.forEach(button => {
-      button.addEventListener('click', () => {
+    const categoryButtons = document.querySelectorAll(".category-btn");
+    const postCards = document.querySelectorAll(".post-card");
+
+    categoryButtons.forEach((button) => {
+      button.addEventListener("click", () => {
         const selectedCategory = button.dataset.category;
-        
-        categoryButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        
-        postCards.forEach(card => {
+
+        categoryButtons.forEach((btn) => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        postCards.forEach((card) => {
           const postCategory = card.dataset.postCategory;
-          
-          if (selectedCategory === '全部' || postCategory === selectedCategory) {
-            card.style.display = 'flex';
+
+          if (
+            selectedCategory === "全部" ||
+            postCategory === selectedCategory
+          ) {
+            card.style.display = "flex";
           } else {
-            card.style.display = 'none';
+            card.style.display = "none";
           }
         });
       });

@@ -1,0 +1,265 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// 處理登錄邏輯
+const PREVIEW_PASSWORD = import.meta.env.PREVIEW_PASSWORD || "preview2024";
+
+if (Astro.request.method === "POST") {
+    const formData = await Astro.request.formData();
+    const password = formData.get("password");
+
+    if (password === PREVIEW_PASSWORD) {
+        // 設置 Cookie，有效期 7 天
+        const response = Astro.redirect("/");
+        response.headers.set(
+            "Set-Cookie",
+            `preview_auth=true; Path=/; Max-Age=${60 * 60 * 24 * 7}; HttpOnly; SameSite=Strict`,
+        );
+        return response;
+    }
+}
+---
+
+<BaseLayout title="訪問驗證 - 青曦空間設計">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo">
+                <svg
+                    width="60"
+                    height="60"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"
+                        fill="var(--tiffany-primary)"
+                        opacity="0.2"></path>
+                    <path
+                        d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"
+                        stroke="var(--tiffany-primary)"
+                        stroke-width="2"></path>
+                    <path
+                        d="M9 12l2 2 4-4"
+                        stroke="var(--tiffany-primary)"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+            </div>
+
+            <h1>預覽版訪問驗證</h1>
+            <p class="subtitle">此網站目前處於建置階段</p>
+            <p class="description">請輸入密碼以繼續訪問</p>
+
+            <form method="POST" class="login-form">
+                <div class="input-group">
+                    <label for="password">密碼</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="請輸入訪問密碼"
+                        autofocus
+                        required
+                    />
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                        <polyline
+                            points="10 17 15 12 10 7"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></polyline>
+                        <line
+                            x1="15"
+                            y1="12"
+                            x2="3"
+                            y2="12"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"></line>
+                    </svg>
+                    進入網站
+                </button>
+            </form>
+
+            <p class="footer-note">
+                💡 如果您是訪客且需要訪問權限，請聯繫網站管理員
+            </p>
+        </div>
+    </div>
+</BaseLayout>
+
+<style>
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+            135deg,
+            var(--tiffany-pale) 0%,
+            var(--off-white) 100%
+        );
+        padding: 2rem;
+    }
+
+    .login-box {
+        background: var(--white);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        box-shadow: 0 20px 60px rgba(129, 199, 212, 0.15);
+        max-width: 440px;
+        width: 100%;
+        text-align: center;
+        border: 2px solid var(--gray-bg);
+    }
+
+    .logo {
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--gray-dark);
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+        color: var(--gray-medium);
+        margin-bottom: 0.25rem;
+    }
+
+    .description {
+        font-size: 0.95rem;
+        color: var(--gray-light);
+        margin-bottom: 2rem;
+    }
+
+    .login-form {
+        margin-bottom: 1.5rem;
+    }
+
+    .input-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+
+    .input-group label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--gray-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+        border: 2px solid var(--gray-bg);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .input-group input:focus {
+        outline: none;
+        border-color: var(--tiffany-primary);
+        box-shadow: 0 0 0 4px rgba(129, 199, 212, 0.1);
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(
+            135deg,
+            var(--tiffany-primary),
+            var(--tiffany-dark)
+        );
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 12px rgba(129, 199, 212, 0.3);
+    }
+
+    .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(129, 199, 212, 0.4);
+    }
+
+    .login-btn:active {
+        transform: translateY(0);
+    }
+
+    .footer-note {
+        font-size: 0.85rem;
+        color: var(--gray-light);
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-bg);
+    }
+
+    @media (max-width: 768px) {
+        .login-box {
+            padding: 2rem 1.5rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    // 如果密碼錯誤，顯示提示
+    const form = document.querySelector("form");
+    const input = document.querySelector('input[name="password"]');
+
+    if (form) {
+        form.addEventListener("submit", async (e) => {
+            // 讓表單正常提交，但如果失敗會留在當前頁面
+            setTimeout(() => {
+                if (window.location.pathname === "/preview-login") {
+                    // 如果還在登錄頁面，說明密碼錯誤
+                    input.value = "";
+                    input.placeholder = "❌ 密碼錯誤，請重試";
+                    input.style.borderColor = "#ef4444";
+                    setTimeout(() => {
+                        input.placeholder = "請輸入訪問密碼";
+                        input.style.borderColor = "";
+                    }, 2000);
+                }
+            }, 100);
+        });
+    }
+</script>
