@@ -8,6 +8,11 @@ const PREVIEW_PROTECTION_ENABLED =
   import.meta.env.PREVIEW_PROTECTION_ENABLED === 'true' ||
   false;
 
+// Debug: 輸出環境變數狀態（僅在開發時）
+console.log('[Middleware Debug] PREVIEW_PROTECTION_ENABLED:', PREVIEW_PROTECTION_ENABLED);
+console.log('[Middleware Debug] process.env.PREVIEW_PROTECTION_ENABLED:', process.env.PREVIEW_PROTECTION_ENABLED);
+console.log('[Middleware Debug] import.meta.env.PREVIEW_PROTECTION_ENABLED:', import.meta.env.PREVIEW_PROTECTION_ENABLED);
+
 // ==================== 維護模式 ====================
 // 設為 true 時，所有訪客（除了特定IP）都會看到建置中頁面
 const MAINTENANCE_MODE =
