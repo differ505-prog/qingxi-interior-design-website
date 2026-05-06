@@ -1,327 +1,496 @@
 ---
-const { 
-  title = '青曦空間設計 - 大台北專業室內設計',
-  description = '青曦空間設計提供大台北地區專業室內設計服務，包含住宅、商業空間、社區公設等。從設計規劃到工程施作，為您打造理想空間。',
-  ogImage = '/images/og-default.jpg'
+const {
+  title = "青曦空間設計 - 大台北專業室內設計",
+  description = "青曦空間設計提供大台北地區專業室內設計服務，包含住宅、商業空間、社區公設等。從設計規劃到工程施作，為您打造理想空間。",
+  ogImage = "/images/og-default.jpg",
 } = Astro.props;
 
+// Get canonical URL
+const canonicalURL = new URL(
+  Astro.url.pathname,
+  Astro.site || "https://www.qingxi-ds.com",
+);
+
 // 維護模式檢查（用於注入到 HTML 中）
-const MAINTENANCE_MODE = import.meta.env.MAINTENANCE_MODE === 'true' || 
-                         import.meta.env.PUBLIC_MAINTENANCE_MODE === 'true' ||
-                         false; // 預設為 false，線上部署時在 Vercel 設置環境變數為 true
+const MAINTENANCE_MODE =
+  import.meta.env.MAINTENANCE_MODE === "true" ||
+  import.meta.env.PUBLIC_MAINTENANCE_MODE === "true" ||
+  false; // 預設為 false，線上部署時在 Vercel 設置環境變數為 true
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO Meta Tags -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="keywords"
+      content="室內設計,大台北,住宅設計,商業空間設計,裝潢,工程施作,青曦空間設計,台北室內設計,新北室內設計,室內裝修"
+    />
+    <meta name="author" content="青曦空間設計" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:site_name" content="青曦空間設計" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={ogImage} />
+
+    <!-- Preload Critical Resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap"
+      as="style"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "青曦空間設計",
+        "image": "https://www.qingxi-ds.com/images/og-default.jpg",
+        "@id": "https://www.qingxi-ds.com",
+        "url": "https://www.qingxi-ds.com",
+        "telephone": "+886-XXX-XXX-XXX",
+        "priceRange": "$$",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "台北市",
+          "addressRegion": "台北",
+          "addressCountry": "TW"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 25.033,
+          "longitude": 121.5654
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "09:00",
+          "closes": "18:00"
+        },
+        "sameAs": [
+          "https://www.facebook.com/profile.php?id=61562661642204",
+          "https://www.instagram.com/qingxi.ds/",
+          "https://lin.ee/U1HCeW4"
+        ],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5",
+          "reviewCount": "1"
+        },
+        "hasOfferCatalog": {
+          "@type": "OfferCatalog",
+          "name": "室內設計服務",
+          "itemListElement": [
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "住宅空間設計",
+                "description": "專業住宅室內設計服務，從平面規劃到完工交屋"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "商業空間設計",
+                "description": "商業空間室內設計與裝修服務"
+              }
+            },
+            {
+              "@type": "Offer",
+              "itemOffered": {
+                "@type": "Service",
+                "name": "社區公設設計",
+                "description": "社區公共空間設計規劃服務"
+              }
+            }
+          ]
+        }
+      }
+    </script>
   
-  <!-- SEO Meta Tags -->
-  <title>{title}</title>
-  <meta name="description" content={description}>
-  <meta name="keywords" content="室內設計,大台北,住宅設計,商業空間設計,裝潢,工程施作,青曦空間設計">
-  <meta name="author" content="青曦空間設計">
+  <!-- Google Analytics 4 (僅在生產環境載入) -->
+  {import.meta.env.PROD && (
+    <>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script is:inline>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': true,
+          'cookie_flags': 'SameSite=None;Secure'
+        });
+      </script>
+    </>
+  )}
   
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content={Astro.url}>
-  <meta property="og:title" content={title}>
-  <meta property="og:description" content={description}>
-  <meta property="og:image" content={ogImage}>
-  <meta property="og:locale" content="zh_TW">
-  <meta property="og:site_name" content="青曦空間設計">
-  
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content={Astro.url}>
-  <meta property="twitter:title" content={title}>
-  <meta property="twitter:description" content={description}>
-  <meta property="twitter:image" content={ogImage}>
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      /* 灰色系 - 主基调 */
-      --gray-darkest: #2F2F2F;
-      --gray-dark: #4A4A4A;
-      --gray-medium: #7A7A7A;
-      --gray-light: #B0B0B0;
-      --gray-lighter: #D8D8D8;
-      --gray-bg: #F5F5F5;
-      
-      /* 白色系 */
-      --white: #FFFFFF;
-      --off-white: #FAFAFA;
-      
-      /* Tiffany绿色系 - 点缀色 */
-      --tiffany-primary: #81C7D4;
-      --tiffany-dark: #69B8C4;
-      --tiffany-light: #A0D9D9;
-      --tiffany-pale: #E6F5F7;
-      
-      /* 语义化颜色 */
-      --primary: var(--gray-dark);
-      --accent: var(--tiffany-primary);
-    }
-    
-    html {
-      scroll-behavior: smooth;
-    }
-    
-    body {
-      font-family: 'Noto Sans TC', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      margin: 0;
-      color: var(--gray-dark);
-    }
+      :root {
+        /* 灰色系 - 主基调 */
+        --gray-darkest: #2f2f2f;
+        --gray-dark: #4a4a4a;
+        --gray-medium: #7a7a7a;
+        --gray-light: #b0b0b0;
+        --gray-lighter: #d8d8d8;
+        --gray-bg: #f5f5f5;
 
-    /* 導覽列拉霸機效果 */
-    .nav-item {
-      position: relative;
-      height: 24px;
-      min-width: 80px;
-      display: inline-block;
-      overflow: hidden;
-    }
-    
-    .nav-link {
-      position: relative;
-      display: block;
-      width: 100%;
-      height: 100%;
-      text-decoration: none;
-      color: var(--gray-dark);
-      transition: color 0.3s ease;
-      font-size: 1rem;
-    }
-    
-    .nav-text-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    
-    .nav-text {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap;
-    }
-    
-    .nav-text-en {
-      position: absolute;
-      top: 0;
-    }
-    
-    .nav-text-zh {
-      position: absolute;
-      top: 100%;
-    }
-    
-    .nav-link:hover .nav-text-container {
-      transform: translateY(-100%);
-    }
-    
-    .nav-link:hover {
-      color: var(--tiffany-primary);
-    }
+        /* 白色系 */
+        --white: #ffffff;
+        --off-white: #fafafa;
 
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      align-items: center;
-    }
+        /* Tiffany绿色系 - 点缀色 */
+        --tiffany-primary: #81c7d4;
+        --tiffany-dark: #69b8c4;
+        --tiffany-light: #a0d9d9;
+        --tiffany-pale: #e6f5f7;
 
-    /* 漢堡選單按鈕 */
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 5px;
-    }
-
-    .hamburger span {
-      width: 25px;
-      height: 3px;
-      background: var(--gray-dark);
-      transition: all 0.3s ease;
-      border-radius: 2px;
-    }
-
-    .hamburger.active span:nth-child(1) {
-      transform: rotate(45deg) translate(8px, 8px);
-    }
-
-    .hamburger.active span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .hamburger.active span:nth-child(3) {
-      transform: rotate(-45deg) translate(7px, -7px);
-    }
-
-    /* 手機版樣式 */
-    @media (max-width: 768px) {
-      .hamburger {
-        display: flex;
+        /* 语义化颜色 */
+        --primary: var(--gray-dark);
+        --accent: var(--tiffany-primary);
       }
 
-      .nav-links {
-        position: fixed;
-        top: 60px;
-        right: -100%;
-        width: 250px;
-        height: calc(100vh - 60px);
-        background: var(--white);
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Noto Sans TC", sans-serif;
+        min-height: 100vh;
+        display: flex;
         flex-direction: column;
-        gap: 0;
-        padding: 2rem 0;
-        transition: right 0.3s ease;
-        box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-        z-index: 999;
-        border-left: 2px solid var(--tiffany-primary);
+        margin: 0;
+        color: var(--gray-dark);
       }
 
-      .nav-links.active {
-        right: 0;
-      }
-
+      /* 導覽列拉霸機效果 */
       .nav-item {
-        width: 100%;
-        min-width: unset;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+        position: relative;
+        height: 24px;
+        min-width: 80px;
+        display: inline-block;
+        overflow: hidden;
       }
 
       .nav-link {
+        position: relative;
+        display: block;
         width: 100%;
-        padding: 1rem;
-        font-size: 1.1rem;
+        height: 100%;
+        text-decoration: none;
+        color: var(--gray-dark);
+        transition: color 0.3s ease;
+        font-size: 1rem;
+      }
+
+      .nav-text-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       }
 
       .nav-text {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
         justify-content: center;
+        white-space: nowrap;
       }
-    }
-  </style>
-</head>
-<body>
-  <!-- 導覽列 -->
-  <nav style="background: var(--white); color: var(--gray-dark); box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-bottom: 2px solid var(--tiffany-primary);">
+
+      .nav-text-en {
+        position: absolute;
+        top: 0;
+      }
+
+      .nav-text-zh {
+        position: absolute;
+        top: 100%;
+      }
+
+      .nav-link:hover .nav-text-container {
+        transform: translateY(-100%);
+      }
+
+      .nav-link:hover {
+        color: var(--tiffany-primary);
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+      }
+
+      /* 漢堡選單按鈕 */
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .hamburger span {
+        width: 25px;
+        height: 3px;
+        background: var(--gray-dark);
+        transition: all 0.3s ease;
+        border-radius: 2px;
+      }
+
+      .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(8px, 8px);
+      }
+
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -7px);
+      }
+
+      /* 手機版樣式 */
+      @media (max-width: 768px) {
+        .hamburger {
+          display: flex;
+        }
+
+        .nav-links {
+          position: fixed;
+          top: 60px;
+          right: -100%;
+          width: 250px;
+          height: calc(100vh - 60px);
+          background: var(--white);
+          flex-direction: column;
+          gap: 0;
+          padding: 2rem 0;
+          transition: right 0.3s ease;
+          box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+          z-index: 999;
+          border-left: 2px solid var(--tiffany-primary);
+        }
+
+        .nav-links.active {
+          right: 0;
+        }
+
+        .nav-item {
+          width: 100%;
+          min-width: unset;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link {
+          width: 100%;
+          padding: 1rem;
+          font-size: 1.1rem;
+        }
+
+        .nav-text {
+          justify-content: center;
+        }
+      }
+
+      /* Skip to main content link */
+      .skip-to-main {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: var(--tiffany-primary);
+        color: white;
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 0 0 4px 0;
+        z-index: 100;
+        font-weight: 500;
+        transition: top 0.3s;
+      }
+
+      .skip-to-main:focus {
+        top: 0;
+      }
+
+      /* Improved focus states */
+      a:focus,
+      button:focus {
+        outline: 2px solid var(--tiffany-primary);
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Skip to main content -->
+    <a href="#main-content" class="skip-to-main">跳至主要內容</a>
+
+    <!-- 導覽列 -->
+  <nav role="navigation" aria-label="主要導覽"
+   style="
+     position: fixed;
+     top: 0;
+     left: 0;
+     right: 0;
+     background: var(--white);
+     color: var(--gray-dark);
+     box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+     border-bottom: 2px solid var(--tiffany-primary);
+     z-index: 1000;
+     transition: transform 0.3s ease, box-shadow 0.3s ease;
+   ">
     <div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <a href="/" style="font-size: 1.5rem; font-weight: bold; color: var(--gray-dark); text-decoration: none;">青曦空間設計</a>
-        
-        <!-- 漢堡選單按鈕 -->
-        <button class="hamburger" id="hamburger" aria-label="選單">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
 
-        <!-- 導覽連結 -->
-        <div class="nav-links" id="navLinks">
-          <span class="nav-item">
-            <a href="/" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Home</span>
-                <span class="nav-text nav-text-zh">首頁</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/portfolio" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Portfolio</span>
-                <span class="nav-text nav-text-zh">作品集</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/blog" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Blog</span>
-                <span class="nav-text nav-text-zh">知識分享</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/tools" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Tools</span>
-                <span class="nav-text nav-text-zh">裝修工具</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/#workflow" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Workflow</span>
-                <span class="nav-text nav-text-zh">服務流程</span>
-              </div>
-            </a>
-          </span>
-          <span class="nav-item">
-            <a href="/contact" class="nav-link">
-              <div class="nav-text-container">
-                <span class="nav-text nav-text-en">Contact</span>
-                <span class="nav-text nav-text-zh">聯絡我</span>
-              </div>
-            </a>
-          </span>
+          <!-- 漢堡選單按鈕 -->
+          <button class="hamburger" id="hamburger" aria-label="選單">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <!-- 導覽連結 -->
+          <div class="nav-links" id="navLinks">
+            <span class="nav-item">
+              <a href="/" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Home</span>
+                  <span class="nav-text nav-text-zh">首頁</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a href="/portfolio" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Portfolio</span>
+                  <span class="nav-text nav-text-zh">作品集</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a href="/blog" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Blog</span>
+                  <span class="nav-text nav-text-zh">知識分享</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a href="/tools" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Tools</span>
+                  <span class="nav-text nav-text-zh">裝修工具</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a href="/#workflow" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Workflow</span>
+                  <span class="nav-text nav-text-zh">服務流程</span>
+                </div>
+              </a>
+            </span>
+            <span class="nav-item">
+              <a href="/contact" class="nav-link">
+                <div class="nav-text-container">
+                  <span class="nav-text nav-text-en">Contact</span>
+                  <span class="nav-text nav-text-zh">聯絡我</span>
+                </div>
+              </a>
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
+    </nav>
 
-  <!-- 主要內容 -->
-  <main style="flex: 1;">
+    <!-- 主要內容 -->
+  <main id="main-content" role="main"
+   style="flex: 1; padding-top: 80px;">
     <slot />
   </main>
 
-  <!-- 頁尾 -->
-  <footer style="background: var(--gray-darkest); color: white; padding: 2rem 0; border-top: 3px solid var(--tiffany-primary);">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem; text-align: center;">
-      <p style="margin: 0; color: var(--gray-light);">&copy; 2025 青曦空間設計. All rights reserved.</p>
-    </div>
-  </footer>
+    <!-- 頁尾 -->
+    <footer
+      style="background: var(--gray-darkest); color: white; padding: 2rem 0; border-top: 3px solid var(--tiffany-primary);"
+    >
+      <div
+        style="max-width: 1200px; margin: 0 auto; padding: 0 1rem; text-align: center;"
+      >
+        <p style="margin: 0; color: var(--gray-light);">
+          &copy; 2025 青曦空間設計. All rights reserved.
+        </p>
+      </div>
+    </footer>
 
-  <script define:vars={{ maintenanceMode: MAINTENANCE_MODE }}>
-    // 維護模式檢查（客戶端重定向，作為 middleware 的備用方案）
-    if (maintenanceMode && window.location.pathname !== '/coming-soon') {
-      window.location.replace('/coming-soon');
-    }
+    <script define:vars={{ maintenanceMode: MAINTENANCE_MODE }}>
+      // 維護模式檢查（客戶端重定向，作為 middleware 的備用方案）
+      if (maintenanceMode && window.location.pathname !== "/coming-soon") {
+        window.location.replace("/coming-soon");
+      }
 
-    const hamburger = document.getElementById('hamburger');
-    const navLinks = document.getElementById('navLinks');
+      const hamburger = document.getElementById("hamburger");
+      const navLinks = document.getElementById("navLinks");
 
-    hamburger?.addEventListener('click', () => {
-      hamburger.classList.toggle('active');
-      navLinks?.classList.toggle('active');
-    });
-
-    // 點擊連結後關閉選單
-    navLinks?.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        hamburger?.classList.remove('active');
-        navLinks?.classList.remove('active');
+      hamburger?.addEventListener("click", () => {
+        hamburger.classList.toggle("active");
+        navLinks?.classList.toggle("active");
       });
-    });
-  </script>
-</body>
+
+      // 點擊連結後關閉選單
+      navLinks?.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          hamburger?.classList.remove("active");
+          navLinks?.classList.remove("active");
+        });
+      });
+
+      // 滾動時增強導航欄陰影效果
+      const nav = document.querySelector('nav');
+      
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // 向下滾動時增加陰影
+        if (scrollTop > 10) {
+          if (nav) nav.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
+        } else {
+          if (nav) nav.style.boxShadow = '0 2px 10px rgba(0,0,0,0.08)';
+        }
+      }, { passive: true });
+    </script>
+  </body>
 </html>

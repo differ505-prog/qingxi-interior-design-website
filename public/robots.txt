@@ -1,9 +1,10 @@
-# 建置期間：阻止所有搜索引擎索引
+# 青曦空間設計 - Robots.txt
+# Allow all search engines to index the site
+
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /preview-login
+Disallow: /coming-soon
 
-# 如果網站上線後，改為：
-# User-agent: *
-# Allow: /
-# Disallow: /coming-soon
-
+# Sitemap location
+Sitemap: https://www.qingxi-ds.com/sitemap.xml

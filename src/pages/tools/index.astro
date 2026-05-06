@@ -1,10 +1,461 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
 
-<BaseLayout title="裝修工具 - 室內設計公司">
-  <div class="container mx-auto px-4 py-16">
-    <h1 class="text-4xl font-bold text-center mb-8">裝修估價器</h1>
-    <p class="text-center text-gray-600 text-xl">即將推出...</p>
+<BaseLayout
+  title="裝修估價器 - 青曦空間設計"
+  description="簡單快速估算室內裝修預算，了解您的設計花費範圍"
+>
+  <div class="calculator-container">
+    <div class="calculator-wrapper">
+      <div class="calculator-header">
+        <h1>裝修估價器</h1>
+        <p class="subtitle">快速估算您的室內裝修預算</p>
+      </div>
+
+      <div class="calculator-form">
+        <div class="form-section">
+          <h2>基本資訊</h2>
+
+          <div class="form-group">
+            <label for="area">室內坪數</label>
+            <div class="input-with-unit">
+              <input
+                type="number"
+                id="area"
+                min="1"
+                max="200"
+                value="30"
+                step="0.5"
+              />
+              <span class="unit">坪</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="project-type">項目類型</label>
+            <select id="project-type">
+              <option value="full">全屋裝修</option>
+              <option value="partial">局部裝修</option>
+              <option value="design-only">純設計</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="quality-level">裝修等級</label>
+            <select id="quality-level">
+              <option value="basic">經濟型 (每坪 4-6萬)</option>
+              <option value="standard" selected>標準型 (每坪 6-10萬)</option>
+              <option value="premium">精緻型 (每坪 10-15萬)</option>
+              <option value="luxury">豪華型 (每坪 15萬以上)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>裝修項目</h2>
+
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" value="ceiling" checked />
+              <span>天花板工程</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="floor" checked />
+              <span>地板工程</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="wall" checked />
+              <span>牆面工程</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="kitchen" />
+              <span>廚房翻新</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="bathroom" />
+              <span>衛浴翻新</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="furniture" />
+              <span>系統家具</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="result-section">
+          <h2>預估結果</h2>
+
+          <div class="result-card">
+            <div class="result-row">
+              <span class="result-label">預估總價</span>
+              <span class="result-value" id="total-price">180萬 - 300萬</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">設計費用</span>
+              <span class="result-value" id="design-fee">9萬 - 15萬</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">工程費用</span>
+              <span class="result-value" id="construction-fee"
+                >171萬 - 285萬</span
+              >
+            </div>
+          </div>
+
+          <div class="disclaimer">
+            <p>此為粗略估算，實際費用需依據現場丈量、設計需求及選材而定</p>
+          </div>
+
+          <div class="cta-buttons">
+            <a href="/contact" class="btn btn-primary">聯絡我們</a>
+            <a href="/requirement-form" class="btn btn-secondary">填寫需求表</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </BaseLayout>
+
+<style>
+  .calculator-container {
+    min-height: calc(100vh - 80px);
+    margin-top: 80px;
+    padding: 4rem 2rem;
+    background: var(--gray-bg);
+  }
+
+  .calculator-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .calculator-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .calculator-header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--gray-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--gray-medium);
+    font-size: 1.1rem;
+  }
+
+  .calculator-form {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 2px solid var(--gray-lighter);
+  }
+
+  .form-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .form-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .form-section h2 {
+    font-size: 1.5rem;
+    color: var(--gray-dark);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--gray-bg);
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--gray-dark);
+  }
+
+  .input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .input-with-unit input {
+    flex: 1;
+  }
+
+  .unit {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--gray-medium);
+  }
+
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--gray-lighter);
+    border-radius: 8px;
+    font-size: 1rem;
+    color: var(--gray-dark);
+    transition: all 0.3s ease;
+    background: var(--white);
+  }
+
+  input[type="number"]:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--tiffany-primary);
+    box-shadow: 0 0 0 3px rgba(129, 199, 212, 0.1);
+  }
+
+  .checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--gray-lighter);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--white);
+  }
+
+  .checkbox-item:hover {
+    background: var(--tiffany-pale);
+    border-color: var(--tiffany-light);
+  }
+
+  .checkbox-item input[type="checkbox"] {
+    margin-right: 0.75rem;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  .checkbox-item input[type="checkbox"]:checked + span {
+    color: var(--tiffany-primary);
+    font-weight: 500;
+  }
+
+  .result-section {
+    background: linear-gradient(
+      135deg,
+      var(--tiffany-pale) 0%,
+      var(--off-white) 100%
+    );
+    padding: 2rem;
+    border-radius: 12px;
+    margin-top: 2rem;
+  }
+
+  .result-section h2 {
+    border-bottom: none;
+    color: var(--gray-dark);
+    margin-bottom: 1.5rem;
+  }
+
+  .result-card {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--gray-bg);
+  }
+
+  .result-row:last-child {
+    border-bottom: none;
+  }
+
+  .result-label {
+    font-size: 1rem;
+    color: var(--gray-medium);
+  }
+
+  .result-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--tiffany-primary);
+  }
+
+  .result-row:first-child .result-value {
+    font-size: 1.5rem;
+    color: var(--gray-dark);
+  }
+
+  .disclaimer {
+    background: var(--white);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--tiffany-primary);
+  }
+
+  .disclaimer p {
+    color: var(--gray-medium);
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+
+  .btn-primary {
+    background: var(--tiffany-primary);
+    color: var(--white);
+    border: 2px solid var(--tiffany-primary);
+  }
+
+  .btn-primary:hover {
+    background: var(--tiffany-dark);
+    border-color: var(--tiffany-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(129, 199, 212, 0.3);
+  }
+
+  .btn-secondary {
+    background: var(--white);
+    color: var(--tiffany-primary);
+    border: 2px solid var(--tiffany-primary);
+  }
+
+  .btn-secondary:hover {
+    background: var(--tiffany-pale);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .calculator-container {
+      margin-top: 60px;
+      padding: 2rem 1rem;
+    }
+
+    .calculator-header h1 {
+      font-size: 2rem;
+    }
+
+    .calculator-form {
+      padding: 1.5rem;
+    }
+
+    .checkbox-group {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+    }
+
+    .result-value {
+      font-size: 1.1rem;
+    }
+
+    .result-row:first-child .result-value {
+      font-size: 1.3rem;
+    }
+  }
+</style>
+
+<script>
+  // Calculator logic
+  const areaInput = document.getElementById("area") as HTMLInputElement;
+  const projectType = document.getElementById(
+    "project-type",
+  ) as HTMLSelectElement;
+  const qualityLevel = document.getElementById(
+    "quality-level",
+  ) as HTMLSelectElement;
+  const totalPrice = document.getElementById("total-price");
+  const designFee = document.getElementById("design-fee");
+  const constructionFee = document.getElementById("construction-fee");
+
+  function calculate() {
+    const area = parseFloat(areaInput.value) || 30;
+    let pricePerPing = { min: 6, max: 10 }; // Default standard
+
+    // Get quality level pricing
+    switch (qualityLevel.value) {
+      case "basic":
+        pricePerPing = { min: 4, max: 6 };
+        break;
+      case "standard":
+        pricePerPing = { min: 6, max: 10 };
+        break;
+      case "premium":
+        pricePerPing = { min: 10, max: 15 };
+        break;
+      case "luxury":
+        pricePerPing = { min: 15, max: 20 };
+        break;
+    }
+
+    // Adjust for project type
+    let multiplier = 1;
+    if (projectType.value === "partial") {
+      multiplier = 0.6;
+    } else if (projectType.value === "design-only") {
+      multiplier = 0.15;
+    }
+
+    const minTotal = Math.round(area * pricePerPing.min * multiplier);
+    const maxTotal = Math.round(area * pricePerPing.max * multiplier);
+
+    const minDesign = Math.round(area * 3);
+    const maxDesign = Math.round(area * 5);
+
+    const minConstruction = minTotal - minDesign;
+    const maxConstruction = maxTotal - maxDesign;
+
+    if (totalPrice && designFee && constructionFee) {
+      totalPrice.textContent = `${minTotal}萬 - ${maxTotal}萬`;
+      designFee.textContent = `${minDesign}萬 - ${maxDesign}萬`;
+      constructionFee.textContent = `${minConstruction}萬 - ${maxConstruction}萬`;
+    }
+  }
+
+  // Add event listeners
+  if (areaInput && projectType && qualityLevel) {
+    areaInput.addEventListener("input", calculate);
+    projectType.addEventListener("change", calculate);
+    qualityLevel.addEventListener("change", calculate);
+
+    // Initial calculation
+    calculate();
+  }
+</script>

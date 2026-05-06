@@ -53,9 +53,12 @@ try {
 ---
 
 <style>
+  /* Blog 專屬字體優化 - 文藝質感 - 強制應用 */
   h1 {
-    font-weight: 600;
+    font-family: "Noto Serif TC", serif !important;
+    font-weight: 500;
     color: var(--gray-dark);
+    letter-spacing: 0.05em;
   }
 
   .category-filters {
@@ -156,14 +159,19 @@ try {
   }
 
   .post-title {
+    font-family: "Noto Serif TC", serif !important;
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--gray-dark);
     margin-bottom: 0.5rem;
+    letter-spacing: 0.03em;
+    line-height: 1.6;
   }
 
   .post-card:hover .post-title {
     color: var(--tiffany-dark);
+    transform: translateX(3px);
+    transition: all 0.3s ease;
   }
 
   .post-date {
@@ -174,8 +182,12 @@ try {
 
   .post-summary {
     font-size: 1rem;
+    font-weight: 300;
     color: var(--gray-medium);
-    line-height: 1.6;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   @media (max-width: 768px) {
