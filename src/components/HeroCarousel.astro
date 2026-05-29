@@ -43,7 +43,7 @@ const slides = fallbackSlides.map((item) => ({
       slides.map((item, index) => (
         <div
           class={`carousel-slide ${item.animationEffect || "zoomIn"}`}
-          data-active={index === 0 ? "true" : "false"}
+          data-state={index === 0 ? "active" : "inactive"}
         >
           <img
             src={item.image.startsWith("http") ? item.image : item.image.startsWith("//") ? `https:${item.image}` : item.image}
@@ -88,7 +88,7 @@ const slides = fallbackSlides.map((item) => ({
       class="hero-featured-card"
       aria-label="查看精選作品"
     >
-      <span class="featured-label">FEATURED PROJECT</span>
+      <span class="featured-label">CURATED SPACE</span>
       <strong>{heroProject.title}</strong>
       <span class="featured-link">進入精選空間</span>
     </a>
@@ -149,12 +149,23 @@ const slides = fallbackSlides.map((item) => ({
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 1s ease-in-out;
+    z-index: 0;
+    pointer-events: none;
+    transition: opacity 1.1s ease-in-out;
   }
 
-  .carousel-slide[data-active="true"] {
-    opacity: 1;
+  .carousel-slide[data-state="ready"],
+  .carousel-slide[data-state="active"] {
+    z-index: 2;
+  }
+
+  .carousel-slide[data-state="leaving"] {
+    opacity: 0;
     z-index: 1;
+  }
+
+  .carousel-slide[data-state="active"] {
+    opacity: 1;
   }
 
   .carousel-image {
@@ -164,51 +175,42 @@ const slides = fallbackSlides.map((item) => ({
     object-position: center;
     transform-origin: center center;
     will-change: transform;
+    transition: none;
+    transform: var(--image-start-transform, scale(1.08));
   }
 
-  .carousel-slide.zoomIn .carousel-image {
-    transform: scale(1.04);
-  }
-
-  .carousel-slide.zoomIn[data-active="true"] .carousel-image {
-    transform: scale(1.18);
+  .carousel-slide[data-state="active"] .carousel-image {
+    transform: var(--image-end-transform, scale(1.16));
     transition: transform 6.8s linear;
   }
 
-  .carousel-slide.zoomOut .carousel-image {
-    transform: scale(1.18);
+  .carousel-slide[data-state="leaving"] .carousel-image {
+    transform: var(--image-end-transform, scale(1.16));
   }
 
-  .carousel-slide.zoomOut[data-active="true"] .carousel-image {
-    transform: scale(1.04);
-    transition: transform 6.8s linear;
+  .carousel-slide.zoomIn {
+    --image-start-transform: scale(1.04);
+    --image-end-transform: scale(1.18);
   }
 
-  .carousel-slide.panLeft .carousel-image {
-    transform: translateX(3%) scale(1.12);
+  .carousel-slide.zoomOut {
+    --image-start-transform: scale(1.18);
+    --image-end-transform: scale(1.04);
   }
 
-  .carousel-slide.panLeft[data-active="true"] .carousel-image {
-    transform: translateX(-5%) scale(1.18);
-    transition: transform 6.8s linear;
+  .carousel-slide.panLeft {
+    --image-start-transform: translateX(3%) scale(1.12);
+    --image-end-transform: translateX(-5%) scale(1.18);
   }
 
-  .carousel-slide.panRight .carousel-image {
-    transform: translateX(-3%) scale(1.12);
+  .carousel-slide.panRight {
+    --image-start-transform: translateX(-3%) scale(1.12);
+    --image-end-transform: translateX(5%) scale(1.18);
   }
 
-  .carousel-slide.panRight[data-active="true"] .carousel-image {
-    transform: translateX(5%) scale(1.18);
-    transition: transform 6.8s linear;
-  }
-
-  .carousel-slide.kenBurns .carousel-image {
-    transform: translate(1%, 1%) scale(1.08);
-  }
-
-  .carousel-slide.kenBurns[data-active="true"] .carousel-image {
-    transform: translate(-5%, -3%) scale(1.18);
-    transition: transform 6.8s linear;
+  .carousel-slide.kenBurns {
+    --image-start-transform: translate(1%, 1%) scale(1.08);
+    --image-end-transform: translate(-5%, -3%) scale(1.18);
   }
 
   .hero-overlay {
@@ -472,18 +474,57 @@ const slides = fallbackSlides.map((item) => ({
     const slides = document.querySelectorAll(".carousel-slide");
     const prevBtn = document.querySelector(".carousel-btn.prev");
     const nextBtn = document.querySelector(".carousel-btn.next");
+    const slideDuration = 7000;
+    const fadeDuration = 1100;
 
     if (slides.length <= 1) return;
 
     let currentIndex = 0;
     let autoPlayInterval;
+    let fadeTimeout;
 
-    function showSlide(index) {
-      slides.forEach((slide) => slide.setAttribute("data-active", "false"));
-      requestAnimationFrame(() => {
-        slides[index].setAttribute("data-active", "true");
-        currentIndex = index;
+    function setSlideState(slide, state) {
+      slide.setAttribute("data-state", state);
+    }
+
+    function showSlide(index, options = {}) {
+      const { immediate = false } = options;
+      const currentSlide = slides[currentIndex];
+      const nextSlide = slides[index];
+
+      if (!nextSlide || (index === currentIndex && !immediate)) return;
+
+      clearTimeout(fadeTimeout);
+
+      slides.forEach((slide, slideIndex) => {
+        if (slideIndex !== currentIndex && slideIndex !== index) {
+          setSlideState(slide, "inactive");
+        }
       });
+
+      if (immediate || !currentSlide || currentSlide === nextSlide) {
+        slides.forEach((slide, slideIndex) => {
+          setSlideState(slide, slideIndex === index ? "active" : "inactive");
+        });
+        currentIndex = index;
+        return;
+      }
+
+      setSlideState(nextSlide, "inactive");
+      void nextSlide.offsetWidth;
+      setSlideState(nextSlide, "ready");
+      void nextSlide.offsetWidth;
+
+      setSlideState(currentSlide, "leaving");
+
+      requestAnimationFrame(() => {
+        setSlideState(nextSlide, "active");
+      });
+
+      currentIndex = index;
+      fadeTimeout = window.setTimeout(() => {
+        setSlideState(currentSlide, "inactive");
+      }, fadeDuration);
     }
 
     function nextSlide() {
@@ -495,11 +536,13 @@ const slides = fallbackSlides.map((item) => ({
     }
 
     function startAutoPlay() {
-      autoPlayInterval = setInterval(nextSlide, 7000);
+      stopAutoPlay();
+      if (document.hidden) return;
+      autoPlayInterval = window.setInterval(nextSlide, slideDuration);
     }
 
     function stopAutoPlay() {
-      clearInterval(autoPlayInterval);
+      window.clearInterval(autoPlayInterval);
     }
 
     prevBtn?.addEventListener("click", (e) => {
@@ -516,7 +559,7 @@ const slides = fallbackSlides.map((item) => ({
       startAutoPlay();
     });
 
-    showSlide(0);
+    showSlide(0, { immediate: true });
     startAutoPlay();
 
     document.addEventListener("visibilitychange", () => {

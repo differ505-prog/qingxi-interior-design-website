@@ -4,27 +4,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 const project = {
   title: '住宅空間精選',
   label: 'CURATED RESIDENCE',
-  subtitle: '以沉穩灰階與俐落線條，整理出耐住也耐看的日常空間。',
+  subtitle: '以沉穩灰階與俐落線條，留下安定且耐看的住宅節奏。',
   story:
-    '以低彩度材質與乾淨收邊為主軸，讓客廳、餐廚與主臥維持一致的安定感。青曦把照明、櫃體比例與動線一併納入，讓空間在入住之後仍保有舒服節奏。',
+    '從材質、照明到櫃體比例，都以低干擾的方式收斂視覺，讓空間在入住之後仍保有舒服節奏。',
   facts: [
     { label: '空間類型', value: '住宅空間設計' },
     { label: '風格關鍵', value: '灰階、線性照明、俐落收納' },
     { label: '規劃重點', value: '公私領域節奏一致' },
-  ],
-  highlights: [
-    {
-      title: '客廳',
-      text: '用大面白牆與黑色量體收斂視覺焦點，讓日常停留更安定。',
-    },
-    {
-      title: '餐廚',
-      text: '櫃體、吧台與燈光同時整合，兼顧備餐效率與整體感。',
-    },
-    {
-      title: '主臥',
-      text: '維持低干擾配色與間接照明，讓休息空間回到最舒適的狀態。',
-    },
   ],
   images: [
     {
@@ -58,7 +44,7 @@ const project = {
         </div>
 
         <aside class="project-facts">
-          <p class="facts-label">CASE NOTES</p>
+          <p class="facts-label">DESIGN NOTES</p>
           <ul>
             {project.facts.map((fact) => (
               <li>
@@ -74,7 +60,7 @@ const project = {
     <section class="project-highlight-section">
       <div class="project-highlight-card">
         <div class="highlight-copy">
-          <p class="section-subtitle">DESIGN DIRECTION</p>
+          <p class="section-subtitle">DESIGN FRAME</p>
           <h2>把材質、照明與收納節奏，整理成更安定的居住感</h2>
           <p>
             不是用大量裝飾來堆疊氛圍，而是回到比例、光線與動線的平衡。
@@ -91,18 +77,6 @@ const project = {
       </div>
     </section>
 
-    <section class="highlights-section">
-      <div class="highlights-grid">
-        {project.highlights.map((item) => (
-          <article class="highlight-item">
-            <p class="section-subtitle">SPACE HIGHLIGHT</p>
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-
     <section class="gallery-section">
       <div class="gallery-header">
         <p class="section-subtitle">SPACE GALLERY</p>
@@ -114,9 +88,6 @@ const project = {
           <figure class={`gallery-item ${img.layout}`} data-index={i}>
             <div class="gallery-thumb">
               <img src={img.src} alt={img.alt} loading="lazy" />
-              <div class="thumb-overlay">
-                <span>查看大圖</span>
-              </div>
             </div>
           </figure>
         ))}
@@ -197,7 +168,6 @@ const project = {
 
   .project-hero-shell,
   .project-highlight-card,
-  .highlights-grid,
   .gallery-section,
   .contact-inner {
     max-width: 1200px;
@@ -352,36 +322,6 @@ const project = {
     transform: scale(1.04);
   }
 
-  .highlights-section {
-    padding: 0 2rem 3rem;
-  }
-
-  .highlights-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
-  }
-
-  .highlight-item {
-    padding: 1.5rem;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(129, 199, 212, 0.12);
-    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.06);
-  }
-
-  .highlight-item h3 {
-    margin: 0;
-    font-size: 1.3rem;
-    color: var(--gray-darkest);
-  }
-
-  .highlight-item p:last-child {
-    margin: 0.85rem 0 0;
-    color: var(--gray-medium);
-    line-height: 1.8;
-  }
-
   .gallery-section {
     padding: 0 2rem 5rem;
   }
@@ -436,32 +376,6 @@ const project = {
 
   .gallery-item.is-tall .gallery-thumb {
     aspect-ratio: 16 / 9;
-  }
-
-  .thumb-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: end;
-    justify-content: flex-start;
-    padding: 1.2rem;
-    background: linear-gradient(180deg, rgba(10, 10, 10, 0.02) 0%, rgba(10, 10, 10, 0.42) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .thumb-overlay span {
-    padding: 0.55rem 0.95rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.16);
-    color: var(--white);
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    backdrop-filter: blur(10px);
-  }
-
-  .gallery-item:hover .thumb-overlay {
-    opacity: 1;
   }
 
   .lightbox {
@@ -639,8 +553,7 @@ const project = {
 
   @media (max-width: 960px) {
     .project-hero-shell,
-    .project-highlight-card,
-    .highlights-grid {
+    .project-highlight-card {
       grid-template-columns: 1fr;
     }
 
