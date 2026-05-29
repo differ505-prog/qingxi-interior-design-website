@@ -1,5 +1,32 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getRenovationEstimatorConfig } from "../../lib/contentful.js";
+
+const estimatorConfig = await getRenovationEstimatorConfig();
+
+const qualityLevelLabels = {
+  basic: "經濟型",
+  standard: "標準型",
+  premium: "精緻型",
+  luxury: "豪華型",
+};
+
+const qualityLevelOptions = Object.entries(qualityLevelLabels).map(
+  ([value, label]) => {
+    const range = estimatorConfig.qualityLevels[value];
+    const rangeLabel =
+      value === "luxury"
+        ? `每坪 ${range.min}萬以上`
+        : `每坪 ${range.min}-${range.max}萬`;
+
+    return {
+      value,
+      label: `${label} (${rangeLabel})`,
+    };
+  },
+);
+
+const estimatorConfigJson = JSON.stringify(estimatorConfig);
 ---
 
 <BaseLayout
@@ -44,10 +71,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           <div class="form-group">
             <label for="quality-level">裝修等級</label>
             <select id="quality-level">
-              <option value="basic">經濟型 (每坪 4-6萬)</option>
-              <option value="standard" selected>標準型 (每坪 6-10萬)</option>
-              <option value="premium">精緻型 (每坪 10-15萬)</option>
-              <option value="luxury">豪華型 (每坪 15萬以上)</option>
+              {
+                qualityLevelOptions.map(({ value, label }) => (
+                  <option value={value} selected={value === "standard"}>
+                    {label}
+                  </option>
+                ))
+              }
             </select>
           </div>
         </div>
@@ -104,7 +134,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           </div>
 
           <div class="disclaimer">
-            <p>此為粗略估算，實際費用需依據現場丈量、設計需求及選材而定</p>
+            <p>{estimatorConfig.disclaimer}</p>
           </div>
 
           <div class="cta-buttons">
@@ -392,8 +422,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   }
 </style>
 
+<script type="application/json" id="estimator-config" set:html={estimatorConfigJson}></script>
 <script>
   // Calculator logic
+  const estimatorConfig = JSON.parse(
+    document.getElementById("estimator-config")?.textContent || "{}",
+  );
   const areaInput = document.getElementById("area") as HTMLInputElement;
   const projectType = document.getElementById(
     "project-type",
@@ -407,37 +441,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   function calculate() {
     const area = parseFloat(areaInput.value) || 30;
-    let pricePerPing = { min: 6, max: 10 }; // Default standard
-
-    // Get quality level pricing
-    switch (qualityLevel.value) {
-      case "basic":
-        pricePerPing = { min: 4, max: 6 };
-        break;
-      case "standard":
-        pricePerPing = { min: 6, max: 10 };
-        break;
-      case "premium":
-        pricePerPing = { min: 10, max: 15 };
-        break;
-      case "luxury":
-        pricePerPing = { min: 15, max: 20 };
-        break;
-    }
-
-    // Adjust for project type
-    let multiplier = 1;
-    if (projectType.value === "partial") {
-      multiplier = 0.6;
-    } else if (projectType.value === "design-only") {
-      multiplier = 0.15;
-    }
+    const pricePerPing =
+      estimatorConfig.qualityLevels?.[qualityLevel.value] ||
+      estimatorConfig.qualityLevels?.standard || { min: 6, max: 10 };
+    const multiplier =
+      estimatorConfig.projectTypeMultipliers?.[projectType.value] ?? 1;
+    const designFeePerPing = estimatorConfig.designFeePerPing || {
+      min: 3,
+      max: 5,
+    };
 
     const minTotal = Math.round(area * pricePerPing.min * multiplier);
     const maxTotal = Math.round(area * pricePerPing.max * multiplier);
 
-    const minDesign = Math.round(area * 3);
-    const maxDesign = Math.round(area * 5);
+    const minDesign = Math.round(area * designFeePerPing.min);
+    const maxDesign = Math.round(area * designFeePerPing.max);
 
     const minConstruction = minTotal - minDesign;
     const maxConstruction = maxTotal - maxDesign;

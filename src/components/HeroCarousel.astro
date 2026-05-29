@@ -1,5 +1,4 @@
 ---
-// 首頁主視覺 - 單張大圖，點擊進入專案圖集
 const heroProject = {
   title: '青曦空間設計作品',
   image: '/images/汐止中興路-客廳-01.jpg',
@@ -7,37 +6,287 @@ const heroProject = {
 };
 ---
 
-<section
-  id="hero-banner"
-  style="position:relative; width:100%; height:100vh; overflow:hidden; background:#000; margin-top:-80px;"
->
-  <a
-    href={`/portfolio/${heroProject.slug}`}
-    style="display:block; width:100%; height:100%; cursor:pointer; text-decoration:none;"
-    aria-label="查看作品"
-  >
-    <img 
-      id="hero-img"
-      src={heroProject.image} 
-      alt={heroProject.title}
-      loading="eager"
-      style="width:100%; height:100%; object-fit:cover; object-position:center;"
-    />
-  </a>
+<section id="hero-banner">
+  <img
+    id="hero-img"
+    src={heroProject.image}
+    alt={heroProject.title}
+    loading="eager"
+  />
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-shell">
+    <div class="hero-copy">
+      <p class="hero-eyebrow">QINGXI INTERIOR DESIGN</p>
+      <h1>為日常留下安定、耐看的空間質感</h1>
+      <p class="hero-description">
+        青曦空間設計專注於大台北住宅與商業空間規劃，從設計提案到工程落地，以清晰流程與細節整合打造真正能久住、耐用、耐看的空間。
+      </p>
+
+      <div class="hero-actions">
+        <a href="/contact" class="hero-button hero-button-primary">預約諮詢</a>
+        <a href="/portfolio" class="hero-button hero-button-secondary">查看作品集</a>
+      </div>
+
+      <ul class="hero-highlights" aria-label="品牌特色">
+        <li>大台北地區服務</li>
+        <li>住宅與商空規劃</li>
+        <li>設計施工整合</li>
+      </ul>
+    </div>
+
+    <a
+      href={`/portfolio/${heroProject.slug}`}
+      class="hero-featured-card"
+      aria-label="查看精選作品"
+    >
+      <span class="featured-label">FEATURED PROJECT</span>
+      <strong>{heroProject.title}</strong>
+      <span class="featured-link">查看精選作品</span>
+    </a>
+  </div>
 </section>
 
 <style is:inline>
   @keyframes heroSlowZoom {
-    0%   { transform: scale(1); }
-    100% { transform: scale(1.15); }
+    0% { transform: scale(1); }
+    100% { transform: scale(1.08); }
   }
+
+  #hero-banner {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    background: #000;
+    margin-top: -80px;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  }
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
   #hero-img {
     animation: heroSlowZoom 15s ease-in-out forwards;
     will-change: transform;
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(20, 20, 20, 0.72) 0%, rgba(20, 20, 20, 0.48) 42%, rgba(20, 20, 20, 0.22) 100%),
+      linear-gradient(180deg, rgba(20, 20, 20, 0.2) 0%, rgba(20, 20, 20, 0.54) 100%);
+  }
+
+  .hero-shell {
+    position: relative;
+    z-index: 1;
+    width: min(1200px, calc(100% - 3rem));
+    margin: 0 auto;
+    padding: 10rem 0 4.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 360px);
+    gap: 2rem;
+    align-items: end;
+  }
+
+  .hero-copy {
+    max-width: 680px;
+    color: var(--white);
+  }
+
+  .hero-eyebrow {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.28em;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .hero-copy h1 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1.2;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+  }
+
+  .hero-description {
+    margin: 1.5rem 0 0;
+    max-width: 42rem;
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  .hero-actions {
+    margin-top: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+    padding: 0.95rem 1.5rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      background-color 0.25s ease,
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .hero-button:hover {
+    transform: translateY(-2px);
+  }
+
+  .hero-button-primary {
+    background: var(--tiffany-primary);
+    border: 1px solid var(--tiffany-primary);
+    color: var(--gray-darkest);
+    box-shadow: 0 16px 30px rgba(129, 199, 212, 0.24);
+  }
+
+  .hero-button-primary:hover {
+    background: var(--tiffany-light);
+    border-color: var(--tiffany-light);
+  }
+
+  .hero-button-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--white);
+    backdrop-filter: blur(10px);
+  }
+
+  .hero-button-secondary:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.48);
+  }
+
+  .hero-highlights {
+    list-style: none;
+    margin: 2rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+  }
+
+  .hero-highlights li {
+    padding: 0.6rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(10px);
+  }
+
+  .hero-featured-card {
+    justify-self: end;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    width: min(100%, 340px);
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--white);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 20px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+    transition:
+      transform 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .hero-featured-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(160, 217, 217, 0.45);
+  }
+
+  .featured-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.24em;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .hero-featured-card strong {
+    font-size: 1.5rem;
+    line-height: 1.4;
+    font-weight: 500;
+    font-family: "Noto Serif TC", serif;
+  }
+
+  .featured-link {
+    color: var(--tiffany-light);
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+  }
+
   }
   @media (max-width: 768px) {
-    #hero-banner {
+      min-height: 78vh;
+      margin-top: -80px;
+    }
+
+    .hero-shell {
+      width: min(100%, calc(100% - 2rem));
+      padding: 8rem 0 2.5rem;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .hero-copy h1 {
+      font-size: 2.2rem;
+      letter-spacing: 0.04em;
+    }
+
+    .hero-description {
+      font-size: 0.98rem;
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .hero-button {
+      width: 100%;
+    }
+
+    .hero-featured-card {
+      justify-self: stretch;
+      width: auto;
+    }
+
+    .hero-highlights {
+      gap: 0.7rem;
+    }
+
+    .hero-highlights li {
+      width: fit-content;
+      max-width: 100%;
       height: 50vh !important;
     }
   }
-</style>
