@@ -3,7 +3,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import * as contentful from "contentful";
 
 // 獲取所有文章（帶錯誤處理）
-let posts = [];
+let posts: Array<{
+  title: string;
+  slug: string;
+  date: string;
+  summary: string;
+  category: string;
+  coverImage: string;
+}> = [];
 let errorMessage = "";
 
 try {
@@ -53,166 +60,292 @@ try {
 ---
 
 <style>
-  /* Blog 專屬字體優化 - 文藝質感 - 強制應用 */
-  h1 {
-    font-family: "Noto Serif TC", serif !important;
+  .blog-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 4.5rem 1.5rem 5rem;
+  }
+
+  .blog-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 360px);
+    gap: 2rem;
+    align-items: end;
+    margin-bottom: 3rem;
+  }
+
+  .hero-eyebrow,
+  .panel-label {
+    margin: 0 0 0.9rem;
+    color: var(--tiffany-dark);
+    font-size: 0.82rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  .blog-hero h1 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(2.4rem, 4vw, 4rem);
     font-weight: 500;
-    color: var(--gray-dark);
+    line-height: 1.3;
     letter-spacing: 0.05em;
+    color: var(--gray-darkest);
+  }
+
+  .hero-description {
+    margin: 1.2rem 0 0;
+    max-width: 44rem;
+    color: var(--gray-medium);
+    line-height: 1.95;
+    font-size: 1.03rem;
+  }
+
+  .blog-panel {
+    padding: 1.6rem;
+    border-radius: 28px;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.2), transparent 30%),
+      linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(47, 47, 47, 1) 100%);
+    color: var(--white);
+    box-shadow: 0 26px 60px rgba(17, 17, 17, 0.16);
+  }
+
+  .blog-panel .panel-label {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .blog-panel p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.8;
+  }
+
+  .blog-panel strong {
+    display: block;
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+    font-family: "Noto Serif TC", serif;
   }
 
   .category-filters {
     display: flex;
     gap: 0.75rem;
-    justify-content: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2.75rem;
     flex-wrap: wrap;
   }
 
   .category-btn {
-    padding: 0.5rem 1.25rem;
-    border: 2px solid var(--gray-lighter);
-    background: var(--white);
+    padding: 0.65rem 1.15rem;
+    border: 1px solid rgba(129, 199, 212, 0.18);
+    background: rgba(255, 255, 255, 0.82);
     color: var(--gray-dark);
-    border-radius: 25px;
-    font-size: 0.95rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
+    transition:
+      transform 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease,
+      box-shadow 0.25s ease;
+    box-shadow: 0 10px 20px rgba(47, 47, 47, 0.04);
   }
 
   .category-btn:hover {
-    background: var(--tiffany-pale);
-    color: var(--gray-dark);
-    border-color: var(--tiffany-light);
     transform: translateY(-2px);
+    background: var(--tiffany-pale);
+    border-color: rgba(129, 199, 212, 0.4);
   }
 
   .category-btn.active {
-    background: var(--tiffany-primary);
+    background: var(--gray-darkest);
     color: var(--white);
-    border-color: var(--tiffany-primary);
+    border-color: var(--gray-darkest);
+    box-shadow: 0 14px 24px rgba(47, 47, 47, 0.14);
   }
 
   .blog-list {
-    max-width: 900px;
-    margin: 0 auto;
+    display: grid;
+    gap: 1.5rem;
   }
 
   .post-card {
-    display: flex;
-    gap: 1.5rem;
-    background: var(--white);
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-    border: 2px solid var(--gray-bg);
+    display: grid;
+    grid-template-columns: minmax(260px, 0.95fr) minmax(0, 1.05fr);
+    gap: 0;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 28px;
+    border: 1px solid rgba(129, 199, 212, 0.14);
     overflow: hidden;
     text-decoration: none;
     color: inherit;
-    transition: all 0.3s ease;
-    margin-bottom: 2rem;
+    box-shadow: 0 22px 45px rgba(47, 47, 47, 0.05);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
   }
 
   .post-card:hover {
-    box-shadow: 0 12px 24px rgba(129, 199, 212, 0.2);
-    border-color: var(--tiffany-light);
-    transform: translateY(-4px);
+    transform: translateY(-6px);
+    border-color: rgba(129, 199, 212, 0.32);
+    box-shadow: 0 30px 60px rgba(129, 199, 212, 0.12);
   }
 
   .post-image {
-    width: 280px;
-    height: 200px;
-    flex-shrink: 0;
+    position: relative;
     overflow: hidden;
+    min-height: 260px;
+    background: var(--gray-bg);
+  }
+
+  .post-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(20, 20, 20, 0.04) 0%, rgba(20, 20, 20, 0.18) 100%);
   }
 
   .post-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
+    transition: transform 0.7s ease;
   }
 
   .post-card:hover .post-image img {
-    transform: scale(1.1);
+    transform: scale(1.05);
   }
 
   .post-content {
-    flex: 1;
-    padding: 1.5rem;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
 
   .post-category {
-    display: inline-block;
-    background: var(--tiffany-primary);
-    color: var(--white);
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
+    display: inline-flex;
     width: fit-content;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(129, 199, 212, 0.12);
+    color: var(--tiffany-dark);
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.85rem;
   }
 
   .post-title {
+    margin: 0;
     font-family: "Noto Serif TC", serif !important;
-    font-size: 1.5rem;
+    font-size: clamp(1.55rem, 2.4vw, 2.15rem);
     font-weight: 500;
-    color: var(--gray-dark);
-    margin-bottom: 0.5rem;
+    color: var(--gray-darkest);
+    line-height: 1.55;
     letter-spacing: 0.03em;
-    line-height: 1.6;
-  }
-
-  .post-card:hover .post-title {
-    color: var(--tiffany-dark);
-    transform: translateX(3px);
-    transition: all 0.3s ease;
   }
 
   .post-date {
-    font-size: 0.9rem;
-    color: var(--gray-medium);
-    margin-bottom: 0.75rem;
+    margin: 0.85rem 0 0;
+    font-size: 0.88rem;
+    color: var(--gray-light);
+    letter-spacing: 0.08em;
   }
 
   .post-summary {
+    margin: 1rem 0 0;
     font-size: 1rem;
-    font-weight: 300;
     color: var(--gray-medium);
+    line-height: 1.9;
+  }
+
+  .post-link {
+    margin-top: 1.35rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--tiffany-dark);
+    letter-spacing: 0.08em;
+  }
+
+  .post-link::after {
+    content: "→";
+    transition: transform 0.25s ease;
+  }
+
+  .post-card:hover .post-link::after {
+    transform: translateX(4px);
+  }
+
+  .empty-state {
+    padding: 4rem 2rem;
+    border-radius: 28px;
+    text-align: center;
+    color: var(--gray-medium);
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.04);
+  }
+
+  .empty-state strong {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--gray-darkest);
+  }
+
+  .empty-state p {
+    margin: 0.5rem 0 0;
     line-height: 1.8;
-    letter-spacing: 0.02em;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (max-width: 900px) {
+    .blog-hero,
+    .post-card {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 768px) {
-    .post-card {
-      flex-direction: column;
+    .blog-page {
+      padding: 4rem 1.25rem 4.5rem;
+    }
+
+    .post-content,
+    .blog-panel {
+      padding: 1.5rem;
     }
 
     .post-image {
-      width: 100%;
-      height: 200px;
-    }
-
-    .category-filters {
-      padding: 0 1rem;
+      min-height: 220px;
     }
   }
 </style>
 
 <BaseLayout title="知識分享 - 青曦空間設計">
-  <div style="max-width: 1200px; margin: 0 auto; padding: 4rem 1rem;">
-    <h1
-      style="font-size: 2.5rem; font-weight: 600; text-align: center; margin-bottom: 2rem; color: var(--gray-dark);"
-    >
-      知識分享
-    </h1>
+  <section class="blog-page">
+    <div class="blog-hero">
+      <div>
+        <p class="hero-eyebrow">EDITORIAL NOTES</p>
+        <h1>把裝修知識整理成更耐讀的觀看節奏。</h1>
+        <p class="hero-description">
+          從水電定位、材質選擇到預算判讀，青曦把實務經驗寫成能被慢慢閱讀的內容，
+          讓你在規劃空間之前，先看懂真正重要的判斷。
+        </p>
+      </div>
+
+      <aside class="blog-panel">
+        <p class="panel-label">READING GUIDE</p>
+        <p>以基礎施工、設計判斷與預算理解為主軸，持續補充更接近日常決策的內容。</p>
+        <strong>{posts.length} 篇文章持續整理中</strong>
+      </aside>
+    </div>
 
     <div class="category-filters">
       <button class="category-btn active" data-category="全部">全部</button>
@@ -242,42 +375,34 @@ try {
                 <h2 class="post-title">{post.title}</h2>
                 <p class="post-date">{post.date}</p>
                 <p class="post-summary">{post.summary}</p>
+                <span class="post-link">閱讀文章</span>
               </div>
             </a>
           ))
         ) : (
-          <div style="text-align: center; padding: 4rem 2rem; color: var(--gray-medium);">
-            <p style="font-size: 1.2rem; margin-bottom: 1rem;">
-              目前還沒有文章
-            </p>
+          <div class="empty-state">
+            <strong>知識內容正在整理中</strong>
             {errorMessage ? (
               <>
-                <p style="font-size: 0.95rem; color: var(--gray-dark); margin-bottom: 0.5rem;">
-                  {errorMessage}
-                </p>
-                <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--gray-light);">
-                  請檢查 .env 文件或 Vercel 環境變數設置
-                </p>
+                <p>{errorMessage}</p>
+                <p>請檢查 `.env` 文件或部署環境中的 Contentful 設定。</p>
               </>
             ) : (
               <>
-                <p style="font-size: 0.95rem;">
-                  請在 .env 文件中配置 Contentful 環境變數以連接內容管理系統
-                </p>
-                <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--gray-light);">
-                  需要設置：CONTENTFUL_SPACE_ID 和 CONTENTFUL_ACCESS_TOKEN
-                </p>
+                <p>請在 `.env` 中配置 Contentful 環境變數以連接內容管理系統。</p>
+                <p>需要設置：`CONTENTFUL_SPACE_ID` 與 `CONTENTFUL_ACCESS_TOKEN`。</p>
               </>
             )}
           </div>
         )
       }
     </div>
-  </div>
+  </section>
 
   <script>
-    const categoryButtons = document.querySelectorAll(".category-btn");
-    const postCards = document.querySelectorAll(".post-card");
+    const categoryButtons =
+      document.querySelectorAll<HTMLButtonElement>(".category-btn");
+    const postCards = document.querySelectorAll<HTMLElement>(".post-card");
 
     categoryButtons.forEach((button) => {
       button.addEventListener("click", () => {
