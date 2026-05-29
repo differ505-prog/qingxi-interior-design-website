@@ -16,6 +16,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <span>住宅需求整理</span>
           <span>預算與時程盤點</span>
           <span>設計施工整合</span>
+          <span>智慧家庭整合</span>
         </div>
       </div>
 
@@ -519,6 +520,121 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 <input type="checkbox" name="spaces" value="tatami-room" class="space-checkbox">
                 <span>和室</span>
               </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2 class="section-title">智慧家庭需求</h2>
+
+          <div class="form-group">
+            <label>是否需要智慧家庭整合規劃</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="smart-home-planning" value="yes" id="smart-home-yes">
+                <span>需要</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="smart-home-planning" value="maybe" id="smart-home-maybe">
+                <span>想了解</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="smart-home-planning" value="no" id="smart-home-no">
+                <span>暫時不需要</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="smart-home-details" class="conditional-section" style="display: none;">
+            <div class="form-group">
+              <label>希望整合的項目</label>
+              <div class="checkbox-grid">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="lighting">
+                  <span>燈光控制</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="curtain">
+                  <span>電動窗簾</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="air-conditioning">
+                  <span>空調整合</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="door-lock">
+                  <span>智慧門鎖</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="sensor">
+                  <span>感測器自動化</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="security">
+                  <span>監控與安防</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="network">
+                  <span>網路與弱電配置</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="audio">
+                  <span>影音情境整合</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>希望支援的生態系</label>
+              <div class="checkbox-grid">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="apple-home">
+                  <span>Apple Home</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="google-home">
+                  <span>Google Home</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="alexa">
+                  <span>Alexa</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="home-assistant">
+                  <span>Home Assistant</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="not-sure">
+                  <span>還不確定</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>目前是否已有既有設備想整合</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="existing-smart-devices" value="yes" id="existing-smart-devices-yes">
+                  <span>有</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="existing-smart-devices" value="no" id="existing-smart-devices-no">
+                  <span>沒有</span>
+                </label>
+              </div>
+              <div id="existing-smart-devices-input" class="conditional-input" style="display: none;">
+                <textarea name="existing-smart-devices-notes" rows="3" placeholder="可填寫目前設備品牌、型號，或想延用的系統"></textarea>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="smart-home-scenes">想實現的生活情境</label>
+              <textarea id="smart-home-scenes" name="smart-home-scenes" rows="3" placeholder="例如回家模式、離家模式、起夜動線、語音控制、遠端查看等"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="smart-home-notes">智慧家庭補充說明</label>
+              <textarea id="smart-home-notes" name="smart-home-notes" rows="3" placeholder="例如希望前期預留哪些線路、是否重視後續擴充、是否已有跨品牌整合需求"></textarea>
             </div>
           </div>
         </section>
@@ -1103,6 +1219,39 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     presaleYes?.addEventListener('change', togglePresaleDetails);
     presaleNo?.addEventListener('change', togglePresaleDetails);
+
+    // 智慧家庭需求相關欄位
+    const smartHomeYes = document.getElementById('smart-home-yes');
+    const smartHomeMaybe = document.getElementById('smart-home-maybe');
+    const smartHomeNo = document.getElementById('smart-home-no');
+    const smartHomeDetails = document.getElementById('smart-home-details');
+
+    function toggleSmartHomeDetails() {
+      if (smartHomeYes?.checked || smartHomeMaybe?.checked) {
+        smartHomeDetails.style.display = 'block';
+      } else {
+        smartHomeDetails.style.display = 'none';
+      }
+    }
+
+    smartHomeYes?.addEventListener('change', toggleSmartHomeDetails);
+    smartHomeMaybe?.addEventListener('change', toggleSmartHomeDetails);
+    smartHomeNo?.addEventListener('change', toggleSmartHomeDetails);
+
+    const existingSmartDevicesYes = document.getElementById('existing-smart-devices-yes');
+    const existingSmartDevicesNo = document.getElementById('existing-smart-devices-no');
+    const existingSmartDevicesInput = document.getElementById('existing-smart-devices-input');
+
+    function toggleExistingSmartDevicesInput() {
+      if (existingSmartDevicesYes?.checked) {
+        existingSmartDevicesInput.style.display = 'block';
+      } else {
+        existingSmartDevicesInput.style.display = 'none';
+      }
+    }
+
+    existingSmartDevicesYes?.addEventListener('change', toggleExistingSmartDevicesInput);
+    existingSmartDevicesNo?.addEventListener('change', toggleExistingSmartDevicesInput);
 
     // 婚姻狀況相關欄位
     const marriedYes = document.getElementById('married-yes');

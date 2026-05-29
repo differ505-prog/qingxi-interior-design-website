@@ -11,10 +11,18 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       <div class="brand-strip-copy">
         <p class="brand-strip-label">BRAND VISION</p>
         <h2>從設計到工程，給你好住的空間</h2>
-        <p>
+        <p class="brand-strip-intro">
           不只追求視覺美感，更在意入住後的耐用與舒適。
           我們讓預算透明、工序清晰，每一次決策都安心。
         </p>
+        <div class="brand-smart-home">
+          <p class="brand-smart-home-label">SMART LIVING</p>
+          <h3>把智慧家庭從設備堆疊，變成真正好用的生活系統</h3>
+          <p>
+            青曦可協助規劃智能家居佈線、硬體建置與跨生態系整合，
+            讓燈光、窗簾、空調、門鎖與情境控制在入住後更直覺、更穩定。
+          </p>
+        </div>
         <div class="brand-credential">
           <p class="brand-credential-label">PROFESSIONAL CREDENTIAL</p>
           <p class="brand-credential-title">具建築物室內裝修工程管理乙級技術士資格</p>
@@ -52,7 +60,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
       <div class="service-modes" data-animate="scale">
         <h3 class="modes-title">我們的服務模式</h3>
-        <p class="modes-desc">無論重視整體風格或專注工程執行，青曦都能靈活對應</p>
+        <p class="modes-desc">無論重視整體風格、專注工程執行，或想同步整合智慧家庭，青曦都能靈活對應</p>
         <div class="mode-cards">
           <div class="mode-card">
             <div class="mode-icon">
@@ -72,6 +80,22 @@ import HeroCarousel from "../components/HeroCarousel.astro";
             </div>
             <h4>專業純統包工程</h4>
             <p>已有設計藍圖？我們以專業工班與嚴謹監工為你精準落地。</p>
+          </div>
+          <div class="mode-card">
+            <div class="mode-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+                <path d="M9 9h.01"></path>
+                <path d="M15 9h.01"></path>
+                <path d="M9 15h6"></path>
+                <path d="M12 4v-2"></path>
+                <path d="M12 22v-2"></path>
+                <path d="M4 12h-2"></path>
+                <path d="M22 12h-2"></path>
+              </svg>
+            </div>
+            <h4>智慧空間整合</h4>
+            <p>從前期佈線、硬體選型到 Home Assistant 與跨生態串聯，打造穩定可擴充的智慧生活。</p>
           </div>
         </div>
       </div>
@@ -209,7 +233,103 @@ import HeroCarousel from "../components/HeroCarousel.astro";
             </figure>
           </a>
         </li>
+
+        <li class="service-item" data-animate="scale">
+          <a href="/contact" class="service-card">
+            <figure class="service-content">
+              <div class="service-text">
+                <p>智慧家庭<br />整合規劃</p>
+              </div>
+              <div class="service-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+                  <path d="M9 9h.01"></path>
+                  <path d="M15 9h.01"></path>
+                  <path d="M9 15h6"></path>
+                  <path d="M12 4v-2"></path>
+                  <path d="M12 22v-2"></path>
+                  <path d="M4 12h-2"></path>
+                  <path d="M22 12h-2"></path>
+                </svg>
+              </div>
+            </figure>
+          </a>
+        </li>
       </ul>
+    </div>
+  </section>
+
+  <section class="smart-case-section">
+    <div class="smart-case-container">
+      <div class="section-header smart-case-header">
+        <h6 class="section-subtitle">SMART HOME CASE</h6>
+        <h2 class="section-title">智慧家庭整合示意</h2>
+        <p class="smart-case-intro">
+          以下以住宅情境示意青曦可協助的智慧整合框架，
+          後續可直接替換成實際案名、設備清單與空間照片。
+        </p>
+      </div>
+
+      <div class="smart-case-shell">
+        <article class="smart-case-summary">
+          <p class="smart-case-label">CASE FRAMEWORK</p>
+          <h3>住宅智慧整合規劃示意</h3>
+          <p class="smart-case-description">
+            以三房住宅為例，從裝修前期預留弱電與設備位置，到入住後的日常情境控制，
+            讓燈光、窗簾、空調、門鎖與感測自動化能穩定協作。
+          </p>
+          <div class="smart-case-tags">
+            <span>三房住宅</span>
+            <span>跨生態整合</span>
+            <span>Home Assistant</span>
+            <span>可後續擴充</span>
+          </div>
+        </article>
+
+        <div class="smart-case-grid">
+          <article class="smart-case-card">
+            <p class="smart-case-card-label">屋主需求</p>
+            <h3>把操作變簡單，而不是設備變複雜</h3>
+            <p>
+              希望回家、離家、起夜與就寢都能一鍵或自動觸發，
+              減少反覆操作開關、窗簾與空調的負擔。
+            </p>
+          </article>
+
+          <article class="smart-case-card">
+            <p class="smart-case-card-label">前期規劃</p>
+            <h3>裝修階段先把線路與設備位置想清楚</h3>
+            <p>
+              於天花、弱電箱、網路節點與控制迴路預留條件，
+              避免入住後才發現擴充困難或需要重工。
+            </p>
+          </article>
+
+          <article class="smart-case-card">
+            <p class="smart-case-card-label">整合項目</p>
+            <h3>燈光、窗簾、空調、門鎖與感測串聯</h3>
+            <p>
+              可依生活習慣整合不同品牌設備，並統一到同一套邏輯中控，
+              兼顧直覺操作、穩定性與後續升級彈性。
+            </p>
+          </article>
+
+          <article class="smart-case-card">
+            <p class="smart-case-card-label">情境控制</p>
+            <h3>以 Home Assistant 為核心建立日常自動化</h3>
+            <p>
+              例如回家模式、離家模式、睡眠模式、夜間動線感應與遠端查看，
+              讓智慧家庭真正融入日常，而不只是堆疊設備。
+            </p>
+          </article>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -560,11 +680,46 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       color: var(--gray-darkest);
     }
 
-    .brand-strip-copy p:last-child {
+    .brand-strip-intro {
       margin: 1.1rem 0 0;
       color: var(--gray-medium);
       line-height: 1.9;
       font-size: 1rem;
+    }
+
+    .brand-smart-home {
+      margin-top: 1.35rem;
+      padding: 1.2rem 1.25rem;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(246, 249, 249, 1) 100%);
+      border: 1px solid rgba(129, 199, 212, 0.18);
+      box-shadow: 0 16px 30px rgba(47, 47, 47, 0.05);
+    }
+
+    .brand-smart-home-label {
+      margin: 0;
+      color: var(--tiffany-dark);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .brand-smart-home h3 {
+      margin: 0.65rem 0 0;
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      line-height: 1.6;
+      color: var(--gray-darkest);
+      letter-spacing: 0.04em;
+    }
+
+    .brand-smart-home > p:last-child {
+      margin: 0.65rem 0 0;
+      color: var(--gray-medium);
+      line-height: 1.85;
+      font-size: 0.96rem;
     }
 
     .brand-credential {
@@ -709,7 +864,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
     .mode-cards {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1.5rem;
     }
 
@@ -1355,6 +1510,123 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       }
     }
 
+    .smart-case-section {
+      padding: 5rem 2rem;
+      background:
+        radial-gradient(circle at top right, rgba(160, 217, 217, 0.12), transparent 22%),
+        linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 248, 248, 1) 100%);
+    }
+
+    .smart-case-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .smart-case-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .smart-case-intro {
+      max-width: 46rem;
+      margin: 1rem auto 0;
+      color: var(--gray-medium);
+      line-height: 1.9;
+    }
+
+    .smart-case-shell {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+
+    .smart-case-summary,
+    .smart-case-card {
+      border-radius: 24px;
+      border: 1px solid rgba(129, 199, 212, 0.14);
+      box-shadow: 0 18px 36px rgba(47, 47, 47, 0.06);
+    }
+
+    .smart-case-summary {
+      padding: 1.8rem;
+      background:
+        radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 30%),
+        linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(47, 47, 47, 1) 100%);
+      color: var(--white);
+    }
+
+    .smart-case-label,
+    .smart-case-card-label {
+      margin: 0;
+      font-size: 0.76rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .smart-case-label {
+      color: rgba(255, 255, 255, 0.58);
+    }
+
+    .smart-case-summary h3 {
+      margin: 0.75rem 0 0;
+      font-family: 'Noto Serif TC', serif;
+      font-size: 1.7rem;
+      font-weight: 500;
+      line-height: 1.45;
+      letter-spacing: 0.04em;
+    }
+
+    .smart-case-description {
+      margin: 1rem 0 0;
+      color: rgba(255, 255, 255, 0.76);
+      line-height: 1.9;
+    }
+
+    .smart-case-tags {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .smart-case-tags span {
+      padding: 0.65rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 0.9rem;
+    }
+
+    .smart-case-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+
+    .smart-case-card {
+      padding: 1.6rem;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
+    }
+
+    .smart-case-card-label {
+      color: var(--tiffany-dark);
+    }
+
+    .smart-case-card h3 {
+      margin: 0.7rem 0 0;
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: var(--gray-darkest);
+      letter-spacing: 0.04em;
+    }
+
+    .smart-case-card p:last-child {
+      margin: 0.75rem 0 0;
+      color: var(--gray-medium);
+      line-height: 1.85;
+    }
+
     /* Area Section Styles */
     .area-section {
       padding: 5rem 2rem;
@@ -1669,6 +1941,15 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
       .workflow-content p {
         font-size: 0.9rem;
+      }
+
+      .smart-case-section {
+        padding: 3rem 1.5rem;
+      }
+
+      .smart-case-shell,
+      .smart-case-grid {
+        grid-template-columns: 1fr;
       }
     }
 
