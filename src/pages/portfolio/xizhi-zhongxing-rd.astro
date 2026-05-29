@@ -2,38 +2,127 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const project = {
+  title: '汐止中興路住宅',
+  label: 'FEATURED RESIDENCE',
+  subtitle: '以沉穩灰階與俐落線條，整理出耐住也耐看的日常空間。',
+  story:
+    '這個案子以低彩度材質與乾淨收邊為主軸，讓客廳、餐廚與主臥維持一致的安定感。青曦把照明、櫃體比例與動線一併納入，讓空間在入住之後仍保有舒服節奏。',
+  facts: [
+    { label: '空間類型', value: '住宅空間設計' },
+    { label: '風格關鍵', value: '灰階、線性照明、俐落收納' },
+    { label: '規劃重點', value: '公私領域節奏一致' },
+  ],
+  highlights: [
+    {
+      title: '客廳',
+      text: '用大面白牆與黑色量體收斂視覺焦點，讓日常停留更安定。',
+    },
+    {
+      title: '餐廚',
+      text: '櫃體、吧台與燈光同時整合，兼顧備餐效率與整體感。',
+    },
+    {
+      title: '主臥',
+      text: '維持低干擾配色與間接照明，讓休息空間回到最舒適的狀態。',
+    },
+  ],
   images: [
-    { src: '/images/portfolio/xizhi-1.jpg', alt: '汐止中興路-客廳-01' },
-    { src: '/images/portfolio/xizhi-2.jpg', alt: '汐止中興路-空間-02' },
-    { src: '/images/portfolio/xizhi-3.jpg', alt: '汐止中興路-主臥-03' },
-  ]
+    {
+      src: '/images/portfolio/xizhi-1.jpg',
+      alt: '汐止中興路住宅客廳',
+      layout: 'is-wide',
+    },
+    {
+      src: '/images/portfolio/xizhi-2.jpg',
+      alt: '汐止中興路住宅餐廚',
+      layout: 'is-standard',
+    },
+    {
+      src: '/images/portfolio/xizhi-3.jpg',
+      alt: '汐止中興路住宅主臥',
+      layout: 'is-tall',
+    },
+  ],
 };
 ---
 
-<BaseLayout title="作品集 - 青曦空間設計">
+<BaseLayout title={`${project.title} - 青曦空間設計`}>
   <div class="project-page">
-    <!-- 縮圖圖集 -->
-    <section class="gallery-section">
-      <div class="gallery-grid">
-        {project.images.map((img, i) => (
-          <div class="gallery-item" data-index={i}>
-            <div class="gallery-thumb">
-              <img src={img.src} alt={img.alt} loading="lazy" />
-              <div class="thumb-overlay">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  <line x1="11" y1="8" x2="11" y2="14"></line>
-                  <line x1="8" y1="11" x2="14" y2="11"></line>
-                </svg>
-              </div>
-            </div>
-          </div>
+    <section class="project-hero">
+      <div class="project-hero-shell">
+        <div class="project-copy">
+          <p class="section-subtitle">{project.label}</p>
+          <h1>{project.title}</h1>
+          <p class="project-subtitle">{project.subtitle}</p>
+          <p class="project-story">{project.story}</p>
+        </div>
+
+        <aside class="project-facts">
+          <p class="facts-label">CASE NOTES</p>
+          <ul>
+            {project.facts.map((fact) => (
+              <li>
+                <span>{fact.label}</span>
+                <strong>{fact.value}</strong>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="project-highlight-section">
+      <div class="project-highlight-card">
+        <div class="highlight-copy">
+          <p class="section-subtitle">DESIGN DIRECTION</p>
+          <h2>把材質、照明與收納節奏，整理成更安定的居住感</h2>
+          <p>
+            這個案例不是用大量裝飾來堆疊氛圍，而是回到比例、光線與動線的平衡。
+            讓空間在白天俐落，夜晚也能保有沉靜層次。
+          </p>
+        </div>
+        <figure class="project-feature-image gallery-item" data-index="0">
+          <img
+            src={project.images[0].src}
+            alt={project.images[0].alt}
+            loading="eager"
+          />
+        </figure>
+      </div>
+    </section>
+
+    <section class="highlights-section">
+      <div class="highlights-grid">
+        {project.highlights.map((item) => (
+          <article class="highlight-item">
+            <p class="section-subtitle">SPACE HIGHLIGHT</p>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+          </article>
         ))}
       </div>
     </section>
 
-    <!-- Lightbox 大圖 -->
+    <section class="gallery-section">
+      <div class="gallery-header">
+        <p class="section-subtitle">PROJECT GALLERY</p>
+        <h2>以更像案例提案的方式，完整呈現空間節奏</h2>
+      </div>
+
+      <div class="gallery-grid editorial-grid">
+        {project.images.map((img, i) => (
+          <figure class={`gallery-item ${img.layout}`} data-index={i}>
+            <div class="gallery-thumb">
+              <img src={img.src} alt={img.alt} loading="lazy" />
+              <div class="thumb-overlay">
+                <span>查看大圖</span>
+              </div>
+            </div>
+          </figure>
+        ))}
+      </div>
+    </section>
+
     <div class="lightbox" id="lightbox">
       <button class="lightbox-close" aria-label="關閉">&times;</button>
       <button class="lightbox-nav lightbox-prev" aria-label="上一張">
@@ -48,11 +137,11 @@ const project = {
       <div class="lightbox-counter" id="lightbox-counter"></div>
     </div>
 
-    <!-- 聯繫資訊 -->
     <section class="contact-section">
       <div class="contact-inner">
-        <h2 class="contact-title">聯繫我們</h2>
-        <p class="contact-desc">對我們的作品感興趣？歡迎透過以下方式與我們聯繫，預約免費諮詢。</p>
+        <p class="section-subtitle contact-subtitle">NEXT STEP</p>
+        <h2 class="contact-title">喜歡這種安定俐落的空間節奏？</h2>
+        <p class="contact-desc">歡迎和青曦聊聊你的住宅需求，從設計到工程，我們會幫你把節奏與預算一起整理好。</p>
         <div class="contact-cards">
           <a href="https://lin.ee/U1HCeW4" target="_blank" class="contact-card">
             <div class="contact-icon line-icon">
@@ -82,94 +171,299 @@ const project = {
             <span>預約諮詢</span>
           </a>
         </div>
-        <div class="social-row">
-          <a href="https://www.facebook.com/profile.php?id=61562661642204" target="_blank" aria-label="Facebook">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
-          </a>
-          <a href="https://www.instagram.com/qingxi.ds/" target="_blank" aria-label="Instagram">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path></svg>
-          </a>
-        </div>
       </div>
     </section>
   </div>
 </BaseLayout>
 
 <style>
-  .project-page { padding-top: 0; }
-
-  /* 專案標題 */
-  .project-header {
-    text-align: center;
-    padding: 4rem 2rem 2rem;
-    background: var(--white);
+  .project-page {
+    padding-top: 0;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(247, 247, 247, 1) 100%);
   }
+
   .section-subtitle {
-    font-size: 0.85rem;
-    letter-spacing: 0.3em;
-    color: var(--tiffany-primary);
-    margin: 0 0 0.5rem;
-    font-weight: 500;
-  }
-  .project-title {
-    font-size: 2.5rem;
-    font-weight: 300;
-    color: var(--gray-dark);
-    margin: 0 0 0.75rem;
-    letter-spacing: 0.1em;
-    font-family: 'Noto Serif TC', serif;
-  }
-  .project-desc {
-    font-size: 1.05rem;
-    color: var(--gray-medium);
-    margin: 0;
-    letter-spacing: 0.05em;
+    margin: 0 0 0.8rem;
+    color: var(--tiffany-dark);
+    font-size: 0.8rem;
+    letter-spacing: 0.26em;
+    font-weight: 600;
   }
 
-  /* 縮圖圖集 */
-  .gallery-section {
-    padding: 2rem;
-    max-width: 1400px;
+  .project-hero {
+    padding: 7rem 2rem 3rem;
+  }
+
+  .project-hero-shell,
+  .project-highlight-card,
+  .highlights-grid,
+  .gallery-section,
+  .contact-inner {
+    max-width: 1200px;
     margin: 0 auto;
   }
-  .gallery-grid {
+
+  .project-hero-shell {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 360px);
+    gap: 2rem;
+    align-items: end;
+  }
+
+  .project-copy h1 {
+    margin: 0;
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(2.6rem, 5vw, 4.6rem);
+    line-height: 1.18;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--gray-darkest);
+  }
+
+  .project-subtitle {
+    margin: 1.25rem 0 0;
+    font-size: 1.18rem;
+    line-height: 1.8;
+    color: var(--gray-dark);
+    max-width: 42rem;
+  }
+
+  .project-story {
+    margin: 1.25rem 0 0;
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--gray-medium);
+    max-width: 40rem;
+  }
+
+  .project-facts {
+    padding: 1.5rem;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 22px 45px rgba(47, 47, 47, 0.08);
+    backdrop-filter: blur(16px);
+  }
+
+  .facts-label {
+    margin: 0 0 1rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.24em;
+    color: var(--tiffany-dark);
+  }
+
+  .project-facts ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
   }
-  .gallery-item { cursor: pointer; }
-  .gallery-thumb {
-    position: relative;
-    overflow: hidden;
-    border-radius: 6px;
-    aspect-ratio: 4 / 3;
-    background: var(--gray-bg);
+
+  .project-facts li {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(47, 47, 47, 0.08);
   }
+
+  .project-facts li:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .project-facts span,
+  .project-facts strong {
+    display: block;
+  }
+
+  .project-facts span {
+    margin-bottom: 0.35rem;
+    color: var(--gray-medium);
+    font-size: 0.88rem;
+    letter-spacing: 0.08em;
+  }
+
+  .project-facts strong {
+    color: var(--gray-darkest);
+    font-size: 1rem;
+    line-height: 1.7;
+    font-weight: 600;
+  }
+
+  .project-highlight-section {
+    padding: 1rem 2rem 3rem;
+  }
+
+  .project-highlight-card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 2rem;
+    align-items: center;
+    padding: 2rem;
+    border-radius: 32px;
+    background: linear-gradient(135deg, rgba(19, 19, 19, 1) 0%, rgba(38, 38, 38, 1) 100%);
+    color: var(--white);
+    box-shadow: 0 28px 70px rgba(17, 17, 17, 0.18);
+  }
+
+  .highlight-copy h2 {
+    margin: 0;
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    line-height: 1.35;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .highlight-copy p:last-child {
+    margin: 1rem 0 0;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.9;
+  }
+
+  .project-feature-image,
+  .gallery-item {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .project-feature-image img,
   .gallery-thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
-  .gallery-item:hover .gallery-thumb img {
-    transform: scale(1.08);
+
+  .project-feature-image {
+    overflow: hidden;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.06);
   }
+
+  .project-feature-image img {
+    aspect-ratio: 4 / 3;
+    display: block;
+  }
+
+  .project-feature-image:hover img,
+  .gallery-item:hover img {
+    transform: scale(1.04);
+  }
+
+  .highlights-section {
+    padding: 0 2rem 3rem;
+  }
+
+  .highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .highlight-item {
+    padding: 1.5rem;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.12);
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.06);
+  }
+
+  .highlight-item h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: var(--gray-darkest);
+  }
+
+  .highlight-item p:last-child {
+    margin: 0.85rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
+  .gallery-section {
+    padding: 0 2rem 5rem;
+  }
+
+  .gallery-header {
+    max-width: 760px;
+    margin-bottom: 2rem;
+  }
+
+  .gallery-header h2 {
+    margin: 0;
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--gray-darkest);
+  }
+
+  .editorial-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .gallery-item.is-wide {
+    grid-column: span 7;
+  }
+
+  .gallery-item.is-standard {
+    grid-column: span 5;
+  }
+
+  .gallery-item.is-tall {
+    grid-column: span 12;
+  }
+
+  .gallery-thumb {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    background: var(--gray-bg);
+    min-height: 340px;
+  }
+
+  .gallery-item.is-wide .gallery-thumb {
+    aspect-ratio: 16 / 11;
+  }
+
+  .gallery-item.is-standard .gallery-thumb {
+    aspect-ratio: 4 / 5;
+  }
+
+  .gallery-item.is-tall .gallery-thumb {
+    aspect-ratio: 16 / 9;
+  }
+
   .thumb-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.3);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: end;
+    justify-content: flex-start;
+    padding: 1.2rem;
+    background: linear-gradient(180deg, rgba(10, 10, 10, 0.02) 0%, rgba(10, 10, 10, 0.42) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
-    color: white;
   }
+
+  .thumb-overlay span {
+    padding: 0.55rem 0.95rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    color: var(--white);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    backdrop-filter: blur(10px);
+  }
+
   .gallery-item:hover .thumb-overlay {
     opacity: 1;
   }
 
-  /* Lightbox */
   .lightbox {
     display: none;
     position: fixed;
@@ -180,7 +474,11 @@ const project = {
     justify-content: center;
     backdrop-filter: blur(8px);
   }
-  .lightbox.active { display: flex; }
+
+  .lightbox.active {
+    display: flex;
+  }
+
   .lightbox-content {
     max-width: 90vw;
     max-height: 85vh;
@@ -188,119 +486,134 @@ const project = {
     align-items: center;
     justify-content: center;
   }
+
   .lightbox-content img {
     max-width: 100%;
     max-height: 85vh;
     object-fit: contain;
-    border-radius: 4px;
-    box-shadow: 0 10px 60px rgba(0,0,0,0.5);
+    border-radius: 8px;
+    box-shadow: 0 10px 60px rgba(0, 0, 0, 0.5);
     animation: lightboxIn 0.3s ease;
   }
+
   @keyframes lightboxIn {
     from { opacity: 0; transform: scale(0.92); }
     to { opacity: 1; transform: scale(1); }
   }
-  .lightbox-close {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2.5rem;
-    cursor: pointer;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s;
-    z-index: 10;
-  }
-  .lightbox-close:hover {
-    background: rgba(255,255,255,0.15);
-    transform: rotate(90deg);
-  }
+
+  .lightbox-close,
   .lightbox-nav {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
+    color: white;
+    transition: all 0.3s ease;
     z-index: 10;
   }
+
+  .lightbox-close {
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    font-size: 2.5rem;
+    cursor: pointer;
+  }
+
+  .lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: rotate(90deg);
+  }
+
+  .lightbox-nav {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+  }
+
   .lightbox-nav:hover {
     background: rgba(129, 199, 212, 0.4);
     border-color: var(--tiffany-primary);
   }
+
   .lightbox-prev { left: 1.5rem; }
   .lightbox-next { right: 1.5rem; }
+
   .lightbox-counter {
     position: absolute;
     bottom: 1.5rem;
     left: 50%;
     transform: translateX(-50%);
-    color: rgba(255,255,255,0.7);
+    color: rgba(255, 255, 255, 0.7);
     font-size: 0.9rem;
     letter-spacing: 0.1em;
   }
 
-  /* 聯繫資訊 */
   .contact-section {
     background: var(--gray-darkest);
     color: white;
-    padding: 4rem 2rem;
+    padding: 4.5rem 2rem;
   }
+
   .contact-inner {
-    max-width: 900px;
-    margin: 0 auto;
     text-align: center;
   }
+
+  .contact-subtitle {
+    color: var(--tiffany-light);
+  }
+
   .contact-title {
-    font-size: 1.8rem;
-    font-weight: 300;
-    margin: 0 0 1rem;
-    letter-spacing: 0.1em;
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 500;
+    letter-spacing: 0.05em;
   }
+
   .contact-desc {
+    max-width: 680px;
+    margin: 1rem auto 0;
     color: var(--gray-light);
-    margin: 0 0 2.5rem;
-    line-height: 1.7;
+    line-height: 1.85;
   }
+
   .contact-cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.5rem;
-    margin-bottom: 2.5rem;
+    margin-top: 2.25rem;
   }
+
   .contact-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
-    padding: 1.5rem 1rem;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
+    padding: 1.6rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
     text-decoration: none;
     color: white;
     transition: all 0.3s ease;
   }
+
   .contact-card:hover {
     background: rgba(129, 199, 212, 0.15);
     border-color: var(--tiffany-primary);
     transform: translateY(-4px);
   }
+
   .contact-icon {
     width: 56px;
     height: 56px;
@@ -310,42 +623,77 @@ const project = {
     border-radius: 50%;
     transition: all 0.3s;
   }
+
   .line-icon { color: #06c755; }
   .email-icon { color: var(--tiffany-primary); }
   .form-icon { color: var(--tiffany-light); }
-  .contact-card:hover .contact-icon { transform: scale(1.15); }
+
+  .contact-card:hover .contact-icon {
+    transform: scale(1.12);
+  }
+
   .contact-card span {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     letter-spacing: 0.05em;
   }
-  .social-row {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-  }
-  .social-row a {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    color: var(--gray-light);
-    border: 1px solid rgba(255,255,255,0.15);
-    transition: all 0.3s;
-  }
-  .social-row a:hover {
-    color: white;
-    background: var(--tiffany-primary);
-    border-color: var(--tiffany-primary);
-    transform: translateY(-3px);
+
+  @media (max-width: 960px) {
+    .project-hero-shell,
+    .project-highlight-card,
+    .highlights-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .editorial-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .gallery-item.is-wide,
+    .gallery-item.is-standard,
+    .gallery-item.is-tall {
+      grid-column: span 1;
+    }
+
+    .gallery-item.is-standard .gallery-thumb,
+    .gallery-item.is-wide .gallery-thumb,
+    .gallery-item.is-tall .gallery-thumb {
+      aspect-ratio: 4 / 3;
+    }
   }
 
   @media (max-width: 768px) {
-    .project-title { font-size: 1.8rem; }
-    .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-    .contact-cards { grid-template-columns: 1fr; max-width: 300px; margin: 0 auto 2rem; }
-    .lightbox-nav { width: 40px; height: 40px; }
+    .project-hero,
+    .project-highlight-section,
+    .highlights-section,
+    .gallery-section,
+    .contact-section {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+
+    .project-hero {
+      padding-top: 6rem;
+    }
+
+    .project-highlight-card {
+      padding: 1.5rem;
+      border-radius: 24px;
+    }
+
+    .gallery-thumb {
+      min-height: 0;
+      border-radius: 18px;
+    }
+
+    .contact-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .lightbox-nav {
+      width: 42px;
+      height: 42px;
+    }
+
     .lightbox-prev { left: 0.75rem; }
     .lightbox-next { right: 0.75rem; }
   }
@@ -361,10 +709,10 @@ const project = {
     const prevBtn = document.querySelector('.lightbox-prev');
     const nextBtn = document.querySelector('.lightbox-next');
 
-    const images = Array.from(items).map(item => {
-      const img = item.querySelector('img');
-      return { src: img.src, alt: img.alt };
-    });
+    const images = Array.from(items)
+      .map((item) => item.querySelector('img'))
+      .filter(Boolean)
+      .map((img) => ({ src: img.src, alt: img.alt }));
     let currentIdx = 0;
 
     function openLightbox(idx) {
@@ -374,7 +722,6 @@ const project = {
       lightboxCounter.textContent = `${idx + 1} / ${images.length}`;
       lightbox.classList.add('active');
       document.body.style.overflow = 'hidden';
-      // Hide nav buttons if only 1 image
       prevBtn.style.display = images.length > 1 ? 'flex' : 'none';
       nextBtn.style.display = images.length > 1 ? 'flex' : 'none';
     }
@@ -388,28 +735,28 @@ const project = {
       item.addEventListener('click', () => openLightbox(i));
     });
 
-    closeBtn.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', (e) => {
+    closeBtn?.addEventListener('click', closeLightbox);
+    lightbox?.addEventListener('click', (e) => {
       if (e.target === lightbox) closeLightbox();
     });
 
-    prevBtn.addEventListener('click', (e) => {
+    prevBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
       currentIdx = (currentIdx - 1 + images.length) % images.length;
       openLightbox(currentIdx);
     });
 
-    nextBtn.addEventListener('click', (e) => {
+    nextBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
       currentIdx = (currentIdx + 1) % images.length;
       openLightbox(currentIdx);
     });
 
     document.addEventListener('keydown', (e) => {
-      if (!lightbox.classList.contains('active')) return;
+      if (!lightbox?.classList.contains('active')) return;
       if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') prevBtn.click();
-      if (e.key === 'ArrowRight') nextBtn.click();
+      if (e.key === 'ArrowLeft') prevBtn?.click();
+      if (e.key === 'ArrowRight') nextBtn?.click();
     });
   });
 </script>
