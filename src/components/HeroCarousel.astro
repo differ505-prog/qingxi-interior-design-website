@@ -7,7 +7,6 @@ const heroProject = {
   slug: "xizhi-zhongxing-rd",
 };
 
-const carouselItems = await getHeroCarousel();
 const fallbackSlides = [
   {
     title: "青曦空間設計 - 質感客廳",
@@ -21,8 +20,8 @@ const fallbackSlides = [
   },
 ];
 
-const slides = (carouselItems.length ? carouselItems : fallbackSlides)
-  .map((item) => ({
+// 強制使用本地最新的真實圖片，忽略 Contentful 舊資料
+const slides = fallbackSlides.map((item) => ({
     title: typeof item.title === "string" ? item.title : heroProject.title,
     image:
       typeof item.image === "string" && item.image.trim()
