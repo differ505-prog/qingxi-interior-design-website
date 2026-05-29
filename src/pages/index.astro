@@ -15,6 +15,13 @@ import HeroCarousel from "../components/HeroCarousel.astro";
           不只追求視覺美感，更在意入住後的耐用與舒適。
           我們讓預算透明、工序清晰，每一次決策都安心。
         </p>
+        <div class="brand-credential">
+          <p class="brand-credential-label">PROFESSIONAL CREDENTIAL</p>
+          <p class="brand-credential-title">具建築物室內裝修工程管理乙級技術士資格</p>
+          <p class="brand-credential-description">
+            在設計美感之外，也重視工程管理、施工節點與實際落地品質。
+          </p>
+        </div>
       </div>
       <div class="brand-strip-metrics">
         <article class="brand-metric">
@@ -558,6 +565,38 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       color: var(--gray-medium);
       line-height: 1.9;
       font-size: 1rem;
+    }
+
+    .brand-credential {
+      margin-top: 1.4rem;
+      padding: 1.15rem 1.25rem;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(47, 47, 47, 0.96) 0%, rgba(32, 32, 32, 0.96) 100%);
+      box-shadow: 0 18px 36px rgba(47, 47, 47, 0.12);
+    }
+
+    .brand-credential-label {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.56);
+      font-size: 0.74rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .brand-credential-title {
+      margin: 0.65rem 0 0;
+      color: var(--white);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      letter-spacing: 0.04em;
+      font-weight: 500;
+    }
+
+    .brand-credential-description {
+      margin: 0.55rem 0 0;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 0.94rem;
+      line-height: 1.8;
     }
 
     .brand-strip-metrics {

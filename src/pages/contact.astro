@@ -19,6 +19,15 @@ import BaseLayout from "../layouts/BaseLayout.astro";
             <span>大台北地區服務</span>
             <span>設計施工整合</span>
           </div>
+
+        <div class="contact-credential">
+          <p class="contact-credential-label">PROFESSIONAL ASSURANCE</p>
+          <p class="contact-credential-title">建築物室內裝修工程管理乙級技術士</p>
+          <p class="contact-credential-meta">技術士證編號：126-0024871</p>
+          <p class="contact-credential-description">
+            諮詢時不只談風格，也能同步協助你釐清工程管理、施工節點與執行風險。
+          </p>
+        </div>
         </div>
 
         <aside class="contact-aside">
@@ -179,6 +188,47 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     color: var(--gray-dark);
     letter-spacing: 0.04em;
     box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
+  }
+
+  .contact-credential {
+    margin-top: 1.6rem;
+    padding: 1.3rem 1.4rem;
+    border-radius: 24px;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.14), transparent 34%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 249, 249, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.2);
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.05);
+  }
+
+  .contact-credential-label {
+    margin: 0;
+    color: var(--tiffany-dark);
+    font-size: 0.76rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .contact-credential-title {
+    margin: 0.7rem 0 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.25rem;
+    line-height: 1.55;
+    color: var(--gray-darkest);
+    letter-spacing: 0.05em;
+  }
+
+  .contact-credential-meta {
+    margin: 0.45rem 0 0;
+    color: var(--tiffany-dark);
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+  }
+
+  .contact-credential-description {
+    margin: 0.7rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
   }
 
   .contact-aside {
