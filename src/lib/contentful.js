@@ -114,7 +114,17 @@ function normalizeEstimatorConfig(fields = {}) {
 }
 
 function validateEstimatorConfig(config) {
-  const normalizedConfig = structuredClone(config);
+  const normalizedConfig = {
+    qualityLevels: {
+      basic: { ...config.qualityLevels.basic },
+      standard: { ...config.qualityLevels.standard },
+      premium: { ...config.qualityLevels.premium },
+      luxury: { ...config.qualityLevels.luxury },
+    },
+    projectTypeMultipliers: { ...config.projectTypeMultipliers },
+    designFeePerPing: { ...config.designFeePerPing },
+    disclaimer: config.disclaimer,
+  };
 
   for (const key of QUALITY_LEVEL_KEYS) {
     const range = normalizedConfig.qualityLevels[key];
