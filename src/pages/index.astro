@@ -6,6 +6,32 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 <BaseLayout title="首頁 - 青曦空間設計">
   <HeroCarousel />
 
+  <section class="brand-strip">
+    <div class="brand-strip-inner">
+      <div class="brand-strip-copy">
+        <p class="brand-strip-label">BRAND VISION</p>
+        <h2>把設計、工程與居住感受，整理成更安心的決策流程</h2>
+        <p>
+          青曦不只在意空間最後長得漂亮，也重視它是否真正適合久住、耐用，並讓每一次預算與工序都說得清楚。
+        </p>
+      </div>
+      <div class="brand-strip-metrics">
+        <article class="brand-metric">
+          <strong>住宅與商空</strong>
+          <span>整合規劃與工程落地</span>
+        </article>
+        <article class="brand-metric">
+          <strong>透明報價</strong>
+          <span>從需求到估算都有清楚節點</span>
+        </article>
+        <article class="brand-metric">
+          <strong>大台北服務</strong>
+          <span>專注區域，回應更即時</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <!-- 關於我們 Section -->
   <section class="about-section">
     <div class="about-container">
@@ -366,6 +392,22 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     </div>
   </section>
 
+  <section class="consult-section">
+    <div class="consult-shell">
+      <div class="consult-copy">
+        <p class="section-subtitle consult-subtitle">NEXT STEP</p>
+        <h2 class="consult-title">如果你正在整理新家需求，現在就可以先從諮詢開始</h2>
+        <p class="consult-description">
+          無論是預售屋客變、老屋翻新，或已有設計圖想找可靠工班落地，青曦都可以協助你把需求、預算與時程先梳理清楚。
+        </p>
+      </div>
+      <div class="consult-actions">
+        <a href="/contact" class="consult-button consult-button-primary">預約諮詢</a>
+        <a href="/tools" class="consult-button consult-button-secondary">先用裝修工具估算</a>
+      </div>
+    </div>
+  </section>
+
   <!-- FAQ Section -->
   <section class="faq-section">
     <div class="faq-container">
@@ -488,6 +530,80 @@ import HeroCarousel from "../components/HeroCarousel.astro";
   </section>
 
   <style>
+    .brand-strip {
+      padding: 0 2rem;
+      margin-top: -2.5rem;
+      position: relative;
+      z-index: 4;
+    }
+
+    .brand-strip-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(320px, 440px);
+      gap: 2rem;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(129, 199, 212, 0.18);
+      box-shadow: 0 20px 50px rgba(47, 47, 47, 0.08);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand-strip-label {
+      margin: 0 0 0.9rem;
+      color: var(--tiffany-dark);
+      letter-spacing: 0.22em;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .brand-strip-copy h2 {
+      margin: 0;
+      font-size: clamp(1.9rem, 3vw, 2.8rem);
+      line-height: 1.3;
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--gray-darkest);
+    }
+
+    .brand-strip-copy p:last-child {
+      margin: 1.1rem 0 0;
+      color: var(--gray-medium);
+      line-height: 1.9;
+      font-size: 1rem;
+    }
+
+    .brand-strip-metrics {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .brand-metric {
+      padding: 1.2rem 1.25rem;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(250, 250, 250, 0.96) 0%, rgba(245, 245, 245, 0.98) 100%);
+      border: 1px solid rgba(129, 199, 212, 0.14);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    }
+
+    .brand-metric strong {
+      display: block;
+      color: var(--gray-darkest);
+      font-size: 1.05rem;
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-metric span {
+      color: var(--gray-medium);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
     /* Smooth scrolling */
     html {
       scroll-behavior: smooth;
@@ -500,8 +616,9 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
     /* About Section Styles */
     .about-section {
-      padding: 5rem 2rem;
-      background: var(--white);
+      padding: 6rem 2rem 5rem;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(250, 250, 250, 1) 100%);
     }
 
     .about-container {
@@ -574,11 +691,12 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     }
 
     .mode-card {
-      background: var(--off-white);
-      border: 2px solid var(--gray-bg);
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(129, 199, 212, 0.16);
+      border-radius: 22px;
       padding: 2rem 1.5rem;
       text-align: center;
+      box-shadow: 0 16px 30px rgba(47, 47, 47, 0.05);
       transition: all 0.3s ease;
     }
 
@@ -641,10 +759,13 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     .philosophy-quote {
       text-align: center;
       padding: 2.5rem 2rem;
-      background: var(--gray-darkest);
-      border-radius: 12px;
+      background:
+        radial-gradient(circle at top left, rgba(160, 217, 217, 0.16), transparent 30%),
+        linear-gradient(135deg, #2f2f2f 0%, #1f1f1f 100%);
+      border-radius: 26px;
       color: var(--white);
       position: relative;
+      overflow: hidden;
     }
 
     .quote-mark {
@@ -685,7 +806,8 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     /* Stats Section Styles */
     .stats-section {
       padding: 4rem 2rem;
-      background: var(--gray-darkest);
+      background:
+        linear-gradient(135deg, rgba(47, 47, 47, 1) 0%, rgba(34, 34, 34, 1) 100%);
       color: var(--white);
     }
 
@@ -699,6 +821,11 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
     .stat-item {
       text-align: center;
+      padding: 1.75rem 1.25rem;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
       opacity: 0;
       transform: scale(0.8);
       transition: all 0.6s ease;
@@ -741,11 +868,11 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     }
 
     .testimonial-card {
-      background: var(--white);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 249, 249, 1) 100%);
       padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      border: 2px solid var(--gray-bg);
+      border-radius: 22px;
+      box-shadow: 0 16px 35px rgba(47, 47, 47, 0.08);
+      border: 1px solid rgba(129, 199, 212, 0.14);
       transition: all 0.3s ease;
       opacity: 0;
       transform: scale(0.9);
@@ -860,10 +987,11 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     }
 
     .faq-item {
-      background: var(--off-white);
-      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 250, 250, 1) 100%);
+      border-radius: 20px;
       overflow: hidden;
-      border: 2px solid var(--gray-bg);
+      border: 1px solid rgba(129, 199, 212, 0.14);
+      box-shadow: 0 12px 26px rgba(47, 47, 47, 0.05);
       transition: all 0.3s ease;
       opacity: 0;
       transition:
@@ -944,6 +1072,10 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
     /* Responsive Styles */
     @media (max-width: 1024px) {
+      .brand-strip-inner {
+        grid-template-columns: 1fr;
+      }
+
       .about-container {
         grid-template-columns: 1fr;
         gap: 3rem;
@@ -961,12 +1093,32 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       .testimonial-grid {
         grid-template-columns: 1fr;
       }
+
+      .consult-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .consult-actions {
+        min-width: 0;
+        max-width: 340px;
+      }
     }
 
     @media (max-width: 768px) {
+      .brand-strip {
+        padding: 0 1.25rem;
+        margin-top: -1.5rem;
+      }
+
+      .brand-strip-inner {
+        padding: 1.5rem;
+        border-radius: 22px;
+      }
+
       .about-section,
       .testimonial-section,
-      .faq-section {
+      .faq-section,
+      .consult-section {
         padding: 3rem 1.5rem;
       }
 
@@ -996,11 +1148,16 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       .faq-answer p {
         padding: 0 1.5rem 1.25rem 1.5rem;
       }
+
+      .workflow-list::before {
+        display: none;
+      }
     }
 
     .service-section {
       padding: 5rem 2rem;
-      background: var(--off-white);
+      background:
+        linear-gradient(180deg, rgba(250, 250, 250, 1) 0%, rgba(245, 247, 247, 1) 100%);
     }
 
     .service-container {
@@ -1051,15 +1208,16 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
     .service-card {
       display: block;
-      background: var(--white);
-      border: 2px solid var(--gray-bg);
-      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 250, 250, 1) 100%);
+      border: 1px solid rgba(129, 199, 212, 0.14);
+      border-radius: 24px;
       overflow: hidden;
       text-decoration: none;
       color: inherit;
       transition: all 0.3s ease;
       height: 100%;
       position: relative;
+      box-shadow: 0 16px 34px rgba(47, 47, 47, 0.06);
     }
 
     .service-card::before {
@@ -1252,7 +1410,8 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     /* Workflow Section Styles */
     .workflow-section {
       padding: 5rem 2rem;
-      background: var(--gray-bg);
+      background:
+        linear-gradient(180deg, rgba(245, 245, 245, 1) 0%, rgba(251, 251, 251, 1) 100%);
     }
 
     .workflow-container {
@@ -1272,6 +1431,17 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       display: flex;
       flex-direction: column;
       gap: 3rem;
+      position: relative;
+    }
+
+    .workflow-list::before {
+      content: "";
+      position: absolute;
+      left: 39px;
+      top: 10px;
+      bottom: 10px;
+      width: 1px;
+      background: linear-gradient(180deg, rgba(129, 199, 212, 0.42) 0%, rgba(129, 199, 212, 0.05) 100%);
     }
 
     .workflow-item {
@@ -1329,7 +1499,91 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
     .workflow-content {
       flex: 1;
-      padding-top: 0.5rem;
+      padding: 1.4rem 1.5rem;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(129, 199, 212, 0.12);
+      box-shadow: 0 16px 30px rgba(47, 47, 47, 0.05);
+    }
+
+    .consult-section {
+      padding: 1rem 2rem 5rem;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(248, 248, 246, 1) 100%);
+    }
+
+    .consult-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 28%),
+        linear-gradient(135deg, #2f2f2f 0%, #202020 100%);
+      color: var(--white);
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) auto;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .consult-subtitle {
+      color: rgba(255, 255, 255, 0.62);
+      margin-bottom: 1rem;
+    }
+
+    .consult-title {
+      margin: 0;
+      font-family: 'Noto Serif TC', serif;
+      font-size: clamp(1.9rem, 3vw, 3rem);
+      font-weight: 500;
+      line-height: 1.35;
+      letter-spacing: 0.04em;
+    }
+
+    .consult-description {
+      margin: 1rem 0 0;
+      max-width: 44rem;
+      line-height: 1.9;
+      color: rgba(255, 255, 255, 0.76);
+    }
+
+    .consult-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 240px;
+    }
+
+    .consult-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 0.95rem 1.4rem;
+      letter-spacing: 0.08em;
+      transition:
+        transform 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        color 0.25s ease;
+    }
+
+    .consult-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .consult-button-primary {
+      background: var(--tiffany-primary);
+      color: var(--gray-darkest);
+      border: 1px solid var(--tiffany-primary);
+    }
+
+    .consult-button-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(12px);
     }
 
     .workflow-content h3 {

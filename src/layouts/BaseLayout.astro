@@ -64,7 +64,7 @@ const MAINTENANCE_MODE =
     />
 
     <!-- Schema.org Structured Data -->
-    <script type="application/ld+json">
+    <script type="application/ld+json" is:inline>
       {
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
@@ -137,7 +137,7 @@ const MAINTENANCE_MODE =
   <!-- Google Analytics 4 (僅在生產環境載入) -->
   {import.meta.env.PROD && (
     <>
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX" is:inline></script>
       <script is:inline>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
@@ -186,6 +186,67 @@ const MAINTENANCE_MODE =
         flex-direction: column;
         margin: 0;
         color: var(--gray-dark);
+        background:
+          radial-gradient(circle at top, rgba(160, 217, 217, 0.12), transparent 28%),
+          linear-gradient(180deg, #ffffff 0%, #f7f7f5 100%);
+      }
+
+      .site-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .site-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        border-bottom: 1px solid rgba(129, 199, 212, 0.26);
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 10px 30px rgba(47, 47, 47, 0.08);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease,
+          background-color 0.3s ease;
+      }
+
+      .site-nav.scrolled {
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 16px 36px rgba(47, 47, 47, 0.12);
+      }
+
+      .nav-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0.95rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+      }
+
+      .brand-link {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        text-decoration: none;
+        color: var(--gray-darkest);
+      }
+
+      .brand-title {
+        font-family: "Noto Serif TC", serif;
+        font-size: 1.25rem;
+        letter-spacing: 0.16em;
+      }
+
+      .brand-subtitle {
+        font-size: 0.68rem;
+        letter-spacing: 0.24em;
+        color: var(--gray-medium);
+        text-transform: uppercase;
       }
 
       /* 導覽列拉霸機效果 */
@@ -248,6 +309,29 @@ const MAINTENANCE_MODE =
         align-items: center;
       }
 
+      .nav-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.8rem 1.2rem;
+        border-radius: 999px;
+        background: var(--gray-darkest);
+        color: var(--white);
+        text-decoration: none;
+        font-size: 0.92rem;
+        letter-spacing: 0.08em;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          background-color 0.25s ease;
+      }
+
+      .nav-cta:hover {
+        transform: translateY(-2px);
+        background: var(--tiffany-dark);
+        box-shadow: 0 12px 24px rgba(129, 199, 212, 0.22);
+      }
+
       /* 漢堡選單按鈕 */
       .hamburger {
         display: none;
@@ -287,22 +371,24 @@ const MAINTENANCE_MODE =
 
         .nav-links {
           position: fixed;
-          top: 60px;
+          top: 78px;
           right: -100%;
-          width: 250px;
-          height: calc(100vh - 60px);
-          background: var(--white);
+          width: min(320px, calc(100vw - 2rem));
+          height: auto;
+          background: rgba(255, 255, 255, 0.96);
+          backdrop-filter: blur(18px);
           flex-direction: column;
-          gap: 0;
-          padding: 2rem 0;
+          gap: 0.4rem;
+          padding: 1rem;
+          border-radius: 24px;
           transition: right 0.3s ease;
-          box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
           z-index: 999;
-          border-left: 2px solid var(--tiffany-primary);
+          border: 1px solid rgba(129, 199, 212, 0.24);
         }
 
         .nav-links.active {
-          right: 0;
+          right: 1rem;
         }
 
         .nav-item {
@@ -312,17 +398,27 @@ const MAINTENANCE_MODE =
           display: flex;
           align-items: center;
           justify-content: center;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 14px;
         }
 
         .nav-link {
           width: 100%;
-          padding: 1rem;
+          padding: 1rem 1.25rem;
           font-size: 1.1rem;
+          border-radius: 14px;
         }
 
         .nav-text {
           justify-content: center;
+        }
+
+        .nav-link:hover {
+          background: rgba(129, 199, 212, 0.12);
+        }
+
+        .nav-cta {
+          width: 100%;
+          margin-top: 0.5rem;
         }
       }
 
@@ -351,38 +447,133 @@ const MAINTENANCE_MODE =
         outline: 2px solid var(--tiffany-primary);
         outline-offset: 2px;
       }
+
+      .site-main {
+        flex: 1;
+        padding-top: 78px;
+      }
+
+      .site-footer {
+        background:
+          linear-gradient(180deg, rgba(47, 47, 47, 0.98) 0%, rgba(31, 31, 31, 1) 100%);
+        color: var(--white);
+        border-top: 1px solid rgba(129, 199, 212, 0.28);
+      }
+
+      .footer-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3.5rem 1.5rem 2rem;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(180px, 220px));
+        gap: 2rem;
+        align-items: start;
+      }
+
+      .footer-brand {
+        max-width: 420px;
+      }
+
+      .footer-brand h2 {
+        margin: 0 0 0.75rem;
+        font-family: "Noto Serif TC", serif;
+        font-size: 1.5rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+      }
+
+      .footer-brand p,
+      .footer-column p,
+      .footer-column a {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.72);
+        line-height: 1.8;
+        text-decoration: none;
+      }
+
+      .footer-note {
+        margin-top: 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.55rem 0.85rem;
+        border: 1px solid rgba(129, 199, 212, 0.22);
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.88);
+        background: rgba(255, 255, 255, 0.04);
+        font-size: 0.88rem;
+      }
+
+      .footer-column h3 {
+        margin: 0 0 1rem;
+        font-size: 0.82rem;
+        letter-spacing: 0.22em;
+        color: rgba(255, 255, 255, 0.56);
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      .footer-links,
+      .footer-contact {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .footer-links a:hover,
+      .footer-contact a:hover {
+        color: var(--tiffany-light);
+      }
+
+      .footer-bottom {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .footer-bottom p,
+      .footer-bottom a {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.56);
+        text-decoration: none;
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 900px) {
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
   </head>
   <body>
-    <!-- Skip to main content -->
-    <a href="#main-content" class="skip-to-main">跳至主要內容</a>
+    <div class="site-shell">
+      <a href="#main-content" class="skip-to-main">跳至主要內容</a>
 
-    <!-- 導覽列 -->
-  <nav role="navigation" aria-label="主要導覽"
-   style="
-     position: fixed;
-     top: 0;
-     left: 0;
-     right: 0;
-     background: var(--white);
-     color: var(--gray-dark);
-     box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-     border-bottom: 2px solid var(--tiffany-primary);
-     z-index: 1000;
-     transition: transform 0.3s ease, box-shadow 0.3s ease;
-   ">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <a href="/" style="font-size: 1.5rem; font-weight: bold; color: var(--gray-dark); text-decoration: none;">青曦空間設計</a>
+      <nav class="site-nav" role="navigation" aria-label="主要導覽">
+        <div class="nav-inner">
+          <a href="/" class="brand-link" aria-label="青曦空間設計首頁">
+            <span class="brand-title">青曦空間設計</span>
+            <span class="brand-subtitle">QINGXI INTERIOR DESIGN</span>
+          </a>
 
-          <!-- 漢堡選單按鈕 -->
           <button class="hamburger" id="hamburger" aria-label="選單">
             <span></span>
             <span></span>
             <span></span>
           </button>
 
-          <!-- 導覽連結 -->
           <div class="nav-links" id="navLinks">
             <span class="nav-item">
               <a href="/" class="nav-link">
@@ -424,39 +615,56 @@ const MAINTENANCE_MODE =
                 </div>
               </a>
             </span>
-            <span class="nav-item">
-              <a href="/contact" class="nav-link">
-                <div class="nav-text-container">
-                  <span class="nav-text nav-text-en">Contact</span>
-                  <span class="nav-text nav-text-zh">聯絡我</span>
-                </div>
-              </a>
-            </span>
+            <a href="/contact" class="nav-cta">預約諮詢</a>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
-    <!-- 主要內容 -->
-  <main id="main-content" role="main"
-   style="flex: 1; padding-top: 80px;">
-    <slot />
-  </main>
+      <main id="main-content" class="site-main" role="main">
+        <slot />
+      </main>
 
-    <!-- 頁尾 -->
-    <footer
-      style="background: var(--gray-darkest); color: white; padding: 2rem 0; border-top: 3px solid var(--tiffany-primary);"
-    >
-      <div
-        style="max-width: 1200px; margin: 0 auto; padding: 0 1rem; text-align: center;"
-      >
-        <p style="margin: 0; color: var(--gray-light);">
-          &copy; 2025 青曦空間設計. All rights reserved.
-        </p>
-      </div>
-    </footer>
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <div class="footer-grid">
+            <section class="footer-brand" aria-label="品牌資訊">
+              <h2>青曦空間設計</h2>
+              <p>
+                專注於大台北住宅與商業空間規劃，從設計提案到工程整合，以安定、耐看的空間語言回應每位屋主的生活方式。
+              </p>
+              <div class="footer-note">大台北地區服務・住宅與商空整合規劃</div>
+            </section>
 
-    <script define:vars={{ maintenanceMode: MAINTENANCE_MODE }}>
+            <section class="footer-column" aria-label="網站導覽">
+              <h3>Explore</h3>
+              <ul class="footer-links">
+                <li><a href="/portfolio">作品集</a></li>
+                <li><a href="/blog">知識分享</a></li>
+                <li><a href="/tools">裝修工具</a></li>
+                <li><a href="/#workflow">服務流程</a></li>
+              </ul>
+            </section>
+
+            <section class="footer-column" aria-label="聯絡方式">
+              <h3>Contact</h3>
+              <ul class="footer-contact">
+                <li><a href="/contact">預約諮詢表單</a></li>
+                <li><a href="https://lin.ee/U1HCeW4" target="_blank" rel="noreferrer">官方 LINE</a></li>
+                <li><a href="https://www.instagram.com/qingxi.ds/" target="_blank" rel="noreferrer">Instagram</a></li>
+                <li><a href="https://www.facebook.com/profile.php?id=61562661642204" target="_blank" rel="noreferrer">Facebook</a></li>
+              </ul>
+            </section>
+          </div>
+
+          <div class="footer-bottom">
+            <p>&copy; 2025 青曦空間設計. All rights reserved.</p>
+            <a href="/policies">網站政策</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script define:vars={{ maintenanceMode: MAINTENANCE_MODE }} is:inline>
       // 維護模式檢查（客戶端重定向，作為 middleware 的備用方案）
       if (maintenanceMode && window.location.pathname !== "/coming-soon") {
         window.location.replace("/coming-soon");
@@ -479,17 +687,12 @@ const MAINTENANCE_MODE =
       });
 
       // 滾動時增強導航欄陰影效果
-      const nav = document.querySelector('nav');
+      const nav = document.querySelector('.site-nav');
       
       window.addEventListener('scroll', () => {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
-        // 向下滾動時增加陰影
-        if (scrollTop > 10) {
-          if (nav) nav.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)';
-        } else {
-          if (nav) nav.style.boxShadow = '0 2px 10px rgba(0,0,0,0.08)';
-        }
+        nav?.classList.toggle('scrolled', scrollTop > 10);
       }, { passive: true });
     </script>
   </body>
