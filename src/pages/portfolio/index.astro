@@ -1,14 +1,42 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
 
-const projects = [
+const featuredProject = {
+  title: '汐止中興路住宅',
+  coverImage: '/images/portfolio/xizhi-1.jpg',
+  summary: '以沉穩灰階、俐落收邊與一致照明節奏，整理出耐住也耐看的住宅日常。',
+  slug: 'xizhi-zhongxing-rd',
+  label: 'CURATED RESIDENCE',
+};
+
+const spatialMoments = [
   {
-    title: '汐止中興路住宅',
-    coverImage: '/images/portfolio/xizhi-1.jpg',
-    summary: '以沉穩灰階與俐落線條，整理出耐住也耐看的居住節奏。',
-    slug: 'xizhi-zhongxing-rd'
-  }
+    title: '客廳視角',
+    image: '/images/portfolio/xizhi-1.jpg',
+  },
+  {
+    title: '餐廚視角',
+    image: '/images/portfolio/xizhi-2.jpg',
+  },
+  {
+    title: '主臥視角',
+    image: '/images/portfolio/xizhi-3.jpg',
+  },
+];
+
+const designPoints = [
+  {
+    title: '材質收斂',
+    text: '用低彩度材質與乾淨收邊，讓畫面穩定而不顯得單薄。',
+  },
+  {
+    title: '光線節奏',
+    text: '以主照明、間接光與線性燈帶，維持白天與夜晚的一致層次。',
+  },
+  {
+    title: '居住感優先',
+    text: '從動線、收納到尺度拿捏，都回到入住後是否真的舒服耐住。',
+  },
 ];
 ---
 
@@ -20,8 +48,8 @@ const projects = [
   }
 
   .portfolio-hero {
-    max-width: 860px;
-    margin: 0 auto 3rem;
+    max-width: 920px;
+    margin: 0 auto;
     text-align: center;
   }
 
@@ -45,44 +73,333 @@ const projects = [
 
   .portfolio-intro {
     margin: 1.15rem auto 0;
-    max-width: 42rem;
+    max-width: 48rem;
     color: var(--gray-medium);
     line-height: 1.9;
     font-size: 1rem;
   }
-  
+
   .portfolio-container {
-    max-width: 1080px;
+    max-width: 1180px;
     margin: 0 auto;
   }
-  
-  .portfolio-grid {
+
+  .portfolio-metrics {
+    margin: 2rem auto 0;
     display: grid;
-    gap: 2.25rem;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    max-width: 880px;
   }
-  
-  @media (min-width: 640px) {
-    .portfolio-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+
+  .portfolio-metric {
+    padding: 1.2rem 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 18px 35px rgba(47, 47, 47, 0.05);
   }
-  
-  @media (min-width: 1024px) {
-    .portfolio-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .portfolio-grid.single-item {
+
+  .portfolio-metric strong,
+  .portfolio-metric span {
+    display: block;
+  }
+
+  .portfolio-metric strong {
+    color: var(--gray-darkest);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .portfolio-metric span {
+    margin-top: 0.35rem;
+    color: var(--gray-medium);
+    line-height: 1.7;
+    font-size: 0.92rem;
+  }
+
+  .featured-showcase {
+    margin-top: 4rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .featured-media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px;
+    background: var(--gray-bg);
+    box-shadow: 0 30px 70px rgba(47, 47, 47, 0.12);
+  }
+
+  .featured-media img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 11;
+    object-fit: cover;
+  }
+
+  .featured-copy {
+    padding: 2rem;
+    border-radius: 28px;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 28%),
+      linear-gradient(135deg, rgba(27, 27, 27, 1) 0%, rgba(41, 41, 41, 1) 100%);
+    color: var(--white);
+    box-shadow: 0 26px 60px rgba(17, 17, 17, 0.16);
+  }
+
+  .featured-label {
+    margin: 0 0 0.9rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.24em;
+    color: rgba(255, 255, 255, 0.66);
+  }
+
+  .featured-copy h2 {
+    margin: 0;
+    font-size: clamp(2rem, 3vw, 3rem);
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.05em;
+  }
+
+  .featured-copy p {
+    margin: 1rem 0 0;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.9;
+  }
+
+  .featured-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.75rem;
+  }
+
+  .featured-link,
+  .featured-secondary-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 150px;
+    padding: 0.9rem 1.35rem;
+    border-radius: 999px;
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition:
+      transform 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  .featured-link {
+    background: var(--tiffany-primary);
+    color: var(--gray-darkest);
+    border: 1px solid var(--tiffany-primary);
+  }
+
+  .featured-secondary-link {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .featured-link:hover,
+  .featured-secondary-link:hover {
+    transform: translateY(-2px);
+  }
+
+  .moments-section {
+    margin-top: 4rem;
+  }
+
+  .section-heading {
+    max-width: 760px;
+    margin-bottom: 1.75rem;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: clamp(1.9rem, 3vw, 2.8rem);
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--gray-darkest);
+  }
+
+  .section-heading p {
+    margin: 0.9rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
+  }
+
+  .moments-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .moment-card {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.12);
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.06);
+  }
+
+  .moment-card:nth-child(1) {
+    grid-column: span 7;
+  }
+
+  .moment-card:nth-child(2) {
+    grid-column: span 5;
+  }
+
+  .moment-card:nth-child(3) {
+    grid-column: span 12;
+  }
+
+  .moment-card img {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .moment-card:nth-child(1) img {
+    aspect-ratio: 16 / 11;
+  }
+
+  .moment-card:nth-child(2) img {
+    aspect-ratio: 4 / 5;
+  }
+
+  .moment-card:nth-child(3) img {
+    aspect-ratio: 16 / 9;
+  }
+
+  .moment-card figcaption {
+    padding: 1rem 1.2rem 1.2rem;
+    color: var(--gray-dark);
+    letter-spacing: 0.06em;
+  }
+
+  .design-points {
+    margin-top: 4rem;
+  }
+
+  .design-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .design-card {
+    padding: 1.6rem;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 18px 36px rgba(47, 47, 47, 0.06);
+  }
+
+  .design-card h3 {
+    margin: 0;
+    color: var(--gray-darkest);
+    font-size: 1.2rem;
+  }
+
+  .design-card p {
+    margin: 0.8rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
+  .portfolio-cta {
+    margin-top: 4rem;
+    padding: 2.5rem;
+    border-radius: 28px;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.2), transparent 30%),
+      linear-gradient(135deg, rgba(244, 247, 247, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.18);
+    box-shadow: 0 20px 40px rgba(47, 47, 47, 0.06);
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) auto;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .portfolio-cta h2 {
+    margin: 0;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 500;
+    color: var(--gray-darkest);
+  }
+
+  .portfolio-cta p {
+    margin: 0.85rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
+    max-width: 42rem;
+  }
+
+  .portfolio-cta a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.95rem 1.5rem;
+    border-radius: 999px;
+    text-decoration: none;
+    background: var(--gray-darkest);
+    color: var(--white);
+    letter-spacing: 0.08em;
+    transition: transform 0.25s ease, background-color 0.25s ease;
+  }
+
+  .portfolio-cta a:hover {
+    transform: translateY(-2px);
+    background: var(--gray-dark);
+  }
+
+  @media (max-width: 960px) {
+    .portfolio-metrics,
+    .design-grid,
+    .featured-showcase,
+    .portfolio-cta {
       grid-template-columns: 1fr;
-      max-width: 500px;
-      margin: 0 auto;
     }
-    
-    .portfolio-grid.two-items {
-      grid-template-columns: repeat(2, 1fr);
-      max-width: 900px;
-      margin: 0 auto;
+
+    .moments-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .moment-card:nth-child(1),
+    .moment-card:nth-child(2),
+    .moment-card:nth-child(3) {
+      grid-column: span 1;
+    }
+
+    .moment-card:nth-child(1) img,
+    .moment-card:nth-child(2) img,
+    .moment-card:nth-child(3) img {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .portfolio-page {
+      padding: 6rem 1.25rem 4rem;
+    }
+
+    .featured-copy,
+    .portfolio-cta {
+      padding: 1.6rem;
     }
   }
 </style>
@@ -90,19 +407,100 @@ const projects = [
 <BaseLayout title="作品集 - 青曦空間設計">
   <div class="portfolio-page">
     <header class="portfolio-hero">
-      <h6 class="section-subtitle">WORKS</h6>
-      <h1>精選作品集</h1>
+      <h6 class="section-subtitle">CURATED WORK</h6>
+      <h1>精選案例與空間視角</h1>
       <p class="portfolio-intro">
-        以住宅日常為核心，透過材質、比例與光線的整合，
-        讓每個案例都回到更安定、更耐看的居住感。
+        青曦以精選方式整理代表性的住宅成果，從整體氛圍、材質節奏到居住感細節，
+        呈現我們如何把日常空間做得安定、耐看，也真正適合久住。
       </p>
-    </header>
-    <div class="portfolio-container">
-      <div class={`portfolio-grid ${projects.length === 1 ? 'single-item' : projects.length === 2 ? 'two-items' : ''}`}>
-        {projects.map(project => (
-          <ProjectCard {...project} />
-        ))}
+      <div class="portfolio-metrics">
+        <article class="portfolio-metric">
+          <strong>住宅尺度</strong>
+          <span>聚焦真實居住情境，不追求表面華麗。</span>
+        </article>
+        <article class="portfolio-metric">
+          <strong>設計施工整合</strong>
+          <span>把設計語言一路延伸到工程落地與收邊細節。</span>
+        </article>
+        <article class="portfolio-metric">
+          <strong>代表作精選</strong>
+          <span>用更完整的案例敘事，取代單純堆疊數量。</span>
+        </article>
       </div>
+    </header>
+
+    <div class="portfolio-container">
+      <section class="featured-showcase">
+        <figure class="featured-media">
+          <img src={featuredProject.coverImage} alt={featuredProject.title} />
+        </figure>
+
+        <div class="featured-copy">
+          <p class="featured-label">{featuredProject.label}</p>
+          <h2>{featuredProject.title}</h2>
+          <p>{featuredProject.summary}</p>
+          <p>
+            這個案例以灰階基調、俐落量體與柔和照明為核心，
+            讓客廳、餐廚與主臥之間維持一致的安定感，也讓整體居住節奏更完整。
+          </p>
+          <div class="featured-actions">
+            <a
+              href={`/portfolio/${featuredProject.slug}`}
+              class="featured-link"
+            >
+              查看完整案例
+            </a>
+            <a href="/contact" class="featured-secondary-link">預約諮詢</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="moments-section">
+        <div class="section-heading">
+          <h2>空間不是靠數量堆疊，而是靠節奏留下記憶點</h2>
+          <p>
+            我們更在意每個畫面是否完整，從公共空間的開闊感，到私領域的沉靜氛圍，
+            都回到同一條設計主線。
+          </p>
+        </div>
+
+        <div class="moments-grid">
+          {spatialMoments.map((moment) => (
+            <figure class="moment-card">
+              <img src={moment.image} alt={moment.title} loading="lazy" />
+              <figcaption>{moment.title}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section class="design-points">
+        <div class="section-heading">
+          <h2>設計判斷比案例數量更能建立信任</h2>
+          <p>
+            青曦想呈現的不是單純照片堆疊，而是每一個空間背後清楚的設計判斷與落地能力。
+          </p>
+        </div>
+
+        <div class="design-grid">
+          {designPoints.map((point) => (
+            <article class="design-card">
+              <h3>{point.title}</h3>
+              <p>{point.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="portfolio-cta">
+        <div>
+          <h2>想把自己的住宅也整理成這樣的空間節奏？</h2>
+          <p>
+            從初步諮詢、設計提案到工程落地，青曦會陪你把需求、預算與完成後的生活感一起想清楚。
+          </p>
+        </div>
+        <a href="/contact">開始諮詢</a>
+      </section>
     </div>
   </div>
 </BaseLayout>
