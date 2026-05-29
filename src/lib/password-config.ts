@@ -7,7 +7,7 @@ export const PASSWORD_PROTECTION_CONFIG = {
     enabled: true,
 
     // 訪問密碼（請修改為您想要的密碼）
-    password: "wife2024",
+    password: "0988959922",
 
     // Cookie 有效期（天數）
     cookieMaxAge: 7,
