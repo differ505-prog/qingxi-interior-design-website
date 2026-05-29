@@ -2,40 +2,25 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const featuredProject = {
-  title: '汐止中興路住宅',
+  title: '住宅空間精選',
   coverImage: '/images/portfolio/xizhi-1.jpg',
   summary: '以沉穩灰階、俐落收邊與一致照明節奏，整理出耐住也耐看的住宅日常。',
   slug: 'xizhi-zhongxing-rd',
-  label: 'CURATED RESIDENCE',
+  label: 'CURATED INTERIOR',
 };
 
 const spatialMoments = [
   {
-    title: '客廳視角',
     image: '/images/portfolio/xizhi-1.jpg',
+    alt: '住宅空間客廳畫面',
   },
   {
-    title: '餐廚視角',
     image: '/images/portfolio/xizhi-2.jpg',
+    alt: '住宅空間餐廚畫面',
   },
   {
-    title: '主臥視角',
     image: '/images/portfolio/xizhi-3.jpg',
-  },
-];
-
-const designPoints = [
-  {
-    title: '材質收斂',
-    text: '用低彩度材質與乾淨收邊，讓畫面穩定而不顯得單薄。',
-  },
-  {
-    title: '光線節奏',
-    text: '以主照明、間接光與線性燈帶，維持白天與夜晚的一致層次。',
-  },
-  {
-    title: '居住感優先',
-    text: '從動線、收納到尺度拿捏，都回到入住後是否真的舒服耐住。',
+    alt: '住宅空間主臥畫面',
   },
 ];
 ---
@@ -289,36 +274,6 @@ const designPoints = [
     letter-spacing: 0.06em;
   }
 
-  .design-points {
-    margin-top: 4rem;
-  }
-
-  .design-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;
-  }
-
-  .design-card {
-    padding: 1.6rem;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(129, 199, 212, 0.14);
-    box-shadow: 0 18px 36px rgba(47, 47, 47, 0.06);
-  }
-
-  .design-card h3 {
-    margin: 0;
-    color: var(--gray-darkest);
-    font-size: 1.2rem;
-  }
-
-  .design-card p {
-    margin: 0.8rem 0 0;
-    color: var(--gray-medium);
-    line-height: 1.8;
-  }
-
   .portfolio-cta {
     margin-top: 4rem;
     padding: 2.5rem;
@@ -369,7 +324,6 @@ const designPoints = [
 
   @media (max-width: 960px) {
     .portfolio-metrics,
-    .design-grid,
     .featured-showcase,
     .portfolio-cta {
       grid-template-columns: 1fr;
@@ -408,10 +362,9 @@ const designPoints = [
   <div class="portfolio-page">
     <header class="portfolio-hero">
       <h6 class="section-subtitle">CURATED WORK</h6>
-      <h1>精選案例與空間視角</h1>
+      <h1>精選空間畫面</h1>
       <p class="portfolio-intro">
-        青曦以精選方式整理代表性的住宅成果，從整體氛圍、材質節奏到居住感細節，
-        呈現我們如何把日常空間做得安定、耐看，也真正適合久住。
+        以更克制的方式呈現住宅空間，讓比例、材質、光線與留白自己說話。
       </p>
       <div class="portfolio-metrics">
         <article class="portfolio-metric">
@@ -437,11 +390,10 @@ const designPoints = [
 
         <div class="featured-copy">
           <p class="featured-label">{featuredProject.label}</p>
-          <h2>{featuredProject.title}</h2>
-          <p>{featuredProject.summary}</p>
+          <h2>以畫面節奏呈現空間質感</h2>
           <p>
-            這個案例以灰階基調、俐落量體與柔和照明為核心，
-            讓客廳、餐廚與主臥之間維持一致的安定感，也讓整體居住節奏更完整。
+            我們不刻意堆疊過多案例名稱，而是把代表性的住宅畫面整理成更完整的觀看體驗。
+            讓你先感受到空間氣質，再深入理解青曦的設計與落地能力。
           </p>
           <div class="featured-actions">
             <a
@@ -457,37 +409,17 @@ const designPoints = [
 
       <section class="moments-section">
         <div class="section-heading">
-          <h2>空間不是靠數量堆疊，而是靠節奏留下記憶點</h2>
+          <h2>用圖片編排，留下更完整的空間感受</h2>
           <p>
-            我們更在意每個畫面是否完整，從公共空間的開闊感，到私領域的沉靜氛圍，
-            都回到同一條設計主線。
+            讓公共空間的開闊、餐廚的俐落與臥室的安定感，自然形成同一條觀看節奏。
           </p>
         </div>
 
         <div class="moments-grid">
           {spatialMoments.map((moment) => (
             <figure class="moment-card">
-              <img src={moment.image} alt={moment.title} loading="lazy" />
-              <figcaption>{moment.title}</figcaption>
+              <img src={moment.image} alt={moment.alt} loading="lazy" />
             </figure>
-          ))}
-        </div>
-      </section>
-
-      <section class="design-points">
-        <div class="section-heading">
-          <h2>設計判斷比案例數量更能建立信任</h2>
-          <p>
-            青曦想呈現的不是單純照片堆疊，而是每一個空間背後清楚的設計判斷與落地能力。
-          </p>
-        </div>
-
-        <div class="design-grid">
-          {designPoints.map((point) => (
-            <article class="design-card">
-              <h3>{point.title}</h3>
-              <p>{point.text}</p>
-            </article>
           ))}
         </div>
       </section>
