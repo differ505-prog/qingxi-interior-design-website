@@ -1,9 +1,19 @@
 ---
 const {
-  title = "青曦空間設計 - 大台北專業室內設計",
+  title = "青曦空間設計",
   description = "青曦空間設計提供大台北地區專業室內設計服務，包含住宅、商業空間、社區公設等。從設計規劃到工程施作，為您打造理想空間。",
   ogImage = "/images/og-default.jpg",
 } = Astro.props;
+
+const siteName = "青曦空間設計";
+const normalizedTitle =
+  typeof title === "string"
+    ? title.replace(/\s*[-|｜]\s*青曦空間設計\s*$/u, "").trim()
+    : siteName;
+const pageTitle =
+  normalizedTitle && normalizedTitle !== siteName
+    ? `${siteName} | ${normalizedTitle}`
+    : siteName;
 
 // Get canonical URL
 const canonicalURL = new URL(
@@ -25,7 +35,7 @@ const MAINTENANCE_MODE =
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- SEO Meta Tags -->
-    <title>{title}</title>
+    <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <meta
       name="keywords"
@@ -33,11 +43,13 @@ const MAINTENANCE_MODE =
     />
     <meta name="author" content="青曦空間設計" />
     <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.svg" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:locale" content="zh_TW" />
@@ -46,7 +58,7 @@ const MAINTENANCE_MODE =
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={Astro.url} />
-    <meta property="twitter:title" content={title} />
+    <meta property="twitter:title" content={pageTitle} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={ogImage} />
 
