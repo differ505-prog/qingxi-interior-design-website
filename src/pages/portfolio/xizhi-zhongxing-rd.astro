@@ -1,6 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
+const photoPlaceholder = '/images/placeholders/space-photo-placeholder.svg';
+const drawingPlaceholder = '/images/placeholders/design-drawing-placeholder.svg';
+
 const project = {
   title: '住宅空間精選',
   label: 'CURATED RESIDENCE',
@@ -38,6 +41,57 @@ const project = {
 
 const primaryGalleryImages = project.images.slice(0, 2);
 const secondaryGalleryImages = project.images.slice(2);
+const drawingBoards = [
+  {
+    label: 'LAYOUT PLAN',
+    title: '平面配置圖',
+    description: '先放平面配置、動線與櫃體規劃圖，之後可直接替換成正式圖面。',
+    image: drawingPlaceholder,
+    alt: '平面配置圖佔位圖',
+  },
+  {
+    label: 'CEILING & LIGHTING',
+    title: '天花與照明圖',
+    description: '適合放燈具迴路、照明節奏、空調與天花整合的設計圖紙。',
+    image: drawingPlaceholder,
+    alt: '天花與照明圖佔位圖',
+  },
+  {
+    label: 'CABINET DETAIL',
+    title: '櫃體與立面圖',
+    description: '適合放收納立面、材質標註與關鍵尺寸，讓客戶看到設計落地能力。',
+    image: drawingPlaceholder,
+    alt: '櫃體與立面圖佔位圖',
+  },
+];
+const renovationComparisons = [
+  {
+    label: 'PUBLIC AREA',
+    title: '客廳改造前後',
+    summary: '可放同角度的改造前與完成後照片，重點說明採光、動線與收納整理後的差異。',
+    beforeImage: photoPlaceholder,
+    beforeAlt: '客廳改造前佔位圖',
+    beforeTitle: '改造前',
+    beforeCaption: '待補現場原況照',
+    afterImage: photoPlaceholder,
+    afterAlt: '客廳改造後佔位圖',
+    afterTitle: '完成後',
+    afterCaption: '待補完工實景照',
+  },
+  {
+    label: 'PRIVATE AREA',
+    title: '浴室改造前後',
+    summary: '可放老屋原況與完工對比，強調材質更新、收納整合與使用感受的提升。',
+    beforeImage: photoPlaceholder,
+    beforeAlt: '浴室改造前佔位圖',
+    beforeTitle: '改造前',
+    beforeCaption: '待補原始浴室照片',
+    afterImage: photoPlaceholder,
+    afterAlt: '浴室改造後佔位圖',
+    afterTitle: '完成後',
+    afterCaption: '待補改造完成照片',
+  },
+];
 ---
 
 <BaseLayout title={`${project.title} - 青曦空間設計`}>
@@ -110,6 +164,67 @@ const secondaryGalleryImages = project.images.slice(2);
             </figure>
           ))}
         </div>
+      </div>
+    </section>
+
+    <section class="drawing-section">
+      <div class="drawing-header">
+        <p class="section-subtitle">DRAWING PACKAGE</p>
+        <h2>設計圖紙框架</h2>
+        <p>先把平面、照明、立面等核心圖紙位置站好，之後只要直接替換正式圖面即可。</p>
+      </div>
+
+      <div class="drawing-grid">
+        {drawingBoards.map((drawing) => (
+          <article class="drawing-card">
+            <figure class="drawing-media">
+              <img src={drawing.image} alt={drawing.alt} loading="lazy" />
+            </figure>
+            <div class="drawing-copy">
+              <p class="drawing-label">{drawing.label}</p>
+              <h3>{drawing.title}</h3>
+              <p>{drawing.description}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="comparison-section">
+      <div class="comparison-header">
+        <p class="section-subtitle">BEFORE & AFTER</p>
+        <h2>工程前後對比框架</h2>
+        <p>這裡先放高質感的前後對比版型，之後可依空間替換成實際的原況與完工照片。</p>
+      </div>
+
+      <div class="comparison-stack">
+        {renovationComparisons.map((item) => (
+          <article class="comparison-card">
+            <div class="comparison-copy">
+              <p class="comparison-label">{item.label}</p>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
+            </div>
+
+            <div class="comparison-grid">
+              <figure class="comparison-media">
+                <img src={item.beforeImage} alt={item.beforeAlt} loading="lazy" />
+                <figcaption>
+                  <strong>{item.beforeTitle}</strong>
+                  <span>{item.beforeCaption}</span>
+                </figcaption>
+              </figure>
+
+              <figure class="comparison-media">
+                <img src={item.afterImage} alt={item.afterAlt} loading="lazy" />
+                <figcaption>
+                  <strong>{item.afterTitle}</strong>
+                  <span>{item.afterCaption}</span>
+                </figcaption>
+              </figure>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
 
@@ -284,6 +399,13 @@ const secondaryGalleryImages = project.images.slice(2);
     padding: 1rem 2rem 3rem;
   }
 
+  .drawing-section,
+  .comparison-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem 5rem;
+  }
+
   .project-highlight-card {
     display: grid;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -343,6 +465,29 @@ const secondaryGalleryImages = project.images.slice(2);
 
   .gallery-section {
     padding: 0 2rem 5rem;
+  }
+
+  .drawing-header,
+  .comparison-header {
+    max-width: 760px;
+    margin-bottom: 2rem;
+  }
+
+  .drawing-header h2,
+  .comparison-header h2 {
+    margin: 0;
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--gray-darkest);
+  }
+
+  .drawing-header p:last-child,
+  .comparison-header p:last-child {
+    margin: 0.95rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
   }
 
   .gallery-header {
@@ -414,6 +559,125 @@ const secondaryGalleryImages = project.images.slice(2);
 
   .gallery-row-secondary .gallery-item.is-immersive {
     margin-top: clamp(0.5rem, 1.8vw, 1.4rem);
+  }
+
+  .drawing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .drawing-card,
+  .comparison-card {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    border-radius: 26px;
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.06);
+  }
+
+  .drawing-card {
+    overflow: hidden;
+  }
+
+  .drawing-media {
+    margin: 0;
+    background: #f7f9f9;
+    border-bottom: 1px solid rgba(129, 199, 212, 0.12);
+  }
+
+  .drawing-media img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .drawing-copy {
+    padding: 1.4rem;
+  }
+
+  .drawing-label,
+  .comparison-label {
+    margin: 0;
+    color: var(--tiffany-dark);
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    font-weight: 600;
+  }
+
+  .drawing-copy h3,
+  .comparison-copy h3 {
+    margin: 0.7rem 0 0;
+    font-family: 'Noto Serif TC', serif;
+    font-size: 1.45rem;
+    line-height: 1.45;
+    font-weight: 500;
+    color: var(--gray-darkest);
+  }
+
+  .drawing-copy p:last-child,
+  .comparison-copy p:last-child {
+    margin: 0.8rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
+  }
+
+  .comparison-stack {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .comparison-card {
+    padding: 1.5rem;
+  }
+
+  .comparison-copy {
+    max-width: 42rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .comparison-media {
+    margin: 0;
+    overflow: hidden;
+    border-radius: 22px;
+    background: #f7f9f9;
+    border: 1px solid rgba(129, 199, 212, 0.12);
+  }
+
+  .comparison-media img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: #f1f5f5;
+  }
+
+  .comparison-media figcaption {
+    padding: 1rem 1.1rem 1.15rem;
+  }
+
+  .comparison-media strong,
+  .comparison-media span {
+    display: block;
+  }
+
+  .comparison-media strong {
+    color: var(--gray-darkest);
+    font-size: 0.98rem;
+    letter-spacing: 0.06em;
+  }
+
+  .comparison-media span {
+    margin-top: 0.35rem;
+    color: var(--gray-medium);
+    line-height: 1.7;
+    font-size: 0.9rem;
   }
 
   .lightbox {
@@ -591,7 +855,9 @@ const secondaryGalleryImages = project.images.slice(2);
 
   @media (max-width: 960px) {
     .project-hero-shell,
-    .project-highlight-card {
+    .project-highlight-card,
+    .comparison-grid,
+    .drawing-grid {
       grid-template-columns: 1fr;
     }
 
@@ -619,6 +885,8 @@ const secondaryGalleryImages = project.images.slice(2);
     .project-highlight-section,
     .highlights-section,
     .gallery-section,
+    .drawing-section,
+    .comparison-section,
     .contact-section {
       padding-left: 1.25rem;
       padding-right: 1.25rem;
