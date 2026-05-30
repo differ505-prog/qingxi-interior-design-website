@@ -1,0 +1,459 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const capabilities = [
+  {
+    label: "AI-ASSISTED SETUP",
+    title: "利用 AI 輔助設定 Home Assistant",
+    description:
+      "協助整理需求、建立自動化邏輯、調整儀表板與排查整合問題，讓 HA 更快從概念進入可用狀態。",
+  },
+  {
+    label: "NAS PLANNING",
+    title: "把 NAS 變成家庭數位中樞",
+    description:
+      "整合備份、媒體庫、監控錄影、遠端存取與權限管理，不讓 NAS 只是單純擺在角落的主機。",
+  },
+  {
+    label: "DESIGN + TECH",
+    title: "從空間設計階段就一起規劃",
+    description:
+      "弱電箱、機櫃位置、網路節點、電源、散熱與日後擴充一起思考，避免入住後才發現設備不好放、不好修、不好用。",
+  },
+];
+
+const scenarios = [
+  "回家模式：進門後燈光、冷氣、窗簾與背景音樂自動切換",
+  "離家模式：一鍵關閉指定設備，同步確認門鎖與監控狀態",
+  "夜間模式：走道感應微亮照明，不打擾家人休息",
+  "NAS 支援：照片備份、監視錄影、媒體串流與遠端檔案存取",
+];
+
+const workflow = [
+  {
+    step: "01",
+    title: "需求盤點",
+    description: "先釐清屋主生活習慣、設備清單、品牌偏好與預算範圍。",
+  },
+  {
+    step: "02",
+    title: "弱電與設備規劃",
+    description: "在裝修前確認網路、電源、控制節點、機櫃與散熱配置。",
+  },
+  {
+    step: "03",
+    title: "AI 輔助設定與整合",
+    description: "利用 AI 加速 HA 規則整理、場景設定與除錯流程，縮短試錯時間。",
+  },
+  {
+    step: "04",
+    title: "交付與後續擴充",
+    description: "保留可維護與可升級架構，讓之後新增設備不必整套重來。",
+  },
+];
+---
+
+<BaseLayout
+  title="智能家居 Smart Home - 青曦空間設計"
+  description="青曦空間設計提供智能家居 Smart Home 規劃，結合 AI 輔助設定 Home Assistant、NAS 與跨品牌設備整合，打造懂科技也懂生活的住宅系統。"
+>
+  <div class="smart-home-page">
+    <section class="smart-home-hero">
+      <div class="smart-home-shell">
+        <div class="hero-copy">
+          <p class="section-subtitle">SMART HOME</p>
+          <h1>懂科技的設計師，把智能家居做成真正能長期使用的生活系統</h1>
+          <p class="hero-intro">
+            青曦不只做空間設計，也能利用 AI 輔助設定 Home Assistant、規劃 NAS 與跨品牌設備整合。
+            從裝修前期的弱電配置，到入住後的自動化與資料管理，一起用設計思維整合完成。
+          </p>
+          <div class="hero-actions">
+            <a href="/contact" class="primary-link">預約智能家居諮詢</a>
+            <a href="/portfolio" class="secondary-link">查看作品集</a>
+          </div>
+        </div>
+
+        <aside class="hero-panel">
+          <p class="hero-panel-label">WHY QINGXI</p>
+          <ul>
+            <li>懂空間設計，也懂系統整合與設備落地</li>
+            <li>可協助 Home Assistant、NAS 與跨品牌生態串聯</li>
+            <li>利用 AI 協助需求整理、設定與除錯，提高交付效率</li>
+            <li>從一開始就把布線、機櫃、散熱與操作流程想進去</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="capability-section">
+      <div class="section-shell">
+        <div class="section-heading">
+          <p class="section-subtitle">CORE CAPABILITIES</p>
+          <h2>不只是裝設備，而是把 HA、NAS 與空間一起整合</h2>
+        </div>
+
+        <div class="capability-grid">
+          {capabilities.map((item) => (
+            <article class="capability-card">
+              <p class="capability-label">{item.label}</p>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="positioning-section">
+      <div class="section-shell positioning-shell">
+        <article class="positioning-card positioning-card-dark">
+          <p class="section-subtitle muted">DESIGNER WHO UNDERSTANDS TECH</p>
+          <h2>科技不該是入住後才補救的外掛</h2>
+          <p>
+            很多智能家居問題，不是設備不夠好，而是空間、佈線、收納、控制邏輯與日常動線從一開始就沒有一起思考。
+            青曦把這些條件前移到設計階段，讓智能系統更像生活的一部分，而不是一堆分散 App。
+          </p>
+        </article>
+
+        <article class="positioning-card positioning-card-light">
+          <p class="section-subtitle">SCENARIO EXAMPLES</p>
+          <ul class="scenario-list">
+            {scenarios.map((scenario) => (
+              <li>{scenario}</li>
+            ))}
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="workflow-section">
+      <div class="section-shell">
+        <div class="section-heading">
+          <p class="section-subtitle">WORKFLOW</p>
+          <h2>智能家居合作流程</h2>
+        </div>
+
+        <div class="workflow-grid">
+          {workflow.map((item) => (
+            <article class="workflow-card">
+              <span class="workflow-step">{item.step}</span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="section-shell cta-shell">
+        <div>
+          <p class="section-subtitle">NEXT STEP</p>
+          <h2>如果你想找的是懂科技的設計師，這裡可以一起開始</h2>
+          <p>
+            不論你是想先做智能家居規劃、同步整合裝修，或評估 HA / NAS 是否適合你的住宅情境，
+            都可以先聊需求與預算範圍。
+          </p>
+        </div>
+        <a href="/contact" class="cta-link">預約諮詢</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .smart-home-page {
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.12), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 248, 248, 1) 100%);
+  }
+
+  .smart-home-hero,
+  .capability-section,
+  .positioning-section,
+  .workflow-section,
+  .cta-section {
+    padding: 5.5rem 2rem;
+  }
+
+  .smart-home-hero {
+    padding-top: 7rem;
+  }
+
+  .smart-home-shell,
+  .section-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .smart-home-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(300px, 0.82fr);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .section-subtitle {
+    margin: 0 0 0.8rem;
+    color: var(--tiffany-dark);
+    font-size: 0.8rem;
+    letter-spacing: 0.26em;
+    font-weight: 600;
+  }
+
+  .section-subtitle.muted {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .hero-copy h1,
+  .section-heading h2,
+  .positioning-card h2,
+  .cta-shell h2 {
+    margin: 0;
+    font-family: 'Noto Serif TC', serif;
+    color: var(--gray-darkest);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2.5rem, 4.6vw, 4.4rem);
+  }
+
+  .hero-intro,
+  .capability-card p,
+  .positioning-card p,
+  .workflow-card p,
+  .cta-shell p {
+    color: var(--gray-medium);
+    line-height: 1.9;
+  }
+
+  .hero-intro {
+    margin: 1.15rem 0 0;
+    max-width: 45rem;
+    font-size: 1.02rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.75rem;
+  }
+
+  .primary-link,
+  .secondary-link,
+  .cta-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.9rem 1.35rem;
+    border-radius: 999px;
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition:
+      transform 0.25s ease,
+      background-color 0.25s ease,
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .primary-link,
+  .cta-link {
+    background: var(--gray-darkest);
+    color: var(--white);
+    border: 1px solid var(--gray-darkest);
+  }
+
+  .secondary-link {
+    background: transparent;
+    color: var(--gray-darkest);
+    border: 1px solid rgba(47, 47, 47, 0.14);
+  }
+
+  .primary-link:hover,
+  .secondary-link:hover,
+  .cta-link:hover {
+    transform: translateY(-2px);
+  }
+
+  .hero-panel {
+    padding: 1.8rem;
+    border-radius: 28px;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 28%),
+      linear-gradient(135deg, rgba(27, 27, 27, 1) 0%, rgba(41, 41, 41, 1) 100%);
+    color: var(--white);
+    box-shadow: 0 26px 60px rgba(17, 17, 17, 0.16);
+  }
+
+  .hero-panel-label,
+  .capability-label,
+  .workflow-step {
+    display: inline-flex;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+  }
+
+  .hero-panel-label {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  .hero-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0;
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .hero-panel li {
+    padding-bottom: 0.95rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.8;
+  }
+
+  .hero-panel li:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .section-heading {
+    max-width: 760px;
+    margin-bottom: 2rem;
+  }
+
+  .section-heading h2 {
+    font-size: clamp(1.9rem, 3.2vw, 3rem);
+  }
+
+  .capability-grid,
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .capability-card,
+  .workflow-card,
+  .positioning-card {
+    border-radius: 26px;
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 18px 36px rgba(47, 47, 47, 0.06);
+  }
+
+  .capability-card,
+  .workflow-card {
+    padding: 1.65rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
+  }
+
+  .capability-label,
+  .workflow-step {
+    color: var(--tiffany-dark);
+  }
+
+  .capability-card h3,
+  .workflow-card h3 {
+    margin: 0.85rem 0 0;
+    font-size: 1.2rem;
+    color: var(--gray-darkest);
+    line-height: 1.55;
+    letter-spacing: 0.03em;
+  }
+
+  .capability-card p,
+  .workflow-card p {
+    margin: 0.8rem 0 0;
+  }
+
+  .positioning-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+    gap: 1.5rem;
+  }
+
+  .positioning-card {
+    padding: 2rem;
+  }
+
+  .positioning-card-dark {
+    background: linear-gradient(135deg, rgba(19, 19, 19, 1) 0%, rgba(38, 38, 38, 1) 100%);
+    color: var(--white);
+  }
+
+  .positioning-card-dark h2 {
+    color: var(--white);
+  }
+
+  .positioning-card-dark p {
+    color: rgba(255, 255, 255, 0.76);
+  }
+
+  .positioning-card-light {
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  .scenario-list {
+    margin: 1rem 0 0;
+    padding-left: 1.1rem;
+    color: var(--gray-medium);
+    line-height: 1.9;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .cta-shell {
+    padding: 2.25rem;
+    border-radius: 30px;
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 20px 40px rgba(47, 47, 47, 0.06);
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.2), transparent 30%),
+      linear-gradient(135deg, rgba(244, 247, 247, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) auto;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .cta-shell p {
+    margin: 0.9rem 0 0;
+    max-width: 44rem;
+  }
+
+  @media (max-width: 960px) {
+    .smart-home-shell,
+    .positioning-shell,
+    .capability-grid,
+    .workflow-grid,
+    .cta-shell {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .smart-home-hero,
+    .capability-section,
+    .positioning-section,
+    .workflow-section,
+    .cta-section {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+
+    .smart-home-hero {
+      padding-top: 6rem;
+    }
+
+    .hero-panel,
+    .positioning-card,
+    .cta-shell {
+      padding: 1.5rem;
+    }
+  }
+</style>
