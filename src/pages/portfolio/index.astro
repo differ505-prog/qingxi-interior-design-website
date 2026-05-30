@@ -2,11 +2,11 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const featuredProject = {
-  title: '住宅空間精選',
+  title: '空間作品精選',
   coverImage: '/images/portfolio/xizhi-1.jpg',
-  summary: '以沉穩灰階、俐落收邊與一致照明節奏，整理出耐住也耐看的住宅日常。',
+  summary: '以材質、光線與場域節奏為主，整理出更耐看的精選空間畫面。',
   slug: 'xizhi-zhongxing-rd',
-  label: 'CURATED INTERIOR',
+  label: 'CURATED PORTFOLIO',
 };
 
 const spatialMoments = [
@@ -26,10 +26,15 @@ const spatialMoments = [
     image: '/images/portfolio/xizhi-zhongxing-rd/bathroom-portrait.jpg',
     alt: '住宅空間浴室直式畫面',
   },
+  {
+    image: '/images/portfolio/hualien-sherlock-pool.jpg',
+    alt: '夜間泳池與建築外觀畫面',
+  },
 ];
 
 const primaryMoments = spatialMoments.slice(0, 2);
-const secondaryMoments = spatialMoments.slice(2);
+const secondaryMoments = spatialMoments.slice(2, 4);
+const closingMoment = spatialMoments[4];
 ---
 
 <style>
@@ -250,6 +255,11 @@ const secondaryMoments = spatialMoments.slice(2);
     padding-left: clamp(0rem, 3vw, 2rem);
   }
 
+  .moments-row-closing {
+    grid-template-columns: 1fr;
+    padding-left: clamp(0rem, 4vw, 3rem);
+  }
+
   .moment-card {
     margin: 0;
     overflow: hidden;
@@ -284,6 +294,10 @@ const secondaryMoments = spatialMoments.slice(2);
 
   .moment-card.is-balanced {
     --moment-height: clamp(250px, 26vw, 320px);
+  }
+
+  .moment-card.is-cinematic {
+    --moment-height: clamp(300px, 34vw, 430px);
   }
 
   .moments-row-primary .moment-card.is-portrait {
@@ -356,7 +370,8 @@ const secondaryMoments = spatialMoments.slice(2);
     }
 
     .moments-row-primary,
-    .moments-row-secondary {
+    .moments-row-secondary,
+    .moments-row-closing {
       grid-template-columns: 1fr;
       padding-left: 0;
     }
@@ -369,7 +384,8 @@ const secondaryMoments = spatialMoments.slice(2);
     .moment-card.is-wide,
     .moment-card.is-portrait,
     .moment-card.is-intimate,
-    .moment-card.is-balanced {
+    .moment-card.is-balanced,
+    .moment-card.is-cinematic {
       --moment-height: clamp(220px, 62vw, 320px);
     }
   }
@@ -420,8 +436,8 @@ const secondaryMoments = spatialMoments.slice(2);
           <p class="featured-label">{featuredProject.label}</p>
           <h2>以畫面節奏呈現空間質感</h2>
           <p>
-            我們不刻意堆疊過多空間名稱，而是把代表性的住宅畫面整理成更完整的觀看體驗。
-            讓你先感受到空間氣質，再深入理解青曦的設計與落地能力。
+            我們不刻意標註每張照片來自哪個案名，而是把代表性的空間畫面整理成更完整的觀看體驗。
+            讓你先感受到氣質與節奏，再深入理解青曦的設計與落地能力。
           </p>
           <div class="featured-actions">
             <a
@@ -439,7 +455,7 @@ const secondaryMoments = spatialMoments.slice(2);
         <div class="section-heading">
           <h2>用圖片編排，留下更完整的空間感受</h2>
           <p>
-            讓公共空間的開闊、餐廚的俐落與臥室的安定感，自然形成同一條觀看節奏。
+            讓材質、光線、比例與場域氣氛，自然形成同一條觀看節奏。
           </p>
         </div>
 
@@ -455,10 +471,18 @@ const secondaryMoments = spatialMoments.slice(2);
           <div class="moments-row moments-row-secondary">
             {secondaryMoments.map((moment, index) => (
               <figure class={`moment-card ${index === 0 ? 'is-intimate' : 'is-balanced'}`}>
-              <img src={moment.image} alt={moment.alt} loading="lazy" />
-            </figure>
+                <img src={moment.image} alt={moment.alt} loading="lazy" />
+              </figure>
             ))}
           </div>
+
+          {closingMoment && (
+            <div class="moments-row moments-row-closing">
+              <figure class="moment-card is-cinematic">
+                <img src={closingMoment.image} alt={closingMoment.alt} loading="lazy" />
+              </figure>
+            </div>
+          )}
         </div>
       </section>
 
