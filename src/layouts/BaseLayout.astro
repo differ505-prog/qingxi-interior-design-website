@@ -269,7 +269,7 @@ const MAINTENANCE_MODE =
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0.35rem 0;
+        padding: 0.35rem 0.15rem;
         text-decoration: none;
         color: var(--gray-dark);
         transition: color 0.3s ease;
@@ -277,6 +277,39 @@ const MAINTENANCE_MODE =
         font-weight: 500;
         letter-spacing: 0.04em;
         white-space: nowrap;
+      }
+
+      .nav-text-window {
+        --nav-text-height: 1.45em;
+        display: inline-flex;
+        height: var(--nav-text-height);
+        overflow: hidden;
+      }
+
+      .nav-text-track {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .nav-text {
+        min-height: var(--nav-text-height);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+      }
+
+      .nav-text-en {
+        font-size: 0.82em;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .nav-link:hover .nav-text-track,
+      .nav-link:focus-visible .nav-text-track {
+        transform: translateY(calc(var(--nav-text-height) * -1));
       }
 
       .nav-link:hover {
@@ -382,6 +415,23 @@ const MAINTENANCE_MODE =
           font-size: 1.1rem;
           border-radius: 14px;
           justify-content: center;
+        }
+
+        .nav-text-window {
+          height: auto;
+          overflow: visible;
+        }
+
+        .nav-text-track {
+          transform: none !important;
+        }
+
+        .nav-text {
+          min-height: auto;
+        }
+
+        .nav-text-en {
+          display: none;
         }
 
         .nav-link:hover {
@@ -548,22 +598,64 @@ const MAINTENANCE_MODE =
 
           <div class="nav-links" id="navLinks">
             <span class="nav-item">
-              <a href="/" class="nav-link">首頁</a>
+              <a href="/" class="nav-link" aria-label="首頁 Home">
+                <span class="nav-text-window">
+                  <span class="nav-text-track">
+                    <span class="nav-text nav-text-zh">首頁</span>
+                    <span class="nav-text nav-text-en">Home</span>
+                  </span>
+                </span>
+              </a>
             </span>
             <span class="nav-item">
-              <a href="/portfolio" class="nav-link">作品集</a>
+              <a href="/portfolio" class="nav-link" aria-label="作品集 Portfolio">
+                <span class="nav-text-window">
+                  <span class="nav-text-track">
+                    <span class="nav-text nav-text-zh">作品集</span>
+                    <span class="nav-text nav-text-en">Portfolio</span>
+                  </span>
+                </span>
+              </a>
             </span>
             <span class="nav-item">
-              <a href="/blog" class="nav-link">知識分享</a>
+              <a href="/blog" class="nav-link" aria-label="知識分享 Blog">
+                <span class="nav-text-window">
+                  <span class="nav-text-track">
+                    <span class="nav-text nav-text-zh">知識分享</span>
+                    <span class="nav-text nav-text-en">Blog</span>
+                  </span>
+                </span>
+              </a>
             </span>
             <span class="nav-item">
-              <a href="/tools" class="nav-link">裝修工具</a>
+              <a href="/tools" class="nav-link" aria-label="裝修工具 Tools">
+                <span class="nav-text-window">
+                  <span class="nav-text-track">
+                    <span class="nav-text nav-text-zh">裝修工具</span>
+                    <span class="nav-text nav-text-en">Tools</span>
+                  </span>
+                </span>
+              </a>
             </span>
             <span class="nav-item">
-              <a href="/smart-home" class="nav-link">智能家居</a>
+              <a href="/smart-home" class="nav-link" aria-label="智能家居 Smart Home">
+                <span class="nav-text-window">
+                  <span class="nav-text-track">
+                    <span class="nav-text nav-text-zh">智能家居</span>
+                    <span class="nav-text nav-text-en">Smart Home</span>
+                  </span>
+                </span>
+              </a>
             </span>
             <span class="nav-item">
-              <a href="/#workflow" class="nav-link">服務流程</a>
+              <a href="/#workflow" class="nav-link" aria-label="服務流程 Workflow">
+                <span class="nav-text-window">
+                  <span class="nav-text-track">
+                    <span class="nav-text nav-text-zh">服務流程</span>
+                    <span class="nav-text nav-text-en">Workflow</span>
+                  </span>
+                </span>
+              </a>
             </span>
             <a href="/contact" class="nav-cta">預約諮詢</a>
           </div>
