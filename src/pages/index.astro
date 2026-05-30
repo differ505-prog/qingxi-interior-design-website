@@ -61,48 +61,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
         <p class="about-intro">深耕大台北地區，提供從毛胚到成屋的完整空間對策</p>
       </div>
 
-      <div class="service-modes" data-animate="scale">
-        <h3 class="modes-title">我們的服務模式</h3>
-        <p class="modes-desc">無論重視整體風格、專注工程執行，或想同步整合智慧家庭，青曦都能靈活對應</p>
-        <div class="mode-cards">
-          <div class="mode-card">
-            <div class="mode-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-              </svg>
-            </div>
-            <h4>設計施工一條龍</h4>
-            <p>從空間規劃到系統智能整合，一次完成高品質交付。</p>
-          </div>
-          <div class="mode-card">
-            <div class="mode-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-              </svg>
-            </div>
-            <h4>專業純統包工程</h4>
-            <p>已有設計藍圖？我們以專業工班與嚴謹監工為你精準落地。</p>
-          </div>
-          <div class="mode-card">
-            <div class="mode-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <rect x="4" y="4" width="16" height="16" rx="3"></rect>
-                <path d="M9 9h.01"></path>
-                <path d="M15 9h.01"></path>
-                <path d="M9 15h6"></path>
-                <path d="M12 4v-2"></path>
-                <path d="M12 22v-2"></path>
-                <path d="M4 12h-2"></path>
-                <path d="M22 12h-2"></path>
-              </svg>
-            </div>
-            <h4>智慧空間整合</h4>
-            <p>從前期佈線、硬體選型到 Home Assistant 與跨生態串聯，打造穩定可擴充的智慧生活。</p>
-          </div>
-        </div>
-      </div>
-
       <div class="core-philosophy" data-animate="right">
         <div class="philosophy-quote">
           <span class="quote-mark">"</span>
@@ -335,33 +293,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
             </p>
           </article>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 服務區域 Section -->
-  <section class="area-section">
-    <div class="area-container">
-      <article class="area-content" data-animate="left">
-        <div class="area-header">
-          <h6 class="section-subtitle">AREA</h6>
-          <h2 class="section-title">服務區域</h2>
-        </div>
-        <p class="area-text">大台北地區及周邊區域</p>
-      </article>
-      <div class="area-map">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <circle cx="12" cy="10" r="3"></circle>
-          <path
-            d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"
-          ></path>
-        </svg>
       </div>
     </div>
   </section>
@@ -832,7 +763,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 3rem;
+      gap: 2.2rem;
     }
 
     .about-header {
@@ -860,94 +791,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       color: var(--gray-medium);
       margin: 0;
       line-height: 1.8;
-    }
-
-    /* Service Modes */
-    .service-modes {
-      text-align: center;
-      opacity: 0;
-      transform: scale(0.95);
-      transition: all 0.8s ease;
-    }
-
-    .service-modes.animate-in {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    .modes-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--gray-dark);
-      margin: 0 0 0.5rem;
-      letter-spacing: 0.05em;
-    }
-
-    .modes-desc {
-      font-size: 0.95rem;
-      color: var(--gray-medium);
-      margin: 0 0 2rem;
-      line-height: 1.7;
-    }
-
-    .mode-cards {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1.5rem;
-    }
-
-    .mode-card {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(129, 199, 212, 0.16);
-      border-radius: 22px;
-      padding: 2rem 1.5rem;
-      text-align: center;
-      box-shadow: 0 16px 30px rgba(47, 47, 47, 0.05);
-      transition: all 0.3s ease;
-    }
-
-    .mode-card:hover {
-      border-color: var(--tiffany-light);
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(129, 199, 212, 0.15);
-    }
-
-    .mode-icon {
-      width: 56px;
-      height: 56px;
-      margin: 0 auto 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--tiffany-pale);
-      border-radius: 50%;
-      color: var(--tiffany-primary);
-      transition: all 0.3s ease;
-    }
-
-    .mode-card:hover .mode-icon {
-      background: var(--tiffany-primary);
-      color: var(--white);
-      transform: scale(1.1);
-    }
-
-    .mode-icon svg {
-      width: 28px;
-      height: 28px;
-    }
-
-    .mode-card h4 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--gray-dark);
-      margin: 0 0 0.75rem;
-    }
-
-    .mode-card p {
-      font-size: 0.95rem;
-      color: var(--gray-medium);
-      line-height: 1.7;
-      margin: 0;
     }
 
     /* Core Philosophy */
@@ -1001,12 +844,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       color: var(--gray-light);
       margin: 0;
       line-height: 1.7;
-    }
-
-    @media (max-width: 768px) {
-      .mode-cards {
-        grid-template-columns: 1fr;
-      }
     }
 
     /* Stats Section Styles */
@@ -1095,16 +932,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       border-color: var(--tiffany-light);
     }
 
-    .testimonial-rating {
-      margin-bottom: 1rem;
-    }
-
-    .star {
-      color: var(--tiffany-primary);
-      font-size: 1.2rem;
-      margin-right: 0.2rem;
-    }
-
     .promise-icon {
       width: 64px;
       height: 64px;
@@ -1143,36 +970,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       color: var(--gray-medium);
       margin-bottom: 0;
       text-align: center;
-    }
-
-    .testimonial-author {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .author-avatar {
-      width: 48px;
-      height: 48px;
-      background: var(--tiffany-primary);
-      color: var(--white);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    .author-name {
-      font-weight: 600;
-      color: var(--gray-dark);
-      margin-bottom: 0.25rem;
-    }
-
-    .author-project {
-      font-size: 0.85rem;
-      color: var(--gray-medium);
     }
 
     /* FAQ Section Styles */
@@ -1283,12 +1080,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       }
 
       .about-container {
-        grid-template-columns: 1fr;
         gap: 3rem;
-      }
-
-      .about-image {
-        order: -1;
       }
 
       .stats-container {
@@ -1326,11 +1118,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       .faq-section,
       .consult-section {
         padding: 3rem 1.5rem;
-      }
-
-      .about-values {
-        flex-direction: column;
-        gap: 1.5rem;
       }
 
       .stats-section {
@@ -1682,81 +1469,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       line-height: 1.85;
     }
 
-    /* Area Section Styles */
-    .area-section {
-      padding: 5rem 2rem;
-      background: var(--white);
-    }
-
-    .area-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 4rem;
-    }
-
-    .area-content {
-      flex: 1;
-      opacity: 0;
-      transform: translateX(-50px);
-      transition: all 0.8s ease;
-    }
-
-    .area-content.animate-in {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .area-header {
-      text-align: left;
-      margin-bottom: 2rem;
-    }
-
-    .area-header .section-subtitle {
-      text-align: left;
-    }
-
-    .area-header .section-title {
-      font-size: 2rem;
-      text-align: left;
-    }
-
-    .area-header::after {
-      content: "";
-      display: block;
-      width: 100%;
-      height: 3px;
-      background: linear-gradient(
-        to right,
-        var(--tiffany-primary) 0%,
-        transparent 100%
-      );
-      margin-top: 1rem;
-    }
-
-    .area-text {
-      font-size: 1.125rem;
-      color: var(--gray-medium);
-      line-height: 1.8;
-      letter-spacing: 0.05em;
-    }
-
-    .area-map {
-      flex: 0 0 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .area-map svg {
-      width: 150px;
-      height: 150px;
-      color: var(--tiffany-primary);
-      filter: drop-shadow(0 4px 6px rgba(129, 199, 212, 0.3));
-    }
-
     /* Workflow Section Styles */
     .workflow-section {
       padding: 5rem 2rem;
@@ -1953,24 +1665,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     }
 
     @media (max-width: 768px) {
-      .area-container {
-        flex-direction: column;
-        gap: 2rem;
-      }
-
-      .area-header .section-title {
-        font-size: 1.75rem;
-      }
-
-      .area-map {
-        flex: 0 0 150px;
-      }
-
-      .area-map svg {
-        width: 120px;
-        height: 120px;
-      }
-
       .workflow-section {
         padding: 3rem 1.5rem;
       }
@@ -2009,10 +1703,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     }
 
     @media (max-width: 480px) {
-      .area-section {
-        padding: 3rem 1.5rem;
-      }
-
       .workflow-item {
         flex-direction: column;
         align-items: center;
@@ -2039,90 +1729,52 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       };
 
       const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            const delay = Number(entry.target.getAttribute("data-animate-delay") || 0);
             setTimeout(() => {
               entry.target.classList.add("animate-in");
-            }, index * 100); // Stagger animation
+              observer.unobserve(entry.target);
+            }, delay);
           }
         });
       }, observerOptions);
 
+      function observeElements(
+        elements: NodeListOf<HTMLElement> | (Element | null)[],
+        delayStep = 0,
+      ) {
+        Array.from(elements).forEach((element, index) => {
+          if (!(element instanceof HTMLElement)) return;
+          element.setAttribute("data-animate-delay", String(index * delayStep));
+          observer.observe(element);
+        });
+      }
+
       // Observe about section
       const aboutHeader = document.querySelector(".about-header");
-      const serviceModes = document.querySelector(".service-modes");
       const corePhilosophy = document.querySelector(".core-philosophy");
-      if (aboutHeader) observer.observe(aboutHeader);
-      if (serviceModes) observer.observe(serviceModes);
-      if (corePhilosophy) observer.observe(corePhilosophy);
+      observeElements([aboutHeader, corePhilosophy]);
 
       // Observe stats
-      const statItems = document.querySelectorAll(".stat-item");
-      statItems.forEach((item, index) => {
-        const statObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setTimeout(() => {
-                entry.target.classList.add("animate-in");
-              }, index * 100);
-            }
-          });
-        }, observerOptions);
-        statObserver.observe(item);
-      });
+      const statItems = document.querySelectorAll<HTMLElement>(".stat-item");
+      observeElements(statItems, 100);
 
       // Observe service items
-      const serviceItems = document.querySelectorAll(".service-item");
-      serviceItems.forEach((item) => observer.observe(item));
-
-      // Observe area content
-      const areaContent = document.querySelector(".area-content");
-      if (areaContent) observer.observe(areaContent);
+      const serviceItems = document.querySelectorAll<HTMLElement>(".service-item");
+      observeElements(serviceItems, 100);
 
       // Observe workflow items
-      const workflowItems = document.querySelectorAll(".workflow-item");
-      workflowItems.forEach((item, index) => {
-        const itemObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setTimeout(() => {
-                entry.target.classList.add("animate-in");
-              }, index * 150); // Stagger workflow items
-            }
-          });
-        }, observerOptions);
-        itemObserver.observe(item);
-      });
+      const workflowItems = document.querySelectorAll<HTMLElement>(".workflow-item");
+      observeElements(workflowItems, 150);
 
       // Observe testimonials
-      const testimonialCards = document.querySelectorAll(".testimonial-card");
-      testimonialCards.forEach((card, index) => {
-        const cardObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setTimeout(() => {
-                entry.target.classList.add("animate-in");
-              }, index * 150);
-            }
-          });
-        }, observerOptions);
-        cardObserver.observe(card);
-      });
+      const testimonialCards = document.querySelectorAll<HTMLElement>(".testimonial-card");
+      observeElements(testimonialCards, 150);
 
       // Observe FAQ items
-      const faqItems = document.querySelectorAll(".faq-item");
-      faqItems.forEach((item, index) => {
-        const faqObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setTimeout(() => {
-                entry.target.classList.add("animate-in");
-              }, index * 100);
-            }
-          });
-        }, observerOptions);
-        faqObserver.observe(item);
-      });
+      const faqItems = document.querySelectorAll<HTMLElement>(".faq-item");
+      observeElements(faqItems, 100);
 
       // FAQ Toggle
       const faqQuestions = document.querySelectorAll(".faq-question");
