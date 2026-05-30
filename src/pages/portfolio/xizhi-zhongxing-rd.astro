@@ -26,7 +26,12 @@ const project = {
     {
       src: '/images/portfolio/xizhi-3.jpg',
       alt: '住宅空間主臥畫面',
-      layout: 'is-tall',
+      layout: 'is-immersive',
+    },
+    {
+      src: '/images/portfolio/xizhi-zhongxing-rd/bathroom-portrait.jpg',
+      alt: '住宅空間浴室直式畫面',
+      layout: 'is-portrait',
     },
   ],
 };
@@ -354,8 +359,12 @@ const project = {
     grid-column: span 5;
   }
 
-  .gallery-item.is-tall {
-    grid-column: span 12;
+  .gallery-item.is-immersive {
+    grid-column: span 7;
+  }
+
+  .gallery-item.is-portrait {
+    grid-column: span 5;
   }
 
   .gallery-thumb {
@@ -374,8 +383,12 @@ const project = {
     aspect-ratio: 4 / 5;
   }
 
-  .gallery-item.is-tall .gallery-thumb {
-    aspect-ratio: 16 / 9;
+  .gallery-item.is-immersive .gallery-thumb {
+    aspect-ratio: 16 / 10;
+  }
+
+  .gallery-item.is-portrait .gallery-thumb {
+    aspect-ratio: 2 / 3;
   }
 
   .lightbox {
@@ -563,13 +576,15 @@ const project = {
 
     .gallery-item.is-wide,
     .gallery-item.is-standard,
-    .gallery-item.is-tall {
+    .gallery-item.is-immersive,
+    .gallery-item.is-portrait {
       grid-column: span 1;
     }
 
     .gallery-item.is-standard .gallery-thumb,
     .gallery-item.is-wide .gallery-thumb,
-    .gallery-item.is-tall .gallery-thumb {
+    .gallery-item.is-immersive .gallery-thumb,
+    .gallery-item.is-portrait .gallery-thumb {
       aspect-ratio: 4 / 3;
     }
   }
