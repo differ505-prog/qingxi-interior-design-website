@@ -9,6 +9,8 @@ const featuredProject = {
   label: 'CURATED PORTFOLIO',
 };
 
+const editorialNotes = ['室內', '光線', '材質', '夜景', '場域氛圍'];
+
 const spatialMoments = [
   {
     image: '/images/portfolio/xizhi-1.jpg',
@@ -74,6 +76,28 @@ const closingMoment = spatialMoments[4];
     color: var(--gray-medium);
     line-height: 1.9;
     font-size: 1rem;
+  }
+
+  .portfolio-notes {
+    margin: 1.75rem auto 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    max-width: 760px;
+  }
+
+  .portfolio-notes span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.68rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    color: var(--gray-dark);
+    letter-spacing: 0.08em;
+    box-shadow: 0 14px 28px rgba(47, 47, 47, 0.04);
   }
 
   .portfolio-container {
@@ -265,6 +289,7 @@ const closingMoment = spatialMoments[4];
     overflow: hidden;
     border-radius: 28px;
     background: var(--gray-bg);
+    position: relative;
   }
 
   .moment-card img {
@@ -312,6 +337,20 @@ const closingMoment = spatialMoments[4];
     padding: 1rem 1.2rem 1.2rem;
     color: var(--gray-dark);
     letter-spacing: 0.06em;
+  }
+
+  .moment-card.is-cinematic figcaption {
+    position: absolute;
+    left: 1.35rem;
+    bottom: 1.35rem;
+    padding: 0.7rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(17, 17, 17, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
   }
 
   .portfolio-cta {
@@ -408,20 +447,26 @@ const closingMoment = spatialMoments[4];
       <h6 class="section-subtitle">CURATED WORK</h6>
       <h1>精選空間畫面</h1>
       <p class="portfolio-intro">
-        以更克制的方式呈現住宅空間，讓比例、材質、光線與留白自己說話。
+        先不急著區分哪一張來自哪個案名，而是把不同場域裡最能代表質感的畫面整理在一起。
+        讓比例、材質、光線與留白自己說話。
       </p>
+      <div class="portfolio-notes">
+        {editorialNotes.map((note) => (
+          <span>{note}</span>
+        ))}
+      </div>
       <div class="portfolio-metrics">
         <article class="portfolio-metric">
-          <strong>住宅尺度</strong>
-          <span>聚焦真實居住情境，不追求表面華麗。</span>
+          <strong>畫面節奏</strong>
+          <span>用主次、疏密與比例，維持觀看時的呼吸感。</span>
         </article>
         <article class="portfolio-metric">
-          <strong>設計施工整合</strong>
-          <span>把設計語言一路延伸到工程落地與收邊細節。</span>
+          <strong>材質與光線</strong>
+          <span>讓白天與夜晚都有層次，而不是只靠單一裝飾撐場。</span>
         </article>
         <article class="portfolio-metric">
-          <strong>精選編排</strong>
-          <span>用更完整的空間敘事，取代單純堆疊數量。</span>
+          <strong>精選敘事</strong>
+          <span>先呈現整體氣質，再讓細節慢慢被看見。</span>
         </article>
       </div>
     </header>
@@ -434,10 +479,10 @@ const closingMoment = spatialMoments[4];
 
         <div class="featured-copy">
           <p class="featured-label">{featuredProject.label}</p>
-          <h2>以畫面節奏呈現空間質感</h2>
+          <h2>像一本精選集一樣觀看空間，而不是逐張對照案名</h2>
           <p>
-            我們不刻意標註每張照片來自哪個案名，而是把代表性的空間畫面整理成更完整的觀看體驗。
-            讓你先感受到氣質與節奏，再深入理解青曦的設計與落地能力。
+            目前作品數量還在持續累積，所以首頁先以質感與編排為主。
+            你會先看到場域氛圍、光線與材料關係，再進一步理解青曦的設計與落地能力。
           </p>
           <div class="featured-actions">
             <a
@@ -453,9 +498,9 @@ const closingMoment = spatialMoments[4];
 
       <section class="moments-section">
         <div class="section-heading">
-          <h2>用圖片編排，留下更完整的空間感受</h2>
+          <h2>讓室內、夜景與不同場域，自然落在同一套觀看節奏裡</h2>
           <p>
-            讓材質、光線、比例與場域氣氛，自然形成同一條觀看節奏。
+            不急著分類成住宅、旅宿或單一空間用途，而是先把好看的畫面與整體氣質整理出來。
           </p>
         </div>
 
@@ -480,6 +525,7 @@ const closingMoment = spatialMoments[4];
             <div class="moments-row moments-row-closing">
               <figure class="moment-card is-cinematic">
                 <img src={closingMoment.image} alt={closingMoment.alt} loading="lazy" />
+                <figcaption>POOLSCAPE AT NIGHT</figcaption>
               </figure>
             </div>
           )}
@@ -488,9 +534,9 @@ const closingMoment = spatialMoments[4];
 
       <section class="portfolio-cta">
         <div>
-          <h2>想把自己的住宅也整理成這樣的空間節奏？</h2>
+          <h2>想把你的空間也整理成這樣的質感與節奏？</h2>
           <p>
-            從初步諮詢、設計提案到工程落地，青曦會陪你把需求、預算與完成後的生活感一起想清楚。
+            從初步諮詢、設計提案到工程落地，青曦會陪你把需求、預算與完成後的整體氣質一起想清楚。
           </p>
         </div>
         <a href="/contact">開始諮詢</a>
