@@ -242,23 +242,25 @@ const secondaryMoments = spatialMoments.slice(2);
   }
 
   .moments-row-primary {
-    grid-template-columns: minmax(0, 1.16fr) minmax(260px, 0.84fr);
+    grid-template-columns: minmax(0, 1.22fr) minmax(240px, 0.78fr);
   }
 
   .moments-row-secondary {
-    grid-template-columns: minmax(260px, 0.92fr) minmax(0, 1.08fr);
-    padding-left: clamp(0rem, 4vw, 3rem);
+    grid-template-columns: minmax(240px, 0.82fr) minmax(0, 1.18fr);
+    padding-left: clamp(0rem, 3vw, 2rem);
   }
 
   .moment-card {
     margin: 0;
     overflow: hidden;
     border-radius: 28px;
+    background: var(--gray-bg);
   }
 
   .moment-card img {
     display: block;
     width: 100%;
+    height: var(--moment-height);
     object-fit: cover;
     transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     box-shadow: 0 18px 40px rgba(47, 47, 47, 0.08);
@@ -268,20 +270,20 @@ const secondaryMoments = spatialMoments.slice(2);
     transform: scale(1.03);
   }
 
-  .moment-card.is-wide img {
-    aspect-ratio: 16 / 11;
+  .moment-card.is-wide {
+    --moment-height: clamp(290px, 34vw, 420px);
   }
 
-  .moment-card.is-portrait img {
-    aspect-ratio: 4 / 5;
+  .moment-card.is-portrait {
+    --moment-height: clamp(280px, 31vw, 380px);
   }
 
-  .moment-card.is-intimate img {
-    aspect-ratio: 5 / 4;
+  .moment-card.is-intimate {
+    --moment-height: clamp(240px, 24vw, 300px);
   }
 
-  .moment-card.is-balanced img {
-    aspect-ratio: 16 / 10;
+  .moment-card.is-balanced {
+    --moment-height: clamp(250px, 26vw, 320px);
   }
 
   .moments-row-primary .moment-card.is-portrait {
@@ -364,11 +366,11 @@ const secondaryMoments = spatialMoments.slice(2);
       margin-top: 0;
     }
 
-    .moment-card.is-wide img,
-    .moment-card.is-portrait img,
-    .moment-card.is-intimate img,
-    .moment-card.is-balanced img {
-      aspect-ratio: 4 / 3;
+    .moment-card.is-wide,
+    .moment-card.is-portrait,
+    .moment-card.is-intimate,
+    .moment-card.is-balanced {
+      --moment-height: clamp(220px, 62vw, 320px);
     }
   }
 

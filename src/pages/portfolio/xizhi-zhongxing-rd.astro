@@ -372,12 +372,12 @@ const secondaryGalleryImages = project.images.slice(2);
   }
 
   .gallery-row-primary {
-    grid-template-columns: minmax(0, 1.16fr) minmax(260px, 0.84fr);
+    grid-template-columns: minmax(0, 1.22fr) minmax(240px, 0.78fr);
   }
 
   .gallery-row-secondary {
-    grid-template-columns: minmax(260px, 0.92fr) minmax(0, 1.08fr);
-    padding-left: clamp(0rem, 4vw, 3rem);
+    grid-template-columns: minmax(240px, 0.82fr) minmax(0, 1.18fr);
+    padding-left: clamp(0rem, 3vw, 2rem);
   }
 
   .gallery-item {
@@ -389,23 +389,24 @@ const secondaryGalleryImages = project.images.slice(2);
     position: relative;
     overflow: hidden;
     border-radius: 24px;
+    background: var(--gray-bg);
     box-shadow: 0 18px 40px rgba(47, 47, 47, 0.08);
   }
 
   .gallery-item.is-wide .gallery-thumb {
-    aspect-ratio: 16 / 11;
+    height: clamp(290px, 34vw, 420px);
   }
 
   .gallery-item.is-standard .gallery-thumb {
-    aspect-ratio: 4 / 5;
+    height: clamp(280px, 31vw, 380px);
   }
 
   .gallery-item.is-immersive .gallery-thumb {
-    aspect-ratio: 16 / 10;
+    height: clamp(240px, 24vw, 300px);
   }
 
   .gallery-item.is-portrait .gallery-thumb {
-    aspect-ratio: 4 / 5;
+    height: clamp(250px, 26vw, 320px);
   }
 
   .gallery-row-primary .gallery-item.is-standard {
@@ -610,7 +611,7 @@ const secondaryGalleryImages = project.images.slice(2);
     .gallery-item.is-wide .gallery-thumb,
     .gallery-item.is-immersive .gallery-thumb,
     .gallery-item.is-portrait .gallery-thumb {
-      aspect-ratio: 4 / 3;
+      height: clamp(220px, 62vw, 320px);
     }
   }
 
