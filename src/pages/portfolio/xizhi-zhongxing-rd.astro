@@ -35,6 +35,9 @@ const project = {
     },
   ],
 };
+
+const primaryGalleryImages = project.images.slice(0, 2);
+const secondaryGalleryImages = project.images.slice(2);
 ---
 
 <BaseLayout title={`${project.title} - 青曦空間設計`}>
@@ -88,14 +91,26 @@ const project = {
         <h2>以圖片節奏呈現空間質感</h2>
       </div>
 
-      <div class="gallery-grid editorial-grid">
-        {project.images.map((img, i) => (
-          <figure class={`gallery-item ${img.layout}`} data-index={i}>
-            <div class="gallery-thumb">
-              <img src={img.src} alt={img.alt} loading="lazy" />
-            </div>
-          </figure>
-        ))}
+      <div class="gallery-stack">
+        <div class="gallery-row gallery-row-primary">
+          {primaryGalleryImages.map((img, i) => (
+            <figure class={`gallery-item ${img.layout}`} data-index={i}>
+              <div class="gallery-thumb">
+                <img src={img.src} alt={img.alt} loading="lazy" />
+              </div>
+            </figure>
+          ))}
+        </div>
+
+        <div class="gallery-row gallery-row-secondary">
+          {secondaryGalleryImages.map((img, i) => (
+            <figure class={`gallery-item ${img.layout}`} data-index={i + primaryGalleryImages.length}>
+              <div class="gallery-thumb">
+                <img src={img.src} alt={img.alt} loading="lazy" />
+              </div>
+            </figure>
+          ))}
+        </div>
       </div>
     </section>
 
@@ -345,39 +360,36 @@ const project = {
     color: var(--gray-darkest);
   }
 
-  .editorial-grid {
+  .gallery-stack {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .gallery-row {
+    display: grid;
     gap: 1.5rem;
     align-items: start;
   }
 
+  .gallery-row-primary {
+    grid-template-columns: minmax(0, 1.16fr) minmax(260px, 0.84fr);
+  }
+
+  .gallery-row-secondary {
+    grid-template-columns: minmax(260px, 0.92fr) minmax(0, 1.08fr);
+    padding-left: clamp(0rem, 4vw, 3rem);
+  }
+
   .gallery-item {
+    margin: 0;
     align-self: start;
-  }
-
-  .gallery-item.is-wide {
-    grid-column: span 7;
-  }
-
-  .gallery-item.is-standard {
-    grid-column: span 5;
-  }
-
-  .gallery-item.is-immersive {
-    grid-column: span 6;
-  }
-
-  .gallery-item.is-portrait {
-    grid-column: span 6;
   }
 
   .gallery-thumb {
     position: relative;
     overflow: hidden;
     border-radius: 24px;
-    background: var(--gray-bg);
-    min-height: 340px;
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.08);
   }
 
   .gallery-item.is-wide .gallery-thumb {
@@ -394,6 +406,14 @@ const project = {
 
   .gallery-item.is-portrait .gallery-thumb {
     aspect-ratio: 4 / 5;
+  }
+
+  .gallery-row-primary .gallery-item.is-standard {
+    margin-top: clamp(1.5rem, 3vw, 2.75rem);
+  }
+
+  .gallery-row-secondary .gallery-item.is-immersive {
+    margin-top: clamp(0.5rem, 1.8vw, 1.4rem);
   }
 
   .lightbox {
@@ -575,15 +595,15 @@ const project = {
       grid-template-columns: 1fr;
     }
 
-    .editorial-grid {
+    .gallery-row-primary,
+    .gallery-row-secondary {
       grid-template-columns: 1fr;
+      padding-left: 0;
     }
 
-    .gallery-item.is-wide,
-    .gallery-item.is-standard,
-    .gallery-item.is-immersive,
-    .gallery-item.is-portrait {
-      grid-column: span 1;
+    .gallery-row-primary .gallery-item.is-standard,
+    .gallery-row-secondary .gallery-item.is-immersive {
+      margin-top: 0;
     }
 
     .gallery-item.is-standard .gallery-thumb,

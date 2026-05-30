@@ -27,6 +27,9 @@ const spatialMoments = [
     alt: '住宅空間浴室直式畫面',
   },
 ];
+
+const primaryMoments = spatialMoments.slice(0, 2);
+const secondaryMoments = spatialMoments.slice(2);
 ---
 
 <style>
@@ -227,59 +230,66 @@ const spatialMoments = [
     line-height: 1.85;
   }
 
-  .moments-grid {
+  .moments-stack {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .moments-row {
+    display: grid;
     gap: 1.5rem;
     align-items: start;
+  }
+
+  .moments-row-primary {
+    grid-template-columns: minmax(0, 1.16fr) minmax(260px, 0.84fr);
+  }
+
+  .moments-row-secondary {
+    grid-template-columns: minmax(260px, 0.92fr) minmax(0, 1.08fr);
+    padding-left: clamp(0rem, 4vw, 3rem);
   }
 
   .moment-card {
     margin: 0;
     overflow: hidden;
-    border-radius: 26px;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(129, 199, 212, 0.12);
-    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.06);
-    align-self: start;
-  }
-
-  .moment-card:nth-child(1) {
-    grid-column: span 7;
-  }
-
-  .moment-card:nth-child(2) {
-    grid-column: span 5;
-  }
-
-  .moment-card:nth-child(3) {
-    grid-column: span 6;
-  }
-
-  .moment-card:nth-child(4) {
-    grid-column: span 6;
+    border-radius: 28px;
   }
 
   .moment-card img {
     display: block;
     width: 100%;
     object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.08);
   }
 
-  .moment-card:nth-child(1) img {
+  .moment-card:hover img {
+    transform: scale(1.03);
+  }
+
+  .moment-card.is-wide img {
     aspect-ratio: 16 / 11;
   }
 
-  .moment-card:nth-child(2) img {
+  .moment-card.is-portrait img {
     aspect-ratio: 4 / 5;
   }
 
-  .moment-card:nth-child(3) img {
+  .moment-card.is-intimate img {
+    aspect-ratio: 5 / 4;
+  }
+
+  .moment-card.is-balanced img {
     aspect-ratio: 16 / 10;
   }
 
-  .moment-card:nth-child(4) img {
-    aspect-ratio: 4 / 5;
+  .moments-row-primary .moment-card.is-portrait {
+    margin-top: clamp(1.5rem, 3vw, 2.75rem);
+  }
+
+  .moments-row-secondary .moment-card.is-intimate {
+    margin-top: clamp(0.5rem, 1.8vw, 1.4rem);
   }
 
   .moment-card figcaption {
@@ -343,19 +353,21 @@ const spatialMoments = [
       grid-template-columns: 1fr;
     }
 
-    .moments-grid {
+    .moments-row-primary,
+    .moments-row-secondary {
       grid-template-columns: 1fr;
+      padding-left: 0;
     }
 
-    .moment-card:nth-child(1),
-    .moment-card:nth-child(2),
-    .moment-card:nth-child(3) {
-      grid-column: span 1;
+    .moments-row-primary .moment-card.is-portrait,
+    .moments-row-secondary .moment-card.is-intimate {
+      margin-top: 0;
     }
 
-    .moment-card:nth-child(1) img,
-    .moment-card:nth-child(2) img,
-    .moment-card:nth-child(3) img {
+    .moment-card.is-wide img,
+    .moment-card.is-portrait img,
+    .moment-card.is-intimate img,
+    .moment-card.is-balanced img {
       aspect-ratio: 4 / 3;
     }
   }
@@ -429,12 +441,22 @@ const spatialMoments = [
           </p>
         </div>
 
-        <div class="moments-grid">
-          {spatialMoments.map((moment) => (
-            <figure class="moment-card">
+        <div class="moments-stack">
+          <div class="moments-row moments-row-primary">
+            {primaryMoments.map((moment, index) => (
+              <figure class={`moment-card ${index === 0 ? 'is-wide' : 'is-portrait'}`}>
+                <img src={moment.image} alt={moment.alt} loading="lazy" />
+              </figure>
+            ))}
+          </div>
+
+          <div class="moments-row moments-row-secondary">
+            {secondaryMoments.map((moment, index) => (
+              <figure class={`moment-card ${index === 0 ? 'is-intimate' : 'is-balanced'}`}>
               <img src={moment.image} alt={moment.alt} loading="lazy" />
             </figure>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
