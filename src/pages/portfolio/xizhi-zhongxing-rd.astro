@@ -167,29 +167,6 @@ const renovationComparisons = [
       </div>
     </section>
 
-    <section class="drawing-section">
-      <div class="drawing-header">
-        <p class="section-subtitle">DRAWING PACKAGE</p>
-        <h2>設計圖紙框架</h2>
-        <p>先把平面、照明、立面等核心圖紙位置站好，之後只要直接替換正式圖面即可。</p>
-      </div>
-
-      <div class="drawing-grid">
-        {drawingBoards.map((drawing) => (
-          <article class="drawing-card">
-            <figure class="drawing-media">
-              <img src={drawing.image} alt={drawing.alt} loading="lazy" />
-            </figure>
-            <div class="drawing-copy">
-              <p class="drawing-label">{drawing.label}</p>
-              <h3>{drawing.title}</h3>
-              <p>{drawing.description}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-
     <section class="comparison-section">
       <div class="comparison-header">
         <p class="section-subtitle">BEFORE & AFTER</p>
@@ -222,6 +199,29 @@ const renovationComparisons = [
                   <span>{item.afterCaption}</span>
                 </figcaption>
               </figure>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="drawing-section">
+      <div class="drawing-header">
+        <p class="section-subtitle">DRAWING PACKAGE</p>
+        <h2>設計圖紙框架</h2>
+        <p>先把平面、照明、立面等核心圖紙位置站好，之後只要直接替換正式圖面即可。</p>
+      </div>
+
+      <div class="drawing-grid">
+        {drawingBoards.map((drawing) => (
+          <article class="drawing-card">
+            <figure class="drawing-media">
+              <img src={drawing.image} alt={drawing.alt} loading="lazy" />
+            </figure>
+            <div class="drawing-copy">
+              <p class="drawing-label">{drawing.label}</p>
+              <h3>{drawing.title}</h3>
+              <p>{drawing.description}</p>
             </div>
           </article>
         ))}
