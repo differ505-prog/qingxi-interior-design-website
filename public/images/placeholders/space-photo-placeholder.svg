@@ -11,8 +11,8 @@
 <circle cx="1108" cy="404" r="62" fill="#EEF3F3" stroke="#B7C8CB" stroke-width="18"/>
 <rect x="164" y="944" width="462" height="28" rx="14" fill="#B7C8CB"/>
 <rect x="164" y="996" width="298" height="20" rx="10" fill="#C9D6D8"/>
+<rect x="164" y="1040" width="356" height="20" rx="10" fill="#D7E1E2"/>
 <rect x="1210" y="946" width="226" height="96" rx="48" fill="#D5DFE0"/>
 <path d="M1272 994H1374" stroke="#AABCC0" stroke-width="14" stroke-linecap="round"/>
 <path d="M1308 958V1030" stroke="#AABCC0" stroke-width="14" stroke-linecap="round"/>
-<text x="164" y="1038" fill="#7C8F94" font-family="Arial, sans-serif" font-size="56" font-weight="700" letter-spacing="6">PHOTO PLACEHOLDER</text>
 </svg>

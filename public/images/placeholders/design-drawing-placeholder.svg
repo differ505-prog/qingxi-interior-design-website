@@ -20,5 +20,5 @@
 <circle cx="1382" cy="918" r="26" stroke="#90A8AD" stroke-width="8"/>
 <rect x="288" y="956" width="504" height="28" rx="14" fill="#B7C8CB"/>
 <rect x="288" y="1006" width="360" height="20" rx="10" fill="#D0DBDD"/>
-<text x="286" y="1082" fill="#7C8F94" font-family="Arial, sans-serif" font-size="56" font-weight="700" letter-spacing="6">DRAWING PLACEHOLDER</text>
+<rect x="288" y="1060" width="428" height="20" rx="10" fill="#D0DBDD"/>
 </svg>

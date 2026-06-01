@@ -45,51 +45,51 @@ const drawingBoards = [
   {
     label: 'LAYOUT PLAN',
     title: '平面配置圖',
-    description: '先放平面配置、動線與櫃體規劃圖，之後可直接替換成正式圖面。',
+    description: '梳理空間配置、動線與櫃體比例，讓生活機能與整體尺度更順手。',
     image: drawingPlaceholder,
-    alt: '平面配置圖佔位圖',
+    alt: '平面配置圖示意',
   },
   {
     label: 'CEILING & LIGHTING',
     title: '天花與照明圖',
-    description: '適合放燈具迴路、照明節奏、空調與天花整合的設計圖紙。',
+    description: '整合照明、空調與天花層次，讓機能安排與空間氛圍兼顧。',
     image: drawingPlaceholder,
-    alt: '天花與照明圖佔位圖',
+    alt: '天花與照明圖示意',
   },
   {
     label: 'CABINET DETAIL',
     title: '櫃體與立面圖',
     description: '適合放收納立面、材質標註與關鍵尺寸，讓客戶看到設計落地能力。',
     image: drawingPlaceholder,
-    alt: '櫃體與立面圖佔位圖',
+    alt: '櫃體與立面圖示意',
   },
 ];
 const renovationComparisons = [
   {
     label: 'PUBLIC AREA',
     title: '客廳改造前後',
-    summary: '先呈現改造前的空間條件，之後可補上同角度完工照，更清楚看見採光、動線與整體整理後的差異。',
+    summary: '從原有空間條件到完成後的整體整理，更清楚看見採光、動線與收納配置的改變。',
     beforeImage: '/images/portfolio/xizhi-zhongxing-rd/living-room-before.jpg',
     beforeAlt: '客廳改造前現場照片',
     beforeTitle: '改造前',
     beforeCaption: '拆除與管線整理階段',
     afterImage: photoPlaceholder,
-    afterAlt: '客廳改造後佔位圖',
+    afterAlt: '客廳完工畫面示意',
     afterTitle: '完成後',
-    afterCaption: '待補完工實景照',
+    afterCaption: '',
   },
   {
     label: 'PRIVATE AREA',
     title: '浴室改造前後',
-    summary: '可放老屋原況與完工對比，強調材質更新、收納整合與使用感受的提升。',
+    summary: '透過改造前後的對照，呈現材質更新、收納整合與日常使用感受的提升。',
     beforeImage: photoPlaceholder,
-    beforeAlt: '浴室改造前佔位圖',
+    beforeAlt: '浴室改造前畫面示意',
     beforeTitle: '改造前',
-    beforeCaption: '待補原始浴室照片',
+    beforeCaption: '',
     afterImage: photoPlaceholder,
-    afterAlt: '浴室改造後佔位圖',
+    afterAlt: '浴室改造後畫面示意',
     afterTitle: '完成後',
-    afterCaption: '待補改造完成照片',
+    afterCaption: '',
   },
 ];
 ---
@@ -170,8 +170,8 @@ const renovationComparisons = [
     <section class="comparison-section">
       <div class="comparison-header">
         <p class="section-subtitle">BEFORE & AFTER</p>
-        <h2>工程前後對比框架</h2>
-        <p>這裡先放高質感的前後對比版型，之後可依空間替換成實際的原況與完工照片。</p>
+        <h2>工程前後對比</h2>
+        <p>透過前後狀態的對照，更清楚看見空間整理、材質更新與生活感受的改變。</p>
       </div>
 
       <div class="comparison-stack">
@@ -188,7 +188,7 @@ const renovationComparisons = [
                 <img src={item.beforeImage} alt={item.beforeAlt} loading="lazy" />
                 <figcaption>
                   <strong>{item.beforeTitle}</strong>
-                  <span>{item.beforeCaption}</span>
+                  {item.beforeCaption && <span>{item.beforeCaption}</span>}
                 </figcaption>
               </figure>
 
@@ -196,7 +196,7 @@ const renovationComparisons = [
                 <img src={item.afterImage} alt={item.afterAlt} loading="lazy" />
                 <figcaption>
                   <strong>{item.afterTitle}</strong>
-                  <span>{item.afterCaption}</span>
+                  {item.afterCaption && <span>{item.afterCaption}</span>}
                 </figcaption>
               </figure>
             </div>
@@ -208,8 +208,8 @@ const renovationComparisons = [
     <section class="drawing-section">
       <div class="drawing-header">
         <p class="section-subtitle">DRAWING PACKAGE</p>
-        <h2>設計圖紙框架</h2>
-        <p>先把平面、照明、立面等核心圖紙位置站好，之後只要直接替換正式圖面即可。</p>
+        <h2>設計圖紙</h2>
+        <p>從平面配置、照明安排到立面細節，讓設計邏輯與落地完整度更清楚。</p>
       </div>
 
       <div class="drawing-grid">
