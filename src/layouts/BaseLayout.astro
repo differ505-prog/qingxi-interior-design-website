@@ -14,11 +14,13 @@ const pageTitle =
   normalizedTitle && normalizedTitle !== siteName
     ? `${siteName} | ${normalizedTitle}`
     : siteName;
+const siteOrigin = (Astro.site || new URL("https://qingxidesign.tw")).toString();
+const ogImageURL = new URL(ogImage, siteOrigin).toString();
 
 // Get canonical URL
 const canonicalURL = new URL(
   Astro.url.pathname,
-  Astro.site || "https://www.qingxi-ds.com",
+  siteOrigin,
 );
 
 // 維護模式檢查（用於注入到 HTML 中）
@@ -51,7 +53,7 @@ const MAINTENANCE_MODE =
     <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:image" content={ogImageURL} />
     <meta property="og:locale" content="zh_TW" />
     <meta property="og:site_name" content="青曦空間設計" />
 
@@ -60,7 +62,7 @@ const MAINTENANCE_MODE =
     <meta property="twitter:url" content={Astro.url} />
     <meta property="twitter:title" content={pageTitle} />
     <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={ogImage} />
+    <meta property="twitter:image" content={ogImageURL} />
 
     <!-- Preload Critical Resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -81,9 +83,9 @@ const MAINTENANCE_MODE =
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
         "name": "青曦空間設計",
-        "image": "https://www.qingxi-ds.com/images/og-default.jpg",
-        "@id": "https://www.qingxi-ds.com",
-        "url": "https://www.qingxi-ds.com",
+        "image": {JSON.stringify(ogImageURL)},
+        "@id": {JSON.stringify(siteOrigin)},
+        "url": {JSON.stringify(siteOrigin)},
         "telephone": "+886-XXX-XXX-XXX",
         "priceRange": "$$",
         "address": {
