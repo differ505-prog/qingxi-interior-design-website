@@ -9,12 +9,19 @@ const featuredProject = {
   label: 'CURATED PORTFOLIO',
 };
 
-const editorialNotes = ['室內', '光線', '材質', '夜景', '場域氛圍'];
+const editorialNotes = ['住宅', '商空', '光線', '材質', '場域氛圍'];
 const poolFeature = {
   image: '/images/portfolio/hualien-sherlock-pool.jpg',
   alt: '夜間泳池與建築外觀畫面',
   title: '泳池與戶外水景規劃',
   summary: '除了室內空間，青曦也能整合泳池、水景、動線與夜間氛圍，規劃更完整的場域體驗。',
+};
+const commercialFeature = {
+  image: '/images/portfolio/restaurant-commercial-the-wrice.jpg',
+  alt: '餐飲商空門面與室內畫面',
+  title: '餐飲商空與店面形象規劃',
+  summary:
+    '從門面識別、外觀材質到室內第一眼的氛圍安排，讓品牌形象、來客感受與空間完成度一起被看見。',
 };
 
 const spatialMoments = [
@@ -341,8 +348,13 @@ const secondaryMoments = spatialMoments.slice(2, 4);
     letter-spacing: 0.06em;
   }
 
-  .pool-feature {
+  .capability-stack {
     margin-top: 2rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .pool-feature {
     display: grid;
     grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.05fr);
     gap: 1.5rem;
@@ -560,7 +572,7 @@ const secondaryMoments = spatialMoments.slice(2, 4);
       <section class="moments-section">
         <div class="section-heading">
           <h2>從室內到夜景，看見空間完整的氣質與層次</h2>
-          <p>收錄不同場域的代表畫面，讓你更直接感受青曦對比例、材質、光線與氛圍的掌握，也看見泳池與戶外水景規劃的整合能力。</p>
+          <p>收錄住宅、餐飲商空與戶外場域的代表畫面，讓你更直接感受青曦對比例、材質、光線與整體氛圍的掌握。</p>
         </div>
 
         <div class="moments-stack">
@@ -581,17 +593,31 @@ const secondaryMoments = spatialMoments.slice(2, 4);
           </div>
         </div>
 
-        <article class="pool-feature">
-          <figure class="pool-feature-media">
-            <img src={poolFeature.image} alt={poolFeature.alt} loading="lazy" />
-            <span class="pool-feature-badge">POOL DESIGN</span>
-          </figure>
-          <div class="pool-feature-copy">
-            <p class="pool-feature-label">OUTDOOR PLANNING</p>
-            <h3>{poolFeature.title}</h3>
-            <p>{poolFeature.summary}</p>
-          </div>
-        </article>
+        <div class="capability-stack">
+          <article class="pool-feature">
+            <figure class="pool-feature-media">
+              <img src={poolFeature.image} alt={poolFeature.alt} loading="lazy" />
+              <span class="pool-feature-badge">POOL DESIGN</span>
+            </figure>
+            <div class="pool-feature-copy">
+              <p class="pool-feature-label">OUTDOOR PLANNING</p>
+              <h3>{poolFeature.title}</h3>
+              <p>{poolFeature.summary}</p>
+            </div>
+          </article>
+
+          <article class="pool-feature">
+            <figure class="pool-feature-media">
+              <img src={commercialFeature.image} alt={commercialFeature.alt} loading="lazy" />
+              <span class="pool-feature-badge">COMMERCIAL SPACE</span>
+            </figure>
+            <div class="pool-feature-copy">
+              <p class="pool-feature-label">RESTAURANT DESIGN</p>
+              <h3>{commercialFeature.title}</h3>
+              <p>{commercialFeature.summary}</p>
+            </div>
+          </article>
+        </div>
       </section>
 
       <section class="portfolio-cta">
