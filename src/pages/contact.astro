@@ -1,5 +1,14 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const requirementFormId =
+  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || "xrevzvnp";
+const quickConsultationAction = requirementFormId
+  ? `https://formspree.io/f/${requirementFormId}`
+  : "";
+const quickConsultationEnabled = Boolean(quickConsultationAction);
+const siteOrigin = (Astro.site || new URL("https://qingxidesign.tw")).toString();
+const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).toString();
 ---
 
 <BaseLayout title="聯絡我們 - 青曦空間設計">
@@ -41,7 +50,13 @@ import BaseLayout from "../layouts/BaseLayout.astro";
       </div>
 
       <div class="contact-actions">
-        <a href="https://lin.ee/U1HCeW4" target="_blank" rel="noreferrer" class="contact-card contact-card-primary">
+        <a
+          href="https://lin.ee/U1HCeW4"
+          target="_blank"
+          rel="noreferrer"
+          class="contact-card contact-card-primary"
+          data-contact-cta="line"
+        >
           <div class="card-icon line-color">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -61,7 +76,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
           <span class="card-link">立即開始對話</span>
         </a>
 
-        <a href="/requirement-form" class="contact-card">
+        <a href="/requirement-form" class="contact-card" data-contact-cta="requirement-form">
           <div class="card-icon form-color">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -79,12 +94,102 @@ import BaseLayout from "../layouts/BaseLayout.astro";
               <line x1="10" y1="9" x2="8" y2="9"></line>
             </svg>
           </div>
-          <p class="card-label">完整諮詢</p>
+          <p class="card-label">進一步整理</p>
           <h2>填寫線上需求表</h2>
-          <p class="card-description">適合已整理好空間條件，希望一次提供較完整資訊的人。</p>
-          <span class="card-link">前往填寫表單</span>
+          <p class="card-description">適合已先釐清方向，想一次補齊空間條件、需求細節與預算資訊的人。</p>
+          <span class="card-link">前往完整需求表</span>
         </a>
       </div>
+
+      <section class="quick-form-panel">
+        <div class="quick-form-copy">
+          <p class="quick-form-eyebrow">QUICK CONSULTATION</p>
+          <h2>如果你還沒準備好完整需求，先留下核心資訊就可以。</h2>
+          <p class="quick-form-description">
+            這是第一階段精簡表單，適合想先確認預算方向、服務方式與時程可行性的人。
+            若之後需要更完整評估，再補填設計需求表即可。
+          </p>
+          <div class="quick-form-highlights">
+            <span>約 1 分鐘完成</span>
+            <span>先確認方向再深入</span>
+            <span>適合第一次接觸</span>
+          </div>
+        </div>
+
+        <div class="quick-form-shell">
+          {
+            !quickConsultationEnabled && (
+              <div class="quick-form-notice" role="status">
+                <p>表單收件尚未完成設定，目前請先透過官方 LINE 聯絡青曦。</p>
+              </div>
+            )
+          }
+
+          <form
+            id="quick-consultation-form"
+            action={quickConsultationAction}
+            method="POST"
+            class="quick-form"
+            data-form-enabled={String(quickConsultationEnabled)}
+          >
+            <input type="hidden" name="_subject" value="青曦空間設計｜新的快速諮詢表單" />
+            <input type="hidden" name="_next" value={consultationSuccessURL} />
+            <input type="hidden" name="form_type" value="quick_consultation" />
+            <input type="hidden" name="form_stage" value="stage_1_quick_consultation" />
+            <input type="hidden" name="utm_source" id="quick-utm-source" />
+            <input type="hidden" name="utm_medium" id="quick-utm-medium" />
+            <input type="hidden" name="utm_campaign" id="quick-utm-campaign" />
+            <input type="hidden" name="utm_term" id="quick-utm-term" />
+            <input type="hidden" name="utm_content" id="quick-utm-content" />
+            <input type="hidden" name="landing_page" id="quick-landing-page" />
+            <input type="hidden" name="page_referrer" id="quick-page-referrer" />
+
+            <div class="quick-form-grid">
+              <label class="quick-form-field">
+                <span>姓名</span>
+                <input type="text" name="name" required />
+              </label>
+              <label class="quick-form-field">
+                <span>聯絡方式</span>
+                <input type="text" name="contact_method" placeholder="電話、LINE ID 或 Email" required />
+              </label>
+              <label class="quick-form-field">
+                <span>空間類型</span>
+                <select name="space_type" required>
+                  <option value="">請選擇</option>
+                  <option value="new-home">新成屋 / 預售屋</option>
+                  <option value="old-home">中古屋 / 老屋</option>
+                  <option value="commercial">商業空間</option>
+                  <option value="community">社區公設 / 其他</option>
+                </select>
+              </label>
+              <label class="quick-form-field">
+                <span>預計時程</span>
+                <select name="timeline">
+                  <option value="">請選擇</option>
+                  <option value="urgent">三個月內</option>
+                  <option value="planned">三到六個月內</option>
+                  <option value="flexible">半年以上</option>
+                </select>
+              </label>
+              <label class="quick-form-field quick-form-field-full">
+                <span>目前最想先確認的事</span>
+                <textarea
+                  name="consultation_focus"
+                  rows="4"
+                  placeholder="例如預算大概怎麼抓、交屋後想怎麼安排、是否能連同智能家居一起規劃等"
+                  required
+                ></textarea>
+              </label>
+            </div>
+
+            <div class="quick-form-actions">
+              <button type="submit" class="quick-form-submit">送出快速諮詢</button>
+              <a href="/requirement-form" class="quick-form-secondary">我已整理好資訊，改填完整需求表</a>
+            </div>
+          </form>
+        </div>
+      </section>
 
       <section class="social-panel">
         <div class="social-copy">
@@ -157,7 +262,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .contact-eyebrow,
   .aside-label,
   .social-label,
-  .card-label {
+  .card-label,
+  .quick-form-eyebrow {
     margin: 0 0 0.9rem;
     font-size: 0.8rem;
     letter-spacing: 0.22em;
@@ -364,6 +470,188 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     transform: translateX(4px);
   }
 
+  .quick-form-panel {
+    margin-top: 2.25rem;
+    padding: 2rem;
+    border-radius: 32px;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 32%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 248, 248, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 24px 60px rgba(47, 47, 47, 0.06);
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .quick-form-copy h2 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(1.8rem, 2.8vw, 2.8rem);
+    line-height: 1.42;
+    font-weight: 500;
+    color: var(--gray-darkest);
+    letter-spacing: 0.05em;
+  }
+
+  .quick-form-description {
+    margin: 1rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.9;
+    max-width: 34rem;
+  }
+
+  .quick-form-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+  }
+
+  .quick-form-highlights span {
+    padding: 0.7rem 0.95rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(129, 199, 212, 0.18);
+    color: var(--gray-dark);
+    letter-spacing: 0.04em;
+    box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
+  }
+
+  .quick-form-shell {
+    padding: 1.5rem;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  .quick-form-notice {
+    margin-bottom: 1rem;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(250, 248, 241, 0.95);
+    border: 1px solid rgba(207, 188, 136, 0.28);
+    color: var(--gray-dark);
+    line-height: 1.75;
+  }
+
+  .quick-form-notice p {
+    margin: 0;
+  }
+
+  .quick-form {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .quick-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .quick-form-field {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .quick-form-field span {
+    color: var(--gray-darkest);
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+  }
+
+  .quick-form-field input,
+  .quick-form-field select,
+  .quick-form-field textarea {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(129, 199, 212, 0.22);
+    background: rgba(255, 255, 255, 0.98);
+    color: var(--gray-darkest);
+    font: inherit;
+    line-height: 1.6;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      background-color 0.25s ease;
+  }
+
+  .quick-form-field input::placeholder,
+  .quick-form-field textarea::placeholder {
+    color: rgba(108, 108, 108, 0.72);
+  }
+
+  .quick-form-field input:focus,
+  .quick-form-field select:focus,
+  .quick-form-field textarea:focus {
+    outline: none;
+    border-color: rgba(129, 199, 212, 0.48);
+    box-shadow: 0 0 0 4px rgba(129, 199, 212, 0.12);
+    background: rgba(252, 255, 255, 1);
+  }
+
+  .quick-form-field textarea {
+    resize: vertical;
+    min-height: 132px;
+  }
+
+  .quick-form-field-full {
+    grid-column: 1 / -1;
+  }
+
+  .quick-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    align-items: center;
+  }
+
+  .quick-form-submit,
+  .quick-form-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 0.95rem 1.5rem;
+    border-radius: 999px;
+    font-size: 1rem;
+    text-decoration: none;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease,
+      background-color 0.25s ease;
+  }
+
+  .quick-form-submit {
+    border: 1px solid var(--gray-darkest);
+    background: linear-gradient(135deg, var(--gray-darkest) 0%, var(--tiffany-dark) 100%);
+    color: var(--white);
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .quick-form-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 28px rgba(47, 47, 47, 0.18);
+  }
+
+  .quick-form-secondary {
+    border: 1px solid rgba(129, 199, 212, 0.22);
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--gray-darkest);
+  }
+
+  .quick-form-secondary:hover {
+    transform: translateY(-2px);
+    background: rgba(245, 250, 250, 1);
+    box-shadow: 0 14px 24px rgba(129, 199, 212, 0.12);
+  }
+
   .social-panel {
     margin-top: 2.25rem;
     padding: 1.6rem 1.75rem;
@@ -423,6 +711,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   @media (max-width: 900px) {
     .contact-hero,
     .contact-actions,
+    .quick-form-panel,
     .social-panel {
       grid-template-columns: 1fr;
       flex-direction: column;
@@ -441,9 +730,23 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
     .contact-card,
     .contact-aside,
+    .quick-form-panel,
+    .quick-form-shell,
     .social-panel {
       padding: 1.5rem;
       border-radius: 22px;
+    }
+
+    .quick-form-grid,
+    .quick-form-actions {
+      grid-template-columns: 1fr;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .quick-form-submit,
+    .quick-form-secondary {
+      width: 100%;
     }
 
     .social-copy h2 {
@@ -451,3 +754,55 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     }
   }
 </style>
+
+<script>
+  // @ts-nocheck
+  const quickConsultationForm = document.getElementById("quick-consultation-form");
+  const quickUtmSource = document.getElementById("quick-utm-source");
+  const quickUtmMedium = document.getElementById("quick-utm-medium");
+  const quickUtmCampaign = document.getElementById("quick-utm-campaign");
+  const quickUtmTerm = document.getElementById("quick-utm-term");
+  const quickUtmContent = document.getElementById("quick-utm-content");
+  const quickLandingPage = document.getElementById("quick-landing-page");
+  const quickPageReferrer = document.getElementById("quick-page-referrer");
+
+  function fillQuickConsultationAttribution() {
+    const searchParams = new URLSearchParams(window.location.search);
+
+    if (quickUtmSource) quickUtmSource.value = searchParams.get("utm_source") || "";
+    if (quickUtmMedium) quickUtmMedium.value = searchParams.get("utm_medium") || "";
+    if (quickUtmCampaign) quickUtmCampaign.value = searchParams.get("utm_campaign") || "";
+    if (quickUtmTerm) quickUtmTerm.value = searchParams.get("utm_term") || "";
+    if (quickUtmContent) quickUtmContent.value = searchParams.get("utm_content") || "";
+    if (quickLandingPage) quickLandingPage.value = window.location.href;
+    if (quickPageReferrer) quickPageReferrer.value = document.referrer || "";
+  }
+
+  fillQuickConsultationAttribution();
+
+  if (quickConsultationForm?.dataset.formEnabled !== "true") {
+    quickConsultationForm?.addEventListener("submit", function(event) {
+      event.preventDefault();
+      window.alert("表單收件尚未完成設定，請先透過官方 LINE 聯絡青曦。");
+    });
+  } else {
+    quickConsultationForm?.addEventListener("submit", function() {
+      const submittedData = new FormData(quickConsultationForm);
+
+      window.trackLeadEvent?.("quick_consultation_submit", {
+        form_name: "quick_consultation_form",
+        space_type: submittedData.get("space_type") || "",
+        timeline: submittedData.get("timeline") || "",
+      });
+    });
+  }
+
+  document.querySelectorAll("[data-contact-cta]").forEach((link) => {
+    link.addEventListener("click", function() {
+      window.trackLeadEvent?.("contact_cta_click", {
+        cta_type: link.getAttribute("data-contact-cta") || "",
+        page_path: window.location.pathname,
+      });
+    });
+  });
+</script>
