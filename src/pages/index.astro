@@ -153,6 +153,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       <div class="section-header">
         <h6 class="section-subtitle">SERVICE</h6>
         <h2 class="section-title">服務項目</h2>
+        <p class="service-intro">以住宅空間為主軸，延伸整合商業空間、智能家居與社區公共空間規劃。</p>
       </div>
 
       <ul class="service-grid">
@@ -195,30 +196,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
                 >
                   <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                   <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                </svg>
-              </div>
-            </figure>
-          </a>
-        </li>
-
-        <li class="service-item" data-animate="scale">
-          <a href="/portfolio?category=community" class="service-card">
-            <figure class="service-content">
-              <div class="service-text">
-                <p class="service-title">社區公設</p>
-              </div>
-              <div class="service-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                >
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
             </figure>
@@ -271,6 +248,30 @@ import HeroCarousel from "../components/HeroCarousel.astro";
                   <path d="M12 22v-2"></path>
                   <path d="M4 12h-2"></path>
                   <path d="M22 12h-2"></path>
+                </svg>
+              </div>
+            </figure>
+          </a>
+        </li>
+
+        <li class="service-item" data-animate="scale">
+          <a href="/portfolio?category=community" class="service-card">
+            <figure class="service-content">
+              <div class="service-text">
+                <p class="service-title">社區公設</p>
+              </div>
+              <div class="service-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
               </div>
             </figure>
@@ -1388,6 +1389,13 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     .section-header {
       text-align: center;
       margin-bottom: 4rem;
+    }
+
+    .service-intro {
+      max-width: 44rem;
+      margin: 1rem auto 0;
+      color: var(--gray-medium);
+      line-height: 1.85;
     }
 
     .section-subtitle {
