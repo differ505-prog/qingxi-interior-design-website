@@ -222,15 +222,119 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
             </select>
           </div>
 
-          <div id="family-members-section" class="conditional-section" style="display: none;">
+          <div class="form-group">
+            <label>家庭成員組成</label>
+            <p class="field-hint">這部分會幫助青曦更快判斷收納、動線、臥房配置與生活節奏。</p>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="household-structure" value="single">
+                <span>單身居住</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="household-structure" value="couple">
+                <span>伴侶 / 夫妻</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="household-structure" value="infant">
+                <span>嬰幼兒</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="household-structure" value="child">
+                <span>學齡兒童</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="household-structure" value="teen">
+                <span>青少年</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="household-structure" value="elder">
+                <span>長輩同住</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="household-structure" value="caregiver">
+                <span>照護者 / 幫手</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="household-structure" value="other" id="household-structure-other-check">
+                <span>其他</span>
+              </label>
+            </div>
+            <div id="household-structure-other-input" class="conditional-input" style="display: none;">
+              <input type="text" name="household-structure-other" placeholder="請補充家庭組成，例如假日才會回家的家人、偶爾留宿的親友等">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="family-lifestyle-notes">家庭成員補充</label>
+            <textarea
+              id="family-lifestyle-notes"
+              name="family-lifestyle-notes"
+              rows="3"
+              placeholder="例如孩子的年齡層、長輩是否需要無障礙考量、誰最常下廚、是否有在家工作或輪班作息等"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>是否有寵物，或近期規劃養寵物？</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="pet-plans" value="current" id="pet-plans-current">
+                <span>目前有寵物</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="pet-plans" value="planned" id="pet-plans-planned">
+                <span>近期會養</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="pet-plans" value="none" id="pet-plans-none">
+                <span>目前沒有</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="pet-details" class="conditional-section" style="display: none;">
             <div class="form-group">
-              <label>家庭成員</label>
-              <div id="family-members-list"></div>
+              <label>寵物組成</label>
+              <p class="field-hint">寵物條件會直接影響材質選擇、收納配置、清潔區與活動動線。</p>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="pet-type" value="dog">
+                  <span>狗</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="pet-type" value="cat">
+                  <span>貓</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="pet-type" value="bird">
+                  <span>鳥</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="pet-type" value="small-animal">
+                  <span>兔 / 鼠 / 其他小型寵物</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="pet-type" value="aquarium">
+                  <span>魚缸 / 水族</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="pet-type" value="other" id="pet-type-other-check">
+                  <span>其他</span>
+                </label>
+              </div>
+              <div id="pet-type-other-input" class="conditional-input" style="display: none;">
+                <input type="text" name="pet-type-other" placeholder="請補充寵物類型">
+              </div>
             </div>
 
             <div class="form-group">
-              <label>成員年齡</label>
-              <div id="family-ages-list"></div>
+              <label for="pet-notes">寵物生活需求</label>
+              <textarea
+                id="pet-notes"
+                name="pet-notes"
+                rows="3"
+                placeholder="例如寵物數量、活動範圍、是否需要貓跳台、寵物門、飼料收納、洗腳區、防抓耐磨材質或氣味控制等"
+              ></textarea>
             </div>
           </div>
 
@@ -1096,6 +1200,13 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
     margin-left: 0.15rem;
   }
 
+  .field-hint {
+    margin: 0.45rem 0 0.9rem;
+    color: var(--gray-medium);
+    font-size: 0.92rem;
+    line-height: 1.75;
+  }
+
   input[type="text"],
   input[type="tel"],
   input[type="email"],
@@ -1505,50 +1616,47 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
     marriedYes?.addEventListener('change', toggleSpouseDetails);
     marriedNo?.addEventListener('change', toggleSpouseDetails);
 
-    // 居住人數相關欄位
-    const residentsSelect = document.getElementById('residents');
-    const familyMembersSection = document.getElementById('family-members-section');
-    const familyMembersList = document.getElementById('family-members-list');
-    const familyAgesList = document.getElementById('family-ages-list');
+    // 家庭組成其他選項
+    const householdStructureOtherCheck = document.getElementById('household-structure-other-check');
+    const householdStructureOtherInput = document.getElementById('household-structure-other-input');
 
-    residentsSelect?.addEventListener('change', function() {
-      const count = parseInt(this.value);
-      if (count > 0) {
-        familyMembersSection.style.display = 'block';
-        familyMembersList.innerHTML = '';
-        familyAgesList.innerHTML = '';
-        
-        for (let i = 1; i <= count; i++) {
-          const memberInput = document.createElement('input');
-          memberInput.type = 'text';
-          memberInput.name = `family-member-${i}`;
-          memberInput.placeholder = `成員 ${i} 姓名`;
-          memberInput.style.width = '100%';
-          memberInput.style.padding = '10px 12px';
-          memberInput.style.border = '1px solid #ddd';
-          memberInput.style.borderRadius = '4px';
-          memberInput.style.marginBottom = '10px';
-          memberInput.style.fontSize = '14px';
-          memberInput.style.fontFamily = "'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif";
-          familyMembersList.appendChild(memberInput);
-
-          const ageInput = document.createElement('input');
-          ageInput.type = 'text';
-          ageInput.name = `family-age-${i}`;
-          ageInput.placeholder = `成員 ${i} 年齡`;
-          ageInput.style.width = '100%';
-          ageInput.style.padding = '10px 12px';
-          ageInput.style.border = '1px solid #ddd';
-          ageInput.style.borderRadius = '4px';
-          ageInput.style.marginBottom = '10px';
-          ageInput.style.fontSize = '14px';
-          ageInput.style.fontFamily = "'Noto Sans TC', '微軟正黑體', 'Microsoft JhengHei', sans-serif";
-          familyAgesList.appendChild(ageInput);
-        }
+    householdStructureOtherCheck?.addEventListener('change', function() {
+      if (this.checked) {
+        householdStructureOtherInput.style.display = 'block';
       } else {
-        familyMembersSection.style.display = 'none';
+        householdStructureOtherInput.style.display = 'none';
       }
     });
+
+    // 寵物資訊
+    const petDetails = document.getElementById('pet-details');
+    const petPlansCurrent = document.getElementById('pet-plans-current');
+    const petPlansPlanned = document.getElementById('pet-plans-planned');
+    const petPlansNone = document.getElementById('pet-plans-none');
+    const petTypeOtherCheck = document.getElementById('pet-type-other-check');
+    const petTypeOtherInput = document.getElementById('pet-type-other-input');
+
+    function togglePetDetails() {
+      if (petPlansCurrent?.checked || petPlansPlanned?.checked) {
+        petDetails.style.display = 'block';
+      } else {
+        petDetails.style.display = 'none';
+      }
+    }
+
+    petPlansCurrent?.addEventListener('change', togglePetDetails);
+    petPlansPlanned?.addEventListener('change', togglePetDetails);
+    petPlansNone?.addEventListener('change', togglePetDetails);
+
+    petTypeOtherCheck?.addEventListener('change', function() {
+      if (this.checked) {
+        petTypeOtherInput.style.display = 'block';
+      } else {
+        petTypeOtherInput.style.display = 'none';
+      }
+    });
+
+    togglePetDetails();
 
     // 假日其他選項
     const holidaysOtherCheck = document.getElementById('holidays-other-check');
