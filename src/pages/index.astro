@@ -97,8 +97,8 @@ import HeroCarousel from "../components/HeroCarousel.astro";
   <section class="public-ready-section">
     <div class="public-ready-container">
       <div class="section-header public-ready-header">
-        <h6 class="section-subtitle">PUBLIC READY</h6>
-        <h2 class="section-title">公開合作資訊</h2>
+        <h6 class="section-subtitle">COOPERATION GUIDE</h6>
+        <h2 class="section-title">合作資訊</h2>
         <p class="public-ready-intro">
           如果你是第一次接觸青曦，這裡先幫你快速理解目前的服務範圍、合作方式與適合的案型。
         </p>
@@ -138,9 +138,9 @@ import HeroCarousel from "../components/HeroCarousel.astro";
           </article>
 
           <article class="public-ready-card" data-animate="scale">
-            <p class="public-ready-card-label">TRUST POINT</p>
-            <h3>公開版重點</h3>
-            <p>目前已提供實際案例、工程前後對比與設計圖紙，方便你更快判斷是否適合合作。</p>
+            <p class="public-ready-card-label">PORTFOLIO VIEW</p>
+            <h3>案例呈現方式</h3>
+            <p>目前可從作品案例、工程前後對比與設計圖紙，更完整了解青曦的規劃與落地能力。</p>
           </article>
         </div>
       </div>
@@ -160,7 +160,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
           <a href="/portfolio?category=residential" class="service-card">
             <figure class="service-content">
               <div class="service-text">
-                <p>住宅</p>
+                <p class="service-title">住宅</p>
               </div>
               <div class="service-icon">
                 <svg
@@ -183,7 +183,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
           <a href="/portfolio?category=commercial" class="service-card">
             <figure class="service-content">
               <div class="service-text">
-                <p>商業空間</p>
+                <p class="service-title">商業空間</p>
               </div>
               <div class="service-icon">
                 <svg
@@ -205,7 +205,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
           <a href="/portfolio?category=community" class="service-card">
             <figure class="service-content">
               <div class="service-text">
-                <p>社區公設</p>
+                <p class="service-title">社區公設</p>
               </div>
               <div class="service-icon">
                 <svg
@@ -229,7 +229,8 @@ import HeroCarousel from "../components/HeroCarousel.astro";
           <a href="/contact" class="service-card">
             <figure class="service-content">
               <div class="service-text">
-                <p>室內設計<br />&<br />工程施作</p>
+                <p class="service-title">室內設計</p>
+                <p class="service-subtitle">& 工程施作</p>
               </div>
               <div class="service-icon">
                 <svg
@@ -252,7 +253,8 @@ import HeroCarousel from "../components/HeroCarousel.astro";
           <a href="/smart-home" class="service-card">
             <figure class="service-content">
               <div class="service-text">
-                <p>智能家居<br />Smart Home</p>
+                <p class="service-title">智能家居</p>
+                <p class="service-subtitle">Smart Home</p>
               </div>
               <div class="service-icon">
                 <svg
@@ -1479,17 +1481,33 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     }
 
     .service-text {
+      min-height: 4.8rem;
       margin-bottom: 2rem;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
     }
 
-    .service-text p {
+    .service-title,
+    .service-subtitle {
+      margin: 0;
+      letter-spacing: 0.05em;
+    }
+
+    .service-title {
       font-size: 1.5rem;
       font-weight: 500;
       color: var(--gray-dark);
       line-height: 1.6;
-      margin: 0;
-      letter-spacing: 0.05em;
+    }
+
+    .service-subtitle {
+      font-size: 1rem;
+      color: var(--gray-medium);
+      line-height: 1.5;
     }
 
     .service-icon {
@@ -1535,8 +1553,16 @@ import HeroCarousel from "../components/HeroCarousel.astro";
         min-height: 240px;
       }
 
-      .service-text p {
+      .service-text {
+        min-height: 4.2rem;
+      }
+
+      .service-title {
         font-size: 1.25rem;
+      }
+
+      .service-subtitle {
+        font-size: 0.92rem;
       }
 
       .service-icon {

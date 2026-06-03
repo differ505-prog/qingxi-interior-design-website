@@ -2,6 +2,10 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { PASSWORD_PROTECTION_CONFIG } from "../lib/password-config";
 
+if (!PASSWORD_PROTECTION_CONFIG.enabled) {
+    return Astro.redirect("/");
+}
+
 // 處理登錄邏輯
 const PREVIEW_PASSWORD = PASSWORD_PROTECTION_CONFIG.password;
 
@@ -22,7 +26,7 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<BaseLayout title="訪問驗證 - 青曦空間設計">
+<BaseLayout title="網站入口 - 青曦空間設計">
     <div class="login-container">
         <div class="login-box">
             <div class="logo">
@@ -50,8 +54,8 @@ if (Astro.request.method === "POST") {
                 </svg>
             </div>
 
-            <h1>預覽版訪問驗證</h1>
-            <p class="subtitle">此網站目前處於建置階段</p>
+            <h1>網站入口驗證</h1>
+            <p class="subtitle">此頁面僅供授權訪客使用</p>
             <p class="description">請輸入密碼以繼續訪問</p>
 
             <form method="POST" class="login-form">
@@ -102,7 +106,7 @@ if (Astro.request.method === "POST") {
             </form>
 
             <p class="footer-note">
-                💡 如果您是訪客且需要訪問權限，請聯繫網站管理員
+                如需協助，歡迎透過官方 LINE 或 Email 與青曦聯繫。
             </p>
         </div>
     </div>
