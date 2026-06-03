@@ -11,6 +11,24 @@ const houseConditionOptions = [
   { value: "rough", label: "毛胚屋 / 大幅改造" },
 ];
 
+const residenceTypeOptions = [
+  { value: "tower", label: "電梯大樓" },
+  { value: "walkup", label: "公寓 / 華廈" },
+  { value: "townhouse", label: "透天 / 樓中樓" },
+];
+
+const usePurposeOptions = [
+  { value: "self", label: "自住" },
+  { value: "family", label: "家庭長住" },
+  { value: "rental", label: "出租 / 轉售整理" },
+];
+
+const timelineOptions = [
+  { value: "flexible", label: "半年以上，可彈性安排" },
+  { value: "planned", label: "三到六個月內，希望開始" },
+  { value: "urgent", label: "三個月內，希望盡快進場" },
+];
+
 const renovationItems = [
   {
     value: "ceiling",
@@ -147,6 +165,45 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               }
             </select>
           </div>
+
+          <div class="form-group">
+            <label for="residence-type">住宅型態</label>
+            <select id="residence-type">
+              {
+                residenceTypeOptions.map(({ value, label }) => (
+                  <option value={value} selected={value === "tower"}>
+                    {label}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="use-purpose">使用目的</label>
+            <select id="use-purpose">
+              {
+                usePurposeOptions.map(({ value, label }) => (
+                  <option value={value} selected={value === "self"}>
+                    {label}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="timeline">預計時程</label>
+            <select id="timeline">
+              {
+                timelineOptions.map(({ value, label }) => (
+                  <option value={value} selected={value === "planned"}>
+                    {label}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
         </div>
 
         <div class="form-section">
@@ -215,6 +272,23 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               <p>以下為依目前勾選工項與條件拆出的粗略比例，方便你理解預算主要落點。</p>
             </div>
             <div class="breakdown-list" id="breakdown-list"></div>
+          </div>
+
+          <div class="advice-grid">
+            <div class="advice-card">
+              <div class="advice-header">
+                <h3>估算判讀</h3>
+                <p>根據你的住宅條件、使用方式與進場時程，整理討論重點。</p>
+              </div>
+              <ul class="advice-list" id="advice-list"></ul>
+            </div>
+            <div class="advice-card advice-card-accent">
+              <div class="advice-header">
+                <h3>建議下一步</h3>
+                <p id="next-step-intro">若方向已接近，下一步最適合把需求與預算一起整理完整。</p>
+              </div>
+              <div class="next-step-points" id="next-step-points"></div>
+            </div>
           </div>
 
           <div class="disclaimer">
@@ -575,6 +649,81 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     white-space: nowrap;
   }
 
+  .advice-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .advice-card {
+    padding: 1.4rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
+  }
+
+  .advice-card-accent {
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 35%),
+      linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
+  }
+
+  .advice-header h3 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.2rem;
+    color: var(--gray-darkest);
+  }
+
+  .advice-header p {
+    margin: 0.55rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.92rem;
+  }
+
+  .advice-list {
+    margin: 1rem 0 0;
+    padding-left: 1.15rem;
+    color: var(--gray-dark);
+    line-height: 1.8;
+  }
+
+  .advice-list li + li {
+    margin-top: 0.5rem;
+  }
+
+  .next-step-points {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  .next-step-item {
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .next-step-item strong,
+  .next-step-item span {
+    display: block;
+  }
+
+  .next-step-item strong {
+    color: var(--gray-darkest);
+  }
+
+  .next-step-item span {
+    margin-top: 0.24rem;
+    color: var(--gray-medium);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
   .disclaimer {
     background: rgba(255, 255, 255, 0.92);
     padding: 1rem 1.1rem;
@@ -663,6 +812,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       grid-template-columns: 1fr;
     }
 
+    .advice-grid {
+      grid-template-columns: 1fr;
+    }
+
     .breakdown-item {
       flex-direction: column;
     }
@@ -702,6 +855,15 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const houseCondition = document.getElementById(
     "house-condition",
   ) as HTMLSelectElement;
+  const residenceType = document.getElementById(
+    "residence-type",
+  ) as HTMLSelectElement;
+  const usePurpose = document.getElementById(
+    "use-purpose",
+  ) as HTMLSelectElement;
+  const timeline = document.getElementById(
+    "timeline",
+  ) as HTMLSelectElement;
   const selectedItems = Array.from(
     document.querySelectorAll('.checkbox-item input[type="checkbox"]'),
   ) as HTMLInputElement[];
@@ -713,6 +875,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const scopeSummary = document.getElementById("scope-summary");
   const resultSubtitle = document.getElementById("result-subtitle");
   const breakdownList = document.getElementById("breakdown-list");
+  const adviceList = document.getElementById("advice-list");
+  const nextStepIntro = document.getElementById("next-step-intro");
+  const nextStepPoints = document.getElementById("next-step-points");
   const requirementFormLink = document.querySelector(
     'a[href="/requirement-form"]',
   );
@@ -731,6 +896,24 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     standard: { label: "中古屋 / 一般整理", multiplier: 1 },
     old: { label: "老屋翻新", multiplier: 1.18 },
     rough: { label: "毛胚屋 / 大幅改造", multiplier: 1.28 },
+  };
+
+  const residenceTypeMeta = {
+    tower: { label: "電梯大樓", multiplier: 1 },
+    walkup: { label: "公寓 / 華廈", multiplier: 1.06 },
+    townhouse: { label: "透天 / 樓中樓", multiplier: 1.12 },
+  };
+
+  const usePurposeMeta = {
+    self: { label: "自住", multiplier: 1.02 },
+    family: { label: "家庭長住", multiplier: 1.05 },
+    rental: { label: "出租 / 轉售整理", multiplier: 0.9 },
+  };
+
+  const timelineMeta = {
+    flexible: { label: "半年以上，可彈性安排", multiplier: 1, reserve: 1 },
+    planned: { label: "三到六個月內，希望開始", multiplier: 1.02, reserve: 1.05 },
+    urgent: { label: "三個月內，希望盡快進場", multiplier: 1.08, reserve: 1.15 },
   };
 
   function formatRange(min, max) {
@@ -769,6 +952,15 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const conditionMeta =
       houseConditionMeta[houseCondition.value as keyof typeof houseConditionMeta] ||
       houseConditionMeta.standard;
+    const residenceMeta =
+      residenceTypeMeta[residenceType.value as keyof typeof residenceTypeMeta] ||
+      residenceTypeMeta.tower;
+    const usePurposeInfo =
+      usePurposeMeta[usePurpose.value as keyof typeof usePurposeMeta] ||
+      usePurposeMeta.self;
+    const timelineInfo =
+      timelineMeta[timeline.value as keyof typeof timelineMeta] ||
+      timelineMeta.planned;
     const totalWeight = renovationItems.reduce(
       (sum, item) => sum + item.weight,
       0,
@@ -790,6 +982,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               pricePerPing.min *
               projectMeta.constructionMultiplier *
               conditionMeta.multiplier *
+              residenceMeta.multiplier *
+              usePurposeInfo.multiplier *
+              timelineInfo.multiplier *
               scopeFactor,
           );
     const maxConstruction =
@@ -800,6 +995,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               pricePerPing.max *
               projectMeta.constructionMultiplier *
               conditionMeta.multiplier *
+              residenceMeta.multiplier *
+              usePurposeInfo.multiplier *
+              timelineInfo.multiplier *
               scopeFactor,
           );
 
@@ -813,11 +1011,19 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const minReserve =
       projectType.value === "design-only"
         ? 0
-        : Math.round(minConstruction * (conditionMeta.multiplier > 1 ? 0.1 : 0.06));
+        : Math.round(
+            minConstruction *
+              (conditionMeta.multiplier > 1 ? 0.1 : 0.06) *
+              timelineInfo.reserve,
+          );
     const maxReserve =
       projectType.value === "design-only"
         ? 0
-        : Math.round(maxConstruction * (conditionMeta.multiplier > 1 ? 0.14 : 0.08));
+        : Math.round(
+            maxConstruction *
+              (conditionMeta.multiplier > 1 ? 0.14 : 0.08) *
+              timelineInfo.reserve,
+          );
 
     const minTotal = minConstruction + minDesign;
     const maxTotal = maxConstruction + maxDesign;
@@ -847,6 +1053,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       projectType: projectType.value,
       qualityLevel: qualityLevel.value,
       houseCondition: houseCondition.value,
+      residenceType: residenceType.value,
+      usePurpose: usePurpose.value,
+      timeline: timeline.value,
       selectedItems: selectedConfigs.map((item) => item.value),
     });
 
@@ -857,18 +1066,82 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       reserveBudget &&
       perPingRange &&
       scopeSummary &&
-      resultSubtitle
+      resultSubtitle &&
+      nextStepIntro
     ) {
       totalPrice.textContent = formatRange(minTotal, maxTotal);
       designFee.textContent = formatRange(minDesign, maxDesign);
       constructionFee.textContent = formatRange(minConstruction, maxConstruction);
       reserveBudget.textContent = formatRange(minReserve, maxReserve);
       perPingRange.textContent = `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`;
-      scopeSummary.textContent = `${projectMeta.label} / ${selectedConfigs.length} 項工種 / ${conditionMeta.label}`;
+      scopeSummary.textContent = `${projectMeta.label} / ${selectedConfigs.length} 項工種 / ${residenceMeta.label}`;
       resultSubtitle.textContent =
         projectType.value === "design-only"
           ? "目前以設計規劃費為主，工程費用需依圖面、工法與發包範圍另行確認。"
           : "依目前輸入條件，先整理出適合討論的預算帶、主要工項與建議預備金。";
+      nextStepIntro.textContent =
+        projectType.value === "design-only"
+          ? "你目前更接近設計規劃前期，適合先整理需求與生活方式，再確認圖面深度。"
+          : "你目前已經有可討論的預算帶，下一步最適合把需求、照片與工程範圍一起整理。";
+    }
+
+    const adviceItems = [];
+    if (conditionMeta.multiplier >= 1.18) {
+      adviceItems.push("屋況偏複雜，建議預留較高比例的拆除、基礎工程與預備金。");
+    } else {
+      adviceItems.push("屋況相對單純，較適合先把預算重點放在機能、材質與收納整合。");
+    }
+
+    if (usePurpose.value === "rental") {
+      adviceItems.push("若以出租或轉售為主，建議優先聚焦耐用、易維護與高感知更新項目。");
+    } else {
+      adviceItems.push("若以自住為主，可優先盤點真正影響日常使用的動線、收納與生活情境。");
+    }
+
+    if (timeline.value === "urgent") {
+      adviceItems.push("預計時程較趕，建議盡快整理現場照片、尺寸與交屋時間，避免後續排程壓縮。");
+    } else {
+      adviceItems.push("時程仍有彈性，可先把需求表填完整，讓設計討論更聚焦也更容易抓準預算。");
+    }
+
+    if (adviceList) {
+      adviceList.innerHTML = adviceItems.map((item) => `<li>${item}</li>`).join("");
+    }
+
+    if (nextStepPoints) {
+      const stepItems =
+        projectType.value === "design-only"
+          ? [
+              {
+                title: "先整理需求與參考圖",
+                description: "把生活需求、喜歡的風格與空間痛點一起帶進需求表，最能提高設計討論效率。",
+              },
+              {
+                title: "確認設計深度與交付內容",
+                description: "若你需要平面規劃、3D、施工圖或發包協助，建議在第一次諮詢就先說清楚。",
+              },
+            ]
+          : [
+              {
+                title: "帶著估價摘要填需求表",
+                description: "你現在的試算會一起帶進需求表，青曦能更快理解你的預算帶與工項範圍。",
+              },
+              {
+                title: "準備現場照片與時程資訊",
+                description: "若能同時提供現況照片、交屋時間與預計入住時間，初步判斷會更準確。",
+              },
+            ];
+
+      nextStepPoints.innerHTML = stepItems
+        .map(
+          (item) => `
+            <div class="next-step-item">
+              <strong>${item.title}</strong>
+              <span>${item.description}</span>
+            </div>
+          `,
+        )
+        .join("");
     }
 
     saveEstimateSnapshot({
@@ -880,6 +1153,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         qualityLevel.options[qualityLevel.selectedIndex]?.textContent || "",
       houseCondition: houseCondition.value,
       houseConditionLabel: conditionMeta.label,
+      residenceType: residenceType.value,
+      residenceTypeLabel: residenceMeta.label,
+      usePurpose: usePurpose.value,
+      usePurposeLabel: usePurposeInfo.label,
+      timeline: timeline.value,
+      timelineLabel: timelineInfo.label,
       selectedItems: selectedConfigs.map((item) => item.label),
       totalRange: formatRange(minTotal, maxTotal),
       designRange: formatRange(minDesign, maxDesign),
@@ -896,6 +1175,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         project_type: projectType.value,
         quality_level: qualityLevel.value,
         house_condition: houseCondition.value,
+        residence_type: residenceType.value,
+        use_purpose: usePurpose.value,
+        timeline: timeline.value,
         selected_item_count: selectedConfigs.length,
         estimated_total_min: minTotal,
         estimated_total_max: maxTotal,
@@ -950,11 +1232,22 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   // Add event listeners
-  if (areaInput && projectType && qualityLevel && houseCondition) {
+  if (
+    areaInput &&
+    projectType &&
+    qualityLevel &&
+    houseCondition &&
+    residenceType &&
+    usePurpose &&
+    timeline
+  ) {
     areaInput.addEventListener("input", calculate);
     projectType.addEventListener("change", calculate);
     qualityLevel.addEventListener("change", calculate);
     houseCondition.addEventListener("change", calculate);
+    residenceType.addEventListener("change", calculate);
+    usePurpose.addEventListener("change", calculate);
+    timeline.addEventListener("change", calculate);
     selectedItems.forEach((checkbox) => {
       checkbox.addEventListener("change", calculate);
     });
