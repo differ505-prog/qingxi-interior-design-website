@@ -1,5 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const requirementFormId = import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || '';
+const requirementFormAction = requirementFormId
+  ? `https://formspree.io/f/${requirementFormId}`
+  : '';
+const requirementFormEnabled = Boolean(requirementFormAction);
 ---
 
 <BaseLayout title="設計需求表 - 青曦空間設計">
@@ -64,10 +70,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
       <form 
         id="requirement-form" 
-        action="https://formspree.io/f/YOUR_FORM_ID" 
+        action={requirementFormAction}
         method="POST"
         class="requirement-form"
+        data-form-enabled={String(requirementFormEnabled)}
       >
+        {
+          !requirementFormEnabled && (
+            <div class="form-status-notice" role="status">
+              <p>表單收件尚未完成設定，目前請先透過官方 LINE 聯絡青曦，我們會協助你接續諮詢。</p>
+            </div>
+          )
+        }
+
         <section class="estimator-brief" id="estimator-brief" style="display: none;">
           <div class="estimator-brief-header">
             <p class="estimator-brief-eyebrow">ESTIMATOR SUMMARY</p>
@@ -103,6 +118,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <input type="hidden" name="estimator-quality-level" id="estimator-quality-level-input">
         <input type="hidden" name="estimator-house-condition" id="estimator-house-condition-input">
         <input type="hidden" name="estimator-selected-items" id="estimator-selected-items-input">
+        <input type="hidden" name="_subject" value="青曦空間設計｜新的設計需求表單">
 
         <!-- 基本資料 -->
         <section class="form-section">
@@ -829,6 +845,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin: 0 auto;
   }
 
+  .form-status-notice {
+    margin-bottom: 1.6rem;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(255, 248, 235, 0.94);
+    border: 1px solid rgba(219, 170, 89, 0.24);
+    color: #7b5a1f;
+    line-height: 1.75;
+  }
+
+  .form-status-notice p {
+    margin: 0;
+  }
+
   .estimator-brief {
     margin-bottom: 1.6rem;
     padding: 1.5rem;
@@ -1272,6 +1302,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <script>
   // @ts-nocheck
   document.addEventListener('DOMContentLoaded', function() {
+    const requirementForm = document.getElementById('requirement-form');
     const estimatorBrief = document.getElementById('estimator-brief');
     const estimatorSummaryInput = document.getElementById('estimator-summary');
     const estimatorTotalRangeInput = document.getElementById('estimator-total-range-input');
@@ -1327,6 +1358,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
 
     restoreEstimatorSnapshot();
+
+    if (requirementForm?.dataset.formEnabled !== 'true') {
+      requirementForm?.addEventListener('submit', function(event) {
+        event.preventDefault();
+        window.alert('表單收件尚未完成設定，請先透過官方 LINE 聯絡青曦。');
+      });
+    }
 
     requestAnimationFrame(() => {
       initFormAnimations();
