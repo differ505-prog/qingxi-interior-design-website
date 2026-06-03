@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const requirementFormId = import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || '';
+const requirementFormId =
+  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || 'xrevzvnp';
 const requirementFormAction = requirementFormId
   ? `https://formspree.io/f/${requirementFormId}`
   : '';

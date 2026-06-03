@@ -6,7 +6,8 @@ const {
 } = Astro.props;
 
 const siteName = "青曦空間設計";
-const googleAnalyticsId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim() || "";
+const googleAnalyticsId =
+  import.meta.env.PUBLIC_GA_MEASUREMENT_ID?.trim() || "G-7ME23MTBKR";
 const normalizedTitle =
   typeof title === "string"
     ? title.replace(/\s*[-|｜]\s*青曦空間設計\s*$/u, "").trim()
