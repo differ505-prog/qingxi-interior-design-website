@@ -68,6 +68,42 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         method="POST"
         class="requirement-form"
       >
+        <section class="estimator-brief" id="estimator-brief" style="display: none;">
+          <div class="estimator-brief-header">
+            <p class="estimator-brief-eyebrow">ESTIMATOR SUMMARY</p>
+            <h2>已帶入本次裝修估算</h2>
+            <p class="estimator-brief-description">
+              若這份試算與你的需求方向接近，直接送出需求表時，青曦就能一併收到這次估算內容作為討論起點。
+            </p>
+          </div>
+          <div class="estimator-brief-grid">
+            <div class="estimator-brief-item">
+              <span>預估總價</span>
+              <strong id="estimator-total-range">--</strong>
+            </div>
+            <div class="estimator-brief-item">
+              <span>每坪抓法</span>
+              <strong id="estimator-per-ping">--</strong>
+            </div>
+            <div class="estimator-brief-item">
+              <span>專案條件</span>
+              <strong id="estimator-project-meta">--</strong>
+            </div>
+            <div class="estimator-brief-item">
+              <span>裝修工項</span>
+              <strong id="estimator-selected-items">--</strong>
+            </div>
+          </div>
+        </section>
+
+        <input type="hidden" name="estimator-summary" id="estimator-summary">
+        <input type="hidden" name="estimator-total-range" id="estimator-total-range-input">
+        <input type="hidden" name="estimator-per-ping-range" id="estimator-per-ping-range-input">
+        <input type="hidden" name="estimator-project-type" id="estimator-project-type-input">
+        <input type="hidden" name="estimator-quality-level" id="estimator-quality-level-input">
+        <input type="hidden" name="estimator-house-condition" id="estimator-house-condition-input">
+        <input type="hidden" name="estimator-selected-items" id="estimator-selected-items-input">
+
         <!-- 基本資料 -->
         <section class="form-section">
           <h2 class="section-title">基本資料</h2>
@@ -793,6 +829,69 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin: 0 auto;
   }
 
+  .estimator-brief {
+    margin-bottom: 1.6rem;
+    padding: 1.5rem;
+    border-radius: 28px;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 32%),
+      linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
+  }
+
+  .estimator-brief-eyebrow {
+    margin: 0 0 0.85rem;
+    color: var(--tiffany-dark);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .estimator-brief-header h2 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.5rem;
+    color: var(--gray-darkest);
+    letter-spacing: 0.04em;
+  }
+
+  .estimator-brief-description {
+    margin: 0.8rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
+  .estimator-brief-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .estimator-brief-item {
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .estimator-brief-item span,
+  .estimator-brief-item strong {
+    display: block;
+  }
+
+  .estimator-brief-item span {
+    color: var(--gray-medium);
+    font-size: 0.88rem;
+  }
+
+  .estimator-brief-item strong {
+    margin-top: 0.35rem;
+    color: var(--gray-darkest);
+    line-height: 1.65;
+  }
+
   .form-header {
     margin-bottom: 2rem;
     text-align: center;
@@ -1163,12 +1262,72 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     .submit-button {
       width: 100%;
     }
+
+    .estimator-brief-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 
 <script>
   // @ts-nocheck
   document.addEventListener('DOMContentLoaded', function() {
+    const estimatorBrief = document.getElementById('estimator-brief');
+    const estimatorSummaryInput = document.getElementById('estimator-summary');
+    const estimatorTotalRangeInput = document.getElementById('estimator-total-range-input');
+    const estimatorPerPingRangeInput = document.getElementById('estimator-per-ping-range-input');
+    const estimatorProjectTypeInput = document.getElementById('estimator-project-type-input');
+    const estimatorQualityLevelInput = document.getElementById('estimator-quality-level-input');
+    const estimatorHouseConditionInput = document.getElementById('estimator-house-condition-input');
+    const estimatorSelectedItemsInput = document.getElementById('estimator-selected-items-input');
+    const estimatorTotalRange = document.getElementById('estimator-total-range');
+    const estimatorPerPing = document.getElementById('estimator-per-ping');
+    const estimatorProjectMeta = document.getElementById('estimator-project-meta');
+    const estimatorSelectedItems = document.getElementById('estimator-selected-items');
+
+    function restoreEstimatorSnapshot() {
+      try {
+        const snapshotRaw = window.sessionStorage.getItem('renovationEstimateSnapshot');
+        if (!snapshotRaw) return;
+
+        const snapshot = JSON.parse(snapshotRaw);
+        const selectedItemsText = Array.isArray(snapshot.selectedItems) && snapshot.selectedItems.length
+          ? snapshot.selectedItems.join('、')
+          : '尚未勾選工項';
+        const projectMetaText = [
+          snapshot.projectTypeLabel,
+          snapshot.qualityLevelLabel,
+          snapshot.houseConditionLabel,
+        ]
+          .filter(Boolean)
+          .join(' / ');
+        const summaryText = [
+          `預估總價：${snapshot.totalRange || '--'}`,
+          `每坪抓法：${snapshot.perPingRange || '--'}`,
+          `專案條件：${projectMetaText || '--'}`,
+          `裝修工項：${selectedItemsText}`,
+        ].join(' ｜ ');
+
+        if (estimatorBrief) estimatorBrief.style.display = 'block';
+        if (estimatorTotalRange) estimatorTotalRange.textContent = snapshot.totalRange || '--';
+        if (estimatorPerPing) estimatorPerPing.textContent = snapshot.perPingRange || '--';
+        if (estimatorProjectMeta) estimatorProjectMeta.textContent = projectMetaText || '--';
+        if (estimatorSelectedItems) estimatorSelectedItems.textContent = selectedItemsText;
+
+        if (estimatorSummaryInput) estimatorSummaryInput.value = summaryText;
+        if (estimatorTotalRangeInput) estimatorTotalRangeInput.value = snapshot.totalRange || '';
+        if (estimatorPerPingRangeInput) estimatorPerPingRangeInput.value = snapshot.perPingRange || '';
+        if (estimatorProjectTypeInput) estimatorProjectTypeInput.value = snapshot.projectTypeLabel || '';
+        if (estimatorQualityLevelInput) estimatorQualityLevelInput.value = snapshot.qualityLevelLabel || '';
+        if (estimatorHouseConditionInput) estimatorHouseConditionInput.value = snapshot.houseConditionLabel || '';
+        if (estimatorSelectedItemsInput) estimatorSelectedItemsInput.value = selectedItemsText;
+      } catch (error) {
+        console.warn('Unable to restore estimator snapshot.', error);
+      }
+    }
+
+    restoreEstimatorSnapshot();
+
     requestAnimationFrame(() => {
       initFormAnimations();
     });

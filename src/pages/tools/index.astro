@@ -4,6 +4,52 @@ import { getRenovationEstimatorConfig } from "../../lib/contentful.js";
 
 const estimatorConfig = await getRenovationEstimatorConfig();
 
+const houseConditionOptions = [
+  { value: "new", label: "新成屋 / 屋況佳" },
+  { value: "standard", label: "中古屋 / 一般整理" },
+  { value: "old", label: "老屋翻新" },
+  { value: "rough", label: "毛胚屋 / 大幅改造" },
+];
+
+const renovationItems = [
+  {
+    value: "ceiling",
+    label: "天花板工程",
+    description: "含平頂、包樑與基礎造型整理",
+    weight: 0.14,
+  },
+  {
+    value: "floor",
+    label: "地板工程",
+    description: "木地板、磁磚與基礎地坪更新",
+    weight: 0.16,
+  },
+  {
+    value: "wall",
+    label: "牆面工程",
+    description: "油漆、批土與牆面基礎修整",
+    weight: 0.14,
+  },
+  {
+    value: "kitchen",
+    label: "廚房翻新",
+    description: "廚具、檯面、設備與相關整修",
+    weight: 0.22,
+  },
+  {
+    value: "bathroom",
+    label: "衛浴翻新",
+    description: "防水、泥作、設備與配件更新",
+    weight: 0.2,
+  },
+  {
+    value: "furniture",
+    label: "系統家具",
+    description: "收納櫃體、立面與機能整合",
+    weight: 0.18,
+  },
+];
+
 const qualityLevelLabels = {
   basic: "經濟型",
   standard: "標準型",
@@ -28,6 +74,7 @@ const qualityLevelOptions = Object.entries(qualityLevelLabels).map(
 );
 
 const estimatorConfigJson = JSON.stringify(estimatorConfig);
+const renovationItemsJson = JSON.stringify(renovationItems);
 ---
 
 <BaseLayout
@@ -82,41 +129,48 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
               }
             </select>
           </div>
+
+          <div class="form-group">
+            <label for="house-condition">屋況條件</label>
+            <select id="house-condition">
+              {
+                houseConditionOptions.map(({ value, label }) => (
+                  <option value={value} selected={value === "standard"}>
+                    {label}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
         </div>
 
         <div class="form-section">
           <h2>裝修項目</h2>
 
           <div class="checkbox-group">
-            <label class="checkbox-item">
-              <input type="checkbox" value="ceiling" checked />
-              <span>天花板工程</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" value="floor" checked />
-              <span>地板工程</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" value="wall" checked />
-              <span>牆面工程</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" value="kitchen" />
-              <span>廚房翻新</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" value="bathroom" />
-              <span>衛浴翻新</span>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" value="furniture" />
-              <span>系統家具</span>
-            </label>
+            {
+              renovationItems.map((item, index) => (
+                <label class="checkbox-item">
+                  <input
+                    type="checkbox"
+                    value={item.value}
+                    checked={index <= 2}
+                  />
+                  <span class="checkbox-copy">
+                    <strong>{item.label}</strong>
+                    <small>{item.description}</small>
+                  </span>
+                </label>
+              ))
+            }
           </div>
         </div>
 
         <div class="result-section">
           <h2>預估結果</h2>
+          <p class="result-subtitle" id="result-subtitle">
+            依目前輸入條件，先整理出適合討論的預算帶與工程範圍。
+          </p>
 
           <div class="result-card">
             <div class="result-row">
@@ -133,6 +187,29 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
                 >171萬 - 285萬</span
               >
             </div>
+            <div class="result-row">
+              <span class="result-label">建議預備金</span>
+              <span class="result-value" id="reserve-budget">10萬 - 18萬</span>
+            </div>
+          </div>
+
+          <div class="result-highlights">
+            <div class="highlight-pill">
+              <span>每坪抓法</span>
+              <strong id="per-ping-range">每坪約 6萬 - 10萬</strong>
+            </div>
+            <div class="highlight-pill">
+              <span>目前範圍</span>
+              <strong id="scope-summary">全屋裝修 / 3 項工種</strong>
+            </div>
+          </div>
+
+          <div class="breakdown-card">
+            <div class="breakdown-header">
+              <h3>工程拆解</h3>
+              <p>以下為依目前勾選工項與條件拆出的粗略比例，方便你理解預算主要落點。</p>
+            </div>
+            <div class="breakdown-list" id="breakdown-list"></div>
           </div>
 
           <div class="disclaimer">
@@ -140,9 +217,10 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
           </div>
 
           <div class="cta-buttons">
-            <a href="/contact" class="btn btn-primary">聯絡我們</a>
-            <a href="/requirement-form" class="btn btn-secondary">填寫需求表</a>
+            <a href="/contact" class="btn btn-primary">帶著估算結果諮詢</a>
+            <a href="/requirement-form" class="btn btn-secondary">填寫完整需求表</a>
           </div>
+          <p class="cta-note">若你已經有大致預算方向，下一步最有效的是帶著這份估算與需求一起討論。</p>
         </div>
       </div>
     </div>
@@ -302,7 +380,26 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
 
   .checkbox-item input[type="checkbox"]:checked + span {
     color: var(--tiffany-dark);
-    font-weight: 500;
+  }
+
+  .checkbox-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+  }
+
+  .checkbox-copy strong {
+    font-size: 0.98rem;
+    color: var(--gray-darkest);
+  }
+
+  .checkbox-copy small {
+    color: var(--gray-medium);
+    line-height: 1.55;
+  }
+
+  .checkbox-item input[type="checkbox"]:checked + .checkbox-copy strong {
+    color: var(--tiffany-dark);
   }
 
   .result-section {
@@ -317,6 +414,12 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
 
   .result-section h2 {
     margin-bottom: 1.2rem;
+  }
+
+  .result-subtitle {
+    margin: -0.4rem 0 1.25rem;
+    color: var(--gray-medium);
+    line-height: 1.8;
   }
 
   .result-card {
@@ -355,6 +458,100 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
     color: var(--gray-darkest);
   }
 
+  .result-highlights {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .highlight-pill {
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+  }
+
+  .highlight-pill span,
+  .highlight-pill strong {
+    display: block;
+  }
+
+  .highlight-pill span {
+    color: var(--gray-medium);
+    font-size: 0.9rem;
+  }
+
+  .highlight-pill strong {
+    margin-top: 0.35rem;
+    color: var(--gray-darkest);
+    line-height: 1.65;
+  }
+
+  .breakdown-card {
+    margin-bottom: 1.5rem;
+    padding: 1.4rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
+  }
+
+  .breakdown-header h3 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.2rem;
+    color: var(--gray-darkest);
+  }
+
+  .breakdown-header p {
+    margin: 0.55rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.92rem;
+  }
+
+  .breakdown-list {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.2rem;
+  }
+
+  .breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(47, 47, 47, 0.08);
+  }
+
+  .breakdown-item:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .breakdown-copy strong,
+  .breakdown-copy span {
+    display: block;
+  }
+
+  .breakdown-copy strong {
+    color: var(--gray-darkest);
+  }
+
+  .breakdown-copy span {
+    margin-top: 0.28rem;
+    color: var(--gray-medium);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .breakdown-value {
+    color: var(--tiffany-dark);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
   .disclaimer {
     background: rgba(255, 255, 255, 0.92);
     padding: 1rem 1.1rem;
@@ -374,6 +571,13 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
+  }
+
+  .cta-note {
+    margin: 1rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.92rem;
   }
 
   .btn {
@@ -432,6 +636,14 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
       grid-template-columns: 1fr;
     }
 
+    .result-highlights {
+      grid-template-columns: 1fr;
+    }
+
+    .breakdown-item {
+      flex-direction: column;
+    }
+
     .cta-buttons {
       flex-direction: column;
     }
@@ -446,11 +658,16 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
   }
 </style>
 
-<script type="application/json" id="estimator-config" set:html={estimatorConfigJson}></script>
+<script type="application/json" id="estimator-config" is:inline set:html={estimatorConfigJson}></script>
+<script type="application/json" id="renovation-items" is:inline set:html={renovationItemsJson}></script>
 <script>
+  // @ts-nocheck
   // Calculator logic
   const estimatorConfig = JSON.parse(
     document.getElementById("estimator-config")?.textContent || "{}",
+  );
+  const renovationItems = JSON.parse(
+    document.getElementById("renovation-items")?.textContent || "[]",
   );
   const areaInput = document.getElementById("area") as HTMLInputElement;
   const projectType = document.getElementById(
@@ -459,43 +676,242 @@ const estimatorConfigJson = JSON.stringify(estimatorConfig);
   const qualityLevel = document.getElementById(
     "quality-level",
   ) as HTMLSelectElement;
+  const houseCondition = document.getElementById(
+    "house-condition",
+  ) as HTMLSelectElement;
+  const selectedItems = Array.from(
+    document.querySelectorAll('.checkbox-item input[type="checkbox"]'),
+  ) as HTMLInputElement[];
   const totalPrice = document.getElementById("total-price");
   const designFee = document.getElementById("design-fee");
   const constructionFee = document.getElementById("construction-fee");
+  const reserveBudget = document.getElementById("reserve-budget");
+  const perPingRange = document.getElementById("per-ping-range");
+  const scopeSummary = document.getElementById("scope-summary");
+  const resultSubtitle = document.getElementById("result-subtitle");
+  const breakdownList = document.getElementById("breakdown-list");
+  const requirementFormLink = document.querySelector(
+    'a[href="/requirement-form"]',
+  );
+
+  const projectTypeMeta = {
+    full: { label: "全屋裝修", constructionMultiplier: estimatorConfig.projectTypeMultipliers?.full ?? 1, designMultiplier: 1 },
+    partial: { label: "局部裝修", constructionMultiplier: estimatorConfig.projectTypeMultipliers?.partial ?? 0.6, designMultiplier: 0.65 },
+    "design-only": { label: "純設計", constructionMultiplier: 0, designMultiplier: 1 },
+  };
+
+  const houseConditionMeta = {
+    new: { label: "新成屋 / 屋況佳", multiplier: 0.92 },
+    standard: { label: "中古屋 / 一般整理", multiplier: 1 },
+    old: { label: "老屋翻新", multiplier: 1.18 },
+    rough: { label: "毛胚屋 / 大幅改造", multiplier: 1.28 },
+  };
+
+  function formatRange(min, max) {
+    return `${min}萬 - ${max}萬`;
+  }
+
+  function saveEstimateSnapshot(snapshot) {
+    try {
+      window.sessionStorage.setItem(
+        "renovationEstimateSnapshot",
+        JSON.stringify(snapshot),
+      );
+    } catch (error) {
+      console.warn("Unable to persist renovation estimate snapshot.", error);
+    }
+  }
 
   function calculate() {
-    const area = parseFloat(areaInput.value) || 30;
+    const area = Math.min(200, Math.max(1, parseFloat(areaInput.value) || 30));
     const pricePerPing =
       estimatorConfig.qualityLevels?.[qualityLevel.value] ||
       estimatorConfig.qualityLevels?.standard || { min: 6, max: 10 };
-    const multiplier =
-      estimatorConfig.projectTypeMultipliers?.[projectType.value] ?? 1;
     const designFeePerPing = estimatorConfig.designFeePerPing || {
       min: 3,
       max: 5,
     };
+    const selected = selectedItems.filter((item) => item.checked);
+    const selectedConfigs = renovationItems.filter((item) =>
+      selected.some((selectedItem) => selectedItem.value === item.value),
+    );
+    const projectMeta =
+      projectTypeMeta[projectType.value as keyof typeof projectTypeMeta] ||
+      projectTypeMeta.full;
+    const conditionMeta =
+      houseConditionMeta[houseCondition.value as keyof typeof houseConditionMeta] ||
+      houseConditionMeta.standard;
+    const totalWeight = renovationItems.reduce(
+      (sum, item) => sum + item.weight,
+      0,
+    );
+    const selectedWeight = selectedConfigs.reduce(
+      (sum, item) => sum + item.weight,
+      0,
+    );
+    const scopeFactor =
+      projectType.value === "design-only"
+        ? 0
+        : Math.max(0.28, 0.45 + 0.55 * (selectedWeight / totalWeight || 0));
 
-    const minTotal = Math.round(area * pricePerPing.min * multiplier);
-    const maxTotal = Math.round(area * pricePerPing.max * multiplier);
+    const minConstruction =
+      projectType.value === "design-only"
+        ? 0
+        : Math.round(
+            area *
+              pricePerPing.min *
+              projectMeta.constructionMultiplier *
+              conditionMeta.multiplier *
+              scopeFactor,
+          );
+    const maxConstruction =
+      projectType.value === "design-only"
+        ? 0
+        : Math.round(
+            area *
+              pricePerPing.max *
+              projectMeta.constructionMultiplier *
+              conditionMeta.multiplier *
+              scopeFactor,
+          );
 
-    const minDesign = Math.round(area * designFeePerPing.min);
-    const maxDesign = Math.round(area * designFeePerPing.max);
+    const minDesign = Math.round(
+      area * designFeePerPing.min * projectMeta.designMultiplier,
+    );
+    const maxDesign = Math.round(
+      area * designFeePerPing.max * projectMeta.designMultiplier,
+    );
 
-    const minConstruction = minTotal - minDesign;
-    const maxConstruction = maxTotal - maxDesign;
+    const minReserve =
+      projectType.value === "design-only"
+        ? 0
+        : Math.round(minConstruction * (conditionMeta.multiplier > 1 ? 0.1 : 0.06));
+    const maxReserve =
+      projectType.value === "design-only"
+        ? 0
+        : Math.round(maxConstruction * (conditionMeta.multiplier > 1 ? 0.14 : 0.08));
 
-    if (totalPrice && designFee && constructionFee) {
-      totalPrice.textContent = `${minTotal}萬 - ${maxTotal}萬`;
-      designFee.textContent = `${minDesign}萬 - ${maxDesign}萬`;
-      constructionFee.textContent = `${minConstruction}萬 - ${maxConstruction}萬`;
+    const minTotal = minConstruction + minDesign;
+    const maxTotal = maxConstruction + maxDesign;
+    const minPerPing = (minTotal / area).toFixed(1);
+    const maxPerPing = (maxTotal / area).toFixed(1);
+    const breakdownItems =
+      projectType.value === "design-only"
+        ? [
+            {
+              label: "設計規劃",
+              description: "依坪數與設計深度估算，尚未包含實際工程發包與選材差異。",
+              min: minDesign,
+              max: maxDesign,
+            },
+          ]
+        : selectedConfigs.map((item) => {
+            const share = item.weight / (selectedWeight || 1);
+            return {
+              label: item.label,
+              description: item.description,
+              min: Math.round(minConstruction * share),
+              max: Math.round(maxConstruction * share),
+            };
+          });
+
+    if (
+      totalPrice &&
+      designFee &&
+      constructionFee &&
+      reserveBudget &&
+      perPingRange &&
+      scopeSummary &&
+      resultSubtitle
+    ) {
+      totalPrice.textContent = formatRange(minTotal, maxTotal);
+      designFee.textContent = formatRange(minDesign, maxDesign);
+      constructionFee.textContent = formatRange(minConstruction, maxConstruction);
+      reserveBudget.textContent = formatRange(minReserve, maxReserve);
+      perPingRange.textContent = `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`;
+      scopeSummary.textContent = `${projectMeta.label} / ${selectedConfigs.length} 項工種 / ${conditionMeta.label}`;
+      resultSubtitle.textContent =
+        projectType.value === "design-only"
+          ? "目前以設計規劃費為主，工程費用需依圖面、工法與發包範圍另行確認。"
+          : "依目前輸入條件，先整理出適合討論的預算帶、主要工項與建議預備金。";
+    }
+
+    saveEstimateSnapshot({
+      area,
+      projectType: projectType.value,
+      projectTypeLabel: projectMeta.label,
+      qualityLevel: qualityLevel.value,
+      qualityLevelLabel:
+        qualityLevel.options[qualityLevel.selectedIndex]?.textContent || "",
+      houseCondition: houseCondition.value,
+      houseConditionLabel: conditionMeta.label,
+      selectedItems: selectedConfigs.map((item) => item.label),
+      totalRange: formatRange(minTotal, maxTotal),
+      designRange: formatRange(minDesign, maxDesign),
+      constructionRange: formatRange(minConstruction, maxConstruction),
+      reserveRange: formatRange(minReserve, maxReserve),
+      perPingRange: `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`,
+      breakdownItems,
+      updatedAt: new Date().toISOString(),
+    });
+
+    if (breakdownList) {
+      if (projectType.value === "design-only") {
+        breakdownList.innerHTML = `
+          <div class="breakdown-item">
+            <div class="breakdown-copy">
+              <strong>設計規劃</strong>
+              <span>依坪數與設計深度估算，尚未包含實際工程發包與選材差異。</span>
+            </div>
+            <span class="breakdown-value">${formatRange(minDesign, maxDesign)}</span>
+          </div>
+        `;
+        return;
+      }
+
+      if (!selectedConfigs.length) {
+        breakdownList.innerHTML = `
+          <div class="breakdown-item">
+            <div class="breakdown-copy">
+              <strong>請至少勾選一項裝修工種</strong>
+              <span>勾選越接近實際需求，結果越能作為後續討論的預算帶參考。</span>
+            </div>
+            <span class="breakdown-value">--</span>
+          </div>
+        `;
+        return;
+      }
+
+      breakdownList.innerHTML = selectedConfigs
+        .map((item) => {
+          const share = item.weight / selectedWeight;
+          const minItem = Math.round(minConstruction * share);
+          const maxItem = Math.round(maxConstruction * share);
+
+          return `
+            <div class="breakdown-item">
+              <div class="breakdown-copy">
+                <strong>${item.label}</strong>
+                <span>${item.description}</span>
+              </div>
+              <span class="breakdown-value">${formatRange(minItem, maxItem)}</span>
+            </div>
+          `;
+        })
+        .join("");
     }
   }
 
   // Add event listeners
-  if (areaInput && projectType && qualityLevel) {
+  if (areaInput && projectType && qualityLevel && houseCondition) {
     areaInput.addEventListener("input", calculate);
     projectType.addEventListener("change", calculate);
     qualityLevel.addEventListener("change", calculate);
+    houseCondition.addEventListener("change", calculate);
+    selectedItems.forEach((checkbox) => {
+      checkbox.addEventListener("change", calculate);
+    });
+    requirementFormLink?.addEventListener("click", calculate);
 
     // Initial calculation
     calculate();
