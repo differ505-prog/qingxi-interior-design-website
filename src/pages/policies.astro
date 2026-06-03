@@ -1,0 +1,171 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="網站政策 - 青曦空間設計">
+  <section class="policies-page">
+    <div class="policies-shell">
+      <header class="policies-hero">
+        <p class="policies-eyebrow">SITE POLICY</p>
+        <h1>網站政策</h1>
+        <p class="policies-intro">
+          為了讓訪客更清楚了解網站資訊使用方式、聯絡表單資料處理原則與內容聲明，
+          青曦在此整理基本網站政策，作為公開站點的說明依據。
+        </p>
+      </header>
+
+      <div class="policies-grid">
+        <article class="policy-card">
+          <h2>資訊使用說明</h2>
+          <p>
+            本網站提供之作品案例、圖面、文字與圖片內容，主要用於介紹青曦空間設計之服務項目、
+            設計觀點與過往案例，作為訪客初步了解品牌與合作方式之參考。
+          </p>
+        </article>
+
+        <article class="policy-card">
+          <h2>聯絡資料處理</h2>
+          <p>
+            當你透過 LINE、Email 或線上需求表與青曦聯繫時，所提供的姓名、聯絡方式、空間資訊、
+            預算與需求內容，僅作為諮詢回覆、合作評估與後續服務聯繫使用，不會任意提供給無關第三方。
+          </p>
+        </article>
+
+        <article class="policy-card">
+          <h2>作品與圖片聲明</h2>
+          <p>
+            網站內案例圖片、工程前後對比與設計圖紙，可能因拍攝條件、螢幕顯示或專案階段不同而略有差異；
+            實際合作內容仍以雙方討論、現場條件與最終確認文件為準。
+          </p>
+        </article>
+
+        <article class="policy-card">
+          <h2>外部連結</h2>
+          <p>
+            本網站可能連結至 LINE、Instagram、Facebook 或其他外部平台。該等平台之隱私與使用政策，
+            依各平台公告內容為準，青曦無法直接控制其資料蒐集或顯示方式。
+          </p>
+        </article>
+
+        <article class="policy-card">
+          <h2>內容更新</h2>
+          <p>
+            青曦保留依實際營運與網站內容調整需求，更新本頁政策說明之權利。若有重大調整，
+            將以本頁最新公告內容為準。
+          </p>
+        </article>
+
+        <article class="policy-card">
+          <h2>聯絡方式</h2>
+          <p>
+            若你對網站內容、諮詢資料處理或合作方式有任何疑問，歡迎透過
+            <a href="/contact">聯絡頁面</a>、
+            <a href="mailto:qingxi.ds@outlook.com">Email</a>
+            或
+            <a href="https://lin.ee/U1HCeW4" target="_blank" rel="noreferrer">官方 LINE</a>
+            與青曦聯繫。
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .policies-page {
+    padding: 5rem 1.5rem 4.5rem;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.12), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 247, 246, 1) 100%);
+  }
+
+  .policies-shell {
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .policies-hero {
+    max-width: 760px;
+    margin-bottom: 2.5rem;
+  }
+
+  .policies-eyebrow {
+    margin: 0 0 0.9rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.22em;
+    color: var(--tiffany-dark);
+    text-transform: uppercase;
+  }
+
+  .policies-hero h1 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(2.2rem, 4vw, 4rem);
+    line-height: 1.25;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--gray-darkest);
+  }
+
+  .policies-intro {
+    margin: 1.2rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.9;
+    font-size: 1rem;
+  }
+
+  .policies-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+
+  .policy-card {
+    padding: 1.6rem;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(249, 250, 250, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.05);
+  }
+
+  .policy-card h2 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.35rem;
+    line-height: 1.45;
+    font-weight: 500;
+    color: var(--gray-darkest);
+  }
+
+  .policy-card p {
+    margin: 0.8rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
+  }
+
+  .policy-card a {
+    color: var(--tiffany-dark);
+    text-decoration: none;
+  }
+
+  .policy-card a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 900px) {
+    .policies-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .policies-page {
+      padding: 4rem 1.25rem 3.5rem;
+    }
+
+    .policy-card {
+      padding: 1.4rem;
+      border-radius: 20px;
+    }
+  }
+</style>

@@ -94,6 +94,59 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     </div>
   </section>
 
+  <section class="public-ready-section">
+    <div class="public-ready-container">
+      <div class="section-header public-ready-header">
+        <h6 class="section-subtitle">PUBLIC READY</h6>
+        <h2 class="section-title">公開合作資訊</h2>
+        <p class="public-ready-intro">
+          如果你是第一次接觸青曦，這裡先幫你快速理解目前的服務範圍、合作方式與適合的案型。
+        </p>
+      </div>
+
+      <div class="public-ready-shell">
+        <article class="public-ready-highlight" data-animate="left">
+          <p class="public-ready-label">QINGXI FIT</p>
+          <h3>適合想把設計、美感與工程執行一起整理清楚的屋主</h3>
+          <p>
+            不論是預售屋客變、新成屋整理、老屋翻新，或希望將智能家居一起納入規劃，
+            青曦都以「好住、耐看、可落地」為核心，協助你把需求與預算對齊。
+          </p>
+          <div class="public-ready-tags">
+            <span>預售屋客變</span>
+            <span>住宅翻新</span>
+            <span>新成屋規劃</span>
+            <span>智能家居整合</span>
+          </div>
+          <div class="public-ready-actions">
+            <a href="/portfolio" class="public-ready-link public-ready-link-primary">先看作品</a>
+            <a href="/contact" class="public-ready-link public-ready-link-secondary">直接諮詢</a>
+          </div>
+        </article>
+
+        <div class="public-ready-grid">
+          <article class="public-ready-card" data-animate="scale">
+            <p class="public-ready-card-label">SERVICE AREA</p>
+            <h3>服務範圍</h3>
+            <p>以大台北住宅與商業空間為主，著重溝通效率、現場掌握與工程整合。</p>
+          </article>
+
+          <article class="public-ready-card" data-animate="scale">
+            <p class="public-ready-card-label">WORKING METHOD</p>
+            <h3>合作方式</h3>
+            <p>可先透過 LINE 或需求表初談，再依空間條件安排丈量、提案與後續設計流程。</p>
+          </article>
+
+          <article class="public-ready-card" data-animate="scale">
+            <p class="public-ready-card-label">TRUST POINT</p>
+            <h3>公開版重點</h3>
+            <p>目前已提供實際案例、工程前後對比與設計圖紙，方便你更快判斷是否適合合作。</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 服務項目 Section -->
   <section class="service-section">
     <div class="service-container">
@@ -893,6 +946,174 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       letter-spacing: 0.05em;
     }
 
+    .public-ready-section {
+      padding: 5rem 2rem;
+      background:
+        radial-gradient(circle at top left, rgba(160, 217, 217, 0.12), transparent 22%),
+        linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(247, 248, 248, 1) 100%);
+    }
+
+    .public-ready-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .public-ready-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .public-ready-intro {
+      max-width: 42rem;
+      margin: 1rem auto 0;
+      color: var(--gray-medium);
+      line-height: 1.9;
+    }
+
+    .public-ready-shell {
+      display: grid;
+      grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+
+    .public-ready-highlight,
+    .public-ready-card {
+      border-radius: 26px;
+      border: 1px solid rgba(129, 199, 212, 0.16);
+      box-shadow: 0 18px 40px rgba(47, 47, 47, 0.06);
+      opacity: 0;
+      transition: all 0.7s ease;
+    }
+
+    .public-ready-highlight[data-animate="left"] {
+      transform: translateX(-30px);
+    }
+
+    .public-ready-card[data-animate="scale"] {
+      transform: scale(0.92);
+    }
+
+    .public-ready-highlight.animate-in,
+    .public-ready-card.animate-in {
+      opacity: 1;
+      transform: translate(0) scale(1);
+    }
+
+    .public-ready-highlight {
+      padding: 1.9rem;
+      background:
+        radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 30%),
+        linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(47, 47, 47, 1) 100%);
+      color: var(--white);
+    }
+
+    .public-ready-label,
+    .public-ready-card-label {
+      margin: 0;
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .public-ready-label {
+      color: rgba(255, 255, 255, 0.58);
+    }
+
+    .public-ready-highlight h3,
+    .public-ready-card h3 {
+      margin: 0.75rem 0 0;
+      font-family: "Noto Serif TC", serif;
+      font-weight: 500;
+      line-height: 1.5;
+      letter-spacing: 0.04em;
+    }
+
+    .public-ready-highlight h3 {
+      font-size: 1.65rem;
+    }
+
+    .public-ready-highlight p:last-of-type {
+      margin: 1rem 0 0;
+      color: rgba(255, 255, 255, 0.78);
+      line-height: 1.9;
+    }
+
+    .public-ready-tags {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .public-ready-tags span {
+      padding: 0.62rem 0.88rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 0.9rem;
+    }
+
+    .public-ready-actions {
+      margin-top: 1.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+
+    .public-ready-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.85rem 1.2rem;
+      border-radius: 999px;
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .public-ready-link:hover {
+      transform: translateY(-2px);
+    }
+
+    .public-ready-link-primary {
+      background: var(--tiffany-primary);
+      color: var(--gray-darkest);
+      border: 1px solid var(--tiffany-primary);
+    }
+
+    .public-ready-link-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .public-ready-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+
+    .public-ready-card {
+      padding: 1.5rem;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
+    }
+
+    .public-ready-card-label {
+      color: var(--tiffany-dark);
+    }
+
+    .public-ready-card h3 {
+      font-size: 1.3rem;
+      color: var(--gray-darkest);
+    }
+
+    .public-ready-card p:last-child {
+      margin: 0.75rem 0 0;
+      color: var(--gray-medium);
+      line-height: 1.85;
+    }
+
     /* Testimonial Section Styles */
     .testimonial-section {
       padding: 5rem 2rem;
@@ -1086,6 +1307,11 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       .stats-container {
         grid-template-columns: repeat(2, 1fr);
         gap: 2rem;
+      }
+
+      .public-ready-shell,
+      .public-ready-grid {
+        grid-template-columns: 1fr;
       }
 
       .testimonial-grid {
@@ -1759,6 +1985,10 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       // Observe stats
       const statItems = document.querySelectorAll<HTMLElement>(".stat-item");
       observeElements(statItems, 100);
+
+      // Observe public-ready section
+      const publicReadyItems = document.querySelectorAll<HTMLElement>(".public-ready-highlight, .public-ready-card");
+      observeElements(publicReadyItems, 120);
 
       // Observe service items
       const serviceItems = document.querySelectorAll<HTMLElement>(".service-item");

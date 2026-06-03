@@ -3,8 +3,8 @@
 
 export const PASSWORD_PROTECTION_CONFIG = {
     // 是否啟用密碼保護（true = 啟用，false = 關閉）
-    // 本地開發時會自動關閉，線上部署時會啟用
-    enabled: true,
+    // 已切換為公開站點，線上與本地皆不再啟用預覽密碼
+    enabled: false,
 
     // 訪問密碼（請修改為您想要的密碼）
     password: "0988959922",

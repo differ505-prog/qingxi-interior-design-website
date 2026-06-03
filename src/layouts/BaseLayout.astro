@@ -86,7 +86,6 @@ const MAINTENANCE_MODE =
         "image": {JSON.stringify(ogImageURL)},
         "@id": {JSON.stringify(siteOrigin)},
         "url": {JSON.stringify(siteOrigin)},
-        "telephone": "+886-XXX-XXX-XXX",
         "priceRange": "$$",
         "address": {
           "@type": "PostalAddress",
@@ -94,27 +93,25 @@ const MAINTENANCE_MODE =
           "addressRegion": "台北",
           "addressCountry": "TW"
         },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "latitude": 25.033,
-          "longitude": 121.5654
-        },
         "openingHoursSpecification": {
           "@type": "OpeningHoursSpecification",
           "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
           "opens": "09:00",
           "closes": "18:00"
         },
+        "areaServed": "台北市、新北市",
+        "email": "qingxi.ds@outlook.com",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "email": "qingxi.ds@outlook.com",
+          "availableLanguage": ["zh-Hant", "zh-TW"]
+        },
         "sameAs": [
           "https://www.facebook.com/profile.php?id=61562661642204",
           "https://www.instagram.com/qingxi.ds/",
           "https://lin.ee/U1HCeW4"
         ],
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "5",
-          "reviewCount": "1"
-        },
         "hasOfferCatalog": {
           "@type": "OfferCatalog",
           "name": "室內設計服務",
