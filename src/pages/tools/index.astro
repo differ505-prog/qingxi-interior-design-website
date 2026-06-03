@@ -3,6 +3,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getRenovationEstimatorConfig } from "../../lib/contentful.js";
 
 const estimatorConfig = await getRenovationEstimatorConfig();
+const requirementFormId =
+  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || "xrevzvnp";
+const estimatorLeadAction = requirementFormId
+  ? `https://formspree.io/f/${requirementFormId}`
+  : "";
+const estimatorLeadEnabled = Boolean(estimatorLeadAction);
+const siteOrigin = (Astro.site || new URL("https://qingxidesign.tw")).toString();
+const estimatorLeadSuccessURL = new URL("/consultation-thank-you", siteOrigin).toString();
 
 const houseConditionOptions = [
   { value: "new", label: "新成屋 / 屋況佳" },
@@ -369,13 +377,72 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             </div>
 
             <div class="report-offer-actions">
-              <a
-                href="/contact?intent=report&source=estimator"
-                class="btn btn-primary"
-                data-estimator-cta="report-request"
+              <div class="report-form-intro">
+                <strong>想直接拿這次的拆解方向</strong>
+                <p>算完後可直接留下姓名與 Line / Email，青曦會依這次試算內容接續整理。</p>
+              </div>
+              {
+                !estimatorLeadEnabled && (
+                  <div class="report-form-notice" role="status">
+                    <p>表單收件尚未完成設定，目前請先透過下方按鈕前往聯絡頁或加入官方 LINE。</p>
+                  </div>
+                )
+              }
+              <form
+                id="estimator-lead-form"
+                action={estimatorLeadAction}
+                method="POST"
+                class="report-lead-form"
+                data-form-enabled={String(estimatorLeadEnabled)}
               >
-                索取費用拆解報告
-              </a>
+                <input type="hidden" name="_subject" value="青曦空間設計｜裝修估價器新名單" />
+                <input type="hidden" name="_next" value={estimatorLeadSuccessURL} />
+                <input type="hidden" name="form_type" value="estimator_inline_lead" />
+                <input type="hidden" name="form_stage" value="stage_1_estimator_inline_lead" />
+                <input type="hidden" name="lead_intent" id="estimator-lead-intent" value="budget-breakdown-report" />
+                <input type="hidden" name="estimator_summary" id="estimator-summary-input" />
+                <input type="hidden" name="utm_source" id="estimator-utm-source" />
+                <input type="hidden" name="utm_medium" id="estimator-utm-medium" />
+                <input type="hidden" name="utm_campaign" id="estimator-utm-campaign" />
+                <input type="hidden" name="utm_term" id="estimator-utm-term" />
+                <input type="hidden" name="utm_content" id="estimator-utm-content" />
+                <input type="hidden" name="landing_page" id="estimator-landing-page" />
+                <input type="hidden" name="page_referrer" id="estimator-page-referrer" />
+
+                <div class="report-lead-grid">
+                  <label class="report-lead-field">
+                    <span>姓名</span>
+                    <input type="text" name="name" placeholder="怎麼稱呼你" required />
+                  </label>
+                  <label class="report-lead-field">
+                    <span>Line / Email</span>
+                    <input
+                      type="text"
+                      name="contact_method"
+                      placeholder="留下 Line ID 或 Email"
+                      required
+                    />
+                  </label>
+                  <label class="report-lead-field report-lead-field-full">
+                    <span>想先確認的重點</span>
+                    <textarea
+                      id="estimator-lead-focus"
+                      name="consultation_focus"
+                      rows="3"
+                      placeholder="例如想先知道預算主要會花在哪裡，或是否適合安排到工作室聊聊"
+                      required
+                    ></textarea>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn-primary report-lead-submit"
+                  disabled={!estimatorLeadEnabled}
+                >
+                  送出並索取費用拆解報告
+                </button>
+              </form>
               <a
                 href="/contact?intent=studio-visit&source=estimator"
                 class="btn btn-secondary"
@@ -952,6 +1019,95 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     width: 100%;
   }
 
+  .report-form-intro strong,
+  .report-form-intro p {
+    display: block;
+  }
+
+  .report-form-intro strong {
+    color: var(--gray-darkest);
+    font-size: 1rem;
+  }
+
+  .report-form-intro p {
+    margin: 0.45rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.92rem;
+  }
+
+  .report-form-notice {
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    background: rgba(255, 246, 236, 0.95);
+    border: 1px solid rgba(209, 165, 97, 0.2);
+    color: var(--gray-dark);
+  }
+
+  .report-form-notice p {
+    margin: 0;
+    line-height: 1.7;
+    font-size: 0.9rem;
+  }
+
+  .report-lead-form {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .report-lead-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .report-lead-field {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .report-lead-field span {
+    color: var(--gray-dark);
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+
+  .report-lead-field input,
+  .report-lead-field textarea {
+    width: 100%;
+    padding: 0.9rem 0.95rem;
+    border: 1px solid rgba(129, 199, 212, 0.18);
+    border-radius: 14px;
+    font-size: 0.98rem;
+    color: var(--gray-darkest);
+    background: rgba(255, 255, 255, 0.96);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    resize: vertical;
+  }
+
+  .report-lead-field input:focus,
+  .report-lead-field textarea:focus {
+    outline: none;
+    border-color: rgba(129, 199, 212, 0.46);
+    box-shadow: 0 0 0 4px rgba(129, 199, 212, 0.12);
+    transform: translateY(-1px);
+  }
+
+  .report-lead-field-full {
+    grid-column: 1 / -1;
+  }
+
+  .report-lead-submit {
+    margin-top: 0.1rem;
+  }
+
+  .report-lead-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+    transform: none;
+    box-shadow: none;
+  }
+
   .report-offer-note {
     margin: 0;
     color: var(--gray-medium);
@@ -1183,6 +1339,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       grid-template-columns: 1fr;
     }
 
+    .report-lead-grid {
+      grid-template-columns: 1fr;
+    }
+
     .breakdown-item {
       flex-direction: column;
     }
@@ -1249,6 +1409,39 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const requirementFormLink = document.querySelector(
     'a[href="/requirement-form"]',
   );
+  const estimatorLeadForm = document.getElementById(
+    "estimator-lead-form",
+  ) as HTMLFormElement | null;
+  const estimatorLeadIntent = document.getElementById(
+    "estimator-lead-intent",
+  ) as HTMLInputElement | null;
+  const estimatorSummaryInput = document.getElementById(
+    "estimator-summary-input",
+  ) as HTMLInputElement | null;
+  const estimatorLeadFocus = document.getElementById(
+    "estimator-lead-focus",
+  ) as HTMLTextAreaElement | null;
+  const estimatorUtmSource = document.getElementById(
+    "estimator-utm-source",
+  ) as HTMLInputElement | null;
+  const estimatorUtmMedium = document.getElementById(
+    "estimator-utm-medium",
+  ) as HTMLInputElement | null;
+  const estimatorUtmCampaign = document.getElementById(
+    "estimator-utm-campaign",
+  ) as HTMLInputElement | null;
+  const estimatorUtmTerm = document.getElementById(
+    "estimator-utm-term",
+  ) as HTMLInputElement | null;
+  const estimatorUtmContent = document.getElementById(
+    "estimator-utm-content",
+  ) as HTMLInputElement | null;
+  const estimatorLandingPage = document.getElementById(
+    "estimator-landing-page",
+  ) as HTMLInputElement | null;
+  const estimatorPageReferrer = document.getElementById(
+    "estimator-page-referrer",
+  ) as HTMLInputElement | null;
   const estimatorCtaLinks = Array.from(
     document.querySelectorAll("[data-estimator-cta]"),
   );
@@ -1312,6 +1505,18 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     } catch (error) {
       console.warn("Unable to persist renovation estimate snapshot.", error);
     }
+  }
+
+  function fillEstimatorLeadAttribution() {
+    const searchParams = new URLSearchParams(window.location.search);
+
+    if (estimatorUtmSource) estimatorUtmSource.value = searchParams.get("utm_source") || "";
+    if (estimatorUtmMedium) estimatorUtmMedium.value = searchParams.get("utm_medium") || "";
+    if (estimatorUtmCampaign) estimatorUtmCampaign.value = searchParams.get("utm_campaign") || "";
+    if (estimatorUtmTerm) estimatorUtmTerm.value = searchParams.get("utm_term") || "";
+    if (estimatorUtmContent) estimatorUtmContent.value = searchParams.get("utm_content") || "";
+    if (estimatorLandingPage) estimatorLandingPage.value = window.location.href;
+    if (estimatorPageReferrer) estimatorPageReferrer.value = document.referrer || "";
   }
 
   let lastTrackedSignature = "";
@@ -1543,6 +1748,38 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         .join("");
     }
 
+    if (estimatorLeadIntent) {
+      estimatorLeadIntent.value =
+        projectType.value === "design-only"
+          ? "design-planning-report"
+          : "budget-breakdown-report";
+    }
+
+    const estimatorSummaryText = [
+      `估價摘要：${formatRange(minTotal, maxTotal)}`,
+      `每坪抓法：每坪約 ${minPerPing}萬 - ${maxPerPing}萬`,
+      `專案條件：${[projectMeta.label, qualityLevel.options[qualityLevel.selectedIndex]?.textContent, conditionMeta.label, residenceMeta.label].filter(Boolean).join(" / ")}`,
+      `使用目的 / 時程：${[usePurposeInfo.label, timelineInfo.label].filter(Boolean).join(" / ")}`,
+      `工項：${selectedConfigs.length ? selectedConfigs.map((item) => item.label).join("、") : "尚未勾選"}`,
+    ].join(" ｜ ");
+
+    if (estimatorSummaryInput) {
+      estimatorSummaryInput.value = estimatorSummaryText;
+    }
+
+    const defaultLeadFocus =
+      projectType.value === "design-only"
+        ? `我想先索取這次設計規劃的拆解方向，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想了解設計深度與下一步建議。`
+        : `我想索取這次估價的費用拆解報告，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想先了解主要預算落點與是否適合安排後續諮詢。`;
+
+    if (
+      estimatorLeadFocus &&
+      (!estimatorLeadFocus.value.trim() || estimatorLeadFocus.dataset.autofilled === "true")
+    ) {
+      estimatorLeadFocus.value = defaultLeadFocus;
+      estimatorLeadFocus.dataset.autofilled = "true";
+    }
+
     saveEstimateSnapshot({
       area,
       projectType: projectType.value,
@@ -1662,6 +1899,19 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           destination: link.getAttribute("data-estimator-cta") || "unknown",
         });
       });
+    });
+
+    fillEstimatorLeadAttribution();
+
+    estimatorLeadForm?.addEventListener("submit", () => {
+      calculate();
+      window.trackLeadEvent?.("estimator_inline_lead_submit", {
+        lead_intent: estimatorLeadIntent?.value || "budget-breakdown-report",
+      });
+    });
+
+    estimatorLeadFocus?.addEventListener("input", () => {
+      estimatorLeadFocus.dataset.autofilled = "false";
     });
 
     // Initial calculation
