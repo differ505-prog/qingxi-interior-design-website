@@ -252,7 +252,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
         <li class="service-item" data-animate="scale">
           <a href="/smart-home" class="service-card">
             <figure class="service-content">
-              <div class="service-text">
+              <div class="service-text service-text-inline">
                 <p class="service-title">智能家居</p>
                 <p class="service-subtitle">Smart Home</p>
               </div>
@@ -1497,6 +1497,11 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       letter-spacing: 0.05em;
     }
 
+    .service-text-inline {
+      flex-direction: row;
+      gap: 0.5rem;
+    }
+
     .service-title {
       font-size: 1.5rem;
       font-weight: 500;
@@ -1555,6 +1560,10 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
       .service-text {
         min-height: 4.2rem;
+      }
+
+      .service-text-inline {
+        gap: 0.35rem;
       }
 
       .service-title {
