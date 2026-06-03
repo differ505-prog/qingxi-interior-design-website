@@ -104,8 +104,8 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       <section class="quick-form-panel">
         <div class="quick-form-copy">
           <p class="quick-form-eyebrow">QUICK CONSULTATION</p>
-          <h2>如果你還沒準備好完整需求，先留下核心資訊就可以。</h2>
-          <p class="quick-form-description">
+          <h2 id="quick-form-title">如果你還沒準備好完整需求，先留下核心資訊就可以。</h2>
+          <p class="quick-form-description" id="quick-form-description">
             這是第一階段精簡表單，適合想先確認預算方向、服務方式與時程可行性的人。
             若之後需要更完整評估，再補填設計需求表即可。
           </p>
@@ -136,6 +136,8 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
             <input type="hidden" name="_next" value={consultationSuccessURL} />
             <input type="hidden" name="form_type" value="quick_consultation" />
             <input type="hidden" name="form_stage" value="stage_1_quick_consultation" />
+            <input type="hidden" name="lead_intent" id="quick-lead-intent" />
+            <input type="hidden" name="estimator_summary" id="quick-estimator-summary" />
             <input type="hidden" name="utm_source" id="quick-utm-source" />
             <input type="hidden" name="utm_medium" id="quick-utm-medium" />
             <input type="hidden" name="utm_campaign" id="quick-utm-campaign" />
@@ -175,6 +177,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
               <label class="quick-form-field quick-form-field-full">
                 <span>目前最想先確認的事</span>
                 <textarea
+                  id="quick-consultation-focus"
                   name="consultation_focus"
                   rows="4"
                   placeholder="例如預算大概怎麼抓、交屋後想怎麼安排、是否能連同智能家居一起規劃等"
@@ -765,6 +768,11 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   const quickUtmContent = document.getElementById("quick-utm-content");
   const quickLandingPage = document.getElementById("quick-landing-page");
   const quickPageReferrer = document.getElementById("quick-page-referrer");
+  const quickLeadIntent = document.getElementById("quick-lead-intent");
+  const quickEstimatorSummary = document.getElementById("quick-estimator-summary");
+  const quickConsultationFocus = document.getElementById("quick-consultation-focus");
+  const quickFormTitle = document.getElementById("quick-form-title");
+  const quickFormDescription = document.getElementById("quick-form-description");
 
   function fillQuickConsultationAttribution() {
     const searchParams = new URLSearchParams(window.location.search);
@@ -776,9 +784,57 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     if (quickUtmContent) quickUtmContent.value = searchParams.get("utm_content") || "";
     if (quickLandingPage) quickLandingPage.value = window.location.href;
     if (quickPageReferrer) quickPageReferrer.value = document.referrer || "";
+    if (quickLeadIntent) quickLeadIntent.value = searchParams.get("intent") || "";
+  }
+
+  function hydrateEstimatorSummary() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const intent = searchParams.get("intent") || "";
+
+    try {
+      const snapshotRaw = window.sessionStorage.getItem("renovationEstimateSnapshot");
+      if (!snapshotRaw) return;
+
+      const snapshot = JSON.parse(snapshotRaw);
+      const summaryText = [
+        `估價摘要：${snapshot.totalRange || "--"}`,
+        `每坪抓法：${snapshot.perPingRange || "--"}`,
+        `專案條件：${[snapshot.projectTypeLabel, snapshot.qualityLevelLabel, snapshot.houseConditionLabel].filter(Boolean).join(" / ") || "--"}`,
+        `工項：${Array.isArray(snapshot.selectedItems) && snapshot.selectedItems.length ? snapshot.selectedItems.join("、") : "尚未勾選"}`,
+      ].join(" ｜ ");
+
+      if (quickEstimatorSummary) quickEstimatorSummary.value = summaryText;
+
+      if (intent === "report") {
+        if (quickFormTitle) quickFormTitle.textContent = "想索取費用拆解報告，先留下這次估價的聯絡資訊就可以。";
+        if (quickFormDescription) {
+          quickFormDescription.textContent =
+            "青曦會依你這次試算的條件，進一步整理更好判讀的初步拆解方向，方便你理解預算主要落點與下一步建議。";
+        }
+        if (quickConsultationFocus && !quickConsultationFocus.value) {
+          quickConsultationFocus.value =
+            `我想索取費用拆解報告，目前估價結果約為 ${snapshot.totalRange || "--"}，想先了解主要預算分配與下一步建議。`;
+        }
+      }
+
+      if (intent === "studio-visit") {
+        if (quickFormTitle) quickFormTitle.textContent = "如果你想直接來汐止工作室體驗，先留下聯絡資訊就可以。";
+        if (quickFormDescription) {
+          quickFormDescription.textContent =
+            "青曦會依你這次估價方向安排後續聯繫，方便你到現場喝杯咖啡、看真實材質與施工細節，並直接體驗智能家居。";
+        }
+        if (quickConsultationFocus && !quickConsultationFocus.value) {
+          quickConsultationFocus.value =
+            `我想預約汐止工作室參觀，目前估價結果約為 ${snapshot.totalRange || "--"}，也想現場看看材質、施工細節與智能家居體驗。`;
+        }
+      }
+    } catch (error) {
+      console.warn("Unable to hydrate estimator summary on contact page.", error);
+    }
   }
 
   fillQuickConsultationAttribution();
+  hydrateEstimatorSummary();
 
   if (quickConsultationForm?.dataset.formEnabled !== "true") {
     quickConsultationForm?.addEventListener("submit", function(event) {

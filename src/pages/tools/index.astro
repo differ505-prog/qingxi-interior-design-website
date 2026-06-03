@@ -344,6 +344,51 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             </div>
           </div>
 
+          <div class="report-offer-card">
+            <div class="report-offer-copy">
+              <p class="report-offer-eyebrow">ESTIMATE FOLLOW-UP</p>
+              <h3>如果你想把這次試算變成更好判讀的下一步，可直接索取費用拆解報告。</h3>
+              <p class="report-offer-description">
+                青曦會依你這次的估價條件，整理一份更適合討論的初步拆解方向，不是系統自動丟出的制式訊息，
+                而是方便你更快看懂預算主要落點、下一步該先確認什麼。
+              </p>
+              <div class="report-offer-points">
+                <div class="report-offer-point">
+                  <strong>這份報告會帶到的重點</strong>
+                  <span>預算帶、主要工項、初步判讀與下一步建議。</span>
+                </div>
+                <div class="report-offer-point">
+                  <strong>適合目前這種前期階段</strong>
+                  <span id="report-context">特別適合正在抓新成屋或住宅裝修預算方向的人。</span>
+                </div>
+                <div class="report-offer-point">
+                  <strong>最推薦的下一步</strong>
+                  <span>先索取報告，再安排到汐止工作室喝咖啡、看材質與體驗智能家居。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="report-offer-actions">
+              <a
+                href="/contact?intent=report&source=estimator"
+                class="btn btn-primary"
+                data-estimator-cta="report-request"
+              >
+                索取費用拆解報告
+              </a>
+              <a
+                href="/contact?intent=studio-visit&source=estimator"
+                class="btn btn-secondary"
+                data-estimator-cta="studio-visit"
+              >
+                預約汐止工作室參觀
+              </a>
+              <p class="report-offer-note">
+                現場可免費喝杯咖啡、直接體驗智能家居，並看真實材質與施工細節，完全無壓力。
+              </p>
+            </div>
+          </div>
+
           <div class="disclaimer">
             <p>{estimatorConfig.disclaimer}</p>
           </div>
@@ -826,6 +871,94 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     margin-bottom: 1.5rem;
   }
 
+  .report-offer-card {
+    margin-top: 1.25rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    gap: 1rem;
+    padding: 1.35rem;
+    border-radius: 24px;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 34%),
+      linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
+  }
+
+  .report-offer-eyebrow {
+    margin: 0 0 0.75rem;
+    color: var(--tiffany-dark);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .report-offer-copy h3 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.45rem;
+    line-height: 1.55;
+    color: var(--gray-darkest);
+    letter-spacing: 0.04em;
+  }
+
+  .report-offer-description {
+    margin: 0.85rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
+  }
+
+  .report-offer-points {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  .report-offer-point {
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .report-offer-point strong,
+  .report-offer-point span {
+    display: block;
+  }
+
+  .report-offer-point strong {
+    color: var(--gray-darkest);
+  }
+
+  .report-offer-point span {
+    margin-top: 0.35rem;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.94rem;
+  }
+
+  .report-offer-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .report-offer-actions .btn {
+    width: 100%;
+  }
+
+  .report-offer-note {
+    margin: 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+    font-size: 0.93rem;
+  }
+
   .advice-card {
     padding: 1.4rem;
     border-radius: 22px;
@@ -1046,6 +1179,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       grid-template-columns: 1fr;
     }
 
+    .report-offer-card {
+      grid-template-columns: 1fr;
+    }
+
     .breakdown-item {
       flex-direction: column;
     }
@@ -1108,6 +1245,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const adviceList = document.getElementById("advice-list");
   const nextStepIntro = document.getElementById("next-step-intro");
   const nextStepPoints = document.getElementById("next-step-points");
+  const reportContext = document.getElementById("report-context");
   const requirementFormLink = document.querySelector(
     'a[href="/requirement-form"]',
   );
@@ -1316,7 +1454,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       perPingRange &&
       scopeSummary &&
       resultSubtitle &&
-      nextStepIntro
+      nextStepIntro &&
+      reportContext
     ) {
       totalPrice.textContent = formatRange(minTotal, maxTotal);
       designFee.textContent = formatRange(minDesign, maxDesign);
@@ -1335,6 +1474,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         projectType.value === "design-only"
           ? "你目前更接近設計規劃前期，適合先整理需求與生活方式，再確認圖面深度。"
           : "你目前已經有可討論的預算帶，下一步最適合把需求、照片與工程範圍一起整理。";
+      reportContext.textContent =
+        projectType.value === "design-only"
+          ? `目前較適合先整理 ${projectMeta.label} 的需求重點與設計深度，再進一步確認交付方向。`
+          : `目前這組 ${projectMeta.label} / ${residenceMeta.label} 條件，可先用拆解報告判讀 ${formatRange(minTotal, maxTotal)} 的主要預算落點。`;
     }
 
     const adviceItems = [];
@@ -1421,6 +1564,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       constructionRange: formatRange(minConstruction, maxConstruction),
       reserveRange: formatRange(minReserve, maxReserve),
       perPingRange: `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`,
+      reportIntent:
+        projectType.value === "design-only"
+          ? "design-planning-report"
+          : "budget-breakdown-report",
       breakdownItems,
       updatedAt: new Date().toISOString(),
     });
