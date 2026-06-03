@@ -110,9 +110,62 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <span>帶著結果進入需求表</span>
           <span>讓諮詢更快進入重點</span>
         </div>
+        <div class="hero-reassurance">
+          <span>不需先留電話</span>
+          <span>約 1 分鐘完成</span>
+          <span>結果可直接帶入諮詢</span>
+        </div>
+        <div class="hero-actions">
+          <a href="#estimator-form" class="btn btn-primary" data-estimator-cta="start-estimate">開始試算</a>
+          <a href="/#workflow" class="btn btn-secondary">先看服務流程</a>
+        </div>
       </div>
 
-      <div class="calculator-form">
+      <div class="landing-grid">
+        <section class="landing-card">
+          <div class="landing-card-header">
+            <h2>這個工具適合誰</h2>
+            <p>如果你正處於以下階段，先做一次試算會比直接問價更有效。</p>
+          </div>
+          <div class="landing-points">
+            <div class="landing-point">
+              <strong>準備交屋或剛交屋</strong>
+              <span>想先知道預算帶是否合理，再安排後續設計與工程。</span>
+            </div>
+            <div class="landing-point">
+              <strong>老屋翻新或局部整理</strong>
+              <span>需要先判斷哪些工項是主要成本來源，避免預算抓太鬆或太緊。</span>
+            </div>
+            <div class="landing-point">
+              <strong>想先做前期判讀</strong>
+              <span>還沒準備好完整需求，也能先用工具理解目前大概的裝修規模。</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="landing-card landing-card-accent">
+          <div class="landing-card-header">
+            <h2>你會拿到什麼</h2>
+            <p>這不是正式報價，但足夠幫你判斷討論方向與下一步。</p>
+          </div>
+          <div class="landing-points">
+            <div class="landing-point">
+              <strong>預算帶與每坪抓法</strong>
+              <span>先知道總價區間、設計費、工程費與建議預備金。</span>
+            </div>
+            <div class="landing-point">
+              <strong>工程拆解與判讀建議</strong>
+              <span>幫你看出預算主要落點，並依條件整理討論重點。</span>
+            </div>
+            <div class="landing-point">
+              <strong>可直接帶入需求表</strong>
+              <span>試算結果會一起帶進需求表，讓青曦更快理解你的案件狀況。</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="calculator-form" id="estimator-form">
         <div class="form-section">
           <h2>基本資訊</h2>
 
@@ -302,6 +355,27 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <p class="cta-note">若你已經有大致預算方向，下一步最有效的是帶著這份估算與需求一起討論。</p>
         </div>
       </div>
+
+      <section class="faq-panel">
+        <div class="faq-header">
+          <h2>常見問題</h2>
+          <p>先回答多數人使用前最在意的 3 個問題。</p>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item" open>
+            <summary>這個結果可以當成正式報價嗎？</summary>
+            <p>不行。這份結果比較像前期預算判讀，用來幫你理解規模、工項與討論方向；正式費用仍需依現場丈量、圖面與選材確認。</p>
+          </details>
+          <details class="faq-item">
+            <summary>我現在還沒有很完整的需求，也適合先用嗎？</summary>
+            <p>適合。估價器本來就是讓你在前期先抓預算帶，不需要一次把所有需求都想清楚，之後再透過需求表補完整即可。</p>
+          </details>
+          <details class="faq-item">
+            <summary>估價後一定要馬上留資料嗎？</summary>
+            <p>不用。你可以先單純試算；只有當你想讓青曦協助下一步判斷時，再把結果帶進需求表或直接預約諮詢即可。</p>
+          </details>
+        </div>
+      </section>
     </div>
   </div>
 </BaseLayout>
@@ -342,6 +416,39 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     font-size: 0.92rem;
   }
 
+  .hero-reassurance {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    color: var(--gray-medium);
+    font-size: 0.94rem;
+  }
+
+  .hero-reassurance span {
+    position: relative;
+    padding-left: 0.95rem;
+  }
+
+  .hero-reassurance span::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.48rem;
+    width: 0.34rem;
+    height: 0.34rem;
+    border-radius: 999px;
+    background: var(--tiffany-dark);
+  }
+
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
   .eyebrow {
     margin: 0 0 0.9rem;
     color: var(--tiffany-dark);
@@ -373,6 +480,69 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     padding: 2.1rem;
     box-shadow: 0 28px 60px rgba(47, 47, 47, 0.06);
     border: 1px solid rgba(129, 199, 212, 0.16);
+  }
+
+  .landing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .landing-card {
+    padding: 1.5rem;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 20px 36px rgba(47, 47, 47, 0.05);
+  }
+
+  .landing-card-accent {
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 35%),
+      linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
+  }
+
+  .landing-card-header h2 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.35rem;
+    color: var(--gray-darkest);
+  }
+
+  .landing-card-header p {
+    margin: 0.65rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
+  .landing-points {
+    display: grid;
+    gap: 0.95rem;
+    margin-top: 1.2rem;
+  }
+
+  .landing-point {
+    padding: 1rem 1.05rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(129, 199, 212, 0.12);
+  }
+
+  .landing-point strong,
+  .landing-point span {
+    display: block;
+  }
+
+  .landing-point strong {
+    color: var(--gray-darkest);
+  }
+
+  .landing-point span {
+    margin-top: 0.35rem;
+    color: var(--gray-medium);
+    line-height: 1.7;
+    font-size: 0.92rem;
   }
 
   .form-section {
@@ -787,6 +957,58 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     box-shadow: 0 14px 24px rgba(129, 199, 212, 0.12);
   }
 
+  .faq-panel {
+    margin-top: 1.5rem;
+    padding: 1.8rem;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 20px 36px rgba(47, 47, 47, 0.05);
+  }
+
+  .faq-header h2 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.5rem;
+    color: var(--gray-darkest);
+  }
+
+  .faq-header p {
+    margin: 0.65rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
+  .faq-list {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.25rem;
+  }
+
+  .faq-item {
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(247, 250, 250, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.12);
+  }
+
+  .faq-item summary {
+    cursor: pointer;
+    color: var(--gray-darkest);
+    font-weight: 600;
+    list-style: none;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item p {
+    margin: 0.75rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
   @media (max-width: 768px) {
     .calculator-container {
       padding: 4rem 1.25rem 4rem;
@@ -797,9 +1019,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       border-radius: 24px;
     }
 
+    .hero-actions,
+    .landing-grid {
+      grid-template-columns: 1fr;
+      flex-direction: column;
+    }
+
     .form-section,
     .result-section,
-    .result-card {
+    .result-card,
+    .landing-card,
+    .faq-panel {
       padding: 1.25rem;
       border-radius: 20px;
     }
