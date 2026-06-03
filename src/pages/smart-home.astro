@@ -277,6 +277,11 @@ const workflow = [
     border: 1px solid rgba(47, 47, 47, 0.14);
   }
 
+  .hero-actions .secondary-link:last-child {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(129, 199, 212, 0.18);
+  }
+
   .primary-link:hover,
   .secondary-link:hover,
   .cta-link:hover {
@@ -466,10 +471,95 @@ const workflow = [
       padding-top: 6rem;
     }
 
+    .section-subtitle,
+    .hero-panel-label,
+    .capability-label,
+    .workflow-step {
+      font-size: 0.74rem;
+      letter-spacing: 0.16em;
+      margin-bottom: 0.65rem;
+    }
+
+    .hero-copy h1 {
+      font-size: clamp(2rem, 9vw, 2.8rem);
+      line-height: 1.28;
+    }
+
+    .hero-intro,
+    .capability-card p,
+    .positioning-card p,
+    .workflow-card p,
+    .cta-shell p,
+    .scenario-list {
+      font-size: 0.96rem;
+      line-height: 1.75;
+    }
+
+    .hero-actions,
+    .cta-actions {
+      gap: 0.7rem;
+    }
+
+    .primary-link,
+    .secondary-link,
+    .cta-link {
+      width: 100%;
+      min-height: 46px;
+      padding: 0.88rem 1.1rem;
+      letter-spacing: 0.04em;
+    }
+
     .hero-panel,
+    .capability-card,
+    .workflow-card,
     .positioning-card,
     .cta-shell {
       padding: 1.5rem;
+      border-radius: 22px;
+    }
+
+    .smart-home-shell,
+    .section-shell,
+    .section-heading {
+      gap: 1rem;
+    }
+
+    .section-heading {
+      margin-bottom: 1.4rem;
+    }
+
+    .section-heading h2,
+    .positioning-card h2,
+    .cta-shell h2 {
+      font-size: 1.6rem;
+      line-height: 1.42;
+    }
+
+    .capability-grid,
+    .workflow-grid,
+    .positioning-shell {
+      gap: 1rem;
+    }
+
+    .capability-card h3,
+    .workflow-card h3 {
+      margin-top: 0.7rem;
+      font-size: 1.08rem;
+      line-height: 1.48;
+    }
+
+    .hero-panel ul,
+    .scenario-list {
+      gap: 0.7rem;
+    }
+
+    .hero-panel li {
+      padding-bottom: 0.7rem;
+      line-height: 1.7;
+    }
+
+    .cta-actions {
+      width: 100%;
     }
   }
 </style>
