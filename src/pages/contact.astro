@@ -138,6 +138,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
             <input type="hidden" name="form_stage" value="stage_1_quick_consultation" />
             <input type="hidden" name="lead_intent" id="quick-lead-intent" />
             <input type="hidden" name="estimator_summary" id="quick-estimator-summary" />
+            <input type="hidden" name="smart_home_quiz_summary" id="quick-smart-home-summary" />
             <input type="hidden" name="utm_source" id="quick-utm-source" />
             <input type="hidden" name="utm_medium" id="quick-utm-medium" />
             <input type="hidden" name="utm_campaign" id="quick-utm-campaign" />
@@ -770,6 +771,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   const quickPageReferrer = document.getElementById("quick-page-referrer");
   const quickLeadIntent = document.getElementById("quick-lead-intent");
   const quickEstimatorSummary = document.getElementById("quick-estimator-summary");
+  const quickSmartHomeSummary = document.getElementById("quick-smart-home-summary");
   const quickConsultationFocus = document.getElementById("quick-consultation-focus");
   const quickFormTitle = document.getElementById("quick-form-title");
   const quickFormDescription = document.getElementById("quick-form-description");
@@ -833,8 +835,60 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     }
   }
 
+  function hydrateSmartHomeQuizSummary() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const intent = searchParams.get("intent") || "";
+
+    if (intent !== "smart-home-quiz" && intent !== "smart-home-studio-visit") {
+      return;
+    }
+
+    try {
+      const snapshotRaw = window.sessionStorage.getItem("smartHomeQuizSnapshot");
+      if (!snapshotRaw) return;
+
+      const snapshot = JSON.parse(snapshotRaw);
+      const summaryText = [
+        `推薦情境包：${snapshot.packageTitle || "--"}`,
+        `方案層級：${snapshot.tierTitle || "--"}`,
+        `智能預算方向：${snapshot.budgetRange || "--"}`,
+        `弱電 / 控制預留：${snapshot.weakRange || "--"}`,
+        `回答重點：${Array.isArray(snapshot.selectedAnswers) && snapshot.selectedAnswers.length ? snapshot.selectedAnswers.join("、") : "--"}`,
+      ].join(" ｜ ");
+
+      if (quickSmartHomeSummary) quickSmartHomeSummary.value = summaryText;
+
+      if (intent === "smart-home-quiz") {
+        if (quickFormTitle) quickFormTitle.textContent = "想帶著智能家居快篩結果深入聊，先留下聯絡資訊就可以。";
+        if (quickFormDescription) {
+          quickFormDescription.textContent =
+            "青曦會依你這次的生活情境快篩結果，進一步整理適合的智能家居方向、弱電預留與下一步建議。";
+        }
+        if (quickConsultationFocus && !quickConsultationFocus.value) {
+          quickConsultationFocus.value =
+            `我剛完成智能家居需求快篩，結果偏向「${snapshot.packageTitle || "--"}」，想進一步了解 ${snapshot.budgetRange || "--"} 的做法與弱電規劃方向。`;
+        }
+      }
+
+      if (intent === "smart-home-studio-visit") {
+        if (quickFormTitle) quickFormTitle.textContent = "如果你想直接來工作室體驗智能家居，先留下聯絡資訊就可以。";
+        if (quickFormDescription) {
+          quickFormDescription.textContent =
+            "青曦會依你這次快篩結果安排後續聯繫，方便你到汐止工作室喝杯咖啡、體驗情境操作並看真實材質與施工細節。";
+        }
+        if (quickConsultationFocus && !quickConsultationFocus.value) {
+          quickConsultationFocus.value =
+            `我想預約汐止工作室體驗，我的智能家居快篩結果偏向「${snapshot.packageTitle || "--"}」，也想現場看看弱電、材質與情境控制的實際做法。`;
+        }
+      }
+    } catch (error) {
+      console.warn("Unable to hydrate smart home quiz summary on contact page.", error);
+    }
+  }
+
   fillQuickConsultationAttribution();
   hydrateEstimatorSummary();
+  hydrateSmartHomeQuizSummary();
 
   if (quickConsultationForm?.dataset.formEnabled !== "true") {
     quickConsultationForm?.addEventListener("submit", function(event) {

@@ -1,0 +1,1070 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const quizSteps = [
+  {
+    id: "pain-point",
+    label: "Q1",
+    title: "你最想先解決哪種生活情境？",
+    options: [
+      {
+        value: "forget-devices",
+        label: "常忘記關燈、關冷氣或確認設備",
+        description: "希望離家與回家能更省事，不必反覆確認。",
+        reason: "你很在意離家前後的便利性，適合從最常用的自動化情境開始。",
+        scores: { automation: 3, security: 1 },
+        budgetWeight: 1,
+      },
+      {
+        value: "pet-care",
+        label: "家裡有寵物，想遠端查看與照顧",
+        description: "希望外出時也能掌握寵物狀態與環境。",
+        reason: "你對寵物照護與遠端掌握有需求，適合優先規劃寵物友善情境。",
+        scores: { petcare: 4, security: 1 },
+        budgetWeight: 2,
+      },
+      {
+        value: "security",
+        label: "在意門鎖、監控與居家安全感",
+        description: "想把門鎖、感測、監控與通知整合起來。",
+        reason: "你對安全與即時提醒很敏感，適合先從安心守護型系統切入。",
+        scores: { security: 4, automation: 1 },
+        budgetWeight: 2,
+      },
+      {
+        value: "night-routine",
+        label: "想讓夜間起床、回家、休息的動線更舒服",
+        description: "希望燈光、窗簾、空調與感應更貼近作息。",
+        reason: "你更重視舒適與節奏感，適合用情境自動化提升日常體驗。",
+        scores: { comfort: 4, automation: 1 },
+        budgetWeight: 1,
+      },
+      {
+        value: "full-control",
+        label: "想一次整合燈光、窗簾、冷氣、門鎖與設備",
+        description: "希望家裡不只是智慧設備，而是一套完整系統。",
+        reason: "你對全屋整合的接受度高，適合從完整架構與弱電預留一起規劃。",
+        scores: { wholehome: 4, automation: 2 },
+        budgetWeight: 4,
+      },
+    ],
+  },
+  {
+    id: "household",
+    label: "Q2",
+    title: "你家目前最需要被照顧的是哪種使用情境？",
+    options: [
+      {
+        value: "pets",
+        label: "有寵物，需要遠端查看、環境控制或照護",
+        description: "例如監看、空調控制、飲水與活動提醒。",
+        reason: "寵物照護需求會直接影響你最適合的設備組合與情境包。",
+        scores: { petcare: 4, security: 1 },
+        budgetWeight: 2,
+      },
+      {
+        value: "family",
+        label: "有小孩或長輩，希望使用更直覺、安全",
+        description: "例如夜燈、感應、語音、操作簡化與提醒。",
+        reason: "家庭成員的作息與安全性，讓舒適動線與提醒變得更重要。",
+        scores: { comfort: 2, security: 2 },
+        budgetWeight: 2,
+      },
+      {
+        value: "travel",
+        label: "常出差、晚回家，想更有安心感",
+        description: "希望離家模式、通知與遠端確認更完整。",
+        reason: "你對遠端狀態掌握需求較高，安心守護型情境會更有感。",
+        scores: { security: 4 },
+        budgetWeight: 2,
+      },
+      {
+        value: "work-home",
+        label: "常在家工作，希望空間更有效率",
+        description: "例如回家模式、工作模式、燈光與空調切換。",
+        reason: "你的生活與工作高度重疊，適合把便利性與工作情境一起整合。",
+        scores: { automation: 2, wholehome: 1, comfort: 1 },
+        budgetWeight: 2,
+      },
+      {
+        value: "couple-life",
+        label: "主要是雙人生活，希望更方便但不要太複雜",
+        description: "先從最常用的燈光、冷氣與回家情境開始。",
+        reason: "你比較適合從輕量但高感知的入門包開始，不需要一開始做太滿。",
+        scores: { automation: 2, comfort: 1 },
+        budgetWeight: 1,
+      },
+    ],
+  },
+  {
+    id: "experience",
+    label: "Q3",
+    title: "如果智能家居只能先改善一件事，你最在意什麼？",
+    options: [
+      {
+        value: "convenience",
+        label: "方便省事，少記少按少切換",
+        description: "讓日常流程更順，而不是設備更多。",
+        reason: "你最重視的是降低操作成本，入門自動化通常最有感。",
+        scores: { automation: 3 },
+        budgetWeight: 1,
+      },
+      {
+        value: "safety",
+        label: "安全感，知道家裡現在怎麼樣",
+        description: "即使不在家，也能掌握門鎖、感測與監控狀態。",
+        reason: "你想先換來安心感，適合把安全與通知系統整合在一起。",
+        scores: { security: 3 },
+        budgetWeight: 2,
+      },
+      {
+        value: "comfort",
+        label: "舒服與氛圍，讓作息切換更自然",
+        description: "讓燈光、窗簾、空調隨情境切換。",
+        reason: "你在意入住後的感受，舒適動線與情境自動化會很有價值。",
+        scores: { comfort: 3 },
+        budgetWeight: 2,
+      },
+      {
+        value: "remote",
+        label: "遠端控制與跨品牌整合",
+        description: "希望出門後仍能確認或操作主要設備。",
+        reason: "你已經不只是想玩設備，而是希望真的把生活系統整合起來。",
+        scores: { security: 2, wholehome: 1 },
+        budgetWeight: 3,
+      },
+      {
+        value: "expandable",
+        label: "未來可擴充，不想之後整套重來",
+        description: "希望從一開始就把架構與預留想好。",
+        reason: "你對長期性與擴充性有要求，適合從全屋架構思維出發。",
+        scores: { wholehome: 4 },
+        budgetWeight: 4,
+      },
+    ],
+  },
+  {
+    id: "scope",
+    label: "Q4",
+    title: "你希望第一階段做到什麼程度？",
+    options: [
+      {
+        value: "starter",
+        label: "先從燈光、冷氣、門鎖等基礎情境開始",
+        description: "以最好上手、最快有感的項目為主。",
+        reason: "你適合從低門檻的基礎自動化開始，不必一次做滿。",
+        scores: { automation: 2, comfort: 1 },
+        budgetWeight: 1,
+      },
+      {
+        value: "scenes",
+        label: "想做 2-3 個實用情境包",
+        description: "例如回家、離家、夜間、寵物或工作模式。",
+        reason: "你已經適合進入實用型規劃，情境包會比單點設備更有感。",
+        scores: { automation: 2, security: 1, comfort: 1, petcare: 1 },
+        budgetWeight: 2,
+      },
+      {
+        value: "integrated",
+        label: "想整合全屋主要設備與控制介面",
+        description: "燈光、窗簾、空調、門鎖與監控一起規劃。",
+        reason: "你想要的是整體體驗，不是零散設備，適合做整合升級型方案。",
+        scores: { wholehome: 3, security: 1 },
+        budgetWeight: 3,
+      },
+      {
+        value: "prewire",
+        label: "最在意裝修前先把弱電與預留做對",
+        description: "希望先把網路、控制節點與機櫃位置想清楚。",
+        reason: "你很適合在裝修前同步規劃，這會大幅影響後續穩定度與擴充性。",
+        scores: { wholehome: 2, security: 1, automation: 1 },
+        budgetWeight: 3,
+      },
+      {
+        value: "flagship",
+        label: "希望一次規劃成真正的高端科技宅",
+        description: "重視整合、穩定、體驗與長期可擴充性。",
+        reason: "你已經是高意圖客群，全屋整合與現場體驗會最值得安排。",
+        scores: { wholehome: 4 },
+        budgetWeight: 4,
+      },
+    ],
+  },
+  {
+    id: "investment",
+    label: "Q5",
+    title: "你目前對智能家居的投入接受度比較接近哪一種？",
+    options: [
+      {
+        value: "trial",
+        label: "先小幅體驗，確認適不適合自己",
+        description: "從最有感的 1-2 個情境開始。",
+        reason: "你適合從體驗型方案開始，先做對再逐步擴充。",
+        scores: { automation: 1 },
+        budgetWeight: 1,
+      },
+      {
+        value: "practical",
+        label: "中階實用型，重視真的好用",
+        description: "希望兼顧便利、穩定與預算效率。",
+        reason: "你是很適合導入實用型情境包的族群，不需要一次做到最滿。",
+        scores: { automation: 1, security: 1, petcare: 1, comfort: 1 },
+        budgetWeight: 2,
+      },
+      {
+        value: "quality",
+        label: "重視整合與質感，願意做得更完整",
+        description: "希望控制體驗、設備整合與空間感一起提升。",
+        reason: "你不是只想加設備，而是希望整體體驗與完成度一起升級。",
+        scores: { comfort: 1, wholehome: 1 },
+        budgetWeight: 3,
+      },
+      {
+        value: "premium",
+        label: "希望一次規劃完整，避免之後重做",
+        description: "更重視長期性、架構與高端體驗。",
+        reason: "你很適合直接進入全屋整合討論，現場看展間會最有價值。",
+        scores: { wholehome: 3 },
+        budgetWeight: 4,
+      },
+    ],
+  },
+];
+
+const quizStepsJson = JSON.stringify(quizSteps);
+---
+
+<BaseLayout
+  title="智能家居需求快篩 - 青曦空間設計"
+  description="用 5 題生活習慣問答，快速看出你最適合哪種智能家居情境包，並抓出弱電與控制預留的初步方向。"
+>
+  <div class="smart-quiz-page">
+    <section class="smart-quiz-hero">
+      <div class="smart-quiz-shell">
+        <div class="hero-copy">
+          <p class="hero-eyebrow">SMART HOME QUIZ</p>
+          <h1>先用 5 題生活習慣，快速看出你適合哪種智能家居方案。</h1>
+          <p class="hero-description">
+            如果你覺得智能家居很吸引人，但又擔心太貴、太複雜、不知道自己真正需要什麼，
+            這份快篩會先用生活情境幫你找出最適合的方向。
+          </p>
+          <div class="hero-highlights">
+            <span>約 1 分鐘完成</span>
+            <span>從生活情境切入</span>
+            <span>附弱電粗估方向</span>
+          </div>
+        </div>
+
+        <aside class="hero-panel">
+          <p class="hero-panel-label">WHAT YOU GET</p>
+          <ul>
+            <li>一個最適合你的智能家居情境包</li>
+            <li>弱電與控制預留的初步粗估區間</li>
+            <li>最值得先做的設備與情境方向</li>
+            <li>下一步如何到汐止工作室現場體驗</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="quiz-intro-section">
+      <div class="smart-quiz-shell">
+        <div class="intro-grid">
+          <article class="intro-card">
+            <p class="intro-card-label">WHY THIS TOOL</p>
+            <h2>不是問你想裝哪些設備，而是先看你的生活方式。</h2>
+            <p>
+              對大多數屋主來說，真正的問題不是不知道品牌，而是不知道自己的生活裡到底哪種情境最值得先做。
+              所以這份快篩先幫你找方向，再決定哪些設備值得投入。
+            </p>
+          </article>
+          <article class="intro-card intro-card-accent">
+            <p class="intro-card-label">WHO IT FITS</p>
+            <h2>特別適合正在裝修前期，或想把科技真正住進生活的人。</h2>
+            <p>
+              如果你同時重視空間設計、智能家居、真實材質與施工細節，這會比直接看設備清單更有幫助。
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="quiz-section">
+      <div class="smart-quiz-shell">
+        <div class="quiz-layout">
+          <div class="quiz-panel">
+            <div class="quiz-header">
+              <p class="quiz-eyebrow">QUIZ QUESTIONS</p>
+              <h2>回答這 5 題，就能先知道你最適合哪種智能家居情境包。</h2>
+            </div>
+
+            <form class="quiz-form" id="smart-home-quiz-form">
+              {
+                quizSteps.map((step) => (
+                  <section class="quiz-question">
+                    <div class="quiz-question-header">
+                      <p class="quiz-step">{step.label}</p>
+                      <h3>{step.title}</h3>
+                    </div>
+                    <div class="quiz-options">
+                      {step.options.map((option) => (
+                        <label class="quiz-option">
+                          <input
+                            type="radio"
+                            name={step.id}
+                            value={option.value}
+                            data-label={option.label}
+                          />
+                          <span class="quiz-option-copy">
+                            <strong>{option.label}</strong>
+                            <small>{option.description}</small>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </section>
+                ))
+              }
+            </form>
+          </div>
+
+          <aside class="result-panel" id="smart-home-result">
+            <div class="result-header">
+              <p class="result-eyebrow">YOUR RESULT</p>
+              <h2 id="result-title">先完成 5 題，青曦再幫你抓最適合的智能家居方向。</h2>
+              <p class="result-description" id="result-description">
+                這裡會顯示你最適合的情境包、弱電粗估方向與下一步建議。
+              </p>
+            </div>
+
+            <div class="result-summary-card">
+              <div class="result-summary-row">
+                <span>推薦情境包</span>
+                <strong id="result-package">尚未完成快篩</strong>
+              </div>
+              <div class="result-summary-row">
+                <span>方案層級</span>
+                <strong id="result-tier">--</strong>
+              </div>
+              <div class="result-summary-row">
+                <span>智能預算方向</span>
+                <strong id="result-budget">--</strong>
+              </div>
+              <div class="result-summary-row">
+                <span>弱電 / 控制預留</span>
+                <strong id="result-weak-budget">--</strong>
+              </div>
+            </div>
+
+            <div class="result-detail-card">
+              <h3>為什麼你適合這個方向</h3>
+              <ul class="result-list" id="result-reasons">
+                <li>先完成所有題目，這裡會整理出最貼近你的生活情境判讀。</li>
+              </ul>
+            </div>
+
+            <div class="result-detail-card">
+              <h3>最值得先做的重點</h3>
+              <div class="feature-list" id="result-features">
+                <div class="feature-item">
+                  <strong>先回答完成</strong>
+                  <span>完成後會看到最適合先做的設備與情境重點。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-cta-card">
+              <h3>下一步最推薦直接來現場看</h3>
+              <p>
+                帶著這份結果到青曦位於新北市汐止區的私宅工作室，現場可以免費喝杯咖啡、
+                直接體驗智能家居，也能看真實材質、弱電規劃與施工細節。
+              </p>
+              <div class="result-actions">
+                <a
+                  href="/contact?intent=smart-home-quiz&source=smart-home-quiz"
+                  class="quiz-btn quiz-btn-primary"
+                  data-smart-home-cta="quiz-consultation"
+                >
+                  帶著結果預約諮詢
+                </a>
+                <a
+                  href="/contact?intent=smart-home-studio-visit&source=smart-home-quiz"
+                  class="quiz-btn quiz-btn-secondary"
+                  data-smart-home-cta="studio-visit"
+                >
+                  預約汐止工作室體驗
+                </a>
+              </div>
+              <p class="result-note">完全免費、沒有壓力，但會比單看設備清單更快知道哪些做法適合你。</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .smart-quiz-page {
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.12), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 248, 248, 1) 100%);
+  }
+
+  .smart-quiz-hero,
+  .quiz-intro-section,
+  .quiz-section {
+    padding: 5rem 1.5rem;
+  }
+
+  .smart-quiz-hero {
+    padding-top: 6.5rem;
+  }
+
+  .smart-quiz-shell {
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  .smart-quiz-shell,
+  .intro-grid,
+  .quiz-layout {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .smart-quiz-shell:first-child,
+  .quiz-layout {
+    grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
+  }
+
+  .hero-eyebrow,
+  .quiz-eyebrow,
+  .result-eyebrow,
+  .hero-panel-label,
+  .intro-card-label,
+  .quiz-step {
+    margin: 0 0 0.8rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.24em;
+    color: var(--tiffany-dark);
+    text-transform: uppercase;
+  }
+
+  .hero-copy h1,
+  .intro-card h2,
+  .quiz-header h2,
+  .result-header h2 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    color: var(--gray-darkest);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2.3rem, 4.4vw, 4.1rem);
+  }
+
+  .hero-description,
+  .intro-card p,
+  .result-description,
+  .result-cta-card p,
+  .hero-panel li {
+    color: var(--gray-medium);
+    line-height: 1.9;
+  }
+
+  .hero-description {
+    margin: 1.1rem 0 0;
+    max-width: 44rem;
+  }
+
+  .hero-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 1.4rem;
+  }
+
+  .hero-highlights span {
+    padding: 0.68rem 0.95rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.18);
+    color: var(--gray-dark);
+    box-shadow: 0 10px 20px rgba(47, 47, 47, 0.04);
+  }
+
+  .hero-panel,
+  .intro-card,
+  .quiz-panel,
+  .result-panel {
+    border-radius: 28px;
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 22px 48px rgba(47, 47, 47, 0.06);
+  }
+
+  .hero-panel {
+    padding: 1.7rem;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 30%),
+      linear-gradient(135deg, rgba(24, 24, 24, 1) 0%, rgba(39, 39, 39, 1) 100%);
+    color: var(--white);
+  }
+
+  .hero-panel-label {
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  .hero-panel ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .hero-panel li {
+    color: rgba(255, 255, 255, 0.82);
+    padding-bottom: 0.95rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .hero-panel li:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .intro-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .intro-card {
+    padding: 1.6rem;
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  .intro-card-accent {
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 32%),
+      linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
+  }
+
+  .intro-card p {
+    margin: 0.9rem 0 0;
+  }
+
+  .quiz-panel,
+  .result-panel {
+    padding: 1.6rem;
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  .quiz-form {
+    display: grid;
+    gap: 1.1rem;
+    margin-top: 1.4rem;
+  }
+
+  .quiz-question {
+    padding: 1.25rem;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 249, 248, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.12);
+  }
+
+  .quiz-question-header h3 {
+    margin: 0;
+    font-size: 1.18rem;
+    line-height: 1.6;
+    color: var(--gray-darkest);
+  }
+
+  .quiz-options {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  .quiz-option {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 1rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    cursor: pointer;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  }
+
+  .quiz-option:hover {
+    transform: translateY(-1px);
+    border-color: rgba(129, 199, 212, 0.34);
+    box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
+  }
+
+  .quiz-option input[type="radio"] {
+    margin-top: 0.2rem;
+    accent-color: var(--tiffany-primary);
+  }
+
+  .quiz-option-copy strong,
+  .quiz-option-copy small {
+    display: block;
+  }
+
+  .quiz-option-copy strong {
+    color: var(--gray-darkest);
+    line-height: 1.6;
+  }
+
+  .quiz-option-copy small {
+    margin-top: 0.3rem;
+    color: var(--gray-medium);
+    line-height: 1.7;
+    font-size: 0.92rem;
+  }
+
+  .result-panel {
+    position: sticky;
+    top: 108px;
+    align-self: start;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .result-description {
+    margin: 0.9rem 0 0;
+  }
+
+  .result-summary-card,
+  .result-detail-card,
+  .result-cta-card {
+    padding: 1.15rem;
+    border-radius: 20px;
+    background: rgba(247, 250, 250, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .result-summary-card {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .result-summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(129, 199, 212, 0.12);
+  }
+
+  .result-summary-row:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .result-summary-row span {
+    color: var(--gray-medium);
+  }
+
+  .result-summary-row strong {
+    color: var(--gray-darkest);
+    text-align: right;
+  }
+
+  .result-detail-card h3,
+  .result-cta-card h3 {
+    margin: 0;
+    font-size: 1.08rem;
+    color: var(--gray-darkest);
+  }
+
+  .result-list,
+  .feature-list {
+    margin-top: 0.9rem;
+  }
+
+  .result-list {
+    padding-left: 1.2rem;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
+  .feature-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .feature-item {
+    padding: 0.85rem 0.95rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.12);
+  }
+
+  .feature-item strong,
+  .feature-item span {
+    display: block;
+  }
+
+  .feature-item strong {
+    color: var(--gray-darkest);
+  }
+
+  .feature-item span {
+    margin-top: 0.3rem;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.92rem;
+  }
+
+  .result-cta-card p {
+    margin: 0.8rem 0 0;
+  }
+
+  .result-actions {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  .quiz-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px;
+    padding: 0.95rem 1.4rem;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .quiz-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .quiz-btn-primary {
+    background: linear-gradient(135deg, var(--gray-darkest) 0%, var(--tiffany-dark) 100%);
+    color: var(--white);
+    border: 1px solid var(--gray-darkest);
+    box-shadow: 0 18px 28px rgba(47, 47, 47, 0.14);
+  }
+
+  .quiz-btn-secondary {
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--gray-darkest);
+    border: 1px solid rgba(129, 199, 212, 0.22);
+  }
+
+  .result-note {
+    margin: 0.8rem 0 0;
+    color: var(--gray-medium);
+    font-size: 0.92rem;
+    line-height: 1.75;
+  }
+
+  @media (max-width: 960px) {
+    .smart-quiz-shell:first-child,
+    .intro-grid,
+    .quiz-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .result-panel {
+      position: static;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .smart-quiz-hero,
+    .quiz-intro-section,
+    .quiz-section {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+
+    .quiz-panel,
+    .result-panel,
+    .hero-panel,
+    .intro-card {
+      padding: 1.25rem;
+      border-radius: 22px;
+    }
+
+    .quiz-question {
+      padding: 1rem;
+    }
+
+    .result-summary-row {
+      flex-direction: column;
+    }
+
+    .result-summary-row strong {
+      text-align: left;
+    }
+  }
+</style>
+
+<script type="application/json" id="smart-home-quiz-data" is:inline set:html={quizStepsJson}></script>
+<script>
+  // @ts-nocheck
+  const quizSteps = JSON.parse(
+    document.getElementById("smart-home-quiz-data")?.textContent || "[]",
+  );
+
+  const smartHomePackages = {
+    automation: {
+      title: "回家自動化入門包",
+      description:
+        "你最適合先從高頻、低負擔的自動化切入，讓燈光、冷氣、門鎖與離家情境先變得更順手。",
+      features: [
+        {
+          title: "先做最常用的回家 / 離家情境",
+          description: "讓每天最常操作的流程先減少重複動作，感受會最直接。",
+        },
+        {
+          title: "把常見設備整合成同一個邏輯",
+          description: "優先整理燈光、冷氣、門鎖與簡單感測，不需要一開始做太滿。",
+        },
+      ],
+    },
+    petcare: {
+      title: "寵物守護情境包",
+      description:
+        "你最值得優先處理的是寵物照護、遠端查看與環境控制，這會比單純玩設備更有實際價值。",
+      features: [
+        {
+          title: "先顧好寵物在家時的環境穩定",
+          description: "可從空調、攝影機、提醒與特定情境整合開始。",
+        },
+        {
+          title: "把寵物活動與人類作息一起考量",
+          description: "規劃時要同時考慮鏡頭位置、收納、防咬與使用習慣。",
+        },
+      ],
+    },
+    security: {
+      title: "遠端安心守護包",
+      description:
+        "你重視的是在外時也知道家裡現在怎麼樣，因此門鎖、感測、監控與通知整合會最有感。",
+      features: [
+        {
+          title: "先建立真正有用的離家安心機制",
+          description: "不是設備越多越好，而是關鍵狀態能被清楚掌握。",
+        },
+        {
+          title: "把通知與操作流程做得簡單",
+          description: "真正重要的是發生狀況時，你能快速知道並處理。",
+        },
+      ],
+    },
+    comfort: {
+      title: "夜間舒適動線包",
+      description:
+        "你在意的是入住後的舒適感與節奏，讓燈光、窗簾、空調與作息情境一起配合，會比單點設備更值得。",
+      features: [
+        {
+          title: "先把起床、回家、夜間與休息情境做順",
+          description: "從感應照明、空調節奏與窗簾切換先建立日常體驗。",
+        },
+        {
+          title: "把氛圍與功能一起整合",
+          description: "舒適型方案最怕只是好看，真正重點是住起來要順手。",
+        },
+      ],
+    },
+    wholehome: {
+      title: "全屋智慧整合包",
+      description:
+        "你不是只想裝幾個設備，而是希望從弱電、控制邏輯、設備整合到日後擴充都一次想清楚。",
+      features: [
+        {
+          title: "優先處理弱電、網路、電源與機櫃架構",
+          description: "這會直接影響系統穩定度、可維護性與日後擴充。",
+        },
+        {
+          title: "從裝修階段就一起整合",
+          description: "如果能在裝修前期同步規劃，整體體驗與完成度會差非常多。",
+        },
+      ],
+    },
+  };
+
+  const budgetTiers = {
+    1: {
+      title: "基礎體驗型",
+      budgetRange: "約 8 萬 - 15 萬",
+      weakRange: "弱電 / 控制預留約 3 萬 - 6 萬",
+    },
+    2: {
+      title: "實用進階型",
+      budgetRange: "約 15 萬 - 28 萬",
+      weakRange: "弱電 / 控制預留約 6 萬 - 12 萬",
+    },
+    3: {
+      title: "整合升級型",
+      budgetRange: "約 28 萬 - 45 萬",
+      weakRange: "弱電 / 控制預留約 10 萬 - 18 萬",
+    },
+    4: {
+      title: "全屋整合型",
+      budgetRange: "約 45 萬以上",
+      weakRange: "弱電 / 控制預留約 18 萬以上",
+    },
+  };
+
+  const resultTitle = document.getElementById("result-title");
+  const resultDescription = document.getElementById("result-description");
+  const resultPackage = document.getElementById("result-package");
+  const resultTier = document.getElementById("result-tier");
+  const resultBudget = document.getElementById("result-budget");
+  const resultWeakBudget = document.getElementById("result-weak-budget");
+  const resultReasons = document.getElementById("result-reasons");
+  const resultFeatures = document.getElementById("result-features");
+  const resultPanel = document.getElementById("smart-home-result");
+  const smartHomeCtas = Array.from(
+    document.querySelectorAll("[data-smart-home-cta]"),
+  );
+
+  let hasScrolledToResult = false;
+
+  function getAnsweredOptions() {
+    return quizSteps
+      .map((step) => {
+        const checked = document.querySelector(`input[name="${step.id}"]:checked`);
+        if (!checked) return null;
+        return step.options.find((option) => option.value === checked.value) || null;
+      })
+      .filter(Boolean);
+  }
+
+  function saveSmartHomeSnapshot(snapshot) {
+    try {
+      window.sessionStorage.setItem("smartHomeQuizSnapshot", JSON.stringify(snapshot));
+    } catch (error) {
+      console.warn("Unable to persist smart home quiz snapshot.", error);
+    }
+  }
+
+  function renderIncompleteState(answeredCount) {
+    const remaining = Math.max(0, quizSteps.length - answeredCount);
+    if (resultTitle) resultTitle.textContent = remaining ? `還差 ${remaining} 題，就能看出最適合你的智能家居方向。` : "先完成 5 題，青曦再幫你抓最適合的智能家居方向。";
+    if (resultDescription) {
+      resultDescription.textContent =
+        "完成後會顯示最適合的情境包、智能預算方向、弱電預留粗估與最值得先做的重點。";
+    }
+    if (resultPackage) resultPackage.textContent = "尚未完成快篩";
+    if (resultTier) resultTier.textContent = "--";
+    if (resultBudget) resultBudget.textContent = "--";
+    if (resultWeakBudget) resultWeakBudget.textContent = "--";
+    if (resultReasons) {
+      resultReasons.innerHTML = "<li>先完成所有題目，這裡會整理出最貼近你的生活情境判讀。</li>";
+    }
+    if (resultFeatures) {
+      resultFeatures.innerHTML = `
+        <div class="feature-item">
+          <strong>完成快篩後顯示</strong>
+          <span>你會看到最適合先做的情境包、設備方向與到店體驗建議。</span>
+        </div>
+      `;
+    }
+  }
+
+  function calculateSmartHomeResult() {
+    const answeredOptions = getAnsweredOptions();
+    if (answeredOptions.length !== quizSteps.length) {
+      renderIncompleteState(answeredOptions.length);
+      return;
+    }
+
+    const scoreBoard = {
+      automation: 0,
+      petcare: 0,
+      security: 0,
+      comfort: 0,
+      wholehome: 0,
+    };
+
+    let budgetScoreTotal = 0;
+
+    answeredOptions.forEach((option) => {
+      budgetScoreTotal += option.budgetWeight || 1;
+      Object.entries(option.scores || {}).forEach(([key, value]) => {
+        scoreBoard[key] = (scoreBoard[key] || 0) + value;
+      });
+    });
+
+    const packageKey = Object.entries(scoreBoard).sort((a, b) => b[1] - a[1])[0]?.[0] || "automation";
+    const packageData = smartHomePackages[packageKey] || smartHomePackages.automation;
+    const averageBudgetScore = Math.round(budgetScoreTotal / answeredOptions.length);
+    const budgetTier = budgetTiers[Math.min(4, Math.max(1, averageBudgetScore))];
+    const reasonItems = answeredOptions.map((option) => option.reason).slice(0, 3);
+
+    if (resultTitle) resultTitle.textContent = `你的智能家居方向更接近「${packageData.title}」`;
+    if (resultDescription) resultDescription.textContent = packageData.description;
+    if (resultPackage) resultPackage.textContent = packageData.title;
+    if (resultTier) resultTier.textContent = budgetTier.title;
+    if (resultBudget) resultBudget.textContent = budgetTier.budgetRange;
+    if (resultWeakBudget) resultWeakBudget.textContent = budgetTier.weakRange;
+
+    if (resultReasons) {
+      resultReasons.innerHTML = reasonItems.map((item) => `<li>${item}</li>`).join("");
+    }
+
+    if (resultFeatures) {
+      resultFeatures.innerHTML = packageData.features
+        .map(
+          (item) => `
+            <div class="feature-item">
+              <strong>${item.title}</strong>
+              <span>${item.description}</span>
+            </div>
+          `,
+        )
+        .join("");
+    }
+
+    const snapshot = {
+      packageKey,
+      packageTitle: packageData.title,
+      packageDescription: packageData.description,
+      tierTitle: budgetTier.title,
+      budgetRange: budgetTier.budgetRange,
+      weakRange: budgetTier.weakRange,
+      selectedAnswers: answeredOptions.map((option) => option.label),
+      reasons: reasonItems,
+      updatedAt: new Date().toISOString(),
+    };
+
+    saveSmartHomeSnapshot(snapshot);
+
+    window.trackLeadEvent?.("smart_home_quiz_completed", {
+      recommended_package: packageKey,
+      budget_tier: budgetTier.title,
+    });
+
+    if (!hasScrolledToResult && resultPanel) {
+      hasScrolledToResult = true;
+      resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  document
+    .querySelectorAll('#smart-home-quiz-form input[type="radio"]')
+    .forEach((input) => input.addEventListener("change", calculateSmartHomeResult));
+
+  smartHomeCtas.forEach((link) => {
+    link.addEventListener("click", () => {
+      calculateSmartHomeResult();
+      window.trackLeadEvent?.("smart_home_quiz_cta_click", {
+        destination: link.getAttribute("data-smart-home-cta") || "unknown",
+      });
+    });
+  });
+
+  renderIncompleteState(0);
+</script>

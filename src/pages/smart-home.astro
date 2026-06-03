@@ -68,7 +68,8 @@ const workflow = [
             從裝修前期的弱電配置，到入住後的自動化與資料管理，一起用設計思維整合完成。
           </p>
           <div class="hero-actions">
-            <a href="/contact" class="primary-link">預約智能家居諮詢</a>
+            <a href="/smart-home-quiz" class="primary-link">先做智能家居需求快篩</a>
+            <a href="/contact?intent=smart-home-studio-visit&source=smart-home" class="secondary-link">預約工作室體驗</a>
             <a href="/portfolio" class="secondary-link">查看作品集</a>
           </div>
         </div>
@@ -155,7 +156,10 @@ const workflow = [
             都可以先聊需求與預算範圍。
           </p>
         </div>
-        <a href="/contact" class="cta-link">預約諮詢</a>
+        <div class="cta-actions">
+          <a href="/smart-home-quiz" class="cta-link">先做需求快篩</a>
+          <a href="/contact?intent=smart-home-studio-visit&source=smart-home" class="secondary-link">預約工作室體驗</a>
+        </div>
       </div>
     </section>
   </div>
@@ -421,6 +425,14 @@ const workflow = [
     align-items: center;
   }
 
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
   .cta-shell p {
     margin: 0.9rem 0 0;
     max-width: 44rem;
@@ -433,6 +445,10 @@ const workflow = [
     .workflow-grid,
     .cta-shell {
       grid-template-columns: 1fr;
+    }
+
+    .cta-actions {
+      justify-content: flex-start;
     }
   }
 
