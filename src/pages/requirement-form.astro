@@ -6,6 +6,8 @@ const requirementFormAction = requirementFormId
   ? `https://formspree.io/f/${requirementFormId}`
   : '';
 const requirementFormEnabled = Boolean(requirementFormAction);
+const siteOrigin = (Astro.site || new URL('https://qingxidesign.tw')).toString();
+const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin).toString();
 ---
 
 <BaseLayout title="設計需求表 - 青曦空間設計">
@@ -119,6 +121,14 @@ const requirementFormEnabled = Boolean(requirementFormAction);
         <input type="hidden" name="estimator-house-condition" id="estimator-house-condition-input">
         <input type="hidden" name="estimator-selected-items" id="estimator-selected-items-input">
         <input type="hidden" name="_subject" value="青曦空間設計｜新的設計需求表單">
+        <input type="hidden" name="_next" value={requirementFormSuccessURL}>
+        <input type="hidden" name="utm_source" id="utm-source-input">
+        <input type="hidden" name="utm_medium" id="utm-medium-input">
+        <input type="hidden" name="utm_campaign" id="utm-campaign-input">
+        <input type="hidden" name="utm_term" id="utm-term-input">
+        <input type="hidden" name="utm_content" id="utm-content-input">
+        <input type="hidden" name="landing_page" id="landing-page-input">
+        <input type="hidden" name="page_referrer" id="page-referrer-input">
 
         <!-- 基本資料 -->
         <section class="form-section">
@@ -1315,6 +1325,25 @@ const requirementFormEnabled = Boolean(requirementFormAction);
     const estimatorPerPing = document.getElementById('estimator-per-ping');
     const estimatorProjectMeta = document.getElementById('estimator-project-meta');
     const estimatorSelectedItems = document.getElementById('estimator-selected-items');
+    const utmSourceInput = document.getElementById('utm-source-input');
+    const utmMediumInput = document.getElementById('utm-medium-input');
+    const utmCampaignInput = document.getElementById('utm-campaign-input');
+    const utmTermInput = document.getElementById('utm-term-input');
+    const utmContentInput = document.getElementById('utm-content-input');
+    const landingPageInput = document.getElementById('landing-page-input');
+    const pageReferrerInput = document.getElementById('page-referrer-input');
+
+    function fillAttributionFields() {
+      const searchParams = new URLSearchParams(window.location.search);
+
+      if (utmSourceInput) utmSourceInput.value = searchParams.get('utm_source') || '';
+      if (utmMediumInput) utmMediumInput.value = searchParams.get('utm_medium') || '';
+      if (utmCampaignInput) utmCampaignInput.value = searchParams.get('utm_campaign') || '';
+      if (utmTermInput) utmTermInput.value = searchParams.get('utm_term') || '';
+      if (utmContentInput) utmContentInput.value = searchParams.get('utm_content') || '';
+      if (landingPageInput) landingPageInput.value = window.location.href;
+      if (pageReferrerInput) pageReferrerInput.value = document.referrer || '';
+    }
 
     function restoreEstimatorSnapshot() {
       try {
@@ -1358,11 +1387,19 @@ const requirementFormEnabled = Boolean(requirementFormAction);
     }
 
     restoreEstimatorSnapshot();
+    fillAttributionFields();
 
     if (requirementForm?.dataset.formEnabled !== 'true') {
       requirementForm?.addEventListener('submit', function(event) {
         event.preventDefault();
         window.alert('表單收件尚未完成設定，請先透過官方 LINE 聯絡青曦。');
+      });
+    } else {
+      requirementForm?.addEventListener('submit', function() {
+        window.trackLeadEvent?.('requirement_form_submit', {
+          form_name: 'design_requirement_form',
+          has_estimator_summary: estimatorBrief?.style.display === 'block',
+        });
       });
     }
 
