@@ -24,8 +24,8 @@ export const DEFAULT_RENOVATION_ESTIMATOR_CONFIG = {
     'design-only': 0.15,
   },
   designFeePerPing: {
-    min: 3,
-    max: 5,
+    min: 0.6,
+    max: 1,
   },
   disclaimer:
     '此為粗略估算，實際費用需依據現場丈量、設計需求及選材而定',
