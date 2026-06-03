@@ -24,7 +24,9 @@ import HeroCarousel from "../components/HeroCarousel.astro";
           </p>
           <div class="brand-smart-home-actions">
             <a href="/smart-home" class="brand-smart-home-link">查看智能家居專區</a>
-          <a href="/smart-home-quiz" class="brand-smart-home-link brand-smart-home-link-secondary">智能家居快篩</a>
+          <a href="/smart-home-quiz" class="brand-smart-home-link brand-smart-home-link-secondary">
+            智能家居快篩
+          </a>
           </div>
         </div>
         <div class="brand-credential">
@@ -350,6 +352,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
             </p>
           </article>
         </div>
+        <p class="smart-case-mobile-note">手機版先整理兩個重點能力，更多整合內容可進入智能家居專區查看。</p>
       </div>
     </div>
   </section>
@@ -360,6 +363,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       <div class="workflow-header">
         <h6 class="section-subtitle">WORKFLOW</h6>
         <h2 class="section-title">服務流程</h2>
+        <p class="workflow-mobile-note">手機版先看前四個關鍵節點，完整流程會在諮詢後依案型進一步說明。</p>
       </div>
 
       <ul class="workflow-list">
@@ -1347,6 +1351,12 @@ import HeroCarousel from "../components/HeroCarousel.astro";
     }
 
     @media (max-width: 768px) {
+      .about-section,
+      .stats-section,
+      .testimonial-section {
+        display: none;
+      }
+
       .brand-strip {
         padding: 0 1.25rem;
         margin-top: -1.5rem;
@@ -1447,7 +1457,6 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       .public-ready-card,
       .smart-case-summary,
       .smart-case-card,
-      .testimonial-card,
       .workflow-content,
       .consult-shell {
         border-radius: 20px;
@@ -1456,9 +1465,12 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       .public-ready-highlight,
       .public-ready-card,
       .smart-case-summary,
-      .smart-case-card,
-      .testimonial-card {
+      .smart-case-card {
         padding: 1.2rem;
+      }
+
+      .public-ready-grid {
+        display: none;
       }
 
       .public-ready-tags,
@@ -1473,29 +1485,8 @@ import HeroCarousel from "../components/HeroCarousel.astro";
         font-size: 0.82rem;
       }
 
-      .testimonial-grid {
-        gap: 1.15rem;
-      }
-
-      .promise-icon {
-        width: 56px;
-        height: 56px;
-        margin-bottom: 1rem;
-      }
-
-      .promise-title {
-        font-size: 1.18rem;
-        margin-bottom: 0.75rem;
-      }
-
-      .about-section,
-      .testimonial-section,
       .faq-section,
       .consult-section {
-        padding: 3rem 1.5rem;
-      }
-
-      .stats-section {
         padding: 3rem 1.5rem;
       }
 
@@ -1524,6 +1515,26 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
       .workflow-list::before {
         display: none;
+      }
+
+      .smart-case-card:nth-child(n + 3),
+      .workflow-item:nth-child(n + 5) {
+        display: none;
+      }
+
+      .smart-case-mobile-note,
+      .workflow-mobile-note {
+        display: block;
+        margin: 0.9rem 0 0;
+        color: var(--gray-medium);
+        font-size: 0.9rem;
+        line-height: 1.7;
+      }
+
+      .workflow-mobile-note {
+        text-align: center;
+        max-width: 32rem;
+        margin: 0.9rem auto 0;
       }
 
       .consult-shell {
@@ -1886,6 +1897,11 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1.5rem;
+    }
+
+    .smart-case-mobile-note,
+    .workflow-mobile-note {
+      display: none;
     }
 
     .smart-case-card {
