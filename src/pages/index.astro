@@ -230,7 +230,7 @@ import HeroCarousel from "../components/HeroCarousel.astro";
             <figure class="service-content">
               <div class="service-text">
                 <p class="service-title">室內設計</p>
-                <p class="service-subtitle">& 工程施作</p>
+                <p class="service-title">工程施作</p>
               </div>
               <div class="service-icon">
                 <svg
@@ -1472,51 +1472,45 @@ import HeroCarousel from "../components/HeroCarousel.astro";
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 3rem 2rem;
+      padding: 2.5rem 1.5rem;
       margin: 0;
       position: relative;
       z-index: 1;
-      min-height: 280px;
+      min-height: 250px;
     }
 
     .service-text {
-      min-height: 4.8rem;
-      margin-bottom: 2rem;
+      min-height: 4.1rem;
+      margin-bottom: 1.5rem;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.35rem;
-    }
-
-    .service-title,
-    .service-subtitle {
-      margin: 0;
-      letter-spacing: 0.05em;
+      gap: 0.2rem;
     }
 
     .service-title {
-      font-size: 1.5rem;
+      margin: 0;
+      letter-spacing: 0.04em;
+    }
+
+    .service-title {
+      font-size: 1.28rem;
       font-weight: 500;
       color: var(--gray-dark);
-      line-height: 1.6;
+      line-height: 1.45;
     }
 
     .service-title-compact {
-      font-size: 1.28rem;
-      line-height: 1.5;
-    }
-
-    .service-subtitle {
-      font-size: 1rem;
-      color: var(--gray-medium);
-      line-height: 1.5;
+      font-size: 1.14rem;
+      line-height: 1.4;
+      white-space: nowrap;
     }
 
     .service-icon {
-      width: 80px;
-      height: 80px;
+      width: 72px;
+      height: 72px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1554,23 +1548,20 @@ import HeroCarousel from "../components/HeroCarousel.astro";
 
       .service-content {
         padding: 2rem 1.5rem;
-        min-height: 240px;
+        min-height: 220px;
       }
 
       .service-text {
-        min-height: 4.2rem;
+        min-height: 3.7rem;
       }
 
       .service-title {
-        font-size: 1.25rem;
+        font-size: 1.14rem;
       }
 
       .service-title-compact {
-        font-size: 1.08rem;
-      }
-
-      .service-subtitle {
-        font-size: 0.92rem;
+        font-size: 1rem;
+        white-space: normal;
       }
 
       .service-icon {
