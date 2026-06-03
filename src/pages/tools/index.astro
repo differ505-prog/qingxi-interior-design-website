@@ -1116,9 +1116,24 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   );
 
   const projectTypeMeta = {
-    full: { label: "全屋裝修", constructionMultiplier: estimatorConfig.projectTypeMultipliers?.full ?? 1, designMultiplier: 1 },
-    partial: { label: "局部裝修", constructionMultiplier: estimatorConfig.projectTypeMultipliers?.partial ?? 0.6, designMultiplier: 0.65 },
-    "design-only": { label: "純設計", constructionMultiplier: 0, designMultiplier: 1 },
+    full: {
+      label: "全屋裝修",
+      constructionMultiplier: estimatorConfig.projectTypeMultipliers?.full ?? 1,
+      designMultiplier: 1,
+      minScopeFactor: 0.78,
+    },
+    partial: {
+      label: "局部裝修",
+      constructionMultiplier: estimatorConfig.projectTypeMultipliers?.partial ?? 0.6,
+      designMultiplier: 0.65,
+      minScopeFactor: 0.38,
+    },
+    "design-only": {
+      label: "純設計",
+      constructionMultiplier: 0,
+      designMultiplier: 1,
+      minScopeFactor: 0,
+    },
   };
 
   const houseConditionMeta = {
@@ -1169,8 +1184,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       estimatorConfig.qualityLevels?.[qualityLevel.value] ||
       estimatorConfig.qualityLevels?.standard || { min: 6, max: 10 };
     const designFeePerPing = estimatorConfig.designFeePerPing || {
-      min: 3,
-      max: 5,
+      min: 0.6,
+      max: 1,
     };
     const selected = selectedItems.filter((item) => item.checked);
     const selectedConfigs = renovationItems.filter((item) =>
@@ -1199,10 +1214,14 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       (sum, item) => sum + item.weight,
       0,
     );
+    const selectedScopeRatio = selectedWeight / totalWeight || 0;
     const scopeFactor =
       projectType.value === "design-only"
         ? 0
-        : Math.max(0.28, 0.45 + 0.55 * (selectedWeight / totalWeight || 0));
+        : Math.max(
+            projectMeta.minScopeFactor,
+            0.45 + 0.55 * selectedScopeRatio,
+          );
 
     const minConstruction =
       projectType.value === "design-only"
@@ -1308,6 +1327,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       resultSubtitle.textContent =
         projectType.value === "design-only"
           ? "目前以設計規劃費為主，工程費用需依圖面、工法與發包範圍另行確認。"
+          : projectType.value === "full" &&
+              selectedScopeRatio < projectMeta.minScopeFactor
+            ? "全屋裝修已包含基礎工程底盤估算，即使未全選工項，也不會直接按局部工程規模計價。"
           : "依目前輸入條件，先整理出適合討論的預算帶、主要工項與建議預備金。";
       nextStepIntro.textContent =
         projectType.value === "design-only"
@@ -1320,6 +1342,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       adviceItems.push("屋況偏複雜，建議預留較高比例的拆除、基礎工程與預備金。");
     } else {
       adviceItems.push("屋況相對單純，較適合先把預算重點放在機能、材質與收納整合。");
+    }
+
+    if (projectType.value === "full" && selectedScopeRatio < projectMeta.minScopeFactor) {
+      adviceItems.push("你目前選的是全屋裝修，因此估算已自動納入基礎工程底盤，不會因少勾幾項就過度低估。");
     }
 
     if (usePurpose.value === "rental") {
