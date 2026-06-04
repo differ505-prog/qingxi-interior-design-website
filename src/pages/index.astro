@@ -135,58 +135,6 @@ const homeStructuredData = [
     </div>
   </section>
 
-  <section class="public-ready-section">
-    <div class="public-ready-container">
-      <div class="section-header public-ready-header">
-        <h6 class="section-subtitle">COOPERATION GUIDE</h6>
-        <h2 class="section-title">合作資訊</h2>
-        <p class="public-ready-intro">
-          第一次接觸青曦，先用這裡快速理解服務範圍與合作方式。
-        </p>
-      </div>
-
-      <div class="public-ready-shell">
-        <article class="public-ready-highlight" data-animate="left">
-          <p class="public-ready-label">QINGXI FIT</p>
-          <h3>適合想把設計、美感與工程執行一起整理清楚的屋主</h3>
-          <p>
-            不論是預售屋客變、新成屋整理、老屋翻新，或想把智能家居一起納入規劃，青曦都以「好住、耐看、可落地」為核心。
-          </p>
-          <div class="public-ready-tags">
-            <span>預售屋客變</span>
-            <span>住宅翻新</span>
-            <span>新成屋規劃</span>
-            <span>智能家居整合</span>
-          </div>
-          <div class="public-ready-actions">
-            <a href="/portfolio" class="public-ready-link public-ready-link-primary">先看作品</a>
-            <a href="/contact" class="public-ready-link public-ready-link-secondary">直接諮詢</a>
-          </div>
-        </article>
-
-        <div class="public-ready-grid">
-          <article class="public-ready-card" data-animate="scale">
-            <p class="public-ready-card-label">SERVICE AREA</p>
-            <h3>服務範圍</h3>
-            <p>以大台北住宅與商業空間為主，重視溝通效率與工程整合。</p>
-          </article>
-
-          <article class="public-ready-card" data-animate="scale">
-            <p class="public-ready-card-label">WORKING METHOD</p>
-            <h3>合作方式</h3>
-            <p>可先透過 LINE 或需求表初談，再安排丈量與提案流程。</p>
-          </article>
-
-          <article class="public-ready-card" data-animate="scale">
-            <p class="public-ready-card-label">PORTFOLIO VIEW</p>
-            <h3>案例呈現方式</h3>
-            <p>可從作品案例、工程前後對比與設計圖紙了解青曦的規劃方式。</p>
-          </article>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- 服務項目 Section -->
   <section class="service-section">
     <div class="service-container">
@@ -565,6 +513,7 @@ const homeStructuredData = [
       <div class="section-header">
         <h6 class="section-subtitle">FAQ</h6>
         <h2 class="section-title">常見問題</h2>
+        <p class="faq-intro">首頁先看 3 個最常被問的問題，其餘細節可到完整 FAQ 查看。</p>
       </div>
 
       <div class="faq-list">
@@ -630,48 +579,10 @@ const homeStructuredData = [
             </p>
           </div>
         </div>
-
-        <div class="faq-item" data-animate="right">
-          <button class="faq-question">
-            <span>預售屋可以提供客變服務嗎？</span>
-            <svg
-              class="faq-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-          <div class="faq-answer">
-            <p>
-              可以，我們擁有豐富客變經驗，能陪同與建商討論，讓客變過程更順利。
-            </p>
-          </div>
-        </div>
-
-        <div class="faq-item" data-animate="left">
-          <button class="faq-question">
-            <span>工程保固期多久？</span>
-            <svg
-              class="faq-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-          <div class="faq-answer">
-            <p>
-              提供一年工程保固，保固期內若有施工瑕疵皆會協助修復，並提供後續維修服務。
-            </p>
-          </div>
-        </div>
+      </div>
+      <div class="faq-actions">
+        <a href="/faq" class="faq-link faq-link-primary">查看完整 FAQ</a>
+        <a href="/contact" class="faq-link faq-link-secondary">直接諮詢</a>
       </div>
     </div>
   </section>
@@ -1005,174 +916,6 @@ const homeStructuredData = [
       letter-spacing: 0.05em;
     }
 
-    .public-ready-section {
-      padding: 5rem 2rem;
-      background:
-        radial-gradient(circle at top left, rgba(160, 217, 217, 0.12), transparent 22%),
-        linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(247, 248, 248, 1) 100%);
-    }
-
-    .public-ready-container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .public-ready-header {
-      margin-bottom: 2.5rem;
-    }
-
-    .public-ready-intro {
-      max-width: 42rem;
-      margin: 1rem auto 0;
-      color: var(--gray-medium);
-      line-height: 1.9;
-    }
-
-    .public-ready-shell {
-      display: grid;
-      grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
-      gap: 1.5rem;
-      align-items: stretch;
-    }
-
-    .public-ready-highlight,
-    .public-ready-card {
-      border-radius: 26px;
-      border: 1px solid rgba(129, 199, 212, 0.16);
-      box-shadow: 0 18px 40px rgba(47, 47, 47, 0.06);
-      opacity: 0;
-      transition: all 0.7s ease;
-    }
-
-    .public-ready-highlight[data-animate="left"] {
-      transform: translateX(-30px);
-    }
-
-    .public-ready-card[data-animate="scale"] {
-      transform: scale(0.92);
-    }
-
-    .public-ready-highlight.animate-in,
-    .public-ready-card.animate-in {
-      opacity: 1;
-      transform: translate(0) scale(1);
-    }
-
-    .public-ready-highlight {
-      padding: 1.9rem;
-      background:
-        radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 30%),
-        linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(47, 47, 47, 1) 100%);
-      color: var(--white);
-    }
-
-    .public-ready-label,
-    .public-ready-card-label {
-      margin: 0;
-      font-size: 0.78rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-    }
-
-    .public-ready-label {
-      color: rgba(255, 255, 255, 0.58);
-    }
-
-    .public-ready-highlight h3,
-    .public-ready-card h3 {
-      margin: 0.75rem 0 0;
-      font-family: "Noto Serif TC", serif;
-      font-weight: 500;
-      line-height: 1.5;
-      letter-spacing: 0.04em;
-    }
-
-    .public-ready-highlight h3 {
-      font-size: 1.65rem;
-    }
-
-    .public-ready-highlight p:last-of-type {
-      margin: 1rem 0 0;
-      color: rgba(255, 255, 255, 0.78);
-      line-height: 1.9;
-    }
-
-    .public-ready-tags {
-      margin-top: 1.25rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    .public-ready-tags span {
-      padding: 0.62rem 0.88rem;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      color: rgba(255, 255, 255, 0.84);
-      font-size: 0.9rem;
-    }
-
-    .public-ready-actions {
-      margin-top: 1.4rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.85rem;
-    }
-
-    .public-ready-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.85rem 1.2rem;
-      border-radius: 999px;
-      text-decoration: none;
-      letter-spacing: 0.08em;
-      transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
-    }
-
-    .public-ready-link:hover {
-      transform: translateY(-2px);
-    }
-
-    .public-ready-link-primary {
-      background: var(--tiffany-primary);
-      color: var(--gray-darkest);
-      border: 1px solid var(--tiffany-primary);
-    }
-
-    .public-ready-link-secondary {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--white);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-
-    .public-ready-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1.25rem;
-    }
-
-    .public-ready-card {
-      padding: 1.5rem;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
-    }
-
-    .public-ready-card-label {
-      color: var(--tiffany-dark);
-    }
-
-    .public-ready-card h3 {
-      font-size: 1.3rem;
-      color: var(--gray-darkest);
-    }
-
-    .public-ready-card p:last-child {
-      margin: 0.75rem 0 0;
-      color: var(--gray-medium);
-      line-height: 1.85;
-    }
-
     /* Testimonial Section Styles */
     .testimonial-section {
       padding: 5rem 2rem;
@@ -1269,6 +1012,13 @@ const homeStructuredData = [
       gap: 1rem;
     }
 
+    .faq-intro {
+      max-width: 38rem;
+      margin: 1rem auto 0;
+      color: var(--gray-medium);
+      line-height: 1.85;
+    }
+
     .faq-item {
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 250, 250, 1) 100%);
       border-radius: 20px;
@@ -1353,6 +1103,44 @@ const homeStructuredData = [
       margin: 0;
     }
 
+    .faq-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+
+    .faq-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.9rem 1.3rem;
+      border-radius: 999px;
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      transition:
+        transform 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease;
+    }
+
+    .faq-link:hover {
+      transform: translateY(-2px);
+    }
+
+    .faq-link-primary {
+      background: var(--gray-darkest);
+      color: var(--white);
+      border: 1px solid var(--gray-darkest);
+    }
+
+    .faq-link-secondary {
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--gray-darkest);
+      border: 1px solid rgba(129, 199, 212, 0.18);
+    }
+
     /* Responsive Styles */
     @media (max-width: 1024px) {
       .brand-strip-inner {
@@ -1366,11 +1154,6 @@ const homeStructuredData = [
       .stats-container {
         grid-template-columns: repeat(2, 1fr);
         gap: 2rem;
-      }
-
-      .public-ready-shell,
-      .public-ready-grid {
-        grid-template-columns: 1fr;
       }
 
       .testimonial-grid {
@@ -1407,8 +1190,6 @@ const homeStructuredData = [
       .brand-strip-label,
       .brand-smart-home-label,
       .brand-credential-label,
-      .public-ready-label,
-      .public-ready-card-label,
       .smart-case-label,
       .smart-case-card-label,
       .section-subtitle,
@@ -1418,7 +1199,6 @@ const homeStructuredData = [
       }
 
       .brand-strip-copy h2,
-      .public-ready-highlight h3,
       .smart-case-summary h3,
       .consult-title {
         line-height: 1.38;
@@ -1430,9 +1210,6 @@ const homeStructuredData = [
 
       .brand-strip-intro,
       .brand-smart-home > p:last-child,
-      .public-ready-intro,
-      .public-ready-highlight p:last-of-type,
-      .public-ready-card p:last-child,
       .smart-case-intro,
       .smart-case-description,
       .smart-case-card p:last-child,
@@ -1448,13 +1225,11 @@ const homeStructuredData = [
       }
 
       .brand-smart-home-actions,
-      .public-ready-actions,
       .smart-case-actions {
         gap: 0.6rem;
       }
 
       .brand-smart-home-link,
-      .public-ready-link,
       .smart-case-link,
       .consult-button {
         width: 100%;
@@ -1472,7 +1247,6 @@ const homeStructuredData = [
       .faq-section,
       .consult-section,
       .service-section,
-      .public-ready-section,
       .smart-case-section,
       .workflow-section {
         padding-left: 1.25rem;
@@ -1485,13 +1259,10 @@ const homeStructuredData = [
 
       .section-header,
       .workflow-header,
-      .public-ready-header,
       .smart-case-header {
         margin-bottom: 2rem;
       }
 
-      .public-ready-highlight,
-      .public-ready-card,
       .smart-case-summary,
       .smart-case-card,
       .workflow-content,
@@ -1499,24 +1270,16 @@ const homeStructuredData = [
         border-radius: 20px;
       }
 
-      .public-ready-highlight,
-      .public-ready-card,
       .smart-case-summary,
       .smart-case-card {
         padding: 1.2rem;
       }
 
-      .public-ready-grid {
-        display: none;
-      }
-
-      .public-ready-tags,
       .smart-case-tags {
         gap: 0.55rem;
         margin-top: 1rem;
       }
 
-      .public-ready-tags span,
       .smart-case-tags span {
         padding: 0.5rem 0.7rem;
         font-size: 0.82rem;
@@ -1548,6 +1311,10 @@ const homeStructuredData = [
 
       .faq-answer p {
         padding: 0 1.5rem 1.25rem 1.5rem;
+      }
+
+      .faq-actions {
+        flex-direction: column;
       }
 
       .workflow-list::before {
@@ -2254,10 +2021,6 @@ const homeStructuredData = [
       // Observe stats
       const statItems = document.querySelectorAll<HTMLElement>(".stat-item");
       observeElements(statItems, 100);
-
-      // Observe public-ready section
-      const publicReadyItems = document.querySelectorAll<HTMLElement>(".public-ready-highlight, .public-ready-card");
-      observeElements(publicReadyItems, 120);
 
       // Observe service items
       const serviceItems = document.querySelectorAll<HTMLElement>(".service-item");

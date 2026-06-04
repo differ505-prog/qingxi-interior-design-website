@@ -1,0 +1,206 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const faqItems = [
+  {
+    question: "設計費用如何計算？",
+    answer: "一般住宅設計費約為每坪 NT$ 3,000-6,000 元。初步諮詢免費，了解需求後會提供詳細報價。",
+  },
+  {
+    question: "從設計到完工需要多久時間？",
+    answer: "整體時程約 3 到 6 個月，依空間大小、工程內容與現場條件而定。",
+  },
+  {
+    question: "可以只做設計不做工程嗎？",
+    answer: "可以，青曦提供純設計服務；若採設計加工程統包，整體品質與時程通常更好掌握。",
+  },
+  {
+    question: "預售屋可以提供客變服務嗎？",
+    answer: "可以，青曦可協助整理客變重點，陪你更有方向地和建商確認調整項目。",
+  },
+  {
+    question: "工程保固期多久？",
+    answer: "提供一年工程保固。若在保固期內發現施工瑕疵，會協助安排修復。",
+  },
+  {
+    question: "第一次合作要怎麼開始？",
+    answer: "可先透過聯絡頁、官方 LINE 或需求表留下基本資訊，青曦會先協助釐清需求、預算與時程，再安排後續討論。",
+  },
+];
+
+const faqStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  },
+];
+---
+
+<BaseLayout
+  title="常見問題 - 青曦空間設計"
+  description="整理青曦空間設計常見問題，包含設計費、合作流程、時程、客變與保固。"
+  ogImage="/images/portfolio/xizhi-1.jpg"
+  structuredData={faqStructuredData}
+>
+  <section class="faq-page">
+    <div class="faq-shell">
+      <header class="faq-hero">
+        <p class="faq-eyebrow">FAQ</p>
+        <h1>先把常見問題看清楚，再決定下一步。</h1>
+        <p class="faq-description">
+          這裡整理設計費、時程、合作方式、客變與保固等常見問題，方便你先快速判斷方向。
+        </p>
+        <div class="faq-hero-actions">
+          <a href="/contact" class="faq-button faq-button-primary">直接諮詢</a>
+          <a href="/tools" class="faq-button faq-button-secondary">先做裝修估價</a>
+        </div>
+      </header>
+
+      <div class="faq-grid">
+        {faqItems.map((item) => (
+          <article class="faq-card">
+            <h2>{item.question}</h2>
+            <p>{item.answer}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .faq-page {
+    padding: 5rem 1.5rem;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.12), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(247, 248, 248, 1) 100%);
+  }
+
+  .faq-shell {
+    max-width: 1040px;
+    margin: 0 auto;
+  }
+
+  .faq-hero {
+    text-align: center;
+    max-width: 44rem;
+    margin: 0 auto 2.5rem;
+  }
+
+  .faq-eyebrow {
+    margin: 0 0 0.85rem;
+    color: var(--tiffany-dark);
+    font-size: 0.8rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .faq-hero h1 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(2.2rem, 4vw, 3.6rem);
+    line-height: 1.32;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--gray-darkest);
+  }
+
+  .faq-description {
+    margin: 1.1rem auto 0;
+    color: var(--gray-medium);
+    line-height: 1.9;
+  }
+
+  .faq-hero-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+  }
+
+  .faq-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 0.9rem 1.35rem;
+    border-radius: 999px;
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    transition:
+      transform 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .faq-button:hover {
+    transform: translateY(-2px);
+  }
+
+  .faq-button-primary {
+    background: var(--gray-darkest);
+    color: var(--white);
+    border: 1px solid var(--gray-darkest);
+  }
+
+  .faq-button-secondary {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--gray-darkest);
+    border: 1px solid rgba(129, 199, 212, 0.18);
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .faq-card {
+    padding: 1.5rem;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 18px 34px rgba(47, 47, 47, 0.05);
+  }
+
+  .faq-card h2 {
+    margin: 0;
+    font-size: 1.18rem;
+    line-height: 1.6;
+    color: var(--gray-darkest);
+    letter-spacing: 0.03em;
+  }
+
+  .faq-card p {
+    margin: 0.8rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
+  }
+
+  @media (max-width: 768px) {
+    .faq-page {
+      padding: 4rem 1.25rem;
+    }
+
+    .faq-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .faq-hero-actions {
+      flex-direction: column;
+    }
+
+    .faq-button {
+      width: 100%;
+    }
+  }
+</style>
