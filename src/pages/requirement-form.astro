@@ -12,16 +12,16 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
 <BaseLayout
   title="設計需求表 - 青曦空間設計"
-  description="先用精簡需求表整理聯絡方式、屋況、預算與時程，讓青曦空間設計更快掌握你的裝修方向；其餘生活細節可後續再補。"
+  description="先整理聯絡方式、屋況、預算與大概時程，讓青曦更快掌握你的裝修方向；其餘細節都可後續再補。"
   ogImage="/images/portfolio/xizhi-1.jpg"
 >
   <section class="form-page-hero">
     <div class="form-hero-shell">
       <div class="hero-copy">
         <p class="hero-eyebrow">DESIGN BRIEF</p>
-        <h1>先用一份不嚇人的需求表，把案子的重點整理出來。</h1>
+        <h1>先把這次裝修的重點整理出來。</h1>
         <p class="hero-description">
-          先留下聯絡方式、屋況、預算與時程即可，其他細節都可依目前掌握狀況選填。
+          先留下聯絡方式、屋況、預算與大概時程即可，其他細節都可依目前掌握狀況選填。
         </p>
         <div class="hero-highlights">
           <span>先填核心資訊</span>
@@ -242,7 +242,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
           </div>
 
           <div class="form-group">
-            <label for="handover-date">交屋日期</label>
+            <label for="handover-date">大概什麼時候交屋</label>
             <input type="date" id="handover-date" name="handover-date" data-progress="true">
           </div>
 
@@ -294,7 +294,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
           <p class="field-hint">這些資訊會幫助青曦初步判斷提案方向、配置與是否需要預留智慧家庭整合。</p>
           
           <div class="form-group">
-            <label for="expected-completion">期望完工時間</label>
+            <label for="expected-completion">希望什麼時候完工</label>
             <input type="date" id="expected-completion" name="expected-completion" data-progress="true">
           </div>
 
@@ -794,7 +794,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
           <div class="form-row">
             <div class="form-group">
-              <label for="latest-completion">最晚可接受完工時間</label>
+              <label for="latest-completion">最晚希望什麼時候完工</label>
               <input type="date" id="latest-completion" name="latest-completion">
             </div>
             <div class="form-group">

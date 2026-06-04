@@ -5,7 +5,7 @@ import { buildRequirementSubmissionSummary } from "../../../lib/requirement-form
 const requirementFormId =
   import.meta.env.FORMSPREE_REQUIREMENT_FORM_ID?.trim() ||
   import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() ||
-  "";
+  "xrevzvnp";
 
 export const POST: APIRoute = async ({ request, redirect }) => {
   const fallbackRedirect = "/requirement-form?submit_error=1";
@@ -28,15 +28,24 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     forwardFormData.set(label, value);
   });
 
-  const response = await fetch(`https://formspree.io/f/${requirementFormId}`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-    },
-    body: forwardFormData,
-  });
+  try {
+    const response = await fetch(`https://formspree.io/f/${requirementFormId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+      },
+      body: forwardFormData,
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      console.error("Requirement form forwarding failed.", {
+        status: response.status,
+        statusText: response.statusText,
+      });
+      return redirect(fallbackRedirect, 303);
+    }
+  } catch (error) {
+    console.error("Requirement form forwarding threw an error.", error);
     return redirect(fallbackRedirect, 303);
   }
 
