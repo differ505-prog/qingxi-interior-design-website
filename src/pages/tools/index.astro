@@ -348,7 +348,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             <div class="advice-card advice-card-accent">
               <div class="advice-header">
                 <h3>建議下一步</h3>
-                <p id="next-step-intro">先看懂現在最適合做的那一步，不用一次吸收太多資訊。</p>
+                <p id="next-step-intro">先看最適合的下一步就好。</p>
               </div>
               <div class="next-step-points" id="next-step-points"></div>
             </div>
@@ -357,18 +357,18 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="estimator-handoff-card">
             <div class="estimator-handoff-copy">
               <p class="estimator-handoff-eyebrow">BEST NEXT STEP</p>
-              <h3 id="estimator-handoff-title">要不要把這次估算直接帶進完整需求表？</h3>
+              <h3 id="estimator-handoff-title">把這次估算帶進完整需求表？</h3>
               <p id="estimator-handoff-description" class="estimator-handoff-description">
-                再補生活需求、空間細節與時程資訊，青曦就能更快判斷你的案件方向，不用從頭再說一次。
+                再補需求、照片與時程，青曦就能更快判斷你的案件方向。
               </p>
               <div class="estimator-handoff-points">
                 <div class="estimator-handoff-point">
                   <strong>不需要重填估算結果</strong>
-                  <span>這次試算摘要會一起帶進需求表，討論更容易直接進入重點。</span>
+                  <span>這次試算摘要會一起帶進需求表。</span>
                 </div>
                 <div class="estimator-handoff-point">
                   <strong id="estimator-handoff-point-title">最適合下一步整理需求</strong>
-                  <span id="estimator-handoff-point-description">如果你已經有大致預算方向，這一步最能幫助青曦快速理解你的案件狀況。</span>
+                  <span id="estimator-handoff-point-description">如果你已經有大致預算方向，這一步最有效率。</span>
                 </div>
               </div>
             </div>
@@ -387,17 +387,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               >
                 先帶著結果諮詢
               </a>
-              <p class="estimator-handoff-note">如果你只是想先知道大概範圍，也可以先保留這次結果，之後再回來填。</p>
+              <p class="estimator-handoff-note">若你只想先抓範圍，也可以先保留這次結果。</p>
             </div>
           </div>
 
           <div class="report-offer-card">
             <div class="report-offer-copy">
               <p class="report-offer-eyebrow">ESTIMATE FOLLOW-UP</p>
-              <h3>如果你想把這次試算變成更好判讀的下一步，可直接索取費用拆解報告。</h3>
+              <h3>如果你想更看懂這次試算，可直接索取費用拆解報告。</h3>
               <p class="report-offer-description">
-                青曦會依你這次的估價條件，整理一份更適合討論的初步拆解方向，不是制式的範本內容，
-                而是方便你更快看懂預算主要落點、下一步該先確認什麼。
+                青曦會依你這次的條件整理初步拆解方向，幫你更快看懂預算主要落點。
               </p>
               <div class="report-offer-points">
                 <div class="report-offer-point">
@@ -418,7 +417,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             <div class="report-offer-actions">
               <div class="report-form-intro">
                 <strong>想直接拿這次的拆解方向</strong>
-                <p>算完後可直接留下姓名與 Line / Email，青曦會依這次試算內容接續整理。</p>
+                <p>留下姓名與 Line / Email，青曦會依這次試算內容接續整理。</p>
               </div>
               {
                 !estimatorLeadEnabled && (
@@ -1809,8 +1808,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           : "依目前輸入條件，先整理出適合討論的預算帶、主要工項與建議預備金。";
       nextStepIntro.textContent =
         projectType.value === "design-only"
-          ? "你目前更接近設計規劃前期，適合先整理需求與生活方式，再確認圖面深度。"
-          : "你目前已經有可討論的預算帶，下一步最適合把需求、照片與工程範圍一起整理。";
+          ? "你現在更接近設計規劃前期。"
+          : "你現在已經有可討論的預算帶。";
       reportContext.textContent =
         projectType.value === "design-only"
           ? `目前較適合先整理 ${projectMeta.label} 的需求重點與設計深度，再進一步確認交付方向。`
@@ -1824,19 +1823,19 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       estimatorHandoffPointDescription
     ) {
       if (projectType.value === "design-only") {
-        estimatorHandoffTitle.textContent = "要不要直接把設計方向整理成完整需求表？";
+        estimatorHandoffTitle.textContent = "把設計方向整理成完整需求表？";
         estimatorHandoffDescription.textContent =
-          "你現在比較接近設計規劃前期，最適合把生活需求、空間痛點與參考風格一次整理清楚。";
+          "把需求、空間痛點與參考風格整理清楚，第一次討論會更有效率。";
         estimatorHandoffPointTitle.textContent = "這一步最能提高設計討論效率";
         estimatorHandoffPointDescription.textContent =
-          "把需求、參考圖與理想交付內容先講清楚，第一次諮詢就更容易直接對焦。";
+          "把需求、參考圖與理想交付內容先講清楚就可以。";
       } else {
-        estimatorHandoffTitle.textContent = "要不要把這次估算直接帶進完整需求表？";
+        estimatorHandoffTitle.textContent = "把這次估算帶進完整需求表？";
         estimatorHandoffDescription.textContent =
-          "再補生活需求、空間細節與時程資訊，青曦就能更快判斷你的案件方向，不用從頭再說一次。";
+          "再補需求、照片與時程，青曦就能更快判斷你的案件方向。";
         estimatorHandoffPointTitle.textContent = "最適合下一步整理需求";
         estimatorHandoffPointDescription.textContent =
-          "如果你已經有大致預算方向，這一步最能幫助青曦快速理解你的案件狀況。";
+          "如果你已經有大致預算方向，這一步最有效率。";
       }
     }
 
@@ -1877,11 +1876,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         projectType.value === "design-only"
           ? {
               title: "先整理需求與參考圖",
-              description: "把生活需求、喜歡的風格與空間痛點一起帶進需求表，第一次設計討論會更容易直接對焦。",
+              description: "把需求、風格與空間痛點帶進需求表，第一次設計討論會更容易對焦。",
             }
           : {
               title: "帶著估價摘要填需求表",
-              description: "你現在的試算會一起帶進需求表，再補照片、時程與空間需求，青曦就能更快理解你的案件狀況。",
+              description: "你現在的試算會一起帶進需求表，再補照片與時程就能直接往下討論。",
             };
 
       nextStepPoints.innerHTML = `
