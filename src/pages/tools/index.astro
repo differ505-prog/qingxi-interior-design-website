@@ -341,14 +341,14 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             <div class="advice-card">
               <div class="advice-header">
                 <h3>估算判讀</h3>
-                <p>根據你的住宅條件、使用方式與進場時程，整理討論重點。</p>
+                <p>只保留目前最值得先注意的 2 個重點，幫你快速判讀方向。</p>
               </div>
               <ul class="advice-list" id="advice-list"></ul>
             </div>
             <div class="advice-card advice-card-accent">
               <div class="advice-header">
                 <h3>建議下一步</h3>
-                <p id="next-step-intro">若方向已接近，下一步最適合把需求與預算一起整理完整。</p>
+                <p id="next-step-intro">先看懂現在最適合做的那一步，不用一次吸收太多資訊。</p>
               </div>
               <div class="next-step-points" id="next-step-points"></div>
             </div>
@@ -1863,44 +1863,33 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       adviceItems.push("時程仍有彈性，可先把需求表填完整，讓設計討論更聚焦也更容易抓準預算。");
     }
 
+    const compactAdviceItems =
+      projectType.value === "design-only"
+        ? adviceItems.slice(0, 2)
+        : [adviceItems[0], adviceItems[2] || adviceItems[1]].filter(Boolean);
+
     if (adviceList) {
-      adviceList.innerHTML = adviceItems.map((item) => `<li>${item}</li>`).join("");
+      adviceList.innerHTML = compactAdviceItems.map((item) => `<li>${item}</li>`).join("");
     }
 
     if (nextStepPoints) {
-      const stepItems =
+      const stepItem =
         projectType.value === "design-only"
-          ? [
-              {
-                title: "先整理需求與參考圖",
-                description: "把生活需求、喜歡的風格與空間痛點一起帶進需求表，最能提高設計討論效率。",
-              },
-              {
-                title: "確認設計深度與交付內容",
-                description: "若你需要平面規劃、3D、施工圖或發包協助，建議在第一次諮詢就先說清楚。",
-              },
-            ]
-          : [
-              {
-                title: "帶著估價摘要填需求表",
-                description: "你現在的試算會一起帶進需求表，青曦能更快理解你的預算帶與工項範圍。",
-              },
-              {
-                title: "準備現場照片與時程資訊",
-                description: "若能同時提供現況照片、交屋時間與預計入住時間，初步判斷會更準確。",
-              },
-            ];
+          ? {
+              title: "先整理需求與參考圖",
+              description: "把生活需求、喜歡的風格與空間痛點一起帶進需求表，第一次設計討論會更容易直接對焦。",
+            }
+          : {
+              title: "帶著估價摘要填需求表",
+              description: "你現在的試算會一起帶進需求表，再補照片、時程與空間需求，青曦就能更快理解你的案件狀況。",
+            };
 
-      nextStepPoints.innerHTML = stepItems
-        .map(
-          (item) => `
-            <div class="next-step-item">
-              <strong>${item.title}</strong>
-              <span>${item.description}</span>
-            </div>
-          `,
-        )
-        .join("");
+      nextStepPoints.innerHTML = `
+        <div class="next-step-item">
+          <strong>${stepItem.title}</strong>
+          <span>${stepItem.description}</span>
+        </div>
+      `;
     }
 
     if (estimatorLeadIntent) {
