@@ -69,7 +69,7 @@ export const AI_DISCOVERY_NOTES = {
     "Home Assistant 與 NAS 規劃",
   ],
   trustSignals: [
-    "建築物室內裝修工程管理乙級技術士",
+    "具室內裝修工程管理乙級證照",
     "提供透明報價流程與需求表單",
     "具作品案例、圖面與工程前後對比內容",
   ],
