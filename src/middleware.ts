@@ -4,9 +4,15 @@ import { PASSWORD_PROTECTION_CONFIG, isLocalDevelopment } from './lib/password-c
 // ==================== 預覽密碼保護 ====================
 // 密碼保護邏輯
 const PREVIEW_PROTECTION_ENABLED = PASSWORD_PROTECTION_CONFIG.enabled && !isLocalDevelopment();
+const LEGACY_VERCEL_HOST = 'qingxi-interior-design-website.vercel.app';
+const CANONICAL_ORIGIN = 'https://qingxidesign.tw';
 
 export const onRequest: MiddlewareHandler = async (context, next) => {
-  const { pathname } = context.url;
+  const { hostname, pathname, search } = context.url;
+
+  if (hostname === LEGACY_VERCEL_HOST) {
+    return context.redirect(`${CANONICAL_ORIGIN}${pathname}${search}`, 308);
+  }
 
   // ==================== 預覽密碼保護邏輯 ====================
   if (PREVIEW_PROTECTION_ENABLED) {
