@@ -354,6 +354,8 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
             </div>
           </div>
 
+          <div id="space-quantity-container" class="space-quantity-container" style="display: none;"></div>
+
           <div class="form-group">
             <label for="priority-needs">最希望優先解決的 1 到 3 件事</label>
             <textarea
@@ -1334,6 +1336,18 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     border: 1px solid rgba(129, 199, 212, 0.14);
   }
 
+  .space-quantity-container {
+    margin: -0.2rem 0 1.25rem;
+    padding: 1rem 1.1rem 0.1rem;
+    border-radius: 18px;
+    background: rgba(244, 248, 248, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .space-quantity-container .field-hint {
+    margin-top: 0;
+  }
+
   .space-quantity-label {
     display: block;
     margin-bottom: 0.55rem;
@@ -1805,6 +1819,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     // 空間詳細需求
     const spaceCheckboxes = document.querySelectorAll('.space-checkbox');
     const spaceDetailsContainer = document.getElementById('space-details-container');
+    const spaceQuantityContainer = document.getElementById('space-quantity-container');
 
     const spaceDetails = {
       'living-room': {
@@ -1957,8 +1972,34 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
       `;
     }
 
+    function updateSpaceQuantities() {
+      if (!spaceQuantityContainer) return;
+
+      const quantityHtml = Array.from(spaceCheckboxes)
+        .filter((checkbox) => checkbox.checked)
+        .map((checkbox) => {
+          const details = spaceDetails[checkbox.value];
+          return details ? getSpaceQuantityHtml(checkbox.value, details) : '';
+        })
+        .filter(Boolean)
+        .join('');
+
+      if (!quantityHtml) {
+        spaceQuantityContainer.innerHTML = '';
+        spaceQuantityContainer.style.display = 'none';
+        return;
+      }
+
+      spaceQuantityContainer.innerHTML = `
+        <p class="field-hint">以下是你剛勾選且可能不只一間的空間，先抓大概數量即可。</p>
+        ${quantityHtml}
+      `;
+      spaceQuantityContainer.style.display = 'block';
+    }
+
     function updateSpaceDetails() {
       spaceDetailsContainer.innerHTML = '';
+      updateSpaceQuantities();
       
       spaceCheckboxes.forEach(checkbox => {
         if (checkbox.checked) {
@@ -2011,7 +2052,6 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
             section.innerHTML = `
               <h3 class="space-detail-title">${details.title}</h3>
               <p class="space-detail-subtitle">如果這個空間已經有明確想法，可以順手勾選；沒有也沒關係。</p>
-              ${getSpaceQuantityHtml(spaceValue, details)}
               <div class="checkbox-group">
                 ${optionsHtml}
               </div>
