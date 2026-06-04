@@ -37,6 +37,18 @@ const project = {
     },
   ],
 };
+const projectDescription =
+  "青曦住宅空間精選案例，整理客廳、餐廚、主臥與浴室的空間照片，並呈現平面、照明與櫃體圖面及工程前後對比。";
+const projectStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.title,
+    description: projectDescription,
+    image: project.images.map((image) => image.src),
+    about: ["住宅空間設計", "室內設計", "工程前後對比", "設計圖面"],
+  },
+];
 
 const primaryGalleryImages = project.images.slice(0, 2);
 const secondaryGalleryImages = project.images.slice(2);
@@ -93,7 +105,13 @@ const renovationComparisons = [
 ];
 ---
 
-<BaseLayout title={`${project.title} - 青曦空間設計`}>
+<BaseLayout
+  title={`${project.title} - 青曦空間設計`}
+  description={projectDescription}
+  ogImage={project.images[0].src}
+  pageType="collection"
+  structuredData={projectStructuredData}
+>
   <div class="project-page">
     <section class="project-hero">
       <div class="project-hero-shell">

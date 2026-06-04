@@ -11,7 +11,12 @@ const siteOrigin = (Astro.site || new URL("https://qingxidesign.tw")).toString()
 const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).toString();
 ---
 
-<BaseLayout title="聯絡我們 - 青曦空間設計">
+<BaseLayout
+  title="聯絡我們 - 青曦空間設計"
+  description="預約青曦空間設計的室內設計諮詢，透過 LINE、需求表或聯絡頁整理你的空間條件、預算與裝修時程。"
+  ogImage="/images/portfolio/xizhi-1.jpg"
+  pageType="contact"
+>
   <section class="contact-page">
     <div class="contact-shell">
       <div class="contact-hero">

@@ -25,9 +25,25 @@ const projectData = {
 };
 
 const project = projectData[slug] || projectData['modern-nordic-apartment'];
+const projectDescription = `${project.title}案例，整理空間故事與作品圖集，幫助你快速理解青曦的設計風格與空間完成度。`;
+const projectStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.title,
+    description: projectDescription,
+    image: [project.bannerImage, ...project.gallery],
+  },
+];
 ---
 
-<BaseLayout title={`${project.title} - 精選作品`}>
+<BaseLayout
+  title={`${project.title} - 精選作品`}
+  description={projectDescription}
+  ogImage={project.bannerImage}
+  pageType="collection"
+  structuredData={projectStructuredData}
+>
   <div class="w-full">
     <img src={project.bannerImage} alt={project.title} class="w-full h-96 object-cover" />
   </div>

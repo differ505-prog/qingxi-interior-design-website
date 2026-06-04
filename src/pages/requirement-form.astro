@@ -11,7 +11,11 @@ const siteOrigin = (Astro.site || new URL('https://qingxidesign.tw')).toString()
 const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin).toString();
 ---
 
-<BaseLayout title="設計需求表 - 青曦空間設計">
+<BaseLayout
+  title="設計需求表 - 青曦空間設計"
+  description="用完整需求表整理住宅條件、生活方式、預算與時程，讓青曦空間設計更快掌握你的裝修方向。"
+  ogImage="/images/portfolio/xizhi-1.jpg"
+>
   <section class="form-page-hero">
     <div class="form-hero-shell">
       <div class="hero-copy">

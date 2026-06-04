@@ -83,6 +83,29 @@ const post = {
 
 // 將 Rich Text 轉換為 HTML
 const contentHtml = documentToHtmlString(post.content);
+const publishedTime = new Date(item.fields.date).toISOString();
+const modifiedTime = item.sys?.updatedAt ? new Date(item.sys.updatedAt).toISOString() : publishedTime;
+const articleStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.summary,
+    image: [post.coverImage],
+    datePublished: publishedTime,
+    dateModified: modifiedTime,
+    author: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    articleSection: post.category,
+    mainEntityOfPage: `https://qingxidesign.tw/blog/${post.slug}`,
+  },
+];
 ---
 
 <style>
@@ -241,7 +264,15 @@ const contentHtml = documentToHtmlString(post.content);
   }
 </style>
 
-<BaseLayout title={`${post.title} - 青曦空間設計`}>
+<BaseLayout
+  title={`${post.title} - 青曦空間設計`}
+  description={post.summary}
+  ogImage={post.coverImage}
+  pageType="article"
+  publishedTime={publishedTime}
+  modifiedTime={modifiedTime}
+  structuredData={articleStructuredData}
+>
   <article style="padding: 4rem 1rem;">
     <div class="article-header">
       <span class="article-category">{post.category}</span>

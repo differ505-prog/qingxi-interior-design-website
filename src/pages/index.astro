@@ -1,9 +1,49 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import HeroCarousel from "../components/HeroCarousel.astro";
+
+const homeDescription =
+  "青曦空間設計提供大台北住宅、商業空間與智能家居整合服務，從設計提案、工程管理到裝修估價與需求整理，協助你把理想空間落地。";
+const homeStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "設計費用如何計算？",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "一般住宅設計費約為每坪 NT$ 3,000-6,000 元。初步諮詢免費，了解需求後會提供詳細報價。",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "從設計到完工需要多久時間？",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "整體時程約 3 到 6 個月，依空間大小與工程內容而定。",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "可以只做設計不做工程嗎？",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "可以，青曦提供純設計服務；若採設計加工程統包，整體品質與時程會更有保障。",
+        },
+      },
+    ],
+  },
+];
 ---
 
-<BaseLayout title="首頁 - 青曦空間設計">
+<BaseLayout
+  title="首頁 - 青曦空間設計"
+  description={homeDescription}
+  ogImage="/images/portfolio/xizhi-1.jpg"
+  structuredData={homeStructuredData}
+>
   <HeroCarousel />
 
   <section class="brand-strip">
