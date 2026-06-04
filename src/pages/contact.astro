@@ -13,7 +13,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
 <BaseLayout
   title="聯絡我們 - 青曦空間設計"
-  description="預約青曦空間設計的室內設計諮詢，透過 LINE、需求表或聯絡頁整理你的空間條件、預算與裝修時程。"
+  description="預約青曦空間設計諮詢，先留下空間條件、預算方向與時程。"
   ogImage="/images/portfolio/xizhi-1.jpg"
   pageType="contact"
 >
@@ -22,9 +22,9 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       <div class="contact-hero">
         <div class="contact-copy">
           <p class="contact-eyebrow">NEXT STEP</p>
-          <h1>讓諮詢過程和空間一樣，清楚、安定、好開始。</h1>
+          <h1>讓諮詢過程清楚、安定、好開始。</h1>
           <p class="contact-description">
-            不論你正準備新成屋、預售屋客變，或想整理既有住宅，青曦都會先陪你把需求與時程梳理清楚。
+            不論是新成屋、預售屋客變，或既有住宅整理，青曦都會先陪你把方向釐清。
           </p>
 
           <div class="contact-highlights">
@@ -38,7 +38,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
           <p class="contact-credential-title">室內裝修工程管理乙級證照</p>
           <p class="contact-credential-meta">技術士證編號：126-0024871</p>
           <p class="contact-credential-description">
-            諮詢時不只談風格，也會一起釐清工程管理與施工節點。
+            諮詢時會一起釐清工程管理與施工節點。
           </p>
         </div>
         </div>
@@ -46,9 +46,9 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
         <aside class="contact-aside">
           <p class="aside-label">CONSULTING FLOW</p>
           <ol class="aside-steps">
-            <li>留下需求方向與空間資訊</li>
-            <li>確認預算帶與裝修時程</li>
-            <li>安排後續討論與現場評估</li>
+            <li>先留下需求方向</li>
+            <li>再確認預算與時程</li>
+            <li>最後安排後續討論</li>
           </ol>
         </aside>
       </div>
@@ -79,30 +79,6 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
           <p class="card-description">適合想先快速聊需求與預算方向的人。</p>
           <span class="card-link">立即開始對話</span>
         </a>
-
-        <a href="/requirement-form" class="contact-card" data-contact-cta="requirement-form">
-          <div class="card-icon form-color">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="64"
-              height="64"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <line x1="10" y1="9" x2="8" y2="9"></line>
-            </svg>
-          </div>
-          <p class="card-label">進一步整理</p>
-          <h2>填寫線上需求表</h2>
-          <p class="card-description">適合想一次補齊空間條件、需求細節與預算資訊的人。</p>
-          <span class="card-link">前往完整需求表</span>
-        </a>
       </div>
 
       <section class="quick-form-panel">
@@ -110,13 +86,16 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
           <p class="quick-form-eyebrow">QUICK CONSULTATION</p>
           <h2 id="quick-form-title">如果你還沒準備好完整需求，先留下核心資訊就可以。</h2>
           <p class="quick-form-description" id="quick-form-description">
-            這是第一階段精簡表單，適合先確認預算方向與服務方式；之後需要更完整評估，再補填需求表即可。
+            這是第一階段精簡表單，適合先確認預算方向。
           </p>
           <div class="quick-form-highlights">
             <span>約 1 分鐘完成</span>
             <span>先確認方向再深入</span>
             <span>適合第一次接觸</span>
           </div>
+          <p class="quick-form-direct-note">
+            若你已整理好資訊，也可改填完整需求表。
+          </p>
         </div>
 
         <div class="quick-form-shell">
@@ -192,7 +171,13 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
             <div class="quick-form-actions">
               <button type="submit" class="quick-form-submit">送出快速諮詢</button>
-              <a href="/requirement-form" class="quick-form-secondary">我已整理好資訊，改填完整需求表</a>
+              <a
+                href="/requirement-form"
+                class="quick-form-secondary is-disabled"
+                data-ready-link="requirement-form"
+                data-contact-cta="requirement-form"
+                aria-disabled="true"
+              >先填 3 項核心資訊，再改填完整需求表</a>
             </div>
           </form>
         </div>
@@ -201,7 +186,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       <section class="social-panel">
         <div class="social-copy">
           <p class="social-label">FOLLOW QINGXI</p>
-          <h2>從社群看更多日常靈感。</h2>
+          <h2>從社群看更多靈感。</h2>
         </div>
 
         <div class="social-section">
@@ -369,9 +354,6 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
   .contact-actions {
     margin-top: 3rem;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
   }
 
   .contact-card {
@@ -526,6 +508,12 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
   }
 
+  .quick-form-direct-note {
+    margin: 1rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+  }
+
   .quick-form-shell {
     padding: 1.5rem;
     border-radius: 28px;
@@ -659,6 +647,15 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     box-shadow: 0 14px 24px rgba(129, 199, 212, 0.12);
   }
 
+  .quick-form-secondary.is-disabled,
+  .quick-form-secondary[aria-disabled="true"] {
+    pointer-events: none;
+    color: rgba(108, 108, 108, 0.82);
+    background: rgba(247, 249, 249, 0.92);
+    border-color: rgba(129, 199, 212, 0.14);
+    box-shadow: none;
+  }
+
   .social-panel {
     margin-top: 2.25rem;
     padding: 1.6rem 1.75rem;
@@ -778,6 +775,22 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   const quickConsultationFocus = document.getElementById("quick-consultation-focus");
   const quickFormTitle = document.getElementById("quick-form-title");
   const quickFormDescription = document.getElementById("quick-form-description");
+  const requirementReadyLink = document.querySelector("[data-ready-link='requirement-form']");
+
+  function toggleRequirementReadyLink() {
+    if (!requirementReadyLink || !quickConsultationForm) return;
+
+    const nameValue = quickConsultationForm.querySelector("input[name='name']")?.value.trim() || "";
+    const contactValue = quickConsultationForm.querySelector("input[name='contact_method']")?.value.trim() || "";
+    const focusValue = quickConsultationForm.querySelector("textarea[name='consultation_focus']")?.value.trim() || "";
+    const isReady = Boolean(nameValue && contactValue && focusValue);
+
+    requirementReadyLink.classList.toggle("is-disabled", !isReady);
+    requirementReadyLink.setAttribute("aria-disabled", String(!isReady));
+    requirementReadyLink.textContent = isReady
+      ? "我已整理好資訊，改填完整需求表"
+      : "先填 3 項核心資訊，再改填完整需求表";
+  }
 
   function fillQuickConsultationAttribution() {
     const searchParams = new URLSearchParams(window.location.search);
@@ -814,7 +827,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
         if (quickFormTitle) quickFormTitle.textContent = "想索取費用拆解報告，先留下這次估價的聯絡資訊就可以。";
         if (quickFormDescription) {
           quickFormDescription.textContent =
-            "青曦會依你這次試算的條件，進一步整理更好判讀的初步拆解方向，方便你理解預算主要落點與下一步建議。";
+            "青曦會依你這次試算條件，整理更好判讀的初步拆解方向，方便你理解預算落點與下一步建議。";
         }
         if (quickConsultationFocus && !quickConsultationFocus.value) {
           quickConsultationFocus.value =
@@ -826,7 +839,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
         if (quickFormTitle) quickFormTitle.textContent = "如果你想直接來汐止工作室體驗，先留下聯絡資訊就可以。";
         if (quickFormDescription) {
           quickFormDescription.textContent =
-            "青曦會依你這次估價方向安排後續聯繫，方便你到現場喝杯咖啡、看真實材質與施工細節，並直接體驗智能家居。";
+            "青曦會依你這次估價方向安排後續聯繫，方便你到現場看材質、施工細節，並直接體驗智能家居。";
         }
         if (quickConsultationFocus && !quickConsultationFocus.value) {
           quickConsultationFocus.value =
@@ -865,7 +878,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
         if (quickFormTitle) quickFormTitle.textContent = "想帶著智能家居快篩結果深入聊，先留下聯絡資訊就可以。";
         if (quickFormDescription) {
           quickFormDescription.textContent =
-            "青曦會依你這次的生活情境快篩結果，進一步整理適合的智能家居方向、弱電預留與下一步建議。";
+            "青曦會依你這次快篩結果，整理適合的智能家居方向、弱電預留與下一步建議。";
         }
         if (quickConsultationFocus && !quickConsultationFocus.value) {
           quickConsultationFocus.value =
@@ -877,7 +890,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
         if (quickFormTitle) quickFormTitle.textContent = "如果你想直接來工作室體驗智能家居，先留下聯絡資訊就可以。";
         if (quickFormDescription) {
           quickFormDescription.textContent =
-            "青曦會依你這次快篩結果安排後續聯繫，方便你到汐止工作室喝杯咖啡、體驗情境操作並看真實材質與施工細節。";
+            "青曦會依你這次快篩結果安排後續聯繫，方便你到汐止工作室體驗情境操作，並看真實材質與施工細節。";
         }
         if (quickConsultationFocus && !quickConsultationFocus.value) {
           quickConsultationFocus.value =
@@ -892,6 +905,9 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   fillQuickConsultationAttribution();
   hydrateEstimatorSummary();
   hydrateSmartHomeQuizSummary();
+  toggleRequirementReadyLink();
+
+  quickConsultationForm?.addEventListener("input", toggleRequirementReadyLink);
 
   if (quickConsultationForm?.dataset.formEnabled !== "true") {
     quickConsultationForm?.addEventListener("submit", function(event) {
