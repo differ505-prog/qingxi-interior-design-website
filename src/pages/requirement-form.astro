@@ -13,23 +13,23 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
 
 <BaseLayout
   title="設計需求表 - 青曦空間設計"
-  description="用完整需求表整理住宅條件、生活方式、預算與時程，讓青曦空間設計更快掌握你的裝修方向。"
+  description="先用精簡需求表整理聯絡方式、屋況、預算與時程，讓青曦空間設計更快掌握你的裝修方向；其餘生活細節可後續再補。"
   ogImage="/images/portfolio/xizhi-1.jpg"
 >
   <section class="form-page-hero">
     <div class="form-hero-shell">
       <div class="hero-copy">
         <p class="hero-eyebrow">DESIGN BRIEF</p>
-        <h1>把需求整理得更完整，讓後續討論直接進入重點。</h1>
+        <h1>先用一份不嚇人的需求表，把案子的重點整理出來。</h1>
         <p class="hero-description">
-          如果你已經先透過快速諮詢留下基本資訊，這份表單會接著幫你補齊空間條件、
-          生活方式、預算範圍與工程需求，讓青曦更完整掌握後續規劃方向。
+          先留下聯絡方式、屋況、預算與時程即可，其他家庭成員、寵物與生活細節都可以依目前掌握狀況選填，
+          讓你不需要一開始就填很多，也能先把諮詢啟動起來。
         </p>
         <div class="hero-highlights">
-          <span>住宅需求整理</span>
-          <span>預算與時程盤點</span>
+          <span>先填核心資訊</span>
+          <span>其餘細節可後補</span>
+          <span>約 1 分鐘可送出</span>
           <span>設計施工整合</span>
-          <span>智慧家庭整合</span>
         </div>
       </div>
 
@@ -56,11 +56,11 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
       <div class="form-header">
         <p class="form-eyebrow">CONSULTATION FORM</p>
         <h1>設計需求表</h1>
-        <p class="form-subtitle">這是進一步整理需求的完整表單，請依照目前掌握的資訊填寫，越完整越能幫助後續討論更聚焦。</p>
+          <p class="form-subtitle">先完成前面幾個核心欄位就能送出，後面的生活細節與補充資料都可依照目前掌握程度再填。</p>
         <div class="form-assurance">
-          <p class="form-assurance-title">由具建築物室內裝修工程管理乙級資格團隊協助梳理需求</p>
+            <p class="form-assurance-title">先快速送出需求，再由具建築物室內裝修工程管理乙級資格團隊協助你往下梳理</p>
           <p class="form-assurance-description">
-            你填寫的內容不只用來談風格，也能更有效整理工程條件、預算節點與後續執行方向。
+            不需要一次把所有事情講完；只要先把案件核心資訊交給青曦，我們就能更快判斷下一步怎麼討論。
           </p>
         </div>
         
@@ -70,7 +70,7 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
             <div class="progress-fill" id="progress-fill"></div>
           </div>
           <div class="progress-text">
-            <span>完成度：</span>
+            <span>快速送出完成度：</span>
             <span id="progress-percentage">0%</span>
           </div>
         </div>
@@ -138,80 +138,344 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
 
         <!-- 基本資料 -->
         <section class="form-section">
-          <h2 class="section-title">基本資料</h2>
+          <h2 class="section-title">第一步｜快速聯絡資訊</h2>
+          <p class="field-hint">先留下姓名與至少一種聯絡方式即可，其餘資料都可後續再補。</p>
           
           <div class="form-group">
             <label for="name">姓名 <span class="required">*</span></label>
-            <input type="text" id="name" name="name" required>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="age">年齡</label>
-              <input type="text" id="age" name="age">
-            </div>
-
-            <div class="form-group">
-              <label for="occupation">職業</label>
-              <input type="text" id="occupation" name="occupation">
-            </div>
+            <input type="text" id="name" name="name" required data-progress="true">
           </div>
 
           <div class="form-group">
-            <label>婚姻狀況</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="marital-status" value="married" id="married-yes">
-                <span>有</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="marital-status" value="single" id="married-no">
-                <span>無</span>
-              </label>
-            </div>
-          </div>
-
-          <div id="spouse-details" class="conditional-section" style="display: none;">
-            <div class="form-group">
-              <label for="spouse-name">配偶/伴侶姓名</label>
-              <input type="text" id="spouse-name" name="spouse-name">
-            </div>
-
-            <div class="form-group">
-              <label for="spouse-occupation">配偶/伴侶職業</label>
-              <input type="text" id="spouse-occupation" name="spouse-occupation">
-            </div>
-
-            <div class="form-group">
-              <label for="spouse-phone">配偶/伴侶電話</label>
-              <input type="tel" id="spouse-phone" name="spouse-phone">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="phone">電話 <span class="required">*</span></label>
-            <input type="tel" id="phone" name="phone" required>
+            <label for="phone">電話</label>
+            <input type="tel" id="phone" name="phone" data-progress="true" placeholder="手機或市話都可以">
           </div>
 
           <div class="form-group">
             <label for="line-id">Line ID</label>
-            <input type="text" id="line-id" name="line-id">
+            <input type="text" id="line-id" name="line-id" data-progress="true" placeholder="如果你比較習慣用 LINE 溝通，可留這裡">
           </div>
 
           <div class="form-group">
-            <label for="line-name">Line 名稱</label>
-            <input type="text" id="line-name" name="line-name">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" data-progress="true" placeholder="如果方便，也可留 Email">
           </div>
 
           <div class="form-group">
-            <label for="email">Email <span class="required">*</span></label>
-            <input type="email" id="email" name="email" required>
+            <label for="contact-preference">最方便聯繫你的方式</label>
+            <select id="contact-preference" name="contact-preference">
+              <option value="">請選擇</option>
+              <option value="phone">電話</option>
+              <option value="line">LINE</option>
+              <option value="email">Email</option>
+              <option value="either">都可以</option>
+            </select>
           </div>
 
           <div class="form-group">
-            <label for="other-notes-basic">其他備註</label>
-            <textarea id="other-notes-basic" name="other-notes-basic" rows="3"></textarea>
+            <label for="other-notes-basic">一句話告訴我們你現在最想先解決什麼</label>
+            <textarea
+              id="other-notes-basic"
+              name="other-notes-basic"
+              rows="3"
+              data-progress="true"
+              placeholder="例如預售屋快客變了、老屋想先抓預算、需要三房改兩房、想一起規劃智能家居等"
+            ></textarea>
           </div>
+        </section>
+
+        <!-- 房屋資料 -->
+        <section class="form-section">
+          <h2 class="section-title">第二步｜案件基本條件</h2>
+          <p class="field-hint">這一段只抓青曦判斷案型最需要的資訊，不用一次把所有細節都填滿。</p>
+          
+          <div class="form-group">
+            <label for="address">裝修地址 <span class="required">*</span></label>
+            <input type="text" id="address" name="address" required data-progress="true" placeholder="可先填到行政區或社區名稱，例如汐止、板橋、新店央北等">
+          </div>
+
+          <div class="form-group">
+            <label>是否為預售屋</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="presale" value="yes" id="presale-yes" data-progress="true">
+                <span>是</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="presale" value="no" id="presale-no" data-progress="true">
+                <span>否</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="presale-details" class="conditional-section" style="display: none;">
+            <div class="form-group">
+              <label>是否需要客變</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="customer-change" value="yes">
+                  <span>是</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="customer-change" value="no">
+                  <span>否</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="change-deadline">客變到期日</label>
+              <input type="date" id="change-deadline" name="change-deadline">
+            </div>
+
+            <div class="form-group">
+              <label for="presale-notes">備註</label>
+              <textarea id="presale-notes" name="presale-notes" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="handover-date">交屋日期</label>
+            <input type="date" id="handover-date" name="handover-date" data-progress="true">
+          </div>
+
+          <div class="form-group">
+            <label for="interior-area">室內總坪數約（含陽台、衛浴）</label>
+            <input type="text" id="interior-area" name="interior-area" data-progress="true" placeholder="例如 22 坪、28.5 坪">
+          </div>
+
+          <div class="form-group">
+            <label>是否為毛胚屋</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="house-status" value="raw" data-progress="true">
+                <span>是</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="house-status" value="renovated" data-progress="true">
+                <span>否</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="house-status" value="other" data-progress="true">
+                <span>其他</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="budget">期望裝修預算</label>
+            <select id="budget" name="budget" data-progress="true">
+              <option value="">請選擇</option>
+              <option value="under-50">50萬以下</option>
+              <option value="50-100">50-100萬</option>
+              <option value="100-200">100-200萬</option>
+              <option value="200-300">200-300萬</option>
+              <option value="300-500">300-500萬</option>
+              <option value="500-800">500-800萬</option>
+              <option value="over-800">800萬以上</option>
+              <option value="other">其他</option>
+            </select>
+            <div id="budget-other-input" class="conditional-input" style="display: none;">
+              <input type="text" name="budget-other" placeholder="請填寫預算金額">
+            </div>
+          </div>
+        </section>
+
+        <!-- 空間配置需求 -->
+        <section class="form-section">
+          <h2 class="section-title">第三步｜空間與方向</h2>
+          <p class="field-hint">這些資訊會幫助青曦初步判斷提案方向、配置與是否需要預留智慧家庭整合。</p>
+          
+          <div class="form-group">
+            <label for="expected-completion">期望完工時間</label>
+            <input type="date" id="expected-completion" name="expected-completion" data-progress="true">
+          </div>
+
+          <div class="form-group">
+            <label>請勾選需要的空間配置</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="living-room" class="space-checkbox" data-progress="true">
+                <span>客廳</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="dining-room" class="space-checkbox" data-progress="true">
+                <span>餐廳</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="bathroom" class="space-checkbox" data-progress="true">
+                <span>浴廁</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="kitchen" class="space-checkbox" data-progress="true">
+                <span>廚房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="master-bedroom" class="space-checkbox" data-progress="true">
+                <span>主臥房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="children-room" class="space-checkbox">
+                <span>小孩房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="guest-room" class="space-checkbox">
+                <span>客房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="elderly-room" class="space-checkbox">
+                <span>孝親房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="study-room" class="space-checkbox">
+                <span>書房</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="walk-in-closet" class="space-checkbox">
+                <span>更衣室</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="storage" class="space-checkbox">
+                <span>儲藏室</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" name="spaces" value="tatami-room" class="space-checkbox">
+                <span>和室</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="priority-needs">最希望優先解決的 1 到 3 件事</label>
+            <textarea
+              id="priority-needs"
+              name="priority-needs"
+              rows="3"
+              data-progress="true"
+              placeholder="例如收納不足、格局想重整、預售屋客變快到期、預算想先抓範圍、需要小孩房與書房共用等"
+            ></textarea>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2 class="section-title">第四步｜智慧家庭需求</h2>
+          <p class="field-hint">如果你還不確定要不要做智慧家庭，只要勾「想了解」即可，後續再一起討論。</p>
+
+          <div class="form-group">
+            <label>是否需要智慧家庭整合規劃</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="smart-home-planning" value="yes" id="smart-home-yes">
+                <span>需要</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="smart-home-planning" value="maybe" id="smart-home-maybe">
+                <span>想了解</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="smart-home-planning" value="no" id="smart-home-no">
+                <span>暫時不需要</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="smart-home-details" class="conditional-section" style="display: none;">
+            <div class="form-group">
+              <label>希望整合的項目</label>
+              <div class="checkbox-grid">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="lighting">
+                  <span>燈光控制</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="curtain">
+                  <span>電動窗簾</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="air-conditioning">
+                  <span>空調整合</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="door-lock">
+                  <span>智慧門鎖</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="sensor">
+                  <span>感測器自動化</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="security">
+                  <span>監控與安防</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="network">
+                  <span>網路與弱電配置</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-features" value="audio">
+                  <span>影音情境整合</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>希望支援的生態系</label>
+              <div class="checkbox-grid">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="apple-home">
+                  <span>Apple Home</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="google-home">
+                  <span>Google Home</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="alexa">
+                  <span>Alexa</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="home-assistant">
+                  <span>Home Assistant</span>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="smart-home-ecosystem" value="not-sure">
+                  <span>還不確定</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>目前是否已有既有設備想整合</label>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="existing-smart-devices" value="yes" id="existing-smart-devices-yes">
+                  <span>有</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="existing-smart-devices" value="no" id="existing-smart-devices-no">
+                  <span>沒有</span>
+                </label>
+              </div>
+              <div id="existing-smart-devices-input" class="conditional-input" style="display: none;">
+                <textarea name="existing-smart-devices-notes" rows="3" placeholder="可填寫目前設備品牌、型號，或想延用的系統"></textarea>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="smart-home-scenes">想實現的生活情境</label>
+              <textarea id="smart-home-scenes" name="smart-home-scenes" rows="3" placeholder="例如回家模式、離家模式、起夜動線、語音控制、遠端查看等"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="smart-home-notes">智慧家庭補充說明</label>
+              <textarea id="smart-home-notes" name="smart-home-notes" rows="3" placeholder="例如希望前期預留哪些線路、是否重視後續擴充、是否已有跨品牌整合需求"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2 class="section-title">進階補充（選填）</h2>
+          <p class="field-hint">以下內容都不是送出前一定要填的，若你現在就有明確想法，填寫後能幫助後續討論更聚焦。</p>
 
           <div class="form-group">
             <label for="residents">居住人數</label>
@@ -399,15 +663,17 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
               <input type="text" name="source-other" placeholder="請說明">
             </div>
           </div>
-        </section>
 
-        <!-- 房屋資料 -->
-        <section class="form-section">
-          <h2 class="section-title">房屋資料</h2>
-          
-          <div class="form-group">
-            <label for="address">裝修地址 <span class="required">*</span></label>
-            <input type="text" id="address" name="address" required>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="age">年齡</label>
+              <input type="text" id="age" name="age">
+            </div>
+
+            <div class="form-group">
+              <label for="occupation">職業</label>
+              <input type="text" id="occupation" name="occupation">
+            </div>
           </div>
 
           <div class="form-group">
@@ -415,9 +681,26 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
             <input type="text" id="community" name="community">
           </div>
 
-          <div class="form-group">
-            <label for="house-age">屋齡</label>
-            <input type="text" id="house-age" name="house-age">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="house-age">屋齡</label>
+              <input type="text" id="house-age" name="house-age">
+            </div>
+            <div class="form-group">
+              <label for="house-height">室內屋高</label>
+              <input type="text" id="house-height" name="house-height">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="building-area">建物坪數</label>
+              <input type="text" id="building-area" name="building-area">
+            </div>
+            <div class="form-group">
+              <label for="deed-area">權狀坪數（不含車位）</label>
+              <input type="text" id="deed-area" name="deed-area">
+            </div>
           </div>
 
           <div class="form-group">
@@ -430,89 +713,6 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
               <label class="radio-label">
                 <input type="radio" name="wall-issue" value="no">
                 <span>無</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>是否為預售屋</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="presale" value="yes" id="presale-yes">
-                <span>是</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="presale" value="no" id="presale-no">
-                <span>否</span>
-              </label>
-            </div>
-          </div>
-
-          <div id="presale-details" class="conditional-section" style="display: none;">
-            <div class="form-group">
-              <label>是否需要客變</label>
-              <div class="radio-group">
-                <label class="radio-label">
-                  <input type="radio" name="customer-change" value="yes">
-                  <span>是</span>
-                </label>
-                <label class="radio-label">
-                  <input type="radio" name="customer-change" value="no">
-                  <span>否</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="change-deadline">客變到期日</label>
-              <input type="date" id="change-deadline" name="change-deadline">
-            </div>
-
-            <div class="form-group">
-              <label for="presale-notes">備註</label>
-              <textarea id="presale-notes" name="presale-notes" rows="3"></textarea>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="handover-date">交屋日期</label>
-            <input type="date" id="handover-date" name="handover-date">
-          </div>
-
-          <div class="form-group">
-            <label for="house-height">室內屋高</label>
-            <input type="text" id="house-height" name="house-height">
-          </div>
-
-          <div class="form-group">
-            <label for="interior-area">室內總坪數約（含陽台、衛浴）</label>
-            <input type="text" id="interior-area" name="interior-area">
-          </div>
-
-          <div class="form-group">
-            <label for="building-area">建物坪數</label>
-            <input type="text" id="building-area" name="building-area">
-          </div>
-
-          <div class="form-group">
-            <label for="deed-area">權狀坪數（不含車位）</label>
-            <input type="text" id="deed-area" name="deed-area">
-          </div>
-
-          <div class="form-group">
-            <label>是否為毛胚屋</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="house-status" value="raw">
-                <span>是</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="house-status" value="renovated">
-                <span>否</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="house-status" value="other">
-                <span>其他</span>
               </label>
             </div>
           </div>
@@ -560,24 +760,6 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
           </div>
 
           <div class="form-group">
-            <label for="budget">期望裝修預算</label>
-            <select id="budget" name="budget">
-              <option value="">請選擇</option>
-              <option value="under-50">50萬以下</option>
-              <option value="50-100">50-100萬</option>
-              <option value="100-200">100-200萬</option>
-              <option value="200-300">200-300萬</option>
-              <option value="300-500">300-500萬</option>
-              <option value="500-800">500-800萬</option>
-              <option value="over-800">800萬以上</option>
-              <option value="other">其他</option>
-            </select>
-            <div id="budget-other-input" class="conditional-input" style="display: none;">
-              <input type="text" name="budget-other" placeholder="請填寫預算金額">
-            </div>
-          </div>
-
-          <div class="form-group">
             <label for="max-budget">最高可接受預算</label>
             <select id="max-budget" name="max-budget">
               <option value="">請選擇</option>
@@ -599,215 +781,37 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
             <label for="budget-notes">預算備註</label>
             <textarea id="budget-notes" name="budget-notes" rows="3"></textarea>
           </div>
-        </section>
 
-        <!-- 空間配置需求 -->
-        <section class="form-section">
-          <h2 class="section-title">空間配置需求</h2>
-          
-          <div class="form-group">
-            <label for="expected-completion">期望完工時間</label>
-            <input type="date" id="expected-completion" name="expected-completion">
-          </div>
-
-          <div class="form-group">
-            <label for="latest-completion">最晚可接受完工時間</label>
-            <input type="date" id="latest-completion" name="latest-completion">
-          </div>
-
-          <div class="form-group">
-            <label for="completion-notes">完工日期備註</label>
-            <textarea id="completion-notes" name="completion-notes" rows="3"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>已有 CAD 檔</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="cad-file" value="yes">
-                <span>是</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="cad-file" value="no">
-                <span>否</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="cad-file" value="notes" id="cad-notes-radio">
-                <span>備註</span>
-              </label>
-            </div>
-            <div id="cad-notes-input" class="conditional-input" style="display: none;">
-              <textarea name="cad-file-notes" rows="2"></textarea>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>請勾選需要的空間配置</label>
-            <div class="checkbox-grid">
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="living-room" class="space-checkbox">
-                <span>客廳</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="dining-room" class="space-checkbox">
-                <span>餐廳</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="bathroom" class="space-checkbox">
-                <span>浴廁</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="kitchen" class="space-checkbox">
-                <span>廚房</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="master-bedroom" class="space-checkbox">
-                <span>主臥房</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="children-room" class="space-checkbox">
-                <span>小孩房</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="guest-room" class="space-checkbox">
-                <span>客房</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="elderly-room" class="space-checkbox">
-                <span>孝親房</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="study-room" class="space-checkbox">
-                <span>書房</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="walk-in-closet" class="space-checkbox">
-                <span>更衣室</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="storage" class="space-checkbox">
-                <span>儲藏室</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" name="spaces" value="tatami-room" class="space-checkbox">
-                <span>和室</span>
-              </label>
-            </div>
-          </div>
-        </section>
-
-        <section class="form-section">
-          <h2 class="section-title">智慧家庭需求</h2>
-
-          <div class="form-group">
-            <label>是否需要智慧家庭整合規劃</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="smart-home-planning" value="yes" id="smart-home-yes">
-                <span>需要</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="smart-home-planning" value="maybe" id="smart-home-maybe">
-                <span>想了解</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="smart-home-planning" value="no" id="smart-home-no">
-                <span>暫時不需要</span>
-              </label>
-            </div>
-          </div>
-
-          <div id="smart-home-details" class="conditional-section" style="display: none;">
+          <div class="form-row">
             <div class="form-group">
-              <label>希望整合的項目</label>
-              <div class="checkbox-grid">
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-features" value="lighting">
-                  <span>燈光控制</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-features" value="curtain">
-                  <span>電動窗簾</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-features" value="air-conditioning">
-                  <span>空調整合</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-features" value="door-lock">
-                  <span>智慧門鎖</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-features" value="sensor">
-                  <span>感測器自動化</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-features" value="security">
-                  <span>監控與安防</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-features" value="network">
-                  <span>網路與弱電配置</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-features" value="audio">
-                  <span>影音情境整合</span>
-                </label>
-              </div>
+              <label for="latest-completion">最晚可接受完工時間</label>
+              <input type="date" id="latest-completion" name="latest-completion">
             </div>
-
             <div class="form-group">
-              <label>希望支援的生態系</label>
-              <div class="checkbox-grid">
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-ecosystem" value="apple-home">
-                  <span>Apple Home</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-ecosystem" value="google-home">
-                  <span>Google Home</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-ecosystem" value="alexa">
-                  <span>Alexa</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-ecosystem" value="home-assistant">
-                  <span>Home Assistant</span>
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="smart-home-ecosystem" value="not-sure">
-                  <span>還不確定</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>目前是否已有既有設備想整合</label>
+              <label>已有 CAD 檔</label>
               <div class="radio-group">
                 <label class="radio-label">
-                  <input type="radio" name="existing-smart-devices" value="yes" id="existing-smart-devices-yes">
-                  <span>有</span>
+                  <input type="radio" name="cad-file" value="yes">
+                  <span>是</span>
                 </label>
                 <label class="radio-label">
-                  <input type="radio" name="existing-smart-devices" value="no" id="existing-smart-devices-no">
-                  <span>沒有</span>
+                  <input type="radio" name="cad-file" value="no">
+                  <span>否</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="cad-file" value="notes" id="cad-notes-radio">
+                  <span>備註</span>
                 </label>
               </div>
-              <div id="existing-smart-devices-input" class="conditional-input" style="display: none;">
-                <textarea name="existing-smart-devices-notes" rows="3" placeholder="可填寫目前設備品牌、型號，或想延用的系統"></textarea>
+              <div id="cad-notes-input" class="conditional-input" style="display: none;">
+                <textarea name="cad-file-notes" rows="2"></textarea>
               </div>
             </div>
+          </div>
 
-            <div class="form-group">
-              <label for="smart-home-scenes">想實現的生活情境</label>
-              <textarea id="smart-home-scenes" name="smart-home-scenes" rows="3" placeholder="例如回家模式、離家模式、起夜動線、語音控制、遠端查看等"></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="smart-home-notes">智慧家庭補充說明</label>
-              <textarea id="smart-home-notes" name="smart-home-notes" rows="3" placeholder="例如希望前期預留哪些線路、是否重視後續擴充、是否已有跨品牌整合需求"></textarea>
-            </div>
+          <div class="form-group">
+            <label for="completion-notes">其他補充</label>
+            <textarea id="completion-notes" name="completion-notes" rows="3" placeholder="例如第二聯絡人、施工限制、社區規範、特殊機能需求等"></textarea>
           </div>
         </section>
 
@@ -822,7 +826,7 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
 
         <!-- 提交按鈕 -->
         <div class="form-submit">
-          <button type="submit" class="submit-button">確認送出需求表</button>
+          <button type="submit" class="submit-button">先送出需求</button>
         </div>
       </form>
     </div>
@@ -1506,13 +1510,36 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
     restoreEstimatorSnapshot();
     fillAttributionFields();
 
+    function hasPrimaryContact() {
+      const phoneInput = document.getElementById('phone');
+      const lineIdInput = document.getElementById('line-id');
+      const emailInput = document.getElementById('email');
+
+      return Boolean(
+        phoneInput?.value?.trim() ||
+        lineIdInput?.value?.trim() ||
+        emailInput?.value?.trim()
+      );
+    }
+
+    function validatePrimaryContact(event) {
+      if (hasPrimaryContact()) return true;
+
+      event.preventDefault();
+      window.alert('請至少留下電話、Line ID、Email 其中一種聯絡方式，青曦才能與你接續討論。');
+      document.getElementById('phone')?.focus();
+      return false;
+    }
+
     if (requirementForm?.dataset.formEnabled !== 'true') {
       requirementForm?.addEventListener('submit', function(event) {
+        if (!validatePrimaryContact(event)) return;
         event.preventDefault();
         window.alert('表單收件尚未完成設定，請先透過官方 LINE 聯絡青曦。');
       });
     } else {
-      requirementForm?.addEventListener('submit', function() {
+      requirementForm?.addEventListener('submit', function(event) {
+        if (!validatePrimaryContact(event)) return;
         window.trackLeadEvent?.('requirement_form_submit', {
           form_name: 'design_requirement_form',
           has_estimator_summary: estimatorBrief?.style.display === 'block',
@@ -1603,22 +1630,6 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
 
     existingSmartDevicesYes?.addEventListener('change', toggleExistingSmartDevicesInput);
     existingSmartDevicesNo?.addEventListener('change', toggleExistingSmartDevicesInput);
-
-    // 婚姻狀況相關欄位
-    const marriedYes = document.getElementById('married-yes');
-    const marriedNo = document.getElementById('married-no');
-    const spouseDetails = document.getElementById('spouse-details');
-
-    function toggleSpouseDetails() {
-      if (marriedYes.checked) {
-        spouseDetails.style.display = 'block';
-      } else {
-        spouseDetails.style.display = 'none';
-      }
-    }
-
-    marriedYes?.addEventListener('change', toggleSpouseDetails);
-    marriedNo?.addEventListener('change', toggleSpouseDetails);
 
     // 家庭組成其他選項
     const householdStructureOtherCheck = document.getElementById('household-structure-other-check');
@@ -1974,8 +1985,7 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
       const form = document.getElementById('requirement-form');
       if (!form) return;
 
-      const allInputs = form.querySelectorAll('input:not([type="hidden"]), select, textarea');
-      const requiredInputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+      const allInputs = form.querySelectorAll('[data-progress="true"]');
       
       let totalFields = allInputs.length;
       let filledFields = 0;
