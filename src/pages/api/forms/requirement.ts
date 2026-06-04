@@ -5,7 +5,7 @@ import { buildRequirementSubmissionSummary } from "../../../lib/requirement-form
 const requirementFormId =
   import.meta.env.FORMSPREE_REQUIREMENT_FORM_ID?.trim() ||
   import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() ||
-  "xrevzvnp";
+  "";
 
 export const POST: APIRoute = async ({ request, redirect }) => {
   const fallbackRedirect = "/requirement-form?submit_error=1";

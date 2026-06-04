@@ -4,7 +4,7 @@ import { getRenovationEstimatorConfig } from "../../lib/contentful.js";
 
 const estimatorConfig = await getRenovationEstimatorConfig();
 const requirementFormId =
-  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || "xrevzvnp";
+  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || "";
 const estimatorLeadAction = requirementFormId
   ? `https://formspree.io/f/${requirementFormId}`
   : "";

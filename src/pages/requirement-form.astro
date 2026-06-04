@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const requirementFormId =
-  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || 'xrevzvnp';
+  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || '';
 const requirementFormAction = requirementFormId ? '/api/forms/requirement' : '';
 const requirementFormEnabled = Boolean(requirementFormAction);
 const siteOrigin = (Astro.site || new URL('https://qingxidesign.tw')).toString();
@@ -1505,6 +1505,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     const utmContentInput = document.getElementById('utm-content-input');
     const landingPageInput = document.getElementById('landing-page-input');
     const pageReferrerInput = document.getElementById('page-referrer-input');
+    const requirementPrefillStorageKey = 'requirementFormPrefill';
 
     function fillAttributionFields() {
       const searchParams = new URLSearchParams(window.location.search);
@@ -1561,6 +1562,60 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
     restoreEstimatorSnapshot();
     fillAttributionFields();
+
+    function detectContactMethodType(value) {
+      if (!value) return '';
+
+      const trimmedValue = value.trim();
+      const digitsOnly = trimmedValue.replace(/\D/g, '');
+
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedValue)) return 'email';
+      if (digitsOnly.length >= 6) return 'phone';
+      return 'line';
+    }
+
+    function hydrateQuickConsultationPrefill() {
+      try {
+        const prefillRaw = window.sessionStorage.getItem(requirementPrefillStorageKey);
+        if (!prefillRaw) return;
+
+        const prefill = JSON.parse(prefillRaw);
+        const nameInput = document.getElementById('name');
+        const phoneInput = document.getElementById('phone');
+        const lineIdInput = document.getElementById('line-id');
+        const emailInput = document.getElementById('email');
+        const contactPreferenceInput = document.getElementById('contact-preference');
+        const otherNotesBasicInput = document.getElementById('other-notes-basic');
+
+        if (nameInput && !nameInput.value && prefill.name) {
+          nameInput.value = prefill.name;
+        }
+
+        if (otherNotesBasicInput && !otherNotesBasicInput.value && prefill.consultationFocus) {
+          otherNotesBasicInput.value = prefill.consultationFocus;
+        }
+
+        if (prefill.contactMethod) {
+          const contactType = detectContactMethodType(prefill.contactMethod);
+
+          if (contactType === 'email' && emailInput && !emailInput.value) {
+            emailInput.value = prefill.contactMethod;
+          } else if (contactType === 'phone' && phoneInput && !phoneInput.value) {
+            phoneInput.value = prefill.contactMethod;
+          } else if (lineIdInput && !lineIdInput.value) {
+            lineIdInput.value = prefill.contactMethod;
+          }
+
+          if (contactPreferenceInput && !contactPreferenceInput.value) {
+            contactPreferenceInput.value = contactType || '';
+          }
+        }
+      } catch (error) {
+        console.warn('Unable to hydrate quick consultation prefill.', error);
+      }
+    }
+
+    hydrateQuickConsultationPrefill();
 
     function hasPrimaryContact() {
       const phoneInput = document.getElementById('phone');

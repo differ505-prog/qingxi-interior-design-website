@@ -2,7 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const requirementFormId =
-  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || "xrevzvnp";
+  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || "";
 const quickConsultationAction = requirementFormId
   ? `https://formspree.io/f/${requirementFormId}`
   : "";
@@ -177,7 +177,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
                 data-ready-link="requirement-form"
                 data-contact-cta="requirement-form"
                 aria-disabled="true"
-              >先填 3 項核心資訊，再改填完整需求表</a>
+              >先填 3 項基本資訊，再填完整需求表</a>
             </div>
           </form>
         </div>
@@ -776,6 +776,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   const quickFormTitle = document.getElementById("quick-form-title");
   const quickFormDescription = document.getElementById("quick-form-description");
   const requirementReadyLink = document.querySelector("[data-ready-link='requirement-form']");
+  const requirementPrefillStorageKey = "requirementFormPrefill";
 
   function toggleRequirementReadyLink() {
     if (!requirementReadyLink || !quickConsultationForm) return;
@@ -788,8 +789,27 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     requirementReadyLink.classList.toggle("is-disabled", !isReady);
     requirementReadyLink.setAttribute("aria-disabled", String(!isReady));
     requirementReadyLink.textContent = isReady
-      ? "我已整理好資訊，改填完整需求表"
-      : "先填 3 項核心資訊，再改填完整需求表";
+      ? "進一步填完整需求表"
+      : "先填 3 項基本資訊，再填完整需求表";
+  }
+
+  function persistRequirementPrefill() {
+    if (!quickConsultationForm) return;
+
+    const nameValue = quickConsultationForm.querySelector("input[name='name']")?.value.trim() || "";
+    const contactValue = quickConsultationForm.querySelector("input[name='contact_method']")?.value.trim() || "";
+    const focusValue = quickConsultationForm.querySelector("textarea[name='consultation_focus']")?.value.trim() || "";
+
+    if (!nameValue || !contactValue || !focusValue) return;
+
+    window.sessionStorage.setItem(
+      requirementPrefillStorageKey,
+      JSON.stringify({
+        name: nameValue,
+        contactMethod: contactValue,
+        consultationFocus: focusValue,
+      }),
+    );
   }
 
   function fillQuickConsultationAttribution() {
@@ -908,6 +928,14 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   toggleRequirementReadyLink();
 
   quickConsultationForm?.addEventListener("input", toggleRequirementReadyLink);
+  requirementReadyLink?.addEventListener("click", function(event) {
+    if (requirementReadyLink.getAttribute("aria-disabled") === "true") {
+      event.preventDefault();
+      return;
+    }
+
+    persistRequirementPrefill();
+  });
 
   if (quickConsultationForm?.dataset.formEnabled !== "true") {
     quickConsultationForm?.addEventListener("submit", function(event) {
