@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "qingxi-interior-design-website.vercel.app"
+        }
+      ],
+      "destination": "https://qingxidesign.tw/:path*",
+      "permanent": true
+    }
+  ]
+}
