@@ -294,6 +294,7 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
 
           <div class="form-group">
             <label>請勾選需要的空間配置</label>
+            <p class="field-hint">勾選後會在下方出現補充需求；只有像浴廁、小孩房、客房、書房這類可能不只一間的空間，才會再請你選數量。</p>
             <div class="checkbox-grid">
               <label class="checkbox-label">
                 <input type="checkbox" name="spaces" value="living-room" class="space-checkbox" data-progress="true">
@@ -1181,6 +1182,13 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
     font-size: 1rem;
   }
 
+  .space-detail-subtitle {
+    margin: -0.75rem 0 1rem;
+    color: var(--gray-medium);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
   .form-group {
     margin-bottom: 1.2rem;
   }
@@ -1309,6 +1317,29 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
 
   .conditional-input {
     margin-top: 0.85rem;
+  }
+
+  .space-quantity-block {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .space-quantity-label {
+    display: block;
+    margin-bottom: 0.55rem;
+    color: var(--gray-dark);
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+
+  .space-quantity-hint {
+    margin: 0.45rem 0 0;
+    color: var(--gray-medium);
+    font-size: 0.86rem;
+    line-height: 1.7;
   }
 
   .form-notice {
@@ -1793,6 +1824,10 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
       },
       'bathroom': {
         title: '浴廁',
+        quantityField: {
+          label: '這次預計處理幾間浴廁？',
+          hint: '如果有主衛、客衛或客用洗手間，先抓總數即可。'
+        },
         options: [
           { label: '主衛浴鏡櫃', value: 'master-mirror' },
           { label: '客衛浴鏡櫃', value: 'guest-mirror' },
@@ -1824,6 +1859,10 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
       },
       'children-room': {
         title: '小孩房',
+        quantityField: {
+          label: '目前預計需要幾間小孩房？',
+          hint: '若之後可能調整，先填目前最接近的規劃就可以。'
+        },
         options: [
           { label: '各種床尺寸', value: 'bed-size' },
           { label: '化妝桌', value: 'makeup-table' },
@@ -1835,6 +1874,10 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
       },
       'guest-room': {
         title: '客房',
+        quantityField: {
+          label: '目前預計需要幾間客房？',
+          hint: '若只是偶爾留宿，也可以先填 1 間。'
+        },
         options: [
           { label: '各種床尺寸', value: 'bed-size' },
           { label: '化妝桌', value: 'makeup-table' },
@@ -1846,6 +1889,10 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
       },
       'elderly-room': {
         title: '孝親房',
+        quantityField: {
+          label: '目前預計需要幾間孝親房？',
+          hint: '先填規劃中的間數即可，後續可再依長輩需求微調。'
+        },
         options: [
           { label: '各種床尺寸', value: 'bed-size' },
           { label: '化妝桌', value: 'makeup-table' },
@@ -1857,6 +1904,10 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
       },
       'study-room': {
         title: '書房',
+        quantityField: {
+          label: '目前預計需要幾間書房？',
+          hint: '若是書房與客房共用，也可先填 1 間並在補充中說明。'
+        },
         options: [
           { label: '各種床尺寸', value: 'bed-size' },
           { label: '化妝桌', value: 'makeup-table' },
@@ -1868,6 +1919,10 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
       },
       'tatami-room': {
         title: '和室',
+        quantityField: {
+          label: '目前預計需要幾間和室？',
+          hint: '若只是保留彈性多功能區，也可先填 1 間。'
+        },
         options: [
           { label: '書桌', value: 'desk' },
           { label: '自動升降桌', value: 'lift-table' },
@@ -1876,6 +1931,24 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
         ]
       }
     };
+
+    function getSpaceQuantityHtml(spaceValue, details) {
+      if (!details.quantityField) return '';
+
+      return `
+        <div class="space-quantity-block">
+          <label class="space-quantity-label" for="${spaceValue}-count">${details.quantityField.label}</label>
+          <select id="${spaceValue}-count" name="${spaceValue}-count">
+            <option value="">請選擇</option>
+            <option value="1">1 間</option>
+            <option value="2">2 間</option>
+            <option value="3">3 間</option>
+            <option value="4+">4 間以上</option>
+          </select>
+          <p class="space-quantity-hint">${details.quantityField.hint}</p>
+        </div>
+      `;
+    }
 
     function updateSpaceDetails() {
       spaceDetailsContainer.innerHTML = '';
@@ -1930,6 +2003,8 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
             
             section.innerHTML = `
               <h3 class="space-detail-title">${details.title}</h3>
+              <p class="space-detail-subtitle">如果這個空間已經有明確想法，可以順手勾選；沒有也沒關係。</p>
+              ${getSpaceQuantityHtml(spaceValue, details)}
               <div class="checkbox-group">
                 ${optionsHtml}
               </div>
