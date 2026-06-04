@@ -3,12 +3,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 const requirementFormId =
   import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() || 'xrevzvnp';
-const requirementFormAction = requirementFormId
-  ? `https://formspree.io/f/${requirementFormId}`
-  : '';
+const requirementFormAction = requirementFormId ? '/api/forms/requirement' : '';
 const requirementFormEnabled = Boolean(requirementFormAction);
 const siteOrigin = (Astro.site || new URL('https://qingxidesign.tw')).toString();
 const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin).toString();
+const submitError = Astro.url.searchParams.get('submit_error') === '1';
 ---
 
 <BaseLayout
@@ -75,6 +74,14 @@ const requirementFormSuccessURL = new URL('/consultation-thank-you', siteOrigin)
           </div>
         </div>
       </div>
+
+      {
+        submitError && (
+          <div class="form-status-notice" role="alert">
+            <p>表單送出時沒有成功轉交，請稍後再試一次；若持續失敗，可先透過官方 LINE 聯絡青曦。</p>
+          </div>
+        )
+      }
 
       <form 
         id="requirement-form" 
