@@ -354,6 +354,43 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             </div>
           </div>
 
+          <div class="estimator-handoff-card">
+            <div class="estimator-handoff-copy">
+              <p class="estimator-handoff-eyebrow">BEST NEXT STEP</p>
+              <h3 id="estimator-handoff-title">要不要把這次估算直接帶進完整需求表？</h3>
+              <p id="estimator-handoff-description" class="estimator-handoff-description">
+                再補生活需求、空間細節與時程資訊，青曦就能更快判斷你的案件方向，不用從頭再說一次。
+              </p>
+              <div class="estimator-handoff-points">
+                <div class="estimator-handoff-point">
+                  <strong>不需要重填估算結果</strong>
+                  <span>這次試算摘要會一起帶進需求表，討論更容易直接進入重點。</span>
+                </div>
+                <div class="estimator-handoff-point">
+                  <strong id="estimator-handoff-point-title">最適合下一步整理需求</strong>
+                  <span id="estimator-handoff-point-description">如果你已經有大致預算方向，這一步最能幫助青曦快速理解你的案件狀況。</span>
+                </div>
+              </div>
+            </div>
+            <div class="estimator-handoff-actions">
+              <a
+                href="/requirement-form"
+                class="btn btn-primary"
+                data-estimator-cta="requirement-form"
+              >
+                帶著估算結果填完整需求表
+              </a>
+              <a
+                href="/contact?intent=budget-review&source=estimator"
+                class="btn btn-secondary"
+                data-estimator-cta="contact"
+              >
+                先帶著結果諮詢
+              </a>
+              <p class="estimator-handoff-note">如果你只是想先知道大概範圍，也可以先保留這次結果，之後再回來填。</p>
+            </div>
+          </div>
+
           <div class="report-offer-card">
             <div class="report-offer-copy">
               <p class="report-offer-eyebrow">ESTIMATE FOLLOW-UP</p>
@@ -463,10 +500,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           </div>
 
           <div class="cta-buttons">
-            <a href="/contact" class="btn btn-primary" data-estimator-cta="contact">帶著估算結果諮詢</a>
-            <a href="/requirement-form" class="btn btn-secondary" data-estimator-cta="requirement-form">填寫完整需求表</a>
+            <a href="/requirement-form" class="btn btn-primary" data-estimator-cta="requirement-form">帶著估算結果填完整需求表</a>
+            <a href="/contact?intent=budget-review&source=estimator" class="btn btn-secondary" data-estimator-cta="contact">先帶著結果諮詢</a>
           </div>
-          <p class="cta-note">若你已經有大致預算方向，下一步最有效的是帶著這份估算與需求一起討論。</p>
+          <p class="cta-note">若你已經有大致預算方向，最有效的下一步通常是先補完整需求，再由青曦接續判讀。</p>
         </div>
       </div>
 
@@ -954,6 +991,94 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
   }
 
+  .estimator-handoff-card {
+    margin: 0 0 1.25rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    gap: 1rem;
+    padding: 1.35rem;
+    border-radius: 24px;
+    background:
+      radial-gradient(circle at top left, rgba(160, 217, 217, 0.18), transparent 34%),
+      linear-gradient(135deg, rgba(243, 248, 248, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.22);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.05);
+  }
+
+  .estimator-handoff-eyebrow {
+    margin: 0 0 0.75rem;
+    color: var(--tiffany-dark);
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .estimator-handoff-copy h3 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.5rem;
+    line-height: 1.55;
+    color: var(--gray-darkest);
+    letter-spacing: 0.04em;
+  }
+
+  .estimator-handoff-description {
+    margin: 0.85rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
+  }
+
+  .estimator-handoff-points {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 1rem;
+  }
+
+  .estimator-handoff-point {
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .estimator-handoff-point strong,
+  .estimator-handoff-point span {
+    display: block;
+  }
+
+  .estimator-handoff-point strong {
+    color: var(--gray-darkest);
+  }
+
+  .estimator-handoff-point span {
+    margin-top: 0.35rem;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.94rem;
+  }
+
+  .estimator-handoff-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.9rem;
+    padding: 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .estimator-handoff-actions .btn {
+    width: 100%;
+  }
+
+  .estimator-handoff-note {
+    margin: 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.92rem;
+  }
+
   .report-offer-eyebrow {
     margin: 0 0 0.75rem;
     color: var(--tiffany-dark);
@@ -1337,6 +1462,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       grid-template-columns: 1fr;
     }
 
+    .estimator-handoff-card,
     .report-offer-card {
       grid-template-columns: 1fr;
     }
@@ -1408,8 +1534,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const nextStepIntro = document.getElementById("next-step-intro");
   const nextStepPoints = document.getElementById("next-step-points");
   const reportContext = document.getElementById("report-context");
-  const requirementFormLink = document.querySelector(
-    'a[href="/requirement-form"]',
+  const estimatorHandoffTitle = document.getElementById("estimator-handoff-title");
+  const estimatorHandoffDescription = document.getElementById("estimator-handoff-description");
+  const estimatorHandoffPointTitle = document.getElementById("estimator-handoff-point-title");
+  const estimatorHandoffPointDescription = document.getElementById("estimator-handoff-point-description");
+  const requirementFormLinks = Array.from(
+    document.querySelectorAll('[data-estimator-cta="requirement-form"]'),
   );
   const estimatorLeadForm = document.getElementById(
     "estimator-lead-form",
@@ -1687,6 +1817,29 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           : `目前這組 ${projectMeta.label} / ${residenceMeta.label} 條件，可先用拆解報告判讀 ${formatRange(minTotal, maxTotal)} 的主要預算落點。`;
     }
 
+    if (
+      estimatorHandoffTitle &&
+      estimatorHandoffDescription &&
+      estimatorHandoffPointTitle &&
+      estimatorHandoffPointDescription
+    ) {
+      if (projectType.value === "design-only") {
+        estimatorHandoffTitle.textContent = "要不要直接把設計方向整理成完整需求表？";
+        estimatorHandoffDescription.textContent =
+          "你現在比較接近設計規劃前期，最適合把生活需求、空間痛點與參考風格一次整理清楚。";
+        estimatorHandoffPointTitle.textContent = "這一步最能提高設計討論效率";
+        estimatorHandoffPointDescription.textContent =
+          "把需求、參考圖與理想交付內容先講清楚，第一次諮詢就更容易直接對焦。";
+      } else {
+        estimatorHandoffTitle.textContent = "要不要把這次估算直接帶進完整需求表？";
+        estimatorHandoffDescription.textContent =
+          "再補生活需求、空間細節與時程資訊，青曦就能更快判斷你的案件方向，不用從頭再說一次。";
+        estimatorHandoffPointTitle.textContent = "最適合下一步整理需求";
+        estimatorHandoffPointDescription.textContent =
+          "如果你已經有大致預算方向，這一步最能幫助青曦快速理解你的案件狀況。";
+      }
+    }
+
     const adviceItems = [];
     if (conditionMeta.multiplier >= 1.18) {
       adviceItems.push("屋況偏複雜，建議預留較高比例的拆除、基礎工程與預備金。");
@@ -1893,7 +2046,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     selectedItems.forEach((checkbox) => {
       checkbox.addEventListener("change", calculate);
     });
-    requirementFormLink?.addEventListener("click", calculate);
+    requirementFormLinks.forEach((link) => {
+      link.addEventListener("click", calculate);
+    });
     estimatorCtaLinks.forEach((link) => {
       link.addEventListener("click", () => {
         calculate();
