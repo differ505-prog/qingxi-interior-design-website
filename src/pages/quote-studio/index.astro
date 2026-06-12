@@ -322,11 +322,19 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
                 </div>
               </label>
               <label class="field">
-                <span>監工 / 管理費</span>
-                <div class="input-with-prefix">
-                  <span>NT$</span>
-                  <input id="management-fee" type="number" min="0" step="1000" />
+                <span>管理費計算方式</span>
+                <select id="management-fee-mode">
+                  <option value="percent">依工程小計百分比</option>
+                  <option value="fixed">固定金額</option>
+                </select>
+              </label>
+              <label class="field">
+                <span id="management-fee-label">監工 / 管理費比例</span>
+                <div class="input-with-suffix">
+                  <input id="management-fee" type="number" min="0" step="0.5" />
+                  <span id="management-fee-unit">%</span>
                 </div>
+                <small id="management-fee-help" class="field-help">將依工程小計乘上比例自動換算，適合初估與正式報價同步控管。</small>
               </label>
               <label class="field">
                 <span>調整金額</span>
@@ -402,7 +410,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
               <div><span>材料等級調整</span><strong id="material-adjustment-total">NT$0</strong></div>
               <div><span>施工難度調整</span><strong id="difficulty-adjustment-total">NT$0</strong></div>
               <div><span>設計費</span><strong id="design-fee-total">NT$0</strong></div>
-              <div><span>監工 / 管理費</span><strong id="management-fee-total">NT$0</strong></div>
+              <div><span id="management-fee-total-label">監工 / 管理費</span><strong id="management-fee-total">NT$0</strong></div>
               <div><span>調整金額</span><strong id="adjustment-total">NT$0</strong></div>
               <div><span>稅金</span><strong id="tax-total">NT$0</strong></div>
               <div class="grand-total"><span>總計</span><strong id="grand-total">NT$0</strong></div>
@@ -446,7 +454,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   const cleanupOptions = JSON.parse(quoteCleanupOptionsJson);
   const waterproofWarrantyOptions = JSON.parse(quoteWaterproofWarrantyOptionsJson);
   const warrantyOptions = JSON.parse(quoteWarrantyOptionsJson);
-  const STORAGE_KEY = "qingxi-quote-studio-draft-v4";
+  const STORAGE_KEY = "qingxi-quote-studio-draft-v5";
 
   const categoryLabelMap = new Map(categories.map((category) => [category.id, category.label]));
   const materialLevelMap = new Map(materialLevelOptions.map((option) => [option.value, option]));
@@ -530,7 +538,8 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       customItems: [],
       fees: {
         designFee: "",
-        managementFee: "",
+        managementFeeMode: "percent",
+        managementFee: "8",
         adjustmentAmount: "",
         includeTax: false,
         taxRate: 5,
@@ -581,6 +590,30 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     return parseNumber(item.quantity) * parseNumber(item.unitPrice);
   }
 
+  function getManagementFeeSetup(baseAmount = 0) {
+    const mode = state.fees.managementFeeMode === "fixed" ? "fixed" : "percent";
+    const rawValue = parseNumber(state.fees.managementFee);
+
+    if (mode === "fixed") {
+      return {
+        mode,
+        rawValue,
+        amount: rawValue,
+        label: "監工 / 管理費（固定額）",
+        note: rawValue > 0 ? `本案以固定金額 ${formatCurrency(rawValue)} 列示監工 / 管理費。` : "本案目前未另列固定管理費。",
+      };
+    }
+
+    const amount = baseAmount * (rawValue / 100);
+    return {
+      mode,
+      rawValue,
+      amount,
+      label: `監工 / 管理費（${rawValue}%）`,
+      note: rawValue > 0 ? `依工程小計 ${rawValue}% 自動換算，適合先控管不同案型的管理成本。` : "本案目前未另列管理費比例。",
+    };
+  }
+
   function computeTotals() {
     const categoryTotals = Object.fromEntries(categories.map((category) => [category.id, 0]));
 
@@ -605,7 +638,8 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     const materialAdjustmentAmount = materialAdjustedSubtotal - lineSubtotal;
     const difficultyAdjustmentAmount = difficultyAdjustedSubtotal - materialAdjustedSubtotal;
     const designFee = parseNumber(state.fees.designFee);
-    const managementFee = parseNumber(state.fees.managementFee);
+    const managementFeeSetup = getManagementFeeSetup(difficultyAdjustedSubtotal);
+    const managementFee = managementFeeSetup.amount;
     const adjustmentAmount = parseNumber(state.fees.adjustmentAmount);
     const subtotalBeforeTax = difficultyAdjustedSubtotal + designFee + managementFee + adjustmentAmount;
     const taxAmount = state.fees.includeTax
@@ -624,6 +658,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       difficultyLevel: difficultyOption,
       designFee,
       managementFee,
+      managementFeeMode: managementFeeSetup.mode,
+      managementFeeRawValue: managementFeeSetup.rawValue,
+      managementFeeLabel: managementFeeSetup.label,
+      managementFeeNote: managementFeeSetup.note,
       adjustmentAmount,
       subtotalBeforeTax,
       taxAmount,
@@ -779,7 +817,11 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       reminders.push("已有拆除或清運工項，但目前設定未含完工清潔，建議先與客戶說明粗清或細清是否另列。");
     }
 
-    if (!parseNumber(state.fees.designFee) && !parseNumber(state.fees.managementFee)) {
+    if (payload.assumptions.cleanupScope?.value === "basic_clean") {
+      reminders.push("目前設定為含基本粗清，建議在送客戶前明說『未達可直接入住之細清標準』，降低交屋期待落差。");
+    }
+
+    if (!parseNumber(state.fees.designFee) && !(payload.totals.managementFee > 0)) {
       reminders.push("目前設計費與監工 / 管理費皆為 0，若實際已攤提於工項單價，建議在前言或條款中先說明，避免客戶抽單項比價時產生疑慮。");
     }
 
@@ -828,7 +870,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       `- 材料等級：${payload.totals.materialLevel?.label || "未填寫"}（${payload.totals.materialLevel?.note || "無說明"}）`,
       `- 施工難度：${payload.totals.difficultyLevel?.label || "未填寫"}（${payload.totals.difficultyLevel?.note || "無說明"}）`,
       `- 設計費預設：${formatCurrency(parseNumber(state.fees.designFee))}`,
-      `- 監工 / 管理費預設：${formatCurrency(parseNumber(state.fees.managementFee))}`,
+      `- 監工 / 管理費預設：${state.fees.managementFeeMode === "fixed" ? `${formatCurrency(parseNumber(state.fees.managementFee))}（固定額）` : `依工程小計 ${parseNumber(state.fees.managementFee)}%`}`,
       `- 施工工法：${assumptions.workMethod?.label || "未填寫"}（${assumptions.workMethod?.note || "無說明"}）`,
       `- 修補範圍：${assumptions.restorationScope?.label || "未填寫"}（${assumptions.restorationScope?.note || "無說明"}）`,
       `- 保護工程：${assumptions.protectionScope?.label || "未填寫"}（${assumptions.protectionScope?.note || "無說明"}）`,
@@ -921,6 +963,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     document.getElementById("waterproof-warranty").value = state.meta.waterproofWarranty;
 
     document.getElementById("design-fee").value = state.fees.designFee;
+    document.getElementById("management-fee-mode").value = state.fees.managementFeeMode;
     document.getElementById("management-fee").value = state.fees.managementFee;
     document.getElementById("adjustment-amount").value = state.fees.adjustmentAmount;
     document.getElementById("include-tax").checked = state.fees.includeTax;
@@ -1037,6 +1080,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     document.getElementById("material-adjustment-total").textContent = formatCurrency(totals.materialAdjustmentAmount);
     document.getElementById("difficulty-adjustment-total").textContent = formatCurrency(totals.difficultyAdjustmentAmount);
     document.getElementById("design-fee-total").textContent = formatCurrency(totals.designFee);
+    document.getElementById("management-fee-total-label").textContent = totals.managementFeeLabel;
     document.getElementById("management-fee-total").textContent = formatCurrency(totals.managementFee);
     document.getElementById("adjustment-total").textContent = formatCurrency(totals.adjustmentAmount);
     document.getElementById("tax-total").textContent = formatCurrency(totals.taxAmount);
@@ -1087,7 +1131,30 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
         <strong>${assumptions.waterproofWarranty.label}</strong>
         <small>${assumptions.waterproofWarranty.note}</small>
       </div>
+      <div class="assumption-item">
+        <span>管理費方式</span>
+        <strong>${totals.managementFeeLabel}</strong>
+        <small>${totals.managementFeeNote}</small>
+      </div>
     `;
+  }
+
+  function renderManagementFeeUi() {
+    const mode = state.fees.managementFeeMode === "fixed" ? "fixed" : "percent";
+    const label = document.getElementById("management-fee-label");
+    const unit = document.getElementById("management-fee-unit");
+    const help = document.getElementById("management-fee-help");
+
+    if (mode === "fixed") {
+      label.textContent = "監工 / 管理費金額";
+      unit.textContent = "元";
+      help.textContent = "以單一固定金額列示，適合已明確知道本案管理成本時使用。";
+      return;
+    }
+
+    label.textContent = "監工 / 管理費比例";
+    unit.textContent = "%";
+    help.textContent = "將依工程小計乘上比例自動換算，適合初估與正式報價同步控管。";
   }
 
   function renderMissingItemReminders() {
@@ -1116,6 +1183,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     renderCustomRows();
     renderCategoryTotals();
     renderPricingAssumptions();
+    renderManagementFeeUi();
     renderMissingItemReminders();
     updatePreviewLinks();
     updateLlmReviewOutput();
@@ -1163,6 +1231,11 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
 
     if (target.id === "include-tax") {
       state.fees.includeTax = target.checked;
+      return true;
+    }
+
+    if (target.id === "management-fee-mode") {
+      state.fees.managementFeeMode = target.value === "fixed" ? "fixed" : "percent";
       return true;
     }
 
@@ -1442,6 +1515,11 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   .field textarea {
     resize: vertical;
     min-height: 120px;
+  }
+
+  .field-help {
+    color: var(--gray-medium);
+    line-height: 1.6;
   }
 
   .input-with-prefix,

@@ -58,7 +58,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             <div class="summary-row"><span>材料等級調整</span><strong id="summary-material-adjustment">NT$0</strong></div>
             <div class="summary-row"><span>施工難度調整</span><strong id="summary-difficulty-adjustment">NT$0</strong></div>
             <div class="summary-row"><span>設計費</span><strong id="summary-design-fee">NT$0</strong></div>
-            <div class="summary-row"><span>監工 / 管理費</span><strong id="summary-management-fee">NT$0</strong></div>
+            <div class="summary-row"><span id="summary-management-fee-label">監工 / 管理費</span><strong id="summary-management-fee">NT$0</strong></div>
             <div class="summary-row"><span>調整金額</span><strong id="summary-adjustment">NT$0</strong></div>
             <div class="summary-row"><span>稅金</span><strong id="summary-tax">NT$0</strong></div>
             <div class="summary-row grand-total"><span>總計</span><strong id="summary-grand-total">NT$0</strong></div>
@@ -220,6 +220,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <strong>${escapeHtml(assumptions.waterproofWarranty?.label || "未填寫")}</strong>
         <p>${escapeHtml(assumptions.waterproofWarranty?.note || "")}</p>
       </div>
+      <div class="preview-assumption-card">
+        <span>管理費方式</span>
+        <strong>${escapeHtml(totals.managementFeeLabel || "監工 / 管理費")}</strong>
+        <p>${escapeHtml(totals.managementFeeNote || "")}</p>
+      </div>
     `;
   }
 
@@ -250,6 +255,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     document.getElementById("summary-material-adjustment").textContent = formatCurrency(totals.materialAdjustmentAmount);
     document.getElementById("summary-difficulty-adjustment").textContent = formatCurrency(totals.difficultyAdjustmentAmount);
     document.getElementById("summary-design-fee").textContent = formatCurrency(totals.designFee);
+    document.getElementById("summary-management-fee-label").textContent = totals.managementFeeLabel || "監工 / 管理費";
     document.getElementById("summary-management-fee").textContent = formatCurrency(totals.managementFee);
     document.getElementById("summary-adjustment").textContent = formatCurrency(totals.adjustmentAmount);
     document.getElementById("summary-tax").textContent = formatCurrency(totals.taxAmount);
