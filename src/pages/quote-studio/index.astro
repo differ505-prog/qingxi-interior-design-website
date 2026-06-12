@@ -468,7 +468,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   const cleanupOptions = JSON.parse(quoteCleanupOptionsJson);
   const waterproofWarrantyOptions = JSON.parse(quoteWaterproofWarrantyOptionsJson);
   const warrantyOptions = JSON.parse(quoteWarrantyOptionsJson);
-  const STORAGE_KEY = "qingxi-quote-studio-draft-v6";
+  const STORAGE_KEY = "qingxi-quote-studio-draft-v7";
 
   const categoryLabelMap = new Map(categories.map((category) => [category.id, category.label]));
   const materialLevelMap = new Map(materialLevelOptions.map((option) => [option.value, option]));
@@ -799,6 +799,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       reminders.push("已有衛浴或貼磚更新且含拆除工程，建議確認是否需要拆除見底 / 見磚工項，避免低估拆除深度與清運量。");
     }
 
+    if (itemIds.has("tiling-refresh") && !itemIds.has("tiling-material")) {
+      reminders.push("目前已列牆地磚鋪貼工資，但尚未列面磚材料費，建議補列材料暫估或提前註明另計。");
+    }
+
     if (itemIds.has("bathroom-waterproof") && payload.assumptions.waterproofWarranty?.value === "pending-waterproof") {
       reminders.push("本案已有防水工程，但目前防水保固仍未列明，建議在正式送客戶前補上年限與責任界線。");
     }
@@ -809,6 +813,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
 
     if ((itemIds.has("ceiling-flat") || itemIds.has("smart-home-control-node")) && !itemIds.has("hvac-piping") && !itemIds.has("hvac-install")) {
       reminders.push("已有天花或智能家居工項，但尚未列空調相關工項，建議確認冷氣管線與設備安裝是否同步處理。");
+    }
+
+    if (itemIds.has("hvac-piping") && !itemIds.has("ac-piping-box") && itemIds.has("ceiling-flat")) {
+      reminders.push("已有空調管線與天花工程，但尚未列冷氣包管 / 包樑修飾，建議確認是否需同步整理外露管線。");
     }
 
     if ((itemIds.has("smart-home-control-node") || itemIds.has("smart-home-security-node")) && !itemIds.has("smart-home-hub")) {
@@ -825,6 +833,14 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
 
     if ((itemIds.has("system-cabinet") || itemIds.has("woodwork-cabinet") || itemIds.has("entry-cabinet")) && !itemIds.has("painting-full")) {
       reminders.push("已有櫃體工項，但尚未列油漆或收尾工項，建議確認是否需要牆面修補與完工收尾。");
+    }
+
+    if (itemIds.has("system-cabinet") && !itemIds.has("cabinet-hardware-upgrade")) {
+      reminders.push("已有系統櫃工項，若本案對收納與五金要求較高，建議補列五金 / 收納配件升級並搭配清單逐項確認。");
+    }
+
+    if (itemIds.has("window-replacement") && !itemIds.has("curtain-box") && itemIds.has("ceiling-flat")) {
+      reminders.push("已有窗體更新與天花工程，但尚未列窗簾盒，建議確認是否需一併整理窗邊收口與軌道位置。");
     }
 
     if (payload.assumptions.workMethod?.value === "concealed" && payload.assumptions.restorationScope?.value === "not_included") {
