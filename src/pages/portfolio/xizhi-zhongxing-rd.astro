@@ -1,8 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
-const photoPlaceholder = '/images/placeholders/space-photo-placeholder.svg';
-
 const project = {
   title: '住宅空間精選',
   label: 'CURATED RESIDENCE',
@@ -29,6 +27,11 @@ const project = {
       src: '/images/portfolio/xizhi-3.jpg',
       alt: '住宅空間主臥畫面',
       layout: 'is-immersive',
+    },
+    {
+      src: '/images/portfolio/xizhi-zhongxing-rd/living-room-after.jpg',
+      alt: '住宅空間客廳改造後畫面',
+      layout: 'is-standard',
     },
     {
       src: '/images/portfolio/xizhi-zhongxing-rd/bathroom-portrait.jpg',
@@ -84,8 +87,8 @@ const renovationComparisons = [
     beforeAlt: '客廳改造前現場照片',
     beforeTitle: '改造前',
     beforeCaption: '拆除與管線整理階段',
-    afterImage: photoPlaceholder,
-    afterAlt: '客廳完工畫面示意',
+    afterImage: '/images/portfolio/xizhi-zhongxing-rd/living-room-after.jpg',
+    afterAlt: '客廳改造後完工照片',
     afterTitle: '完成後',
     afterCaption: '',
   },
