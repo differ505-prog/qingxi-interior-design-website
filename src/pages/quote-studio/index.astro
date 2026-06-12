@@ -35,6 +35,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
             開啟客戶預覽
           </a>
           <button type="button" id="copy-preview-link" class="btn btn-secondary">複製客戶預覽連結</button>
+          <button type="button" id="copy-llm-review" class="btn btn-secondary">複製 LLM 覆核文字</button>
           <button type="button" id="reset-quote" class="btn btn-secondary btn-muted">重設本次報價</button>
         </div>
         <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；之後可直接改掛到次網域。</p>
@@ -105,6 +106,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
                   <span class="default-category">{categoryLabelMap.get(item.categoryId)}</span>
                   <strong>{item.name}</strong>
                   <span class="default-description">{item.description}</span>
+                  <span class="default-basis">計價基準：{item.pricingBasis}</span>
                   <div class="input-with-prefix">
                     <span>NT$</span>
                     <input
@@ -249,6 +251,11 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
             <label class="field field-full">
               <span>客戶預覽連結</span>
               <input id="preview-link-input" type="text" readonly />
+            </label>
+
+            <label class="field field-full">
+              <span>LLM 覆核文字</span>
+              <textarea id="llm-review-output" rows="12" readonly></textarea>
             </label>
 
             <div class="summary-block">
@@ -500,6 +507,73 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     };
   }
 
+  function buildLlmReviewText() {
+    const payload = buildQuotePayload();
+    const defaultPriceLines = templateItems
+      .map((item) => `- [${categoryLabelMap.get(item.categoryId) || item.categoryId}] ${item.name}：${formatCurrency(parseNumber(state.defaults[item.id]))} / ${item.unit}；計價基準：${item.pricingBasis}；說明：${item.description}`)
+      .join("\n");
+
+    const activeItemLines = payload.items.length
+      ? payload.items
+          .map(
+            (item) =>
+              `- [${item.categoryLabel}] ${item.name}：數量 ${item.quantity} ${item.unit}，單價 ${formatCurrency(item.unitPrice)}，小計 ${formatCurrency(item.subtotal)}${item.note ? `；客戶說明：${item.note}` : ""}`,
+          )
+          .join("\n")
+      : "- 目前尚未勾選工項";
+
+    const totals = payload.totals;
+    const invoiceNotice = payload.notes.invoiceNoticeParagraphs?.join("\n") || "";
+
+    return [
+      "請你以室內設計 / 裝修報價覆核顧問的角色，協助檢查以下報價內容。",
+      "",
+      "請優先指出：",
+      "1. 是否有常見遺漏工項",
+      "2. 單價或計價方式是否不合理或不夠清楚",
+      "3. 哪些條款或說明對客戶來說仍可能不夠明白",
+      "4. 是否有容易引發爭議的稅務、發票、範圍界線或追加減項風險",
+      "5. 如果要再優化，請給我具體修改建議與建議文案",
+      "",
+      "【案件基本資訊】",
+      `- 報價標題：${payload.meta.quoteTitle || "未填寫"}`,
+      `- 客戶姓名：${payload.meta.clientName || "未填寫"}`,
+      `- 案件名稱：${payload.meta.projectName || "未填寫"}`,
+      `- 空間類型：${payload.meta.propertyType || "未填寫"}`,
+      `- 坪數：${payload.meta.area ? `${payload.meta.area} 坪` : "未填寫"}`,
+      `- 地址 / 備註：${payload.meta.address || "未填寫"}`,
+      "",
+      "【預設單價資料庫】",
+      defaultPriceLines,
+      "",
+      "【本案工項】",
+      activeItemLines,
+      "",
+      "【費用摘要】",
+      `- 工程小計：${formatCurrency(totals.lineSubtotal)}`,
+      `- 設計費：${formatCurrency(totals.designFee)}`,
+      `- 監工 / 管理費：${formatCurrency(totals.managementFee)}`,
+      `- 調整金額：${formatCurrency(totals.adjustmentAmount)}`,
+      `- 稅金：${formatCurrency(totals.taxAmount)}`,
+      `- 總計：${formatCurrency(totals.grandTotal)}`,
+      "",
+      "【前言說明】",
+      payload.notes.intro || "未填寫",
+      "",
+      "【報價條款】",
+      ...(payload.notes.terms?.length ? payload.notes.terms.map((term) => `- ${term}`) : ["- 未填寫"]),
+      "",
+      "【稅務與開立發票說明】",
+      invoiceNotice || "未填寫",
+      "",
+      "請直接輸出：",
+      "A. 主要問題",
+      "B. 風險提醒",
+      "C. 建議補問客戶的問題",
+      "D. 建議改寫文案",
+    ].join("\n");
+  }
+
   function encodePayload(payload) {
     const serialized = JSON.stringify(payload);
     const bytes = new TextEncoder().encode(serialized);
@@ -662,6 +736,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     document.getElementById("open-preview-link").href = previewUrl;
   }
 
+  function updateLlmReviewOutput() {
+    document.getElementById("llm-review-output").value = buildLlmReviewText();
+  }
+
   function refreshUi() {
     syncBaseFields();
     syncDefaults();
@@ -669,6 +747,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     renderCustomRows();
     renderCategoryTotals();
     updatePreviewLinks();
+    updateLlmReviewOutput();
   }
 
   function saveAndRefresh() {
@@ -804,6 +883,20 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
         }, 1400);
       } catch (error) {
         console.error("無法複製連結：", error);
+      }
+      return;
+    }
+
+    if (target.id === "copy-llm-review") {
+      const reviewText = buildLlmReviewText();
+      try {
+        await navigator.clipboard.writeText(reviewText);
+        target.textContent = "LLM 文字已複製";
+        window.setTimeout(() => {
+          target.textContent = "複製 LLM 覆核文字";
+        }, 1400);
+      } catch (error) {
+        console.error("無法複製 LLM 文字：", error);
       }
       return;
     }
@@ -1019,6 +1112,12 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     color: var(--gray-medium);
     line-height: 1.7;
     min-height: 3rem;
+  }
+
+  .default-basis {
+    color: var(--gray-dark);
+    line-height: 1.7;
+    font-size: 0.9rem;
   }
 
   .table-shell {
