@@ -1,11 +1,17 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { quoteCategories, quoteDefaultTerms, quoteTemplateItems } from "../../lib/quote-studio";
+import {
+  quoteCategories,
+  quoteDefaultTerms,
+  quoteInvoiceNotice,
+  quoteTemplateItems,
+} from "../../lib/quote-studio";
 
 const propertyTypeOptions = ["住宅空間", "商業空間", "局部整修", "客變規劃", "智能家居"];
 const quoteCategoriesJson = JSON.stringify(quoteCategories);
 const quoteTemplateItemsJson = JSON.stringify(quoteTemplateItems);
 const quoteDefaultTermsJson = JSON.stringify(quoteDefaultTerms);
+const quoteInvoiceNoticeJson = JSON.stringify(quoteInvoiceNotice);
 const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id, category.label]));
 ---
 
@@ -225,6 +231,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
                 <span>報價條款（每行一則）</span>
                 <textarea id="quote-terms" rows="5"></textarea>
               </label>
+              <label class="field field-full">
+                <span>稅務與開立發票說明</span>
+                <textarea id="invoice-notice" rows="5"></textarea>
+              </label>
             </div>
           </section>
         </div>
@@ -265,12 +275,13 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
 
 <script
   is:inline
-  define:vars={{ quoteCategoriesJson, quoteTemplateItemsJson, quoteDefaultTermsJson }}
+  define:vars={{ quoteCategoriesJson, quoteTemplateItemsJson, quoteDefaultTermsJson, quoteInvoiceNoticeJson }}
 >
   // @ts-nocheck
   const categories = JSON.parse(quoteCategoriesJson);
   const templateItems = JSON.parse(quoteTemplateItemsJson);
   const defaultTerms = JSON.parse(quoteDefaultTermsJson);
+  const defaultInvoiceNotice = JSON.parse(quoteInvoiceNoticeJson);
   const STORAGE_KEY = "qingxi-quote-studio-draft-v1";
 
   const categoryLabelMap = new Map(categories.map((category) => [category.id, category.label]));
@@ -341,6 +352,8 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       notes: {
         intro: "以下報價依目前討論內容整理，方便先確認預算方向與工項範圍。",
         termsText: defaultTerms.join("\n"),
+        invoiceNoticeTitle: defaultInvoiceNotice.title,
+        invoiceNoticeText: defaultInvoiceNotice.paragraphs.join("\n\n"),
       },
     };
   }
@@ -477,6 +490,11 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
           .split("\n")
           .map((term) => term.trim())
           .filter(Boolean),
+        invoiceNoticeTitle: state.notes.invoiceNoticeTitle || defaultInvoiceNotice.title,
+        invoiceNoticeParagraphs: state.notes.invoiceNoticeText
+          .split(/\n\s*\n/g)
+          .map((paragraph) => paragraph.trim())
+          .filter(Boolean),
       },
       generatedAt: new Date().toISOString(),
     };
@@ -542,6 +560,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     document.getElementById("tax-rate").value = state.fees.taxRate;
     document.getElementById("quote-intro").value = state.notes.intro;
     document.getElementById("quote-terms").value = state.notes.termsText;
+    document.getElementById("invoice-notice").value = state.notes.invoiceNoticeText;
   }
 
   function syncDefaults() {
@@ -702,6 +721,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     }
     if (target.id === "quote-terms") {
       state.notes.termsText = target.value;
+      return true;
+    }
+    if (target.id === "invoice-notice") {
+      state.notes.invoiceNoticeText = target.value;
       return true;
     }
     return false;
