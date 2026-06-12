@@ -1,0 +1,523 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="報價預覽 - 青曦空間設計"
+  description="青曦報價預覽頁。"
+  noindex={true}
+>
+  <section class="quote-preview-page">
+    <div class="quote-preview-shell">
+      <header class="preview-toolbar print-hidden">
+        <div>
+          <p class="preview-eyebrow">CLIENT PREVIEW</p>
+          <h1>報價預覽頁</h1>
+          <p class="preview-description">此頁可直接分享給客戶，也可列印另存 PDF。</p>
+        </div>
+        <div class="preview-actions">
+          <button type="button" id="print-quote" class="btn btn-primary">列印 / 另存 PDF</button>
+          <a href="/quote-studio" class="btn btn-secondary">返回工作台</a>
+        </div>
+      </header>
+
+      <div id="preview-empty" class="preview-empty">
+        目前沒有可顯示的報價資料，請先回到工作台建立內容後再開啟此頁。
+      </div>
+
+      <article id="preview-document" class="preview-document" hidden>
+        <header class="document-header">
+          <div>
+            <p class="document-brand">青曦空間設計</p>
+            <h2 id="document-title">青曦空間設計初估單</h2>
+            <p id="document-intro" class="document-intro"></p>
+          </div>
+          <div class="document-meta" id="document-meta"></div>
+        </header>
+
+        <section class="document-section">
+          <div class="section-heading">
+            <h3>工項明細</h3>
+            <p>以下內容會依目前討論需求、數量與單價整理。</p>
+          </div>
+          <div id="quote-groups" class="quote-groups"></div>
+        </section>
+
+        <section class="document-section document-summary-section">
+          <div>
+            <div class="section-heading">
+              <h3>報價摘要</h3>
+              <p>若後續工項或材料有調整，會再提供新版內容確認。</p>
+            </div>
+            <div id="quote-terms" class="quote-terms"></div>
+          </div>
+          <div class="quote-summary-card">
+            <div class="summary-row"><span>工程小計</span><strong id="summary-line-subtotal">NT$0</strong></div>
+            <div class="summary-row"><span>設計費</span><strong id="summary-design-fee">NT$0</strong></div>
+            <div class="summary-row"><span>監工 / 管理費</span><strong id="summary-management-fee">NT$0</strong></div>
+            <div class="summary-row"><span>調整金額</span><strong id="summary-adjustment">NT$0</strong></div>
+            <div class="summary-row"><span>稅金</span><strong id="summary-tax">NT$0</strong></div>
+            <div class="summary-row grand-total"><span>總計</span><strong id="summary-grand-total">NT$0</strong></div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // @ts-nocheck
+  function formatCurrency(value) {
+    return new Intl.NumberFormat("zh-TW", {
+      style: "currency",
+      currency: "TWD",
+      maximumFractionDigits: 0,
+    }).format(Number.isFinite(value) ? value : 0);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function decodePayload(encoded) {
+    const binary = atob(encoded);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    const json = new TextDecoder().decode(bytes);
+    return JSON.parse(json);
+  }
+
+  function getEncodedPayload() {
+    const hash = window.location.hash.startsWith("#")
+      ? window.location.hash.slice(1)
+      : window.location.hash;
+
+    if (hash.startsWith("quote=")) {
+      return hash.replace(/^quote=/, "");
+    }
+
+    const queryValue = new URLSearchParams(window.location.search).get("quote");
+    return queryValue || "";
+  }
+
+  function renderMeta(meta) {
+    const metaItems = [
+      ["客戶", meta.clientName || "未填寫"],
+      ["案件", meta.projectName || "未填寫"],
+      ["空間類型", meta.propertyType || "未填寫"],
+      ["坪數", meta.area ? `${meta.area} 坪` : "未填寫"],
+      ["地址 / 備註", meta.address || "未填寫"],
+      ["報價日期", meta.quoteDate || "未填寫"],
+      ["有效期限", meta.validUntil || "未填寫"],
+      ["報價人", meta.preparedBy || "青曦空間設計"],
+    ];
+
+    document.getElementById("document-meta").innerHTML = metaItems
+      .map(
+        ([label, value]) => `
+          <div class="meta-item">
+            <span>${escapeHtml(label)}</span>
+            <strong>${escapeHtml(value)}</strong>
+          </div>
+        `,
+      )
+      .join("");
+  }
+
+  function renderGroups(items) {
+    const groups = new Map();
+
+    items.forEach((item) => {
+      if (!groups.has(item.categoryLabel)) {
+        groups.set(item.categoryLabel, []);
+      }
+      groups.get(item.categoryLabel).push(item);
+    });
+
+    document.getElementById("quote-groups").innerHTML = [...groups.entries()]
+      .map(([label, entries]) => {
+        const subtotal = entries.reduce((sum, entry) => sum + entry.subtotal, 0);
+        return `
+          <section class="quote-group">
+            <header class="quote-group-header">
+              <h4>${escapeHtml(label)}</h4>
+              <strong>${formatCurrency(subtotal)}</strong>
+            </header>
+            <div class="quote-item-list">
+              ${entries
+                .map(
+                  (entry) => `
+                    <article class="quote-item-card">
+                      <div class="quote-item-main">
+                        <div>
+                          <h5>${escapeHtml(entry.name)}</h5>
+                          ${entry.note ? `<p>${escapeHtml(entry.note)}</p>` : ""}
+                        </div>
+                        <strong>${formatCurrency(entry.subtotal)}</strong>
+                      </div>
+                      <div class="quote-item-meta">
+                        <span>數量：${escapeHtml(entry.quantity)} ${escapeHtml(entry.unit)}</span>
+                        <span>單價：${formatCurrency(entry.unitPrice)} / ${escapeHtml(entry.unit)}</span>
+                      </div>
+                    </article>
+                  `,
+                )
+                .join("")}
+            </div>
+          </section>
+        `;
+      })
+      .join("");
+  }
+
+  function renderTerms(terms) {
+    document.getElementById("quote-terms").innerHTML = `
+      <ul>
+        ${terms.map((term) => `<li>${escapeHtml(term)}</li>`).join("")}
+      </ul>
+    `;
+  }
+
+  function renderSummary(totals) {
+    document.getElementById("summary-line-subtotal").textContent = formatCurrency(totals.lineSubtotal);
+    document.getElementById("summary-design-fee").textContent = formatCurrency(totals.designFee);
+    document.getElementById("summary-management-fee").textContent = formatCurrency(totals.managementFee);
+    document.getElementById("summary-adjustment").textContent = formatCurrency(totals.adjustmentAmount);
+    document.getElementById("summary-tax").textContent = formatCurrency(totals.taxAmount);
+    document.getElementById("summary-grand-total").textContent = formatCurrency(totals.grandTotal);
+  }
+
+  function renderDocument(payload) {
+    document.getElementById("document-title").textContent = payload.meta.quoteTitle || "青曦空間設計初估單";
+    document.getElementById("document-intro").textContent = payload.notes.intro || "";
+    renderMeta(payload.meta);
+    renderGroups(payload.items || []);
+    renderTerms(payload.notes.terms || []);
+    renderSummary(payload.totals || {});
+  }
+
+  function bootstrap() {
+    const encoded = getEncodedPayload();
+    if (!encoded) return;
+
+    try {
+      const payload = decodePayload(encoded);
+      renderDocument(payload);
+      document.getElementById("preview-empty").hidden = true;
+      document.getElementById("preview-document").hidden = false;
+    } catch (error) {
+      console.error("無法解析報價資料：", error);
+    }
+  }
+
+  document.getElementById("print-quote")?.addEventListener("click", () => {
+    window.print();
+  });
+
+  bootstrap();
+</script>
+
+<style>
+  .quote-preview-page {
+    padding: 4rem 1.5rem 5rem;
+    background:
+      radial-gradient(circle at top left, rgba(160, 217, 217, 0.14), transparent 22%),
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(245, 246, 245, 1) 100%);
+  }
+
+  .quote-preview-shell {
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .preview-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1.4rem;
+  }
+
+  .preview-eyebrow {
+    margin: 0 0 0.8rem;
+    color: var(--tiffany-dark);
+    font-size: 0.8rem;
+    letter-spacing: 0.24em;
+  }
+
+  .preview-toolbar h1 {
+    margin: 0;
+    color: var(--gray-darkest);
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+  }
+
+  .preview-description,
+  .document-intro {
+    margin: 0.8rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
+  }
+
+  .preview-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .preview-empty,
+  .preview-document {
+    padding: 2rem;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 28px 60px rgba(47, 47, 47, 0.06);
+  }
+
+  .preview-empty {
+    text-align: center;
+    color: var(--gray-medium);
+  }
+
+  .document-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(47, 47, 47, 0.08);
+  }
+
+  .document-brand {
+    margin: 0;
+    color: var(--tiffany-dark);
+    letter-spacing: 0.18em;
+    font-size: 0.82rem;
+  }
+
+  .document-header h2 {
+    margin: 0.7rem 0 0;
+    color: var(--gray-darkest);
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    line-height: 1.3;
+  }
+
+  .document-meta {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .meta-item {
+    padding: 0.9rem 1rem;
+    border-radius: 18px;
+    background: rgba(247, 249, 249, 0.92);
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .meta-item span {
+    color: var(--gray-medium);
+    font-size: 0.86rem;
+  }
+
+  .meta-item strong {
+    color: var(--gray-darkest);
+    line-height: 1.7;
+  }
+
+  .document-section {
+    margin-top: 1.7rem;
+  }
+
+  .section-heading h3 {
+    margin: 0;
+    color: var(--gray-darkest);
+    font-size: 1.25rem;
+  }
+
+  .section-heading p {
+    margin: 0.45rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+  }
+
+  .quote-groups {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .quote-group {
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  .quote-group-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem 1.2rem;
+    background: rgba(247, 249, 249, 0.92);
+  }
+
+  .quote-group-header h4 {
+    margin: 0;
+    color: var(--gray-darkest);
+  }
+
+  .quote-item-list {
+    display: grid;
+    gap: 0;
+  }
+
+  .quote-item-card {
+    padding: 1rem 1.2rem;
+    border-top: 1px solid rgba(47, 47, 47, 0.08);
+  }
+
+  .quote-item-main,
+  .quote-item-meta,
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .quote-item-main h5 {
+    margin: 0;
+    color: var(--gray-darkest);
+    font-size: 1rem;
+  }
+
+  .quote-item-main p {
+    margin: 0.45rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+  }
+
+  .quote-item-meta {
+    margin-top: 0.65rem;
+    color: var(--gray-medium);
+    font-size: 0.92rem;
+  }
+
+  .document-summary-section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .quote-terms ul {
+    margin: 1rem 0 0;
+    padding-left: 1.2rem;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
+  .quote-summary-card {
+    padding: 1.3rem;
+    border-radius: 24px;
+    background: rgba(247, 249, 249, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .summary-row {
+    color: var(--gray-dark);
+  }
+
+  .grand-total {
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(47, 47, 47, 0.08);
+    font-size: 1.08rem;
+    color: var(--gray-darkest);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .btn-primary {
+    background: var(--tiffany-primary);
+    color: var(--gray-darkest);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--gray-darkest);
+    border-color: rgba(129, 199, 212, 0.24);
+  }
+
+  @media (max-width: 900px) {
+    .preview-toolbar,
+    .document-header,
+    .document-summary-section {
+      grid-template-columns: 1fr;
+      display: grid;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .quote-preview-page {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .preview-document,
+    .preview-empty {
+      padding: 1.2rem;
+      border-radius: 22px;
+    }
+
+    .preview-actions {
+      display: grid;
+    }
+
+    .quote-item-main,
+    .quote-item-meta,
+    .summary-row,
+    .quote-group-header {
+      display: grid;
+    }
+  }
+
+  @media print {
+    .quote-preview-page {
+      padding: 0;
+      background: white;
+    }
+
+    .print-hidden {
+      display: none !important;
+    }
+
+    .preview-document {
+      box-shadow: none;
+      border: none;
+      padding: 0;
+    }
+
+    .quote-group,
+    .quote-summary-card,
+    .meta-item {
+      break-inside: avoid;
+    }
+  }
+</style>

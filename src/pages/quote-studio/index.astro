@@ -1,0 +1,1175 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { quoteCategories, quoteDefaultTerms, quoteTemplateItems } from "../../lib/quote-studio";
+
+const propertyTypeOptions = ["住宅空間", "商業空間", "局部整修", "客變規劃", "智能家居"];
+const quoteCategoriesJson = JSON.stringify(quoteCategories);
+const quoteTemplateItemsJson = JSON.stringify(quoteTemplateItems);
+const quoteDefaultTermsJson = JSON.stringify(quoteDefaultTerms);
+const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id, category.label]));
+---
+
+<BaseLayout
+  title="報價工作台 - 青曦空間設計"
+  description="青曦內部使用的報價工作台，可調整預設單價、案件覆寫與客戶預覽。"
+  noindex={true}
+>
+  <section class="quote-studio-page">
+    <div class="quote-studio-shell">
+      <header class="studio-hero">
+        <div>
+          <p class="studio-eyebrow">INTERNAL QUOTE STUDIO</p>
+          <h1>報價工作台</h1>
+          <p class="studio-description">
+            先調整預設單價，再依當案覆寫數量與單價，就能產生給客戶看的估價頁。
+          </p>
+        </div>
+        <div class="studio-actions">
+          <a id="open-preview-link" href="/quote-studio/preview" target="_blank" rel="noreferrer" class="btn btn-primary">
+            開啟客戶預覽
+          </a>
+          <button type="button" id="copy-preview-link" class="btn btn-secondary">複製客戶預覽連結</button>
+          <button type="button" id="reset-quote" class="btn btn-secondary btn-muted">重設本次報價</button>
+        </div>
+        <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；之後可直接改掛到次網域。</p>
+      </header>
+
+      <div class="studio-grid">
+        <div class="studio-main">
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>案件基本資訊</h2>
+              <p>這些內容會直接出現在客戶看到的估價頁。</p>
+            </div>
+            <div class="form-grid">
+              <label class="field">
+                <span>報價標題</span>
+                <input id="quote-title" type="text" placeholder="例如：青曦住宅空間初估單" />
+              </label>
+              <label class="field">
+                <span>客戶姓名</span>
+                <input id="client-name" type="text" placeholder="例如：王小姐" />
+              </label>
+              <label class="field">
+                <span>案件名稱</span>
+                <input id="project-name" type="text" placeholder="例如：林口新成屋裝修" />
+              </label>
+              <label class="field">
+                <span>空間類型</span>
+                <select id="property-type">
+                  {propertyTypeOptions.map((option) => (
+                    <option value={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+              <label class="field">
+                <span>坪數</span>
+                <div class="input-with-suffix">
+                  <input id="project-area" type="number" min="0" step="0.5" placeholder="例如：28" />
+                  <span>坪</span>
+                </div>
+              </label>
+              <label class="field">
+                <span>報價日期</span>
+                <input id="quote-date" type="date" />
+              </label>
+              <label class="field">
+                <span>有效期限</span>
+                <input id="valid-until" type="date" />
+              </label>
+              <label class="field">
+                <span>報價人</span>
+                <input id="prepared-by" type="text" placeholder="例如：青曦空間設計" />
+              </label>
+              <label class="field field-full">
+                <span>案件地址 / 備註</span>
+                <input id="project-address" type="text" placeholder="例如：新北市林口區..." />
+              </label>
+            </div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>預設單價資料庫</h2>
+              <p>先調整平常常用的基準值，下面案件工項會自動跟著更新。</p>
+            </div>
+            <div class="default-price-grid">
+              {quoteTemplateItems.map((item) => (
+                <label class="default-price-card">
+                  <span class="default-category">{categoryLabelMap.get(item.categoryId)}</span>
+                  <strong>{item.name}</strong>
+                  <span class="default-description">{item.description}</span>
+                  <div class="input-with-prefix">
+                    <span>NT$</span>
+                    <input
+                      class="default-price-input"
+                      data-default-id={item.id}
+                      type="number"
+                      min="0"
+                      step="100"
+                    />
+                    <small>/ {item.unit}</small>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading with-action">
+              <div>
+                <h2>本案工項</h2>
+                <p>勾選要報給客戶的工項，需要特殊價格時直接填寫「本案改價」。</p>
+              </div>
+              <button type="button" id="add-custom-item" class="btn btn-secondary">新增自訂工項</button>
+            </div>
+
+            <div class="table-shell">
+              <table class="quote-table">
+                <thead>
+                  <tr>
+                    <th>啟用</th>
+                    <th>工項</th>
+                    <th>數量</th>
+                    <th>本案改價</th>
+                    <th>套用單價</th>
+                    <th>小計</th>
+                    <th>客戶說明</th>
+                  </tr>
+                </thead>
+                <tbody id="template-items-body">
+                  {quoteTemplateItems.map((item) => (
+                    <tr data-template-item-id={item.id}>
+                      <td>
+                        <input class="item-enabled" type="checkbox" />
+                      </td>
+                      <td>
+                        <div class="item-copy">
+                          <strong>{item.name}</strong>
+                          <span>{categoryLabelMap.get(item.categoryId)} · {item.description}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="input-with-suffix compact-input">
+                          <input class="item-quantity" type="number" min="0" step="0.5" />
+                          <span>{item.unit}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="input-with-prefix compact-input">
+                          <span>NT$</span>
+                          <input class="item-override-price" type="number" min="0" step="100" placeholder="跟隨預設" />
+                        </div>
+                      </td>
+                      <td>
+                        <strong class="item-effective-price">NT$0</strong>
+                      </td>
+                      <td>
+                        <strong class="item-subtotal">NT$0</strong>
+                      </td>
+                      <td>
+                        <input class="item-note" type="text" placeholder="例如：含配線與基礎整理" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tbody id="custom-items-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>附加費用與條款</h2>
+              <p>設計費、管理費、調整額與條款都可當案修改。</p>
+            </div>
+
+            <div class="form-grid">
+              <label class="field">
+                <span>設計費</span>
+                <div class="input-with-prefix">
+                  <span>NT$</span>
+                  <input id="design-fee" type="number" min="0" step="1000" />
+                </div>
+              </label>
+              <label class="field">
+                <span>監工 / 管理費</span>
+                <div class="input-with-prefix">
+                  <span>NT$</span>
+                  <input id="management-fee" type="number" min="0" step="1000" />
+                </div>
+              </label>
+              <label class="field">
+                <span>調整金額</span>
+                <div class="input-with-prefix">
+                  <span>NT$</span>
+                  <input id="adjustment-amount" type="number" step="1000" placeholder="可填負數作為折扣" />
+                </div>
+              </label>
+              <label class="field checkbox-field">
+                <span>是否加計稅金</span>
+                <input id="include-tax" type="checkbox" />
+              </label>
+              <label class="field">
+                <span>稅率</span>
+                <div class="input-with-suffix">
+                  <input id="tax-rate" type="number" min="0" step="0.1" />
+                  <span>%</span>
+                </div>
+              </label>
+              <label class="field field-full">
+                <span>前言說明</span>
+                <textarea id="quote-intro" rows="3" placeholder="例如：以下報價依目前討論內容整理，方便先確認預算方向與工項範圍。"></textarea>
+              </label>
+              <label class="field field-full">
+                <span>報價條款（每行一則）</span>
+                <textarea id="quote-terms" rows="5"></textarea>
+              </label>
+            </div>
+          </section>
+        </div>
+
+        <aside class="studio-side">
+          <section class="studio-card studio-summary-card">
+            <div class="section-heading">
+              <h2>即時摘要</h2>
+              <p>預覽連結會跟著目前內容自動更新。</p>
+            </div>
+
+            <label class="field field-full">
+              <span>客戶預覽連結</span>
+              <input id="preview-link-input" type="text" readonly />
+            </label>
+
+            <div class="summary-block">
+              <p class="summary-title">分類小計</p>
+              <div id="category-totals" class="category-total-list"></div>
+            </div>
+
+            <div class="summary-block amount-list">
+              <div><span>工程小計</span><strong id="line-subtotal">NT$0</strong></div>
+              <div><span>設計費</span><strong id="design-fee-total">NT$0</strong></div>
+              <div><span>監工 / 管理費</span><strong id="management-fee-total">NT$0</strong></div>
+              <div><span>調整金額</span><strong id="adjustment-total">NT$0</strong></div>
+              <div><span>稅金</span><strong id="tax-total">NT$0</strong></div>
+              <div class="grand-total"><span>總計</span><strong id="grand-total">NT$0</strong></div>
+            </div>
+
+            <p class="summary-note">客戶預覽頁內建列印版型，可直接另存成 PDF。</p>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script
+  is:inline
+  define:vars={{ quoteCategoriesJson, quoteTemplateItemsJson, quoteDefaultTermsJson }}
+>
+  // @ts-nocheck
+  const categories = JSON.parse(quoteCategoriesJson);
+  const templateItems = JSON.parse(quoteTemplateItemsJson);
+  const defaultTerms = JSON.parse(quoteDefaultTermsJson);
+  const STORAGE_KEY = "qingxi-quote-studio-draft-v1";
+
+  const categoryLabelMap = new Map(categories.map((category) => [category.id, category.label]));
+
+  function formatCurrency(value) {
+    return new Intl.NumberFormat("zh-TW", {
+      style: "currency",
+      currency: "TWD",
+      maximumFractionDigits: 0,
+    }).format(Number.isFinite(value) ? value : 0);
+  }
+
+  function parseNumber(value) {
+    const parsed = Number.parseFloat(String(value ?? "").trim());
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function todayString() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function validUntilString() {
+    const date = new Date();
+    date.setDate(date.getDate() + 14);
+    return date.toISOString().slice(0, 10);
+  }
+
+  function createInitialState() {
+    return {
+      meta: {
+        quoteTitle: "青曦空間設計初估單",
+        clientName: "",
+        projectName: "",
+        propertyType: "住宅空間",
+        area: "",
+        address: "",
+        quoteDate: todayString(),
+        validUntil: validUntilString(),
+        preparedBy: "青曦空間設計",
+      },
+      defaults: Object.fromEntries(
+        templateItems.map((item) => [item.id, item.defaultUnitPrice]),
+      ),
+      items: templateItems.map((item) => ({
+        id: item.id,
+        enabled: false,
+        quantity: item.defaultQuantity,
+        overrideUnitPrice: "",
+        note: "",
+      })),
+      customItems: [],
+      fees: {
+        designFee: "",
+        managementFee: "",
+        adjustmentAmount: "",
+        includeTax: false,
+        taxRate: 5,
+      },
+      notes: {
+        intro: "以下報價依目前討論內容整理，方便先確認預算方向與工項範圍。",
+        termsText: defaultTerms.join("\n"),
+      },
+    };
+  }
+
+  let state = createInitialState();
+
+  function createCustomItem() {
+    return {
+      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      categoryId: categories[0]?.id || "custom",
+      name: "",
+      unit: "式",
+      quantity: 1,
+      unitPrice: "",
+      note: "",
+    };
+  }
+
+  function getTemplateState(itemId) {
+    return state.items.find((item) => item.id === itemId);
+  }
+
+  function getTemplateUnitPrice(itemId) {
+    const itemState = getTemplateState(itemId);
+    const overridePrice = parseNumber(itemState?.overrideUnitPrice);
+    if (String(itemState?.overrideUnitPrice ?? "").trim()) {
+      return overridePrice;
+    }
+    return parseNumber(state.defaults[itemId]);
+  }
+
+  function getTemplateSubtotal(itemId) {
+    const itemState = getTemplateState(itemId);
+    if (!itemState?.enabled) return 0;
+    return parseNumber(itemState.quantity) * getTemplateUnitPrice(itemId);
+  }
+
+  function getCustomSubtotal(item) {
+    return parseNumber(item.quantity) * parseNumber(item.unitPrice);
+  }
+
+  function computeTotals() {
+    const categoryTotals = Object.fromEntries(categories.map((category) => [category.id, 0]));
+
+    templateItems.forEach((item) => {
+      const subtotal = getTemplateSubtotal(item.id);
+      categoryTotals[item.categoryId] += subtotal;
+    });
+
+    state.customItems.forEach((item) => {
+      const subtotal = getCustomSubtotal(item);
+      if (categoryTotals[item.categoryId] == null) {
+        categoryTotals[item.categoryId] = 0;
+      }
+      categoryTotals[item.categoryId] += subtotal;
+    });
+
+    const lineSubtotal = Object.values(categoryTotals).reduce((sum, value) => sum + value, 0);
+    const designFee = parseNumber(state.fees.designFee);
+    const managementFee = parseNumber(state.fees.managementFee);
+    const adjustmentAmount = parseNumber(state.fees.adjustmentAmount);
+    const subtotalBeforeTax = lineSubtotal + designFee + managementFee + adjustmentAmount;
+    const taxAmount = state.fees.includeTax
+      ? subtotalBeforeTax * (parseNumber(state.fees.taxRate) / 100)
+      : 0;
+    const grandTotal = subtotalBeforeTax + taxAmount;
+
+    return {
+      categoryTotals,
+      lineSubtotal,
+      designFee,
+      managementFee,
+      adjustmentAmount,
+      subtotalBeforeTax,
+      taxAmount,
+      grandTotal,
+    };
+  }
+
+  function buildQuotePayload() {
+    const totals = computeTotals();
+    const visibleTemplateItems = templateItems
+      .map((item) => {
+        const itemState = getTemplateState(item.id);
+        const quantity = parseNumber(itemState?.quantity);
+        const unitPrice = getTemplateUnitPrice(item.id);
+        const subtotal = quantity * unitPrice;
+
+        if (!itemState?.enabled || subtotal <= 0) return null;
+
+        return {
+          id: item.id,
+          categoryId: item.categoryId,
+          categoryLabel: categoryLabelMap.get(item.categoryId) || item.categoryId,
+          name: item.name,
+          unit: item.unit,
+          quantity,
+          unitPrice,
+          subtotal,
+          note: String(itemState.note || "").trim(),
+        };
+      })
+      .filter(Boolean);
+
+    const visibleCustomItems = state.customItems
+      .map((item) => {
+        const quantity = parseNumber(item.quantity);
+        const unitPrice = parseNumber(item.unitPrice);
+        const subtotal = quantity * unitPrice;
+
+        if (!String(item.name || "").trim() || subtotal <= 0) return null;
+
+        return {
+          id: item.id,
+          categoryId: item.categoryId,
+          categoryLabel: categoryLabelMap.get(item.categoryId) || item.categoryId,
+          name: item.name,
+          unit: item.unit || "式",
+          quantity,
+          unitPrice,
+          subtotal,
+          note: String(item.note || "").trim(),
+        };
+      })
+      .filter(Boolean);
+
+    return {
+      meta: state.meta,
+      items: [...visibleTemplateItems, ...visibleCustomItems],
+      totals,
+      notes: {
+        intro: state.notes.intro,
+        terms: state.notes.termsText
+          .split("\n")
+          .map((term) => term.trim())
+          .filter(Boolean),
+      },
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
+  function encodePayload(payload) {
+    const serialized = JSON.stringify(payload);
+    const bytes = new TextEncoder().encode(serialized);
+    const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+    return btoa(binary);
+  }
+
+  function buildPreviewUrl() {
+    const payload = buildQuotePayload();
+    const encoded = encodePayload(payload);
+    return `${window.location.origin}/quote-studio/preview#quote=${encoded}`;
+  }
+
+  function persistDraft() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function hydrateState() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return;
+
+    try {
+      const draft = JSON.parse(stored);
+      const nextState = createInitialState();
+
+      nextState.meta = { ...nextState.meta, ...(draft.meta || {}) };
+      nextState.defaults = { ...nextState.defaults, ...(draft.defaults || {}) };
+      nextState.fees = { ...nextState.fees, ...(draft.fees || {}) };
+      nextState.notes = { ...nextState.notes, ...(draft.notes || {}) };
+
+      nextState.items = nextState.items.map((item) => {
+        const saved = (draft.items || []).find((entry) => entry.id === item.id);
+        return saved ? { ...item, ...saved } : item;
+      });
+
+      nextState.customItems = Array.isArray(draft.customItems) ? draft.customItems : [];
+      state = nextState;
+    } catch (error) {
+      console.error("無法讀取報價草稿：", error);
+    }
+  }
+
+  function syncBaseFields() {
+    document.getElementById("quote-title").value = state.meta.quoteTitle;
+    document.getElementById("client-name").value = state.meta.clientName;
+    document.getElementById("project-name").value = state.meta.projectName;
+    document.getElementById("property-type").value = state.meta.propertyType;
+    document.getElementById("project-area").value = state.meta.area;
+    document.getElementById("project-address").value = state.meta.address;
+    document.getElementById("quote-date").value = state.meta.quoteDate;
+    document.getElementById("valid-until").value = state.meta.validUntil;
+    document.getElementById("prepared-by").value = state.meta.preparedBy;
+
+    document.getElementById("design-fee").value = state.fees.designFee;
+    document.getElementById("management-fee").value = state.fees.managementFee;
+    document.getElementById("adjustment-amount").value = state.fees.adjustmentAmount;
+    document.getElementById("include-tax").checked = state.fees.includeTax;
+    document.getElementById("tax-rate").value = state.fees.taxRate;
+    document.getElementById("quote-intro").value = state.notes.intro;
+    document.getElementById("quote-terms").value = state.notes.termsText;
+  }
+
+  function syncDefaults() {
+    document.querySelectorAll(".default-price-input").forEach((input) => {
+      const itemId = input.dataset.defaultId;
+      input.value = state.defaults[itemId] ?? 0;
+    });
+  }
+
+  function syncTemplateRows() {
+    templateItems.forEach((item) => {
+      const row = document.querySelector(`[data-template-item-id="${item.id}"]`);
+      const itemState = getTemplateState(item.id);
+      row.querySelector(".item-enabled").checked = itemState.enabled;
+      row.querySelector(".item-quantity").value = itemState.quantity;
+      row.querySelector(".item-override-price").value = itemState.overrideUnitPrice;
+      row.querySelector(".item-note").value = itemState.note;
+      row.querySelector(".item-effective-price").textContent = formatCurrency(getTemplateUnitPrice(item.id));
+      row.querySelector(".item-subtotal").textContent = formatCurrency(getTemplateSubtotal(item.id));
+    });
+  }
+
+  function renderCustomRows() {
+    const tbody = document.getElementById("custom-items-body");
+    tbody.innerHTML = state.customItems
+      .map(
+        (item) => `
+          <tr data-custom-item-id="${item.id}">
+            <td><span class="custom-badge">自訂</span></td>
+            <td>
+              <div class="custom-item-grid">
+                <select class="custom-category">
+                  ${categories
+                    .map(
+                      (category) =>
+                        `<option value="${escapeHtml(category.id)}" ${category.id === item.categoryId ? "selected" : ""}>${escapeHtml(category.label)}</option>`,
+                    )
+                    .join("")}
+                </select>
+                <input class="custom-name" type="text" placeholder="工項名稱" value="${escapeHtml(item.name ?? "")}" />
+              </div>
+            </td>
+            <td>
+              <div class="input-with-suffix compact-input">
+                <input class="custom-quantity" type="number" min="0" step="0.5" value="${item.quantity ?? 1}" />
+                <input class="custom-unit" type="text" value="${escapeHtml(item.unit ?? "式")}" />
+              </div>
+            </td>
+            <td>
+              <div class="input-with-prefix compact-input">
+                <span>NT$</span>
+                <input class="custom-price" type="number" min="0" step="100" value="${item.unitPrice ?? ""}" />
+              </div>
+            </td>
+            <td>
+              <strong class="custom-effective-price">${formatCurrency(parseNumber(item.unitPrice))}</strong>
+            </td>
+            <td>
+              <strong class="custom-subtotal">${formatCurrency(getCustomSubtotal(item))}</strong>
+            </td>
+            <td>
+              <div class="custom-note-group">
+                <input class="custom-note" type="text" placeholder="客戶說明" value="${escapeHtml(item.note ?? "")}" />
+                <button type="button" class="remove-custom-item btn-inline">刪除</button>
+              </div>
+            </td>
+          </tr>
+        `,
+      )
+      .join("");
+  }
+
+  function renderCategoryTotals() {
+    const totals = computeTotals();
+    const container = document.getElementById("category-totals");
+    container.innerHTML = categories
+      .filter((category) => totals.categoryTotals[category.id] > 0)
+      .map(
+        (category) => `
+          <div class="category-total-item">
+            <span>${category.label}</span>
+            <strong>${formatCurrency(totals.categoryTotals[category.id])}</strong>
+          </div>
+        `,
+      )
+      .join("") || '<p class="empty-note">尚未勾選工項</p>';
+
+    document.getElementById("line-subtotal").textContent = formatCurrency(totals.lineSubtotal);
+    document.getElementById("design-fee-total").textContent = formatCurrency(totals.designFee);
+    document.getElementById("management-fee-total").textContent = formatCurrency(totals.managementFee);
+    document.getElementById("adjustment-total").textContent = formatCurrency(totals.adjustmentAmount);
+    document.getElementById("tax-total").textContent = formatCurrency(totals.taxAmount);
+    document.getElementById("grand-total").textContent = formatCurrency(totals.grandTotal);
+  }
+
+  function updatePreviewLinks() {
+    const previewUrl = buildPreviewUrl();
+    document.getElementById("preview-link-input").value = previewUrl;
+    document.getElementById("open-preview-link").href = previewUrl;
+  }
+
+  function refreshUi() {
+    syncBaseFields();
+    syncDefaults();
+    syncTemplateRows();
+    renderCustomRows();
+    renderCategoryTotals();
+    updatePreviewLinks();
+  }
+
+  function saveAndRefresh() {
+    persistDraft();
+    refreshUi();
+  }
+
+  function updateMetaField(target) {
+    const mapping = {
+      "quote-title": "quoteTitle",
+      "client-name": "clientName",
+      "project-name": "projectName",
+      "property-type": "propertyType",
+      "project-area": "area",
+      "project-address": "address",
+      "quote-date": "quoteDate",
+      "valid-until": "validUntil",
+      "prepared-by": "preparedBy",
+    };
+
+    const key = mapping[target.id];
+    if (!key) return false;
+    state.meta[key] = target.value;
+    return true;
+  }
+
+  function updateFeeField(target) {
+    const mapping = {
+      "design-fee": "designFee",
+      "management-fee": "managementFee",
+      "adjustment-amount": "adjustmentAmount",
+      "tax-rate": "taxRate",
+    };
+
+    if (target.id === "include-tax") {
+      state.fees.includeTax = target.checked;
+      return true;
+    }
+
+    const key = mapping[target.id];
+    if (!key) return false;
+    state.fees[key] = target.value;
+    return true;
+  }
+
+  function updateNoteField(target) {
+    if (target.id === "quote-intro") {
+      state.notes.intro = target.value;
+      return true;
+    }
+    if (target.id === "quote-terms") {
+      state.notes.termsText = target.value;
+      return true;
+    }
+    return false;
+  }
+
+  document.addEventListener("input", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) {
+      return;
+    }
+
+    if (updateMetaField(target) || updateFeeField(target) || updateNoteField(target)) {
+      saveAndRefresh();
+      return;
+    }
+
+    if (target.classList.contains("default-price-input")) {
+      state.defaults[target.dataset.defaultId] = parseNumber(target.value);
+      saveAndRefresh();
+      return;
+    }
+
+    const templateRow = target.closest("[data-template-item-id]");
+    if (templateRow) {
+      const itemState = getTemplateState(templateRow.dataset.templateItemId);
+      if (!itemState) return;
+
+      if (target.classList.contains("item-enabled")) itemState.enabled = target.checked;
+      if (target.classList.contains("item-quantity")) itemState.quantity = target.value;
+      if (target.classList.contains("item-override-price")) itemState.overrideUnitPrice = target.value;
+      if (target.classList.contains("item-note")) itemState.note = target.value;
+
+      saveAndRefresh();
+      return;
+    }
+
+    const customRow = target.closest("[data-custom-item-id]");
+    if (customRow) {
+      const item = state.customItems.find((entry) => entry.id === customRow.dataset.customItemId);
+      if (!item) return;
+
+      if (target.classList.contains("custom-category")) item.categoryId = target.value;
+      if (target.classList.contains("custom-name")) item.name = target.value;
+      if (target.classList.contains("custom-quantity")) item.quantity = target.value;
+      if (target.classList.contains("custom-unit")) item.unit = target.value;
+      if (target.classList.contains("custom-price")) item.unitPrice = target.value;
+      if (target.classList.contains("custom-note")) item.note = target.value;
+
+      saveAndRefresh();
+    }
+  });
+
+  document.addEventListener("click", async (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    if (target.id === "add-custom-item") {
+      state.customItems.push(createCustomItem());
+      saveAndRefresh();
+      return;
+    }
+
+    if (target.id === "reset-quote") {
+      if (!window.confirm("要清空目前這份報價，回到初始狀態嗎？")) return;
+      state = createInitialState();
+      saveAndRefresh();
+      return;
+    }
+
+    if (target.id === "copy-preview-link") {
+      const url = buildPreviewUrl();
+      try {
+        await navigator.clipboard.writeText(url);
+        target.textContent = "連結已複製";
+        window.setTimeout(() => {
+          target.textContent = "複製客戶預覽連結";
+        }, 1400);
+      } catch (error) {
+        console.error("無法複製連結：", error);
+      }
+      return;
+    }
+
+    if (target.classList.contains("remove-custom-item")) {
+      const customRow = target.closest("[data-custom-item-id]");
+      state.customItems = state.customItems.filter((item) => item.id !== customRow.dataset.customItemId);
+      saveAndRefresh();
+    }
+  });
+
+  hydrateState();
+  refreshUi();
+</script>
+
+<style>
+  .quote-studio-page {
+    padding: 5.5rem 1.5rem 5rem;
+    background:
+      radial-gradient(circle at top left, rgba(160, 217, 217, 0.14), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(244, 246, 246, 1) 100%);
+  }
+
+  .quote-studio-shell {
+    max-width: 1360px;
+    margin: 0 auto;
+  }
+
+  .studio-hero {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .studio-eyebrow {
+    margin: 0 0 0.8rem;
+    color: var(--tiffany-dark);
+    font-size: 0.8rem;
+    letter-spacing: 0.24em;
+  }
+
+  .studio-hero h1 {
+    margin: 0;
+    color: var(--gray-darkest);
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(2.2rem, 4vw, 3.6rem);
+    line-height: 1.22;
+  }
+
+  .studio-description,
+  .studio-route-note {
+    margin: 0;
+    color: var(--gray-medium);
+    line-height: 1.85;
+  }
+
+  .studio-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+  }
+
+  .studio-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.6fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .studio-main,
+  .studio-side {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .studio-card {
+    padding: 1.6rem;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 24px 48px rgba(47, 47, 47, 0.06);
+  }
+
+  .section-heading {
+    margin-bottom: 1.1rem;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    color: var(--gray-darkest);
+    font-size: 1.3rem;
+  }
+
+  .section-heading p {
+    margin: 0.45rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+  }
+
+  .with-action {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .field > span {
+    color: var(--gray-dark);
+    font-size: 0.95rem;
+  }
+
+  .field-full {
+    grid-column: 1 / -1;
+  }
+
+  .field input,
+  .field select,
+  .field textarea,
+  .default-price-input,
+  .quote-table input,
+  .quote-table select {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(129, 199, 212, 0.2);
+    background: rgba(255, 255, 255, 0.96);
+    padding: 0.82rem 0.95rem;
+    color: var(--gray-darkest);
+    font: inherit;
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .input-with-prefix,
+  .input-with-suffix {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    border: 1px solid rgba(129, 199, 212, 0.2);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.96);
+  }
+
+  .input-with-prefix span,
+  .input-with-suffix span,
+  .input-with-prefix small,
+  .input-with-suffix small {
+    padding: 0 0.8rem;
+    color: var(--gray-medium);
+    white-space: nowrap;
+  }
+
+  .input-with-prefix input,
+  .input-with-suffix input {
+    border: none;
+    background: transparent;
+    padding: 0.82rem 0;
+  }
+
+  .compact-input {
+    min-width: 160px;
+  }
+
+  .compact-input input:last-child {
+    min-width: 70px;
+  }
+
+  .checkbox-field {
+    align-content: end;
+  }
+
+  .checkbox-field input {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--tiffany-dark);
+  }
+
+  .default-price-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+  .default-price-card {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1rem;
+    border-radius: 20px;
+    background: rgba(247, 249, 249, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .default-category {
+    color: var(--tiffany-dark);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+  }
+
+  .default-description {
+    color: var(--gray-medium);
+    line-height: 1.7;
+    min-height: 3rem;
+  }
+
+  .table-shell {
+    overflow-x: auto;
+  }
+
+  .quote-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1080px;
+  }
+
+  .quote-table th,
+  .quote-table td {
+    padding: 0.9rem 0.65rem;
+    border-bottom: 1px solid rgba(47, 47, 47, 0.08);
+    vertical-align: top;
+    text-align: left;
+  }
+
+  .quote-table th {
+    color: var(--gray-medium);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .quote-table td strong {
+    color: var(--gray-darkest);
+  }
+
+  .item-copy,
+  .custom-item-grid,
+  .custom-note-group {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .item-copy span {
+    color: var(--gray-medium);
+    line-height: 1.7;
+    font-size: 0.92rem;
+  }
+
+  .custom-item-grid {
+    grid-template-columns: 170px minmax(0, 1fr);
+  }
+
+  .custom-badge {
+    display: inline-flex;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(160, 217, 217, 0.16);
+    color: var(--tiffany-dark);
+    font-size: 0.8rem;
+  }
+
+  .btn-inline {
+    justify-self: start;
+    border: none;
+    background: transparent;
+    color: #9d4b4b;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .studio-summary-card {
+    position: sticky;
+    top: 5.5rem;
+  }
+
+  .summary-block + .summary-block {
+    margin-top: 1rem;
+  }
+
+  .summary-title {
+    margin: 0 0 0.7rem;
+    color: var(--gray-dark);
+    font-weight: 600;
+  }
+
+  .category-total-list,
+  .amount-list {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .category-total-item,
+  .amount-list div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--gray-dark);
+  }
+
+  .grand-total {
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(47, 47, 47, 0.08);
+    font-size: 1.08rem;
+  }
+
+  .summary-note,
+  .empty-note {
+    margin: 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    background: var(--tiffany-primary);
+    color: var(--gray-darkest);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--gray-darkest);
+    border-color: rgba(129, 199, 212, 0.24);
+  }
+
+  .btn-muted {
+    color: var(--gray-medium);
+  }
+
+  @media (max-width: 1080px) {
+    .studio-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .studio-summary-card {
+      position: static;
+    }
+
+    .default-price-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .quote-studio-page {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .studio-card {
+      padding: 1.2rem;
+      border-radius: 22px;
+    }
+
+    .form-grid,
+    .default-price-grid,
+    .custom-item-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .with-action,
+    .studio-actions {
+      display: grid;
+    }
+  }
+</style>
