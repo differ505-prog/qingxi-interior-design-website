@@ -197,62 +197,103 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
             <div class="section-heading with-action">
               <div>
                 <h2>本案工項</h2>
-                <p>勾選要報給客戶的工項，需要特殊價格時直接填寫「本案改價」。</p>
+                <p>依工種分區整理要報給客戶的工項，需要特殊價格時直接填寫「本案改價」。</p>
               </div>
-              <button type="button" id="add-custom-item" class="btn btn-secondary">新增自訂工項</button>
+              <div class="section-actions">
+                <button type="button" id="select-all-template-items" class="btn btn-secondary">全選工項</button>
+                <button type="button" id="submit-quote-items" class="btn btn-primary">提交送出</button>
+                <button type="button" id="add-custom-item" class="btn btn-secondary">新增自訂工項</button>
+              </div>
             </div>
 
-            <div class="table-shell">
-              <table class="quote-table">
-                <thead>
-                  <tr>
-                    <th>啟用</th>
-                    <th>工項</th>
-                    <th>數量</th>
-                    <th>本案改價</th>
-                    <th>套用單價</th>
-                    <th>小計</th>
-                    <th>客戶說明</th>
-                  </tr>
-                </thead>
-                <tbody id="template-items-body">
-                  {quoteTemplateItems.map((item) => (
-                    <tr data-template-item-id={item.id}>
-                      <td>
-                        <input class="item-enabled" type="checkbox" />
-                      </td>
-                      <td>
-                        <div class="item-copy">
-                          <strong>{item.name}</strong>
-                          <span>{categoryLabelMap.get(item.categoryId)} · {item.description}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="input-with-suffix compact-input">
-                          <input class="item-quantity" type="number" min="0" step="0.5" />
-                          <span>{item.unit}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <div class="input-with-prefix compact-input">
-                          <span>NT$</span>
-                          <input class="item-override-price" type="number" min="0" step="100" placeholder="跟隨預設" />
-                        </div>
-                      </td>
-                      <td>
-                        <strong class="item-effective-price">NT$0</strong>
-                      </td>
-                      <td>
-                        <strong class="item-subtotal">NT$0</strong>
-                      </td>
-                      <td>
-                        <input class="item-note" type="text" placeholder="例如：含配線與基礎整理" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tbody id="custom-items-body"></tbody>
-              </table>
+            <div class="trade-groups">
+              {quoteCategories.map((category) => {
+                const items = quoteTemplateItems.filter((item) => item.categoryId === category.id);
+                if (!items.length) return null;
+
+                return (
+                  <section class="trade-group">
+                    <header class="trade-group-header">
+                      <h3>{category.label}</h3>
+                      <p>這一區可集中處理同工種項目與本案改價。</p>
+                    </header>
+                    <div class="table-shell">
+                      <table class="quote-table">
+                        <thead>
+                          <tr>
+                            <th>啟用</th>
+                            <th>工項</th>
+                            <th>數量</th>
+                            <th>本案改價</th>
+                            <th>套用單價</th>
+                            <th>小計</th>
+                            <th>客戶說明</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {items.map((item) => (
+                            <tr data-template-item-id={item.id}>
+                              <td>
+                                <input class="item-enabled" type="checkbox" />
+                              </td>
+                              <td>
+                                <div class="item-copy">
+                                  <strong>{item.name}</strong>
+                                  <span>{categoryLabelMap.get(item.categoryId)} · {item.description}</span>
+                                </div>
+                              </td>
+                              <td>
+                                <div class="input-with-suffix compact-input">
+                                  <input class="item-quantity" type="number" min="0" step="0.5" />
+                                  <span>{item.unit}</span>
+                                </div>
+                              </td>
+                              <td>
+                                <div class="input-with-prefix compact-input">
+                                  <span>NT$</span>
+                                  <input class="item-override-price" type="number" min="0" step="100" placeholder="跟隨預設" />
+                                </div>
+                              </td>
+                              <td>
+                                <strong class="item-effective-price">NT$0</strong>
+                              </td>
+                              <td>
+                                <strong class="item-subtotal">NT$0</strong>
+                              </td>
+                              <td>
+                                <input class="item-note" type="text" placeholder="例如：含配線與基礎整理" />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+                );
+              })}
+
+              <section class="trade-group">
+                <header class="trade-group-header">
+                  <h3>自訂工項</h3>
+                  <p>若這案有模板外工項，可在這裡另外補上。</p>
+                </header>
+                <div class="table-shell">
+                  <table class="quote-table">
+                    <thead>
+                      <tr>
+                        <th>啟用</th>
+                        <th>工項</th>
+                        <th>數量</th>
+                        <th>本案改價</th>
+                        <th>套用單價</th>
+                        <th>小計</th>
+                        <th>客戶說明</th>
+                      </tr>
+                    </thead>
+                    <tbody id="custom-items-body"></tbody>
+                  </table>
+                </div>
+              </section>
             </div>
           </section>
 
@@ -919,6 +960,24 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       .join("");
   }
 
+  function selectAllTemplateItems() {
+    state.items = state.items.map((item) => ({
+      ...item,
+      enabled: true,
+    }));
+  }
+
+  function submitQuoteItems() {
+    const payload = buildQuotePayload();
+    if (!payload.items.length) {
+      window.alert("請先至少勾選一個工項，再提交送出。");
+      return;
+    }
+
+    const previewUrl = buildPreviewUrl();
+    window.open(previewUrl, "_blank", "noopener,noreferrer");
+  }
+
   function renderCategoryTotals() {
     const totals = computeTotals();
     const container = document.getElementById("category-totals");
@@ -1138,6 +1197,17 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       return;
     }
 
+    if (target.id === "select-all-template-items") {
+      selectAllTemplateItems();
+      saveAndRefresh();
+      return;
+    }
+
+    if (target.id === "submit-quote-items") {
+      submitQuoteItems();
+      return;
+    }
+
     if (target.id === "reset-quote") {
       if (!window.confirm("要清空目前這份報價，回到初始狀態嗎？")) return;
       state = createInitialState();
@@ -1275,6 +1345,13 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     align-items: end;
   }
 
+  .section-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: end;
+  }
+
   .form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1396,6 +1473,36 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     overflow-x: auto;
   }
 
+  .trade-groups {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .trade-group {
+    padding: 1rem;
+    border-radius: 22px;
+    background: rgba(247, 249, 249, 0.8);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .trade-group-header {
+    display: grid;
+    gap: 0.35rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .trade-group-header h3 {
+    margin: 0;
+    color: var(--gray-darkest);
+    font-size: 1.05rem;
+  }
+
+  .trade-group-header p {
+    margin: 0;
+    color: var(--gray-medium);
+    line-height: 1.7;
+  }
+
   .quote-table {
     width: 100%;
     border-collapse: collapse;
@@ -1456,8 +1563,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   }
 
   .studio-summary-card {
-    position: sticky;
-    top: 5.5rem;
+    position: static;
   }
 
   .summary-block + .summary-block {
@@ -1564,12 +1670,17 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       grid-template-columns: 1fr;
     }
 
-    .studio-summary-card {
-      position: static;
+    .with-action {
+      align-items: start;
+      flex-direction: column;
     }
 
     .default-price-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .section-actions {
+      justify-content: start;
     }
   }
 
