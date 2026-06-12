@@ -21,6 +21,12 @@ export type QuoteOption = {
   note: string;
 };
 
+export type QuoteChoice = {
+  value: string;
+  label: string;
+  note: string;
+};
+
 export const quoteCategories: QuoteCategory[] = [
   { id: "preparation", label: "保護與拆除" },
   { id: "electrical", label: "水電工程" },
@@ -255,7 +261,8 @@ export const quoteTemplateItems: QuoteTemplateItem[] = [
 
 export const quoteDefaultTerms = [
   "本報價為現階段初估，實際金額仍會依現場丈量、材料確認與施工條件微調。",
-  "未列項目、特殊保護、特殊搬運、額外加班與大樓管委會相關費用，將另行說明。",
+  "本報價為局部或目前已確認項目的初步估價，若後續增加其他空間、設備或工程內容，會另行補充整體報價。",
+  "若遇大樓管委會特殊規定、無電梯搬運、夜間施工或高規格公共區保護需求，會於開工前另行評估並說明。",
   "若後續有新增工項、材料升級或施工條件變動，會先提供調整內容再確認。",
   "正式開工前會再提供最終版報價與施工安排。",
 ];
@@ -302,10 +309,100 @@ export const quoteDifficultyOptions: QuoteOption[] = [
   },
 ];
 
+export const quoteMethodOptions: QuoteChoice[] = [
+  {
+    value: "surface",
+    label: "明管配置",
+    note: "以明管、壓條或可見管路方式施作，通常不含牆面打鑿。",
+  },
+  {
+    value: "concealed",
+    label: "暗管配置",
+    note: "需牆面或地坪打鑿，通常需搭配泥作、批土或油漆修補。",
+  },
+  {
+    value: "pending",
+    label: "現場確認後再定",
+    note: "待現場丈量與路徑確認後，再決定工法與最終做法。",
+  },
+];
+
+export const quoteRestorationOptions: QuoteChoice[] = [
+  {
+    value: "not_included",
+    label: "未含牆面修補",
+    note: "目前未含泥作修補、批土與油漆復原。",
+  },
+  {
+    value: "basic_patch",
+    label: "含局部修補",
+    note: "含基礎修補，若需大面積泥作或全區重整，會另行估價。",
+  },
+  {
+    value: "full_restore",
+    label: "含泥作與油漆復原",
+    note: "含必要之泥作、批土與油漆復原工序。",
+  },
+];
+
+export const quoteProtectionOptions: QuoteChoice[] = [
+  {
+    value: "review",
+    label: "依現場需求另評估",
+    note: "是否需地坪、電梯或公共區保護，依現場與社區規定確認。",
+  },
+  {
+    value: "basic",
+    label: "含基本保護",
+    note: "含一般施工動線與局部區域保護。",
+  },
+  {
+    value: "advanced",
+    label: "需高規格保護另估",
+    note: "若社區規範較高或需大範圍保護，將另行評估追加。",
+  },
+];
+
+export const quoteCleanupOptions: QuoteChoice[] = [
+  {
+    value: "none",
+    label: "未含清運與清潔",
+    note: "目前僅含施工本體，未含額外廢棄物清運與完工清潔。",
+  },
+  {
+    value: "haul",
+    label: "含廢棄物清運",
+    note: "含施工後基本廢棄物清運，未含深度清潔。",
+  },
+  {
+    value: "haul_clean",
+    label: "含清運與基本清潔",
+    note: "含施工後廢棄物清運與基礎整理清潔。",
+  },
+];
+
+export const quoteWarrantyOptions: QuoteChoice[] = [
+  {
+    value: "water-electric-1y",
+    label: "基礎工程保固 1 年",
+    note: "常用於水電、局部泥作等基礎工程；耗材與人為損壞除外。",
+  },
+  {
+    value: "custom-limited",
+    label: "依工項另列保固",
+    note: "依本案實際工項與合作廠商條件，於正式報價時另列保固內容。",
+  },
+  {
+    value: "none",
+    label: "此階段先不列保固",
+    note: "僅用於非常初步之討論估價，正式報價前仍建議補上。",
+  },
+];
+
 export const quoteInvoiceNotice = {
   title: "稅務與開立發票說明",
   paragraphs: [
-    "本工作室目前為個人承攬型態，為替業主節省非必要之稅務管銷成本，本報價單所列金額皆為未稅現金價。完工後將開立具備負責人身分證字號之個人勞務報酬收據，作為合法付款證明。",
-    "若業主因報帳需求，確實需要開立統一發票，本工作室可協助委託合作之建材商或工班代為開立。惟依稅法規定，需另行加收 8% 之營業稅與代辦手續費。此稅額費用不包含於本報價單總價內，將於簽約時另行計算。",
+    "本工作室目前採個人承攬方式接案，報價單所列金額為未稅現金價。實際請款與付款證明，會依本案最終承攬與結算方式提供合法憑證。",
+    "若業主因公司報帳需求需要統一發票，請於報價確認前先行告知。我們會依實際承攬與開票方式另行核算稅額與正式報價內容。",
   ],
 };

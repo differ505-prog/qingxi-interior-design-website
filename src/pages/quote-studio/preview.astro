@@ -178,7 +178,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       .join("");
   }
 
-  function renderPricingAssumptions(totals) {
+  function renderPricingAssumptions(totals, assumptions = {}) {
     document.getElementById("pricing-assumptions").innerHTML = `
       <div class="preview-assumption-card">
         <span>材料等級</span>
@@ -189,6 +189,31 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <span>施工難度</span>
         <strong>${escapeHtml(totals.difficultyLevel?.label || "一般施工")}</strong>
         <p>${escapeHtml(totals.difficultyLevel?.note || "")}</p>
+      </div>
+      <div class="preview-assumption-card">
+        <span>施工工法</span>
+        <strong>${escapeHtml(assumptions.workMethod?.label || "現場確認後再定")}</strong>
+        <p>${escapeHtml(assumptions.workMethod?.note || "")}</p>
+      </div>
+      <div class="preview-assumption-card">
+        <span>修補範圍</span>
+        <strong>${escapeHtml(assumptions.restorationScope?.label || "未填寫")}</strong>
+        <p>${escapeHtml(assumptions.restorationScope?.note || "")}</p>
+      </div>
+      <div class="preview-assumption-card">
+        <span>保護工程</span>
+        <strong>${escapeHtml(assumptions.protectionScope?.label || "未填寫")}</strong>
+        <p>${escapeHtml(assumptions.protectionScope?.note || "")}</p>
+      </div>
+      <div class="preview-assumption-card">
+        <span>清運 / 清潔</span>
+        <strong>${escapeHtml(assumptions.cleanupScope?.label || "未填寫")}</strong>
+        <p>${escapeHtml(assumptions.cleanupScope?.note || "")}</p>
+      </div>
+      <div class="preview-assumption-card">
+        <span>保固說明</span>
+        <strong>${escapeHtml(assumptions.warrantyTemplate?.label || "未填寫")}</strong>
+        <p>${escapeHtml(assumptions.warrantyTemplate?.note || "")}</p>
       </div>
     `;
   }
@@ -230,7 +255,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     document.getElementById("document-title").textContent = payload.meta.quoteTitle || "青曦空間設計初估單";
     document.getElementById("document-intro").textContent = payload.notes.intro || "";
     renderMeta(payload.meta);
-    renderPricingAssumptions(payload.totals || {});
+    renderPricingAssumptions(payload.totals || {}, payload.assumptions || {});
     renderGroups(payload.items || []);
     renderTerms(payload.notes.terms || []);
     renderInvoiceNotice(payload.notes.invoiceNoticeTitle, payload.notes.invoiceNoticeParagraphs || []);
