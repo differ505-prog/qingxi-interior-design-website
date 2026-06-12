@@ -446,7 +446,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   const warrantyMap = new Map(warrantyOptions.map((option) => [option.value, option]));
   const llmReviewCopy = {
     label: "給 LLM 的架構覆核文字",
-    note: "這段只提供預設單價、單位、計價基準與條款前提給 LLM 覆核，不帶本案數量與總價。",
+    note: "這段只提供預設單價、單位、計價基準與條款前提給 LLM 覆核，不帶本案數量與總價，並要求 LLM 以 10 分制評分。",
     buttonSuccessText: "架構覆核已複製",
     buttonDefaultText: "複製 LLM 架構覆核文字",
   };
@@ -720,8 +720,20 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       reminders.push("有衛浴防水更新，但尚未列冷熱水配管更新，建議確認是否同步處理舊水路。");
     }
 
+    if (itemIds.has("bathroom-waterproof") && !itemIds.has("bathroom-fixture-install")) {
+      reminders.push("有衛浴防水或貼磚工項，但尚未列衛浴設備安裝，建議確認是否需一併報價。");
+    }
+
     if ((itemIds.has("smart-home-basic") || itemIds.has("smart-home-security")) && !itemIds.has("weak-current")) {
       reminders.push("已有智能家居工項，但尚未列弱電 / 網路點位，建議確認是否需預留佈線。");
+    }
+
+    if ((itemIds.has("ceiling-flat") || itemIds.has("smart-home-basic")) && !itemIds.has("hvac-piping") && !itemIds.has("hvac-install")) {
+      reminders.push("已有天花或智能家居工項，但尚未列空調相關工項，建議確認冷氣管線與設備安裝是否同步處理。");
+    }
+
+    if ((itemIds.has("window-replacement") || itemIds.has("interior-door")) && !itemIds.has("protection-basic")) {
+      reminders.push("已有門窗或門片更新，但尚未列保護工程，建議確認拆裝動線與公共區保護是否需先納入。");
     }
 
     if ((itemIds.has("system-cabinet") || itemIds.has("woodwork-cabinet") || itemIds.has("entry-cabinet")) && !itemIds.has("painting-full")) {
@@ -763,6 +775,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       "請你以室內設計 / 裝修報價覆核顧問的角色，協助檢查以下報價系統的預設架構。",
       "這不是單一案件的正式報價，也不是實際丈量後的數量清單。",
       "請不要把模板裡常見的預設數量 1 視為本案實際數量；請聚焦檢查工項架構、單位、單價、計價基準、條款與風險。",
+      "請另外為這份預設報價架構打分，滿分 10 分，可使用 0.5 分刻度，並明確說出扣分原因。",
       "",
       "請優先指出：",
       "1. 工項分類是否完整，是否有常見遺漏工項",
@@ -770,12 +783,15 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       "3. 哪些計價基準、描述或條款對客戶來說仍可能不夠明白",
       "4. 是否有容易引發爭議的稅務、發票、範圍界線、修補、清潔或追加減項風險",
       "5. 如果要再優化，請給我具體修改建議與建議文案",
+      "6. 若你認為某些項目已可接受，也請指出哪些地方目前做得不錯",
       "",
       "【目前預設前提】",
       `- 報價標題：${payload.meta.quoteTitle || "未填寫"}`,
       `- 空間類型：${payload.meta.propertyType || "未填寫"}`,
       `- 材料等級：${payload.totals.materialLevel?.label || "未填寫"}（${payload.totals.materialLevel?.note || "無說明"}）`,
       `- 施工難度：${payload.totals.difficultyLevel?.label || "未填寫"}（${payload.totals.difficultyLevel?.note || "無說明"}）`,
+      `- 設計費預設：${formatCurrency(parseNumber(state.fees.designFee))}`,
+      `- 監工 / 管理費預設：${formatCurrency(parseNumber(state.fees.managementFee))}`,
       `- 施工工法：${assumptions.workMethod?.label || "未填寫"}（${assumptions.workMethod?.note || "無說明"}）`,
       `- 修補範圍：${assumptions.restorationScope?.label || "未填寫"}（${assumptions.restorationScope?.note || "無說明"}）`,
       `- 保護工程：${assumptions.protectionScope?.label || "未填寫"}（${assumptions.protectionScope?.note || "無說明"}）`,
@@ -795,10 +811,13 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       invoiceNotice || "未填寫",
       "",
       "請直接輸出：",
+      "S. 架構總分（滿分 10 分）",
+      "- 先給分數，再用 2 至 4 句說明主要加分與扣分原因",
       "A. 主要問題",
       "B. 風險提醒",
       "C. 建議補問客戶的問題",
       "D. 建議改寫文案",
+      "E. 目前做得不錯的地方",
     ].join("\n");
   }
 
