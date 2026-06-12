@@ -39,7 +39,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
             開啟客戶預覽
           </a>
           <button type="button" id="copy-preview-link" class="btn btn-secondary">複製客戶預覽連結</button>
-          <button type="button" id="copy-llm-review" class="btn btn-secondary">複製 LLM 覆核文字</button>
+          <button type="button" id="copy-llm-review" class="btn btn-secondary">複製給 LLM 的覆核文字</button>
           <button type="button" id="reset-quote" class="btn btn-secondary btn-muted">重設本次報價</button>
         </div>
         <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；之後可直接改掛到次網域。</p>
@@ -257,10 +257,6 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
                 <span>稅務與開立發票說明</span>
                 <textarea id="invoice-notice" rows="5"></textarea>
               </label>
-              <label class="field field-full">
-                <span>LLM 覆核回填</span>
-                <textarea id="llm-review-feedback" rows="6" placeholder="把 LLM 的建議貼回這裡，方便後續對照與調整。"></textarea>
-              </label>
             </div>
           </section>
         </div>
@@ -278,9 +274,12 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
             </label>
 
             <label class="field field-full">
-              <span>LLM 覆核文字</span>
+              <span>給 LLM 的覆核文字</span>
               <textarea id="llm-review-output" rows="12" readonly></textarea>
             </label>
+            <p class="summary-note">
+              這段文字可直接貼給 ChatGPT、Claude 或其他模型；拿到改善建議後，再貼回 IDE 給我處理。
+            </p>
 
             <div class="summary-block">
               <p class="summary-title">估價前提</p>
@@ -410,7 +409,6 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
         termsText: defaultTerms.join("\n"),
         invoiceNoticeTitle: defaultInvoiceNotice.title,
         invoiceNoticeText: defaultInvoiceNotice.paragraphs.join("\n\n"),
-        llmReviewFeedback: "",
       },
     };
   }
@@ -667,9 +665,6 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       "【系統自動提醒的可能漏項】",
       ...(reminders.length ? reminders.map((item) => `- ${item}`) : ["- 目前未偵測到明顯漏項"]),
       "",
-      "【LLM 覆核回填】",
-      state.notes.llmReviewFeedback || "尚未回填",
-      "",
       "請直接輸出：",
       "A. 主要問題",
       "B. 風險提醒",
@@ -741,7 +736,6 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     document.getElementById("quote-intro").value = state.notes.intro;
     document.getElementById("quote-terms").value = state.notes.termsText;
     document.getElementById("invoice-notice").value = state.notes.invoiceNoticeText;
-    document.getElementById("llm-review-feedback").value = state.notes.llmReviewFeedback;
   }
 
   function syncDefaults() {
@@ -942,10 +936,6 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       state.notes.invoiceNoticeText = target.value;
       return true;
     }
-    if (target.id === "llm-review-feedback") {
-      state.notes.llmReviewFeedback = target.value;
-      return true;
-    }
     return false;
   }
 
@@ -1033,7 +1023,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
         await navigator.clipboard.writeText(reviewText);
         target.textContent = "LLM 文字已複製";
         window.setTimeout(() => {
-          target.textContent = "複製 LLM 覆核文字";
+          target.textContent = "複製給 LLM 的覆核文字";
         }, 1400);
       } catch (error) {
         console.error("無法複製 LLM 文字：", error);
