@@ -11,6 +11,7 @@ import {
   quoteProtectionOptions,
   quoteRestorationOptions,
   quoteTemplateItems,
+  quoteWaterproofWarrantyOptions,
   quoteWarrantyOptions,
 } from "../../lib/quote-studio";
 
@@ -25,6 +26,7 @@ const quoteMethodOptionsJson = JSON.stringify(quoteMethodOptions);
 const quoteRestorationOptionsJson = JSON.stringify(quoteRestorationOptions);
 const quoteProtectionOptionsJson = JSON.stringify(quoteProtectionOptions);
 const quoteCleanupOptionsJson = JSON.stringify(quoteCleanupOptions);
+const quoteWaterproofWarrantyOptionsJson = JSON.stringify(quoteWaterproofWarrantyOptions);
 const quoteWarrantyOptionsJson = JSON.stringify(quoteWarrantyOptions);
 const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id, category.label]));
 ---
@@ -158,6 +160,14 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
                 <span>保固說明</span>
                 <select id="warranty-template">
                   {quoteWarrantyOptions.map((option) => (
+                    <option value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </label>
+              <label class="field field-full">
+                <span>防水保固</span>
+                <select id="waterproof-warranty">
+                  {quoteWaterproofWarrantyOptions.map((option) => (
                     <option value={option.value}>{option.label}</option>
                   ))}
                 </select>
@@ -419,6 +429,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     quoteRestorationOptionsJson,
     quoteProtectionOptionsJson,
     quoteCleanupOptionsJson,
+    quoteWaterproofWarrantyOptionsJson,
     quoteWarrantyOptionsJson,
   }}
 >
@@ -433,6 +444,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   const restorationOptions = JSON.parse(quoteRestorationOptionsJson);
   const protectionOptions = JSON.parse(quoteProtectionOptionsJson);
   const cleanupOptions = JSON.parse(quoteCleanupOptionsJson);
+  const waterproofWarrantyOptions = JSON.parse(quoteWaterproofWarrantyOptionsJson);
   const warrantyOptions = JSON.parse(quoteWarrantyOptionsJson);
   const STORAGE_KEY = "qingxi-quote-studio-draft-v2";
 
@@ -443,6 +455,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   const restorationMap = new Map(restorationOptions.map((option) => [option.value, option]));
   const protectionMap = new Map(protectionOptions.map((option) => [option.value, option]));
   const cleanupMap = new Map(cleanupOptions.map((option) => [option.value, option]));
+  const waterproofWarrantyMap = new Map(waterproofWarrantyOptions.map((option) => [option.value, option]));
   const warrantyMap = new Map(warrantyOptions.map((option) => [option.value, option]));
   const llmReviewCopy = {
     label: "給 LLM 的架構覆核文字",
@@ -502,6 +515,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
         validUntil: validUntilString(),
         preparedBy: "青曦空間設計",
         warrantyTemplate: warrantyOptions[0]?.value || "water-electric-1y",
+        waterproofWarranty: waterproofWarrantyOptions[0]?.value || "waterproof-2y",
       },
       defaults: Object.fromEntries(
         templateItems.map((item) => [item.id, item.defaultUnitPrice]),
@@ -522,7 +536,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
         taxRate: 5,
       },
       notes: {
-        intro: "本單為依現階段需求整理之初步估價，實際金額仍會依現場丈量、點位放樣、管線路徑與材料規格確認後調整。",
+        intro: "本單為依現階段需求整理之概念初估，主要用於先確認預算區間、工項方向與施工前提。實際金額仍會依現場丈量、點位放樣、管線路徑、修補範圍與材料規格確認後調整。",
         termsText: defaultTerms.join("\n"),
         invoiceNoticeTitle: defaultInvoiceNotice.title,
         invoiceNoticeText: defaultInvoiceNotice.paragraphs.join("\n\n"),
@@ -626,6 +640,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       protectionScope: protectionMap.get(state.meta.protectionScope) || protectionOptions[0],
       cleanupScope: cleanupMap.get(state.meta.cleanupScope) || cleanupOptions[0],
       warrantyTemplate: warrantyMap.get(state.meta.warrantyTemplate) || warrantyOptions[0],
+      waterproofWarranty: waterproofWarrantyMap.get(state.meta.waterproofWarranty) || waterproofWarrantyOptions[0],
     };
   }
 
@@ -728,6 +743,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       reminders.push("有衛浴防水或貼磚工項，但尚未列衛浴設備安裝，建議確認是否需一併報價。");
     }
 
+    if (itemIds.has("bathroom-waterproof") && payload.assumptions.waterproofWarranty?.value === "pending-waterproof") {
+      reminders.push("本案已有防水工程，但目前防水保固仍未列明，建議在正式送客戶前補上年限與責任界線。");
+    }
+
     if ((itemIds.has("smart-home-basic") || itemIds.has("smart-home-security")) && !itemIds.has("weak-current")) {
       reminders.push("已有智能家居工項，但尚未列弱電 / 網路點位，建議確認是否需預留佈線。");
     }
@@ -811,6 +830,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       `- 保護工程：${assumptions.protectionScope?.label || "未填寫"}（${assumptions.protectionScope?.note || "無說明"}）`,
       `- 完工清潔：${assumptions.cleanupScope?.label || "未填寫"}（${assumptions.cleanupScope?.note || "無說明"}）`,
       `- 保固說明：${assumptions.warrantyTemplate?.label || "未填寫"}（${assumptions.warrantyTemplate?.note || "無說明"}）`,
+      `- 防水保固：${assumptions.waterproofWarranty?.label || "未填寫"}（${assumptions.waterproofWarranty?.note || "無說明"}）`,
       "",
       "【預設單價資料庫】",
       defaultPriceLines,
@@ -894,6 +914,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     document.getElementById("valid-until").value = state.meta.validUntil;
     document.getElementById("prepared-by").value = state.meta.preparedBy;
     document.getElementById("warranty-template").value = state.meta.warrantyTemplate;
+    document.getElementById("waterproof-warranty").value = state.meta.waterproofWarranty;
 
     document.getElementById("design-fee").value = state.fees.designFee;
     document.getElementById("management-fee").value = state.fees.managementFee;
@@ -1057,6 +1078,11 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
         <strong>${assumptions.warrantyTemplate.label}</strong>
         <small>${assumptions.warrantyTemplate.note}</small>
       </div>
+      <div class="assumption-item">
+        <span>防水保固</span>
+        <strong>${assumptions.waterproofWarranty.label}</strong>
+        <small>${assumptions.waterproofWarranty.note}</small>
+      </div>
     `;
   }
 
@@ -1114,6 +1140,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       "valid-until": "validUntil",
       "prepared-by": "preparedBy",
       "warranty-template": "warrantyTemplate",
+      "waterproof-warranty": "waterproofWarranty",
     };
 
     const key = mapping[target.id];
