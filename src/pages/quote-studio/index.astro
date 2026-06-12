@@ -709,7 +709,11 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     const reminders = [];
 
     if (itemIds.has("demolition-basic") && !itemIds.has("protection-basic")) {
-      reminders.push("已有拆除清運，但尚未列保護工程，建議確認是否需要施工前保護。");
+      reminders.push("已有拆除工程，但尚未列保護工程，建議確認是否需要施工前保護。");
+    }
+
+    if (itemIds.has("demolition-basic") && !itemIds.has("waste-bag")) {
+      reminders.push("已有拆除工程，但尚未列清運車次，建議確認社區清運規範與垃圾量是否需另計。");
     }
 
     if (payload.assumptions.workMethod?.value === "pending") {
@@ -732,6 +736,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       reminders.push("已有天花或智能家居工項，但尚未列空調相關工項，建議確認冷氣管線與設備安裝是否同步處理。");
     }
 
+    if (itemIds.has("glass-sliding-hardware") && !itemIds.has("glass-partition")) {
+      reminders.push("已有玻璃拉門五金，但尚未列玻璃本體，建議確認是否需一併納入玻璃固定隔間數量。");
+    }
+
     if ((itemIds.has("window-replacement") || itemIds.has("interior-door")) && !itemIds.has("protection-basic")) {
       reminders.push("已有門窗或門片更新，但尚未列保護工程，建議確認拆裝動線與公共區保護是否需先納入。");
     }
@@ -744,8 +752,8 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       reminders.push("目前選擇暗管配置，但修補範圍設定為未含牆面修補，建議先與客戶確認是否接受後續另估。");
     }
 
-    if (itemIds.has("demolition-basic") && payload.assumptions.cleanupScope?.value === "none") {
-      reminders.push("已有拆除工項，但目前設定未含完工清潔，建議先與客戶說明粗清或細清是否另列。");
+    if ((itemIds.has("demolition-basic") || itemIds.has("waste-bag")) && payload.assumptions.cleanupScope?.value === "none") {
+      reminders.push("已有拆除或清運工項，但目前設定未含完工清潔，建議先與客戶說明粗清或細清是否另列。");
     }
 
     if (payload.meta.propertyType === "住宅空間" && !parseNumber(state.fees.designFee)) {
@@ -775,6 +783,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       "請你以室內設計 / 裝修報價覆核顧問的角色，協助檢查以下報價系統的預設架構。",
       "這不是單一案件的正式報價，也不是實際丈量後的數量清單。",
       "請不要把模板裡常見的預設數量 1 視為本案實際數量；請聚焦檢查工項架構、單位、單價、計價基準、條款與風險。",
+      "這一版已盡量把常見的一式工項拆細為坪、尺、點、才、樘、台或車次；若仍有保留一式者，請特別檢查是否合理。",
       "請另外為這份預設報價架構打分，滿分 10 分，可使用 0.5 分刻度，並明確說出扣分原因。",
       "",
       "請優先指出：",
