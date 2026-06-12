@@ -40,6 +40,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             <h3>工項明細</h3>
             <p>以下內容會依目前討論需求、數量與單價整理。</p>
           </div>
+          <div id="pricing-assumptions" class="preview-assumption-list"></div>
           <div id="quote-groups" class="quote-groups"></div>
         </section>
 
@@ -54,6 +55,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           </div>
           <div class="quote-summary-card">
             <div class="summary-row"><span>工程小計</span><strong id="summary-line-subtotal">NT$0</strong></div>
+            <div class="summary-row"><span>材料等級調整</span><strong id="summary-material-adjustment">NT$0</strong></div>
+            <div class="summary-row"><span>施工難度調整</span><strong id="summary-difficulty-adjustment">NT$0</strong></div>
             <div class="summary-row"><span>設計費</span><strong id="summary-design-fee">NT$0</strong></div>
             <div class="summary-row"><span>監工 / 管理費</span><strong id="summary-management-fee">NT$0</strong></div>
             <div class="summary-row"><span>調整金額</span><strong id="summary-adjustment">NT$0</strong></div>
@@ -175,6 +178,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       .join("");
   }
 
+  function renderPricingAssumptions(totals) {
+    document.getElementById("pricing-assumptions").innerHTML = `
+      <div class="preview-assumption-card">
+        <span>材料等級</span>
+        <strong>${escapeHtml(totals.materialLevel?.label || "標準實用")}</strong>
+        <p>${escapeHtml(totals.materialLevel?.note || "")}</p>
+      </div>
+      <div class="preview-assumption-card">
+        <span>施工難度</span>
+        <strong>${escapeHtml(totals.difficultyLevel?.label || "一般施工")}</strong>
+        <p>${escapeHtml(totals.difficultyLevel?.note || "")}</p>
+      </div>
+    `;
+  }
+
   function renderTerms(terms) {
     document.getElementById("quote-terms").innerHTML = `
       <ul>
@@ -199,6 +217,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   function renderSummary(totals) {
     document.getElementById("summary-line-subtotal").textContent = formatCurrency(totals.lineSubtotal);
+    document.getElementById("summary-material-adjustment").textContent = formatCurrency(totals.materialAdjustmentAmount);
+    document.getElementById("summary-difficulty-adjustment").textContent = formatCurrency(totals.difficultyAdjustmentAmount);
     document.getElementById("summary-design-fee").textContent = formatCurrency(totals.designFee);
     document.getElementById("summary-management-fee").textContent = formatCurrency(totals.managementFee);
     document.getElementById("summary-adjustment").textContent = formatCurrency(totals.adjustmentAmount);
@@ -210,6 +230,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     document.getElementById("document-title").textContent = payload.meta.quoteTitle || "青曦空間設計初估單";
     document.getElementById("document-intro").textContent = payload.notes.intro || "";
     renderMeta(payload.meta);
+    renderPricingAssumptions(payload.totals || {});
     renderGroups(payload.items || []);
     renderTerms(payload.notes.terms || []);
     renderInvoiceNotice(payload.notes.invoiceNoticeTitle, payload.notes.invoiceNoticeParagraphs || []);
@@ -367,6 +388,37 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     margin-top: 1rem;
   }
 
+  .preview-assumption-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  .preview-assumption-card {
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(247, 249, 249, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
+  .preview-assumption-card span {
+    color: var(--gray-medium);
+    font-size: 0.86rem;
+  }
+
+  .preview-assumption-card strong {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--gray-darkest);
+  }
+
+  .preview-assumption-card p {
+    margin: 0.5rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+  }
+
   .quote-group {
     border: 1px solid rgba(129, 199, 212, 0.14);
     border-radius: 24px;
@@ -507,6 +559,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     .document-summary-section {
       grid-template-columns: 1fr;
       display: grid;
+    }
+
+    .preview-assumption-list {
+      grid-template-columns: 1fr;
     }
   }
 

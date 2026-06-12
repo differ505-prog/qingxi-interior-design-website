@@ -14,6 +14,13 @@ export type QuoteTemplateItem = {
   description: string;
 };
 
+export type QuoteOption = {
+  value: string;
+  label: string;
+  multiplier: number;
+  note: string;
+};
+
 export const quoteCategories: QuoteCategory[] = [
   { id: "preparation", label: "保護與拆除" },
   { id: "electrical", label: "水電工程" },
@@ -251,6 +258,48 @@ export const quoteDefaultTerms = [
   "未列項目、特殊保護、特殊搬運、額外加班與大樓管委會相關費用，將另行說明。",
   "若後續有新增工項、材料升級或施工條件變動，會先提供調整內容再確認。",
   "正式開工前會再提供最終版報價與施工安排。",
+];
+
+export const quoteMaterialLevelOptions: QuoteOption[] = [
+  {
+    value: "basic",
+    label: "標準實用",
+    multiplier: 1,
+    note: "以常用規格與實用型材料為主。",
+  },
+  {
+    value: "refined",
+    label: "進階升級",
+    multiplier: 1.08,
+    note: "部分材料、五金與表面處理升級。",
+  },
+  {
+    value: "premium",
+    label: "高階精緻",
+    multiplier: 1.18,
+    note: "櫃體、五金、設備與表面材質整體升級。",
+  },
+];
+
+export const quoteDifficultyOptions: QuoteOption[] = [
+  {
+    value: "standard",
+    label: "一般施工",
+    multiplier: 1,
+    note: "新成屋或條件單純案場。",
+  },
+  {
+    value: "complex",
+    label: "條件較複雜",
+    multiplier: 1.08,
+    note: "需搬運、局部保護或現場介面較多。",
+  },
+  {
+    value: "challenging",
+    label: "高難度施工",
+    multiplier: 1.15,
+    note: "老屋、動線受限或多工種交錯施工。",
+  },
 ];
 
 export const quoteInvoiceNotice = {
