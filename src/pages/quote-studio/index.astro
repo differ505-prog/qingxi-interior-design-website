@@ -446,7 +446,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   const cleanupOptions = JSON.parse(quoteCleanupOptionsJson);
   const waterproofWarrantyOptions = JSON.parse(quoteWaterproofWarrantyOptionsJson);
   const warrantyOptions = JSON.parse(quoteWarrantyOptionsJson);
-  const STORAGE_KEY = "qingxi-quote-studio-draft-v3";
+  const STORAGE_KEY = "qingxi-quote-studio-draft-v4";
 
   const categoryLabelMap = new Map(categories.map((category) => [category.id, category.label]));
   const materialLevelMap = new Map(materialLevelOptions.map((option) => [option.value, option]));
@@ -747,12 +747,16 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       reminders.push("本案已有防水工程，但目前防水保固仍未列明，建議在正式送客戶前補上年限與責任界線。");
     }
 
-    if ((itemIds.has("smart-home-basic") || itemIds.has("smart-home-security")) && !itemIds.has("weak-current")) {
+    if ((itemIds.has("smart-home-hub") || itemIds.has("smart-home-control-node") || itemIds.has("smart-home-security-node")) && !itemIds.has("weak-current")) {
       reminders.push("已有智能家居工項，但尚未列弱電 / 網路點位，建議確認是否需預留佈線。");
     }
 
-    if ((itemIds.has("ceiling-flat") || itemIds.has("smart-home-basic")) && !itemIds.has("hvac-piping") && !itemIds.has("hvac-install")) {
+    if ((itemIds.has("ceiling-flat") || itemIds.has("smart-home-control-node")) && !itemIds.has("hvac-piping") && !itemIds.has("hvac-install")) {
       reminders.push("已有天花或智能家居工項，但尚未列空調相關工項，建議確認冷氣管線與設備安裝是否同步處理。");
+    }
+
+    if ((itemIds.has("smart-home-control-node") || itemIds.has("smart-home-security-node")) && !itemIds.has("smart-home-hub")) {
+      reminders.push("已有智能家居節點，但尚未列智慧主機 / 網關建置，建議確認是否已有既有中樞可沿用。");
     }
 
     if (itemIds.has("glass-sliding-hardware") && !itemIds.has("glass-partition")) {
