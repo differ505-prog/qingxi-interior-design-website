@@ -178,28 +178,42 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
           <section class="studio-card">
             <div class="section-heading">
               <h2>預設單價資料庫</h2>
-              <p>先調整平常常用的基準值，下面案件工項會自動跟著更新。</p>
+              <p>先依工種調整平常常用的基準值，下面案件工項會自動跟著更新。</p>
             </div>
-            <div class="default-price-grid">
-              {quoteTemplateItems.map((item) => (
-                <label class="default-price-card">
-                  <span class="default-category">{categoryLabelMap.get(item.categoryId)}</span>
-                  <strong>{item.name}</strong>
-                  <span class="default-description">{item.description}</span>
-                  <span class="default-basis">計價基準：{item.pricingBasis}</span>
-                  <div class="input-with-prefix">
-                    <span>NT$</span>
-                    <input
-                      class="default-price-input"
-                      data-default-id={item.id}
-                      type="number"
-                      min="0"
-                      step="100"
-                    />
-                    <small>/ {item.unit}</small>
-                  </div>
-                </label>
-              ))}
+            <div class="default-trade-groups">
+              {quoteCategories.map((category) => {
+                const items = quoteTemplateItems.filter((item) => item.categoryId === category.id);
+                if (!items.length) return null;
+
+                return (
+                  <section class="default-trade-group">
+                    <header class="trade-group-header">
+                      <h3>{category.label}</h3>
+                      <p>這一區可集中調整此工種常用的預設單價。</p>
+                    </header>
+                    <div class="default-price-grid">
+                      {items.map((item) => (
+                        <label class="default-price-card">
+                          <strong>{item.name}</strong>
+                          <span class="default-description">{item.description}</span>
+                          <span class="default-basis">計價基準：{item.pricingBasis}</span>
+                          <div class="input-with-prefix">
+                            <span>NT$</span>
+                            <input
+                              class="default-price-input"
+                              data-default-id={item.id}
+                              type="number"
+                              min="0"
+                              step="100"
+                            />
+                            <small>/ {item.unit}</small>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })}
             </div>
           </section>
 
@@ -1489,6 +1503,18 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     justify-content: end;
   }
 
+  .default-trade-groups {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .default-trade-group {
+    padding: 1rem;
+    border-radius: 22px;
+    background: rgba(247, 249, 249, 0.8);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
   .form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1591,12 +1617,6 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     border-radius: 20px;
     background: rgba(247, 249, 249, 0.88);
     border: 1px solid rgba(129, 199, 212, 0.14);
-  }
-
-  .default-category {
-    color: var(--tiffany-dark);
-    font-size: 0.78rem;
-    letter-spacing: 0.14em;
   }
 
   .default-description {
