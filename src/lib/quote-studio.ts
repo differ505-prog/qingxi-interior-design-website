@@ -92,10 +92,10 @@ export const quoteTemplateItems: QuoteTemplateItem[] = [
     categoryId: "electrical",
     name: "開關移位",
     unit: "處",
-    pricingBasis: "含配線延伸與牆面修補",
+    pricingBasis: "含配線延伸與基礎收口",
     defaultUnitPrice: 900,
     defaultQuantity: 1,
-    description: "含原開關位移與基礎整理。",
+    description: "含原開關位移與基礎收口，不含大面積批土與油漆復原。",
   },
   {
     id: "lighting-downlight",
@@ -202,10 +202,10 @@ export const quoteTemplateItems: QuoteTemplateItem[] = [
     categoryId: "cabinet",
     name: "系統櫃",
     unit: "尺",
-    pricingBasis: "依每尺櫃體長度與五金配置計",
+    pricingBasis: "依每尺櫃體長度與標準五金配置計",
     defaultUnitPrice: 8500,
     defaultQuantity: 1,
-    description: "含板材、五金與安裝。",
+    description: "含板材、標準五金與安裝，特殊配件另列。",
   },
   {
     id: "woodwork-cabinet",
@@ -232,10 +232,10 @@ export const quoteTemplateItems: QuoteTemplateItem[] = [
     categoryId: "cabinet",
     name: "玄關鞋櫃",
     unit: "式",
-    pricingBasis: "依櫃體尺寸、門片與五金配置計",
+    pricingBasis: "依櫃體尺寸、門片與標準五金配置計",
     defaultUnitPrice: 26000,
     defaultQuantity: 1,
-    description: "含鞋櫃、吊衣區或落塵區整合。",
+    description: "含鞋櫃、吊衣區或落塵區整合，特殊五金另列。",
   },
   {
     id: "smart-home-basic",
@@ -366,18 +366,18 @@ export const quoteProtectionOptions: QuoteChoice[] = [
 export const quoteCleanupOptions: QuoteChoice[] = [
   {
     value: "none",
-    label: "未含清運與清潔",
-    note: "目前僅含施工本體，未含額外廢棄物清運與完工清潔。",
+    label: "未含完工清潔",
+    note: "目前僅含施工本體，未含完工粗清或細部清潔。",
   },
   {
-    value: "haul",
-    label: "含廢棄物清運",
-    note: "含施工後基本廢棄物清運，未含深度清潔。",
+    value: "basic_clean",
+    label: "含基本粗清",
+    note: "含完工後基本粗清與現場整理，未含細部清潔。",
   },
   {
-    value: "haul_clean",
-    label: "含清運與基本清潔",
-    note: "含施工後廢棄物清運與基礎整理清潔。",
+    value: "fine_clean",
+    label: "含粗清與細部清潔",
+    note: "含完工粗清與交屋前細部清潔整理。",
   },
 ];
 
