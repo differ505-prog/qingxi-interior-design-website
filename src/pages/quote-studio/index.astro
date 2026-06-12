@@ -493,9 +493,9 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
         materialLevel: materialLevelOptions[0]?.value || "basic",
         difficultyLevel: difficultyOptions[0]?.value || "standard",
         workMethod: methodOptions[2]?.value || "pending",
-        restorationScope: restorationOptions[0]?.value || "not_included",
+        restorationScope: restorationOptions[1]?.value || "basic_patch",
         protectionScope: protectionOptions[0]?.value || "review",
-        cleanupScope: cleanupOptions[0]?.value || "none",
+        cleanupScope: cleanupOptions[1]?.value || "basic_clean",
         area: "",
         address: "",
         quoteDate: todayString(),
@@ -756,6 +756,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       reminders.push("已有拆除或清運工項，但目前設定未含完工清潔，建議先與客戶說明粗清或細清是否另列。");
     }
 
+    if (!parseNumber(state.fees.designFee) && !parseNumber(state.fees.managementFee)) {
+      reminders.push("目前設計費與監工 / 管理費皆為 0，若實際已攤提於工項單價，建議在前言或條款中先說明，避免客戶抽單項比價時產生疑慮。");
+    }
+
     if (payload.meta.propertyType === "住宅空間" && !parseNumber(state.fees.designFee)) {
       reminders.push("住宅空間通常會有設計或規劃費，若本案不收設計費，建議在說明中註明。");
     }
@@ -784,6 +788,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
       "這不是單一案件的正式報價，也不是實際丈量後的數量清單。",
       "請不要把模板裡常見的預設數量 1 視為本案實際數量；請聚焦檢查工項架構、單位、單價、計價基準、條款與風險。",
       "這一版已盡量把常見的一式工項拆細為坪、尺、點、才、樘、台或車次；若仍有保留一式者，請特別檢查是否合理。",
+      "若你發現單位與單價明顯錯置，請先指出目前數字是否合理，不要沿用過往版本或假設舊數值。",
       "請另外為這份預設報價架構打分，滿分 10 分，可使用 0.5 分刻度，並明確說出扣分原因。",
       "",
       "請優先指出：",
@@ -1315,7 +1320,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
 
   .studio-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.6fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: 1.25rem;
     align-items: start;
   }
@@ -1324,6 +1329,10 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   .studio-side {
     display: grid;
     gap: 1.25rem;
+  }
+
+  .studio-side {
+    order: 2;
   }
 
   .studio-card {
