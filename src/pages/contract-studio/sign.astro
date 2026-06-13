@@ -181,6 +181,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     return queryValue || "";
   }
 
+  function getContractToken() {
+    return new URLSearchParams(window.location.search).get("token") || "";
+  }
+
   function simpleChecksum(input) {
     let hash = 5381;
     for (let index = 0; index < input.length; index += 1) {
@@ -381,148 +385,189 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     padState.hasStroke = false;
   }
 
-  const encodedPayload = getEncodedPayload();
+  async function resolveContractPayload() {
+    const token = getContractToken();
 
-  if (!encodedPayload) {
-    document.getElementById("sign-empty").hidden = false;
-  } else {
-    const payload = decodePayload(encodedPayload);
-    const contractChecksum = simpleChecksum(encodedPayload);
+    if (token) {
+      const response = await fetch(`/api/contracts/${encodeURIComponent(token)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch short contract with status ${response.status}`);
+      }
+
+      const record = await response.json();
+      return {
+        payload: record.payload,
+        contractChecksum: simpleChecksum(token),
+      };
+    }
+
+    const encodedPayload = getEncodedPayload();
+    if (!encodedPayload) {
+      return null;
+    }
+
+    return {
+      payload: decodePayload(encodedPayload),
+      contractChecksum: simpleChecksum(encodedPayload),
+    };
+  }
+
+  async function bootstrap() {
+    const signEmpty = document.getElementById("sign-empty");
+    const contractDocument = document.getElementById("contract-document");
+
+    try {
+      const resolved = await resolveContractPayload();
+      if (!resolved) {
+        signEmpty.hidden = false;
+        contractDocument.hidden = true;
+        return;
+      }
+
+      const { payload, contractChecksum } = resolved;
     const storageKey = getAuditStorageKey(contractChecksum);
 
-    document.getElementById("sign-empty").hidden = true;
-    document.getElementById("contract-document").hidden = false;
-    document.getElementById("document-title").textContent = payload.meta.contractTitle || "住宅空間裝修工程合約書";
-    document.getElementById("document-summary").textContent = payload.meta.contractSummary || "";
-    renderMeta(payload.meta);
-    renderPaymentStages(payload.paymentStages || []);
-    renderSections(payload.sections || []);
-    renderMaterialSpecs(payload.materialSpecs || []);
-    renderChecklist(payload.checklist || []);
+      signEmpty.hidden = true;
+      contractDocument.hidden = false;
+      document.getElementById("document-title").textContent = payload.meta.contractTitle || "住宅空間裝修工程合約書";
+      document.getElementById("document-summary").textContent = payload.meta.contractSummary || "";
+      renderMeta(payload.meta);
+      renderPaymentStages(payload.paymentStages || []);
+      renderSections(payload.sections || []);
+      renderMaterialSpecs(payload.materialSpecs || []);
+      renderChecklist(payload.checklist || []);
 
-    const padState = setupSignatureCanvas();
-    const submitMessage = document.getElementById("submit-message");
+      const padState = setupSignatureCanvas();
+      const submitMessage = document.getElementById("submit-message");
 
-    function loadSavedRecord() {
-      try {
-        const saved = localStorage.getItem(storageKey);
-        if (!saved) return null;
-        return JSON.parse(saved);
-      } catch (error) {
-        console.error("無法讀取簽署紀錄：", error);
-        return null;
+      function loadSavedRecord() {
+        try {
+          const saved = localStorage.getItem(storageKey);
+          if (!saved) return null;
+          return JSON.parse(saved);
+        } catch (error) {
+          console.error("無法讀取簽署紀錄：", error);
+          return null;
+        }
       }
+
+      function saveSignedRecord(record) {
+        localStorage.setItem(storageKey, JSON.stringify(record));
+      }
+
+      function exportAuditJson() {
+        const savedRecord = loadSavedRecord();
+        if (!savedRecord) return;
+
+        const blob = new Blob([JSON.stringify(savedRecord, null, 2)], { type: "application/json" });
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = `${savedRecord.contractNumber || "contract-signature"}.json`;
+        link.click();
+        URL.revokeObjectURL(objectUrl);
+      }
+
+      const existingRecord = loadSavedRecord();
+      if (existingRecord) {
+        renderSignedRecord(existingRecord);
+        document.getElementById("signer-name").value = existingRecord.signerName || "";
+        document.getElementById("signer-phone").value = existingRecord.signerPhone || "";
+        document.getElementById("signer-email").value = existingRecord.signerEmail || "";
+        document.getElementById("signer-identity-code").value = existingRecord.signerIdentityCode || "";
+        document.getElementById("signer-role").value = existingRecord.signerRole || "";
+      }
+
+      document.getElementById("clear-signature").addEventListener("click", () => {
+        clearCanvas(padState);
+        submitMessage.textContent = "";
+      });
+
+      document.getElementById("submit-signature").addEventListener("click", () => {
+        const signerName = document.getElementById("signer-name").value.trim();
+        const signerPhone = document.getElementById("signer-phone").value.trim();
+        const signerEmail = document.getElementById("signer-email").value.trim();
+        const signerIdentityCode = document.getElementById("signer-identity-code").value.trim();
+        const signerRole = document.getElementById("signer-role").value.trim();
+        const checkboxes = [...document.querySelectorAll("[data-check-id]")];
+        const allChecked = checkboxes.every((checkbox) => checkbox.checked);
+
+        if (!signerName) {
+          submitMessage.textContent = "請先填寫簽署人姓名。";
+          return;
+        }
+
+        if (!signerPhone && !signerEmail) {
+          submitMessage.textContent = "請至少提供電話或 Email 其中一項。";
+          return;
+        }
+
+        if (!signerIdentityCode) {
+          submitMessage.textContent = "請填寫身分識別資訊後再簽署。";
+          return;
+        }
+
+        if (!allChecked) {
+          submitMessage.textContent = "請先勾選所有簽署確認項目。";
+          return;
+        }
+
+        if (!padState.hasStroke) {
+          submitMessage.textContent = "請先完成手寫簽名。";
+          return;
+        }
+
+        const signedAt = new Date();
+        const signedRecord = {
+          contractNumber: payload.meta.contractNumber || "",
+          contractTitle: payload.meta.contractTitle || "",
+          contractChecksum,
+          signerName,
+          signerPhone,
+          signerEmail,
+          signerIdentityCode,
+          signerRole,
+          signedAtIso: signedAt.toISOString(),
+          signedAtLocal: signedAt.toLocaleString("zh-TW", { hour12: false }),
+          signatureDataUrl: padState.canvas.toDataURL("image/png"),
+          audit: {
+            language: navigator.language || "",
+            userAgent: navigator.userAgent || "",
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+            platform: navigator.platform || "",
+            source: payload.source || "qingxi-contract-studio",
+          },
+          contractMeta: payload.meta,
+          paymentStages: payload.paymentStages,
+          sections: payload.sections,
+          materialSpecs: payload.materialSpecs,
+        };
+
+        saveSignedRecord(signedRecord);
+        renderSignedRecord(signedRecord);
+        submitMessage.textContent = "已完成簽署，建議立即列印或另存 PDF。";
+      });
+
+      document.getElementById("download-audit-json").addEventListener("click", exportAuditJson);
+
+      document.getElementById("clear-saved-record").addEventListener("click", () => {
+        localStorage.removeItem(storageKey);
+        document.getElementById("signed-record-section").hidden = true;
+        submitMessage.textContent = "已清除此頁簽署紀錄。";
+      });
+
+      document.getElementById("print-contract").addEventListener("click", () => {
+        window.print();
+      });
+    } catch (error) {
+      console.error("載入合約簽署資料失敗：", error);
+      signEmpty.textContent = "目前無法讀取這份簽約資料，請向青曦重新索取有效連結。";
+      signEmpty.hidden = false;
+      contractDocument.hidden = true;
     }
-
-    function saveSignedRecord(record) {
-      localStorage.setItem(storageKey, JSON.stringify(record));
-    }
-
-    function exportAuditJson() {
-      const savedRecord = loadSavedRecord();
-      if (!savedRecord) return;
-
-      const blob = new Blob([JSON.stringify(savedRecord, null, 2)], { type: "application/json" });
-      const objectUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = objectUrl;
-      link.download = `${savedRecord.contractNumber || "contract-signature"}.json`;
-      link.click();
-      URL.revokeObjectURL(objectUrl);
-    }
-
-    const existingRecord = loadSavedRecord();
-    if (existingRecord) {
-      renderSignedRecord(existingRecord);
-      document.getElementById("signer-name").value = existingRecord.signerName || "";
-      document.getElementById("signer-phone").value = existingRecord.signerPhone || "";
-      document.getElementById("signer-email").value = existingRecord.signerEmail || "";
-      document.getElementById("signer-identity-code").value = existingRecord.signerIdentityCode || "";
-      document.getElementById("signer-role").value = existingRecord.signerRole || "";
-    }
-
-    document.getElementById("clear-signature").addEventListener("click", () => {
-      clearCanvas(padState);
-      submitMessage.textContent = "";
-    });
-
-    document.getElementById("submit-signature").addEventListener("click", () => {
-      const signerName = document.getElementById("signer-name").value.trim();
-      const signerPhone = document.getElementById("signer-phone").value.trim();
-      const signerEmail = document.getElementById("signer-email").value.trim();
-      const signerIdentityCode = document.getElementById("signer-identity-code").value.trim();
-      const signerRole = document.getElementById("signer-role").value.trim();
-      const checkboxes = [...document.querySelectorAll("[data-check-id]")];
-      const allChecked = checkboxes.every((checkbox) => checkbox.checked);
-
-      if (!signerName) {
-        submitMessage.textContent = "請先填寫簽署人姓名。";
-        return;
-      }
-
-      if (!signerPhone && !signerEmail) {
-        submitMessage.textContent = "請至少提供電話或 Email 其中一項。";
-        return;
-      }
-
-      if (!signerIdentityCode) {
-        submitMessage.textContent = "請填寫身分識別資訊後再簽署。";
-        return;
-      }
-
-      if (!allChecked) {
-        submitMessage.textContent = "請先勾選所有簽署確認項目。";
-        return;
-      }
-
-      if (!padState.hasStroke) {
-        submitMessage.textContent = "請先完成手寫簽名。";
-        return;
-      }
-
-      const signedAt = new Date();
-      const signedRecord = {
-        contractNumber: payload.meta.contractNumber || "",
-        contractTitle: payload.meta.contractTitle || "",
-        contractChecksum,
-        signerName,
-        signerPhone,
-        signerEmail,
-        signerIdentityCode,
-        signerRole,
-        signedAtIso: signedAt.toISOString(),
-        signedAtLocal: signedAt.toLocaleString("zh-TW", { hour12: false }),
-        signatureDataUrl: padState.canvas.toDataURL("image/png"),
-        audit: {
-          language: navigator.language || "",
-          userAgent: navigator.userAgent || "",
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
-          platform: navigator.platform || "",
-          source: payload.source || "qingxi-contract-studio",
-        },
-        contractMeta: payload.meta,
-        paymentStages: payload.paymentStages,
-        sections: payload.sections,
-        materialSpecs: payload.materialSpecs,
-      };
-
-      saveSignedRecord(signedRecord);
-      renderSignedRecord(signedRecord);
-      submitMessage.textContent = "已完成簽署，建議立即列印或另存 PDF。";
-    });
-
-    document.getElementById("download-audit-json").addEventListener("click", exportAuditJson);
-
-    document.getElementById("clear-saved-record").addEventListener("click", () => {
-      localStorage.removeItem(storageKey);
-      document.getElementById("signed-record-section").hidden = true;
-      submitMessage.textContent = "已清除此頁簽署紀錄。";
-    });
-
-    document.getElementById("print-contract").addEventListener("click", () => {
-      window.print();
-    });
   }
+
+  bootstrap();
 </script>
 
 <style>

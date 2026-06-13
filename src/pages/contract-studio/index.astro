@@ -36,7 +36,7 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
           <button type="button" id="copy-contract-llm-review" class="btn btn-secondary">複製 LLM 合約覆核文字</button>
           <button type="button" id="reset-contract" class="btn btn-secondary btn-muted">重設本次合約</button>
         </div>
-        <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；可先在這裡預覽客戶簽署頁，再複製完整簽約連結傳給客戶。</p>
+          <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；若已接上 Vercel KV，分享會優先產生短簽約連結，未接上時則自動退回內嵌長連結。</p>
       </header>
 
       <div class="studio-grid">
@@ -389,9 +389,43 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
     };
   }
 
-  function buildSignUrl() {
+  function buildInlineSignUrl() {
     const payload = encodePayload(buildPayload());
     return `${window.location.origin}/contract-studio/sign#contract=${payload}`;
+  }
+
+  async function createShareLink() {
+    const fallbackUrl = buildInlineSignUrl();
+
+    try {
+      const response = await fetch("/api/contracts/share", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          payload: buildPayload(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Share link request failed with status ${response.status}`);
+      }
+
+      const result = await response.json();
+      return {
+        mode: result.mode || "inline",
+        url: result.url || fallbackUrl,
+        warning: result.warning || "",
+      };
+    } catch (error) {
+      console.error("建立分享連結失敗，改用長連結：", error);
+      return {
+        mode: "inline",
+        url: fallbackUrl,
+        warning: "CREATE_SHARE_LINK_FAILED",
+      };
+    }
   }
 
   function buildContractLlmReviewText() {
@@ -636,7 +670,7 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
   }
 
   function syncActions() {
-    const signUrl = buildSignUrl();
+    const signUrl = buildInlineSignUrl();
     document.getElementById("open-sign-link").href = signUrl;
   }
 
@@ -719,14 +753,21 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
     }
   });
 
+  document.getElementById("open-sign-link").addEventListener("click", async (event) => {
+    event.preventDefault();
+    const result = await createShareLink();
+    window.open(result.url, "_blank", "noopener,noreferrer");
+  });
+
   document.getElementById("copy-sign-link").addEventListener("click", async (event) => {
     const target = event.currentTarget;
     if (!(target instanceof HTMLButtonElement)) return;
 
     try {
-      await navigator.clipboard.writeText(buildSignUrl());
+      const result = await createShareLink();
+      await navigator.clipboard.writeText(result.url);
       const originalText = target.textContent;
-      target.textContent = "客戶簽約連結已複製";
+      target.textContent = result.mode === "short" ? "短簽約連結已複製" : "已複製長連結";
       window.setTimeout(() => {
         target.textContent = originalText;
       }, 1400);
