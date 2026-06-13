@@ -89,6 +89,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   <input id="signer-role" type="text" placeholder="例如：業主本人 / 委託人" />
                 </label>
               </div>
+              <p class="signature-note">
+                簽署頁會先帶入合約中的客戶資料；請確認姓名、聯絡方式、身分識別、勾選確認項目並完成手寫簽名後再送出。
+              </p>
 
               <div id="sign-checklist" class="sign-checklist"></div>
 
@@ -440,6 +443,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       const padState = setupSignatureCanvas();
       const submitMessage = document.getElementById("submit-message");
+      const signerNameInput = document.getElementById("signer-name");
+      const signerPhoneInput = document.getElementById("signer-phone");
+      const signerEmailInput = document.getElementById("signer-email");
+      const signerIdentityInput = document.getElementById("signer-identity-code");
+      const signerRoleInput = document.getElementById("signer-role");
 
       function loadSavedRecord() {
         try {
@@ -472,11 +480,19 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       const existingRecord = loadSavedRecord();
       if (existingRecord) {
         renderSignedRecord(existingRecord);
-        document.getElementById("signer-name").value = existingRecord.signerName || "";
-        document.getElementById("signer-phone").value = existingRecord.signerPhone || "";
-        document.getElementById("signer-email").value = existingRecord.signerEmail || "";
-        document.getElementById("signer-identity-code").value = existingRecord.signerIdentityCode || "";
-        document.getElementById("signer-role").value = existingRecord.signerRole || "";
+        signerNameInput.value = existingRecord.signerName || "";
+        signerPhoneInput.value = existingRecord.signerPhone || "";
+        signerEmailInput.value = existingRecord.signerEmail || "";
+        signerIdentityInput.value = existingRecord.signerIdentityCode || "";
+        signerRoleInput.value = existingRecord.signerRole || "";
+      } else {
+        signerNameInput.value = payload.meta.clientName || "";
+        signerPhoneInput.value = payload.meta.clientPhone || "";
+        signerEmailInput.value = payload.meta.clientEmail || "";
+        signerIdentityInput.value = payload.meta.clientIdentityCode || "";
+        signerRoleInput.value = payload.meta.projectAgentName
+          ? `${payload.meta.projectAgentRole || "指定代理人"}（${payload.meta.projectAgentName}）`
+          : "業主本人";
       }
 
       document.getElementById("clear-signature").addEventListener("click", () => {
@@ -485,11 +501,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       });
 
       document.getElementById("submit-signature").addEventListener("click", () => {
-        const signerName = document.getElementById("signer-name").value.trim();
-        const signerPhone = document.getElementById("signer-phone").value.trim();
-        const signerEmail = document.getElementById("signer-email").value.trim();
-        const signerIdentityCode = document.getElementById("signer-identity-code").value.trim();
-        const signerRole = document.getElementById("signer-role").value.trim();
+        const signerName = signerNameInput.value.trim();
+        const signerPhone = signerPhoneInput.value.trim();
+        const signerEmail = signerEmailInput.value.trim();
+        const signerIdentityCode = signerIdentityInput.value.trim();
+        const signerRole = signerRoleInput.value.trim();
         const checkboxes = [...document.querySelectorAll("[data-check-id]")];
         const allChecked = checkboxes.every((checkbox) => checkbox.checked);
 
