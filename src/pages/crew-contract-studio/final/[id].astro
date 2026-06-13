@@ -127,14 +127,19 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       ["約定聯絡管道", meta.notificationChannel || "未填寫"],
       ["通知帳號 / LINE", meta.notificationAccount || "未填寫"],
       ["私下接洽限制", meta.privateContactRule || "未填寫"],
+      ["私下接案違約金", meta.privateContactPenalty || "未填寫"],
       ["未到場 / 停工認定", meta.noShowRule || "未填寫"],
+      ["催告 / 改善期限", meta.noticeCureRule || "未填寫"],
       ["傷病通知規則", meta.injuryNoticeRule || "未填寫"],
       ["替代人力規則", meta.substituteWorkerRule || "未填寫"],
+      ["返工責任例外", meta.qualityExceptionRule || "未填寫"],
       ["代僱工 / 扣款規則", meta.backchargeRule || "未填寫"],
       ["工安 / 雇主責任", meta.employerResponsibilityRule || "未填寫"],
       ["公司供料 / 耗損賠償", meta.materialLossRule || "未填寫"],
       ["工地公約 / 罰則", meta.siteRulePenalty || "未填寫"],
       ["保險 / 補件要求", meta.insuranceRequirement || "未填寫"],
+      ["不可歸責工期調整", meta.forceMajeureRule || "未填寫"],
+      ["電子簽署效力", meta.electronicSignatureEffect || "未填寫"],
     ];
 
     metaShell.innerHTML = metaItems

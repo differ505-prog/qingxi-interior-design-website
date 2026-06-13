@@ -172,8 +172,16 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
                 <input data-field="privateContactRule" type="text" placeholder="例如：不得私下與業主交換聯絡方式、報價或收款" />
               </label>
               <label class="field field-full">
+                <span>私下接案違約金</span>
+                <input data-field="privateContactPenalty" type="text" placeholder="例如：固定 NT$200,000，或依實際損害擇高主張" />
+              </label>
+              <label class="field field-full">
                 <span>未到場 / 停工認定</span>
                 <input data-field="noShowRule" type="text" placeholder="例如：連續 2 日未到場或 7 日內累計 3 日未依約出工，視為無故停工" />
+              </label>
+              <label class="field field-full">
+                <span>催告 / 改善期限</span>
+                <input data-field="noticeCureRule" type="text" placeholder="例如：經電話或 LINE 催告後，應於 24 小時內回覆並於合理期限內改善" />
               </label>
               <label class="field field-full">
                 <span>傷病通知規則</span>
@@ -182,6 +190,10 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
               <label class="field field-full">
                 <span>替代人力規則</span>
                 <input data-field="substituteWorkerRule" type="text" placeholder="例如：工班應自行調派同等技能替代人力，不得以受傷為由長期停工" />
+              </label>
+              <label class="field field-full">
+                <span>返工責任例外</span>
+                <input data-field="qualityExceptionRule" type="text" placeholder="例如：前工種素地不良、設計變更或交底不一致且已即時提出者，不由工班單獨負責" />
               </label>
               <label class="field field-full">
                 <span>代僱工 / 扣款規則</span>
@@ -202,6 +214,14 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
               <label class="field field-full">
                 <span>保險 / 補件要求</span>
                 <input data-field="insuranceRequirement" type="text" placeholder="例如：高風險工種應提供意外險或雇主責任險證明" />
+              </label>
+              <label class="field field-full">
+                <span>不可歸責工期調整</span>
+                <input data-field="forceMajeureRule" type="text" placeholder="例如：前工種延誤、社區停工或設計變更，經即時通知後由雙方調整工期" />
+              </label>
+              <label class="field field-full">
+                <span>電子簽署效力</span>
+                <input data-field="electronicSignatureEffect" type="text" placeholder="例如：本電子簽署依電子簽章法作為雙方合作確認依據" />
               </label>
               <label class="field">
                 <span>請款帳戶戶名</span>
@@ -343,14 +363,19 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         delayPenaltyCap: "總價 10%",
         settlementMethod: "依已完成部分與已發生成本結算",
         privateContactRule: "不得私下與業主交換聯絡方式、報價或收款",
+        privateContactPenalty: "固定 NT$200,000，或依實際損害擇高主張",
         noShowRule: "連續 2 日未到場或 7 日內累計 3 日未依約出工，視為無故停工",
+        noticeCureRule: "經電話或 LINE 催告後，應於 24 小時內回覆並於合理期限內改善",
         injuryNoticeRule: "傷病或事故應立即通知並補證明，未經書面同意不當然順延工期",
         substituteWorkerRule: "工班應自行調派同等技能替代人力，不得以受傷為由長期停工",
+        qualityExceptionRule: "前工種素地不良、設計變更或交底不一致且已即時提出者，不由工班單獨負責",
         backchargeRule: "青曦得另找人進場，依實支單據、差額與合理管理成本扣款",
         employerResponsibilityRule: "工班自負所屬人員勞健保、職災、雇主責任與保險",
         materialLossRule: "合理耗損依工種常態認定，超耗由造成損失者補料或賠償",
         siteRulePenalty: "違反禁菸酒檳榔、垃圾管理或住戶衝突，得要求改善、退場或合理扣款",
         insuranceRequirement: "高風險工種應提供意外險或雇主責任險證明",
+        forceMajeureRule: "前工種延誤、社區停工或設計變更，經即時通知後由雙方調整工期",
+        electronicSignatureEffect: "本電子簽署依台灣《電子簽章法》作為雙方合作確認依據",
         refundAccountName: "",
         refundAccount: "",
         signNotice: "簽署完成後，請工班留存 PDF；若現場追加，另補追加確認單。",
@@ -423,9 +448,12 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
   function buildCrewLlmReviewText() {
     const payload = buildPayload();
+    const retentionStage = state.paymentStages.find((stage) => stage.id === "retention") || state.paymentStages[state.paymentStages.length - 1];
+    const retentionPercent = retentionStage ? parseNumber(retentionStage.percent) : 0;
     return [
       "請你以台灣室內裝修工班承攬風險、付款爭議、防止私下接業主與返工責任的角度，覆核以下工班承攬合約架構。",
       "請兼顧：工人沒耐心看，所以文案要短，但法律效果仍要保留。",
+      `目前保留款比例：${retentionPercent}%`,
       "",
       "請直接輸出：",
       "S. 架構總分（滿分 10 分）",
@@ -448,6 +476,8 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       "6. 是否把工班自負所屬人員勞健保、職災、雇主責任與保險寫清楚",
       "7. 公司供料、材料超耗、工地公約與罰則是否寫清楚",
       "8. 哪些扣款、罰則或解約效果可能過重，會讓正常工班不願意簽",
+      "9. 是否明確寫明電子簽署效力、約定通知管道與催告程序",
+      "10. 是否對返工責任、前工種素地、設計變更與不可歸責工期影響保留合理例外",
       "",
       JSON.stringify(payload, null, 2),
     ].join("\n");
@@ -514,14 +544,17 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
     const shell = document.getElementById("summary-content");
     if (!shell) return;
     const totalPercent = state.paymentStages.reduce((sum, stage) => sum + parseNumber(stage.percent), 0);
+    const retentionStage = state.paymentStages.find((stage) => stage.id === "retention") || state.paymentStages[state.paymentStages.length - 1];
     shell.innerHTML = `
       <div class="summary-item"><span>工班 / 師傅</span><strong>${escapeHtml(state.meta.clientName || "未填寫")}</strong></div>
       <div class="summary-item"><span>工種</span><strong>${escapeHtml(state.meta.referenceLabel || "未填寫")}</strong></div>
       <div class="summary-item"><span>案件名稱</span><strong>${escapeHtml(state.meta.projectName || "未填寫")}</strong></div>
       <div class="summary-item"><span>承攬總價</span><strong>${formatCurrency(state.meta.contractAmount)}</strong></div>
       <div class="summary-item"><span>付款比例合計</span><strong class="${totalPercent === 100 ? "is-good" : "is-warning"}">${totalPercent}%</strong></div>
+      <div class="summary-item"><span>保留款比例</span><strong>${escapeHtml(retentionStage ? `${retentionStage.percent}%` : "未填寫")}</strong></div>
       <div class="summary-item"><span>中段里程碑</span><strong>${escapeHtml(state.meta.midpointMilestone || "未填寫")}</strong></div>
       <div class="summary-item"><span>停工認定</span><strong>${escapeHtml(state.meta.noShowRule || "未填寫")}</strong></div>
+      <div class="summary-item"><span>私下接案違約金</span><strong>${escapeHtml(state.meta.privateContactPenalty || "未填寫")}</strong></div>
       <div class="summary-item"><span>材料超耗</span><strong>${escapeHtml(state.meta.materialLossRule || "未填寫")}</strong></div>
       <div class="summary-item"><span>附件版次</span><strong>${escapeHtml(state.meta.attachmentVersion || "未填寫")}</strong></div>
     `;
