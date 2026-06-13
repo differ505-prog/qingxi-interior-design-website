@@ -251,6 +251,18 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
                 <span>電子簽署效力</span>
                 <input data-field="electronicSignatureEffect" type="text" placeholder="例如：本電子簽署依電子簽章法作為雙方合作確認依據" />
               </label>
+              <label class="field field-full">
+                <span>每日進度回報規則</span>
+                <input data-field="dailyProgressRule" type="text" placeholder="例如：原則上每日收工前，應透過約定 LINE 回報當日進度照片與簡述" />
+              </label>
+              <label class="field">
+                <span>每日照片最低要求</span>
+                <input data-field="dailyProgressPhotoMinimum" type="text" placeholder="例如：至少 3 張，可辨識施工部位、完成狀態與現場保護" />
+              </label>
+              <label class="field field-full">
+                <span>補傳時限</span>
+                <input data-field="dailyProgressFallbackWindow" type="text" placeholder="例如：若當下不具拍攝或傳送條件，應於當日晚間或次一工作日上午補傳" />
+              </label>
               <label class="field">
                 <span>請款帳戶戶名</span>
                 <input data-field="refundAccountName" type="text" placeholder="例如：陳大宏" />
@@ -411,6 +423,9 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         insuranceRequirement: "高風險工種應提供意外險或雇主責任險證明",
         forceMajeureRule: "前工種延誤、社區停工或設計變更，經即時通知後由雙方調整工期",
         electronicSignatureEffect: "本電子簽署依台灣《電子簽章法》作為雙方合作確認依據",
+        dailyProgressRule: "原則上每日收工前，應透過約定 LINE 或通知管道回報當日進度照片與簡述，供進度認列與爭議釐清",
+        dailyProgressPhotoMinimum: "至少 3 張，可辨識施工部位、完成狀態與現場保護情形",
+        dailyProgressFallbackWindow: "若當下不具拍攝或傳送條件，應於當日晚間或次一工作日上午補傳",
         refundAccountName: "",
         refundAccount: "",
         signNotice: "簽署完成後，請工班留存 PDF；若現場追加，另補追加確認單。",
@@ -516,6 +531,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       "11. 催告回覆時限、復工期限、代僱工管理費與私接案違約金是否有明確數字",
       "12. 材料超耗是否有依材料類型、百分比或數量上限量化",
       "13. 職災或工安事故若使青曦受罰、遭求償或支出律師費，是否有反向補償條款",
+      "14. 是否要求每日進度照片與簡述回報，且保留合理補傳彈性，不至於過度苛刻",
       "",
       JSON.stringify(payload, null, 2),
     ].join("\n");
@@ -597,6 +613,9 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       <div class="summary-item"><span>代僱工管理費</span><strong>${escapeHtml(state.meta.backchargeManagementFeeRate || "未填寫")}</strong></div>
       <div class="summary-item"><span>材料超耗</span><strong>${escapeHtml(state.meta.materialLossRule || "未填寫")}</strong></div>
       <div class="summary-item"><span>超耗基準</span><strong>${escapeHtml(state.meta.materialLossMetric || "未填寫")}</strong></div>
+      <div class="summary-item"><span>每日進度回報</span><strong>${escapeHtml(state.meta.dailyProgressRule || "未填寫")}</strong></div>
+      <div class="summary-item"><span>每日照片要求</span><strong>${escapeHtml(state.meta.dailyProgressPhotoMinimum || "未填寫")}</strong></div>
+      <div class="summary-item"><span>補傳時限</span><strong>${escapeHtml(state.meta.dailyProgressFallbackWindow || "未填寫")}</strong></div>
       <div class="summary-item"><span>附件版次</span><strong>${escapeHtml(state.meta.attachmentVersion || "未填寫")}</strong></div>
     `;
     document.getElementById("llm-review-output").value = buildCrewLlmReviewText();

@@ -147,6 +147,9 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
       ["保險 / 補件要求", meta.insuranceRequirement || "未填寫"],
       ["不可歸責工期調整", meta.forceMajeureRule || "未填寫"],
       ["電子簽署效力", meta.electronicSignatureEffect || "未填寫"],
+      ["每日進度回報", meta.dailyProgressRule || "未填寫"],
+      ["每日照片要求", meta.dailyProgressPhotoMinimum || "未填寫"],
+      ["補傳時限", meta.dailyProgressFallbackWindow || "未填寫"],
     ];
 
     metaShell.innerHTML = metaItems
