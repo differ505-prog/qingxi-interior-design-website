@@ -230,6 +230,7 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
               <li>客戶可在手機上手寫簽名</li>
               <li>簽署頁可列印或另存 PDF</li>
               <li>保留簽署時間與裝置摘要</li>
+              <li>可先防堵尾款未清就提前入住的風險</li>
               <li>後續可再升級 OTP 與第三方電子簽署</li>
             </ul>
           </section>
@@ -461,6 +462,7 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
       "5. 若要再升級成更正式的電子簽署流程，最優先應補哪些機制",
       "6. 請特別檢查：違約金預設值、終止結算標準、中期款里程碑、附件版次與退款帳戶是否足夠實務",
       "7. 請一起檢查材料規格確認表是否足以作為正式報價附件，哪些欄位仍可能造成品牌、等級、顏色、五金或清潔交付標準的爭議",
+      "8. 請特別檢查：尾款未清前先入住、先行使用、分區點交與保固起算的風險是否已被清楚處理",
       "",
       "【合約基本資訊】",
       `- 合約標題：${payload.meta.contractTitle || "未填寫"}`,
@@ -485,6 +487,7 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
       `- 終止結算標準：${payload.meta.settlementMethod || "未填寫"}`,
       `- 退款帳戶戶名：${payload.meta.refundAccountName || "未填寫"}`,
       `- 退款 / 結算指定帳戶：${payload.meta.refundAccount || "未填寫"}`,
+      `- 提前入住風險條款：已納入預設核心條款與簽署確認`,
       `- 合約摘要：${payload.meta.contractSummary || "未填寫"}`,
       `- 簽署完成提醒：${payload.meta.signNotice || "未填寫"}`,
       "",
@@ -646,6 +649,10 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
       <div class="summary-row">
         <span>退款帳戶</span>
         <strong>${state.meta.refundAccount && state.meta.refundAccountName ? "已填寫" : "未填寫"}</strong>
+      </div>
+      <div class="summary-row">
+        <span>先入住風險條款</span>
+        <strong>已納入</strong>
       </div>
       <div class="summary-row">
         <span>指定代理人</span>
