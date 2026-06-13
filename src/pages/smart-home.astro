@@ -29,6 +29,33 @@ const scenarios = [
   "NAS 支援：照片備份、監視錄影、媒體串流與遠端檔案存取",
 ];
 
+const visualPlaceholders = [
+  {
+    tag: "SCENE 01",
+    title: "回家模式情境照",
+    description: "之後可替換為客廳燈光、窗簾、冷氣一起切換的完成照。",
+    note: "建議替換：客廳情境燈光實拍",
+  },
+  {
+    tag: "SCENE 02",
+    title: "手機控制畫面",
+    description: "之後可替換為 Home Assistant 儀表板、燈光群組或監控整合截圖。",
+    note: "建議替換：手機操作介面截圖",
+  },
+  {
+    tag: "SCENE 03",
+    title: "弱電與設備整合",
+    description: "之後可替換為弱電箱、機櫃、NAS 或網路節點整理完成照。",
+    note: "建議替換：設備機櫃 / NAS 實拍",
+  },
+  {
+    tag: "SCENE 04",
+    title: "夜間動線與感應",
+    description: "之後可替換為走道微亮照明、床邊夜燈或感應路徑示意。",
+    note: "建議替換：夜間模式情境照",
+  },
+];
+
 const workflow = [
   {
     step: "01",
@@ -107,6 +134,36 @@ const workflow = [
       </div>
     </section>
 
+    <section class="visual-section">
+      <div class="section-shell">
+        <div class="section-heading">
+          <p class="section-subtitle">VISUAL PREVIEW</p>
+          <h2>先把智能家居畫面感建立起來</h2>
+          <p>
+            這區先用佔位圖保留版面節奏。之後你只要把每張卡片替換成實拍照、操作畫面或設備整合照，
+            整體說服力就會明顯提升。
+          </p>
+        </div>
+
+        <div class="visual-grid">
+          {visualPlaceholders.map((item) => (
+            <article class="visual-card">
+              <div class="visual-frame">
+                <span>{item.tag}</span>
+                <strong>IMAGE PLACEHOLDER</strong>
+              </div>
+              <div class="visual-copy">
+                <p class="visual-tag">{item.tag}</p>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <small>{item.note}</small>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
     <section class="positioning-section">
       <div class="section-shell positioning-shell">
         <article class="positioning-card positioning-card-dark">
@@ -176,6 +233,7 @@ const workflow = [
 
   .smart-home-hero,
   .capability-section,
+  .visual-section,
   .positioning-section,
   .workflow-section,
   .cta-section {
@@ -343,13 +401,19 @@ const workflow = [
   }
 
   .capability-grid,
+  .visual-grid,
   .workflow-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.5rem;
   }
 
+  .visual-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .capability-card,
+  .visual-card,
   .workflow-card,
   .positioning-card {
     border-radius: 26px;
@@ -358,9 +422,72 @@ const workflow = [
   }
 
   .capability-card,
+  .visual-card,
   .workflow-card {
     padding: 1.65rem;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
+  }
+
+  .visual-card {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .visual-frame {
+    aspect-ratio: 16 / 10;
+    border-radius: 22px;
+    border: 1px dashed rgba(27, 27, 27, 0.18);
+    background:
+      linear-gradient(135deg, rgba(19, 19, 19, 0.88) 0%, rgba(61, 89, 94, 0.88) 100%),
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.28), transparent 34%);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  .visual-frame span,
+  .visual-tag {
+    display: inline-flex;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tiffany-dark);
+  }
+
+  .visual-frame span {
+    color: rgba(255, 255, 255, 0.64);
+  }
+
+  .visual-frame strong {
+    display: block;
+    margin-top: 0.85rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.14em;
+    font-weight: 500;
+  }
+
+  .visual-copy h3 {
+    margin: 0.55rem 0 0;
+    font-size: 1.18rem;
+    color: var(--gray-darkest);
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+  }
+
+  .visual-copy p {
+    margin: 0.75rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
+  .visual-copy small {
+    display: inline-block;
+    margin-top: 0.9rem;
+    color: var(--tiffany-dark);
+    letter-spacing: 0.03em;
   }
 
   .capability-label,
@@ -449,6 +576,7 @@ const workflow = [
     .smart-home-shell,
     .positioning-shell,
     .capability-grid,
+    .visual-grid,
     .workflow-grid,
     .cta-shell {
       grid-template-columns: 1fr;
@@ -462,6 +590,7 @@ const workflow = [
   @media (max-width: 768px) {
     .smart-home-hero,
     .capability-section,
+    .visual-section,
     .positioning-section,
     .workflow-section,
     .cta-section {
@@ -489,6 +618,7 @@ const workflow = [
 
     .hero-intro,
     .capability-card p,
+    .visual-copy p,
     .positioning-card p,
     .workflow-card p,
     .cta-shell p,
@@ -513,6 +643,7 @@ const workflow = [
 
     .hero-panel,
     .capability-card,
+    .visual-card,
     .workflow-card,
     .positioning-card,
     .cta-shell {
@@ -538,16 +669,22 @@ const workflow = [
     }
 
     .capability-grid,
+    .visual-grid,
     .workflow-grid,
     .positioning-shell {
       gap: 1rem;
     }
 
     .capability-card h3,
+    .visual-copy h3,
     .workflow-card h3 {
       margin-top: 0.7rem;
       font-size: 1.08rem;
       line-height: 1.48;
+    }
+
+    .visual-frame {
+      border-radius: 18px;
     }
 
     .hero-panel ul,
