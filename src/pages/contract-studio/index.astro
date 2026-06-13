@@ -82,8 +82,8 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
                 <input data-field="clientEmail" type="email" placeholder="例如：client@example.com" />
               </label>
               <label class="field">
-                <span>身分證末四碼 / 統編後四碼</span>
-                <input data-field="clientIdentityCode" type="text" placeholder="例如：1234" />
+                <span>身分證字號 / 居留證號 / 統編</span>
+                <input data-field="clientIdentityCode" type="text" placeholder="例如：A123456789 / 12345678" />
               </label>
               <label class="field">
                 <span>指定專案代理人</span>
@@ -92,6 +92,18 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
               <label class="field">
                 <span>代理人關係 / 權限</span>
                 <input data-field="projectAgentRole" type="text" placeholder="例如：配偶，現場確認與材料回覆視同業主確認" />
+              </label>
+              <label class="field">
+                <span>緊急聯絡人姓名</span>
+                <input data-field="emergencyContactName" type="text" placeholder="例如：王先生" />
+              </label>
+              <label class="field">
+                <span>緊急聯絡人關係</span>
+                <input data-field="emergencyContactRelation" type="text" placeholder="例如：配偶 / 家人 / 公司窗口" />
+              </label>
+              <label class="field">
+                <span>緊急聯絡人電話</span>
+                <input data-field="emergencyContactPhone" type="text" placeholder="例如：09xx-xxx-xxx" />
               </label>
               <label class="field">
                 <span>案件名稱</span>
@@ -111,7 +123,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
               </label>
               <label class="field">
                 <span>中期款查驗里程碑</span>
-                <input data-field="midpointMilestone" type="text" placeholder="例如：管線配置完成 / 泥作打底完成" />
+                <input data-field="midpointMilestone" type="text" placeholder="例如：水電管線配置完成" />
               </label>
               <label class="field">
                 <span>合約總額</span>
@@ -165,12 +177,12 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
                 <input data-field="settlementMethod" type="text" placeholder="例如：依原報價單單價與完成比例結算" />
               </label>
               <label class="field">
-                <span>退款帳戶戶名</span>
-                <input data-field="refundAccountName" type="text" placeholder="例如：王小姐本人帳戶" />
+                <span>退款帳戶戶名（限合約當事人本人）</span>
+                <input data-field="refundAccountName" type="text" placeholder="例如：王小明" />
               </label>
               <label class="field">
                 <span>退款 / 結算指定帳戶</span>
-                <input data-field="refundAccount" type="text" placeholder="例如：王小姐 / 銀行代碼 000 / 帳號末五碼 12345" />
+                <input data-field="refundAccount" type="text" placeholder="例如：台灣銀行 004 / 帳號末五碼 12345" />
               </label>
               <label class="field field-full">
                 <span>合約摘要</span>
@@ -210,7 +222,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>簽署與留證設定</h2>
-              <p>目前可整理線上簽署內容、手機手寫簽名與簽署摘要留證；若案件需要更高證據力，再補 OTP 與存證機制即可。</p>
+              <p>目前可整理線上簽署內容、手機手寫簽名與簽署摘要留證；若案件需要更高證據力，可再補 OTP 與額外存證機制。</p>
             </div>
             <label class="field field-full">
               <span>簽署完成提醒</span>
@@ -320,6 +332,14 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       .replaceAll("正式副本", "定稿副本")
       .replaceAll("第三方電子簽署", "外部簽署服務")
       .replaceAll("法院認證版本", "高證據力版本")
+      .replaceAll("身分證末四碼 / 統編後四碼", "身分證字號 / 居留證號 / 統編")
+      .replaceAll("本人名義帳戶為原則", "限以合約當事人本人名義帳戶為準")
+      .replaceAll(
+        "若附件採雲端共用文件協作，亦應以簽署日當天匯出之靜態檔案或載明之明確版次為準。",
+        "附件應於簽署當下固定為 PDF 或其他不可任意改寫之靜態檔案；簽署後如需調整，應以新版附件或追加減確認文件重新確認。",
+      )
+      .replaceAll("原則上得依原報價單單價、已完成比例與已發生成本計算；", "結算應依原報價單單價、已完成比例與已發生成本計算；")
+      .replaceAll("尾款未清前原則上不得", "尾款未清前不得")
       .replaceAll("MVP", "目前版本");
   }
 
@@ -378,10 +398,13 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         contractSummary:
           "本案依雙方已確認之需求、報價單與材料方向進行裝修工程施作，詳細內容以本合約與附件共同構成。",
         signNotice:
-          "簽署完成後，雙方請立即列印或另存 PDF 留存；後續若有追加減，將另附確認單共同簽認。",
+          "簽署完成後，雙方請立即列印或另存定稿 PDF 留存；後續若有追加減，將另附確認單共同簽認。",
         clientIdentityCode: "",
+        emergencyContactName: "",
+        emergencyContactRelation: "",
+        emergencyContactPhone: "",
         attachmentVersion: "",
-        midpointMilestone: "管線配置完成 / 泥作打底完成",
+        midpointMilestone: "",
         generalWarrantyYears: "1 年",
         waterproofWarrantyYears: "3 年",
         notificationChannel: "Email 與 LINE",
@@ -571,10 +594,11 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       "3.5. 哪些句子仍保留內部起草語氣，例如「建議明列」、「可再補」、「依案件調整」、「預設」、「目前版本」等，不適合直接出現在客戶簽署頁",
       "4. 這套合約簽署模組目前版本的可用度評分（滿分 10 分）",
       "5. 若要再升級成更高證據力的簽署流程，最優先應補哪些機制",
-      "6. 請特別檢查：違約金預設值、終止結算標準、中期款里程碑、附件版次與退款帳戶是否足夠實務",
+      "6. 請特別檢查：違約金預設值、終止結算標準、中期款里程碑、附件版次、退款帳戶與緊急聯絡人是否足夠實務",
       "7. 請一起檢查材料規格確認表是否足以作為本案附件，哪些欄位仍可能造成品牌、等級、顏色、五金或清潔交付標準的爭議",
       "8. 請特別檢查：尾款未清前先入住、先行使用、分區點交與保固起算的風險是否已被清楚處理",
       "9. 請特別檢查：個人承攬適用範圍、需切換合法專業單位承接時的條款與責任界線是否清楚，避免誤寫成已承諾特定建築師或立案業者一定承接",
+      "10. 請特別檢查：附件是否已明確要求於簽署當下定稿為靜態檔案，以及涉及法定程序之工項是否已清楚寫明由適格專業單位直接締約、請款或開立發票",
       "",
       "【合約基本資訊】",
       `- 合約標題：${payload.meta.contractTitle || "未填寫"}`,
@@ -582,6 +606,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       `- 客戶姓名：${payload.meta.clientName || "未填寫"}`,
       `- 身分識別：${payload.meta.clientIdentityCode || "未填寫"}`,
       `- 指定代理人：${payload.meta.projectAgentName || "未填寫"} / ${payload.meta.projectAgentRole || "未填寫"}`,
+      `- 緊急聯絡人：${payload.meta.emergencyContactName || "未填寫"} / ${payload.meta.emergencyContactRelation || "未填寫"} / ${payload.meta.emergencyContactPhone || "未填寫"}`,
       `- 案件名稱：${payload.meta.projectName || "未填寫"}`,
       `- 案件地址：${payload.meta.projectAddress || "未填寫"}`,
       `- 參照附件：${payload.meta.referenceLabel || "未填寫"}`,
@@ -606,7 +631,6 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       "",
       "【付款節點】",
       paymentLines || "- 未填寫",
-      "- 提醒：中期款是否合理，應以『查驗里程碑是否具體』為主，而不只看比例本身。",
       "",
       "【核心條款】",
       sectionLines || "- 未填寫",
@@ -617,7 +641,8 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       "【客戶簽署前確認】",
       checklistLines || "- 未填寫",
       "",
-      "【目前簽署模組特性】",
+      "【留證與驗證現況】",
+      "- 以下為供覆核使用的系統現況說明，非客戶簽署頁文案",
       "- 客戶可於手機或平板手寫簽名",
       "- 簽署頁可列印或另存 PDF",
       "- 目前會留存簽署姓名、電話、Email、身分、簽署時間、語系、時區、裝置摘要與簽名圖像",
@@ -765,6 +790,10 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         <strong>${state.meta.refundAccount && state.meta.refundAccountName ? "已填寫" : "未填寫"}</strong>
       </div>
       <div class="summary-row">
+        <span>緊急聯絡人</span>
+        <strong>${state.meta.emergencyContactName && state.meta.emergencyContactPhone ? "已填寫" : "未填寫"}</strong>
+      </div>
+      <div class="summary-row">
         <span>先入住風險條款</span>
         <strong>已納入</strong>
       </div>
@@ -773,7 +802,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         <strong>${state.meta.projectAgentName || "未填寫"}</strong>
       </div>
       <p class="summary-note">
-        若付款比例未滿 100%，或身分識別、退款帳戶、材料規格仍未補齊，簽署頁雖可開啟，但建議先補正後再分享給客戶。
+        若付款比例未滿 100%，或完整身分識別、緊急聯絡人、退款帳戶、附件版次與材料規格仍未補齊，簽署頁雖可開啟，但建議先補正後再分享給客戶。
       </p>
     `;
   }

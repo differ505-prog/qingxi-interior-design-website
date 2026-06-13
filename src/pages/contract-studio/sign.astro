@@ -81,8 +81,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   <input id="signer-email" type="email" placeholder="例如：client@example.com" />
                 </label>
                 <label class="field">
-                  <span>身分證末四碼 / 統編後四碼</span>
-                  <input id="signer-identity-code" type="text" placeholder="例如：1234" />
+                  <span>身分證字號 / 居留證號 / 統編</span>
+                  <input id="signer-identity-code" type="text" placeholder="例如：A123456789 / 12345678" />
                 </label>
                 <label class="field">
                   <span>簽署身分</span>
@@ -90,7 +90,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 </label>
               </div>
               <p class="signature-note">
-                簽署頁會先帶入合約中的客戶資料；請確認姓名、聯絡方式、身分識別、勾選確認項目並完成手寫簽名後再送出。
+                簽署頁會先帶入合約中的客戶資料；請確認姓名、聯絡方式、完整身分識別、勾選確認項目並完成手寫簽名後再送出。
               </p>
               <div id="signing-status" class="signing-status" aria-live="polite"></div>
 
@@ -114,7 +114,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             <aside class="signature-side-card">
               <h4>此版簽署留證包含</h4>
               <ul>
-                <li>簽署姓名、電話、Email 與身分欄位</li>
+                <li>簽署姓名、電話、Email 與完整身分識別</li>
                 <li>簽署時間、語系、時區與裝置資訊摘要</li>
                 <li>手寫簽名圖像與合約編號摘要</li>
                 <li>提前入住、分區點交與保固起算條款</li>
@@ -189,6 +189,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       .replaceAll("正式副本", "定稿副本")
       .replaceAll("第三方電子簽署", "外部簽署服務")
       .replaceAll("法院認證版本", "高證據力版本")
+      .replaceAll("身分證末四碼 / 統編後四碼", "身分證字號 / 居留證號 / 統編")
+      .replaceAll("本人名義帳戶為原則", "限以合約當事人本人名義帳戶為準")
+      .replaceAll(
+        "若附件採雲端共用文件協作，亦應以簽署日當天匯出之靜態檔案或載明之明確版次為準。",
+        "附件應於簽署當下固定為 PDF 或其他不可任意改寫之靜態檔案；簽署後如需調整，應以新版附件或追加減確認文件重新確認。",
+      )
+      .replaceAll("原則上得依原報價單單價、已完成比例與已發生成本計算；", "結算應依原報價單單價、已完成比例與已發生成本計算；")
+      .replaceAll("尾款未清前原則上不得", "尾款未清前不得")
       .replaceAll("MVP", "目前版本");
   }
 
@@ -261,6 +269,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       ["身分識別", meta.clientIdentityCode || "未填寫"],
       ["指定代理人", meta.projectAgentName || "未填寫"],
       ["代理人關係 / 權限", meta.projectAgentRole || "未填寫"],
+      ["緊急聯絡人", meta.emergencyContactName || "未填寫"],
+      ["緊急聯絡人關係", meta.emergencyContactRelation || "未填寫"],
+      ["緊急聯絡人電話", meta.emergencyContactPhone || "未填寫"],
       ["聯絡電話", meta.clientPhone || "未填寫"],
       ["Email", meta.clientEmail || "未填寫"],
       ["案件名稱", meta.projectName || "未填寫"],
