@@ -39,7 +39,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <button type="button" id="copy-contract-llm-review" class="btn btn-secondary">複製 LLM 合約覆核文字</button>
           <button type="button" id="reset-contract" class="btn btn-secondary btn-muted">重設本次合約</button>
         </div>
-        <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；若已接上 Vercel KV，分享會優先產生短簽約連結，未接上時則自動退回內嵌長連結。</p>
+        <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；若已接上 Vercel KV，分享會優先產生短簽約連結，客戶完成簽署後，你可用同一份短連結重新開啟查看已簽內容。未接上時則自動退回內嵌長連結，且簽署紀錄只會保存在客戶當下裝置。</p>
         <div id="share-link-status" class:list={["share-link-status", shortLinkStorageConfigured ? "is-ready" : "is-warning"]}>
           <strong>{shortLinkStorageConfigured ? "短簽約連結已啟用" : "短簽約連結尚未啟用"}</strong>
           <p id="share-link-status-note">

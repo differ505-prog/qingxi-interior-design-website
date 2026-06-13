@@ -92,6 +92,35 @@ export async function getSharedContractPayload(token: string) {
   return JSON.parse(String(raw));
 }
 
+export async function saveSignedContractRecord(token: string, signedRecord: unknown) {
+  if (!isContractLinkStorageConfigured()) {
+    return null;
+  }
+
+  const storageKey = buildStorageKey(token);
+  const raw = await runKvCommand(["GET", storageKey]);
+  if (!raw) {
+    return null;
+  }
+
+  const existingRecord = JSON.parse(String(raw));
+  const nextRecord = {
+    ...existingRecord,
+    signedRecord,
+    signedRecordUpdatedAt: new Date().toISOString(),
+  };
+
+  const result = await runKvCommand([
+    "SET",
+    storageKey,
+    JSON.stringify(nextRecord),
+    "EX",
+    CONTRACT_LINK_TTL_SECONDS,
+  ]);
+
+  return result === "OK" ? nextRecord : null;
+}
+
 export function encodeContractPayload(payload: unknown) {
   return Buffer.from(JSON.stringify(payload), "utf-8").toString("base64");
 }

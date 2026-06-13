@@ -118,7 +118,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 <li>簽署時間、語系、時區與裝置資訊摘要</li>
                 <li>手寫簽名圖像與合約編號摘要</li>
                 <li>提前入住、分區點交與保固起算條款</li>
-                <li>簽後列印 / 另存 PDF 與匯出 JSON 留檔</li>
+                <li>簽後列印 / 另存 PDF 與已簽內容留存</li>
               </ul>
               <p>若案件需要更高證據力，可再補 OTP、雙方分流簽署或後台不可竄改存證機制。</p>
             </aside>
@@ -128,18 +128,15 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <section id="signed-record-section" class="document-section signed-record-section" hidden>
           <div class="section-heading">
             <h3>簽署完成紀錄</h3>
-            <p>簽署完成後，建議立即列印或另存 PDF，並匯出 JSON 留檔。</p>
+            <p>簽署完成後，建議立即列印或另存 PDF 留存。</p>
           </div>
+          <p id="signed-record-note" class="signed-record-note"></p>
           <div class="signed-record-grid">
             <div id="signed-record-meta" class="signed-record-meta"></div>
             <div class="signed-record-signature">
               <span>簽名圖像</span>
               <img id="signed-record-image" alt="簽名圖像" />
             </div>
-          </div>
-          <div class="signed-record-actions print-hidden">
-            <button type="button" id="download-audit-json" class="btn btn-secondary">下載簽署紀錄 JSON</button>
-            <button type="button" id="clear-saved-record" class="btn btn-secondary btn-muted">清除此頁簽署紀錄</button>
           </div>
         </section>
       </article>
@@ -498,6 +495,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       return {
         payload: normalizeContractPayload(record.payload),
         contractChecksum: simpleChecksum(token),
+        token,
+        signedRecord: record.signedRecord || null,
       };
     }
 
@@ -509,6 +508,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     return {
       payload: normalizeContractPayload(decodePayload(encodedPayload)),
       contractChecksum: simpleChecksum(encodedPayload),
+      token: "",
+      signedRecord: null,
     };
   }
 
@@ -524,8 +525,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         return;
       }
 
-      const { payload, contractChecksum } = resolved;
-    const storageKey = getAuditStorageKey(contractChecksum);
+      const { payload, contractChecksum, token, signedRecord: remoteSignedRecord } = resolved;
+      const storageKey = getAuditStorageKey(contractChecksum);
 
       signEmpty.hidden = true;
       contractDocument.hidden = false;
@@ -561,22 +562,47 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         localStorage.setItem(storageKey, JSON.stringify(record));
       }
 
-      function exportAuditJson() {
-        const savedRecord = loadSavedRecord();
-        if (!savedRecord) return;
+      async function persistSignedRecord(record) {
+        saveSignedRecord(record);
 
-        const blob = new Blob([JSON.stringify(savedRecord, null, 2)], { type: "application/json" });
-        const objectUrl = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = objectUrl;
-        link.download = `${savedRecord.contractNumber || "contract-signature"}.json`;
-        link.click();
-        URL.revokeObjectURL(objectUrl);
+        if (!token) {
+          return { savedToServer: false };
+        }
+
+        const response = await fetch(`/api/contracts/${encodeURIComponent(token)}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            signedRecord: record,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to save signed record with status ${response.status}`);
+        }
+
+        return { savedToServer: true };
       }
 
-      const existingRecord = loadSavedRecord();
+      function renderSignedRecordNote(savedToServer) {
+        const note = document.getElementById("signed-record-note");
+        if (!note) return;
+
+        if (savedToServer) {
+          note.textContent = "這份已簽內容已同步留存，青曦可用同一份簽約連結重新查看。";
+          return;
+        }
+
+        note.textContent = "這份已簽內容目前保存在此裝置，請立即列印或另存 PDF 留存。";
+      }
+
+      const existingRecord = remoteSignedRecord || loadSavedRecord();
       if (existingRecord) {
+        saveSignedRecord(existingRecord);
         renderSignedRecord(existingRecord);
+        renderSignedRecordNote(Boolean(token && remoteSignedRecord));
         signerNameInput.value = existingRecord.signerName || "";
         signerPhoneInput.value = existingRecord.signerPhone || "";
         signerEmailInput.value = existingRecord.signerEmail || "";
@@ -644,7 +670,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       padState.canvas.addEventListener("pointerleave", updateSigningStatus);
       updateSigningStatus();
 
-      document.getElementById("submit-signature").addEventListener("click", () => {
+      document.getElementById("submit-signature").addEventListener("click", async () => {
         const signerName = signerNameInput.value.trim();
         const signerPhone = signerPhoneInput.value.trim();
         const signerEmail = signerEmailInput.value.trim();
@@ -694,18 +720,20 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           materialSpecs: payload.materialSpecs,
         };
 
-        saveSignedRecord(signedRecord);
-        renderSignedRecord(signedRecord);
-        submitMessage.textContent = "已完成簽署，建議立即列印或另存 PDF。";
-        updateSigningStatus();
-      });
-
-      document.getElementById("download-audit-json").addEventListener("click", exportAuditJson);
-
-      document.getElementById("clear-saved-record").addEventListener("click", () => {
-        localStorage.removeItem(storageKey);
-        document.getElementById("signed-record-section").hidden = true;
-        submitMessage.textContent = "已清除此頁簽署紀錄。";
+        try {
+          const result = await persistSignedRecord(signedRecord);
+          renderSignedRecord(signedRecord);
+          renderSignedRecordNote(result.savedToServer);
+          submitMessage.textContent = result.savedToServer
+            ? "已完成簽署，建議立即列印或另存 PDF；青曦也可用同一份連結查看已簽內容。"
+            : "已完成簽署，建議立即列印或另存 PDF。";
+          updateSigningStatus();
+        } catch (error) {
+          console.error("儲存簽署紀錄失敗：", error);
+          renderSignedRecord(signedRecord);
+          renderSignedRecordNote(false);
+          submitMessage.textContent = "已完成簽署，請立即列印或另存 PDF；目前留存同步失敗，請通知青曦確認。";
+        }
       });
 
       document.getElementById("print-contract").addEventListener("click", () => {
