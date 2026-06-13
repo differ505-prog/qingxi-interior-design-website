@@ -53,6 +53,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
         <section class="document-section">
           <div class="section-heading">
+            <h3>材料規格確認表</h3>
+            <p>以下為本案目前作為正式報價附件的材料與交付標準基準，簽署前請一併確認。</p>
+          </div>
+          <div id="material-spec-list" class="section-list"></div>
+        </section>
+
+        <section class="document-section">
+          <div class="section-heading">
             <h3>簽署確認</h3>
             <p>請確認基本資料與勾選內容後，再用手機或平板手寫簽名。</p>
           </div>
@@ -190,6 +198,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       ["合約編號", meta.contractNumber || "未填寫"],
       ["客戶", meta.clientName || "未填寫"],
       ["身分識別", meta.clientIdentityCode || "未填寫"],
+      ["指定代理人", meta.projectAgentName || "未填寫"],
+      ["代理人關係 / 權限", meta.projectAgentRole || "未填寫"],
       ["聯絡電話", meta.clientPhone || "未填寫"],
       ["Email", meta.clientEmail || "未填寫"],
       ["案件名稱", meta.projectName || "未填寫"],
@@ -209,6 +219,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       ["逾期違約金", meta.delayPenaltyRate || "未填寫"],
       ["違約金上限", meta.delayPenaltyCap || "未填寫"],
       ["終止結算標準", meta.settlementMethod || "未填寫"],
+      ["退款帳戶戶名", meta.refundAccountName || "未填寫"],
       ["退款 / 結算指定帳戶", meta.refundAccount || "未填寫"],
     ];
 
@@ -250,6 +261,25 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           <article class="contract-copy-card">
             <h4>${escapeHtml(section.title)}</h4>
             <p>${escapeHtml(section.body).replace(/\n/g, "<br />")}</p>
+          </article>
+        `,
+      )
+      .join("");
+  }
+
+  function renderMaterialSpecs(materialSpecs) {
+    document.getElementById("material-spec-list").innerHTML = materialSpecs
+      .map(
+        (section) => `
+          <article class="contract-copy-card">
+            <h4>${escapeHtml(section.title)}</h4>
+            <p>${escapeHtml(section.description || "")}</p>
+            <div class="spec-copy-grid">
+              <div class="spec-copy-item"><span>基準 / 做法</span><strong>${escapeHtml(section.baseline || "未填寫")}</strong></div>
+              <div class="spec-copy-item"><span>品牌 / 型號 / 等級</span><strong>${escapeHtml(section.selection || "未填寫")}</strong></div>
+              <div class="spec-copy-item"><span>顏色 / 完成面 / 範圍</span><strong>${escapeHtml(section.finishScope || "未填寫")}</strong></div>
+              <div class="spec-copy-item"><span>補充說明</span><strong>${escapeHtml(section.note || "未填寫")}</strong></div>
+            </div>
           </article>
         `,
       )
@@ -367,6 +397,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     renderMeta(payload.meta);
     renderPaymentStages(payload.paymentStages || []);
     renderSections(payload.sections || []);
+    renderMaterialSpecs(payload.materialSpecs || []);
     renderChecklist(payload.checklist || []);
 
     const padState = setupSignatureCanvas();
@@ -472,6 +503,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         contractMeta: payload.meta,
         paymentStages: payload.paymentStages,
         sections: payload.sections,
+        materialSpecs: payload.materialSpecs,
       };
 
       saveSignedRecord(signedRecord);
@@ -614,6 +646,25 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .contract-copy-card h4,
   .signature-side-card h4 {
     margin: 0 0 0.4rem;
+  }
+
+  .spec-copy-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+  }
+
+  .spec-copy-item {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .spec-copy-item span {
+    color: rgba(64, 44, 30, 0.62);
+    font-size: 0.92rem;
   }
 
   .payment-stage-amounts {

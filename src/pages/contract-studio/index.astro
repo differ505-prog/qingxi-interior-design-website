@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {
   contractDefaultChecklist,
+  contractDefaultMaterialSpecs,
   contractDefaultPaymentStages,
   contractDefaultSections,
 } from "../../lib/contract-studio";
@@ -9,6 +10,7 @@ import {
 const contractDefaultPaymentStagesJson = JSON.stringify(contractDefaultPaymentStages);
 const contractDefaultSectionsJson = JSON.stringify(contractDefaultSections);
 const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
+const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialSpecs);
 ---
 
 <BaseLayout
@@ -68,6 +70,14 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
               <label class="field">
                 <span>身分證末四碼 / 統編後四碼</span>
                 <input data-field="clientIdentityCode" type="text" placeholder="例如：1234" />
+              </label>
+              <label class="field">
+                <span>指定專案代理人</span>
+                <input data-field="projectAgentName" type="text" placeholder="例如：王太太 / 家人 / 代理窗口" />
+              </label>
+              <label class="field">
+                <span>代理人關係 / 權限</span>
+                <input data-field="projectAgentRole" type="text" placeholder="例如：配偶，現場確認與材料回覆視同業主確認" />
               </label>
               <label class="field">
                 <span>案件名稱</span>
@@ -141,6 +151,10 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
                 <input data-field="settlementMethod" type="text" placeholder="例如：依原報價單單價與完成比例結算" />
               </label>
               <label class="field">
+                <span>退款帳戶戶名</span>
+                <input data-field="refundAccountName" type="text" placeholder="例如：王小姐本人帳戶" />
+              </label>
+              <label class="field">
                 <span>退款 / 結算指定帳戶</span>
                 <input data-field="refundAccount" type="text" placeholder="例如：王小姐 / 銀行代碼 000 / 帳號末五碼 12345" />
               </label>
@@ -169,6 +183,14 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
               <p>先用正式合約最常用的五段骨架，再依案件需要微調。</p>
             </div>
             <div id="contract-section-list" class="contract-section-list"></div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>材料規格確認表</h2>
+              <p>把正式報價最容易吵的板材、五金、磁磚、玻璃、衛浴與清潔交付標準先鎖在同一份附件裡。</p>
+            </div>
+            <div id="material-spec-list" class="material-spec-list"></div>
           </section>
 
           <section class="studio-card">
@@ -234,13 +256,15 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
     contractDefaultPaymentStagesJson,
     contractDefaultSectionsJson,
     contractDefaultChecklistJson,
+    contractDefaultMaterialSpecsJson,
   }}
 >
   // @ts-nocheck
   const paymentStageTemplate = JSON.parse(contractDefaultPaymentStagesJson);
   const contractSectionTemplate = JSON.parse(contractDefaultSectionsJson);
   const contractChecklist = JSON.parse(contractDefaultChecklistJson);
-  const draftKey = "qingxi-contract-studio-draft-v1";
+  const materialSpecTemplate = JSON.parse(contractDefaultMaterialSpecsJson);
+  const draftKey = "qingxi-contract-studio-draft-v2";
 
   function buildDefaultContractNumber() {
     const now = new Date();
@@ -276,6 +300,8 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
         clientName: "",
         clientPhone: "",
         clientEmail: "",
+        projectAgentName: "",
+        projectAgentRole: "",
         projectName: "",
         projectAddress: "",
         referenceLabel: "",
@@ -298,10 +324,12 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
         delayPenaltyRate: "千分之一 / 日",
         delayPenaltyCap: "合約總額 10%",
         settlementMethod: "依原報價單單價、已完成比例與已發生成本結算；必要時由第三方專業單位協助認定。",
+        refundAccountName: "",
         refundAccount: "",
       },
       paymentStages: paymentStageTemplate.map((stage) => ({ ...stage })),
       sections: contractSectionTemplate.map((section) => ({ ...section })),
+      materialSpecs: materialSpecTemplate.map((section) => ({ ...section })),
     };
   }
 
@@ -324,6 +352,9 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
         sections: Array.isArray(parsed.sections) && parsed.sections.length
           ? parsed.sections
           : state.sections,
+        materialSpecs: Array.isArray(parsed.materialSpecs) && parsed.materialSpecs.length
+          ? parsed.materialSpecs
+          : state.materialSpecs,
       };
     } catch (error) {
       console.error("無法讀取合約草稿：", error);
@@ -351,6 +382,7 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       },
       paymentStages,
       sections: state.sections,
+      materialSpecs: state.materialSpecs,
       checklist: contractChecklist,
       generatedAt: new Date().toISOString(),
       source: "qingxi-contract-studio",
@@ -373,6 +405,12 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
     const sectionLines = payload.sections
       .map((section) => `- ${section.title}：${section.body || "未填寫"}`)
       .join("\n");
+    const materialSpecLines = (payload.materialSpecs || [])
+      .map(
+        (section) =>
+          `- [${section.title}] 基準：${section.baseline || "未填寫"}；品牌/型號/等級：${section.selection || "未填寫"}；顏色/完成面/範圍：${section.finishScope || "未填寫"}；補充：${section.note || "未填寫"}`,
+      )
+      .join("\n");
     const checklistLines = payload.checklist.map((item) => `- ${item}`).join("\n");
 
     return [
@@ -388,12 +426,14 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       "4. 這套合約簽署模組以『MVP 可用度』為基準的成熟度評分（滿分 10 分）",
       "5. 若要再升級成更正式的電子簽署流程，最優先應補哪些機制",
       "6. 請特別檢查：違約金預設值、終止結算標準、中期款里程碑、附件版次與退款帳戶是否足夠實務",
+      "7. 請一起檢查材料規格確認表是否足以作為正式報價附件，哪些欄位仍可能造成品牌、等級、顏色、五金或清潔交付標準的爭議",
       "",
       "【合約基本資訊】",
       `- 合約標題：${payload.meta.contractTitle || "未填寫"}`,
       `- 合約編號：${payload.meta.contractNumber || "未填寫"}`,
       `- 客戶姓名：${payload.meta.clientName || "未填寫"}`,
       `- 身分識別：${payload.meta.clientIdentityCode || "未填寫"}`,
+      `- 指定代理人：${payload.meta.projectAgentName || "未填寫"} / ${payload.meta.projectAgentRole || "未填寫"}`,
       `- 案件名稱：${payload.meta.projectName || "未填寫"}`,
       `- 案件地址：${payload.meta.projectAddress || "未填寫"}`,
       `- 參照附件：${payload.meta.referenceLabel || "未填寫"}`,
@@ -409,6 +449,7 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       `- 爭議處理：${payload.meta.disputeVenue || "未填寫"}`,
       `- 逾期違約金：${payload.meta.delayPenaltyRate || "未填寫"}；上限：${payload.meta.delayPenaltyCap || "未填寫"}`,
       `- 終止結算標準：${payload.meta.settlementMethod || "未填寫"}`,
+      `- 退款帳戶戶名：${payload.meta.refundAccountName || "未填寫"}`,
       `- 退款 / 結算指定帳戶：${payload.meta.refundAccount || "未填寫"}`,
       `- 合約摘要：${payload.meta.contractSummary || "未填寫"}`,
       `- 簽署完成提醒：${payload.meta.signNotice || "未填寫"}`,
@@ -419,6 +460,9 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       "",
       "【核心條款】",
       sectionLines || "- 未填寫",
+      "",
+      "【材料規格確認表】",
+      materialSpecLines || "- 未填寫",
       "",
       "【客戶簽署前確認】",
       checklistLines || "- 未填寫",
@@ -483,6 +527,41 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       .join("");
   }
 
+  function renderMaterialSpecs() {
+    document.getElementById("material-spec-list").innerHTML = state.materialSpecs
+      .map(
+        (section) => `
+          <article class="material-spec-card">
+            <div class="material-spec-header">
+              <div>
+                <h3>${section.title}</h3>
+                <p>${section.description || ""}</p>
+              </div>
+            </div>
+            <div class="form-grid">
+              <label class="field">
+                <span>基準 / 做法</span>
+                <textarea data-material-id="${section.id}" data-material-field="baseline" rows="3">${section.baseline || ""}</textarea>
+              </label>
+              <label class="field">
+                <span>品牌 / 型號 / 等級</span>
+                <textarea data-material-id="${section.id}" data-material-field="selection" rows="3">${section.selection || ""}</textarea>
+              </label>
+              <label class="field">
+                <span>顏色 / 完成面 / 範圍</span>
+                <textarea data-material-id="${section.id}" data-material-field="finishScope" rows="3">${section.finishScope || ""}</textarea>
+              </label>
+              <label class="field">
+                <span>補充說明</span>
+                <textarea data-material-id="${section.id}" data-material-field="note" rows="3">${section.note || ""}</textarea>
+              </label>
+            </div>
+          </article>
+        `,
+      )
+      .join("");
+  }
+
   function renderChecklist() {
     document.getElementById("checklist-list").innerHTML = contractChecklist
       .map((item) => `<li>${item}</li>`)
@@ -507,6 +586,10 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
         <strong>${state.sections.length} 段</strong>
       </div>
       <div class="summary-row">
+        <span>材料規格附件</span>
+        <strong>${state.materialSpecs.length} 區塊</strong>
+      </div>
+      <div class="summary-row">
         <span>一般 / 防水保固</span>
         <strong>${state.meta.generalWarrantyYears || "未填寫"} / ${state.meta.waterproofWarrantyYears || "未填寫"}</strong>
       </div>
@@ -528,10 +611,14 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       </div>
       <div class="summary-row">
         <span>退款帳戶</span>
-        <strong>${state.meta.refundAccount ? "已填寫" : "未填寫"}</strong>
+        <strong>${state.meta.refundAccount && state.meta.refundAccountName ? "已填寫" : "未填寫"}</strong>
+      </div>
+      <div class="summary-row">
+        <span>指定代理人</span>
+        <strong>${state.meta.projectAgentName || "未填寫"}</strong>
       </div>
       <p class="summary-note">
-        若付款比例未滿 100%，或身分識別、退款帳戶仍未填，簽署頁雖可開啟，但建議先補正後再分享給客戶。
+        若付款比例未滿 100%，或身分識別、退款帳戶、材料規格仍未補齊，簽署頁雖可開啟，但建議先補正後再分享給客戶。
       </p>
     `;
   }
@@ -557,6 +644,7 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
     syncMetaInputs();
     renderPaymentStages();
     renderSections();
+    renderMaterialSpecs();
     renderChecklist();
     renderSummary();
     renderLlmReviewOutput();
@@ -612,6 +700,17 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
     if (target.dataset.sectionId) {
       state.sections = state.sections.map((section) =>
         section.id === target.dataset.sectionId ? { ...section, body: target.value } : section,
+      );
+      saveDraft();
+      renderSummary();
+      renderLlmReviewOutput();
+      syncActions();
+      return;
+    }
+
+    if (target.dataset.materialId && target.dataset.materialField) {
+      state.materialSpecs = state.materialSpecs.map((section) =>
+        section.id === target.dataset.materialId ? { ...section, [target.dataset.materialField]: target.value } : section,
       );
       saveDraft();
       renderSummary();
@@ -796,13 +895,15 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
   }
 
   .payment-stage-list,
-  .contract-section-list {
+  .contract-section-list,
+  .material-spec-list {
     display: grid;
     gap: 1rem;
   }
 
   .payment-stage-card,
   .contract-section-card,
+  .material-spec-card,
   .checklist-shell {
     border: 1px solid rgba(93, 67, 44, 0.1);
     border-radius: 18px;
@@ -815,6 +916,16 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     align-items: start;
+  }
+
+  .material-spec-card {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .material-spec-header p {
+    margin: 0.35rem 0 0;
+    color: rgba(64, 44, 30, 0.72);
   }
 
   .stage-amount {
