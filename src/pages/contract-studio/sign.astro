@@ -92,6 +92,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               <p class="signature-note">
                 簽署頁會先帶入合約中的客戶資料；請確認姓名、聯絡方式、身分識別、勾選確認項目並完成手寫簽名後再送出。
               </p>
+              <div id="signing-status" class="signing-status" aria-live="polite"></div>
 
               <div id="sign-checklist" class="sign-checklist"></div>
 
@@ -389,6 +390,32 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     padState.hasStroke = false;
   }
 
+  function getSigningIssues({ signerName, signerPhone, signerEmail, signerIdentityCode, allChecked, hasSignature }) {
+    const issues = [];
+
+    if (!signerName) {
+      issues.push("請填寫簽署人姓名");
+    }
+
+    if (!signerPhone && !signerEmail) {
+      issues.push("請至少提供電話或 Email 其中一項");
+    }
+
+    if (!signerIdentityCode) {
+      issues.push("請填寫身分識別資訊");
+    }
+
+    if (!allChecked) {
+      issues.push("請勾選所有簽署確認項目");
+    }
+
+    if (!hasSignature) {
+      issues.push("請完成手寫簽名");
+    }
+
+    return issues;
+  }
+
   async function resolveContractPayload() {
     const token = getContractToken();
 
@@ -443,6 +470,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       const padState = setupSignatureCanvas();
       const submitMessage = document.getElementById("submit-message");
+      const signingStatus = document.getElementById("signing-status");
       const signerNameInput = document.getElementById("signer-name");
       const signerPhoneInput = document.getElementById("signer-phone");
       const signerEmailInput = document.getElementById("signer-email");
@@ -498,7 +526,44 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       document.getElementById("clear-signature").addEventListener("click", () => {
         clearCanvas(padState);
         submitMessage.textContent = "";
+        updateSigningStatus();
       });
+
+      function updateSigningStatus() {
+        const checkboxes = [...document.querySelectorAll("[data-check-id]")];
+        const allChecked = checkboxes.every((checkbox) => checkbox.checked);
+        const issues = getSigningIssues({
+          signerName: signerNameInput.value.trim(),
+          signerPhone: signerPhoneInput.value.trim(),
+          signerEmail: signerEmailInput.value.trim(),
+          signerIdentityCode: signerIdentityInput.value.trim(),
+          allChecked,
+          hasSignature: padState.hasStroke,
+        });
+
+        if (!issues.length) {
+          signingStatus.className = "signing-status is-ready";
+          signingStatus.innerHTML = "<strong>目前可簽署</strong><span>資料已齊全，可直接按下「確認並完成簽署」。</span>";
+          return;
+        }
+
+        signingStatus.className = "signing-status is-pending";
+        signingStatus.innerHTML = `
+          <strong>完成簽署前還缺以下項目</strong>
+          <ul>
+            ${issues.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+          </ul>
+        `;
+      }
+
+      [signerNameInput, signerPhoneInput, signerEmailInput, signerIdentityInput, signerRoleInput].forEach((input) => {
+        input.addEventListener("input", updateSigningStatus);
+      });
+
+      document.getElementById("sign-checklist").addEventListener("change", updateSigningStatus);
+      padState.canvas.addEventListener("pointerup", updateSigningStatus);
+      padState.canvas.addEventListener("pointerleave", updateSigningStatus);
+      updateSigningStatus();
 
       document.getElementById("submit-signature").addEventListener("click", () => {
         const signerName = signerNameInput.value.trim();
@@ -508,29 +573,19 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         const signerRole = signerRoleInput.value.trim();
         const checkboxes = [...document.querySelectorAll("[data-check-id]")];
         const allChecked = checkboxes.every((checkbox) => checkbox.checked);
+        const issues = getSigningIssues({
+          signerName,
+          signerPhone,
+          signerEmail,
+          signerIdentityCode,
+          allChecked,
+          hasSignature: padState.hasStroke,
+        });
 
-        if (!signerName) {
-          submitMessage.textContent = "請先填寫簽署人姓名。";
-          return;
-        }
+        updateSigningStatus();
 
-        if (!signerPhone && !signerEmail) {
-          submitMessage.textContent = "請至少提供電話或 Email 其中一項。";
-          return;
-        }
-
-        if (!signerIdentityCode) {
-          submitMessage.textContent = "請填寫身分識別資訊後再簽署。";
-          return;
-        }
-
-        if (!allChecked) {
-          submitMessage.textContent = "請先勾選所有簽署確認項目。";
-          return;
-        }
-
-        if (!padState.hasStroke) {
-          submitMessage.textContent = "請先完成手寫簽名。";
+        if (issues.length) {
+          submitMessage.textContent = issues[0];
           return;
         }
 
@@ -563,6 +618,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         saveSignedRecord(signedRecord);
         renderSignedRecord(signedRecord);
         submitMessage.textContent = "已完成簽署，建議立即列印或另存 PDF。";
+        updateSigningStatus();
       });
 
       document.getElementById("download-audit-json").addEventListener("click", exportAuditJson);
@@ -758,6 +814,38 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .field {
     display: grid;
     gap: 0.45rem;
+  }
+
+  .signing-status {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(93, 67, 44, 0.12);
+  }
+
+  .signing-status strong {
+    color: #5f4230;
+  }
+
+  .signing-status ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: rgba(94, 46, 35, 0.88);
+  }
+
+  .signing-status.is-pending {
+    background: rgba(255, 244, 238, 0.92);
+    border-color: rgba(181, 93, 63, 0.18);
+  }
+
+  .signing-status.is-ready {
+    background: rgba(239, 248, 241, 0.95);
+    border-color: rgba(92, 132, 93, 0.2);
+  }
+
+  .signing-status.is-ready span {
+    color: rgba(39, 86, 51, 0.84);
   }
 
   .field input {
