@@ -39,8 +39,10 @@ const visualPlaceholders = [
   {
     tag: "SCENE 02",
     title: "手機控制畫面",
-    description: "之後可替換為 Home Assistant 儀表板、燈光群組或監控整合截圖。",
-    note: "建議替換：手機操作介面截圖",
+    description: "目前已放入手機控制畫面，可直接呈現 Home Assistant 或智能家居操作介面感。",
+    note: "已套用：手機操作介面截圖",
+    image: "/images/smart-home/mobile-control.jpg",
+    alt: "智能家居手機控制畫面",
   },
   {
     tag: "SCENE 03",
@@ -148,10 +150,16 @@ const workflow = [
         <div class="visual-grid">
           {visualPlaceholders.map((item) => (
             <article class="visual-card">
-              <div class="visual-frame">
-                <span>{item.tag}</span>
-                <strong>IMAGE PLACEHOLDER</strong>
-              </div>
+              {item.image ? (
+                <div class="visual-frame visual-frame-image">
+                  <img src={item.image} alt={item.alt || item.title} loading="lazy" />
+                </div>
+              ) : (
+                <div class="visual-frame">
+                  <span>{item.tag}</span>
+                  <strong>IMAGE PLACEHOLDER</strong>
+                </div>
+              )}
               <div class="visual-copy">
                 <p class="visual-tag">{item.tag}</p>
                 <h3>{item.title}</h3>
@@ -446,6 +454,21 @@ const workflow = [
     padding: 1rem;
     color: rgba(255, 255, 255, 0.9);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
+  .visual-frame-image {
+    padding: 0;
+    overflow: hidden;
+    border-style: solid;
+    border-color: rgba(27, 27, 27, 0.08);
+    background: #dfe6e8;
+  }
+
+  .visual-frame-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   .visual-frame span,
