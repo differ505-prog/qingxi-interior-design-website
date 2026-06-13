@@ -1,0 +1,481 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="已簽合約內容 - 青曦空間設計"
+  description="青曦內部使用的單筆已簽合約內容頁。"
+  noindex={true}
+>
+  <section class="signed-detail-page">
+    <div class="signed-detail-shell">
+      <header class="signed-detail-toolbar print-hidden">
+        <div>
+          <p class="signed-detail-eyebrow">SIGNED CONTRACT DETAIL</p>
+          <h1>已簽合約內容</h1>
+          <p>此頁顯示永久留存的已簽版本與簽名紀錄。</p>
+        </div>
+        <div class="signed-detail-actions">
+          <button type="button" id="print-signed-contract" class="btn btn-primary">列印 / 另存 PDF</button>
+          <a href="/contract-studio/records" class="btn btn-secondary">返回已簽合約</a>
+        </div>
+      </header>
+
+      <div id="signed-detail-empty" class="signed-detail-empty">正在讀取已簽合約...</div>
+
+      <article id="signed-detail-document" class="signed-detail-document" hidden>
+        <header class="signed-document-header">
+          <div>
+            <p class="signed-document-brand">青曦空間設計</p>
+            <h2 id="signed-document-title">已簽合約</h2>
+            <p id="signed-document-summary" class="signed-document-summary"></p>
+          </div>
+          <div id="signed-document-meta" class="signed-document-meta"></div>
+        </header>
+
+        <section class="signed-document-section">
+          <div class="section-heading">
+            <h3>付款節點</h3>
+            <p>以下為簽署當下留存的付款節點內容。</p>
+          </div>
+          <div id="signed-payment-stages" class="signed-payment-stages"></div>
+        </section>
+
+        <section class="signed-document-section">
+          <div class="section-heading">
+            <h3>核心條款</h3>
+            <p>以下為已簽署版本的條款內容。</p>
+          </div>
+          <div id="signed-sections" class="signed-sections"></div>
+        </section>
+
+        <section class="signed-document-section">
+          <div class="section-heading">
+            <h3>材料規格確認表</h3>
+            <p>以下為簽署當下留存的材料規格內容。</p>
+          </div>
+          <div id="signed-material-specs" class="signed-sections"></div>
+        </section>
+
+        <section class="signed-document-section">
+          <div class="section-heading">
+            <h3>簽署完成紀錄</h3>
+            <p>以下為永久留存的簽署人資訊與簽名圖像。</p>
+          </div>
+          <div class="signed-record-grid">
+            <div id="signed-record-meta" class="signed-record-meta"></div>
+            <div class="signed-record-signature">
+              <span>簽名圖像</span>
+              <img id="signed-record-image" alt="簽名圖像" />
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // @ts-nocheck
+  function formatCurrency(value) {
+    return new Intl.NumberFormat("zh-TW", {
+      style: "currency",
+      currency: "TWD",
+      maximumFractionDigits: 0,
+    }).format(Number.isFinite(value) ? value : 0);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function getRecordId() {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    return parts[parts.length - 1] || "";
+  }
+
+  function renderMeta(meta) {
+    const metaShell = document.getElementById("signed-document-meta");
+    if (!metaShell) return;
+
+    const metaItems = [
+      ["合約編號", meta.contractNumber || "未填寫"],
+      ["客戶", meta.clientName || "未填寫"],
+      ["身分識別", meta.clientIdentityCode || "未填寫"],
+      ["戶籍地址", meta.clientRegisteredAddress || "未填寫"],
+      ["通訊地址", meta.clientMailingAddress || "未填寫"],
+      ["聯絡電話", meta.clientPhone || "未填寫"],
+      ["Email", meta.clientEmail || "未填寫"],
+      ["案件名稱", meta.projectName || "未填寫"],
+      ["案件地址", meta.projectAddress || "未填寫"],
+      ["附件版次", meta.attachmentVersion || "未填寫"],
+      ["合約總額", formatCurrency(Number(meta.contractAmount) || 0)],
+      ["中期款里程碑", meta.midpointMilestone || "未填寫"],
+      ["簽約日期", meta.contractDate || "未填寫"],
+      ["約定通知管道", meta.notificationChannel || "未填寫"],
+      ["通知帳號 / 地址", meta.notificationAccount || "未填寫"],
+      ["退款帳戶戶名", meta.refundAccountName || "未填寫"],
+      ["退款 / 結算指定帳戶", meta.refundAccount || "未填寫"],
+    ];
+
+    metaShell.innerHTML = metaItems
+      .map(
+        ([label, value]) => `
+          <div class="meta-item">
+            <span>${escapeHtml(label)}</span>
+            <strong>${escapeHtml(value)}</strong>
+          </div>
+        `,
+      )
+      .join("");
+  }
+
+  function renderPaymentStages(paymentStages) {
+    const shell = document.getElementById("signed-payment-stages");
+    if (!shell) return;
+
+    shell.innerHTML = paymentStages
+      .map(
+        (stage) => `
+          <article class="card-block payment-card">
+            <div>
+              <h4>${escapeHtml(stage.label)}</h4>
+              <p>${escapeHtml(stage.note || "")}</p>
+            </div>
+            <div class="payment-side">
+              <strong>${escapeHtml(String(stage.percent || 0))}%</strong>
+              <span>${formatCurrency(Number(stage.amount) || 0)}</span>
+            </div>
+          </article>
+        `,
+      )
+      .join("");
+  }
+
+  function renderSections(containerId, sections, materialMode = false) {
+    const shell = document.getElementById(containerId);
+    if (!shell) return;
+
+    shell.innerHTML = sections
+      .map((section) => {
+        if (materialMode) {
+          return `
+            <article class="card-block">
+              <h4>${escapeHtml(section.title)}</h4>
+              <p>${escapeHtml(section.description || "")}</p>
+              <div class="spec-grid">
+                <div class="spec-item"><span>基準 / 做法</span><strong>${escapeHtml(section.baseline || "未填寫")}</strong></div>
+                <div class="spec-item"><span>品牌 / 型號 / 等級</span><strong>${escapeHtml(section.selection || "未填寫")}</strong></div>
+                <div class="spec-item"><span>顏色 / 完成面 / 範圍</span><strong>${escapeHtml(section.finishScope || "未填寫")}</strong></div>
+                <div class="spec-item"><span>補充說明</span><strong>${escapeHtml(section.note || "未填寫")}</strong></div>
+              </div>
+            </article>
+          `;
+        }
+
+        return `
+          <article class="card-block">
+            <h4>${escapeHtml(section.title)}</h4>
+            <p>${escapeHtml(section.body || "")}</p>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function renderSignedRecord(record, recordId) {
+    const metaShell = document.getElementById("signed-record-meta");
+    const image = document.getElementById("signed-record-image");
+    if (!metaShell || !(image instanceof HTMLImageElement)) return;
+
+    const metaItems = [
+      ["永久紀錄 ID", recordId || "未填寫"],
+      ["簽署人姓名", record.signerName || "未填寫"],
+      ["聯絡電話", record.signerPhone || "未填寫"],
+      ["Email", record.signerEmail || "未填寫"],
+      ["身分識別", record.signerIdentityCode || "未填寫"],
+      ["簽署身分", record.signerRole || "未填寫"],
+      ["簽署時間", record.signedAtLocal || record.signedAtIso || "未填寫"],
+      ["語系", record.audit?.language || "未填寫"],
+      ["時區", record.audit?.timezone || "未填寫"],
+      ["裝置摘要", record.audit?.platform || "未填寫"],
+      ["來源", record.audit?.source || "未填寫"],
+    ];
+
+    metaShell.innerHTML = metaItems
+      .map(
+        ([label, value]) => `
+          <div class="meta-item">
+            <span>${escapeHtml(label)}</span>
+            <strong>${escapeHtml(value)}</strong>
+          </div>
+        `,
+      )
+      .join("");
+    image.src = record.signatureDataUrl || "";
+  }
+
+  async function bootstrap() {
+    const empty = document.getElementById("signed-detail-empty");
+    const documentShell = document.getElementById("signed-detail-document");
+    const recordId = getRecordId();
+
+    if (!empty || !documentShell) {
+      return;
+    }
+
+    if (!recordId) {
+      empty.textContent = "找不到這筆已簽合約。";
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/contracts/signed/${encodeURIComponent(recordId)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch signed contract with status ${response.status}`);
+      }
+
+      const record = await response.json();
+      const signedRecord = record.signedRecord || {};
+      const contractMeta = signedRecord.contractMeta || record.payload?.meta || {};
+      const title = document.getElementById("signed-document-title");
+      const summary = document.getElementById("signed-document-summary");
+      if (!title || !summary) {
+        throw new Error("Signed contract detail shell is missing.");
+      }
+
+      title.textContent = signedRecord.contractTitle || contractMeta.contractTitle || "已簽合約";
+      summary.textContent = contractMeta.contractSummary || "";
+      renderMeta(contractMeta);
+      renderPaymentStages(signedRecord.paymentStages || []);
+      renderSections("signed-sections", signedRecord.sections || []);
+      renderSections("signed-material-specs", signedRecord.materialSpecs || [], true);
+      renderSignedRecord(signedRecord, record.id);
+
+      empty.hidden = true;
+      documentShell.hidden = false;
+    } catch (error) {
+      console.error("讀取已簽合約內容失敗：", error);
+      empty.textContent = "目前無法讀取這筆已簽合約，請稍後再試。";
+    }
+  }
+
+  const printButton = document.getElementById("print-signed-contract");
+  if (printButton) {
+    printButton.addEventListener("click", () => {
+      window.print();
+    });
+  }
+
+  bootstrap();
+</script>
+
+<style>
+  .signed-detail-page {
+    padding: 8rem 0 5rem;
+    background: linear-gradient(180deg, rgba(246, 242, 236, 0.94), rgba(255, 255, 255, 0.98));
+  }
+
+  .signed-detail-shell {
+    width: min(1100px, calc(100% - 2rem));
+    margin: 0 auto;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .signed-detail-toolbar,
+  .signed-detail-document,
+  .signed-detail-empty {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(60, 37, 22, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 20px 45px rgba(31, 24, 19, 0.08);
+  }
+
+  .signed-detail-toolbar,
+  .signed-document-header,
+  .card-block,
+  .signed-record-meta,
+  .signed-record-signature {
+    padding: 1.25rem;
+  }
+
+  .signed-detail-toolbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .signed-detail-eyebrow,
+  .signed-document-brand {
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    color: #8d6f5c;
+  }
+
+  .signed-detail-toolbar h1,
+  .signed-document-header h2,
+  .section-heading h3,
+  .card-block h4 {
+    margin: 0;
+  }
+
+  .signed-detail-empty {
+    padding: 1.5rem;
+    color: rgba(64, 44, 30, 0.76);
+  }
+
+  .signed-detail-document {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+
+  .signed-document-header {
+    display: grid;
+    gap: 1rem;
+    border: 1px solid rgba(93, 67, 44, 0.1);
+    border-radius: 18px;
+    background: rgba(250, 247, 242, 0.72);
+  }
+
+  .signed-document-summary {
+    margin: 0.75rem 0 0;
+    color: rgba(64, 44, 30, 0.76);
+  }
+
+  .signed-document-meta,
+  .signed-record-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .meta-item,
+  .spec-item {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.85rem 0.95rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .meta-item span,
+  .spec-item span {
+    font-size: 0.9rem;
+    color: rgba(64, 44, 30, 0.62);
+  }
+
+  .signed-document-section {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .section-heading p,
+  .card-block p {
+    margin: 0.4rem 0 0;
+    color: rgba(64, 44, 30, 0.76);
+    white-space: pre-wrap;
+  }
+
+  .signed-payment-stages,
+  .signed-sections {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .card-block {
+    border: 1px solid rgba(93, 67, 44, 0.1);
+    border-radius: 18px;
+    background: rgba(250, 247, 242, 0.72);
+  }
+
+  .payment-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .payment-side {
+    display: grid;
+    justify-items: end;
+    gap: 0.25rem;
+  }
+
+  .spec-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.85rem;
+  }
+
+  .signed-record-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.9fr);
+    gap: 1rem;
+  }
+
+  .signed-record-meta,
+  .signed-record-signature {
+    border: 1px solid rgba(93, 67, 44, 0.1);
+    border-radius: 18px;
+    background: rgba(250, 247, 242, 0.72);
+  }
+
+  .signed-record-signature {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .signed-record-signature img {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(93, 67, 44, 0.12);
+    background: #fff;
+  }
+
+  @media (max-width: 900px) {
+    .signed-detail-toolbar,
+    .payment-card,
+    .signed-record-grid {
+      grid-template-columns: 1fr;
+      display: grid;
+    }
+
+    .signed-document-meta,
+    .signed-record-meta {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media print {
+    .print-hidden {
+      display: none !important;
+    }
+
+    .signed-detail-page {
+      padding: 0;
+      background: #fff;
+    }
+
+    .signed-detail-shell {
+      width: 100%;
+    }
+
+    .signed-detail-document,
+    .card-block,
+    .signed-document-header,
+    .signed-record-meta,
+    .signed-record-signature {
+      box-shadow: none;
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+  }
+</style>

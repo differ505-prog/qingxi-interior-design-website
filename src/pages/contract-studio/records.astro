@@ -1,0 +1,215 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="已簽合約 - 青曦空間設計"
+  description="青曦內部使用的已簽合約列表。"
+  noindex={true}
+>
+  <section class="records-page">
+    <div class="records-shell">
+      <header class="records-header">
+        <div>
+          <p class="records-eyebrow">SIGNED CONTRACT ARCHIVE</p>
+          <h1>已簽合約</h1>
+          <p>客戶完成簽署後，永久留存的合約會顯示在這裡。</p>
+        </div>
+        <div class="records-actions">
+          <a href="/contract-studio" class="btn btn-secondary">返回合約工作台</a>
+        </div>
+      </header>
+
+      <div id="records-empty" class="records-empty" hidden>目前還沒有已同步留存的已簽合約。</div>
+      <div id="records-disabled" class="records-empty" hidden>尚未接上 KV，永久已簽合約留存功能目前未啟用。</div>
+      <div id="records-list" class="records-list" hidden></div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // @ts-nocheck
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  async function bootstrap() {
+    const empty = document.getElementById("records-empty");
+    const disabled = document.getElementById("records-disabled");
+    const list = document.getElementById("records-list");
+    if (!empty || !disabled || !list) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/contracts/signed?limit=100");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch signed records with status ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.configured) {
+        disabled.hidden = false;
+        return;
+      }
+
+      if (!Array.isArray(data.records) || !data.records.length) {
+        empty.hidden = false;
+        return;
+      }
+
+      list.innerHTML = data.records
+        .map(
+          (record) => `
+            <article class="record-card">
+              <div class="record-card-main">
+                <div class="record-card-meta">
+                  <span>合約編號</span>
+                  <strong>${escapeHtml(record.contractNumber || "未填寫")}</strong>
+                </div>
+                <div class="record-card-meta">
+                  <span>客戶</span>
+                  <strong>${escapeHtml(record.clientName || "未填寫")}</strong>
+                </div>
+                <div class="record-card-meta">
+                  <span>案件名稱</span>
+                  <strong>${escapeHtml(record.projectName || "未填寫")}</strong>
+                </div>
+                <div class="record-card-meta">
+                  <span>簽署人</span>
+                  <strong>${escapeHtml(record.signerName || "未填寫")}</strong>
+                </div>
+                <div class="record-card-meta">
+                  <span>簽署時間</span>
+                  <strong>${escapeHtml(record.signedAtLocal || record.updatedAt || "未填寫")}</strong>
+                </div>
+              </div>
+              <div class="record-card-side">
+                <h2>${escapeHtml(record.contractTitle || "已簽合約")}</h2>
+                <a class="btn btn-primary" href="/contract-studio/records/${encodeURIComponent(record.id)}">查看完整已簽合約</a>
+              </div>
+            </article>
+          `,
+        )
+        .join("");
+      list.hidden = false;
+    } catch (error) {
+      console.error("讀取已簽合約清單失敗：", error);
+      empty.textContent = "目前無法讀取已簽合約清單，請稍後再試。";
+      empty.hidden = false;
+    }
+  }
+
+  bootstrap();
+</script>
+
+<style>
+  .records-page {
+    padding: 8rem 0 5rem;
+    background: linear-gradient(180deg, rgba(246, 242, 236, 0.94), rgba(255, 255, 255, 0.98));
+  }
+
+  .records-shell {
+    width: min(1080px, calc(100% - 2rem));
+    margin: 0 auto;
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .records-header,
+  .record-card,
+  .records-empty {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(60, 37, 22, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 20px 45px rgba(31, 24, 19, 0.08);
+  }
+
+  .records-header {
+    padding: 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .records-eyebrow {
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    color: #8d6f5c;
+  }
+
+  .records-header h1 {
+    margin: 0;
+  }
+
+  .records-header p,
+  .records-empty {
+    color: rgba(64, 44, 30, 0.76);
+  }
+
+  .records-empty {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .records-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .record-card {
+    padding: 1.25rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(220px, 0.9fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .record-card-main {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+  .record-card-meta {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    background: rgba(247, 243, 238, 0.7);
+  }
+
+  .record-card-meta span {
+    font-size: 0.9rem;
+    color: rgba(64, 44, 30, 0.62);
+  }
+
+  .record-card-side {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .record-card-side h2 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 900px) {
+    .records-header,
+    .record-card {
+      grid-template-columns: 1fr;
+      display: grid;
+    }
+
+    .record-card-main {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

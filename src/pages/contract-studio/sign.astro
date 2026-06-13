@@ -566,7 +566,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         saveSignedRecord(record);
 
         if (!token) {
-          return { savedToServer: false };
+          return { savedToServer: false, signedRecordId: "" };
         }
 
         const response = await fetch(`/api/contracts/${encodeURIComponent(token)}`, {
@@ -583,7 +583,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           throw new Error(`Failed to save signed record with status ${response.status}`);
         }
 
-        return { savedToServer: true };
+        const result = await response.json();
+
+        return {
+          savedToServer: true,
+          signedRecordId: result.signedRecordId || "",
+        };
       }
 
       function renderSignedRecordNote(savedToServer) {
@@ -591,7 +596,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         if (!note) return;
 
         if (savedToServer) {
-          note.textContent = "這份已簽內容已同步留存，青曦可用同一份簽約連結重新查看。";
+          note.textContent = "這份已簽內容已同步存成永久紀錄，青曦可在內部的已簽合約頁重新查看。";
           return;
         }
 
@@ -725,7 +730,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           renderSignedRecord(signedRecord);
           renderSignedRecordNote(result.savedToServer);
           submitMessage.textContent = result.savedToServer
-            ? "已完成簽署，建議立即列印或另存 PDF；青曦也可用同一份連結查看已簽內容。"
+            ? "已完成簽署，建議立即列印或另存 PDF；青曦已同步存成永久已簽合約。"
             : "已完成簽署，建議立即列印或另存 PDF。";
           updateSigningStatus();
         } catch (error) {

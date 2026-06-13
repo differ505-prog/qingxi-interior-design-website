@@ -70,6 +70,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     return new Response(
       JSON.stringify({
         ok: true,
+        signedRecordId: savedRecord.signedRecordId || null,
         signedRecord: savedRecord.signedRecord || null,
       }),
       {
