@@ -4,13 +4,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 const project = {
   title: '住宅空間精選',
   label: 'CURATED RESIDENCE',
-  subtitle: '以沉穩灰階與俐落線條，留下安定且耐看的住宅節奏。',
+  subtitle: '用灰階、燈光與收納整理出舒服耐看的住宅空間。',
   story:
-    '從材質、照明到櫃體比例，都以低干擾的方式收斂視覺，讓空間在入住之後仍保有舒服節奏。',
+    '從客廳、餐廚到臥室，都把收納、照明與日常使用一起整理好，讓入住後更順手。',
   facts: [
     { label: '空間類型', value: '住宅空間設計' },
     { label: '風格關鍵', value: '灰階、線性照明、俐落收納' },
-    { label: '規劃重點', value: '公私領域節奏一致' },
+    { label: '規劃重點', value: '公共區與私領域都更好使用' },
   ],
   images: [
     {
@@ -41,7 +41,7 @@ const project = {
   ],
 };
 const projectDescription =
-  "青曦住宅空間精選案例，整理客廳、餐廚、主臥與浴室的空間照片，並呈現平面、照明與櫃體圖面及工程前後對比。";
+  "青曦住宅空間精選案例，整理客廳、餐廚、主臥與浴室的實際照片，並呈現設計圖面與工程前後對比。";
 const projectStructuredData = [
   {
     "@context": "https://schema.org",
@@ -59,21 +59,21 @@ const drawingBoards = [
   {
     label: 'LAYOUT PLAN',
     title: '平面佈置圖',
-    description: '透過空間配置、動線安排與家具尺度的整理，讓日常使用更順手，整體節奏也更清楚。',
+    description: '整理空間配置、動線與家具位置，讓日常使用更順手。',
     image: '/images/portfolio/xizhi-zhongxing-rd/layout-plan.jpg',
     alt: '住宅空間平面佈置圖',
   },
   {
     label: 'CEILING & LIGHTING',
     title: '天花與照明圖',
-    description: '整合天花分層、燈具位置與空調設備，讓照明節奏、機能配置與整體視覺一次對齊。',
+    description: '整理天花、燈具與空調位置，讓施工與後續使用都更清楚。',
     image: '/images/portfolio/xizhi-zhongxing-rd/ceiling-lighting-plan.jpg',
     alt: '住宅空間綜合天花與照明配置圖',
   },
   {
     label: 'CABINET DETAIL',
     title: '櫃體與立面圖',
-    description: '以客廳電視牆補強立面為例，整理木作做法、尺寸與關鍵節點，讓現場施工更容易對齊。',
+    description: '以客廳電視牆為例，整理木作做法與尺寸，讓現場施工更容易對齊。',
     image: '/images/portfolio/xizhi-zhongxing-rd/tv-wall-elevation-reinforcement.jpg',
     alt: '客廳電視牆補強木作立面圖',
   },
@@ -82,7 +82,7 @@ const renovationComparisons = [
   {
     label: 'PUBLIC AREA',
     title: '客廳改造前後',
-    summary: '從原有空間條件到完成後的整體整理，更清楚看見採光、動線與收納配置的改變。',
+    summary: '從原始現場到完工後的樣子，可以直接看見採光、動線與收納的差異。',
     beforeImage: '/images/portfolio/xizhi-zhongxing-rd/living-room-before.jpg',
     beforeAlt: '客廳改造前現場照片',
     beforeTitle: '改造前',
@@ -95,7 +95,7 @@ const renovationComparisons = [
   {
     label: 'PRIVATE AREA',
     title: '浴室改造前後',
-    summary: '透過改造前後的對照，呈現材質更新、收納整合與日常使用感受的提升。',
+    summary: '透過改造前後的對照，可以看見材質更新與使用便利性的差異。',
     beforeImage: '/images/portfolio/xizhi-zhongxing-rd/bathroom-before.jpg',
     beforeAlt: '浴室改造前拆除後現場照片',
     beforeTitle: '改造前',
@@ -143,9 +143,9 @@ const renovationComparisons = [
       <div class="project-highlight-card">
         <div class="highlight-copy">
           <p class="section-subtitle">DESIGN FRAME</p>
-          <h2>把材質、照明與收納節奏，整理成更安定的居住感</h2>
+          <h2>把收納、燈光和日常使用整理得更清楚</h2>
           <p>
-            透過比例、光線與動線的平衡，讓空間在白天俐落，夜晚也保有沉靜層次。
+            從客廳到臥室，都把好看和好住一起考慮，讓生活更順手。
           </p>
         </div>
         <figure class="project-feature-image gallery-item" data-index="0">
@@ -161,7 +161,7 @@ const renovationComparisons = [
     <section class="gallery-section">
       <div class="gallery-header">
         <p class="section-subtitle">SPACE GALLERY</p>
-        <h2>以圖片節奏呈現空間質感</h2>
+        <h2>看看這個家完成後的樣子</h2>
       </div>
 
       <div class="gallery-stack">
@@ -191,7 +191,7 @@ const renovationComparisons = [
       <div class="comparison-header">
         <p class="section-subtitle">BEFORE & AFTER</p>
         <h2>工程前後對比</h2>
-        <p>透過前後狀態的對照，更清楚看見空間整理、材質更新與生活感受的改變。</p>
+        <p>用前後照片對照，更容易看見空間整理完成後的差異。</p>
       </div>
 
       <div class="comparison-stack">
@@ -229,7 +229,7 @@ const renovationComparisons = [
       <div class="drawing-header">
         <p class="section-subtitle">DRAWING PACKAGE</p>
         <h2>設計圖紙</h2>
-        <p>從平面配置、照明安排到立面細節，讓設計邏輯與落地完整度更清楚。</p>
+        <p>從平面配置、照明安排到立面細節，讓施工內容更容易理解。</p>
       </div>
 
       <div class="drawing-grid">
@@ -265,8 +265,8 @@ const renovationComparisons = [
     <section class="contact-section">
       <div class="contact-inner">
         <p class="section-subtitle contact-subtitle">NEXT STEP</p>
-        <h2 class="contact-title">喜歡這種安定俐落的空間節奏？</h2>
-        <p class="contact-desc">歡迎和青曦聊聊你的住宅需求，從設計到工程，我們會幫你把節奏與預算一起整理好。</p>
+        <h2 class="contact-title">喜歡這樣的空間方向嗎？</h2>
+        <p class="contact-desc">歡迎和青曦聊聊你的住宅需求，我們會協助你整理需求、預算與施工安排。</p>
         <div class="contact-cards">
           <a href="https://lin.ee/U1HCeW4" target="_blank" class="contact-card">
             <div class="contact-icon line-icon">

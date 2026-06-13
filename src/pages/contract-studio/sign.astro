@@ -532,6 +532,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       function updateSigningStatus() {
         const checkboxes = [...document.querySelectorAll("[data-check-id]")];
         const allChecked = checkboxes.every((checkbox) => checkbox.checked);
+        const checklistShell = document.getElementById("sign-checklist");
+        const signatureShell = document.querySelector(".signature-pad-shell");
         const issues = getSigningIssues({
           signerName: signerNameInput.value.trim(),
           signerPhone: signerPhoneInput.value.trim(),
@@ -540,6 +542,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           allChecked,
           hasSignature: padState.hasStroke,
         });
+
+        signerNameInput.classList.toggle("is-invalid", !signerNameInput.value.trim());
+        const missingContact = !signerPhoneInput.value.trim() && !signerEmailInput.value.trim();
+        signerPhoneInput.classList.toggle("is-invalid", missingContact);
+        signerEmailInput.classList.toggle("is-invalid", missingContact);
+        signerIdentityInput.classList.toggle("is-invalid", !signerIdentityInput.value.trim());
+        checklistShell.classList.toggle("has-error", !allChecked);
+        signatureShell?.classList.toggle("has-error", !padState.hasStroke);
 
         if (!issues.length) {
           signingStatus.className = "signing-status is-ready";
@@ -816,6 +826,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     gap: 0.45rem;
   }
 
+  .field input.is-invalid {
+    border-color: rgba(181, 93, 63, 0.5);
+    box-shadow: 0 0 0 3px rgba(181, 93, 63, 0.12);
+    background: rgba(255, 247, 243, 0.96);
+  }
+
   .signing-status {
     display: grid;
     gap: 0.45rem;
@@ -860,6 +876,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .sign-checklist {
     display: grid;
     gap: 0.75rem;
+  }
+
+  .sign-checklist.has-error,
+  .signature-pad-shell.has-error {
+    border-radius: 18px;
+    box-shadow: 0 0 0 3px rgba(181, 93, 63, 0.1);
   }
 
   .checkbox-item {

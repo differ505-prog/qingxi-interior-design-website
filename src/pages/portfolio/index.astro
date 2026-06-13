@@ -4,24 +4,24 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 const featuredProject = {
   title: '住宅空間設計',
   coverImage: '/images/portfolio/xizhi-1.jpg',
-  summary: '以住宅空間為主軸，精選最能呈現生活質感、光線與細節層次的畫面。',
+  summary: '以住宅空間為主軸，整理最能看出實際完工效果的照片。',
   slug: 'xizhi-zhongxing-rd',
   label: 'RESIDENTIAL INTERIOR',
 };
 
-const editorialNotes = ['住宅', '商空', '光線', '材質', '場域氛圍'];
+const editorialNotes = ['住宅', '商空', '泳池', '改造前後', '設計圖面'];
 const poolFeature = {
   image: '/images/portfolio/hualien-sherlock-pool.jpg',
   alt: '夜間泳池與建築外觀畫面',
   title: '泳池與戶外水景規劃',
-  summary: '除了室內空間，青曦也能整合泳池、水景、動線與夜間氛圍，規劃更完整的場域體驗。',
+  summary: '除了室內空間，青曦也能協助規劃泳池、水景與戶外動線，讓整體使用更完整。',
 };
 const commercialFeature = {
   image: '/images/portfolio/restaurant-commercial-the-wrice.jpg',
   alt: '餐飲商空門面與室內畫面',
   title: '餐飲商空與店面形象規劃',
   summary:
-    '從門面識別、外觀材質到室內第一眼的氛圍安排，讓品牌形象、來客感受與空間完成度一起被看見。',
+    '從門面到室內，協助整理品牌形象、來客第一印象與實際使用動線。',
 };
 
 const spatialMoments = [
@@ -520,7 +520,7 @@ const secondaryMoments = spatialMoments.slice(2);
 
 <BaseLayout
   title="精選作品 - 青曦空間設計"
-  description="瀏覽青曦空間設計的精選作品，從住宅、商空到戶外場域，快速理解空間質感、材質比例與工程落地能力。"
+  description="瀏覽青曦空間設計的精選作品，從住宅、商空到戶外規劃，快速了解實際完工照片與案例內容。"
   ogImage="/images/portfolio/xizhi-1.jpg"
   pageType="collection"
 >
@@ -529,8 +529,8 @@ const secondaryMoments = spatialMoments.slice(2);
       <h6 class="section-subtitle">CURATED WORK</h6>
       <h1>精選作品</h1>
       <p class="portfolio-intro">
-        以住宅空間為核心，收錄最能代表質感的畫面，
-        也延伸呈現商空與戶外場域的整體規劃能力。
+        以住宅案例為主，也收錄商空與戶外規劃，
+        讓你直接看見不同空間做完後的樣子。
       </p>
       <div class="portfolio-notes">
         {editorialNotes.map((note) => (
@@ -539,16 +539,16 @@ const secondaryMoments = spatialMoments.slice(2);
       </div>
       <div class="portfolio-metrics">
         <article class="portfolio-metric">
-          <strong>住宅主軸</strong>
-          <span>以日常生活感受為核心，整理出舒服、耐看的空間節奏。</span>
+          <strong>住宅案例</strong>
+          <span>直接看客廳、餐廚、臥室與浴室的完工照片。</span>
         </article>
         <article class="portfolio-metric">
-          <strong>材質與光線</strong>
-          <span>讓白天與夜晚都保有清楚層次與舒服氛圍。</span>
+          <strong>前後對照</strong>
+          <span>看見改造前後差異，更容易判斷是不是你喜歡的方向。</span>
         </article>
         <article class="portfolio-metric">
-          <strong>整體質感</strong>
-          <span>從第一眼的氛圍到細節收尾，都看得到空間的完整度。</span>
+          <strong>更多類型</strong>
+          <span>除了住宅，也能快速了解商空與戶外規劃案例。</span>
         </article>
       </div>
     </header>
@@ -561,10 +561,10 @@ const secondaryMoments = spatialMoments.slice(2);
 
         <div class="featured-copy">
           <p class="featured-label">{featuredProject.label}</p>
-          <h2>看見住宅空間真正的質感</h2>
+          <h2>看看住宅空間完成後的樣子</h2>
           <p>
-            從開闊的公共區域、安定的私領域，到日夜之間的光線層次，
-            讓你更直接感受到青曦在住宅空間設計、材質比例與整體完成度上的掌握。
+            從客廳、餐廚到臥室，直接看這個家整理完成後的樣子，
+            也更容易判斷是不是你喜歡的方向。
           </p>
           <div class="featured-actions">
             <a
@@ -580,8 +580,8 @@ const secondaryMoments = spatialMoments.slice(2);
 
       <section class="moments-section">
         <div class="section-heading">
-          <h2>從室內到夜景，看見空間完整的氣質與層次</h2>
-          <p>收錄住宅、餐飲商空與戶外場域的代表畫面，讓你更直接感受青曦對比例、材質、光線與整體氛圍的掌握。</p>
+          <h2>看看不同空間的實際照片</h2>
+          <p>收錄住宅、餐飲商空與戶外規劃照片，讓你更快找到自己喜歡的方向。</p>
         </div>
 
         <div class="moments-stack">
@@ -631,9 +631,9 @@ const secondaryMoments = spatialMoments.slice(2);
 
       <section class="portfolio-cta">
         <div>
-          <h2>想讓你的空間也呈現這樣的質感與完整度？</h2>
+          <h2>想聊聊你的空間會怎麼做嗎？</h2>
           <p>
-            從初步諮詢、設計提案到工程落地，青曦會陪你一起釐清需求、預算與理想中的空間樣貌。
+            從初步諮詢、設計提案到工程施工，青曦會陪你一起整理需求、預算與時程。
           </p>
         </div>
         <a href="/contact">開始諮詢</a>

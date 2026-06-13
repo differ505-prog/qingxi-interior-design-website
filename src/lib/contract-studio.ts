@@ -56,6 +56,12 @@ export const contractDefaultSections: ContractSection[] = [
       "本合約內容係依雙方確認之報價單、施工圖說、材料規格確認表、系統櫃配件清單與現場丈量結果執行。正式附件請載明名稱、版次與日期；若附件採雲端共用文件協作，亦應以簽署日當天匯出之靜態檔案或載明之明確版次為準。若後續因業主調整需求、現場隱蔽條件或法規限制而需變更工法、材料或數量，應先提出追加減確認內容，經雙方以書面、Email 或指定電子通訊確認後施作。",
   },
   {
+    id: "entity",
+    title: "承攬主體與法定程序切換",
+    body:
+      "本工作台預設適用於一般修繕、局部更新、櫃體工程、軟裝配置或其他不涉及依法須由特定主體承攬、申請、審查或簽證之工作。若本案依法需辦理室內裝修審查、施工許可、建築師簽證或其他應由合法專業單位承接之程序，雙方同意改由合作之合法立案公司、建築師事務所或其他適格專業單位依正式委任程序承接，並以其作為申請、簽約或法定程序主體；相關申請費、簽證費、審查費與責任界線，應以正式委任文件及法定流程另行載明。",
+  },
+  {
     id: "schedule",
     title: "工期與施工配合",
     body:
@@ -102,6 +108,7 @@ export const contractDefaultSections: ContractSection[] = [
 export const contractDefaultChecklist = [
   "我已完整閱讀並同意本合約內容與付款節點。",
   "我已確認本合約附件名稱、版次與目前確認內容，若後續有調整需再經雙方確認。",
+  "我理解本案若依法需由合法專業單位辦理審查、許可、簽證或作為簽約主體，將另依正式委任程序切換，不視為本頁預設即已包含該法定服務。",
   "我同意以本合約指定之 Email 或 LINE 作為圖面、追加減與通知之正式書面往來管道。",
   "我已確認合約主體身分識別、指定代理人資訊，以及退款 / 結算帳戶應以本人名義帳戶為原則。",
   "我理解尾款未清前原則上不得先入住或先行使用；如經同意先行使用，該區域後續使用風險與非施工因素損害由我方自行負責。",
@@ -113,7 +120,7 @@ export const contractDefaultMaterialSpecs: MaterialSpecSection[] = [
     id: "cabinet-board",
     title: "板材與櫃體",
     description: "確認系統櫃、木作櫃體與門片的主要板材基準。",
-    baseline: "國產 E1 / F1 板材與常規櫃體做法",
+    baseline: "國產 E1 / F1 等級板材、一般平口門片與可視面封邊做法",
     selection: "",
     finishScope: "櫃體外觀、門片與可視側板",
     note: "若升級進口板材、特殊門型或染色木皮，需另行調整單價。",
@@ -122,7 +129,7 @@ export const contractDefaultMaterialSpecs: MaterialSpecSection[] = [
     id: "hardware-storage",
     title: "五金與收納配件",
     description: "確認標準五金與是否另列進口或特殊收納配件。",
-    baseline: "標準鉸鏈、滑軌、吊衣桿與基礎收納五金",
+    baseline: "台製緩衝鉸鏈、三節滑軌、吊衣桿與一般收納五金",
     selection: "",
     finishScope: "特殊拉籃、抽屜分隔、升降五金另列",
     note: "正式報價建議搭配系統櫃五金配件確認清單逐項勾選。",
@@ -131,7 +138,7 @@ export const contractDefaultMaterialSpecs: MaterialSpecSection[] = [
     id: "tile-stone",
     title: "磁磚與石材",
     description: "確認貼磚材料基準、暫列預算與最終選樣依據。",
-    baseline: "常規國產磚材或依暫列預算選樣",
+    baseline: "60x60cm 內國產常用磚材，或依暫列材料預算選樣",
     selection: "",
     finishScope: "牆磚、地磚、收邊條與必要耗損",
     note: "若改選大板磚、進口磚、特殊石材或斜拼工法，將另行核價。",
@@ -149,7 +156,7 @@ export const contractDefaultMaterialSpecs: MaterialSpecSection[] = [
     id: "paint-finish",
     title: "油漆與表面處理",
     description: "確認油漆品牌、平整度標準與特殊塗料範圍。",
-    baseline: "常規室內乳膠漆與基礎局部批土",
+    baseline: "得利 / 虹牌 / 立邦同級室內乳膠漆，一底兩度與局部批土理平",
     selection: "",
     finishScope: "牆面、天花與需修補後之可視區域",
     note: "全室重新批土整平、藝術塗料、特殊色或特殊面材復原另計。",
