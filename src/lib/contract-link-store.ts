@@ -60,10 +60,15 @@ export async function saveSharedContractPayload(payload: unknown) {
     return null;
   }
 
+  const payloadSource =
+    payload && typeof payload === "object" && typeof (payload as { source?: unknown }).source === "string"
+      ? (payload as { source: string }).source
+      : "qingxi-contract-studio";
+
   const record = {
     payload,
     createdAt: new Date().toISOString(),
-    source: "qingxi-contract-studio",
+    source: payloadSource,
   };
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -190,6 +195,11 @@ export async function listPermanentSignedContractRecords(limit = 50) {
   );
 
   return records.filter(Boolean);
+}
+
+export async function listPermanentSignedContractRecordsBySource(source: string, limit = 50) {
+  const records = await listPermanentSignedContractRecords(limit);
+  return records.filter((record: any) => record?.source === source);
 }
 
 export function encodeContractPayload(payload: unknown) {

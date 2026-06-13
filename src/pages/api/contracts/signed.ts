@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import {
   isContractLinkStorageConfigured,
   listPermanentSignedContractRecords,
+  listPermanentSignedContractRecordsBySource,
 } from "../../../lib/contract-link-store";
 
 export const GET: APIRoute = async ({ url }) => {
@@ -20,10 +21,14 @@ export const GET: APIRoute = async ({ url }) => {
 
   try {
     const limit = Number(url.searchParams.get("limit") || 50);
-    const records = await listPermanentSignedContractRecords(Number.isFinite(limit) ? limit : 50);
+    const source = url.searchParams.get("source") || "";
+    const records = source
+      ? await listPermanentSignedContractRecordsBySource(source, Number.isFinite(limit) ? limit : 50)
+      : await listPermanentSignedContractRecords(Number.isFinite(limit) ? limit : 50);
 
     const summaries = records.map((record: any) => ({
       id: record.id,
+      source: record.source || "",
       sourceToken: record.sourceToken || "",
       contractNumber: record.signedRecord?.contractNumber || record.payload?.meta?.contractNumber || "",
       contractTitle: record.signedRecord?.contractTitle || record.payload?.meta?.contractTitle || "",

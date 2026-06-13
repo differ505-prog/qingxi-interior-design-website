@@ -9,6 +9,7 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
     const payload = body?.payload;
+    const signPath = typeof body?.signPath === "string" && body.signPath.startsWith("/") ? body.signPath : "/contract-studio/sign";
 
     if (!payload || typeof payload !== "object") {
       return new Response(JSON.stringify({ error: "INVALID_PAYLOAD" }), {
@@ -20,7 +21,7 @@ export const POST: APIRoute = async ({ request }) => {
     const origin = new URL(request.url).origin;
 
     if (!isContractLinkStorageConfigured()) {
-      const fallbackUrl = new URL("/contract-studio/sign", origin);
+      const fallbackUrl = new URL(signPath, origin);
       fallbackUrl.searchParams.set("contract", encodeContractPayload(payload));
       return new Response(
         JSON.stringify({
@@ -36,7 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const token = await saveSharedContractPayload(payload);
-    const shortUrl = `${origin}/contract-studio/sign?token=${encodeURIComponent(token || "")}`;
+    const shortUrl = `${origin}${signPath}?token=${encodeURIComponent(token || "")}`;
 
     return new Response(
       JSON.stringify({

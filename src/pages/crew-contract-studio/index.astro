@@ -1,0 +1,626 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  crewContractDefaultChecklist,
+  crewContractDefaultPaymentStages,
+  crewContractDefaultSections,
+  crewContractDefaultWorkRules,
+} from "../../lib/crew-contract-studio";
+import { isContractLinkStorageConfigured } from "../../lib/contract-link-store";
+
+const defaultPaymentStagesJson = JSON.stringify(crewContractDefaultPaymentStages);
+const defaultSectionsJson = JSON.stringify(crewContractDefaultSections);
+const defaultChecklistJson = JSON.stringify(crewContractDefaultChecklist);
+const defaultWorkRulesJson = JSON.stringify(crewContractDefaultWorkRules);
+const shortLinkStorageConfigured = isContractLinkStorageConfigured();
+const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured);
+---
+
+<BaseLayout
+  title="工班承攬合約工作台 - 青曦空間設計"
+  description="青曦內部使用的工班承攬合約工作台，可整理承作範圍並生成工班簽署頁。"
+  noindex={true}
+>
+  <section class="crew-contract-page">
+    <div class="crew-contract-shell">
+      <header class="studio-hero">
+        <div>
+          <p class="studio-eyebrow">INTERNAL CREW CONTRACT STUDIO</p>
+          <h1>工班承攬合約工作台</h1>
+          <p class="studio-description">把工班要做的範圍、價錢、進退場時間與責任講清楚，再產生手機簽署連結。</p>
+        </div>
+        <div class="studio-actions">
+          <a id="open-sign-link" href="/crew-contract-studio/sign" target="_blank" rel="noreferrer" class="btn btn-primary">預覽工班簽署頁</a>
+          <button type="button" id="copy-sign-link" class="btn btn-secondary">複製給工班的簽約連結</button>
+          <a href="/crew-contract-studio/records" class="btn btn-secondary">查看已簽工班合約</a>
+          <button type="button" id="copy-crew-llm-review" class="btn btn-secondary">複製 LLM 工班合約覆核文字</button>
+          <button type="button" id="reset-crew-contract" class="btn btn-secondary btn-muted">重設本次工班合約</button>
+        </div>
+        <p class="studio-route-note">此頁未加入前台導覽，且已設為 noindex；若已接上 Vercel KV，分享會優先產生短簽約連結，工班完成簽署後會另存為永久已簽工班合約。</p>
+        <div id="share-link-status" class:list={["share-link-status", shortLinkStorageConfigured ? "is-ready" : "is-warning"]}>
+          <strong>{shortLinkStorageConfigured ? "短簽約連結已啟用" : "短簽約連結尚未啟用"}</strong>
+          <p>{shortLinkStorageConfigured ? "目前分享給工班時，會優先產生較短的 token 連結，比較適合直接傳 LINE。" : "目前仍會退回完整長連結；請在 Vercel 補上 KV_REST_API_URL 與 KV_REST_API_TOKEN 後重新部署。"}</p>
+        </div>
+        <p id="share-link-feedback" class="share-link-feedback" aria-live="polite"></p>
+      </header>
+
+      <div class="studio-grid">
+        <div class="studio-main">
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>基本資料</h2>
+              <p>只留工班真的需要看的內容，避免一開始就太長。</p>
+            </div>
+            <div class="form-grid">
+              <label class="field">
+                <span>合約標題</span>
+                <input data-field="contractTitle" type="text" placeholder="例如：工班承攬合作確認書" />
+              </label>
+              <label class="field">
+                <span>合約編號</span>
+                <input data-field="contractNumber" type="text" placeholder="例如：CREW-20260613" />
+              </label>
+              <label class="field">
+                <span>工班 / 師傅名稱</span>
+                <input data-field="clientName" type="text" placeholder="例如：阿宏木作" />
+              </label>
+              <label class="field">
+                <span>工班電話</span>
+                <input data-field="clientPhone" type="text" placeholder="例如：09xx-xxx-xxx" />
+              </label>
+              <label class="field">
+                <span>Email</span>
+                <input data-field="clientEmail" type="email" placeholder="例如：crew@example.com" />
+              </label>
+              <label class="field">
+                <span>身分證字號 / 統編</span>
+                <input data-field="clientIdentityCode" type="text" placeholder="例如：A123456789 / 12345678" />
+              </label>
+              <label class="field">
+                <span>工班地址</span>
+                <input data-field="clientRegisteredAddress" type="text" placeholder="例如：桃園市龜山區..." />
+              </label>
+              <label class="field">
+                <span>通訊地址</span>
+                <input data-field="clientMailingAddress" type="text" placeholder="例如：同上 / 倉庫地址" />
+              </label>
+              <label class="field">
+                <span>工班負責人</span>
+                <input data-field="projectAgentName" type="text" placeholder="例如：陳大宏" />
+              </label>
+              <label class="field">
+                <span>簽署身分</span>
+                <input data-field="projectAgentRole" type="text" placeholder="例如：工班負責人 / 班長" />
+              </label>
+              <label class="field">
+                <span>緊急聯絡人</span>
+                <input data-field="emergencyContactName" type="text" placeholder="例如：陳太太" />
+              </label>
+              <label class="field">
+                <span>緊急聯絡人關係</span>
+                <input data-field="emergencyContactRelation" type="text" placeholder="例如：配偶 / 兄弟 / 員工" />
+              </label>
+              <label class="field">
+                <span>緊急聯絡電話</span>
+                <input data-field="emergencyContactPhone" type="text" placeholder="例如：09xx-xxx-xxx" />
+              </label>
+              <label class="field">
+                <span>工種</span>
+                <input data-field="referenceLabel" type="text" placeholder="例如：木作 / 水電 / 泥作" />
+              </label>
+              <label class="field">
+                <span>案件名稱</span>
+                <input data-field="projectName" type="text" placeholder="例如：林口住宅裝修" />
+              </label>
+              <label class="field field-full">
+                <span>案場地址</span>
+                <input data-field="projectAddress" type="text" placeholder="例如：新北市林口區..." />
+              </label>
+              <label class="field field-full">
+                <span>承作內容摘要</span>
+                <textarea data-field="contractSummary" rows="3" placeholder="例如：天花封板、窗簾盒、冷氣包管、現場保護與退場清潔。"></textarea>
+              </label>
+              <label class="field">
+                <span>附件版次</span>
+                <input data-field="attachmentVersion" type="text" placeholder="例如：木作範圍圖 A 版" />
+              </label>
+              <label class="field">
+                <span>中段請款里程碑</span>
+                <input data-field="midpointMilestone" type="text" placeholder="例如：骨架完成並確認尺寸" />
+              </label>
+              <label class="field">
+                <span>承攬總價</span>
+                <div class="input-with-prefix">
+                  <span>NT$</span>
+                  <input data-field="contractAmount" type="number" min="0" step="1000" placeholder="例如：120000" />
+                </div>
+              </label>
+              <label class="field">
+                <span>簽約日期</span>
+                <input data-field="contractDate" type="date" />
+              </label>
+              <label class="field">
+                <span>預計進場</span>
+                <input data-field="plannedStartDate" type="date" />
+              </label>
+              <label class="field">
+                <span>預計退場</span>
+                <input data-field="plannedEndDate" type="date" />
+              </label>
+              <label class="field">
+                <span>聯絡管道</span>
+                <input data-field="notificationChannel" type="text" placeholder="例如：電話與 LINE" />
+              </label>
+              <label class="field">
+                <span>通知帳號 / LINE</span>
+                <input data-field="notificationAccount" type="text" placeholder="例如：LINE ID / 手機號碼" />
+              </label>
+              <label class="field">
+                <span>逾期違約金</span>
+                <input data-field="delayPenaltyRate" type="text" placeholder="例如：未完成部分價額千分之一 / 日" />
+              </label>
+              <label class="field">
+                <span>違約金上限</span>
+                <input data-field="delayPenaltyCap" type="text" placeholder="例如：總價 10%" />
+              </label>
+              <label class="field">
+                <span>停工 / 解約結算</span>
+                <input data-field="settlementMethod" type="text" placeholder="例如：依已完成部分與已發生成本結算" />
+              </label>
+              <label class="field">
+                <span>請款帳戶戶名</span>
+                <input data-field="refundAccountName" type="text" placeholder="例如：陳大宏" />
+              </label>
+              <label class="field field-full">
+                <span>請款 / 結算帳戶</span>
+                <input data-field="refundAccount" type="text" placeholder="例如：台灣銀行 004 / 帳號 12345" />
+              </label>
+              <label class="field field-full">
+                <span>簽署完成提醒</span>
+                <textarea data-field="signNotice" rows="2" placeholder="例如：簽署完成後，請工班留存 PDF；若現場追加，另補追加確認單。"></textarea>
+              </label>
+            </div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>付款節點</h2>
+              <p>先用最常用的 4 段式付款，工班頁會同步換算成金額。</p>
+            </div>
+            <div id="payment-stage-list" class="editable-list"></div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>核心條款</h2>
+              <p>文案儘量短，但把最容易出事的責任寫清楚。</p>
+            </div>
+            <div id="contract-section-list" class="editable-list"></div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>現場重點</h2>
+              <p>這區用來整理工班現場要遵守的重點，不走冗長材料表語氣。</p>
+            </div>
+            <div id="work-rule-list" class="editable-list"></div>
+          </section>
+        </div>
+
+        <aside class="studio-sidebar">
+          <section class="studio-card summary-card">
+            <div class="section-heading">
+              <h2>即時摘要</h2>
+              <p>先確認付款比例是否為 100%。</p>
+            </div>
+            <div id="summary-content" class="summary-content"></div>
+          </section>
+          <section class="studio-card summary-card">
+            <div class="section-heading">
+              <h2>簽署前確認</h2>
+              <p>工班簽署前會再次勾選這些內容。</p>
+            </div>
+            <ul id="checklist-list" class="checklist-list"></ul>
+          </section>
+          <section class="studio-card summary-card">
+            <div class="section-heading">
+              <h2>LLM 覆核</h2>
+              <p>把這份工班合約架構交給 LLM 看有沒有太冗長或缺防線。</p>
+            </div>
+            <textarea id="llm-review-output" class="llm-review-output" rows="16" readonly></textarea>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script define:vars={{ defaultPaymentStagesJson, defaultSectionsJson, defaultChecklistJson, defaultWorkRulesJson, shortLinkStorageConfiguredJson }}>
+  // @ts-nocheck
+  const STORAGE_KEY = "qingxi-crew-contract-studio-draft-v1";
+  const paymentStageTemplate = JSON.parse(defaultPaymentStagesJson);
+  const sectionTemplate = JSON.parse(defaultSectionsJson);
+  const checklistTemplate = JSON.parse(defaultChecklistJson);
+  const workRuleTemplate = JSON.parse(defaultWorkRulesJson);
+  const shortLinkStorageConfigured = JSON.parse(shortLinkStorageConfiguredJson);
+
+  function buildDefaultContractNumber() {
+    const now = new Date();
+    return `CREW-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+  }
+
+  function parseNumber(value) {
+    const result = Number(value);
+    return Number.isFinite(result) ? result : 0;
+  }
+
+  function formatCurrency(value) {
+    return new Intl.NumberFormat("zh-TW", { style: "currency", currency: "TWD", maximumFractionDigits: 0 }).format(parseNumber(value));
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function encodePayload(payload) {
+    const bytes = new TextEncoder().encode(JSON.stringify(payload));
+    const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+    return btoa(binary);
+  }
+
+  function createInitialState() {
+    const today = new Date();
+    const todayString = today.toISOString().slice(0, 10);
+    return {
+      meta: {
+        contractTitle: "工班承攬合作確認書",
+        contractNumber: buildDefaultContractNumber(),
+        clientName: "",
+        clientPhone: "",
+        clientEmail: "",
+        clientIdentityCode: "",
+        clientRegisteredAddress: "",
+        clientMailingAddress: "",
+        projectAgentName: "",
+        projectAgentRole: "工班負責人",
+        emergencyContactName: "",
+        emergencyContactRelation: "",
+        emergencyContactPhone: "",
+        referenceLabel: "",
+        projectName: "",
+        projectAddress: "",
+        contractSummary: "",
+        attachmentVersion: "",
+        midpointMilestone: "",
+        contractAmount: 0,
+        contractDate: todayString,
+        plannedStartDate: todayString,
+        plannedEndDate: todayString,
+        notificationChannel: "電話與 LINE",
+        notificationAccount: "",
+        delayPenaltyRate: "未完成部分價額千分之一 / 日",
+        delayPenaltyCap: "總價 10%",
+        settlementMethod: "依已完成部分與已發生成本結算",
+        refundAccountName: "",
+        refundAccount: "",
+        signNotice: "簽署完成後，請工班留存 PDF；若現場追加，另補追加確認單。",
+      },
+      paymentStages: paymentStageTemplate.map((item) => ({ ...item })),
+      sections: sectionTemplate.map((item) => ({ ...item })),
+      workRules: workRuleTemplate.map((item) => ({ ...item })),
+      checklist: [...checklistTemplate],
+    };
+  }
+
+  let state = createInitialState();
+
+  function saveDraft() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function loadDraft() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      state = {
+        meta: { ...state.meta, ...(parsed.meta || {}) },
+        paymentStages: Array.isArray(parsed.paymentStages) && parsed.paymentStages.length ? parsed.paymentStages : state.paymentStages,
+        sections: Array.isArray(parsed.sections) && parsed.sections.length ? parsed.sections : state.sections,
+        workRules: Array.isArray(parsed.workRules) && parsed.workRules.length ? parsed.workRules : state.workRules,
+        checklist: Array.isArray(parsed.checklist) && parsed.checklist.length ? parsed.checklist : state.checklist,
+      };
+    } catch (error) {
+      console.error("讀取工班合約草稿失敗：", error);
+    }
+  }
+
+  function buildPayload() {
+    const contractAmount = parseNumber(state.meta.contractAmount);
+    return {
+      source: "qingxi-crew-contract-studio",
+      meta: { ...state.meta, contractAmount },
+      paymentStages: state.paymentStages.map((stage) => ({
+        ...stage,
+        percent: parseNumber(stage.percent),
+        amount: Math.round((contractAmount * parseNumber(stage.percent)) / 100),
+      })),
+      sections: state.sections,
+      materialSpecs: state.workRules,
+      checklist: state.checklist,
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
+  function buildInlineSignUrl() {
+    const url = new URL("/crew-contract-studio/sign", window.location.origin);
+    url.searchParams.set("contract", encodePayload(buildPayload()));
+    return url.toString();
+  }
+
+  async function createShareLink() {
+    const response = await fetch("/api/contracts/share", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        payload: buildPayload(),
+        signPath: "/crew-contract-studio/sign",
+      }),
+    });
+    if (!response.ok) throw new Error(`Share link request failed with status ${response.status}`);
+    return response.json();
+  }
+
+  function buildCrewLlmReviewText() {
+    const payload = buildPayload();
+    return [
+      "請你以台灣室內裝修工班承攬風險、付款爭議、防止私下接業主與返工責任的角度，覆核以下工班承攬合約架構。",
+      "請兼顧：工人沒耐心看，所以文案要短，但法律效果仍要保留。",
+      "",
+      "請直接輸出：",
+      "S. 架構總分（滿分 10 分）",
+      "S2. 高證據力電子簽署評分（滿分 10 分）",
+      "A. 主要問題",
+      "B. 風險提醒",
+      "C. 建議補問或補簽資訊",
+      "D. 建議改寫文案",
+      "D2. 不適合讓工班看到的內部草稿語氣",
+      "E. 目前做得不錯的地方",
+      "",
+      "請特別檢查：",
+      "1. 條款是否太長、太官樣、工班不耐看",
+      "2. 是否把不得直接向業主收款、議價、接案寫清楚",
+      "3. 是否把返工、損壞、清潔未完成與公共區域損害責任寫清楚",
+      "4. 付款節點、中段里程碑與保留款是否合理",
+      "5. 是否缺少轉包、停工、遲到、缺工與工地安全風險",
+      "",
+      JSON.stringify(payload, null, 2),
+    ].join("\n");
+  }
+
+  function syncMetaFields() {
+    document.querySelectorAll("[data-field]").forEach((element) => {
+      const key = element.dataset.field;
+      if (!key) return;
+      element.value = state.meta[key] || "";
+    });
+  }
+
+  function renderPaymentStages() {
+    const shell = document.getElementById("payment-stage-list");
+    if (!shell) return;
+    shell.innerHTML = state.paymentStages.map((stage, index) => `
+      <article class="editable-card">
+        <strong>付款節點 ${index + 1}</strong>
+        <label class="field"><span>名稱</span><input data-payment-index="${index}" data-key="label" type="text" value="${escapeHtml(stage.label)}" /></label>
+        <label class="field"><span>比例 (%)</span><input data-payment-index="${index}" data-key="percent" type="number" min="0" max="100" step="1" value="${escapeHtml(stage.percent)}" /></label>
+        <label class="field field-full"><span>說明</span><textarea data-payment-index="${index}" data-key="note" rows="2">${escapeHtml(stage.note)}</textarea></label>
+      </article>
+    `).join("");
+  }
+
+  function renderSections() {
+    const shell = document.getElementById("contract-section-list");
+    if (!shell) return;
+    shell.innerHTML = state.sections.map((section, index) => `
+      <article class="editable-card">
+        <strong>第 ${index + 1} 條</strong>
+        <label class="field"><span>標題</span><input data-section-index="${index}" data-key="title" type="text" value="${escapeHtml(section.title)}" /></label>
+        <label class="field field-full"><span>條文</span><textarea data-section-index="${index}" data-key="body" rows="3">${escapeHtml(section.body)}</textarea></label>
+      </article>
+    `).join("");
+  }
+
+  function renderWorkRules() {
+    const shell = document.getElementById("work-rule-list");
+    if (!shell) return;
+    shell.innerHTML = state.workRules.map((item, index) => `
+      <article class="editable-card">
+        <strong>現場重點 ${index + 1}</strong>
+        <label class="field"><span>標題</span><input data-rule-index="${index}" data-key="title" type="text" value="${escapeHtml(item.title)}" /></label>
+        <label class="field field-full"><span>說明</span><textarea data-rule-index="${index}" data-key="description" rows="2">${escapeHtml(item.description)}</textarea></label>
+        <div class="form-grid compact-grid">
+          <label class="field"><span>基準</span><input data-rule-index="${index}" data-key="baseline" type="text" value="${escapeHtml(item.baseline)}" /></label>
+          <label class="field"><span>本案約定</span><input data-rule-index="${index}" data-key="selection" type="text" value="${escapeHtml(item.selection)}" /></label>
+          <label class="field"><span>範圍</span><input data-rule-index="${index}" data-key="finishScope" type="text" value="${escapeHtml(item.finishScope)}" /></label>
+          <label class="field"><span>補充</span><input data-rule-index="${index}" data-key="note" type="text" value="${escapeHtml(item.note)}" /></label>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  function renderChecklist() {
+    const shell = document.getElementById("checklist-list");
+    if (!shell) return;
+    shell.innerHTML = state.checklist.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  }
+
+  function renderSummary() {
+    const shell = document.getElementById("summary-content");
+    if (!shell) return;
+    const totalPercent = state.paymentStages.reduce((sum, stage) => sum + parseNumber(stage.percent), 0);
+    shell.innerHTML = `
+      <div class="summary-item"><span>工班 / 師傅</span><strong>${escapeHtml(state.meta.clientName || "未填寫")}</strong></div>
+      <div class="summary-item"><span>工種</span><strong>${escapeHtml(state.meta.referenceLabel || "未填寫")}</strong></div>
+      <div class="summary-item"><span>案件名稱</span><strong>${escapeHtml(state.meta.projectName || "未填寫")}</strong></div>
+      <div class="summary-item"><span>承攬總價</span><strong>${formatCurrency(state.meta.contractAmount)}</strong></div>
+      <div class="summary-item"><span>付款比例合計</span><strong class="${totalPercent === 100 ? "is-good" : "is-warning"}">${totalPercent}%</strong></div>
+      <div class="summary-item"><span>中段里程碑</span><strong>${escapeHtml(state.meta.midpointMilestone || "未填寫")}</strong></div>
+      <div class="summary-item"><span>附件版次</span><strong>${escapeHtml(state.meta.attachmentVersion || "未填寫")}</strong></div>
+    `;
+    document.getElementById("llm-review-output").value = buildCrewLlmReviewText();
+  }
+
+  function rerender() {
+    renderPaymentStages();
+    renderSections();
+    renderWorkRules();
+    renderChecklist();
+    renderSummary();
+    saveDraft();
+  }
+
+  function setFeedback(message, mode = "") {
+    const shell = document.getElementById("share-link-feedback");
+    if (!shell) return;
+    shell.className = `share-link-feedback ${mode}`.trim();
+    shell.textContent = message;
+  }
+
+  function flashActionText(button, text) {
+    const original = button.textContent;
+    button.textContent = text;
+    window.setTimeout(() => { button.textContent = original; }, 1400);
+  }
+
+  document.addEventListener("input", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+    if (target.dataset.field) {
+      state.meta[target.dataset.field] = target.value;
+      renderSummary();
+      saveDraft();
+      return;
+    }
+    if (target.dataset.paymentIndex) {
+      const index = Number(target.dataset.paymentIndex);
+      const key = target.dataset.key;
+      if (Number.isInteger(index) && key) {
+        state.paymentStages[index][key] = key === "percent" ? parseNumber(target.value) : target.value;
+        renderSummary();
+        saveDraft();
+      }
+      return;
+    }
+    if (target.dataset.sectionIndex) {
+      const index = Number(target.dataset.sectionIndex);
+      const key = target.dataset.key;
+      if (Number.isInteger(index) && key) {
+        state.sections[index][key] = target.value;
+        saveDraft();
+      }
+      return;
+    }
+    if (target.dataset.ruleIndex) {
+      const index = Number(target.dataset.ruleIndex);
+      const key = target.dataset.key;
+      if (Number.isInteger(index) && key) {
+        state.workRules[index][key] = target.value;
+        saveDraft();
+      }
+    }
+  });
+
+  document.getElementById("open-sign-link")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.open(buildInlineSignUrl(), "_blank", "noopener,noreferrer");
+    setFeedback("已開啟工班測試簽署頁", "is-ready");
+  });
+
+  document.getElementById("copy-sign-link")?.addEventListener("click", async (event) => {
+    const target = event.currentTarget;
+    try {
+      const result = await createShareLink();
+      await navigator.clipboard.writeText(result.url || buildInlineSignUrl());
+      setFeedback(result.mode === "short" ? "已複製給工班的短簽約連結" : "已複製給工班的完整長連結", result.mode === "short" ? "is-ready" : "is-warning");
+      if (target instanceof HTMLButtonElement) flashActionText(target, result.mode === "short" ? "短連結已複製" : "長連結已複製");
+    } catch (error) {
+      console.error("建立工班簽約連結失敗：", error);
+      await navigator.clipboard.writeText(buildInlineSignUrl());
+      setFeedback("短連結建立失敗，已改複製完整長連結", "is-warning");
+    }
+  });
+
+  document.getElementById("copy-crew-llm-review")?.addEventListener("click", async (event) => {
+    await navigator.clipboard.writeText(buildCrewLlmReviewText());
+    setFeedback("已複製 LLM 工班合約覆核文字", "is-ready");
+    const target = event.currentTarget;
+    if (target instanceof HTMLButtonElement) flashActionText(target, "LLM 覆核已複製");
+  });
+
+  document.getElementById("reset-crew-contract")?.addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    state = createInitialState();
+    syncMetaFields();
+    rerender();
+    setFeedback("已重設本次工班合約", "is-ready");
+  });
+
+  loadDraft();
+  syncMetaFields();
+  rerender();
+</script>
+
+<style>
+  .crew-contract-page {
+    padding: 8rem 0 5rem;
+    background: linear-gradient(180deg, rgba(246, 242, 236, 0.94), rgba(255, 255, 255, 0.98));
+  }
+  .crew-contract-shell {
+    width: min(1180px, calc(100% - 2rem));
+    margin: 0 auto;
+    display: grid;
+    gap: 1.5rem;
+  }
+  .studio-hero, .studio-card {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(60, 37, 22, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 20px 45px rgba(31, 24, 19, 0.08);
+    padding: 1.35rem;
+  }
+  .studio-eyebrow { margin: 0 0 0.5rem; letter-spacing: 0.18em; font-size: 0.78rem; color: #8d6f5c; }
+  .studio-hero h1, .section-heading h2 { margin: 0; }
+  .studio-description, .studio-route-note, .section-heading p, .share-link-status p { color: rgba(64, 44, 30, 0.76); }
+  .studio-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0; }
+  .share-link-status, .share-link-feedback, .editable-card, .summary-item, .checklist-list li { border-radius: 18px; }
+  .share-link-status, .share-link-feedback { padding: 1rem 1.1rem; margin-top: 1rem; }
+  .share-link-status.is-ready, .share-link-feedback.is-ready { background: rgba(237, 245, 239, 0.92); color: #2d5b3d; }
+  .share-link-status.is-warning, .share-link-feedback.is-warning { background: rgba(255, 244, 235, 0.95); color: #8d5b35; }
+  .studio-grid { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(280px, 0.85fr); gap: 1rem; align-items: start; }
+  .studio-main, .studio-sidebar, .editable-list, .summary-content { display: grid; gap: 1rem; }
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; }
+  .compact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .field, .editable-card, .summary-item { display: grid; gap: 0.4rem; }
+  .field span, .summary-item span { font-size: 0.94rem; color: rgba(64, 44, 30, 0.72); }
+  .field input, .field textarea { width: 100%; border: 1px solid rgba(93, 67, 44, 0.16); border-radius: 14px; padding: 0.8rem 0.95rem; font: inherit; background: rgba(255, 255, 255, 0.95); }
+  .field textarea { resize: vertical; }
+  .field-full { grid-column: 1 / -1; }
+  .input-with-prefix { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.75rem; border: 1px solid rgba(93, 67, 44, 0.16); border-radius: 14px; padding: 0 0.95rem; }
+  .input-with-prefix input { border: 0; padding-left: 0; padding-right: 0; }
+  .editable-card { background: rgba(248, 244, 239, 0.8); border: 1px solid rgba(93, 67, 44, 0.08); padding: 1rem; }
+  .summary-item, .checklist-list li { padding: 0.9rem 1rem; background: rgba(248, 244, 239, 0.76); }
+  .checklist-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
+  .summary-item strong.is-good { color: #2d5b3d; }
+  .summary-item strong.is-warning { color: #8d5b35; }
+  .llm-review-output { width: 100%; min-height: 320px; border: 1px solid rgba(93, 67, 44, 0.14); border-radius: 16px; padding: 0.95rem 1rem; font: inherit; background: rgba(248, 244, 239, 0.6); }
+  @media (max-width: 960px) {
+    .studio-grid, .form-grid, .compact-grid { grid-template-columns: 1fr; }
+    .field-full { grid-column: auto; }
+  }
+</style>

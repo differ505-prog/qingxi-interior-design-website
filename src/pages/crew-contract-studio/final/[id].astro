@@ -1,0 +1,511 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="工班合約定稿頁 - 青曦空間設計"
+  description="青曦工班承攬合約定稿頁，可於簽署後另存 PDF 留存。"
+  noindex={true}
+>
+  <section class="final-contract-page">
+    <div class="final-contract-shell">
+      <header class="final-contract-header">
+        <div>
+          <p class="final-contract-eyebrow">FINAL CREW CONTRACT COPY</p>
+          <h1>工班合約定稿頁</h1>
+          <p>此頁為簽署完成後的定稿版本，可直接列印或另存 PDF 留存。</p>
+        </div>
+      </header>
+
+      <div id="final-contract-empty" class="final-contract-empty">正在讀取定稿合約...</div>
+
+      <article id="final-contract-document" class="final-contract-document" hidden>
+        <header class="document-header">
+          <div>
+            <p class="document-brand">青曦空間設計</p>
+            <h2 id="document-title">工班承攬合作確認書</h2>
+            <p id="document-summary" class="document-summary"></p>
+          </div>
+          <div id="document-meta" class="document-meta"></div>
+        </header>
+
+        <section class="document-section">
+          <div class="section-heading">
+            <h3>付款節點</h3>
+            <p>以下為本次定稿版本的付款節點內容。</p>
+          </div>
+          <div id="payment-stage-groups" class="payment-stage-groups"></div>
+        </section>
+
+        <section class="document-section">
+          <div class="section-heading">
+            <h3>核心條款</h3>
+            <p>以下為本次定稿版本的合約條款。</p>
+          </div>
+          <div id="section-list" class="section-list"></div>
+        </section>
+
+        <section class="document-section">
+          <div class="section-heading">
+            <h3>現場重點</h3>
+            <p>以下為本案簽署時留存的工班現場基準與執行範圍。</p>
+          </div>
+          <div id="material-spec-list" class="section-list"></div>
+        </section>
+
+        <section class="document-section">
+          <div class="section-heading">
+            <h3>簽署完成紀錄</h3>
+            <p>以下為本次定稿版本所附的簽署紀錄。</p>
+          </div>
+          <div class="signed-record-grid">
+            <div id="signed-record-meta" class="signed-record-meta"></div>
+            <div class="signed-record-signature">
+              <span>簽名圖像</span>
+              <img id="signed-record-image" alt="簽名圖像" />
+            </div>
+          </div>
+        </section>
+
+        <div class="final-actions print-hidden">
+          <button type="button" id="print-final-contract" class="btn btn-primary">儲存 / 列印定稿 PDF</button>
+        </div>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // @ts-nocheck
+  function formatCurrency(value) {
+    return new Intl.NumberFormat("zh-TW", {
+      style: "currency",
+      currency: "TWD",
+      maximumFractionDigits: 0,
+    }).format(Number.isFinite(value) ? value : 0);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function getRecordId() {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    return parts[parts.length - 1] || "";
+  }
+
+  function shouldAutoPrint() {
+    return new URLSearchParams(window.location.search).get("autoprint") === "1";
+  }
+
+  function renderMeta(meta) {
+    const metaShell = document.getElementById("document-meta");
+    if (!metaShell) return;
+
+    const metaItems = [
+      ["合約編號", meta.contractNumber || "未填寫"],
+      ["工班 / 師傅", meta.clientName || "未填寫"],
+      ["身分識別", meta.clientIdentityCode || "未填寫"],
+      ["工班地址", meta.clientRegisteredAddress || "未填寫"],
+      ["通訊地址", meta.clientMailingAddress || "未填寫"],
+      ["工班電話", meta.clientPhone || "未填寫"],
+      ["Email", meta.clientEmail || "未填寫"],
+      ["案件名稱", meta.projectName || "未填寫"],
+      ["案場地址", meta.projectAddress || "未填寫"],
+      ["工種", meta.referenceLabel || "未填寫"],
+      ["附件版次", meta.attachmentVersion || "未填寫"],
+      ["承攬總價", formatCurrency(Number(meta.contractAmount) || 0)],
+      ["中段請款里程碑", meta.midpointMilestone || "未填寫"],
+      ["簽約日期", meta.contractDate || "未填寫"],
+      ["預計進場", meta.plannedStartDate || "未填寫"],
+      ["預計退場", meta.plannedEndDate || "未填寫"],
+      ["約定聯絡管道", meta.notificationChannel || "未填寫"],
+      ["通知帳號 / LINE", meta.notificationAccount || "未填寫"],
+    ];
+
+    metaShell.innerHTML = metaItems
+      .map(
+        ([label, value]) => `
+          <div class="meta-item">
+            <span>${escapeHtml(label)}</span>
+            <strong>${escapeHtml(value)}</strong>
+          </div>
+        `,
+      )
+      .join("");
+  }
+
+  function renderPaymentStages(paymentStages) {
+    const shell = document.getElementById("payment-stage-groups");
+    if (!shell) return;
+
+    shell.innerHTML = paymentStages
+      .map(
+        (stage) => `
+          <article class="payment-stage-card">
+            <div>
+              <h4>${escapeHtml(stage.label)}</h4>
+              <p>${escapeHtml(stage.note || "")}</p>
+            </div>
+            <div class="payment-stage-amounts">
+              <span>${escapeHtml(String(stage.percent || 0))}%</span>
+              <strong>${formatCurrency(Number(stage.amount) || 0)}</strong>
+            </div>
+          </article>
+        `,
+      )
+      .join("");
+  }
+
+  function renderSections(sections) {
+    const shell = document.getElementById("section-list");
+    if (!shell) return;
+
+    shell.innerHTML = sections
+      .map(
+        (section, index) => `
+          <article class="contract-copy-card">
+            <h4>第 ${index + 1} 條｜${escapeHtml(section.title)}</h4>
+            <p>${escapeHtml(section.body || "").replace(/\n/g, "<br />")}</p>
+          </article>
+        `,
+      )
+      .join("");
+  }
+
+  function renderMaterialSpecs(materialSpecs) {
+    const shell = document.getElementById("material-spec-list");
+    if (!shell) return;
+
+    shell.innerHTML = materialSpecs
+      .map((section, index) => `
+        <article class="contract-copy-card">
+          ${
+            index === 0
+              ? `<p class="material-spec-rule">若個別欄位未填寫或標示不明，仍以本項基準、現場交底與附件範圍施作。</p>`
+              : ""
+          }
+          <h4>${escapeHtml(section.title)}</h4>
+          <p>${escapeHtml(section.description || "")}</p>
+          <div class="spec-copy-grid">
+            <div class="spec-copy-item"><span>基準</span><strong>${escapeHtml(section.baseline || "未填寫")}</strong></div>
+            <div class="spec-copy-item"><span>本案約定</span><strong>${escapeHtml(section.selection || "未填寫")}</strong></div>
+            <div class="spec-copy-item"><span>範圍</span><strong>${escapeHtml(section.finishScope || "未填寫")}</strong></div>
+            <div class="spec-copy-item"><span>補充說明</span><strong>${escapeHtml(section.note || "未填寫")}</strong></div>
+          </div>
+        </article>
+      `)
+      .join("");
+  }
+
+  function renderSignedRecord(record, recordId) {
+    const metaShell = document.getElementById("signed-record-meta");
+    const image = document.getElementById("signed-record-image");
+    if (!metaShell || !(image instanceof HTMLImageElement)) return;
+
+    const metaItems = [
+      ["定稿紀錄 ID", recordId || "未填寫"],
+      ["簽署人姓名", record.signerName || "未填寫"],
+      ["聯絡電話", record.signerPhone || "未填寫"],
+      ["Email", record.signerEmail || "未填寫"],
+      ["身分識別", record.signerIdentityCode || "未填寫"],
+      ["簽署身分", record.signerRole || "未填寫"],
+      ["簽署時間", record.signedAtLocal || record.signedAtIso || "未填寫"],
+    ];
+
+    metaShell.innerHTML = metaItems
+      .map(
+        ([label, value]) => `
+          <div class="signed-meta-item">
+            <span>${escapeHtml(label)}</span>
+            <strong>${escapeHtml(value)}</strong>
+          </div>
+        `,
+      )
+      .join("");
+
+    image.src = record.signatureDataUrl || "";
+  }
+
+  async function bootstrap() {
+    const empty = document.getElementById("final-contract-empty");
+    const documentShell = document.getElementById("final-contract-document");
+    const recordId = getRecordId();
+
+    if (!empty || !documentShell) {
+      return;
+    }
+
+    if (!recordId) {
+      empty.textContent = "找不到這份定稿合約。";
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/contracts/signed/${encodeURIComponent(recordId)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch final contract with status ${response.status}`);
+      }
+
+      const record = await response.json();
+      const signedRecord = record.signedRecord || {};
+      const contractMeta = signedRecord.contractMeta || record.payload?.meta || {};
+      const title = document.getElementById("document-title");
+      const summary = document.getElementById("document-summary");
+      if (!title || !summary) {
+        throw new Error("Final contract shell is missing.");
+      }
+
+      title.textContent = signedRecord.contractTitle || contractMeta.contractTitle || "工班承攬合作確認書";
+      summary.textContent = contractMeta.contractSummary || "";
+      renderMeta(contractMeta);
+      renderPaymentStages(signedRecord.paymentStages || []);
+      renderSections(signedRecord.sections || []);
+      renderMaterialSpecs(signedRecord.materialSpecs || []);
+      renderSignedRecord(signedRecord, record.id || "");
+
+      empty.hidden = true;
+      documentShell.hidden = false;
+
+      if (shouldAutoPrint()) {
+        window.setTimeout(() => {
+          window.print();
+        }, 360);
+      }
+    } catch (error) {
+      console.error("讀取定稿合約失敗：", error);
+      empty.textContent = "目前無法讀取這份定稿合約，請稍後再試。";
+    }
+  }
+
+  const printButton = document.getElementById("print-final-contract");
+  if (printButton) {
+    printButton.addEventListener("click", () => {
+      window.print();
+    });
+  }
+
+  bootstrap();
+</script>
+
+<style>
+  .final-contract-page {
+    padding: 8rem 0 5rem;
+    background: linear-gradient(180deg, rgba(246, 242, 236, 0.94), rgba(255, 255, 255, 0.98));
+  }
+
+  .final-contract-shell {
+    width: min(1100px, calc(100% - 2rem));
+    margin: 0 auto;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .final-contract-header,
+  .final-contract-document,
+  .final-contract-empty {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(60, 37, 22, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 20px 45px rgba(31, 24, 19, 0.08);
+  }
+
+  .final-contract-header,
+  .document-header,
+  .payment-stage-card,
+  .contract-copy-card,
+  .signed-record-meta,
+  .signed-record-signature {
+    padding: 1.25rem;
+  }
+
+  .final-contract-eyebrow,
+  .document-brand {
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    color: #8d6f5c;
+  }
+
+  .final-contract-header h1,
+  .document-header h2,
+  .section-heading h3,
+  .contract-copy-card h4 {
+    margin: 0;
+  }
+
+  .final-contract-header p,
+  .final-contract-empty,
+  .section-heading p,
+  .document-summary,
+  .contract-copy-card p {
+    color: rgba(64, 44, 30, 0.76);
+  }
+
+  .final-contract-empty {
+    padding: 1.5rem;
+  }
+
+  .final-contract-document {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.25rem;
+  }
+
+  .document-header {
+    display: grid;
+    gap: 1rem;
+    border: 1px solid rgba(93, 67, 44, 0.1);
+    border-radius: 18px;
+    background: rgba(250, 247, 242, 0.72);
+  }
+
+  .document-summary {
+    margin: 0.75rem 0 0;
+  }
+
+  .document-meta,
+  .signed-record-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .meta-item,
+  .spec-copy-item,
+  .signed-meta-item {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.85rem 0.95rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .meta-item span,
+  .spec-copy-item span,
+  .signed-meta-item span {
+    font-size: 0.9rem;
+    color: rgba(64, 44, 30, 0.62);
+  }
+
+  .document-section {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .payment-stage-groups,
+  .section-list {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .payment-stage-card,
+  .payment-stage-amounts {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .payment-stage-card,
+  .contract-copy-card,
+  .signed-record-meta,
+  .signed-record-signature {
+    border: 1px solid rgba(93, 67, 44, 0.1);
+    border-radius: 18px;
+    background: rgba(250, 247, 242, 0.72);
+  }
+
+  .payment-stage-amounts {
+    min-width: 140px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .contract-copy-card p {
+    margin: 0.55rem 0 0;
+    white-space: pre-wrap;
+  }
+
+  .material-spec-rule {
+    margin: 0 0 0.75rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 14px;
+    background: rgba(255, 249, 241, 0.92);
+    color: rgba(93, 67, 44, 0.82);
+  }
+
+  .spec-copy-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+  }
+
+  .signed-record-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .signed-record-signature {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .signed-record-signature img {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(93, 67, 44, 0.12);
+    background: #fff;
+  }
+
+  .final-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 0.25rem;
+  }
+
+  @media (max-width: 900px) {
+    .document-meta,
+    .signed-record-meta {
+      grid-template-columns: 1fr;
+    }
+
+    .payment-stage-card,
+    .signed-record-grid {
+      grid-template-columns: 1fr;
+      display: grid;
+    }
+  }
+
+  @media print {
+    .print-hidden {
+      display: none !important;
+    }
+
+    .final-contract-page {
+      padding: 0;
+      background: #fff;
+    }
+
+    .final-contract-shell {
+      width: 100%;
+    }
+
+    .final-contract-document,
+    .payment-stage-card,
+    .contract-copy-card,
+    .document-header,
+    .signed-record-meta,
+    .signed-record-signature {
+      box-shadow: none;
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+  }
+</style>

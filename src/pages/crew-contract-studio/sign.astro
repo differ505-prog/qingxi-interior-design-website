@@ -1,0 +1,1125 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="工班承攬簽署頁 - 青曦空間設計"
+  description="青曦工班承攬合約簽署頁，可於手機上確認內容並完成手寫簽名。"
+  noindex={true}
+>
+  <section class="contract-sign-page">
+    <div class="contract-sign-shell">
+      <header class="sign-toolbar print-hidden">
+        <div>
+          <p class="sign-eyebrow">CREW CONTRACT SIGNING</p>
+          <h1>工班承攬簽署頁</h1>
+          <p class="sign-description">可直接在手機上閱讀承攬內容、手寫簽名，並於完成後列印或另存 PDF。</p>
+        </div>
+        <div class="sign-actions">
+          <a href="/crew-contract-studio" class="btn btn-secondary">返回工班合約工作台</a>
+        </div>
+      </header>
+
+      <div id="sign-empty" class="sign-empty">
+        目前沒有可顯示的合約資料，請先回到合約工作台建立內容後再開啟此頁。
+      </div>
+
+      <article id="contract-document" class="contract-document" hidden>
+        <header class="document-header">
+          <div>
+            <p class="document-brand">青曦空間設計</p>
+            <h2 id="document-title">工班承攬合作確認書</h2>
+            <p id="document-summary" class="document-summary"></p>
+          </div>
+          <div id="document-meta" class="document-meta"></div>
+        </header>
+
+        <section class="document-section">
+          <div class="section-heading">
+            <h3>付款節點</h3>
+            <p>以下付款比例與金額會以本次合約總額同步換算。</p>
+          </div>
+          <div id="payment-stage-groups" class="payment-stage-groups"></div>
+        </section>
+
+        <section class="document-section">
+          <div class="section-heading">
+            <h3>核心條款</h3>
+            <p>簽署前請先完整閱讀以下約定內容。</p>
+          </div>
+          <div id="section-list" class="section-list"></div>
+        </section>
+
+        <section class="document-section">
+          <div class="section-heading">
+            <h3>現場重點</h3>
+            <p>以下為本次工班承作的現場基準與執行範圍，簽署前請一併確認。</p>
+          </div>
+          <div id="material-spec-list" class="section-list"></div>
+        </section>
+
+        <section class="document-section">
+          <div class="section-heading">
+            <h3>簽署確認</h3>
+            <p>請確認基本資料與勾選內容後，再用手機或平板手寫簽名。</p>
+          </div>
+
+          <div class="signature-layout">
+            <div class="signature-panel">
+              <div class="form-grid">
+                <label class="field">
+                  <span>簽署人姓名</span>
+                  <input id="signer-name" type="text" placeholder="例如：陳大宏" />
+                </label>
+                <label class="field">
+                  <span>聯絡電話</span>
+                  <input id="signer-phone" type="text" placeholder="例如：09xx-xxx-xxx" />
+                </label>
+                <label class="field">
+                  <span>Email</span>
+                  <input id="signer-email" type="email" placeholder="例如：crew@example.com" />
+                </label>
+                <label class="field">
+                  <span>身分證字號 / 居留證號 / 統編</span>
+                  <input id="signer-identity-code" type="text" placeholder="例如：A123456789 / 12345678" />
+                </label>
+                <label class="field">
+                  <span>簽署身分</span>
+                  <input id="signer-role" type="text" placeholder="例如：工班負責人 / 班長" />
+                </label>
+              </div>
+              <p class="signature-note">
+                簽署頁會先帶入合約中的工班資料；請確認姓名、聯絡方式、完整身分識別、勾選確認項目並完成手寫簽名後再送出。
+              </p>
+              <div id="signing-status" class="signing-status" aria-live="polite"></div>
+
+              <div id="sign-checklist" class="sign-checklist"></div>
+
+              <div class="signature-pad-shell">
+                <div class="signature-pad-header">
+                  <strong>手寫簽名區</strong>
+                  <button type="button" id="clear-signature" class="btn btn-secondary btn-sm">清除簽名</button>
+                </div>
+                <canvas id="signature-canvas" class="signature-canvas"></canvas>
+                <p class="signature-note">可直接用手機手指或平板觸控筆簽名。</p>
+              </div>
+
+              <div class="signature-submit-row">
+                <button type="button" id="submit-signature" class="btn btn-primary">確認並完成簽署</button>
+                <span id="submit-message" class="submit-message"></span>
+              </div>
+            </div>
+
+            <aside class="signature-side-card">
+              <h4>此版簽署留證包含</h4>
+              <ul>
+                <li>簽署姓名、電話、Email 與完整身分識別</li>
+                <li>簽署時間、語系、時區與裝置資訊摘要</li>
+                <li>手寫簽名圖像與合約編號摘要</li>
+                <li>付款節點、返工、清潔與損害責任條款</li>
+                <li>簽後列印 / 另存 PDF 與已簽內容留存</li>
+              </ul>
+              <p>若案件需要更高證據力，可再補 OTP、雙方分流簽署或後台不可竄改存證機制。</p>
+            </aside>
+          </div>
+        </section>
+
+        <section id="signed-record-section" class="document-section signed-record-section" hidden>
+          <div class="section-heading">
+            <h3>簽署完成紀錄</h3>
+            <p>簽署完成後，請從最下方開啟定稿頁並另存 PDF 留存。</p>
+          </div>
+          <p id="signed-record-note" class="signed-record-note"></p>
+          <div class="signed-record-grid">
+            <div id="signed-record-meta" class="signed-record-meta"></div>
+            <div class="signed-record-signature">
+              <span>簽名圖像</span>
+              <img id="signed-record-image" alt="簽名圖像" />
+            </div>
+          </div>
+          <div class="signed-record-actions print-hidden">
+            <button type="button" id="open-final-pdf" class="btn btn-primary">開啟定稿頁並儲存 PDF</button>
+          </div>
+        </section>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // @ts-nocheck
+  function formatCurrency(value) {
+    return new Intl.NumberFormat("zh-TW", {
+      style: "currency",
+      currency: "TWD",
+      maximumFractionDigits: 0,
+    }).format(Number.isFinite(value) ? value : 0);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function decodePayload(encoded) {
+    const binary = atob(encoded);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    const json = new TextDecoder().decode(bytes);
+    return JSON.parse(json);
+  }
+
+  function normalizeLegacyContractText(value) {
+    if (typeof value !== "string") return value;
+
+    return value
+      .replaceAll("正式合約", "本合約")
+      .replaceAll("正式報價", "本案報價")
+      .replaceAll("正式附件", "附件")
+      .replaceAll("正式通知管道", "約定通知管道")
+      .replaceAll("正式書面往來管道", "約定書面往來管道")
+      .replaceAll("正式點交", "雙方點交")
+      .replaceAll("正式委任程序", "另行委任程序")
+      .replaceAll("正式委任文件", "另行委任文件")
+      .replaceAll("正式 PDF 定稿存證", "定稿 PDF 存證")
+      .replaceAll("正式副本", "定稿副本")
+      .replaceAll("第三方電子簽署", "外部簽署服務")
+      .replaceAll("法院認證版本", "高證據力版本")
+      .replaceAll("身分證末四碼 / 統編後四碼", "身分證字號 / 居留證號 / 統編")
+      .replaceAll("本人名義帳戶為原則", "限以合約當事人本人名義帳戶為準")
+      .replaceAll("合約總額千分之一 / 日計收違約金", "未完成工程部分之價額千分之一 / 日計收違約金")
+      .replaceAll(
+        "若附件採雲端共用文件協作，亦應以簽署日當天匯出之靜態檔案或載明之明確版次為準。",
+        "附件應於簽署當下固定為 PDF 或其他不可任意改寫之靜態檔案；簽署後如需調整，應以新版附件或追加減確認文件重新確認。",
+      )
+      .replaceAll("原則上得依原報價單單價、已完成比例與已發生成本計算；", "結算應依原報價單單價、已完成比例與已發生成本計算；")
+      .replaceAll("尾款未清前原則上不得", "尾款未清前不得")
+      .replaceAll("MVP", "目前版本");
+  }
+
+  function normalizeContractPayload(payload) {
+    if (!payload || typeof payload !== "object") return payload;
+
+    const normalizedMeta = Object.fromEntries(
+      Object.entries(payload.meta || {}).map(([key, value]) => [key, normalizeLegacyContractText(value)]),
+    );
+
+    return {
+      ...payload,
+      meta: normalizedMeta,
+      paymentStages: (payload.paymentStages || []).map((stage) => ({
+        ...stage,
+        label: normalizeLegacyContractText(stage.label),
+        note: normalizeLegacyContractText(stage.note),
+      })),
+      sections: (payload.sections || []).map((section) => ({
+        ...section,
+        title: normalizeLegacyContractText(section.title),
+        body: normalizeLegacyContractText(section.body),
+      })),
+      materialSpecs: (payload.materialSpecs || []).map((section) => ({
+        ...section,
+        title: normalizeLegacyContractText(section.title),
+        description: normalizeLegacyContractText(section.description),
+        baseline: normalizeLegacyContractText(section.baseline),
+        selection: normalizeLegacyContractText(section.selection),
+        finishScope: normalizeLegacyContractText(section.finishScope),
+        note: normalizeLegacyContractText(section.note),
+      })),
+      checklist: (payload.checklist || []).map((item) => normalizeLegacyContractText(item)),
+    };
+  }
+
+  function getEncodedPayload() {
+    const hash = window.location.hash.startsWith("#")
+      ? window.location.hash.slice(1)
+      : window.location.hash;
+
+    if (hash.startsWith("contract=")) {
+      return hash.replace(/^contract=/, "");
+    }
+
+    const queryValue = new URLSearchParams(window.location.search).get("contract");
+    return queryValue || "";
+  }
+
+  function getContractToken() {
+    return new URLSearchParams(window.location.search).get("token") || "";
+  }
+
+  function simpleChecksum(input) {
+    let hash = 5381;
+    for (let index = 0; index < input.length; index += 1) {
+      hash = (hash * 33) ^ input.charCodeAt(index);
+    }
+    return `qx-${(hash >>> 0).toString(16)}`;
+  }
+
+  function getAuditStorageKey(checksum) {
+    return `qingxi-crew-contract-signature-${checksum}`;
+  }
+
+  function renderMeta(meta) {
+    const metaItems = [
+      ["合約編號", meta.contractNumber || "未填寫"],
+      ["工班 / 師傅", meta.clientName || "未填寫"],
+      ["身分識別", meta.clientIdentityCode || "未填寫"],
+      ["工班地址", meta.clientRegisteredAddress || "未填寫"],
+      ["通訊地址", meta.clientMailingAddress || "未填寫"],
+      ["工班負責人", meta.projectAgentName || "未填寫"],
+      ["簽署身分", meta.projectAgentRole || "未填寫"],
+      ["緊急聯絡人", meta.emergencyContactName || "未填寫"],
+      ["緊急聯絡人關係", meta.emergencyContactRelation || "未填寫"],
+      ["緊急聯絡人電話", meta.emergencyContactPhone || "未填寫"],
+      ["工班電話", meta.clientPhone || "未填寫"],
+      ["Email", meta.clientEmail || "未填寫"],
+      ["案件名稱", meta.projectName || "未填寫"],
+      ["案場地址", meta.projectAddress || "未填寫"],
+      ["工種", meta.referenceLabel || "未填寫"],
+      ["附件版次", meta.attachmentVersion || "未填寫"],
+      ["承攬總價", formatCurrency(Number(meta.contractAmount) || 0)],
+      ["中段請款里程碑", meta.midpointMilestone || "未填寫"],
+      ["簽約日期", meta.contractDate || "未填寫"],
+      ["預計進場", meta.plannedStartDate || "未填寫"],
+      ["預計退場", meta.plannedEndDate || "未填寫"],
+      ["約定聯絡管道", meta.notificationChannel || "未填寫"],
+      ["通知帳號 / LINE", meta.notificationAccount || "未填寫"],
+      ["承作內容摘要", meta.contractSummary || "未填寫"],
+      ["逾期違約金", meta.delayPenaltyRate || "未填寫"],
+      ["違約金上限", meta.delayPenaltyCap || "未填寫"],
+      ["停工 / 解約結算", meta.settlementMethod || "未填寫"],
+      ["請款帳戶戶名", meta.refundAccountName || "未填寫"],
+      ["請款 / 結算帳戶", meta.refundAccount || "未填寫"],
+    ];
+
+    document.getElementById("document-meta").innerHTML = metaItems
+      .map(
+        ([label, value]) => `
+          <div class="meta-item">
+            <span>${escapeHtml(label)}</span>
+            <strong>${escapeHtml(value)}</strong>
+          </div>
+        `,
+      )
+      .join("");
+  }
+
+  function renderPaymentStages(paymentStages) {
+    document.getElementById("payment-stage-groups").innerHTML = paymentStages
+      .map(
+        (stage) => `
+          <article class="payment-stage-card">
+            <div>
+              <h4>${escapeHtml(stage.label)}</h4>
+              <p>${escapeHtml(stage.note || "")}</p>
+            </div>
+            <div class="payment-stage-amounts">
+              <span>${escapeHtml(stage.percent)}%</span>
+              <strong>${formatCurrency(stage.amount)}</strong>
+            </div>
+          </article>
+        `,
+      )
+      .join("");
+  }
+
+  function renderSections(sections) {
+    document.getElementById("section-list").innerHTML = sections
+      .map(
+        (section, index) => `
+          <article class="contract-copy-card">
+            <h4>第 ${index + 1} 條｜${escapeHtml(section.title)}</h4>
+            <p>${escapeHtml(section.body).replace(/\n/g, "<br />")}</p>
+          </article>
+        `,
+      )
+      .join("");
+  }
+
+  function renderMaterialSpecs(materialSpecs) {
+    document.getElementById("material-spec-list").innerHTML = materialSpecs
+      .map((section, index) => `
+          <article class="contract-copy-card">
+            ${
+              index === 0
+                ? `<p class="material-spec-rule">若個別欄位未填寫或標示不明，仍以本項基準、現場交底與附件範圍施作。</p>`
+                : ""
+            }
+            <h4>${escapeHtml(section.title)}</h4>
+            <p>${escapeHtml(section.description || "")}</p>
+            <div class="spec-copy-grid">
+              <div class="spec-copy-item"><span>基準</span><strong>${escapeHtml(section.baseline || "未填寫")}</strong></div>
+              <div class="spec-copy-item"><span>本案約定</span><strong>${escapeHtml(section.selection || "未填寫")}</strong></div>
+              <div class="spec-copy-item"><span>範圍</span><strong>${escapeHtml(section.finishScope || "未填寫")}</strong></div>
+              <div class="spec-copy-item"><span>補充說明</span><strong>${escapeHtml(section.note || "未填寫")}</strong></div>
+            </div>
+          </article>
+        `)
+      .join("");
+  }
+
+  function renderChecklist(checklist) {
+    document.getElementById("sign-checklist").innerHTML = checklist
+      .map(
+        (item, index) => `
+          <label class="checkbox-item">
+            <input type="checkbox" data-check-id="${index}" />
+            <span>${escapeHtml(item)}</span>
+          </label>
+        `,
+      )
+      .join("");
+  }
+
+  function renderSignedRecord(record) {
+    document.getElementById("signed-record-meta").innerHTML = `
+      <div class="signed-meta-item"><span>簽署人</span><strong>${escapeHtml(record.signerName)}</strong></div>
+      <div class="signed-meta-item"><span>聯絡電話</span><strong>${escapeHtml(record.signerPhone || "未填寫")}</strong></div>
+      <div class="signed-meta-item"><span>Email</span><strong>${escapeHtml(record.signerEmail || "未填寫")}</strong></div>
+      <div class="signed-meta-item"><span>身分識別</span><strong>${escapeHtml(record.signerIdentityCode || "未填寫")}</strong></div>
+      <div class="signed-meta-item"><span>簽署身分</span><strong>${escapeHtml(record.signerRole || "未填寫")}</strong></div>
+      <div class="signed-meta-item"><span>簽署時間</span><strong>${escapeHtml(record.signedAtLocal)}</strong></div>
+      <div class="signed-meta-item"><span>時區</span><strong>${escapeHtml(record.audit.timezone || "未填寫")}</strong></div>
+      <div class="signed-meta-item"><span>語系</span><strong>${escapeHtml(record.audit.language || "未填寫")}</strong></div>
+      <div class="signed-meta-item"><span>裝置摘要</span><strong>${escapeHtml(record.audit.userAgent || "未填寫")}</strong></div>
+      <div class="signed-meta-item"><span>合約摘要碼</span><strong>${escapeHtml(record.contractChecksum)}</strong></div>
+    `;
+    document.getElementById("signed-record-image").src = record.signatureDataUrl;
+    document.getElementById("signed-record-section").hidden = false;
+  }
+
+  function setupSignatureCanvas() {
+    const canvas = document.getElementById("signature-canvas");
+    const context = canvas.getContext("2d");
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    const bounds = canvas.getBoundingClientRect();
+
+    canvas.width = bounds.width * ratio;
+    canvas.height = bounds.height * ratio;
+    context.scale(ratio, ratio);
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.lineWidth = 2.2;
+    context.strokeStyle = "#2d2017";
+
+    const padState = {
+      drawing: false,
+      hasStroke: false,
+      ctx: context,
+      canvas,
+    };
+
+    function getPoint(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      };
+    }
+
+    function start(event) {
+      event.preventDefault();
+      const point = getPoint(event);
+      padState.drawing = true;
+      padState.hasStroke = true;
+      context.beginPath();
+      context.moveTo(point.x, point.y);
+    }
+
+    function move(event) {
+      if (!padState.drawing) return;
+      event.preventDefault();
+      const point = getPoint(event);
+      context.lineTo(point.x, point.y);
+      context.stroke();
+    }
+
+    function end() {
+      padState.drawing = false;
+    }
+
+    canvas.addEventListener("pointerdown", start);
+    canvas.addEventListener("pointermove", move);
+    canvas.addEventListener("pointerup", end);
+    canvas.addEventListener("pointerleave", end);
+
+    return padState;
+  }
+
+  function clearCanvas(padState) {
+    const canvas = padState.canvas;
+    const context = padState.ctx;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    padState.hasStroke = false;
+  }
+
+  function getSigningIssues({ signerName, signerPhone, signerEmail, signerIdentityCode, allChecked, hasSignature }) {
+    const issues = [];
+
+    if (!signerName) {
+      issues.push("請填寫簽署人姓名");
+    }
+
+    if (!signerPhone && !signerEmail) {
+      issues.push("請至少提供電話或 Email 其中一項");
+    }
+
+    if (!signerIdentityCode) {
+      issues.push("請填寫身分識別資訊");
+    }
+
+    if (!allChecked) {
+      issues.push("請勾選所有簽署確認項目");
+    }
+
+    if (!hasSignature) {
+      issues.push("請完成手寫簽名");
+    }
+
+    return issues;
+  }
+
+  async function resolveContractPayload() {
+    const token = getContractToken();
+
+    if (token) {
+      const response = await fetch(`/api/contracts/${encodeURIComponent(token)}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch short contract with status ${response.status}`);
+      }
+
+      const record = await response.json();
+      return {
+        payload: normalizeContractPayload(record.payload),
+        contractChecksum: simpleChecksum(token),
+        token,
+        signedRecordId: record.signedRecordId || "",
+        signedRecord: record.signedRecord || null,
+      };
+    }
+
+    const encodedPayload = getEncodedPayload();
+    if (!encodedPayload) {
+      return null;
+    }
+
+    return {
+      payload: normalizeContractPayload(decodePayload(encodedPayload)),
+      contractChecksum: simpleChecksum(encodedPayload),
+      token: "",
+      signedRecordId: "",
+      signedRecord: null,
+    };
+  }
+
+  async function bootstrap() {
+    const signEmpty = document.getElementById("sign-empty");
+    const contractDocument = document.getElementById("contract-document");
+
+    try {
+      const resolved = await resolveContractPayload();
+      if (!resolved) {
+        signEmpty.hidden = false;
+        contractDocument.hidden = true;
+        return;
+      }
+
+      const { payload, contractChecksum, token, signedRecordId: remoteSignedRecordId, signedRecord: remoteSignedRecord } = resolved;
+      const storageKey = getAuditStorageKey(contractChecksum);
+      let currentSignedRecordId = remoteSignedRecordId || "";
+
+      signEmpty.hidden = true;
+      contractDocument.hidden = false;
+      document.getElementById("document-title").textContent = payload.meta.contractTitle || "工班承攬合作確認書";
+      document.getElementById("document-summary").textContent = payload.meta.contractSummary || "";
+      renderMeta(payload.meta);
+      renderPaymentStages(payload.paymentStages || []);
+      renderSections(payload.sections || []);
+      renderMaterialSpecs(payload.materialSpecs || []);
+      renderChecklist(payload.checklist || []);
+
+      const padState = setupSignatureCanvas();
+      const submitMessage = document.getElementById("submit-message");
+      const signingStatus = document.getElementById("signing-status");
+      const signerNameInput = document.getElementById("signer-name");
+      const signerPhoneInput = document.getElementById("signer-phone");
+      const signerEmailInput = document.getElementById("signer-email");
+      const signerIdentityInput = document.getElementById("signer-identity-code");
+      const signerRoleInput = document.getElementById("signer-role");
+
+      function loadSavedRecord() {
+        try {
+          const saved = localStorage.getItem(storageKey);
+          if (!saved) return null;
+          return JSON.parse(saved);
+        } catch (error) {
+          console.error("無法讀取簽署紀錄：", error);
+          return null;
+        }
+      }
+
+      function saveSignedRecord(record) {
+        localStorage.setItem(storageKey, JSON.stringify(record));
+      }
+
+      async function persistSignedRecord(record) {
+        saveSignedRecord(record);
+
+        if (!token) {
+          return { savedToServer: false, signedRecordId: "" };
+        }
+
+        const response = await fetch(`/api/contracts/${encodeURIComponent(token)}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            signedRecord: record,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to save signed record with status ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        return {
+          savedToServer: true,
+          signedRecordId: result.signedRecordId || "",
+        };
+      }
+
+      function renderSignedRecordNote(savedToServer) {
+        const note = document.getElementById("signed-record-note");
+        if (!note) return;
+
+        if (savedToServer) {
+          note.textContent = "這份已簽內容已同步存成永久紀錄，系統會開啟定稿頁並觸發列印 / 另存 PDF。";
+          return;
+        }
+
+        note.textContent = "這份已簽內容目前保存在此裝置，請立即列印或另存 PDF 留存。";
+      }
+
+      function buildFinalContractUrl(recordId, autoPrint = false) {
+        if (!recordId) {
+          return "";
+        }
+        const finalUrl = new URL(`/crew-contract-studio/final/${encodeURIComponent(recordId)}`, window.location.origin);
+        if (autoPrint) {
+          finalUrl.searchParams.set("autoprint", "1");
+        }
+        return finalUrl.toString();
+      }
+
+      const existingRecord = remoteSignedRecord || loadSavedRecord();
+      if (existingRecord) {
+        saveSignedRecord(existingRecord);
+        renderSignedRecord(existingRecord);
+        renderSignedRecordNote(Boolean(token && remoteSignedRecord));
+        currentSignedRecordId = currentSignedRecordId || existingRecord.signedRecordId || "";
+        signerNameInput.value = existingRecord.signerName || "";
+        signerPhoneInput.value = existingRecord.signerPhone || "";
+        signerEmailInput.value = existingRecord.signerEmail || "";
+        signerIdentityInput.value = existingRecord.signerIdentityCode || "";
+        signerRoleInput.value = existingRecord.signerRole || "";
+      } else {
+        signerNameInput.value = payload.meta.clientName || "";
+        signerPhoneInput.value = payload.meta.clientPhone || "";
+        signerEmailInput.value = payload.meta.clientEmail || "";
+        signerIdentityInput.value = payload.meta.clientIdentityCode || "";
+        signerRoleInput.value = payload.meta.projectAgentName
+          ? `${payload.meta.projectAgentRole || "指定代理人"}（${payload.meta.projectAgentName}）`
+          : "工班本人";
+      }
+
+      document.getElementById("clear-signature").addEventListener("click", () => {
+        clearCanvas(padState);
+        submitMessage.textContent = "";
+        updateSigningStatus();
+      });
+
+      function updateSigningStatus() {
+        const checkboxes = [...document.querySelectorAll("[data-check-id]")];
+        const allChecked = checkboxes.every((checkbox) => checkbox.checked);
+        const checklistShell = document.getElementById("sign-checklist");
+        const signatureShell = document.querySelector(".signature-pad-shell");
+        const issues = getSigningIssues({
+          signerName: signerNameInput.value.trim(),
+          signerPhone: signerPhoneInput.value.trim(),
+          signerEmail: signerEmailInput.value.trim(),
+          signerIdentityCode: signerIdentityInput.value.trim(),
+          allChecked,
+          hasSignature: padState.hasStroke,
+        });
+
+        signerNameInput.classList.toggle("is-invalid", !signerNameInput.value.trim());
+        const missingContact = !signerPhoneInput.value.trim() && !signerEmailInput.value.trim();
+        signerPhoneInput.classList.toggle("is-invalid", missingContact);
+        signerEmailInput.classList.toggle("is-invalid", missingContact);
+        signerIdentityInput.classList.toggle("is-invalid", !signerIdentityInput.value.trim());
+        checklistShell.classList.toggle("has-error", !allChecked);
+        signatureShell?.classList.toggle("has-error", !padState.hasStroke);
+
+        if (!issues.length) {
+          signingStatus.className = "signing-status is-ready";
+          signingStatus.innerHTML = "<strong>目前可簽署</strong><span>資料已齊全，可直接按下「確認並完成簽署」。</span>";
+          return;
+        }
+
+        signingStatus.className = "signing-status is-pending";
+        signingStatus.innerHTML = `
+          <strong>完成簽署前還缺以下項目</strong>
+          <ul>
+            ${issues.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+          </ul>
+        `;
+      }
+
+      [signerNameInput, signerPhoneInput, signerEmailInput, signerIdentityInput, signerRoleInput].forEach((input) => {
+        input.addEventListener("input", updateSigningStatus);
+      });
+
+      document.getElementById("sign-checklist").addEventListener("change", updateSigningStatus);
+      padState.canvas.addEventListener("pointerup", updateSigningStatus);
+      padState.canvas.addEventListener("pointerleave", updateSigningStatus);
+      updateSigningStatus();
+
+      document.getElementById("submit-signature").addEventListener("click", async () => {
+        const signerName = signerNameInput.value.trim();
+        const signerPhone = signerPhoneInput.value.trim();
+        const signerEmail = signerEmailInput.value.trim();
+        const signerIdentityCode = signerIdentityInput.value.trim();
+        const signerRole = signerRoleInput.value.trim();
+        const checkboxes = [...document.querySelectorAll("[data-check-id]")];
+        const allChecked = checkboxes.every((checkbox) => checkbox.checked);
+        const issues = getSigningIssues({
+          signerName,
+          signerPhone,
+          signerEmail,
+          signerIdentityCode,
+          allChecked,
+          hasSignature: padState.hasStroke,
+        });
+
+        updateSigningStatus();
+
+        if (issues.length) {
+          submitMessage.textContent = issues[0];
+          return;
+        }
+
+        const signedAt = new Date();
+        const signedRecord = {
+          signedRecordId: currentSignedRecordId,
+          contractNumber: payload.meta.contractNumber || "",
+          contractTitle: payload.meta.contractTitle || "",
+          contractChecksum,
+          signerName,
+          signerPhone,
+          signerEmail,
+          signerIdentityCode,
+          signerRole,
+          signedAtIso: signedAt.toISOString(),
+          signedAtLocal: signedAt.toLocaleString("zh-TW", { hour12: false }),
+          signatureDataUrl: padState.canvas.toDataURL("image/png"),
+          audit: {
+            language: navigator.language || "",
+            userAgent: navigator.userAgent || "",
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+            platform: navigator.platform || "",
+            source: payload.source || "qingxi-crew-contract-studio",
+          },
+          contractMeta: payload.meta,
+          paymentStages: payload.paymentStages,
+          sections: payload.sections,
+          materialSpecs: payload.materialSpecs,
+        };
+
+        try {
+          const result = await persistSignedRecord(signedRecord);
+          renderSignedRecord(signedRecord);
+          renderSignedRecordNote(result.savedToServer);
+          currentSignedRecordId = result.signedRecordId || currentSignedRecordId;
+          submitMessage.textContent = result.savedToServer
+            ? "已完成簽署，正在開啟定稿頁並準備列印 / 另存 PDF。"
+            : "已完成簽署，建議立即列印或另存 PDF。";
+          updateSigningStatus();
+          if (result.savedToServer && result.signedRecordId) {
+            window.setTimeout(() => {
+              window.location.assign(buildFinalContractUrl(result.signedRecordId, true));
+            }, 240);
+          }
+        } catch (error) {
+          console.error("儲存簽署紀錄失敗：", error);
+          renderSignedRecord(signedRecord);
+          renderSignedRecordNote(false);
+          submitMessage.textContent = "已完成簽署，請立即列印或另存 PDF；目前留存同步失敗，請通知青曦確認。";
+        }
+      });
+
+      document.getElementById("open-final-pdf").addEventListener("click", () => {
+        const finalUrl = buildFinalContractUrl(currentSignedRecordId);
+        if (finalUrl) {
+          window.location.assign(finalUrl);
+          return;
+        }
+        window.print();
+      });
+    } catch (error) {
+      console.error("載入合約簽署資料失敗：", error);
+      signEmpty.textContent = "目前無法讀取這份簽約資料，請向青曦重新索取有效連結。";
+      signEmpty.hidden = false;
+      contractDocument.hidden = true;
+    }
+  }
+
+  bootstrap();
+</script>
+
+<style>
+  .contract-sign-page {
+    padding: 8rem 0 5rem;
+    background: linear-gradient(180deg, rgba(246, 242, 236, 0.94), rgba(255, 255, 255, 0.98));
+  }
+
+  .contract-sign-shell {
+    width: min(1100px, calc(100% - 2rem));
+    margin: 0 auto;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .sign-toolbar,
+  .contract-document,
+  .sign-empty {
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(60, 37, 22, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 20px 45px rgba(31, 24, 19, 0.08);
+  }
+
+  .sign-toolbar {
+    padding: 1.75rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .sign-eyebrow,
+  .document-brand {
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    color: #8d6f5c;
+  }
+
+  .sign-description,
+  .section-heading p,
+  .signature-note,
+  .signature-side-card p,
+  .contract-copy-card p,
+  .payment-stage-card p {
+    margin: 0;
+    color: rgba(64, 44, 30, 0.76);
+  }
+
+  .sign-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .sign-empty {
+    padding: 2rem;
+    text-align: center;
+    color: rgba(64, 44, 30, 0.78);
+  }
+
+  .contract-document {
+    padding: 1.5rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .document-header,
+  .document-section {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .document-header {
+    border-bottom: 1px solid rgba(93, 67, 44, 0.1);
+    padding-bottom: 1rem;
+  }
+
+  .document-summary {
+    margin: 0.6rem 0 0;
+    color: rgba(64, 44, 30, 0.76);
+  }
+
+  .document-meta,
+  .payment-stage-groups,
+  .section-list {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .meta-item,
+  .signed-meta-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 16px;
+    background: rgba(249, 246, 240, 0.9);
+  }
+
+  .payment-stage-card,
+  .contract-copy-card,
+  .signature-panel,
+  .signature-side-card,
+  .signed-record-meta,
+  .signed-record-signature {
+    border: 1px solid rgba(93, 67, 44, 0.1);
+    border-radius: 18px;
+    padding: 1rem;
+    background: rgba(250, 247, 242, 0.72);
+  }
+
+  .payment-stage-card,
+  .payment-stage-amounts {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .payment-stage-card h4,
+  .contract-copy-card h4,
+  .signature-side-card h4 {
+    margin: 0 0 0.4rem;
+  }
+
+  .spec-copy-grid {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.9rem;
+  }
+
+  .spec-copy-item {
+    display: grid;
+    gap: 0.25rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .spec-copy-item span {
+    color: rgba(64, 44, 30, 0.62);
+    font-size: 0.92rem;
+  }
+
+  .payment-stage-amounts {
+    min-width: 140px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .signature-layout,
+  .signed-record-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .signed-record-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .signature-panel,
+  .signed-record-meta {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .field input.is-invalid {
+    border-color: rgba(181, 93, 63, 0.5);
+    box-shadow: 0 0 0 3px rgba(181, 93, 63, 0.12);
+    background: rgba(255, 247, 243, 0.96);
+  }
+
+  .signing-status {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(93, 67, 44, 0.12);
+  }
+
+  .signing-status strong {
+    color: #5f4230;
+  }
+
+  .signing-status ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: rgba(94, 46, 35, 0.88);
+  }
+
+  .signing-status.is-pending {
+    background: rgba(255, 244, 238, 0.92);
+    border-color: rgba(181, 93, 63, 0.18);
+  }
+
+  .signing-status.is-ready {
+    background: rgba(239, 248, 241, 0.95);
+    border-color: rgba(92, 132, 93, 0.2);
+  }
+
+  .signing-status.is-ready span {
+    color: rgba(39, 86, 51, 0.84);
+  }
+
+  .field input {
+    width: 100%;
+    border: 1px solid rgba(93, 67, 44, 0.18);
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    font: inherit;
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  .sign-checklist {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .sign-checklist.has-error,
+  .signature-pad-shell.has-error {
+    border-radius: 18px;
+    box-shadow: 0 0 0 3px rgba(181, 93, 63, 0.1);
+  }
+
+  .checkbox-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: start;
+    color: rgba(64, 44, 30, 0.88);
+  }
+
+  .checkbox-item input {
+    margin-top: 0.2rem;
+  }
+
+  .signature-pad-shell {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .signature-pad-header,
+  .signature-submit-row,
+  .signed-record-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .signature-canvas {
+    width: 100%;
+    min-height: 220px;
+    border: 1px dashed rgba(93, 67, 44, 0.3);
+    border-radius: 18px;
+    background: #fff;
+    touch-action: none;
+  }
+
+  .submit-message {
+    color: #6d513c;
+    font-size: 0.95rem;
+  }
+
+  .signature-side-card ul {
+    padding-left: 1.1rem;
+    margin: 0 0 1rem;
+  }
+
+  .signed-record-signature {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .signed-record-signature img {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(93, 67, 44, 0.12);
+    background: #fff;
+  }
+
+  .btn-sm {
+    padding: 0.55rem 0.95rem;
+    font-size: 0.92rem;
+  }
+
+  @media (max-width: 860px) {
+    .signature-layout,
+    .signed-record-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .contract-sign-page {
+      padding-top: 7rem;
+    }
+
+    .payment-stage-card {
+      flex-direction: column;
+    }
+  }
+
+  @media print {
+    .print-hidden {
+      display: none !important;
+    }
+
+    .contract-sign-page {
+      padding: 0;
+      background: #fff;
+    }
+
+    .contract-sign-shell {
+      width: 100%;
+    }
+
+    .contract-document {
+      box-shadow: none;
+      border: 0;
+      padding: 0;
+    }
+  }
+</style>
