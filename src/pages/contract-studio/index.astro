@@ -18,7 +18,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
 <BaseLayout
   title="合約工作台 - 青曦空間設計"
-  description="青曦內部使用的合約工作台，可整理正式合約內容並生成客戶簽署頁。"
+  description="青曦內部使用的合約工作台，可整理合約內容並生成客戶簽署頁。"
   noindex={true}
 >
   <section class="contract-studio-page">
@@ -58,7 +58,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>合約基本資訊</h2>
-              <p>這些內容會直接顯示在客戶簽署頁，建議與正式報價或材料確認表一致。</p>
+              <p>這些內容會直接顯示在客戶簽署頁，建議與本案報價或材料確認表一致。</p>
             </div>
             <div class="form-grid">
               <label class="field">
@@ -141,7 +141,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
                 <input data-field="waterproofWarrantyYears" type="text" placeholder="例如：3 年" />
               </label>
               <label class="field">
-                <span>正式通知管道</span>
+                <span>約定通知管道</span>
                 <input data-field="notificationChannel" type="text" placeholder="例如：Email 與 LINE" />
               </label>
               <label class="field">
@@ -194,7 +194,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>核心條款</h2>
-              <p>先用正式合約最常用的五段骨架，再依案件需要微調。</p>
+              <p>先用常見的合約骨架整理，再依案件需要微調。</p>
             </div>
             <div id="contract-section-list" class="contract-section-list"></div>
           </section>
@@ -202,7 +202,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>材料規格確認表</h2>
-              <p>把正式報價最容易吵的板材、五金、磁磚、玻璃、衛浴與清潔交付標準先鎖在同一份附件裡。</p>
+              <p>把本案最容易吵的板材、五金、磁磚、玻璃、衛浴與清潔交付標準先鎖在同一份附件裡。</p>
             </div>
             <div id="material-spec-list" class="material-spec-list"></div>
           </section>
@@ -210,7 +210,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>簽署與留證設定</h2>
-              <p>這一版先做手機手寫簽名與簽署摘要留證，之後若要再升級可銜接 OTP 或第三方電子簽署。</p>
+              <p>目前可整理線上簽署內容、手機手寫簽名與簽署摘要留證；若案件需要更高證據力，再補 OTP 與存證機制即可。</p>
             </div>
             <label class="field field-full">
               <span>簽署完成提醒</span>
@@ -238,14 +238,14 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card summary-card">
             <div class="section-heading">
               <h2>模組定位</h2>
-              <p>這版先做到可操作的手機簽署 MVP。</p>
+              <p>目前可作為可操作的線上合約確認與手機簽署流程。</p>
             </div>
             <ul class="support-list">
               <li>客戶可在手機上手寫簽名</li>
               <li>簽署頁可列印或另存 PDF</li>
               <li>保留簽署時間與裝置摘要</li>
               <li>可先防堵尾款未清就提前入住的風險</li>
-              <li>後續可再升級 OTP 與第三方電子簽署</li>
+              <li>後續可再補 OTP 與更高證據力存證</li>
             </ul>
           </section>
           <section class="studio-card summary-card">
@@ -327,7 +327,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         plannedStartDate: todayString,
         plannedEndDate: endDate.toISOString().slice(0, 10),
         contractSummary:
-          "本案依雙方已確認之需求、報價單與材料方向進行裝修工程施作，正式內容仍以合約與附件共同構成。",
+          "本案依雙方已確認之需求、報價單與材料方向進行裝修工程施作，詳細內容以本合約與附件共同構成。",
         signNotice:
           "簽署完成後，建議雙方立即列印或另存 PDF 留存；後續若有追加減，會再附確認單共同簽認。",
         clientIdentityCode: "",
@@ -509,18 +509,18 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
     return [
       "請你以室內設計 / 裝修合約覆核顧問的角色，協助檢查以下合約工作台的預設架構。",
-      "這是一套給室內設計工作室內部使用的『階段性合約簽署 MVP』，目標是先把合約骨架、付款節點、附件版次、通知管道與手機簽署流程整理完整，再持續升級到更正式的電子簽署版本。",
-      "這不是法院認證版本，也不是第三方電子簽署平台產生的正式存證文件；請先以『室內設計合約架構是否清楚、是否能降低雙方爭議』為主軸評分，不要只因尚未接 OTP、CA 或第三方存證就把整體 MVP 分數過度壓低。",
-      "請在回覆中同時區分：1. 目前作為輕量 MVP 的成熟度；2. 若要升級成正式高證據力簽署系統，還缺哪些能力。",
+      "這是一套給室內設計工作室內部使用的線上合約簽署工作台，目標是先把合約骨架、付款節點、附件版次、通知管道與手機簽署流程整理完整，再持續補強證據留存能力。",
+      "請先以『室內設計合約架構是否清楚、是否能降低雙方爭議』為主軸評分；不要只因尚未接 OTP、CA 或不可竄改存證，就過度壓低整體可用度。",
+      "請在回覆中同時區分：1. 目前版本作為線上簽署工作流的成熟度；2. 若要升級成更高證據力簽署系統，還缺哪些能力。",
       "",
       "請優先指出：",
       "1. 合約主體、工程範圍、付款節點與簽署流程是否完整",
       "2. 哪些條款對客戶或承攬方來說仍有爭議風險",
       "3. 哪些文案仍過於模糊，應補上定義、上限或免責界線",
-      "4. 這套合約簽署模組以『MVP 可用度』為基準的成熟度評分（滿分 10 分）",
-      "5. 若要再升級成更正式的電子簽署流程，最優先應補哪些機制",
+      "4. 這套合約簽署模組目前版本的可用度評分（滿分 10 分）",
+      "5. 若要再升級成更高證據力的簽署流程，最優先應補哪些機制",
       "6. 請特別檢查：違約金預設值、終止結算標準、中期款里程碑、附件版次與退款帳戶是否足夠實務",
-      "7. 請一起檢查材料規格確認表是否足以作為正式報價附件，哪些欄位仍可能造成品牌、等級、顏色、五金或清潔交付標準的爭議",
+      "7. 請一起檢查材料規格確認表是否足以作為本案附件，哪些欄位仍可能造成品牌、等級、顏色、五金或清潔交付標準的爭議",
       "8. 請特別檢查：尾款未清前先入住、先行使用、分區點交與保固起算的風險是否已被清楚處理",
       "9. 請特別檢查：個人承攬適用範圍、需切換合法專業單位承接時的條款與責任界線是否清楚，避免誤寫成已承諾特定建築師或立案業者一定承接",
       "",
@@ -541,7 +541,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       `- 預計完工：${payload.meta.plannedEndDate || "未填寫"}`,
       `- 一般裝修保固：${payload.meta.generalWarrantyYears || "未填寫"}`,
       `- 防水工程保固：${payload.meta.waterproofWarrantyYears || "未填寫"}`,
-      `- 正式通知管道：${payload.meta.notificationChannel || "未填寫"} / ${payload.meta.notificationAccount || "未填寫"}`,
+      `- 約定通知管道：${payload.meta.notificationChannel || "未填寫"} / ${payload.meta.notificationAccount || "未填寫"}`,
       `- 爭議處理：${payload.meta.disputeVenue || "未填寫"}`,
       `- 逾期違約金：${payload.meta.delayPenaltyRate || "未填寫"}；上限：${payload.meta.delayPenaltyCap || "未填寫"}`,
       `- 終止結算標準：${payload.meta.settlementMethod || "未填寫"}`,
@@ -570,11 +570,11 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       "- 簽署頁可列印或另存 PDF",
       "- 目前會留存簽署姓名、電話、Email、身分、簽署時間、語系、時區、裝置摘要與簽名圖像",
       "- 目前尚未可靠取得真實 IP，也尚未加入 OTP 驗證、CA 憑證或後端不可竄改時間戳",
-      "- 尚未加入第三方電子簽署、雙方分流簽署、自動寄送正式副本與後端不可竄改存證",
+      "- 尚未加入雙方分流簽署、自動寄送定稿副本與後端不可竄改存證",
       "",
       "請直接輸出：",
-      "S. 架構總分（滿分 10 分，請以 MVP 可用度為主）",
-      "S2. 若以正式高證據力電子簽署標準評估，目前大約落在幾分",
+      "S. 架構總分（滿分 10 分，請以目前版本可用度為主）",
+      "S2. 若以高證據力電子簽署標準評估，目前大約落在幾分",
       "A. 主要問題",
       "B. 風險提醒",
       "C. 建議補問客戶或補簽的資訊",
@@ -692,7 +692,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         <strong>${state.meta.generalWarrantyYears || "未填寫"} / ${state.meta.waterproofWarrantyYears || "未填寫"}</strong>
       </div>
       <div class="summary-row">
-        <span>正式通知管道</span>
+        <span>約定通知管道</span>
         <strong>${state.meta.notificationChannel || "未填寫"}</strong>
       </div>
       <div class="summary-row">

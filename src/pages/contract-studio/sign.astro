@@ -54,7 +54,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <section class="document-section">
           <div class="section-heading">
             <h3>材料規格確認表</h3>
-            <p>以下為本案目前作為正式報價附件的材料與交付標準基準，簽署前請一併確認。</p>
+            <p>以下為本案約定的材料與交付標準基準，簽署前請一併確認。</p>
           </div>
           <div id="material-spec-list" class="section-list"></div>
         </section>
@@ -120,7 +120,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 <li>提前入住、分區點交與保固起算條款</li>
                 <li>簽後列印 / 另存 PDF 與匯出 JSON 留檔</li>
               </ul>
-              <p>若之後需要 OTP、雙方分流簽署或後台不可竄改存證，再接第三方電子簽署會更完整。</p>
+              <p>若案件需要更高證據力，可再補 OTP、雙方分流簽署或後台不可竄改存證機制。</p>
             </aside>
           </div>
         </section>
@@ -222,7 +222,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       ["預計完工", meta.plannedEndDate || "未填寫"],
       ["一般裝修保固", meta.generalWarrantyYears || "未填寫"],
       ["防水工程保固", meta.waterproofWarrantyYears || "未填寫"],
-      ["正式通知管道", meta.notificationChannel || "未填寫"],
+      ["約定通知管道", meta.notificationChannel || "未填寫"],
       ["通知帳號 / 地址", meta.notificationAccount || "未填寫"],
       ["爭議處理", meta.disputeVenue || "未填寫"],
       ["逾期違約金", meta.delayPenaltyRate || "未填寫"],
