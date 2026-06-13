@@ -66,6 +66,10 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
                 <input data-field="clientEmail" type="email" placeholder="例如：client@example.com" />
               </label>
               <label class="field">
+                <span>身分證末四碼 / 統編後四碼</span>
+                <input data-field="clientIdentityCode" type="text" placeholder="例如：1234" />
+              </label>
+              <label class="field">
                 <span>案件名稱</span>
                 <input data-field="projectName" type="text" placeholder="例如：林口新成屋裝修" />
               </label>
@@ -76,6 +80,10 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
               <label class="field">
                 <span>報價 / 規格參照</span>
                 <input data-field="referenceLabel" type="text" placeholder="例如：初估單 v3、材料確認表 A 版" />
+              </label>
+              <label class="field">
+                <span>附件版次</span>
+                <input data-field="attachmentVersion" type="text" placeholder="例如：施工圖 A 版 / 規格表 v2" />
               </label>
               <label class="field">
                 <span>合約總額</span>
@@ -95,6 +103,26 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
               <label class="field">
                 <span>預計完工</span>
                 <input data-field="plannedEndDate" type="date" />
+              </label>
+              <label class="field">
+                <span>一般裝修保固</span>
+                <input data-field="generalWarrantyYears" type="text" placeholder="例如：1 年" />
+              </label>
+              <label class="field">
+                <span>防水工程保固</span>
+                <input data-field="waterproofWarrantyYears" type="text" placeholder="例如：3 年" />
+              </label>
+              <label class="field">
+                <span>正式通知管道</span>
+                <input data-field="notificationChannel" type="text" placeholder="例如：Email 與 LINE" />
+              </label>
+              <label class="field">
+                <span>通知帳號 / 地址</span>
+                <input data-field="notificationAccount" type="text" placeholder="例如：client@example.com / LINE ID" />
+              </label>
+              <label class="field">
+                <span>爭議處理管道</span>
+                <input data-field="disputeVenue" type="text" placeholder="例如：案場所在地法院 / 先行調解" />
               </label>
               <label class="field field-full">
                 <span>合約摘要</span>
@@ -239,6 +267,13 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
           "本案依雙方已確認之需求、報價單與材料方向進行裝修工程施作，正式內容仍以合約與附件共同構成。",
         signNotice:
           "簽署完成後，建議雙方立即列印或另存 PDF 留存；後續若有追加減，會再附確認單共同簽認。",
+        clientIdentityCode: "",
+        attachmentVersion: "",
+        generalWarrantyYears: "1 年",
+        waterproofWarrantyYears: "3 年",
+        notificationChannel: "Email 與 LINE",
+        notificationAccount: "",
+        disputeVenue: "如需進一步處理，原則先協調或調解，必要時以案場所在地法院為第一審管轄法院。",
       },
       paymentStages: paymentStageTemplate.map((stage) => ({ ...stage })),
       sections: contractSectionTemplate.map((section) => ({ ...section })),
@@ -317,26 +352,34 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
 
     return [
       "請你以室內設計 / 裝修合約覆核顧問的角色，協助檢查以下合約工作台的預設架構。",
-      "這不是法院認證版本，也不是第三方電子簽署平台產生的正式存證文件；請聚焦於合約架構、條款完整性、付款節點、風險界線與簽署流程。",
+      "這是一套給室內設計工作室內部使用的『階段性合約簽署 MVP』，目標是先把合約骨架、付款節點、附件版次、通知管道與手機簽署流程整理完整，再持續升級到更正式的電子簽署版本。",
+      "這不是法院認證版本，也不是第三方電子簽署平台產生的正式存證文件；請先以『室內設計合約架構是否清楚、是否能降低雙方爭議』為主軸評分，不要只因尚未接 OTP、CA 或第三方存證就把整體 MVP 分數過度壓低。",
+      "請在回覆中同時區分：1. 目前作為輕量 MVP 的成熟度；2. 若要升級成正式高證據力簽署系統，還缺哪些能力。",
       "",
       "請優先指出：",
       "1. 合約主體、工程範圍、付款節點與簽署流程是否完整",
       "2. 哪些條款對客戶或承攬方來說仍有爭議風險",
       "3. 哪些文案仍過於模糊，應補上定義、上限或免責界線",
-      "4. 這套合約簽署模組目前的成熟度評分（滿分 10 分）",
+      "4. 這套合約簽署模組以『MVP 可用度』為基準的成熟度評分（滿分 10 分）",
       "5. 若要再升級成更正式的電子簽署流程，最優先應補哪些機制",
       "",
       "【合約基本資訊】",
       `- 合約標題：${payload.meta.contractTitle || "未填寫"}`,
       `- 合約編號：${payload.meta.contractNumber || "未填寫"}`,
       `- 客戶姓名：${payload.meta.clientName || "未填寫"}`,
+      `- 身分識別：${payload.meta.clientIdentityCode || "未填寫"}`,
       `- 案件名稱：${payload.meta.projectName || "未填寫"}`,
       `- 案件地址：${payload.meta.projectAddress || "未填寫"}`,
       `- 參照附件：${payload.meta.referenceLabel || "未填寫"}`,
+      `- 附件版次：${payload.meta.attachmentVersion || "未填寫"}`,
       `- 合約總額：${formatCurrency(payload.meta.contractAmount || 0)}`,
       `- 簽約日期：${payload.meta.contractDate || "未填寫"}`,
       `- 預計開工：${payload.meta.plannedStartDate || "未填寫"}`,
       `- 預計完工：${payload.meta.plannedEndDate || "未填寫"}`,
+      `- 一般裝修保固：${payload.meta.generalWarrantyYears || "未填寫"}`,
+      `- 防水工程保固：${payload.meta.waterproofWarrantyYears || "未填寫"}`,
+      `- 正式通知管道：${payload.meta.notificationChannel || "未填寫"} / ${payload.meta.notificationAccount || "未填寫"}`,
+      `- 爭議處理：${payload.meta.disputeVenue || "未填寫"}`,
       `- 合約摘要：${payload.meta.contractSummary || "未填寫"}`,
       `- 簽署完成提醒：${payload.meta.signNotice || "未填寫"}`,
       "",
@@ -353,10 +396,12 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       "- 客戶可於手機或平板手寫簽名",
       "- 簽署頁可列印或另存 PDF",
       "- 目前會留存簽署姓名、電話、Email、身分、簽署時間、語系、時區、裝置摘要與簽名圖像",
-      "- 尚未加入 OTP 驗證、第三方電子簽署、雙方分流簽署與後端不可竄改存證",
+      "- 目前尚未可靠取得真實 IP，也尚未加入 OTP 驗證、CA 憑證或後端不可竄改時間戳",
+      "- 尚未加入第三方電子簽署、雙方分流簽署、自動寄送正式副本與後端不可竄改存證",
       "",
       "請直接輸出：",
-      "S. 架構總分（滿分 10 分）",
+      "S. 架構總分（滿分 10 分，請以 MVP 可用度為主）",
+      "S2. 若以正式高證據力電子簽署標準評估，目前大約落在幾分",
       "A. 主要問題",
       "B. 風險提醒",
       "C. 建議補問客戶或補簽的資訊",
@@ -429,6 +474,14 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       <div class="summary-row">
         <span>條款段落</span>
         <strong>${state.sections.length} 段</strong>
+      </div>
+      <div class="summary-row">
+        <span>一般 / 防水保固</span>
+        <strong>${state.meta.generalWarrantyYears || "未填寫"} / ${state.meta.waterproofWarrantyYears || "未填寫"}</strong>
+      </div>
+      <div class="summary-row">
+        <span>正式通知管道</span>
+        <strong>${state.meta.notificationChannel || "未填寫"}</strong>
       </div>
       <div class="summary-row">
         <span>簽署方式</span>

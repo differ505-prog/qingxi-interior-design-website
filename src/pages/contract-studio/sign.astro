@@ -73,6 +73,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   <input id="signer-email" type="email" placeholder="例如：client@example.com" />
                 </label>
                 <label class="field">
+                  <span>身分證末四碼 / 統編後四碼</span>
+                  <input id="signer-identity-code" type="text" placeholder="例如：1234" />
+                </label>
+                <label class="field">
                   <span>簽署身分</span>
                   <input id="signer-role" type="text" placeholder="例如：業主本人 / 委託人" />
                 </label>
@@ -185,15 +189,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     const metaItems = [
       ["合約編號", meta.contractNumber || "未填寫"],
       ["客戶", meta.clientName || "未填寫"],
+      ["身分識別", meta.clientIdentityCode || "未填寫"],
       ["聯絡電話", meta.clientPhone || "未填寫"],
       ["Email", meta.clientEmail || "未填寫"],
       ["案件名稱", meta.projectName || "未填寫"],
       ["案件地址", meta.projectAddress || "未填寫"],
       ["參照附件", meta.referenceLabel || "未填寫"],
+      ["附件版次", meta.attachmentVersion || "未填寫"],
       ["合約總額", formatCurrency(Number(meta.contractAmount) || 0)],
       ["簽約日期", meta.contractDate || "未填寫"],
       ["預計開工", meta.plannedStartDate || "未填寫"],
       ["預計完工", meta.plannedEndDate || "未填寫"],
+      ["一般裝修保固", meta.generalWarrantyYears || "未填寫"],
+      ["防水工程保固", meta.waterproofWarrantyYears || "未填寫"],
+      ["正式通知管道", meta.notificationChannel || "未填寫"],
+      ["通知帳號 / 地址", meta.notificationAccount || "未填寫"],
+      ["爭議處理", meta.disputeVenue || "未填寫"],
     ];
 
     document.getElementById("document-meta").innerHTML = metaItems
@@ -258,6 +269,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       <div class="signed-meta-item"><span>簽署人</span><strong>${escapeHtml(record.signerName)}</strong></div>
       <div class="signed-meta-item"><span>聯絡電話</span><strong>${escapeHtml(record.signerPhone || "未填寫")}</strong></div>
       <div class="signed-meta-item"><span>Email</span><strong>${escapeHtml(record.signerEmail || "未填寫")}</strong></div>
+      <div class="signed-meta-item"><span>身分識別</span><strong>${escapeHtml(record.signerIdentityCode || "未填寫")}</strong></div>
       <div class="signed-meta-item"><span>簽署身分</span><strong>${escapeHtml(record.signerRole || "未填寫")}</strong></div>
       <div class="signed-meta-item"><span>簽署時間</span><strong>${escapeHtml(record.signedAtLocal)}</strong></div>
       <div class="signed-meta-item"><span>時區</span><strong>${escapeHtml(record.audit.timezone || "未填寫")}</strong></div>
@@ -389,6 +401,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       document.getElementById("signer-name").value = existingRecord.signerName || "";
       document.getElementById("signer-phone").value = existingRecord.signerPhone || "";
       document.getElementById("signer-email").value = existingRecord.signerEmail || "";
+      document.getElementById("signer-identity-code").value = existingRecord.signerIdentityCode || "";
       document.getElementById("signer-role").value = existingRecord.signerRole || "";
     }
 
@@ -401,6 +414,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       const signerName = document.getElementById("signer-name").value.trim();
       const signerPhone = document.getElementById("signer-phone").value.trim();
       const signerEmail = document.getElementById("signer-email").value.trim();
+      const signerIdentityCode = document.getElementById("signer-identity-code").value.trim();
       const signerRole = document.getElementById("signer-role").value.trim();
       const checkboxes = [...document.querySelectorAll("[data-check-id]")];
       const allChecked = checkboxes.every((checkbox) => checkbox.checked);
@@ -433,6 +447,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         signerName,
         signerPhone,
         signerEmail,
+        signerIdentityCode,
         signerRole,
         signedAtIso: signedAt.toISOString(),
         signedAtLocal: signedAt.toLocaleString("zh-TW", { hour12: false }),
