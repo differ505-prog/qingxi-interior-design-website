@@ -1,0 +1,673 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  contractDefaultChecklist,
+  contractDefaultPaymentStages,
+  contractDefaultSections,
+} from "../../lib/contract-studio";
+
+const contractDefaultPaymentStagesJson = JSON.stringify(contractDefaultPaymentStages);
+const contractDefaultSectionsJson = JSON.stringify(contractDefaultSections);
+const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
+---
+
+<BaseLayout
+  title="合約工作台 - 青曦空間設計"
+  description="青曦內部使用的合約工作台，可整理正式合約內容並生成客戶簽署頁。"
+  noindex={true}
+>
+  <section class="contract-studio-page">
+    <div class="contract-studio-shell">
+      <header class="studio-hero">
+        <div>
+          <p class="studio-eyebrow">INTERNAL CONTRACT STUDIO</p>
+          <h1>合約工作台</h1>
+          <p class="studio-description">
+            先整理合約摘要、付款節點與條款，再產生給客戶手機簽署的專屬連結。
+          </p>
+        </div>
+        <div class="studio-actions">
+          <a id="open-sign-link" href="/contract-studio/sign" target="_blank" rel="noreferrer" class="btn btn-primary">
+            開啟客戶簽署頁
+          </a>
+          <button type="button" id="copy-sign-link" class="btn btn-secondary">複製簽署連結</button>
+          <button type="button" id="reset-contract" class="btn btn-secondary btn-muted">重設本次合約</button>
+        </div>
+        <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；後續可再改掛到 `contract` 次網址。</p>
+      </header>
+
+      <div class="studio-grid">
+        <div class="studio-main">
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>合約基本資訊</h2>
+              <p>這些內容會直接顯示在客戶簽署頁，建議與正式報價或材料確認表一致。</p>
+            </div>
+            <div class="form-grid">
+              <label class="field">
+                <span>合約標題</span>
+                <input data-field="contractTitle" type="text" placeholder="例如：住宅空間裝修工程合約書" />
+              </label>
+              <label class="field">
+                <span>合約編號</span>
+                <input data-field="contractNumber" type="text" placeholder="例如：QX-202606-001" />
+              </label>
+              <label class="field">
+                <span>客戶姓名</span>
+                <input data-field="clientName" type="text" placeholder="例如：王小姐" />
+              </label>
+              <label class="field">
+                <span>聯絡電話</span>
+                <input data-field="clientPhone" type="text" placeholder="例如：09xx-xxx-xxx" />
+              </label>
+              <label class="field">
+                <span>Email</span>
+                <input data-field="clientEmail" type="email" placeholder="例如：client@example.com" />
+              </label>
+              <label class="field">
+                <span>案件名稱</span>
+                <input data-field="projectName" type="text" placeholder="例如：林口新成屋裝修" />
+              </label>
+              <label class="field">
+                <span>案件地址</span>
+                <input data-field="projectAddress" type="text" placeholder="例如：新北市林口區..." />
+              </label>
+              <label class="field">
+                <span>報價 / 規格參照</span>
+                <input data-field="referenceLabel" type="text" placeholder="例如：初估單 v3、材料確認表 A 版" />
+              </label>
+              <label class="field">
+                <span>合約總額</span>
+                <div class="input-with-prefix">
+                  <span>NT$</span>
+                  <input data-field="contractAmount" type="number" min="0" step="1000" placeholder="例如：680000" />
+                </div>
+              </label>
+              <label class="field">
+                <span>簽約日期</span>
+                <input data-field="contractDate" type="date" />
+              </label>
+              <label class="field">
+                <span>預計開工</span>
+                <input data-field="plannedStartDate" type="date" />
+              </label>
+              <label class="field">
+                <span>預計完工</span>
+                <input data-field="plannedEndDate" type="date" />
+              </label>
+              <label class="field field-full">
+                <span>合約摘要</span>
+                <textarea
+                  data-field="contractSummary"
+                  rows="4"
+                  placeholder="例如：本案為新成屋住宅裝修，含拆除、水電、泥作、木作、油漆與系統櫃工程。"
+                ></textarea>
+              </label>
+            </div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>付款節點</h2>
+              <p>第一版先用百分比分配，客戶頁會同步換算成金額。</p>
+            </div>
+            <div id="payment-stage-list" class="payment-stage-list"></div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>核心條款</h2>
+              <p>先用正式合約最常用的五段骨架，再依案件需要微調。</p>
+            </div>
+            <div id="contract-section-list" class="contract-section-list"></div>
+          </section>
+
+          <section class="studio-card">
+            <div class="section-heading">
+              <h2>簽署與留證設定</h2>
+              <p>這一版先做手機手寫簽名與簽署摘要留證，之後若要再升級可銜接 OTP 或第三方電子簽署。</p>
+            </div>
+            <label class="field field-full">
+              <span>簽署完成提醒</span>
+              <textarea
+                data-field="signNotice"
+                rows="3"
+                placeholder="例如：簽署完成後，請雙方各自留存 PDF；若有追加減項，會再附上確認單。"
+              ></textarea>
+            </label>
+            <div class="checklist-shell">
+              <h3>客戶簽署前會再次確認以下內容</h3>
+              <ul id="checklist-list"></ul>
+            </div>
+          </section>
+        </div>
+
+        <aside class="studio-sidebar">
+          <section class="studio-card summary-card">
+            <div class="section-heading">
+              <h2>即時摘要</h2>
+              <p>確認付款比例是否為 100%，再分享給客戶。</p>
+            </div>
+            <div id="summary-content" class="summary-content"></div>
+          </section>
+          <section class="studio-card summary-card">
+            <div class="section-heading">
+              <h2>模組定位</h2>
+              <p>這版先做到可操作的手機簽署 MVP。</p>
+            </div>
+            <ul class="support-list">
+              <li>客戶可在手機上手寫簽名</li>
+              <li>簽署頁可列印或另存 PDF</li>
+              <li>保留簽署時間與裝置摘要</li>
+              <li>後續可再升級 OTP 與第三方電子簽署</li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script
+  is:inline
+  define:vars={{
+    contractDefaultPaymentStagesJson,
+    contractDefaultSectionsJson,
+    contractDefaultChecklistJson,
+  }}
+>
+  // @ts-nocheck
+  const paymentStageTemplate = JSON.parse(contractDefaultPaymentStagesJson);
+  const contractSectionTemplate = JSON.parse(contractDefaultSectionsJson);
+  const contractChecklist = JSON.parse(contractDefaultChecklistJson);
+  const draftKey = "qingxi-contract-studio-draft-v1";
+
+  function buildDefaultContractNumber() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `QX-${year}${month}${day}`;
+  }
+
+  function formatCurrency(value) {
+    return new Intl.NumberFormat("zh-TW", {
+      style: "currency",
+      currency: "TWD",
+      maximumFractionDigits: 0,
+    }).format(Number.isFinite(value) ? value : 0);
+  }
+
+  function parseNumber(value) {
+    const normalized = Number(value);
+    return Number.isFinite(normalized) ? normalized : 0;
+  }
+
+  function createInitialState() {
+    const today = new Date();
+    const todayString = today.toISOString().slice(0, 10);
+    const endDate = new Date(today);
+    endDate.setMonth(endDate.getMonth() + 2);
+
+    return {
+      meta: {
+        contractTitle: "住宅空間裝修工程合約書",
+        contractNumber: buildDefaultContractNumber(),
+        clientName: "",
+        clientPhone: "",
+        clientEmail: "",
+        projectName: "",
+        projectAddress: "",
+        referenceLabel: "",
+        contractAmount: 0,
+        contractDate: todayString,
+        plannedStartDate: todayString,
+        plannedEndDate: endDate.toISOString().slice(0, 10),
+        contractSummary:
+          "本案依雙方已確認之需求、報價單與材料方向進行裝修工程施作，正式內容仍以合約與附件共同構成。",
+        signNotice:
+          "簽署完成後，建議雙方立即列印或另存 PDF 留存；後續若有追加減，會再附確認單共同簽認。",
+      },
+      paymentStages: paymentStageTemplate.map((stage) => ({ ...stage })),
+      sections: contractSectionTemplate.map((section) => ({ ...section })),
+    };
+  }
+
+  let state = createInitialState();
+
+  function saveDraft() {
+    localStorage.setItem(draftKey, JSON.stringify(state));
+  }
+
+  function loadDraft() {
+    try {
+      const saved = localStorage.getItem(draftKey);
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      state = {
+        meta: { ...state.meta, ...(parsed.meta || {}) },
+        paymentStages: Array.isArray(parsed.paymentStages) && parsed.paymentStages.length
+          ? parsed.paymentStages
+          : state.paymentStages,
+        sections: Array.isArray(parsed.sections) && parsed.sections.length
+          ? parsed.sections
+          : state.sections,
+      };
+    } catch (error) {
+      console.error("無法讀取合約草稿：", error);
+    }
+  }
+
+  function encodePayload(payload) {
+    const bytes = new TextEncoder().encode(JSON.stringify(payload));
+    const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+    return btoa(binary);
+  }
+
+  function buildPayload() {
+    const amount = parseNumber(state.meta.contractAmount);
+    const paymentStages = state.paymentStages.map((stage) => ({
+      ...stage,
+      percent: parseNumber(stage.percent),
+      amount: Math.round((amount * parseNumber(stage.percent)) / 100),
+    }));
+
+    return {
+      meta: {
+        ...state.meta,
+        contractAmount: amount,
+      },
+      paymentStages,
+      sections: state.sections,
+      checklist: contractChecklist,
+      generatedAt: new Date().toISOString(),
+      source: "qingxi-contract-studio",
+    };
+  }
+
+  function buildSignUrl() {
+    const payload = encodePayload(buildPayload());
+    return `${window.location.origin}/contract-studio/sign#contract=${payload}`;
+  }
+
+  function renderPaymentStages() {
+    const amount = parseNumber(state.meta.contractAmount);
+    document.getElementById("payment-stage-list").innerHTML = state.paymentStages
+      .map((stage) => {
+        const computedAmount = Math.round((amount * parseNumber(stage.percent)) / 100);
+        return `
+          <article class="payment-stage-card">
+            <label class="field">
+              <span>節點名稱</span>
+              <input data-payment-id="${stage.id}" data-payment-field="label" type="text" value="${stage.label}" />
+            </label>
+            <label class="field">
+              <span>比例</span>
+              <div class="input-with-suffix">
+                <input data-payment-id="${stage.id}" data-payment-field="percent" type="number" min="0" max="100" step="1" value="${stage.percent}" />
+                <span>%</span>
+              </div>
+            </label>
+            <label class="field field-full">
+              <span>說明</span>
+              <textarea data-payment-id="${stage.id}" data-payment-field="note" rows="3">${stage.note}</textarea>
+            </label>
+            <div class="stage-amount">${formatCurrency(computedAmount)}</div>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function renderSections() {
+    document.getElementById("contract-section-list").innerHTML = state.sections
+      .map(
+        (section) => `
+          <article class="contract-section-card">
+            <h3>${section.title}</h3>
+            <textarea data-section-id="${section.id}" rows="5">${section.body}</textarea>
+          </article>
+        `,
+      )
+      .join("");
+  }
+
+  function renderChecklist() {
+    document.getElementById("checklist-list").innerHTML = contractChecklist
+      .map((item) => `<li>${item}</li>`)
+      .join("");
+  }
+
+  function renderSummary() {
+    const amount = parseNumber(state.meta.contractAmount);
+    const totalPercent = state.paymentStages.reduce((sum, stage) => sum + parseNumber(stage.percent), 0);
+
+    document.getElementById("summary-content").innerHTML = `
+      <div class="summary-row">
+        <span>合約總額</span>
+        <strong>${formatCurrency(amount)}</strong>
+      </div>
+      <div class="summary-row">
+        <span>付款比例總和</span>
+        <strong class="${totalPercent === 100 ? "is-good" : "is-warning"}">${totalPercent}%</strong>
+      </div>
+      <div class="summary-row">
+        <span>條款段落</span>
+        <strong>${state.sections.length} 段</strong>
+      </div>
+      <div class="summary-row">
+        <span>簽署方式</span>
+        <strong>手機手寫簽名</strong>
+      </div>
+      <p class="summary-note">
+        若付款比例未滿 100%，簽署頁仍可開啟，但建議先補正後再分享給客戶。
+      </p>
+    `;
+  }
+
+  function syncMetaInputs() {
+    document.querySelectorAll("[data-field]").forEach((input) => {
+      const key = input.dataset.field;
+      if (!key) return;
+      input.value = state.meta[key] ?? "";
+    });
+  }
+
+  function syncActions() {
+    const signUrl = buildSignUrl();
+    document.getElementById("open-sign-link").href = signUrl;
+  }
+
+  function renderAll() {
+    syncMetaInputs();
+    renderPaymentStages();
+    renderSections();
+    renderChecklist();
+    renderSummary();
+    syncActions();
+  }
+
+  function resetState() {
+    state = createInitialState();
+    saveDraft();
+    renderAll();
+  }
+
+  loadDraft();
+  renderAll();
+
+  document.addEventListener("input", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+
+    if (target.dataset.field) {
+      state.meta[target.dataset.field] = target.type === "number" ? parseNumber(target.value) : target.value;
+      saveDraft();
+      renderSummary();
+      syncActions();
+      renderPaymentStages();
+      return;
+    }
+  });
+
+  document.addEventListener("change", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+
+    if (target.dataset.paymentId && target.dataset.paymentField) {
+      state.paymentStages = state.paymentStages.map((stage) =>
+        stage.id === target.dataset.paymentId
+          ? {
+              ...stage,
+              [target.dataset.paymentField]:
+                target.dataset.paymentField === "percent" ? parseNumber(target.value) : target.value,
+            }
+          : stage,
+      );
+      saveDraft();
+      renderPaymentStages();
+      renderSummary();
+      syncActions();
+      return;
+    }
+
+    if (target.dataset.sectionId) {
+      state.sections = state.sections.map((section) =>
+        section.id === target.dataset.sectionId ? { ...section, body: target.value } : section,
+      );
+      saveDraft();
+      renderSummary();
+      syncActions();
+    }
+  });
+
+  document.getElementById("copy-sign-link").addEventListener("click", async (event) => {
+    const target = event.currentTarget;
+    if (!(target instanceof HTMLButtonElement)) return;
+
+    try {
+      await navigator.clipboard.writeText(buildSignUrl());
+      const originalText = target.textContent;
+      target.textContent = "簽署連結已複製";
+      window.setTimeout(() => {
+        target.textContent = originalText;
+      }, 1400);
+    } catch (error) {
+      console.error("無法複製簽署連結：", error);
+    }
+  });
+
+  document.getElementById("reset-contract").addEventListener("click", () => {
+    resetState();
+  });
+</script>
+
+<style>
+  .contract-studio-page {
+    padding: 8rem 0 5rem;
+    background: linear-gradient(180deg, rgba(246, 242, 236, 0.94), rgba(255, 255, 255, 0.98));
+  }
+
+  .contract-studio-shell {
+    width: min(1180px, calc(100% - 2rem));
+    margin: 0 auto;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .studio-hero,
+  .studio-card {
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(60, 37, 22, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 20px 45px rgba(31, 24, 19, 0.08);
+  }
+
+  .studio-hero {
+    padding: 1.75rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .studio-eyebrow {
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.18em;
+    font-size: 0.78rem;
+    color: #8d6f5c;
+  }
+
+  .studio-hero h1,
+  .section-heading h2,
+  .contract-section-card h3,
+  .checklist-shell h3 {
+    margin: 0;
+  }
+
+  .studio-description,
+  .studio-route-note,
+  .section-heading p,
+  .summary-note,
+  .support-list {
+    margin: 0;
+    color: rgba(64, 44, 30, 0.76);
+  }
+
+  .studio-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .studio-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 0.95fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .studio-main,
+  .studio-sidebar {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .studio-card {
+    padding: 1.4rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .field,
+  .contract-section-card {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .field span {
+    font-size: 0.95rem;
+    color: rgba(64, 44, 30, 0.9);
+  }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    border: 1px solid rgba(93, 67, 44, 0.18);
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    font: inherit;
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .field-full {
+    grid-column: 1 / -1;
+  }
+
+  .input-with-prefix,
+  .input-with-suffix {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    border: 1px solid rgba(93, 67, 44, 0.18);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.98);
+    overflow: hidden;
+  }
+
+  .input-with-suffix {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .input-with-prefix span,
+  .input-with-suffix span {
+    padding: 0.85rem 1rem;
+    color: rgba(64, 44, 30, 0.68);
+    background: rgba(243, 236, 228, 0.72);
+  }
+
+  .input-with-prefix input,
+  .input-with-suffix input {
+    border: 0;
+    border-radius: 0;
+    padding: 0.85rem 1rem;
+  }
+
+  .payment-stage-list,
+  .contract-section-list {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .payment-stage-card,
+  .contract-section-card,
+  .checklist-shell {
+    border: 1px solid rgba(93, 67, 44, 0.1);
+    border-radius: 18px;
+    padding: 1rem;
+    background: rgba(250, 247, 242, 0.7);
+  }
+
+  .payment-stage-card {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .stage-amount {
+    grid-column: 1 / -1;
+    justify-self: end;
+    font-weight: 700;
+    color: #6d513c;
+  }
+
+  .checklist-shell ul,
+  .support-list {
+    padding-left: 1.1rem;
+  }
+
+  .summary-content {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.98rem;
+  }
+
+  .is-good {
+    color: #276749;
+  }
+
+  .is-warning {
+    color: #b45309;
+  }
+
+  @media (max-width: 960px) {
+    .studio-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .form-grid,
+    .payment-stage-card {
+      grid-template-columns: 1fr;
+    }
+
+    .contract-studio-page {
+      padding-top: 7rem;
+    }
+  }
+</style>
