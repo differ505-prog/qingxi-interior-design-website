@@ -454,6 +454,13 @@ const workflow = [
   .visual-card {
     display: grid;
     gap: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition:
+      transform 0.38s ease,
+      box-shadow 0.38s ease,
+      border-color 0.38s ease,
+      background-color 0.38s ease;
   }
 
   .visual-frame {
@@ -469,16 +476,42 @@ const workflow = [
     padding: 1rem;
     color: rgba(255, 255, 255, 0.9);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    transition:
+      transform 0.45s ease,
+      box-shadow 0.45s ease,
+      border-color 0.45s ease;
   }
 
   .visual-frame-photo {
+    position: relative;
+    isolation: isolate;
     overflow: hidden;
     border-style: solid;
     border-color: rgba(27, 27, 27, 0.08);
     background-position: center;
-    background-size: cover;
+    background-size: 102%;
     background-repeat: no-repeat;
     align-content: space-between;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 18px 30px rgba(17, 17, 17, 0.08);
+    transition:
+      background-size 0.6s ease,
+      filter 0.45s ease,
+      box-shadow 0.45s ease,
+      border-color 0.45s ease;
+  }
+
+  .visual-frame-photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(12, 12, 12, 0.04) 0%, rgba(12, 12, 12, 0.28) 100%),
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 38%);
+    opacity: 0.72;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
   }
 
   .visual-frame span,
@@ -492,6 +525,11 @@ const workflow = [
 
   .visual-frame span {
     color: rgba(255, 255, 255, 0.64);
+    position: relative;
+    z-index: 1;
+    transition:
+      transform 0.38s ease,
+      color 0.38s ease;
   }
 
   .visual-frame strong {
@@ -500,6 +538,19 @@ const workflow = [
     font-size: 1.05rem;
     letter-spacing: 0.14em;
     font-weight: 500;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 6px 22px rgba(0, 0, 0, 0.24);
+    transition:
+      transform 0.38s ease,
+      letter-spacing 0.38s ease,
+      color 0.38s ease;
+  }
+
+  .visual-copy {
+    display: grid;
+    align-content: start;
+    transition: transform 0.38s ease;
   }
 
   .visual-copy h3 {
@@ -521,6 +572,68 @@ const workflow = [
     margin-top: 0.9rem;
     color: var(--tiffany-dark);
     letter-spacing: 0.03em;
+    transition:
+      color 0.35s ease,
+      letter-spacing 0.35s ease,
+      opacity 0.35s ease;
+  }
+
+  @media (hover: hover) {
+    .visual-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(129, 199, 212, 0.24);
+      box-shadow: 0 28px 48px rgba(32, 42, 46, 0.12);
+    }
+
+    .visual-card:hover .visual-frame {
+      transform: translateY(-2px);
+      border-color: rgba(129, 199, 212, 0.28);
+    }
+
+    .visual-card:hover .visual-frame-photo {
+      background-size: 108%;
+      filter: saturate(1.03) contrast(1.02);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+        0 24px 36px rgba(17, 17, 17, 0.12);
+    }
+
+    .visual-card:hover .visual-frame-photo::after {
+      opacity: 0.44;
+    }
+
+    .visual-card:hover .visual-frame span {
+      transform: translateY(-2px);
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .visual-card:hover .visual-frame strong {
+      transform: translateY(-1px);
+      letter-spacing: 0.17em;
+      color: rgba(255, 255, 255, 0.98);
+    }
+
+    .visual-card:hover .visual-copy {
+      transform: translateY(-1px);
+    }
+
+    .visual-card:hover .visual-copy small {
+      color: var(--gray-darkest);
+      letter-spacing: 0.05em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .visual-card,
+    .visual-frame,
+    .visual-frame-photo,
+    .visual-frame-photo::after,
+    .visual-frame span,
+    .visual-frame strong,
+    .visual-copy,
+    .visual-copy small {
+      transition: none;
+    }
   }
 
   .capability-label,
