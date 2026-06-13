@@ -173,6 +173,58 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     return JSON.parse(json);
   }
 
+  function normalizeLegacyContractText(value) {
+    if (typeof value !== "string") return value;
+
+    return value
+      .replaceAll("正式合約", "本合約")
+      .replaceAll("正式報價", "本案報價")
+      .replaceAll("正式附件", "附件")
+      .replaceAll("正式通知管道", "約定通知管道")
+      .replaceAll("正式書面往來管道", "約定書面往來管道")
+      .replaceAll("正式點交", "雙方點交")
+      .replaceAll("正式委任程序", "另行委任程序")
+      .replaceAll("正式委任文件", "另行委任文件")
+      .replaceAll("正式 PDF 定稿存證", "定稿 PDF 存證")
+      .replaceAll("正式副本", "定稿副本")
+      .replaceAll("第三方電子簽署", "外部簽署服務")
+      .replaceAll("法院認證版本", "高證據力版本")
+      .replaceAll("MVP", "目前版本");
+  }
+
+  function normalizeContractPayload(payload) {
+    if (!payload || typeof payload !== "object") return payload;
+
+    const normalizedMeta = Object.fromEntries(
+      Object.entries(payload.meta || {}).map(([key, value]) => [key, normalizeLegacyContractText(value)]),
+    );
+
+    return {
+      ...payload,
+      meta: normalizedMeta,
+      paymentStages: (payload.paymentStages || []).map((stage) => ({
+        ...stage,
+        label: normalizeLegacyContractText(stage.label),
+        note: normalizeLegacyContractText(stage.note),
+      })),
+      sections: (payload.sections || []).map((section) => ({
+        ...section,
+        title: normalizeLegacyContractText(section.title),
+        body: normalizeLegacyContractText(section.body),
+      })),
+      materialSpecs: (payload.materialSpecs || []).map((section) => ({
+        ...section,
+        title: normalizeLegacyContractText(section.title),
+        description: normalizeLegacyContractText(section.description),
+        baseline: normalizeLegacyContractText(section.baseline),
+        selection: normalizeLegacyContractText(section.selection),
+        finishScope: normalizeLegacyContractText(section.finishScope),
+        note: normalizeLegacyContractText(section.note),
+      })),
+      checklist: (payload.checklist || []).map((item) => normalizeLegacyContractText(item)),
+    };
+  }
+
   function getEncodedPayload() {
     const hash = window.location.hash.startsWith("#")
       ? window.location.hash.slice(1)
@@ -427,7 +479,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       const record = await response.json();
       return {
-        payload: record.payload,
+        payload: normalizeContractPayload(record.payload),
         contractChecksum: simpleChecksum(token),
       };
     }
@@ -438,7 +490,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     }
 
     return {
-      payload: decodePayload(encodedPayload),
+      payload: normalizeContractPayload(decodePayload(encodedPayload)),
       contractChecksum: simpleChecksum(encodedPayload),
     };
   }

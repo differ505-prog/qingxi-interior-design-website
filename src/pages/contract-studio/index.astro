@@ -304,6 +304,55 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
     return Number.isFinite(normalized) ? normalized : 0;
   }
 
+  function normalizeLegacyContractText(value) {
+    if (typeof value !== "string") return value;
+
+    return value
+      .replaceAll("正式合約", "本合約")
+      .replaceAll("正式報價", "本案報價")
+      .replaceAll("正式附件", "附件")
+      .replaceAll("正式通知管道", "約定通知管道")
+      .replaceAll("正式書面往來管道", "約定書面往來管道")
+      .replaceAll("正式點交", "雙方點交")
+      .replaceAll("正式委任程序", "另行委任程序")
+      .replaceAll("正式委任文件", "另行委任文件")
+      .replaceAll("正式 PDF 定稿存證", "定稿 PDF 存證")
+      .replaceAll("正式副本", "定稿副本")
+      .replaceAll("第三方電子簽署", "外部簽署服務")
+      .replaceAll("法院認證版本", "高證據力版本")
+      .replaceAll("MVP", "目前版本");
+  }
+
+  function normalizeContractState(nextState) {
+    const normalizedMeta = Object.fromEntries(
+      Object.entries(nextState.meta || {}).map(([key, value]) => [key, normalizeLegacyContractText(value)]),
+    );
+
+    return {
+      ...nextState,
+      meta: normalizedMeta,
+      paymentStages: (nextState.paymentStages || []).map((stage) => ({
+        ...stage,
+        label: normalizeLegacyContractText(stage.label),
+        note: normalizeLegacyContractText(stage.note),
+      })),
+      sections: (nextState.sections || []).map((section) => ({
+        ...section,
+        title: normalizeLegacyContractText(section.title),
+        body: normalizeLegacyContractText(section.body),
+      })),
+      materialSpecs: (nextState.materialSpecs || []).map((section) => ({
+        ...section,
+        title: normalizeLegacyContractText(section.title),
+        description: normalizeLegacyContractText(section.description),
+        baseline: normalizeLegacyContractText(section.baseline),
+        selection: normalizeLegacyContractText(section.selection),
+        finishScope: normalizeLegacyContractText(section.finishScope),
+        note: normalizeLegacyContractText(section.note),
+      })),
+    };
+  }
+
   function createInitialState() {
     const today = new Date();
     const todayString = today.toISOString().slice(0, 10);
@@ -361,7 +410,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       const saved = localStorage.getItem(draftKey);
       if (!saved) return;
       const parsed = JSON.parse(saved);
-      state = {
+      state = normalizeContractState({
         meta: { ...state.meta, ...(parsed.meta || {}) },
         paymentStages: Array.isArray(parsed.paymentStages) && parsed.paymentStages.length
           ? parsed.paymentStages
@@ -372,7 +421,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         materialSpecs: Array.isArray(parsed.materialSpecs) && parsed.materialSpecs.length
           ? parsed.materialSpecs
           : state.materialSpecs,
-      };
+      });
     } catch (error) {
       console.error("無法讀取合約草稿：", error);
     }
