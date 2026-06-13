@@ -16,7 +16,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           <p class="sign-description">可直接在手機上閱讀合約、手寫簽名，並於完成後列印或另存 PDF。</p>
         </div>
         <div class="sign-actions">
-          <button type="button" id="print-contract" class="btn btn-primary">列印 / 另存 PDF</button>
           <a href="/contract-studio" class="btn btn-secondary">返回合約工作台</a>
         </div>
       </header>
@@ -128,7 +127,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <section id="signed-record-section" class="document-section signed-record-section" hidden>
           <div class="section-heading">
             <h3>簽署完成紀錄</h3>
-            <p>簽署完成後，建議立即列印或另存 PDF 留存。</p>
+            <p>簽署完成後，請從最下方開啟定稿頁並另存 PDF 留存。</p>
           </div>
           <p id="signed-record-note" class="signed-record-note"></p>
           <div class="signed-record-grid">
@@ -137,6 +136,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               <span>簽名圖像</span>
               <img id="signed-record-image" alt="簽名圖像" />
             </div>
+          </div>
+          <div class="signed-record-actions print-hidden">
+            <button type="button" id="open-final-pdf" class="btn btn-primary">開啟定稿頁並儲存 PDF</button>
           </div>
         </section>
       </article>
@@ -329,9 +331,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   function renderSections(sections) {
     document.getElementById("section-list").innerHTML = sections
       .map(
-        (section) => `
+        (section, index) => `
           <article class="contract-copy-card">
-            <h4>${escapeHtml(section.title)}</h4>
+            <h4>第 ${index + 1} 條｜${escapeHtml(section.title)}</h4>
             <p>${escapeHtml(section.body).replace(/\n/g, "<br />")}</p>
           </article>
         `,
@@ -496,6 +498,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         payload: normalizeContractPayload(record.payload),
         contractChecksum: simpleChecksum(token),
         token,
+        signedRecordId: record.signedRecordId || "",
         signedRecord: record.signedRecord || null,
       };
     }
@@ -509,6 +512,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       payload: normalizeContractPayload(decodePayload(encodedPayload)),
       contractChecksum: simpleChecksum(encodedPayload),
       token: "",
+      signedRecordId: "",
       signedRecord: null,
     };
   }
@@ -525,8 +529,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         return;
       }
 
-      const { payload, contractChecksum, token, signedRecord: remoteSignedRecord } = resolved;
+      const { payload, contractChecksum, token, signedRecordId: remoteSignedRecordId, signedRecord: remoteSignedRecord } = resolved;
       const storageKey = getAuditStorageKey(contractChecksum);
+      let currentSignedRecordId = remoteSignedRecordId || "";
 
       signEmpty.hidden = true;
       contractDocument.hidden = false;
@@ -596,11 +601,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         if (!note) return;
 
         if (savedToServer) {
-          note.textContent = "這份已簽內容已同步存成永久紀錄，青曦可在內部的已簽合約頁重新查看。";
+          note.textContent = "這份已簽內容已同步存成永久紀錄，系統會開啟定稿頁並觸發列印 / 另存 PDF。";
           return;
         }
 
         note.textContent = "這份已簽內容目前保存在此裝置，請立即列印或另存 PDF 留存。";
+      }
+
+      function buildFinalContractUrl(recordId, autoPrint = false) {
+        if (!recordId) {
+          return "";
+        }
+        const finalUrl = new URL(`/contract-studio/final/${encodeURIComponent(recordId)}`, window.location.origin);
+        if (autoPrint) {
+          finalUrl.searchParams.set("autoprint", "1");
+        }
+        return finalUrl.toString();
       }
 
       const existingRecord = remoteSignedRecord || loadSavedRecord();
@@ -608,6 +624,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         saveSignedRecord(existingRecord);
         renderSignedRecord(existingRecord);
         renderSignedRecordNote(Boolean(token && remoteSignedRecord));
+        currentSignedRecordId = currentSignedRecordId || existingRecord.signedRecordId || "";
         signerNameInput.value = existingRecord.signerName || "";
         signerPhoneInput.value = existingRecord.signerPhone || "";
         signerEmailInput.value = existingRecord.signerEmail || "";
@@ -701,6 +718,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
         const signedAt = new Date();
         const signedRecord = {
+          signedRecordId: currentSignedRecordId,
           contractNumber: payload.meta.contractNumber || "",
           contractTitle: payload.meta.contractTitle || "",
           contractChecksum,
@@ -729,10 +747,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           const result = await persistSignedRecord(signedRecord);
           renderSignedRecord(signedRecord);
           renderSignedRecordNote(result.savedToServer);
+          currentSignedRecordId = result.signedRecordId || currentSignedRecordId;
           submitMessage.textContent = result.savedToServer
-            ? "已完成簽署，建議立即列印或另存 PDF；青曦已同步存成永久已簽合約。"
+            ? "已完成簽署，正在開啟定稿頁並準備列印 / 另存 PDF。"
             : "已完成簽署，建議立即列印或另存 PDF。";
           updateSigningStatus();
+          if (result.savedToServer && result.signedRecordId) {
+            window.setTimeout(() => {
+              window.location.assign(buildFinalContractUrl(result.signedRecordId, true));
+            }, 240);
+          }
         } catch (error) {
           console.error("儲存簽署紀錄失敗：", error);
           renderSignedRecord(signedRecord);
@@ -741,7 +765,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         }
       });
 
-      document.getElementById("print-contract").addEventListener("click", () => {
+      document.getElementById("open-final-pdf").addEventListener("click", () => {
+        const finalUrl = buildFinalContractUrl(currentSignedRecordId);
+        if (finalUrl) {
+          window.location.assign(finalUrl);
+          return;
+        }
         window.print();
       });
     } catch (error) {
@@ -909,6 +938,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
     gap: 1rem;
     align-items: start;
+  }
+
+  .signed-record-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
   }
 
   .signature-panel,
