@@ -197,6 +197,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       ["參照附件", meta.referenceLabel || "未填寫"],
       ["附件版次", meta.attachmentVersion || "未填寫"],
       ["合約總額", formatCurrency(Number(meta.contractAmount) || 0)],
+      ["中期款里程碑", meta.midpointMilestone || "未填寫"],
       ["簽約日期", meta.contractDate || "未填寫"],
       ["預計開工", meta.plannedStartDate || "未填寫"],
       ["預計完工", meta.plannedEndDate || "未填寫"],
@@ -205,6 +206,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       ["正式通知管道", meta.notificationChannel || "未填寫"],
       ["通知帳號 / 地址", meta.notificationAccount || "未填寫"],
       ["爭議處理", meta.disputeVenue || "未填寫"],
+      ["逾期違約金", meta.delayPenaltyRate || "未填寫"],
+      ["違約金上限", meta.delayPenaltyCap || "未填寫"],
+      ["終止結算標準", meta.settlementMethod || "未填寫"],
+      ["退款 / 結算指定帳戶", meta.refundAccount || "未填寫"],
     ];
 
     document.getElementById("document-meta").innerHTML = metaItems
@@ -426,6 +431,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       if (!signerPhone && !signerEmail) {
         submitMessage.textContent = "請至少提供電話或 Email 其中一項。";
+        return;
+      }
+
+      if (!signerIdentityCode) {
+        submitMessage.textContent = "請填寫身分識別資訊後再簽署。";
         return;
       }
 

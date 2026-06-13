@@ -86,6 +86,10 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
                 <input data-field="attachmentVersion" type="text" placeholder="例如：施工圖 A 版 / 規格表 v2" />
               </label>
               <label class="field">
+                <span>中期款查驗里程碑</span>
+                <input data-field="midpointMilestone" type="text" placeholder="例如：管線配置完成 / 泥作打底完成" />
+              </label>
+              <label class="field">
                 <span>合約總額</span>
                 <div class="input-with-prefix">
                   <span>NT$</span>
@@ -123,6 +127,22 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
               <label class="field">
                 <span>爭議處理管道</span>
                 <input data-field="disputeVenue" type="text" placeholder="例如：案場所在地法院 / 先行調解" />
+              </label>
+              <label class="field">
+                <span>逾期違約金</span>
+                <input data-field="delayPenaltyRate" type="text" placeholder="例如：千分之一 / 日" />
+              </label>
+              <label class="field">
+                <span>違約金上限</span>
+                <input data-field="delayPenaltyCap" type="text" placeholder="例如：合約總額 10%" />
+              </label>
+              <label class="field">
+                <span>終止結算標準</span>
+                <input data-field="settlementMethod" type="text" placeholder="例如：依原報價單單價與完成比例結算" />
+              </label>
+              <label class="field">
+                <span>退款 / 結算指定帳戶</span>
+                <input data-field="refundAccount" type="text" placeholder="例如：王小姐 / 銀行代碼 000 / 帳號末五碼 12345" />
               </label>
               <label class="field field-full">
                 <span>合約摘要</span>
@@ -269,11 +289,16 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
           "簽署完成後，建議雙方立即列印或另存 PDF 留存；後續若有追加減，會再附確認單共同簽認。",
         clientIdentityCode: "",
         attachmentVersion: "",
+        midpointMilestone: "管線配置完成 / 泥作打底完成",
         generalWarrantyYears: "1 年",
         waterproofWarrantyYears: "3 年",
         notificationChannel: "Email 與 LINE",
         notificationAccount: "",
         disputeVenue: "如需進一步處理，原則先協調或調解，必要時以案場所在地法院為第一審管轄法院。",
+        delayPenaltyRate: "千分之一 / 日",
+        delayPenaltyCap: "合約總額 10%",
+        settlementMethod: "依原報價單單價、已完成比例與已發生成本結算；必要時由第三方專業單位協助認定。",
+        refundAccount: "",
       },
       paymentStages: paymentStageTemplate.map((stage) => ({ ...stage })),
       sections: contractSectionTemplate.map((section) => ({ ...section })),
@@ -362,6 +387,7 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       "3. 哪些文案仍過於模糊，應補上定義、上限或免責界線",
       "4. 這套合約簽署模組以『MVP 可用度』為基準的成熟度評分（滿分 10 分）",
       "5. 若要再升級成更正式的電子簽署流程，最優先應補哪些機制",
+      "6. 請特別檢查：違約金預設值、終止結算標準、中期款里程碑、附件版次與退款帳戶是否足夠實務",
       "",
       "【合約基本資訊】",
       `- 合約標題：${payload.meta.contractTitle || "未填寫"}`,
@@ -373,6 +399,7 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       `- 參照附件：${payload.meta.referenceLabel || "未填寫"}`,
       `- 附件版次：${payload.meta.attachmentVersion || "未填寫"}`,
       `- 合約總額：${formatCurrency(payload.meta.contractAmount || 0)}`,
+      `- 中期款查驗里程碑：${payload.meta.midpointMilestone || "未填寫"}`,
       `- 簽約日期：${payload.meta.contractDate || "未填寫"}`,
       `- 預計開工：${payload.meta.plannedStartDate || "未填寫"}`,
       `- 預計完工：${payload.meta.plannedEndDate || "未填寫"}`,
@@ -380,11 +407,15 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
       `- 防水工程保固：${payload.meta.waterproofWarrantyYears || "未填寫"}`,
       `- 正式通知管道：${payload.meta.notificationChannel || "未填寫"} / ${payload.meta.notificationAccount || "未填寫"}`,
       `- 爭議處理：${payload.meta.disputeVenue || "未填寫"}`,
+      `- 逾期違約金：${payload.meta.delayPenaltyRate || "未填寫"}；上限：${payload.meta.delayPenaltyCap || "未填寫"}`,
+      `- 終止結算標準：${payload.meta.settlementMethod || "未填寫"}`,
+      `- 退款 / 結算指定帳戶：${payload.meta.refundAccount || "未填寫"}`,
       `- 合約摘要：${payload.meta.contractSummary || "未填寫"}`,
       `- 簽署完成提醒：${payload.meta.signNotice || "未填寫"}`,
       "",
       "【付款節點】",
       paymentLines || "- 未填寫",
+      "- 提醒：中期款是否合理，應以『查驗里程碑是否具體』為主，而不只看比例本身。",
       "",
       "【核心條款】",
       sectionLines || "- 未填寫",
@@ -484,11 +515,23 @@ const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
         <strong>${state.meta.notificationChannel || "未填寫"}</strong>
       </div>
       <div class="summary-row">
+        <span>中期款里程碑</span>
+        <strong>${state.meta.midpointMilestone || "未填寫"}</strong>
+      </div>
+      <div class="summary-row">
+        <span>違約金 / 上限</span>
+        <strong>${state.meta.delayPenaltyRate || "未填寫"} / ${state.meta.delayPenaltyCap || "未填寫"}</strong>
+      </div>
+      <div class="summary-row">
         <span>簽署方式</span>
         <strong>手機手寫簽名</strong>
       </div>
+      <div class="summary-row">
+        <span>退款帳戶</span>
+        <strong>${state.meta.refundAccount ? "已填寫" : "未填寫"}</strong>
+      </div>
       <p class="summary-note">
-        若付款比例未滿 100%，簽署頁仍可開啟，但建議先補正後再分享給客戶。
+        若付款比例未滿 100%，或身分識別、退款帳戶仍未填，簽署頁雖可開啟，但建議先補正後再分享給客戶。
       </p>
     `;
   }
