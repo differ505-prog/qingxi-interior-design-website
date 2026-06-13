@@ -86,6 +86,14 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
                 <input data-field="clientIdentityCode" type="text" placeholder="例如：A123456789 / 12345678" />
               </label>
               <label class="field">
+                <span>戶籍地址</span>
+                <input data-field="clientRegisteredAddress" type="text" placeholder="例如：台北市大安區..." />
+              </label>
+              <label class="field">
+                <span>通訊地址</span>
+                <input data-field="clientMailingAddress" type="text" placeholder="例如：同戶籍地址 / 新北市林口區..." />
+              </label>
+              <label class="field">
                 <span>指定專案代理人</span>
                 <input data-field="projectAgentName" type="text" placeholder="例如：王太太 / 家人 / 代理窗口" />
               </label>
@@ -166,7 +174,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
               </label>
               <label class="field">
                 <span>逾期違約金</span>
-                <input data-field="delayPenaltyRate" type="text" placeholder="例如：千分之一 / 日" />
+                <input data-field="delayPenaltyRate" type="text" placeholder="例如：未完成工程部分價額千分之一 / 日" />
               </label>
               <label class="field">
                 <span>違約金上限</span>
@@ -334,6 +342,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       .replaceAll("法院認證版本", "高證據力版本")
       .replaceAll("身分證末四碼 / 統編後四碼", "身分證字號 / 居留證號 / 統編")
       .replaceAll("本人名義帳戶為原則", "限以合約當事人本人名義帳戶為準")
+      .replaceAll("合約總額千分之一 / 日計收違約金", "未完成工程部分之價額千分之一 / 日計收違約金")
       .replaceAll(
         "若附件採雲端共用文件協作，亦應以簽署日當天匯出之靜態檔案或載明之明確版次為準。",
         "附件應於簽署當下固定為 PDF 或其他不可任意改寫之靜態檔案；簽署後如需調整，應以新版附件或追加減確認文件重新確認。",
@@ -400,6 +409,8 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         signNotice:
           "簽署完成後，雙方請立即列印或另存定稿 PDF 留存；後續若有追加減，將另附確認單共同簽認。",
         clientIdentityCode: "",
+        clientRegisteredAddress: "",
+        clientMailingAddress: "",
         emergencyContactName: "",
         emergencyContactRelation: "",
         emergencyContactPhone: "",
@@ -410,7 +421,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         notificationChannel: "Email 與 LINE",
         notificationAccount: "",
         disputeVenue: "如需進一步處理，原則先協調或調解，必要時以案場所在地法院為第一審管轄法院。",
-        delayPenaltyRate: "千分之一 / 日",
+        delayPenaltyRate: "未完成工程部分價額千分之一 / 日",
         delayPenaltyCap: "合約總額 10%",
         settlementMethod: "依原報價單單價、已完成比例與已發生成本結算；必要時由第三方專業單位協助認定。",
         refundAccountName: "",
@@ -599,12 +610,15 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       "8. 請特別檢查：尾款未清前先入住、先行使用、分區點交與保固起算的風險是否已被清楚處理",
       "9. 請特別檢查：個人承攬適用範圍、需切換合法專業單位承接時的條款與責任界線是否清楚，避免誤寫成已承諾特定建築師或立案業者一定承接",
       "10. 請特別檢查：附件是否已明確要求於簽署當下定稿為靜態檔案，以及涉及法定程序之工項是否已清楚寫明由適格專業單位直接締約、請款或開立發票",
+      "11. 請特別檢查：分享給客戶前是否應強制要求主體身分、送達地址、中期款里程碑、附件版次與退款帳戶完整填寫",
       "",
       "【合約基本資訊】",
       `- 合約標題：${payload.meta.contractTitle || "未填寫"}`,
       `- 合約編號：${payload.meta.contractNumber || "未填寫"}`,
       `- 客戶姓名：${payload.meta.clientName || "未填寫"}`,
       `- 身分識別：${payload.meta.clientIdentityCode || "未填寫"}`,
+      `- 戶籍地址：${payload.meta.clientRegisteredAddress || "未填寫"}`,
+      `- 通訊地址：${payload.meta.clientMailingAddress || "未填寫"}`,
       `- 指定代理人：${payload.meta.projectAgentName || "未填寫"} / ${payload.meta.projectAgentRole || "未填寫"}`,
       `- 緊急聯絡人：${payload.meta.emergencyContactName || "未填寫"} / ${payload.meta.emergencyContactRelation || "未填寫"} / ${payload.meta.emergencyContactPhone || "未填寫"}`,
       `- 案件名稱：${payload.meta.projectName || "未填寫"}`,
@@ -659,6 +673,70 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       "D2. 不適合讓客戶看到的內部草稿語氣句子",
       "E. 目前做得不錯的地方",
     ].join("\n");
+  }
+
+  function getShareReadinessIssues() {
+    const issues = [];
+    const meta = state.meta || {};
+
+    if (!String(meta.clientName || "").trim()) issues.push("客戶姓名");
+    if (!String(meta.clientIdentityCode || "").trim()) issues.push("完整身分識別");
+    if (!String(meta.clientRegisteredAddress || "").trim()) issues.push("戶籍地址");
+    if (!String(meta.clientMailingAddress || "").trim()) issues.push("通訊地址");
+    if (!String(meta.clientPhone || "").trim() && !String(meta.clientEmail || "").trim()) issues.push("電話或 Email");
+    if (!String(meta.attachmentVersion || "").trim()) issues.push("附件版次");
+    if (!String(meta.midpointMilestone || "").trim()) issues.push("中期款查驗里程碑");
+    if (!String(meta.notificationAccount || "").trim()) issues.push("約定通知帳號 / 地址");
+    if (!String(meta.emergencyContactName || "").trim()) issues.push("緊急聯絡人姓名");
+    if (!String(meta.emergencyContactPhone || "").trim()) issues.push("緊急聯絡人電話");
+    if (!String(meta.refundAccountName || "").trim()) issues.push("退款帳戶戶名");
+    if (!String(meta.refundAccount || "").trim()) issues.push("退款 / 結算指定帳戶");
+    if (!(parseNumber(meta.contractAmount) > 0)) issues.push("合約總額");
+
+    return issues;
+  }
+
+  function applyShareValidationState() {
+    const requiredFieldIssues = {
+      clientName: !String(state.meta.clientName || "").trim(),
+      clientIdentityCode: !String(state.meta.clientIdentityCode || "").trim(),
+      clientRegisteredAddress: !String(state.meta.clientRegisteredAddress || "").trim(),
+      clientMailingAddress: !String(state.meta.clientMailingAddress || "").trim(),
+      attachmentVersion: !String(state.meta.attachmentVersion || "").trim(),
+      midpointMilestone: !String(state.meta.midpointMilestone || "").trim(),
+      notificationAccount: !String(state.meta.notificationAccount || "").trim(),
+      emergencyContactName: !String(state.meta.emergencyContactName || "").trim(),
+      emergencyContactPhone: !String(state.meta.emergencyContactPhone || "").trim(),
+      refundAccountName: !String(state.meta.refundAccountName || "").trim(),
+      refundAccount: !String(state.meta.refundAccount || "").trim(),
+      contractAmount: !(parseNumber(state.meta.contractAmount) > 0),
+    };
+
+    document.querySelectorAll("[data-field]").forEach((input) => {
+      if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) return;
+      const key = input.dataset.field;
+      if (!key || !(key in requiredFieldIssues)) return;
+      input.classList.toggle("is-invalid", requiredFieldIssues[key]);
+    });
+
+    const missingContact = !String(state.meta.clientPhone || "").trim() && !String(state.meta.clientEmail || "").trim();
+    const phoneInput = document.querySelector('[data-field="clientPhone"]');
+    const emailInput = document.querySelector('[data-field="clientEmail"]');
+    if (phoneInput instanceof HTMLInputElement) phoneInput.classList.toggle("is-invalid", missingContact);
+    if (emailInput instanceof HTMLInputElement) emailInput.classList.toggle("is-invalid", missingContact);
+  }
+
+  function renderShareValidationIssues(issues) {
+    const feedback = document.getElementById("share-link-feedback");
+    if (!feedback) return;
+    if (!issues.length) {
+      feedback.className = "share-link-feedback";
+      feedback.textContent = "";
+      return;
+    }
+
+    feedback.className = "share-link-feedback is-warning";
+    feedback.textContent = `分享前請先補齊：${issues.join("、")}`;
   }
 
   function renderPaymentStages() {
@@ -782,6 +860,10 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         <strong>${state.meta.delayPenaltyRate || "未填寫"} / ${state.meta.delayPenaltyCap || "未填寫"}</strong>
       </div>
       <div class="summary-row">
+        <span>送達地址</span>
+        <strong>${state.meta.clientRegisteredAddress && state.meta.clientMailingAddress ? "已填寫" : "未填寫"}</strong>
+      </div>
+      <div class="summary-row">
         <span>簽署方式</span>
         <strong>手機手寫簽名</strong>
       </div>
@@ -802,9 +884,13 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         <strong>${state.meta.projectAgentName || "未填寫"}</strong>
       </div>
       <p class="summary-note">
-        若付款比例未滿 100%，或完整身分識別、緊急聯絡人、退款帳戶、附件版次與材料規格仍未補齊，簽署頁雖可開啟，但建議先補正後再分享給客戶。
+        若付款比例未滿 100%，或完整身分識別、送達地址、緊急聯絡人、退款帳戶、附件版次與材料規格仍未補齊，簽署頁雖可開啟，但建議先補正後再分享給客戶。
       </p>
     `;
+    applyShareValidationState();
+    if (!getShareReadinessIssues().length) {
+      renderShareValidationIssues([]);
+    }
   }
 
   function renderLlmReviewOutput() {
@@ -906,6 +992,10 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
   document.getElementById("open-sign-link").addEventListener("click", async (event) => {
     event.preventDefault();
+    const issues = getShareReadinessIssues();
+    applyShareValidationState();
+    renderShareValidationIssues(issues);
+    if (issues.length) return;
     const result = await createShareLink();
     renderShareLinkStatus(result);
     const feedback = document.getElementById("share-link-feedback");
@@ -921,6 +1011,10 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
     if (!(target instanceof HTMLButtonElement)) return;
 
     try {
+      const issues = getShareReadinessIssues();
+      applyShareValidationState();
+      renderShareValidationIssues(issues);
+      if (issues.length) return;
       const result = await createShareLink();
       renderShareLinkStatus(result);
       await navigator.clipboard.writeText(result.url);
@@ -1047,6 +1141,13 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
   .share-link-feedback.is-warning {
     color: #b45309;
+  }
+
+  .field input.is-invalid,
+  .field textarea.is-invalid {
+    border-color: rgba(181, 93, 63, 0.5);
+    box-shadow: 0 0 0 3px rgba(181, 93, 63, 0.12);
+    background: rgba(255, 247, 243, 0.96);
   }
 
   .studio-grid {
