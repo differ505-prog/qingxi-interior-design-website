@@ -457,7 +457,9 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
   function buildInlineSignUrl() {
     const payload = encodePayload(buildPayload());
-    return `${window.location.origin}/contract-studio/sign#contract=${payload}`;
+    const url = new URL("/contract-studio/sign", window.location.origin);
+    url.searchParams.set("contract", payload);
+    return url.toString();
   }
 
   async function createShareLink() {

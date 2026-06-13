@@ -20,11 +20,12 @@ export const POST: APIRoute = async ({ request }) => {
     const origin = new URL(request.url).origin;
 
     if (!isContractLinkStorageConfigured()) {
-      const fallbackUrl = `${origin}/contract-studio/sign#contract=${encodeContractPayload(payload)}`;
+      const fallbackUrl = new URL("/contract-studio/sign", origin);
+      fallbackUrl.searchParams.set("contract", encodeContractPayload(payload));
       return new Response(
         JSON.stringify({
           mode: "inline",
-          url: fallbackUrl,
+          url: fallbackUrl.toString(),
           warning: "SHORT_LINK_STORAGE_NOT_CONFIGURED",
         }),
         {
