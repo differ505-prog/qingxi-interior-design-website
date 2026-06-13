@@ -736,7 +736,23 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
     }
 
     feedback.className = "share-link-feedback is-warning";
-    feedback.textContent = `分享前請先補齊：${issues.join("、")}`;
+    feedback.textContent = `正式發給客戶前建議補齊：${issues.join("、")}`;
+  }
+
+  function focusFirstInvalidShareField() {
+    const firstInvalid = document.querySelector(".field input.is-invalid, .field textarea.is-invalid");
+    if (!(firstInvalid instanceof HTMLInputElement || firstInvalid instanceof HTMLTextAreaElement)) return;
+    firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => firstInvalid.focus(), 180);
+  }
+
+  function flashActionText(button, text, delay = 1500) {
+    if (!(button instanceof HTMLButtonElement || button instanceof HTMLAnchorElement)) return;
+    const originalText = button.textContent;
+    button.textContent = text;
+    window.setTimeout(() => {
+      button.textContent = originalText;
+    }, delay);
   }
 
   function renderPaymentStages() {
@@ -992,16 +1008,27 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
   document.getElementById("open-sign-link").addEventListener("click", async (event) => {
     event.preventDefault();
+    const trigger = event.currentTarget;
     const issues = getShareReadinessIssues();
     applyShareValidationState();
     renderShareValidationIssues(issues);
-    if (issues.length) return;
+    if (issues.length) {
+      focusFirstInvalidShareField();
+      flashActionText(trigger, "已開啟測試連結");
+    }
     const result = await createShareLink();
     renderShareLinkStatus(result);
     const feedback = document.getElementById("share-link-feedback");
     if (feedback) {
-      feedback.className = `share-link-feedback ${result.mode === "short" ? "is-ready" : "is-warning"}`;
-      feedback.textContent = result.mode === "short" ? "已在新分頁開啟短簽約連結。" : "已在新分頁開啟完整長連結。";
+      feedback.className = `share-link-feedback ${issues.length || result.mode !== "short" ? "is-warning" : "is-ready"}`;
+      if (issues.length) {
+        feedback.textContent =
+          result.mode === "short"
+            ? `已開啟測試用短簽約連結；正式發給客戶前建議補齊：${issues.join("、")}`
+            : `已開啟測試用完整長連結；正式發給客戶前建議補齊：${issues.join("、")}`;
+      } else {
+        feedback.textContent = result.mode === "short" ? "已在新分頁開啟短簽約連結。" : "已在新分頁開啟完整長連結。";
+      }
     }
     window.open(result.url, "_blank", "noopener,noreferrer");
   });
@@ -1014,17 +1041,39 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
       const issues = getShareReadinessIssues();
       applyShareValidationState();
       renderShareValidationIssues(issues);
-      if (issues.length) return;
+      if (issues.length) {
+        focusFirstInvalidShareField();
+        flashActionText(target, "已複製測試連結");
+      }
       const result = await createShareLink();
       renderShareLinkStatus(result);
       await navigator.clipboard.writeText(result.url);
-      const originalText = target.textContent;
-      target.textContent = result.mode === "short" ? "短簽約連結已複製" : "已複製完整長連結";
-      window.setTimeout(() => {
-        target.textContent = originalText;
-      }, 1400);
+      flashActionText(
+        target,
+        issues.length
+          ? result.mode === "short"
+            ? "測試用短連結已複製"
+            : "測試用長連結已複製"
+          : result.mode === "short"
+            ? "短簽約連結已複製"
+            : "已複製完整長連結",
+        1400,
+      );
+      if (issues.length) {
+        renderShareValidationIssues([]);
+        const feedback = document.getElementById("share-link-feedback");
+        if (feedback) {
+          feedback.className = "share-link-feedback is-warning";
+          feedback.textContent =
+            result.mode === "short"
+              ? `已複製測試用短簽約連結；正式發給客戶前建議補齊：${issues.join("、")}`
+              : `已複製測試用完整長連結；正式發給客戶前建議補齊：${issues.join("、")}`;
+        }
+      }
     } catch (error) {
       console.error("無法複製簽署連結：", error);
+      renderShareValidationIssues(["瀏覽器未允許複製功能，請改用預覽客戶簽署頁後自行複製網址"]);
+      flashActionText(target, "複製失敗，請改用預覽頁");
     }
   });
 
