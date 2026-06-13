@@ -6,11 +6,14 @@ import {
   contractDefaultPaymentStages,
   contractDefaultSections,
 } from "../../lib/contract-studio";
+import { isContractLinkStorageConfigured } from "../../lib/contract-link-store";
 
 const contractDefaultPaymentStagesJson = JSON.stringify(contractDefaultPaymentStages);
 const contractDefaultSectionsJson = JSON.stringify(contractDefaultSections);
 const contractDefaultChecklistJson = JSON.stringify(contractDefaultChecklist);
 const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialSpecs);
+const shortLinkStorageConfigured = isContractLinkStorageConfigured();
+const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured);
 ---
 
 <BaseLayout
@@ -32,11 +35,22 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
           <a id="open-sign-link" href="/contract-studio/sign" target="_blank" rel="noreferrer" class="btn btn-primary">
             預覽客戶簽署頁
           </a>
-          <button type="button" id="copy-sign-link" class="btn btn-secondary">複製給客戶的完整簽約連結</button>
+          <button type="button" id="copy-sign-link" class="btn btn-secondary">複製給客戶的簽約連結</button>
           <button type="button" id="copy-contract-llm-review" class="btn btn-secondary">複製 LLM 合約覆核文字</button>
           <button type="button" id="reset-contract" class="btn btn-secondary btn-muted">重設本次合約</button>
         </div>
-          <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；若已接上 Vercel KV，分享會優先產生短簽約連結，未接上時則自動退回內嵌長連結。</p>
+        <p class="studio-route-note">此頁未加入前台導覽，且已設為 `noindex`；若已接上 Vercel KV，分享會優先產生短簽約連結，未接上時則自動退回內嵌長連結。</p>
+        <div id="share-link-status" class:list={["share-link-status", shortLinkStorageConfigured ? "is-ready" : "is-warning"]}>
+          <strong>{shortLinkStorageConfigured ? "短簽約連結已啟用" : "短簽約連結尚未啟用"}</strong>
+          <p id="share-link-status-note">
+            {
+              shortLinkStorageConfigured
+                ? "目前分享給客戶時，會優先產生較短的 token 簽約連結，比較適合直接傳 LINE。"
+                : "目前仍會退回完整長連結；請在 Vercel 補上 KV_REST_API_URL 與 KV_REST_API_TOKEN 後重新部署。"
+            }
+          </p>
+        </div>
+        <p id="share-link-feedback" class="share-link-feedback" aria-live="polite"></p>
       </header>
 
       <div class="studio-grid">
@@ -258,6 +272,7 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
     contractDefaultSectionsJson,
     contractDefaultChecklistJson,
     contractDefaultMaterialSpecsJson,
+    shortLinkStorageConfiguredJson,
   }}
 >
   // @ts-nocheck
@@ -265,6 +280,7 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
   const contractSectionTemplate = JSON.parse(contractDefaultSectionsJson);
   const contractChecklist = JSON.parse(contractDefaultChecklistJson);
   const materialSpecTemplate = JSON.parse(contractDefaultMaterialSpecsJson);
+  const shortLinkStorageConfigured = JSON.parse(shortLinkStorageConfiguredJson);
   const draftKey = "qingxi-contract-studio-draft-v2";
 
   function buildDefaultContractNumber() {
@@ -427,6 +443,49 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
         warning: "CREATE_SHARE_LINK_FAILED",
       };
     }
+  }
+
+  function renderShareLinkStatus(result) {
+    const statusShell = document.getElementById("share-link-status");
+    const statusTitle = statusShell?.querySelector("strong");
+    const statusNote = document.getElementById("share-link-status-note");
+    const feedback = document.getElementById("share-link-feedback");
+    if (!statusShell || !statusTitle || !statusNote || !feedback) return;
+
+    if (!result) {
+      statusShell.className = `share-link-status ${shortLinkStorageConfigured ? "is-ready" : "is-warning"}`;
+      statusTitle.textContent = shortLinkStorageConfigured ? "短簽約連結已啟用" : "短簽約連結尚未啟用";
+      statusNote.textContent = shortLinkStorageConfigured
+        ? "目前分享給客戶時，會優先產生較短的 token 簽約連結，比較適合直接傳 LINE。"
+        : "目前仍會退回完整長連結；請在 Vercel 補上 KV_REST_API_URL 與 KV_REST_API_TOKEN 後重新部署。";
+      feedback.className = "share-link-feedback";
+      feedback.textContent = "";
+      return;
+    }
+
+    if (result.mode === "short") {
+      statusShell.className = "share-link-status is-ready";
+      statusTitle.textContent = "短簽約連結已啟用";
+      statusNote.textContent = "本次已成功產生短簽約連結，適合直接貼給客戶。";
+      feedback.className = "share-link-feedback is-ready";
+      feedback.textContent = "這次拿到的是短簽約連結。";
+      return;
+    }
+
+    statusShell.className = "share-link-status is-warning";
+    statusTitle.textContent = "目前使用完整長連結";
+
+    if (result.warning === "SHORT_LINK_STORAGE_NOT_CONFIGURED") {
+      statusNote.textContent =
+        "短連結儲存尚未啟用，所以目前複製或預覽都會退回完整長連結；請在 Vercel 補上 KV_REST_API_URL 與 KV_REST_API_TOKEN 後重新部署。";
+      feedback.className = "share-link-feedback is-warning";
+      feedback.textContent = "這次拿到的是完整長連結，還不是短網址。";
+      return;
+    }
+
+    statusNote.textContent = "短連結建立失敗，系統已暫時改用完整長連結，建議檢查 KV 設定或部署狀態。";
+    feedback.className = "share-link-feedback is-warning";
+    feedback.textContent = "短連結建立失敗，這次已改用完整長連結。";
   }
 
   function buildContractLlmReviewText() {
@@ -692,6 +751,7 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
     renderSummary();
     renderLlmReviewOutput();
     syncActions();
+    renderShareLinkStatus();
   }
 
   function resetState() {
@@ -765,6 +825,12 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
   document.getElementById("open-sign-link").addEventListener("click", async (event) => {
     event.preventDefault();
     const result = await createShareLink();
+    renderShareLinkStatus(result);
+    const feedback = document.getElementById("share-link-feedback");
+    if (feedback) {
+      feedback.className = `share-link-feedback ${result.mode === "short" ? "is-ready" : "is-warning"}`;
+      feedback.textContent = result.mode === "short" ? "已在新分頁開啟短簽約連結。" : "已在新分頁開啟完整長連結。";
+    }
     window.open(result.url, "_blank", "noopener,noreferrer");
   });
 
@@ -774,9 +840,10 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
 
     try {
       const result = await createShareLink();
+      renderShareLinkStatus(result);
       await navigator.clipboard.writeText(result.url);
       const originalText = target.textContent;
-      target.textContent = result.mode === "short" ? "短簽約連結已複製" : "已複製長連結";
+      target.textContent = result.mode === "short" ? "短簽約連結已複製" : "已複製完整長連結";
       window.setTimeout(() => {
         target.textContent = originalText;
       }, 1400);
@@ -860,6 +927,44 @@ const contractDefaultMaterialSpecsJson = JSON.stringify(contractDefaultMaterialS
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
+  }
+
+  .share-link-status {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(93, 67, 44, 0.12);
+    background: rgba(250, 247, 242, 0.78);
+  }
+
+  .share-link-status strong,
+  .share-link-feedback {
+    font-size: 0.98rem;
+  }
+
+  .share-link-status p,
+  .share-link-feedback {
+    margin: 0;
+    color: rgba(64, 44, 30, 0.8);
+  }
+
+  .share-link-status.is-ready {
+    border-color: rgba(39, 103, 73, 0.2);
+    background: rgba(241, 250, 244, 0.92);
+  }
+
+  .share-link-status.is-warning {
+    border-color: rgba(180, 83, 9, 0.2);
+    background: rgba(255, 249, 235, 0.96);
+  }
+
+  .share-link-feedback.is-ready {
+    color: #276749;
+  }
+
+  .share-link-feedback.is-warning {
+    color: #b45309;
   }
 
   .studio-grid {
