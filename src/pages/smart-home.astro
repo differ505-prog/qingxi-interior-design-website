@@ -3,22 +3,22 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 const capabilities = [
   {
-    label: "SYSTEM SETUP",
+    label: "系統整理",
     title: "協助設定與整理 Home Assistant",
     description:
-      "協助整理需求、建立自動化邏輯、調整儀表板與排查整合問題，讓 HA 更快從概念進入可用狀態。",
+      "協助整理需求、建立自動化邏輯、調整儀表板與排查整合問題，讓 HA 更快進入可用狀態。",
   },
   {
-    label: "NAS PLANNING",
+    label: "NAS 規劃",
     title: "把 NAS 變成家庭數位中樞",
     description:
-      "整合備份、媒體庫、監控錄影、遠端存取與權限管理，不讓 NAS 只是單純擺在角落的主機。",
+      "整合備份、媒體庫、監控錄影、遠端存取與權限管理，不讓 NAS 只是擺在角落的主機。",
   },
   {
-    label: "DESIGN + TECH",
+    label: "設計整合",
     title: "從空間設計階段就一起規劃",
     description:
-      "弱電箱、機櫃位置、網路節點、電源、散熱與日後擴充一起思考，避免入住後才發現設備不好放、不好修、不好用。",
+      "弱電箱、機櫃位置、網路節點、電源、散熱與日後擴充一起思考，避免入住後才發現設備不好放也不好用。",
   },
 ];
 
@@ -102,11 +102,11 @@ const workflow = [
     <section class="smart-home-hero">
       <div class="smart-home-shell">
         <div class="hero-copy">
-          <p class="section-subtitle">SMART HOME</p>
-          <h1>懂科技的設計師，把智能家居做成真正能長期使用的生活系統</h1>
+          <p class="section-subtitle">智能家居</p>
+          <h1>懂科技的設計師，把智能家居做成真正好用的生活系統</h1>
           <p class="hero-intro">
-            青曦不只做空間設計，也能協助設定 Home Assistant、規劃 NAS 與跨品牌設備整合。
-            從裝修前期的弱電配置，到入住後的自動化與資料管理，一起用設計思維整合完成。
+            青曦不只做空間設計，也能協助設定 Home Assistant、規劃 NAS 與跨品牌整合。
+            從裝修前期的弱電配置，到入住後的自動化與資料管理，一起整理清楚。
           </p>
           <div class="hero-actions">
             <a href="/smart-home-quiz" class="primary-link">先做智能家居需求快篩</a>
@@ -116,7 +116,7 @@ const workflow = [
         </div>
 
         <aside class="hero-panel">
-          <p class="hero-panel-label">WHY QINGXI</p>
+          <p class="hero-panel-label">為什麼是青曦</p>
           <ul>
             <li>懂空間設計，也懂系統整合與設備落地</li>
             <li>可協助 Home Assistant、NAS 與跨品牌生態串聯</li>
@@ -130,7 +130,7 @@ const workflow = [
     <section class="capability-section">
       <div class="section-shell">
         <div class="section-heading reveal-up" data-reveal-delay="0">
-          <p class="section-subtitle">CORE CAPABILITIES</p>
+          <p class="section-subtitle">核心能力</p>
           <h2>不只是裝設備，而是把 HA、NAS 與空間一起整合</h2>
         </div>
 
@@ -149,10 +149,10 @@ const workflow = [
     <section class="visual-section">
       <div class="section-shell">
         <div class="section-heading reveal-up" data-reveal-delay="0">
-          <p class="section-subtitle">VISUAL PREVIEW</p>
+          <p class="section-subtitle">情境畫面</p>
           <h2>把智能家居的使用感與空間感一起看見</h2>
           <p>
-            這裡不是單純展示設備，而是讓你直接理解智能家居進入生活後，空間氛圍、操作方式與設備整合會變成什麼樣子。
+            不是單純展示設備，而是讓你直接理解智能家居進入生活後的空間氛圍、操作方式與整合感。
           </p>
         </div>
 
@@ -190,16 +190,16 @@ const workflow = [
     <section class="positioning-section">
       <div class="section-shell positioning-shell">
         <article class="positioning-card positioning-card-dark reveal-up" data-reveal-delay="0">
-          <p class="section-subtitle muted">DESIGNER WHO UNDERSTANDS TECH</p>
+          <p class="section-subtitle muted">設計與科技</p>
           <h2>科技應該從入住前就規劃到位</h2>
           <p>
             很多智能家居問題，關鍵在於空間、佈線、收納、控制邏輯與日常動線沒有從一開始一起規劃。
-            青曦會在設計階段先整合這些條件，讓智能系統更順手，也更貼近日常生活。
+            青曦會在設計階段先整合這些條件，讓系統更順手，也更貼近日常生活。
           </p>
         </article>
 
         <article class="positioning-card positioning-card-light reveal-up" data-reveal-delay="120">
-          <p class="section-subtitle">SCENARIO EXAMPLES</p>
+          <p class="section-subtitle">使用情境</p>
           <ul class="scenario-list">
             {scenarios.map((scenario) => (
               <li>{scenario}</li>
@@ -212,7 +212,7 @@ const workflow = [
     <section class="workflow-section">
       <div class="section-shell">
         <div class="section-heading reveal-up" data-reveal-delay="0">
-          <p class="section-subtitle">WORKFLOW</p>
+          <p class="section-subtitle">合作流程</p>
           <h2>智能家居合作流程</h2>
         </div>
 
@@ -231,11 +231,10 @@ const workflow = [
     <section class="cta-section">
       <div class="section-shell cta-shell reveal-up" data-reveal-delay="0">
         <div class="reveal-up" data-reveal-delay="40">
-          <p class="section-subtitle">NEXT STEP</p>
-          <h2>如果你想找的是懂科技的設計師，這裡可以一起開始</h2>
+          <p class="section-subtitle">下一步</p>
+          <h2>如果你想找的是懂科技的設計師，就從這裡開始</h2>
           <p>
-            不論你是想先做智能家居規劃、同步整合裝修，或評估 HA / NAS 是否適合你的住宅情境，
-            都可以先聊需求與預算範圍。
+            不論你是想先做智能家居規劃、同步整合裝修，或評估 HA / NAS 是否適合你的住宅情境，都可以先聊需求與預算。
           </p>
         </div>
         <div class="cta-actions reveal-up" data-reveal-delay="120">
@@ -313,7 +312,7 @@ const workflow = [
     margin: 0 0 0.8rem;
     color: var(--tiffany-dark);
     font-size: 0.8rem;
-    letter-spacing: 0.26em;
+    letter-spacing: 0.18em;
     font-weight: 600;
   }
 
@@ -415,7 +414,6 @@ const workflow = [
   .workflow-step {
     display: inline-flex;
     letter-spacing: 0.18em;
-    text-transform: uppercase;
     font-size: 0.78rem;
   }
 
