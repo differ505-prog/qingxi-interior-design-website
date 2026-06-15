@@ -4,24 +4,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 const defaultGroups = [
   {
     id: "group-1654316948220005",
-    alias: "社團入口 A",
+    alias: "南港修繕社團",
     groupId: "1654316948220005",
     url: "https://www.facebook.com/groups/1654316948220005/",
-    note: "先掃在地修繕題。",
   },
   {
     id: "group-679286528824529",
-    alias: "社團入口 B",
+    alias: "汐止修繕社團",
     groupId: "679286528824529",
     url: "https://www.facebook.com/groups/679286528824529",
-    note: "補第二輪搜尋。",
   },
   {
     id: "group-163175389244849",
-    alias: "社團入口 C",
+    alias: "自由找題社團",
     groupId: "163175389244849",
     url: "https://www.facebook.com/groups/163175389244849",
-    note: "沒好題時補掃。",
   },
 ];
 
@@ -30,31 +27,31 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
 
 <BaseLayout
   title="設計師工作面板 - 青曦空間設計"
-  description="青曦內部使用的設計師工作面板，以遊戲化任務節奏管理社群導流行動。"
+  description="青曦內部使用的設計師工作面板，只留必要任務、進度與入口。"
   noindex={true}
 >
   <section class="social-ops-page">
     <div class="social-ops-shell">
       <header class="ops-hero">
         <div class="hero-copy">
-          <p class="ops-eyebrow">DESIGNER WORK PANEL</p>
+          <p class="ops-eyebrow">QINGXI INTERNAL</p>
           <h1>設計師工作面板</h1>
           <p class="ops-description">
-            開頁就做，做完就劃掉。
+            只留今天要做的事。
           </p>
           <div class="hero-actions">
             <a href="#quest-board" class="btn btn-primary">開始本週任務</a>
             <a href="#portal-grid" class="btn btn-secondary">前往社團傳送門</a>
-            <button type="button" id="reset-social-ops" class="btn btn-secondary btn-muted">重設本週任務</button>
+            <button type="button" id="reset-social-ops" class="btn btn-tertiary">重設</button>
           </div>
           <p id="ops-feedback" class="ops-feedback" aria-live="polite"></p>
         </div>
 
         <div class="hero-command-panel">
           <div class="command-badge">
-            <span>當前職階</span>
-            <strong id="rank-title">Apprentice Operator</strong>
-            <small id="level-value">Lv.1</small>
+            <span>本週狀態</span>
+            <strong id="rank-title">起稿中</strong>
+            <small id="level-value">第 1 級</small>
           </div>
           <div class="command-metrics">
             <article class="metric-card metric-card-primary">
@@ -68,17 +65,14 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
             <article class="metric-card">
               <span>總 XP</span>
               <strong id="xp-value">0 XP</strong>
-              <small>完成任務自動累積</small>
             </article>
             <article class="metric-card">
               <span>連勝週數</span>
               <strong id="streak-value">0</strong>
-              <small>每週達標才延續</small>
             </article>
             <article class="metric-card">
               <span>累積通關</span>
               <strong id="lifetime-runs-value">0</strong>
-              <small>已完成任務數</small>
             </article>
           </div>
         </div>
@@ -92,7 +86,6 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
                 <p class="panel-tag">WEEKLY QUESTS</p>
                 <h2>本週主線任務</h2>
               </div>
-              <p>找到題目、回覆、導流。</p>
             </div>
             <div id="quest-grid" class="quest-grid"></div>
           </section>
@@ -103,7 +96,6 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
                 <p class="panel-tag">GROUP PORTALS</p>
                 <h2>社團傳送門</h2>
               </div>
-              <p>只留直接可用入口。</p>
             </div>
             <div id="portal-card-grid" class="portal-card-grid"></div>
           </section>
@@ -120,12 +112,12 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
   const WEEKLY_BONUS_XP = 50;
   const groupTemplate = JSON.parse(defaultGroupsJson);
   const rankTitles = [
-    "Apprentice Operator",
-    "Lead Hunter",
-    "Signal Captain",
-    "Market Commander",
-    "Pipeline CEO",
-    "Empire Architect",
+    "起稿中",
+    "構圖中",
+    "提案中",
+    "執行中",
+    "定稿中",
+    "主理中",
   ];
 
   function getWeekKey(date = new Date()) {
@@ -138,13 +130,11 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     return `${target.getFullYear()}-W${String(weekNo).padStart(2, "0")}`;
   }
 
-  function createRun(slot, keyword, title, guidance) {
+  function createRun(slot, keyword) {
     return {
       id: `run-${slot}`,
       slot,
       keyword,
-      title,
-      guidance,
       actionSearch: false,
       actionAdvice: false,
       actionArticle: false,
@@ -155,9 +145,9 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
 
   function createWeeklyRuns() {
     return [
-      createRun(1, "南港", "Quest 01｜南港主線", "先解在地修繕問題，再附最貼近的痛點文。"),
-      createRun(2, "汐止", "Quest 02｜汐止主線", "挑一題，快速完成。"),
-      createRun(3, "自由掃場", "Quest 03｜自由補刀", "自由補一題。"),
+      createRun(1, "南港"),
+      createRun(2, "汐止"),
+      createRun(3, "自由掃場"),
     ];
   }
 
@@ -176,6 +166,17 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     };
   }
 
+  function syncRuns(savedRuns = []) {
+    const templateRuns = createWeeklyRuns();
+    return templateRuns.map((templateRun, index) => {
+      const savedRun = savedRuns.find((run) => run?.id === templateRun.id) ?? savedRuns[index] ?? {};
+      return {
+        ...templateRun,
+        ...savedRun,
+      };
+    });
+  }
+
   let state = createInitialState();
 
   function saveState() {
@@ -187,10 +188,15 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw);
+      const initialState = createInitialState();
       state = {
-        weekly: parsed.weekly || createInitialState().weekly,
+        weekly: {
+          ...initialState.weekly,
+          ...(parsed.weekly || {}),
+          runs: syncRuns(parsed.weekly?.runs),
+        },
         stats: {
-          ...createInitialState().stats,
+          ...initialState.stats,
           ...(parsed.stats || {}),
         },
       };
@@ -273,7 +279,7 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     document.getElementById("xp-value").textContent = `${state.stats.xp} XP`;
     document.getElementById("streak-value").textContent = String(state.stats.streak);
     document.getElementById("lifetime-runs-value").textContent = String(state.stats.lifetimeRuns);
-    document.getElementById("level-value").textContent = `Lv.${level}`;
+    document.getElementById("level-value").textContent = `第 ${level} 級`;
     document.getElementById("rank-title").textContent = getRankTitle(level);
   }
 
@@ -288,11 +294,9 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
         return `
           <article class="quest-card ${complete ? "is-complete" : ""}">
             <div class="quest-topline">
-              <span class="quest-slot">RUN ${run.slot}</span>
+              <span class="quest-slot">任務 ${run.slot}</span>
               <span class="quest-keyword">${escapeHtml(run.keyword)}</span>
             </div>
-            <h3>${escapeHtml(run.title)}</h3>
-            <p class="quest-guidance">${escapeHtml(run.guidance)}</p>
             <div class="quest-checklist">
               <label class="quest-check ${run.actionSearch ? "is-checked" : ""}">
                 <input type="checkbox" data-run-index="${index}" data-run-check="actionSearch" ${run.actionSearch ? "checked" : ""} />
@@ -306,10 +310,6 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
                 <input type="checkbox" data-run-index="${index}" data-run-check="actionArticle" ${run.actionArticle ? "checked" : ""} />
                 <span>已附痛點文導流</span>
               </label>
-            </div>
-            <div class="quest-footer">
-              <small>${complete ? `CLEAR：${new Date(run.completedAt).toLocaleString("zh-TW")}` : "清空三格 +100 XP"}</small>
-              <strong>${complete ? "Quest Cleared" : "Quest Active"}</strong>
             </div>
           </article>
         `;
@@ -327,7 +327,6 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
           <div class="portal-card-top">
             <span class="portal-card-label">${escapeHtml(group.alias)}</span>
           </div>
-          <p>${escapeHtml(group.note)}</p>
           <div class="portal-actions">
             <a class="portal-link primary-link" href="${escapeHtml(group.url)}" target="_blank" rel="noreferrer">開啟社團</a>
           </div>
@@ -377,11 +376,11 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
   .social-ops-page {
     padding: 5rem 1.25rem 6rem;
     background:
-      radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 22%),
-      radial-gradient(circle at right top, rgba(196, 196, 188, 0.08), transparent 24%),
-      linear-gradient(180deg, #121212 0%, #171717 44%, #1d1d1c 100%);
-    color: #f0efeb;
-    font-family: "Noto Sans TC", sans-serif;
+      radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 24%),
+      radial-gradient(circle at right top, rgba(196, 196, 188, 0.05), transparent 28%),
+      linear-gradient(180deg, #111111 0%, #151515 44%, #1a1a19 100%);
+    color: #f1efea;
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -410,12 +409,12 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
 
   .ops-hero,
   .ops-panel {
-    border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
     background:
-      linear-gradient(180deg, rgba(44, 44, 44, 0.92), rgba(27, 27, 28, 0.94));
+      linear-gradient(180deg, rgba(39, 39, 39, 0.92), rgba(24, 24, 25, 0.96));
     box-shadow:
-      0 28px 72px rgba(0, 0, 0, 0.28),
+      0 24px 64px rgba(0, 0, 0, 0.24),
       inset 0 1px 0 rgba(255, 255, 255, 0.04);
     backdrop-filter: blur(18px);
   }
@@ -430,29 +429,29 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
   .ops-eyebrow,
   .panel-tag,
   .quest-slot,
-  .portal-card-label,
-  .article-state {
+  .portal-card-label {
     margin: 0;
-    letter-spacing: 0.22em;
-    font-size: 0.74rem;
-    color: rgba(215, 213, 206, 0.56);
+    letter-spacing: 0.18em;
+    font-size: 0.73rem;
+    color: rgba(220, 217, 210, 0.5);
   }
 
   .hero-copy h1 {
     margin: 0;
-    font-family: "Noto Serif TC", serif;
-    font-size: clamp(2.45rem, 4vw, 4rem);
-    line-height: 1.04;
-    letter-spacing: 0.02em;
+    font-family: "Noto Sans TC", "PingFang TC", sans-serif;
+    font-size: clamp(2.35rem, 3.7vw, 3.7rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: 0.01em;
     color: #f7f6f2;
   }
 
   .ops-description {
-    margin: 0.85rem 0 0;
-    max-width: 520px;
-    color: rgba(233, 231, 225, 0.68);
-    font-size: 0.98rem;
-    line-height: 1.8;
+    margin: 0.7rem 0 0;
+    max-width: 380px;
+    color: rgba(233, 231, 225, 0.64);
+    font-size: 0.95rem;
+    line-height: 1.7;
   }
 
   .hero-actions {
@@ -463,31 +462,39 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
   }
 
   .hero-actions .btn {
-    min-height: 52px;
-    padding: 0.92rem 1.35rem;
-    border-radius: 18px;
+    min-height: 50px;
+    padding: 0.88rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-width: 1px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.16);
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    box-shadow: 0 14px 24px rgba(0, 0, 0, 0.14);
   }
 
   .hero-actions .btn.btn-primary {
-    background: linear-gradient(180deg, rgba(247, 246, 241, 0.18), rgba(201, 197, 188, 0.12));
+    background: linear-gradient(180deg, rgba(247, 246, 241, 0.16), rgba(201, 197, 188, 0.1));
     border-color: rgba(247, 246, 241, 0.18);
     color: #f7f6f2;
   }
 
   .hero-actions .btn.btn-secondary {
-    background: linear-gradient(180deg, rgba(248, 247, 243, 0.12), rgba(255, 255, 255, 0.04));
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(248, 247, 243, 0.08), rgba(255, 255, 255, 0.03));
+    border-color: rgba(255, 255, 255, 0.08);
     color: #ece9e2;
+  }
+
+  .hero-actions .btn.btn-tertiary {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.06);
+    color: rgba(232, 228, 220, 0.76);
+    box-shadow: none;
   }
 
   .hero-actions .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.16);
   }
 
   .ops-feedback {
@@ -519,28 +526,25 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
   .metric-card,
   .quest-card,
   .portal-card {
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
     background:
-      linear-gradient(180deg, rgba(64, 64, 63, 0.68), rgba(40, 40, 39, 0.8));
+      linear-gradient(180deg, rgba(59, 59, 58, 0.62), rgba(34, 34, 34, 0.82));
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.04),
-      0 14px 34px rgba(0, 0, 0, 0.14);
+      0 12px 28px rgba(0, 0, 0, 0.12);
   }
 
   .command-badge {
     padding: 1.2rem 1.2rem 1rem;
     background:
-      radial-gradient(circle at top left, rgba(244, 242, 236, 0.1), transparent 42%),
-      linear-gradient(180deg, rgba(74, 74, 72, 0.96), rgba(41, 41, 40, 0.96));
+      radial-gradient(circle at top left, rgba(244, 242, 236, 0.07), transparent 42%),
+      linear-gradient(180deg, rgba(66, 66, 65, 0.96), rgba(36, 36, 36, 0.96));
   }
 
   .command-badge span,
   .metric-card span,
   .metric-card small,
-  .quest-guidance,
-  .quest-footer small,
-  .portal-card p,
   .panel-heading p {
     color: rgba(230, 228, 222, 0.66);
   }
@@ -578,8 +582,8 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
   .metric-card-primary {
     grid-column: 1 / -1;
     background:
-      radial-gradient(circle at top right, rgba(236, 234, 228, 0.12), transparent 40%),
-      linear-gradient(180deg, rgba(82, 82, 80, 0.98), rgba(44, 44, 43, 0.96));
+      radial-gradient(circle at top right, rgba(236, 234, 228, 0.08), transparent 40%),
+      linear-gradient(180deg, rgba(74, 74, 72, 0.98), rgba(42, 42, 42, 0.96));
   }
 
   .progress-track {
@@ -611,15 +615,16 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    align-items: end;
+    align-items: start;
     margin-bottom: 1.15rem;
   }
 
   .panel-heading h2 {
     margin: 0.2rem 0 0;
-    font-family: "Noto Serif TC", serif;
-    font-size: 1.5rem;
-    letter-spacing: 0.02em;
+    font-family: "Noto Sans TC", "PingFang TC", sans-serif;
+    font-size: 1.38rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
     color: #f5f3ef;
   }
 
@@ -652,15 +657,15 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.08), transparent 30%);
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.05), transparent 32%);
     pointer-events: none;
   }
 
   .quest-card.is-complete {
     border-color: rgba(255, 255, 255, 0.18);
     background:
-      radial-gradient(circle at top right, rgba(255, 255, 255, 0.08), transparent 34%),
-      linear-gradient(180deg, rgba(74, 74, 76, 0.84), rgba(49, 49, 51, 0.92));
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.06), transparent 34%),
+      linear-gradient(180deg, rgba(70, 70, 72, 0.82), rgba(46, 46, 48, 0.92));
   }
 
   .quest-topline,
@@ -677,25 +682,11 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
 
   .quest-keyword {
     display: inline-flex;
-    padding: 0.34rem 0.7rem;
+    padding: 0.3rem 0.62rem;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(236, 234, 227, 0.74);
-    font-size: 0.82rem;
-  }
-
-  .quest-card h3,
-  .portal-card h3 {
-    margin: 0.7rem 0 0;
-    color: #f7f6f2;
-    font-size: 1.16rem;
-    letter-spacing: 0.015em;
-  }
-
-  .quest-guidance {
-    margin: 0.72rem 0 0;
-    line-height: 1.7;
-    font-size: 0.93rem;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(236, 234, 227, 0.72);
+    font-size: 0.79rem;
   }
 
   .quest-checklist {
@@ -708,10 +699,10 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    padding: 0.78rem 0.88rem;
-    border-radius: 16px;
+    padding: 0.8rem 0.88rem;
+    border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.035);
+    background: rgba(255, 255, 255, 0.03);
     color: #f1efea;
     transition: background 0.25s ease, border-color 0.25s ease;
   }
@@ -737,17 +728,17 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 54px;
-    padding: 0.95rem 1.1rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    background: linear-gradient(180deg, rgba(249, 248, 244, 0.15), rgba(255, 255, 255, 0.045));
+    min-height: 52px;
+    padding: 0.9rem 1.05rem;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(249, 248, 244, 0.13), rgba(255, 255, 255, 0.04));
     color: #f1efea !important;
     text-decoration: none;
-    font-weight: 700;
-    font-size: 0.95rem;
-    letter-spacing: 0.03em;
-    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.16);
+    font-weight: 600;
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+    box-shadow: 0 14px 24px rgba(0, 0, 0, 0.14);
     transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
   }
 
@@ -765,25 +756,9 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
 
   .social-ops-page :global(.portal-link:hover) {
     transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.16);
-    background: linear-gradient(180deg, rgba(249, 248, 244, 0.18), rgba(255, 255, 255, 0.06));
-    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.18);
-  }
-
-  .quest-footer {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: center;
-    margin-top: 1rem;
-    padding-top: 0.95rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .quest-footer strong {
-    color: rgba(236, 234, 227, 0.82);
-    letter-spacing: 0.08em;
-    font-size: 0.82rem;
+    border-color: rgba(255, 255, 255, 0.14);
+    background: linear-gradient(180deg, rgba(249, 248, 244, 0.16), rgba(255, 255, 255, 0.05));
+    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.16);
   }
 
   .portal-card {
@@ -808,7 +783,7 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
   }
 
   .primary-link {
-    background: linear-gradient(180deg, rgba(250, 249, 245, 0.2), rgba(209, 204, 193, 0.09));
+    background: linear-gradient(180deg, rgba(250, 249, 245, 0.16), rgba(209, 204, 193, 0.08));
   }
 
   .ops-main {
