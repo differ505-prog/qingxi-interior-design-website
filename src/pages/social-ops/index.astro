@@ -105,11 +105,22 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
           <section id="portal-grid" class="ops-panel portal-board">
             <div class="panel-heading">
               <div>
-                <p class="panel-tag">社團入口</p>
+                <p class="panel-tag">來源入口</p>
                 <h2>來源入口</h2>
               </div>
             </div>
-            <div id="portal-card-grid" class="portal-card-grid"></div>
+            <div class="portal-section">
+              <div class="portal-section-heading">
+                <p>Facebook 社團</p>
+              </div>
+              <div id="facebook-card-grid" class="portal-card-grid"></div>
+            </div>
+            <div class="portal-section">
+              <div class="portal-section-heading">
+                <p>LINE 社群</p>
+              </div>
+              <div id="line-card-grid" class="portal-card-grid"></div>
+            </div>
           </section>
         </div>
       </div>
@@ -328,15 +339,11 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
       .join("");
   }
 
-  function renderPortals() {
-    const shell = document.getElementById("portal-card-grid");
-    if (!shell) return;
-
-    shell.innerHTML = sourceTemplate
+  function renderPortalCards(sources) {
+    return sources
       .map((source) => `
         <article class="portal-card">
           <div class="portal-card-top">
-            <span class="portal-card-label">${escapeHtml(source.platform)}</span>
             <strong>${escapeHtml(source.alias)}</strong>
           </div>
           <div class="portal-actions">
@@ -347,6 +354,18 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
         </article>
       `)
       .join("");
+  }
+
+  function renderPortals() {
+    const facebookShell = document.getElementById("facebook-card-grid");
+    const lineShell = document.getElementById("line-card-grid");
+    if (!facebookShell || !lineShell) return;
+
+    const facebookSources = sourceTemplate.filter((source) => source.platform === "Facebook");
+    const lineSources = sourceTemplate.filter((source) => source.platform === "LINE");
+
+    facebookShell.innerHTML = renderPortalCards(facebookSources);
+    lineShell.innerHTML = renderPortalCards(lineSources);
   }
 
   function rerender() {
@@ -442,8 +461,7 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
 
   .ops-eyebrow,
   .panel-tag,
-  .quest-slot,
-  .portal-card-label {
+  .quest-slot {
     margin: 0;
     letter-spacing: 0.14em;
     font-size: 0.72rem;
@@ -455,6 +473,27 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.5;
+  }
+
+  .portal-section {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .portal-section + .portal-section {
+    margin-top: 1rem;
+  }
+
+  .portal-section-heading {
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .portal-section-heading p {
+    margin: 0;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    color: rgba(224, 221, 214, 0.58);
   }
 
   .hero-copy h1 {
