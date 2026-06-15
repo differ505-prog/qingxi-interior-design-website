@@ -32,6 +32,12 @@ const defaultSources = [
     platform: "LINE",
     url: "https://line.me/ti/g2/hc7WHOLh4D5ZKYgSiA7cW1klztRTtza3CMK4PA?utm_source=invitation&utm_medium=link_copy&utm_campaign=default",
   },
+  {
+    id: "google-business",
+    alias: "Google 商家編輯",
+    platform: "Google",
+    url: "https://www.google.com/search?q=%E9%9D%92%E6%9B%A6%E7%A9%BA%E9%96%93%E8%A8%AD%E8%A8%88&stick=H4sIAAAAAAAA_wE8AMP_CAYiIzB4Y2Y1NzIzYWQyN2I2OGVmOjB4MzMzYmU1YWI0ZDAxYjBiogUS6Z2S5pum56m66ZaT6Kit6KiI6b38AjwAAAA&hl=zh-TW&mat=CZzruPD9kuTbElcBa0lj_0QRxYoywBlV9k9DYHoy-VFRkTjl1IkHR0qufOOE0MNc1wkNSVfDEkXxAJyYs12m8HUMY9ODzhD28iMbxLDtTMqjl02vI5c77ni0KGBTZjiz2vc&authuser=9",
+  },
 ];
 
 const defaultSourcesJson = JSON.stringify(defaultSources);
@@ -120,6 +126,12 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
                 <p>LINE 社群</p>
               </div>
               <div id="line-card-grid" class="portal-card-grid"></div>
+            </div>
+            <div class="portal-section">
+              <div class="portal-section-heading">
+                <p>Google 商家</p>
+              </div>
+              <div id="google-card-grid" class="portal-card-grid"></div>
             </div>
           </section>
         </div>
@@ -359,13 +371,16 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
   function renderPortals() {
     const facebookShell = document.getElementById("facebook-card-grid");
     const lineShell = document.getElementById("line-card-grid");
-    if (!facebookShell || !lineShell) return;
+    const googleShell = document.getElementById("google-card-grid");
+    if (!facebookShell || !lineShell || !googleShell) return;
 
     const facebookSources = sourceTemplate.filter((source) => source.platform === "Facebook");
     const lineSources = sourceTemplate.filter((source) => source.platform === "LINE");
+    const googleSources = sourceTemplate.filter((source) => source.platform === "Google");
 
     facebookShell.innerHTML = renderPortalCards(facebookSources);
     lineShell.innerHTML = renderPortalCards(lineSources);
+    googleShell.innerHTML = renderPortalCards(googleSources);
   }
 
   function rerender() {
