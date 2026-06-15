@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import * as contentful from "contentful";
 
 const defaultSources = [
   {
@@ -40,7 +41,60 @@ const defaultSources = [
   },
 ];
 
+const fallbackBlogPosts = [
+  {
+    title: "畫出家的神經系統——全屋開關與插座的最適定位",
+    slug: "whole-house-switch-socket-positioning",
+    date: "2025-11-12",
+    summary: "整理全屋開關與插座定位原則，從生活動線、家具尺寸到常見錯誤，幫助裝修前先把隱蔽工程規劃清楚。",
+    category: "水電篇",
+  },
+];
+
+let blogPosts = [...fallbackBlogPosts];
+let blogSyncLabel = "目前先顯示已存在文章。";
+
+try {
+  if (import.meta.env.CONTENTFUL_SPACE_ID && import.meta.env.CONTENTFUL_ACCESS_TOKEN) {
+    const client = contentful.createClient({
+      space: import.meta.env.CONTENTFUL_SPACE_ID,
+      accessToken: import.meta.env.CONTENTFUL_ACCESS_TOKEN,
+      environment: "master",
+    });
+
+    const response = await client.getEntries({
+      content_type: "blogPost",
+      order: ["-fields.date"],
+    });
+
+    const syncedPosts = response.items.map((item: any) => ({
+      title: item.fields.title,
+      slug: item.fields.slug,
+      date: new Date(item.fields.date).toISOString().split("T")[0],
+      summary: item.fields.summary,
+      category: item.fields.category,
+    }));
+
+    if (syncedPosts.length > 0) {
+      const postMap = new Map(
+        [...fallbackBlogPosts, ...syncedPosts].map((post) => [post.slug, post]),
+      );
+      blogPosts = Array.from(postMap.values()).sort((a, b) => b.date.localeCompare(a.date));
+      blogSyncLabel = `已同步 ${syncedPosts.length} 篇知識文章。`;
+    } else {
+      blogSyncLabel = "Contentful 目前無文章，先顯示已存在文章。";
+    }
+  } else {
+    blogSyncLabel = "未連接 Contentful，先顯示已存在文章。";
+  }
+} catch (error) {
+  console.error("讀取知識分享文章失敗：", error);
+  blogSyncLabel = "同步失敗，先顯示已存在文章。";
+}
+
 const defaultSourcesJson = JSON.stringify(defaultSources);
+const blogPostsJson = JSON.stringify(blogPosts);
+const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
 ---
 
 <BaseLayout
@@ -134,18 +188,72 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
               <div id="google-card-grid" class="portal-card-grid"></div>
             </div>
           </section>
+
+          <section id="bookshelf-board" class="ops-panel bookshelf-board">
+            <div class="panel-heading">
+              <div>
+                <p class="panel-tag">內容書架</p>
+                <h2>內容書架</h2>
+              </div>
+              <p>把既有文章慢慢整理成書。</p>
+            </div>
+
+            <div class="bookshelf-summary">
+              <article class="bookshelf-stat">
+                <span>現有文章</span>
+                <strong>{blogPosts.length}</strong>
+              </article>
+              <article class="bookshelf-stat">
+                <span>現有分類</span>
+                <strong>{blogCategoryCount}</strong>
+              </article>
+              <article class="bookshelf-stat bookshelf-stat-wide">
+                <span>同步狀態</span>
+                <strong>{blogSyncLabel}</strong>
+              </article>
+            </div>
+
+            <div class="bookshelf-actions">
+              <button type="button" id="copy-book-plan" class="bookshelf-action bookshelp-action-primary">複製 LLM 書系整理稿</button>
+              <button type="button" id="copy-book-titles" class="bookshelf-action">複製文章標題清單</button>
+              <a href="/blog" class="bookshelf-action" target="_blank" rel="noreferrer">前往知識分享</a>
+            </div>
+
+            <div class="bookshelf-preview">
+              <div class="bookshelf-preview-head">
+                <p>目前文章</p>
+                <span>{blogPosts.length} 篇</span>
+              </div>
+              <div class="bookshelf-title-list">
+                {blogPosts.map((post, index) => (
+                  <article class="bookshelf-entry">
+                    <div class="bookshelf-entry-top">
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <p>{post.category}</p>
+                    </div>
+                    <h3>{post.title}</h3>
+                    <div class="bookshelf-entry-meta">
+                      <span>{post.date}</span>
+                      <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer">查看文章</a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const WEEKLY_TARGET = 3;
   const RUN_XP = 100;
   const WEEKLY_BONUS_XP = 50;
   const sourceTemplate = JSON.parse(defaultSourcesJson);
+  const articleLibrary = JSON.parse(blogPostsJson);
   const rankTitles = [
     "起稿中",
     "構圖中",
@@ -383,6 +491,55 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
     googleShell.innerHTML = renderPortalCards(googleSources);
   }
 
+  function buildArticleTitlesText() {
+    return articleLibrary
+      .map((post, index) => `${index + 1}. [${post.category}] ${post.title}`)
+      .join("\n");
+  }
+
+  function buildBookshelfLlmPrompt() {
+    const categories = Array.from(new Set(articleLibrary.map((post) => post.category))).join("、");
+
+    return [
+      "你是青曦空間設計的內容總編與出版策劃。",
+      "以下是目前知識分享已存在的文章標題清單。請依照現有文章，幫我把內容整理成可持續完成與未來可出版的書系架構。",
+      "",
+      "工作目標：",
+      "1. 把零散文章整理成一本一本可持續完成的書。",
+      "2. 先用『書名 -> 章節 -> 已有文章 -> 還缺文章』的方式規劃。",
+      "3. 優先找出最適合先完成的第一本書。",
+      "",
+      "請直接輸出：",
+      "A. 建議先做的 3-5 本書名",
+      "B. 每本書的定位與目標讀者",
+      "C. 每本書的章節架構",
+      "D. 目前文章應歸到哪一本到哪一章",
+      "E. 每本書還缺哪些關鍵文章",
+      "F. 最優先下一篇該補哪 3 篇，並說明原因",
+      "G. 哪些現有標題適合改名，讓未來更像書稿章名",
+      "",
+      `目前文章數：${articleLibrary.length}`,
+      `目前分類：${categories || "未分類"}`,
+      "",
+      "現有文章清單：",
+      buildArticleTitlesText(),
+    ].join("\n");
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        window.prompt("請手動複製以下內容", text);
+      }
+      setFeedback(successMessage, "is-success");
+    } catch (error) {
+      console.error("複製失敗：", error);
+      setFeedback("複製失敗，請再試一次。", "is-warning");
+    }
+  }
+
   function rerender() {
     renderHero();
     renderQuests();
@@ -413,6 +570,14 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
     };
     rerender();
     setFeedback("本週任務已重設，XP 與連勝保留。", "is-warning");
+  });
+
+  document.getElementById("copy-book-plan")?.addEventListener("click", async () => {
+    await copyText(buildBookshelfLlmPrompt(), "已複製 LLM 書系整理稿。");
+  });
+
+  document.getElementById("copy-book-titles")?.addEventListener("click", async () => {
+    await copyText(buildArticleTitlesText(), "已複製文章標題清單。");
   });
 
   loadState();
@@ -592,7 +757,9 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
   .ops-grid,
   .ops-main,
   .quest-grid,
-  .portal-card-grid {
+  .portal-card-grid,
+  .bookshelf-summary,
+  .bookshelf-title-list {
     display: grid;
     gap: 0.85rem;
   }
@@ -600,7 +767,9 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
   .command-badge,
   .metric-card,
   .quest-card,
-  .portal-card {
+  .portal-card,
+  .bookshelf-stat,
+  .bookshelf-entry {
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     background:
@@ -717,6 +886,130 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
 
   .portal-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bookshelf-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 0.95rem;
+  }
+
+  .bookshelf-stat {
+    padding: 0.95rem 1rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .bookshelf-stat span {
+    color: rgba(230, 228, 222, 0.62);
+    font-size: 0.85rem;
+  }
+
+  .bookshelf-stat strong {
+    color: #f7f6f2;
+    font-size: 1.16rem;
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+  }
+
+  .bookshelf-stat-wide {
+    grid-column: span 1;
+  }
+
+  .bookshelf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .bookshelf-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0.8rem 1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(249, 248, 244, 0.1), rgba(255, 255, 255, 0.03));
+    color: #f1efea;
+    font-size: 0.89rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .bookshelp-action-primary {
+    background: linear-gradient(180deg, rgba(250, 249, 245, 0.16), rgba(209, 204, 193, 0.08));
+    border-color: rgba(247, 246, 241, 0.18);
+  }
+
+  .bookshelf-action:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.16);
+  }
+
+  .bookshelf-preview {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .bookshelf-preview-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .bookshelf-preview-head p,
+  .bookshelf-preview-head span {
+    margin: 0;
+    color: rgba(232, 228, 220, 0.68);
+    font-size: 0.9rem;
+  }
+
+  .bookshelf-title-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bookshelf-entry {
+    padding: 0.95rem 1rem;
+    display: grid;
+    gap: 0.62rem;
+  }
+
+  .bookshelf-entry-top,
+  .bookshelf-entry-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    align-items: center;
+  }
+
+  .bookshelf-entry-top span,
+  .bookshelf-entry-top p,
+  .bookshelf-entry-meta span {
+    margin: 0;
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-entry h3 {
+    margin: 0;
+    color: #f5f3ef;
+    font-size: 1rem;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  .bookshelf-entry-meta a {
+    color: rgba(244, 242, 237, 0.82);
+    font-size: 0.84rem;
+    text-decoration: none;
   }
 
   .quest-card,
@@ -876,7 +1169,8 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
 
   @media (max-width: 1120px) {
     .ops-hero,
-    .portal-card-grid {
+    .portal-card-grid,
+    .bookshelf-title-list {
       grid-template-columns: 1fr;
     }
 
@@ -886,6 +1180,10 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
 
     .command-metrics {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bookshelf-summary {
+      grid-template-columns: 1fr 1fr;
     }
 
   }
@@ -905,7 +1203,9 @@ const defaultSourcesJson = JSON.stringify(defaultSources);
       grid-template-columns: 1fr;
     }
 
-    .quest-grid {
+    .quest-grid,
+    .bookshelf-summary,
+    .bookshelf-title-list {
       grid-template-columns: 1fr;
     }
   }
