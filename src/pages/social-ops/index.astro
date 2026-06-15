@@ -7,7 +7,7 @@ const defaultGroups = [
     alias: "主社團 01",
     groupId: "1654316948220005",
     url: "https://www.facebook.com/groups/1654316948220005/",
-    note: "可先掃南港/汐止關鍵字，再挑最值得導流的貼文。",
+    note: "先掃在地修繕題，再挑最值得導流的貼文。",
   },
   {
     id: "group-679286528824529",
@@ -21,7 +21,7 @@ const defaultGroups = [
     alias: "主社團 03",
     groupId: "163175389244849",
     url: "https://www.facebook.com/groups/163175389244849",
-    note: "當日沒好題時，也可先去看留言區是否有待回答問題。",
+    note: "當日沒好題時，也可先看留言區是否有待回答問題。",
   },
 ];
 
@@ -31,14 +31,14 @@ const defaultArticles = [
     title: "軟裝進場順序",
     status: "published",
     url: "",
-    summary: "已完成的一篇痛點文，可補上正式文章連結後作為回覆導流素材。",
+    summary: "你目前已完成的一篇痛點文，可作為回覆導流素材。",
   },
   {
     id: "next-pain-point",
     title: "下一篇痛點文",
     status: "draft",
     url: "",
-    summary: "先留一格給下一篇，例如老屋翻新踩雷、收納尺寸、預算分配。",
+    summary: "先留給下一篇，例如老屋翻新踩雷、收納尺寸或預算分配。",
   },
 ];
 
@@ -48,183 +48,122 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
 
 <BaseLayout
   title="社群作戰台 - 青曦空間設計"
-  description="青曦內部使用的社群誘餌式回覆與知識導流作戰頁，含每週任務、社團快捷入口與遊戲化追蹤。"
+  description="青曦內部使用的社群誘餌式回覆與知識導流作戰頁，採遊戲化任務面板設計。"
   noindex={true}
 >
   <section class="social-ops-page">
     <div class="social-ops-shell">
       <header class="ops-hero">
-        <div>
-          <p class="ops-eyebrow">INTERNAL SOCIAL OPS</p>
-          <h1>社群誘餌式回覆作戰台</h1>
+        <div class="hero-copy">
+          <p class="ops-eyebrow">SOCIAL OPS COMMAND</p>
+          <h1>CEO 社群作戰台</h1>
           <p class="ops-description">
-            把每週嚴格執行 3 次的社群導流，變成一個能直接開始、可累積戰果、像解任務一樣推進的內部工作流。
+            這不是待辦清單，而是每週固定推進的任務面板。打開後直接選任務、進場回覆、完成後劃掉，讓導流像解主線一樣穩定推進。
           </p>
-          <div class="ops-actions">
-            <button type="button" id="open-all-groups" class="btn btn-primary">開啟全部社團</button>
-            <button type="button" id="open-nangang-pack" class="btn btn-secondary">開啟南港搜尋包</button>
-            <button type="button" id="open-xizhi-pack" class="btn btn-secondary">開啟汐止搜尋包</button>
+          <div class="hero-actions">
+            <a href="#quest-board" class="btn btn-primary">開始本週任務</a>
+            <a href="#portal-grid" class="btn btn-secondary">前往社團傳送門</a>
             <button type="button" id="reset-social-ops" class="btn btn-secondary btn-muted">重設本週任務</button>
           </div>
           <p id="ops-feedback" class="ops-feedback" aria-live="polite"></p>
         </div>
 
-        <div class="hero-scoreboard">
-          <div class="score-card score-card-highlight">
-            <span>本週進度</span>
-            <strong id="weekly-progress-count">0 / 3</strong>
-            <small id="weekly-progress-note">距離本週達標還差 3 次出擊</small>
+        <div class="hero-command-panel">
+          <div class="command-badge">
+            <span>當前職階</span>
+            <strong id="rank-title">Apprentice Operator</strong>
+            <small id="level-value">Lv.1</small>
           </div>
-          <div class="score-grid">
-            <div class="score-card">
-              <span>等級</span>
-              <strong id="level-value">Lv.1</strong>
-              <small id="xp-value">0 XP</small>
-            </div>
-            <div class="score-card">
+          <div class="command-metrics">
+            <article class="metric-card metric-card-primary">
+              <span>本週主線</span>
+              <strong id="weekly-progress-count">0 / 3</strong>
+              <small id="weekly-progress-note">距離本週達標還差 3 次出擊</small>
+              <div class="progress-track">
+                <div id="weekly-progress-bar" class="progress-bar"></div>
+              </div>
+            </article>
+            <article class="metric-card">
+              <span>總 XP</span>
+              <strong id="xp-value">0 XP</strong>
+              <small>每完成一個任務自動累積</small>
+            </article>
+            <article class="metric-card">
               <span>連勝週數</span>
               <strong id="streak-value">0</strong>
               <small>每週達標 3 次才算延續</small>
-            </div>
-            <div class="score-card">
-              <span>累積出擊</span>
+            </article>
+            <article class="metric-card">
+              <span>累積通關</span>
               <strong id="lifetime-runs-value">0</strong>
-              <small>完成一輪任務才計入</small>
-            </div>
-            <div class="score-card">
-              <span>回覆紀錄</span>
-              <strong id="log-count-value">0</strong>
-              <small>可回頭追哪種題目最有回應</small>
-            </div>
+              <small>本頁只算完整完成的任務數</small>
+            </article>
           </div>
         </div>
       </header>
 
       <div class="ops-grid">
         <div class="ops-main">
-          <section class="ops-card">
-            <div class="section-heading">
-              <h2>任務 6｜本週主線</h2>
-              <p>維持節奏比靈感更重要。這一區專注把每週 3 次出擊真的做完。</p>
-            </div>
-            <div class="mission-rules">
-              <div class="rule-chip">行動 1：看到在地人發問修繕問題，給予專業建議</div>
-              <div class="rule-chip">行動 2：用社團搜尋只掃南港 / 汐止貼文</div>
-              <div class="rule-chip">行動 3：回覆時帶痛點文連結導流</div>
-            </div>
-            <div id="weekly-run-list" class="weekly-run-list"></div>
-          </section>
-
-          <section class="ops-card">
-            <div class="section-heading">
-              <h2>社團快捷入口</h2>
-              <p>直接從這裡開始，不再浪費時間在找社團、切搜尋關鍵字與重複開頁。</p>
-            </div>
-            <div id="group-launcher-grid" class="group-launcher-grid"></div>
-          </section>
-
-          <section class="ops-card">
-            <div class="section-heading">
-              <h2>痛點文素材庫</h2>
-              <p>先把可導流的素材放在手邊，回覆時就不需要臨場想連結。</p>
-            </div>
-            <div id="article-library" class="article-library"></div>
-          </section>
-
-          <section class="ops-card">
-            <div class="section-heading">
-              <h2>戰果紀錄</h2>
-              <p>記錄今天回了什麼題、帶了哪篇、結果如何，才能慢慢找到最有效的導流模式。</p>
-            </div>
-            <form id="battle-log-form" class="battle-log-form">
-              <div class="form-grid">
-                <label class="field">
-                  <span>日期</span>
-                  <input id="log-date" type="date" />
-                </label>
-                <label class="field">
-                  <span>社團</span>
-                  <select id="log-group"></select>
-                </label>
-                <label class="field">
-                  <span>地區關鍵字</span>
-                  <select id="log-keyword">
-                    <option value="南港">南港</option>
-                    <option value="汐止">汐止</option>
-                    <option value="其他">其他</option>
-                  </select>
-                </label>
-                <label class="field">
-                  <span>導流素材</span>
-                  <select id="log-article"></select>
-                </label>
-                <label class="field field-full">
-                  <span>問題主題</span>
-                  <input id="log-topic" type="text" placeholder="例如：老屋壁癌、浴室漏水、插座位置、窗簾盒高度" />
-                </label>
-                <label class="field field-full">
-                  <span>回覆策略簡述</span>
-                  <textarea id="log-summary" rows="3" placeholder="例如：先回答抓預算與動線，再附上軟裝進場順序文章，引導去官網看完整內容。"></textarea>
-                </label>
-                <label class="field field-full">
-                  <span>貼文網址 / 備註</span>
-                  <input id="log-url" type="url" placeholder="可貼 Facebook 貼文網址，或寫後續私訊 / 加 LINE 狀態" />
-                </label>
+          <section id="quest-board" class="ops-panel quest-board">
+            <div class="panel-heading">
+              <div>
+                <p class="panel-tag">WEEKLY QUESTS</p>
+                <h2>本週主線任務</h2>
               </div>
-              <div class="battle-log-actions">
-                <button type="submit" class="btn btn-primary">記錄這次出擊</button>
-                <small>每記錄一筆可加 15 XP，方便回頭看哪種主題最值得持續回答。</small>
+              <p>每個任務只做三件事：找到題目、給專業建議、帶痛點文導流。完成就劃掉。</p>
+            </div>
+            <div id="quest-grid" class="quest-grid"></div>
+          </section>
+
+          <section id="portal-grid" class="ops-panel portal-board">
+            <div class="panel-heading">
+              <div>
+                <p class="panel-tag">GROUP PORTALS</p>
+                <h2>社團傳送門</h2>
               </div>
-            </form>
-            <div id="battle-log-list" class="battle-log-list"></div>
+              <p>不再用會被瀏覽器擋掉的多開模式。每個社團直接給你首頁、南港、汐止三種入口。</p>
+            </div>
+            <div id="portal-card-grid" class="portal-card-grid"></div>
           </section>
         </div>
 
         <aside class="ops-sidebar">
-          <section class="ops-card">
-            <div class="section-heading">
-              <h2>今日快速開始</h2>
-              <p>如果現在只想先動起來，就照這個順序做。</p>
+          <section class="ops-panel side-panel">
+            <div class="panel-heading compact-heading">
+              <div>
+                <p class="panel-tag">PLAYBOOK</p>
+                <h2>本局打法</h2>
+              </div>
             </div>
-            <ol class="quick-start-list">
-              <li>先開南港或汐止搜尋包，找一篇最容易回的修繕問題。</li>
-              <li>先給專業建議，再挑一篇最貼近的痛點文導流。</li>
-              <li>回來勾任務、記戰果，讓 XP 和進度真的累積起來。</li>
-            </ol>
-          </section>
-
-          <section class="ops-card">
-            <div class="section-heading">
-              <h2>本週獎勵規則</h2>
-              <p>讓任務有一點遊戲感，但重點仍是穩定執行。</p>
-            </div>
-            <ul class="reward-list">
-              <li>完成 1 次完整出擊：+100 XP</li>
-              <li>新增 1 筆戰果紀錄：+15 XP</li>
-              <li>每週達標 3 次：連勝週數 +1</li>
-              <li>同週若 3 次全完成：額外獎勵 +50 XP</li>
+            <ul class="command-list">
+              <li>先進搜尋結果，挑最容易切進專業建議的一題。</li>
+              <li>先解決對方眼前問題，再貼最相近的痛點文。</li>
+              <li>完成後直接回來打勾，不要再額外填很多字。</li>
             </ul>
           </section>
 
-          <section class="ops-card">
-            <div class="section-heading">
-              <h2>戰略連動</h2>
-              <p>這一區不是只有導流，也是在幫你累積下一階段素材。</p>
-            </div>
-            <div class="strategy-notes">
-              <div class="strategy-note">
-                <strong>短期</strong>
-                <span>把每週固定曝光與官網導流做成習慣。</span>
-              </div>
-              <div class="strategy-note">
-                <strong>中期</strong>
-                <span>從高互動問題萃取成下一篇痛點文題材。</span>
-              </div>
-              <div class="strategy-note">
-                <strong>長期</strong>
-                <span>沉澱成你未來寫書、講內容與建立個人觀點的原始素材庫。</span>
+          <section class="ops-panel side-panel">
+            <div class="panel-heading compact-heading">
+              <div>
+                <p class="panel-tag">ARSENAL</p>
+                <h2>導流武器庫</h2>
               </div>
             </div>
+            <div id="article-stack" class="article-stack"></div>
+          </section>
+
+          <section class="ops-panel side-panel">
+            <div class="panel-heading compact-heading">
+              <div>
+                <p class="panel-tag">REWARDS</p>
+                <h2>升級規則</h2>
+              </div>
+            </div>
+            <ul class="command-list reward-list">
+              <li>完成 1 個任務：+100 XP</li>
+              <li>本週 3 個任務全清：額外 +50 XP</li>
+              <li>下週繼續達標：連勝週數 +1</li>
+            </ul>
           </section>
         </aside>
       </div>
@@ -233,17 +172,20 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
 </BaseLayout>
 
 <script is:inline define:vars={{ defaultGroupsJson, defaultArticlesJson }}>
-  const STORAGE_KEY = "qingxi-social-ops-v1";
-  const groupTemplate = JSON.parse(defaultGroupsJson);
-  const articleTemplate = JSON.parse(defaultArticlesJson);
+  const STORAGE_KEY = "qingxi-social-ops-v2";
   const WEEKLY_TARGET = 3;
   const RUN_XP = 100;
-  const LOG_XP = 15;
   const WEEKLY_BONUS_XP = 50;
-
-  function getCurrentDateString() {
-    return new Date().toISOString().slice(0, 10);
-  }
+  const groupTemplate = JSON.parse(defaultGroupsJson);
+  const articleTemplate = JSON.parse(defaultArticlesJson);
+  const rankTitles = [
+    "Apprentice Operator",
+    "Lead Hunter",
+    "Signal Captain",
+    "Market Commander",
+    "Pipeline CEO",
+    "Empire Architect",
+  ];
 
   function getWeekKey(date = new Date()) {
     const target = new Date(date);
@@ -255,32 +197,36 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     return `${target.getFullYear()}-W${String(weekNo).padStart(2, "0")}`;
   }
 
-  function createRun(slot) {
+  function createRun(slot, keyword, title, guidance) {
     return {
       id: `run-${slot}`,
       slot,
-      title: `本週出擊 ${slot}`,
-      keyword: slot === 1 ? "南港" : slot === 2 ? "汐止" : "南港",
-      actionAdvice: false,
+      keyword,
+      title,
+      guidance,
       actionSearch: false,
+      actionAdvice: false,
       actionArticle: false,
-      notes: "",
-      launchedAt: "",
-      completedAt: "",
       rewardClaimed: false,
+      completedAt: "",
     };
+  }
+
+  function createWeeklyRuns() {
+    return [
+      createRun(1, "南港", "Quest 01｜南港主線", "先解在地修繕問題，再附最貼近的痛點文。"),
+      createRun(2, "汐止", "Quest 02｜汐止主線", "選最容易切進專業判斷的一題，快速完成。"),
+      createRun(3, "自由掃場", "Quest 03｜自由補刀", "自由挑一題最值得導流的貼文，不限南港或汐止。"),
+    ];
   }
 
   function createInitialState() {
     return {
-      groups: groupTemplate.map((group) => ({ ...group })),
-      articles: articleTemplate.map((article) => ({ ...article })),
       weekly: {
         weekKey: getWeekKey(),
         bonusClaimed: false,
-        runs: [createRun(1), createRun(2), createRun(3)],
+        runs: createWeeklyRuns(),
       },
-      logs: [],
       stats: {
         xp: 0,
         streak: 0,
@@ -301,10 +247,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
       if (!raw) return;
       const parsed = JSON.parse(raw);
       state = {
-        groups: Array.isArray(parsed.groups) && parsed.groups.length ? parsed.groups : createInitialState().groups,
-        articles: Array.isArray(parsed.articles) && parsed.articles.length ? parsed.articles : createInitialState().articles,
         weekly: parsed.weekly || createInitialState().weekly,
-        logs: Array.isArray(parsed.logs) ? parsed.logs : [],
         stats: {
           ...createInitialState().stats,
           ...(parsed.stats || {}),
@@ -315,33 +258,22 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     }
   }
 
+  function isRunComplete(run) {
+    return run.actionSearch && run.actionAdvice && run.actionArticle;
+  }
+
   function normalizeWeeklyState() {
     const currentWeekKey = getWeekKey();
     if (state.weekly.weekKey === currentWeekKey) return;
 
-    const completedRuns = state.weekly.runs.filter((run) => run.actionAdvice && run.actionSearch && run.actionArticle).length;
+    const completedRuns = state.weekly.runs.filter(isRunComplete).length;
     state.stats.streak = completedRuns >= WEEKLY_TARGET ? state.stats.streak + 1 : 0;
     state.weekly = {
       weekKey: currentWeekKey,
       bonusClaimed: false,
-      runs: [createRun(1), createRun(2), createRun(3)],
+      runs: createWeeklyRuns(),
     };
     saveState();
-  }
-
-  function setFeedback(message, mode = "") {
-    const shell = document.getElementById("ops-feedback");
-    if (!shell) return;
-    shell.className = `ops-feedback ${mode}`.trim();
-    shell.textContent = message;
-  }
-
-  function flashButton(button, text) {
-    const original = button.textContent;
-    button.textContent = text;
-    window.setTimeout(() => {
-      button.textContent = original;
-    }, 1400);
   }
 
   function escapeHtml(value) {
@@ -353,17 +285,45 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
       .replace(/'/g, "&#39;");
   }
 
+  function setFeedback(message, mode = "") {
+    const shell = document.getElementById("ops-feedback");
+    if (!shell) return;
+    shell.className = `ops-feedback ${mode}`.trim();
+    shell.textContent = message;
+  }
+
   function buildSearchUrl(group, keyword) {
     return `https://www.facebook.com/groups/${encodeURIComponent(group.groupId)}/search/?q=${encodeURIComponent(keyword)}`;
   }
 
+  function getRunPortals(run) {
+    if (run.keyword === "南港" || run.keyword === "汐止") {
+      return groupTemplate.map((group) => ({
+        label: `${group.alias} ${run.keyword}`,
+        url: buildSearchUrl(group, run.keyword),
+      }));
+    }
+
+    return groupTemplate.map((group) => ({
+      label: `${group.alias} 首頁`,
+      url: group.url,
+    }));
+  }
+
   function getCompletedRunCount() {
-    return state.weekly.runs.filter((run) => run.actionAdvice && run.actionSearch && run.actionArticle).length;
+    return state.weekly.runs.filter(isRunComplete).length;
+  }
+
+  function getLevel() {
+    return Math.floor(state.stats.xp / 200) + 1;
+  }
+
+  function getRankTitle(level) {
+    return rankTitles[Math.min(level - 1, rankTitles.length - 1)];
   }
 
   function maybeClaimRunReward(run) {
-    const isComplete = run.actionAdvice && run.actionSearch && run.actionArticle;
-    if (!isComplete || run.rewardClaimed) return;
+    if (!isRunComplete(run) || run.rewardClaimed) return;
     run.rewardClaimed = true;
     run.completedAt = new Date().toISOString();
     state.stats.xp += RUN_XP;
@@ -373,64 +333,64 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     if (completedRuns >= WEEKLY_TARGET && !state.weekly.bonusClaimed) {
       state.weekly.bonusClaimed = true;
       state.stats.xp += WEEKLY_BONUS_XP;
-      setFeedback("本週 3 次出擊已達標，已領取 +50 XP 週獎勵。", "is-success");
+      setFeedback("本週三個任務已全清，已領取 +50 XP 額外獎勵。", "is-success");
     }
   }
 
-  function getLevel() {
-    return Math.floor(state.stats.xp / 200) + 1;
-  }
-
-  function renderScoreboard() {
+  function renderHero() {
     const completedRuns = getCompletedRunCount();
     const remaining = Math.max(WEEKLY_TARGET - completedRuns, 0);
+    const percent = Math.round((completedRuns / WEEKLY_TARGET) * 100);
+    const level = getLevel();
     document.getElementById("weekly-progress-count").textContent = `${completedRuns} / ${WEEKLY_TARGET}`;
-    document.getElementById("weekly-progress-note").textContent =
-      remaining === 0 ? "本週已達標，維持連勝節奏。" : `距離本週達標還差 ${remaining} 次出擊`;
-    document.getElementById("level-value").textContent = `Lv.${getLevel()}`;
+    document.getElementById("weekly-progress-note").textContent = remaining === 0
+      ? "本週主線已清空，維持連勝節奏。"
+      : `距離本週達標還差 ${remaining} 個任務`;
+    document.getElementById("weekly-progress-bar").style.width = `${percent}%`;
     document.getElementById("xp-value").textContent = `${state.stats.xp} XP`;
     document.getElementById("streak-value").textContent = String(state.stats.streak);
     document.getElementById("lifetime-runs-value").textContent = String(state.stats.lifetimeRuns);
-    document.getElementById("log-count-value").textContent = String(state.logs.length);
+    document.getElementById("level-value").textContent = `Lv.${level}`;
+    document.getElementById("rank-title").textContent = getRankTitle(level);
   }
 
-  function renderRuns() {
-    const shell = document.getElementById("weekly-run-list");
+  function renderQuests() {
+    const shell = document.getElementById("quest-grid");
     if (!shell) return;
 
     shell.innerHTML = state.weekly.runs
       .map((run, index) => {
-        const isComplete = run.actionAdvice && run.actionSearch && run.actionArticle;
+        const complete = isRunComplete(run);
+        const portals = getRunPortals(run)
+          .map((portal) => `<a class="portal-chip" href="${escapeHtml(portal.url)}" target="_blank" rel="noreferrer">${escapeHtml(portal.label)}</a>`)
+          .join("");
+
         return `
-          <article class="run-card ${isComplete ? "is-complete" : ""}">
-            <div class="run-card-header">
-              <div>
-                <span class="run-step">RUN ${index + 1}</span>
-                <h3>${escapeHtml(run.title)}</h3>
-              </div>
-              <span class="run-state ${isComplete ? "is-complete" : "is-pending"}">${isComplete ? "已完成" : "進行中"}</span>
+          <article class="quest-card ${complete ? "is-complete" : ""}">
+            <div class="quest-topline">
+              <span class="quest-slot">RUN ${run.slot}</span>
+              <span class="quest-keyword">${escapeHtml(run.keyword)}</span>
             </div>
-            <div class="run-meta-grid">
-              <label class="field">
-                <span>主攻關鍵字</span>
-                <select data-run-index="${index}" data-run-field="keyword">
-                  <option value="南港" ${run.keyword === "南港" ? "selected" : ""}>南港</option>
-                  <option value="汐止" ${run.keyword === "汐止" ? "selected" : ""}>汐止</option>
-                </select>
+            <h3>${escapeHtml(run.title)}</h3>
+            <p class="quest-guidance">${escapeHtml(run.guidance)}</p>
+            <div class="quest-checklist">
+              <label class="quest-check ${run.actionSearch ? "is-checked" : ""}">
+                <input type="checkbox" data-run-index="${index}" data-run-check="actionSearch" ${run.actionSearch ? "checked" : ""} />
+                <span>已進場找題</span>
               </label>
-              <label class="field field-full">
-                <span>這輪備註</span>
-                <input data-run-index="${index}" data-run-field="notes" type="text" value="${escapeHtml(run.notes || "")}" placeholder="例如：今天主攻老屋翻新、壁癌、浴室漏水類問題" />
+              <label class="quest-check ${run.actionAdvice ? "is-checked" : ""}">
+                <input type="checkbox" data-run-index="${index}" data-run-check="actionAdvice" ${run.actionAdvice ? "checked" : ""} />
+                <span>已給專業建議</span>
+              </label>
+              <label class="quest-check ${run.actionArticle ? "is-checked" : ""}">
+                <input type="checkbox" data-run-index="${index}" data-run-check="actionArticle" ${run.actionArticle ? "checked" : ""} />
+                <span>已附痛點文導流</span>
               </label>
             </div>
-            <div class="run-checklist">
-              <label><input type="checkbox" data-run-index="${index}" data-run-check="actionAdvice" ${run.actionAdvice ? "checked" : ""} /> 已給專業建議</label>
-              <label><input type="checkbox" data-run-index="${index}" data-run-check="actionSearch" ${run.actionSearch ? "checked" : ""} /> 已用社團搜尋掃南港 / 汐止</label>
-              <label><input type="checkbox" data-run-index="${index}" data-run-check="actionArticle" ${run.actionArticle ? "checked" : ""} /> 已附痛點文導流</label>
-            </div>
-            <div class="run-actions">
-              <button type="button" class="btn btn-secondary" data-run-launch="${index}">開啟這輪搜尋包</button>
-              <small>${run.completedAt ? `完成時間：${new Date(run.completedAt).toLocaleString("zh-TW")}` : "完成後會自動領取 100 XP"}</small>
+            <div class="quest-portals">${portals}</div>
+            <div class="quest-footer">
+              <small>${complete ? `CLEAR：${new Date(run.completedAt).toLocaleString("zh-TW")}` : "清空三格後自動獲得 +100 XP"}</small>
+              <strong>${complete ? "Quest Cleared" : "Quest Active"}</strong>
             </div>
           </article>
         `;
@@ -438,22 +398,22 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
       .join("");
   }
 
-  function renderGroups() {
-    const shell = document.getElementById("group-launcher-grid");
+  function renderPortals() {
+    const shell = document.getElementById("portal-card-grid");
     if (!shell) return;
 
-    shell.innerHTML = state.groups
-      .map((group, index) => `
-        <article class="group-card">
-          <label class="field">
-            <span>社團名稱</span>
-            <input data-group-index="${index}" data-group-field="alias" type="text" value="${escapeHtml(group.alias)}" />
-          </label>
-          <p class="group-note">${escapeHtml(group.note || "")}</p>
-          <div class="group-actions">
-            <a class="btn btn-secondary" href="${escapeHtml(group.url)}" target="_blank" rel="noreferrer">開啟社團</a>
-            <a class="btn btn-secondary" href="${escapeHtml(buildSearchUrl(group, "南港"))}" target="_blank" rel="noreferrer">搜南港</a>
-            <a class="btn btn-secondary" href="${escapeHtml(buildSearchUrl(group, "汐止"))}" target="_blank" rel="noreferrer">搜汐止</a>
+    shell.innerHTML = groupTemplate
+      .map((group) => `
+        <article class="portal-card">
+          <div class="portal-card-top">
+            <span class="portal-card-label">${escapeHtml(group.alias)}</span>
+            <h3>${escapeHtml(group.groupId)}</h3>
+          </div>
+          <p>${escapeHtml(group.note)}</p>
+          <div class="portal-actions">
+            <a class="portal-link primary-link" href="${escapeHtml(group.url)}" target="_blank" rel="noreferrer">社團首頁</a>
+            <a class="portal-link" href="${escapeHtml(buildSearchUrl(group, "南港"))}" target="_blank" rel="noreferrer">搜南港</a>
+            <a class="portal-link" href="${escapeHtml(buildSearchUrl(group, "汐止"))}" target="_blank" rel="noreferrer">搜汐止</a>
           </div>
         </article>
       `)
@@ -461,697 +421,496 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   }
 
   function renderArticles() {
-    const shell = document.getElementById("article-library");
+    const shell = document.getElementById("article-stack");
     if (!shell) return;
 
-    shell.innerHTML = state.articles
-      .map((article, index) => `
+    shell.innerHTML = articleTemplate
+      .map((article) => `
         <article class="article-card ${article.status === "published" ? "is-published" : ""}">
-          <div class="article-card-header">
-            <div>
-              <span class="article-state">${article.status === "published" ? "已完成" : "待產出"}</span>
-              <h3>${escapeHtml(article.title)}</h3>
-            </div>
-            ${article.url ? `<a class="btn btn-secondary" href="${escapeHtml(article.url)}" target="_blank" rel="noreferrer">開啟連結</a>` : `<span class="article-missing-link">尚未補連結</span>`}
+          <div class="article-head">
+            <span class="article-state">${article.status === "published" ? "READY" : "DRAFT"}</span>
+            <h3>${escapeHtml(article.title)}</h3>
           </div>
-          <p>${escapeHtml(article.summary || "")}</p>
-          <div class="form-grid compact-grid">
-            <label class="field">
-              <span>標題</span>
-              <input data-article-index="${index}" data-article-field="title" type="text" value="${escapeHtml(article.title)}" />
-            </label>
-            <label class="field">
-              <span>狀態</span>
-              <select data-article-index="${index}" data-article-field="status">
-                <option value="published" ${article.status === "published" ? "selected" : ""}>已完成</option>
-                <option value="draft" ${article.status === "draft" ? "selected" : ""}>待產出</option>
-              </select>
-            </label>
-            <label class="field field-full">
-              <span>文章連結</span>
-              <input data-article-index="${index}" data-article-field="url" type="url" value="${escapeHtml(article.url || "")}" placeholder="例如：https://qingxidesign.tw/blog/..." />
-            </label>
-            <label class="field field-full">
-              <span>摘要 / 用法</span>
-              <input data-article-index="${index}" data-article-field="summary" type="text" value="${escapeHtml(article.summary || "")}" />
-            </label>
-          </div>
+          <p>${escapeHtml(article.summary)}</p>
+          ${article.url ? `<a class="article-link" href="${escapeHtml(article.url)}" target="_blank" rel="noreferrer">開啟素材</a>` : `<span class="article-link is-muted">連結待補</span>`}
         </article>
       `)
       .join("");
-
-    const logArticleSelect = document.getElementById("log-article");
-    if (logArticleSelect) {
-      logArticleSelect.innerHTML = state.articles
-        .map((article) => `<option value="${escapeHtml(article.title)}">${escapeHtml(article.title)}</option>`)
-        .join("");
-    }
-  }
-
-  function renderBattleLog() {
-    const shell = document.getElementById("battle-log-list");
-    if (!shell) return;
-
-    if (!state.logs.length) {
-      shell.innerHTML = `<p class="empty-log">目前還沒有戰果紀錄。完成一次回覆後，就回來留一筆。</p>`;
-      return;
-    }
-
-    shell.innerHTML = state.logs
-      .slice()
-      .reverse()
-      .map((log) => `
-        <article class="log-card">
-          <div class="log-card-header">
-            <strong>${escapeHtml(log.topic || "未命名主題")}</strong>
-            <span>${escapeHtml(log.date || "")}｜${escapeHtml(log.groupAlias || "")}｜${escapeHtml(log.keyword || "")}</span>
-          </div>
-          <p>${escapeHtml(log.summary || "")}</p>
-          <div class="log-tags">
-            <span>${escapeHtml(log.articleTitle || "未附素材")}</span>
-            ${log.url ? `<a href="${escapeHtml(log.url)}" target="_blank" rel="noreferrer">查看貼文</a>` : "<span>未附貼文網址</span>"}
-          </div>
-        </article>
-      `)
-      .join("");
-  }
-
-  function syncLogGroupOptions() {
-    const select = document.getElementById("log-group");
-    if (!select) return;
-    const currentValue = select.value;
-    select.innerHTML = state.groups
-      .map((group) => `<option value="${escapeHtml(group.id)}">${escapeHtml(group.alias)}</option>`)
-      .join("");
-    if (currentValue) select.value = currentValue;
   }
 
   function rerender() {
-    renderScoreboard();
-    renderRuns();
-    renderGroups();
+    renderHero();
+    renderQuests();
+    renderPortals();
     renderArticles();
-    syncLogGroupOptions();
-    renderBattleLog();
     saveState();
-  }
-
-  function openUrlPack(urls) {
-    urls.forEach((url) => {
-      window.open(url, "_blank", "noopener,noreferrer");
-    });
   }
 
   document.addEventListener("change", (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
-
-    if (target.dataset.runCheck) {
-      const index = Number(target.dataset.runIndex);
-      const key = target.dataset.runCheck;
-      const run = state.weekly.runs[index];
-      if (!run || !key) return;
-      run[key] = target.checked;
-      maybeClaimRunReward(run);
-      rerender();
-      return;
-    }
-
-    if (target.dataset.runField) {
-      const index = Number(target.dataset.runIndex);
-      const key = target.dataset.runField;
-      const run = state.weekly.runs[index];
-      if (!run || !key) return;
-      run[key] = target.value;
-      rerender();
-      return;
-    }
-
-    if (target.dataset.groupField) {
-      const index = Number(target.dataset.groupIndex);
-      const key = target.dataset.groupField;
-      const group = state.groups[index];
-      if (!group || !key) return;
-      group[key] = target.value;
-      rerender();
-      return;
-    }
-
-    if (target.dataset.articleField) {
-      const index = Number(target.dataset.articleIndex);
-      const key = target.dataset.articleField;
-      const article = state.articles[index];
-      if (!article || !key) return;
-      article[key] = target.value;
-      rerender();
-    }
-  });
-
-  document.addEventListener("input", (event) => {
-    const target = event.target;
     if (!(target instanceof HTMLInputElement)) return;
+    if (!target.dataset.runCheck) return;
 
-    if (target.dataset.runField) {
-      const index = Number(target.dataset.runIndex);
-      const key = target.dataset.runField;
-      const run = state.weekly.runs[index];
-      if (!run || !key) return;
-      run[key] = target.value;
-      saveState();
-      return;
-    }
+    const index = Number(target.dataset.runIndex);
+    const key = target.dataset.runCheck;
+    const run = state.weekly.runs[index];
+    if (!run || !key) return;
 
-    if (target.dataset.groupField) {
-      const index = Number(target.dataset.groupIndex);
-      const key = target.dataset.groupField;
-      const group = state.groups[index];
-      if (!group || !key) return;
-      group[key] = target.value;
-      saveState();
-      return;
-    }
-
-    if (target.dataset.articleField) {
-      const index = Number(target.dataset.articleIndex);
-      const key = target.dataset.articleField;
-      const article = state.articles[index];
-      if (!article || !key) return;
-      article[key] = target.value;
-      saveState();
-    }
-  });
-
-  document.addEventListener("click", (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) return;
-
-    const launchButton = target.closest("[data-run-launch]");
-    if (launchButton instanceof HTMLButtonElement) {
-      const index = Number(launchButton.dataset.runLaunch);
-      const run = state.weekly.runs[index];
-      if (!run) return;
-      const urls = state.groups.map((group) => buildSearchUrl(group, run.keyword || "南港"));
-      openUrlPack(urls);
-      run.launchedAt = new Date().toISOString();
-      run.actionSearch = true;
-      rerender();
-      flashButton(launchButton, "已開啟");
-      setFeedback(`已開啟 ${run.keyword} 搜尋包，直接去挑最值得回的一題。`, "is-success");
-      return;
-    }
-
-    if (target.id === "open-all-groups") {
-      openUrlPack(state.groups.map((group) => group.url));
-      setFeedback("已開啟 3 個社團首頁。", "is-success");
-      flashButton(target, "已開啟");
-      return;
-    }
-
-    if (target.id === "open-nangang-pack") {
-      openUrlPack(state.groups.map((group) => buildSearchUrl(group, "南港")));
-      setFeedback("已開啟南港搜尋包，先找最容易回的一題。", "is-success");
-      flashButton(target, "已開啟");
-      return;
-    }
-
-    if (target.id === "open-xizhi-pack") {
-      openUrlPack(state.groups.map((group) => buildSearchUrl(group, "汐止")));
-      setFeedback("已開啟汐止搜尋包，去挑最容易切進專業建議的貼文。", "is-success");
-      flashButton(target, "已開啟");
-      return;
-    }
-
-    if (target.id === "reset-social-ops") {
-      state.weekly = {
-        weekKey: getWeekKey(),
-        bonusClaimed: false,
-        runs: [createRun(1), createRun(2), createRun(3)],
-      };
-      rerender();
-      setFeedback("本週任務已重設，XP 與戰果紀錄保留。", "is-warning");
-    }
-  });
-
-  document.getElementById("battle-log-form")?.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const groupSelect = document.getElementById("log-group");
-    const keywordSelect = document.getElementById("log-keyword");
-    const articleSelect = document.getElementById("log-article");
-    const dateInput = document.getElementById("log-date");
-    const topicInput = document.getElementById("log-topic");
-    const summaryInput = document.getElementById("log-summary");
-    const urlInput = document.getElementById("log-url");
-
-    if (!(groupSelect instanceof HTMLSelectElement) || !(keywordSelect instanceof HTMLSelectElement) || !(articleSelect instanceof HTMLSelectElement) || !(dateInput instanceof HTMLInputElement) || !(topicInput instanceof HTMLInputElement) || !(summaryInput instanceof HTMLTextAreaElement) || !(urlInput instanceof HTMLInputElement)) {
-      return;
-    }
-
-    const group = state.groups.find((item) => item.id === groupSelect.value);
-    state.logs.push({
-      id: `log-${Date.now()}`,
-      date: dateInput.value || getCurrentDateString(),
-      groupId: groupSelect.value,
-      groupAlias: group?.alias || "",
-      keyword: keywordSelect.value,
-      articleTitle: articleSelect.value,
-      topic: topicInput.value,
-      summary: summaryInput.value,
-      url: urlInput.value,
-    });
-    state.stats.xp += LOG_XP;
+    run[key] = target.checked;
+    maybeClaimRunReward(run);
     rerender();
+  });
 
-    dateInput.value = getCurrentDateString();
-    topicInput.value = "";
-    summaryInput.value = "";
-    urlInput.value = "";
-    setFeedback("已記錄本次出擊，+15 XP。", "is-success");
+  document.getElementById("reset-social-ops")?.addEventListener("click", () => {
+    state.weekly = {
+      weekKey: getWeekKey(),
+      bonusClaimed: false,
+      runs: createWeeklyRuns(),
+    };
+    rerender();
+    setFeedback("本週任務已重設，XP 與連勝保留。", "is-warning");
   });
 
   loadState();
   normalizeWeeklyState();
   rerender();
-  const dateInput = document.getElementById("log-date");
-  if (dateInput instanceof HTMLInputElement && !dateInput.value) {
-    dateInput.value = getCurrentDateString();
-  }
 </script>
 
 <style>
   .social-ops-page {
-    padding: 5.5rem 1.5rem 6rem;
+    padding: 5rem 1.25rem 6rem;
     background:
-      radial-gradient(circle at top left, rgba(129, 199, 212, 0.16), transparent 28%),
-      linear-gradient(180deg, #f8fbfc 0%, #f4f8f7 100%);
+      radial-gradient(circle at top, rgba(120, 168, 255, 0.16), transparent 24%),
+      radial-gradient(circle at right top, rgba(80, 226, 205, 0.12), transparent 28%),
+      linear-gradient(180deg, #060812 0%, #0b1020 44%, #0d1426 100%);
+    color: #eff4ff;
   }
 
   .social-ops-shell {
-    max-width: 1280px;
+    max-width: 1320px;
     margin: 0 auto;
     display: grid;
     gap: 1.5rem;
   }
 
   .ops-hero,
-  .ops-card {
-    border-radius: 28px;
-    border: 1px solid rgba(27, 27, 27, 0.08);
-    background: rgba(255, 255, 255, 0.92);
-    box-shadow: 0 22px 50px rgba(28, 42, 46, 0.08);
+  .ops-panel {
+    border-radius: 30px;
+    border: 1px solid rgba(140, 168, 255, 0.16);
+    background:
+      linear-gradient(180deg, rgba(15, 21, 39, 0.94), rgba(10, 15, 29, 0.92));
+    box-shadow:
+      0 30px 80px rgba(0, 0, 0, 0.34),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(18px);
   }
 
   .ops-hero {
     padding: clamp(1.5rem, 3vw, 2.4rem);
     display: grid;
     gap: 1.5rem;
-    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+    grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.9fr);
   }
 
-  .ops-eyebrow {
-    margin: 0 0 0.5rem;
-    letter-spacing: 0.2em;
-    font-size: 0.78rem;
-    color: var(--tiffany-dark);
+  .ops-eyebrow,
+  .panel-tag,
+  .quest-slot,
+  .portal-card-label,
+  .article-state {
+    margin: 0;
+    letter-spacing: 0.18em;
+    font-size: 0.74rem;
+    color: #87f5dd;
   }
 
-  .ops-hero h1 {
+  .hero-copy h1 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: clamp(2rem, 4vw, 3.2rem);
-    line-height: 1.16;
-    color: var(--gray-darkest);
+    font-size: clamp(2.3rem, 4vw, 3.8rem);
+    line-height: 1.08;
+    color: #ffffff;
   }
 
   .ops-description {
-    margin: 0.9rem 0 0;
-    max-width: 700px;
-    color: var(--gray-dark);
+    margin: 1rem 0 0;
+    max-width: 720px;
+    color: rgba(231, 238, 255, 0.78);
     font-size: 1.02rem;
-    line-height: 1.8;
+    line-height: 1.9;
   }
 
-  .ops-actions {
-    margin-top: 1.4rem;
+  .hero-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.8rem;
+    margin-top: 1.4rem;
   }
 
   .ops-feedback {
     min-height: 1.5rem;
-    margin: 0.9rem 0 0;
-    color: var(--gray-dark);
+    margin: 0.95rem 0 0;
+    color: rgba(231, 238, 255, 0.76);
   }
 
   .ops-feedback.is-success {
-    color: #16725e;
+    color: #82ffd4;
   }
 
   .ops-feedback.is-warning {
-    color: #8b5a12;
+    color: #ffd88a;
   }
 
-  .hero-scoreboard {
+  .hero-command-panel,
+  .command-metrics,
+  .ops-grid,
+  .ops-main,
+  .ops-sidebar,
+  .quest-grid,
+  .portal-card-grid,
+  .article-stack {
     display: grid;
     gap: 1rem;
   }
 
-  .score-grid {
-    display: grid;
-    gap: 1rem;
+  .command-badge,
+  .metric-card,
+  .quest-card,
+  .portal-card,
+  .article-card {
+    border-radius: 24px;
+    border: 1px solid rgba(140, 168, 255, 0.14);
+    background:
+      linear-gradient(180deg, rgba(17, 24, 44, 0.92), rgba(10, 16, 30, 0.94));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  .command-badge {
+    padding: 1.2rem 1.2rem 1rem;
+    background:
+      radial-gradient(circle at top left, rgba(102, 167, 255, 0.22), transparent 42%),
+      linear-gradient(180deg, rgba(21, 31, 58, 0.98), rgba(12, 18, 34, 0.96));
+  }
+
+  .command-badge span,
+  .metric-card span,
+  .metric-card small,
+  .quest-guidance,
+  .quest-footer small,
+  .portal-card p,
+  .article-card p,
+  .panel-heading p,
+  .command-list li {
+    color: rgba(224, 232, 255, 0.72);
+  }
+
+  .command-badge strong {
+    display: block;
+    margin-top: 0.45rem;
+    font-size: 1.52rem;
+    color: #ffffff;
+  }
+
+  .command-badge small {
+    display: inline-flex;
+    margin-top: 0.45rem;
+    color: #87f5dd;
+  }
+
+  .command-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .score-card {
-    border-radius: 22px;
-    padding: 1.1rem 1.15rem;
-    border: 1px solid rgba(27, 27, 27, 0.08);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 248, 247, 0.92));
-    display: grid;
-    gap: 0.35rem;
+  .metric-card {
+    padding: 1rem 1.05rem;
   }
 
-  .score-card span,
-  .score-card small {
-    color: var(--gray-dark);
+  .metric-card strong {
+    display: block;
+    margin-top: 0.32rem;
+    font-size: 1.55rem;
+    color: #ffffff;
   }
 
-  .score-card strong {
-    font-size: 1.65rem;
-    color: var(--gray-darkest);
+  .metric-card-primary {
+    grid-column: 1 / -1;
+    background:
+      radial-gradient(circle at top right, rgba(135, 245, 221, 0.16), transparent 38%),
+      linear-gradient(180deg, rgba(18, 28, 54, 0.98), rgba(11, 17, 33, 0.96));
   }
 
-  .score-card-highlight {
-    background: linear-gradient(135deg, rgba(129, 199, 212, 0.18), rgba(255, 255, 255, 0.98));
+  .progress-track {
+    margin-top: 0.85rem;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #6fe2ff, #87f5dd);
+    transition: width 0.35s ease;
   }
 
   .ops-grid {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.72fr);
+    grid-template-columns: minmax(0, 1.42fr) minmax(300px, 0.7fr);
     align-items: start;
   }
 
-  .ops-main,
-  .ops-sidebar {
-    display: grid;
-    gap: 1.5rem;
+  .ops-panel {
+    padding: 1.35rem;
   }
 
-  .ops-card {
-    padding: 1.5rem;
-  }
-
-  .section-heading {
+  .panel-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
     margin-bottom: 1.15rem;
   }
 
-  .section-heading h2 {
-    margin: 0;
+  .compact-heading {
+    margin-bottom: 0.95rem;
+  }
+
+  .panel-heading h2 {
+    margin: 0.2rem 0 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.5rem;
-    color: var(--gray-darkest);
+    font-size: 1.55rem;
+    color: #ffffff;
   }
 
-  .section-heading p {
-    margin: 0.55rem 0 0;
-    color: var(--gray-dark);
-    line-height: 1.7;
+  .panel-heading p {
+    margin: 0;
+    max-width: 360px;
+    line-height: 1.8;
   }
 
-  .mission-rules {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem;
-    margin-bottom: 1rem;
+  .quest-grid,
+  .portal-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .rule-chip {
-    padding: 0.72rem 0.95rem;
-    border-radius: 999px;
-    background: rgba(129, 199, 212, 0.12);
-    color: var(--gray-darkest);
-    font-size: 0.92rem;
-  }
-
-  .weekly-run-list,
-  .group-launcher-grid,
-  .article-library,
-  .battle-log-list {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .run-card,
-  .group-card,
-  .article-card,
-  .log-card {
-    border-radius: 22px;
-    border: 1px solid rgba(27, 27, 27, 0.08);
-    background: #fff;
+  .quest-card,
+  .portal-card,
+  .article-card {
     padding: 1rem;
   }
 
-  .run-card.is-complete {
-    border-color: rgba(22, 114, 94, 0.28);
-    background: linear-gradient(180deg, rgba(233, 249, 244, 0.95), #fff);
+  .quest-card {
+    position: relative;
+    overflow: hidden;
   }
 
-  .run-card-header,
-  .article-card-header,
-  .log-card-header {
+  .quest-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(102, 167, 255, 0.14), transparent 30%);
+    pointer-events: none;
+  }
+
+  .quest-card.is-complete {
+    border-color: rgba(135, 245, 221, 0.28);
+    background:
+      radial-gradient(circle at top right, rgba(135, 245, 221, 0.1), transparent 34%),
+      linear-gradient(180deg, rgba(15, 30, 34, 0.96), rgba(10, 19, 24, 0.96));
+  }
+
+  .quest-topline,
+  .quest-portals,
+  .portal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .quest-topline {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .quest-keyword {
+    display: inline-flex;
+    padding: 0.34rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #c7d7ff;
+    font-size: 0.82rem;
+  }
+
+  .quest-card h3,
+  .portal-card h3,
+  .article-card h3 {
+    margin: 0.7rem 0 0;
+    color: #ffffff;
+    font-size: 1.2rem;
+  }
+
+  .quest-guidance {
+    margin: 0.72rem 0 0;
+    line-height: 1.75;
+  }
+
+  .quest-checklist {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1rem;
+  }
+
+  .quest-check {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.78rem 0.88rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #f0f5ff;
+    transition: background 0.25s ease;
+  }
+
+  .quest-check.is-checked {
+    background: rgba(135, 245, 221, 0.12);
+    color: rgba(240, 245, 255, 0.76);
+  }
+
+  .quest-check.is-checked span {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+  }
+
+  .quest-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #87f5dd;
+  }
+
+  .quest-portals {
+    margin-top: 1rem;
+  }
+
+  .portal-chip,
+  .portal-link,
+  .article-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.7rem 0.95rem;
+    border-radius: 14px;
+    border: 1px solid rgba(140, 168, 255, 0.18);
+    background: rgba(255, 255, 255, 0.04);
+    color: #e9f1ff;
+    text-decoration: none;
+    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+  }
+
+  .portal-chip:hover,
+  .portal-link:hover,
+  .article-link:hover {
+    transform: translateY(-2px);
+    border-color: rgba(135, 245, 221, 0.34);
+    background: rgba(135, 245, 221, 0.08);
+  }
+
+  .quest-footer {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    align-items: start;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 0.95rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .run-step,
-  .article-state {
-    display: inline-flex;
-    margin-bottom: 0.32rem;
-    color: var(--tiffany-dark);
-    letter-spacing: 0.14em;
-    font-size: 0.75rem;
+  .quest-footer strong {
+    color: #87f5dd;
+    letter-spacing: 0.08em;
+    font-size: 0.82rem;
   }
 
-  .run-card h3,
-  .article-card h3 {
-    margin: 0;
-    color: var(--gray-darkest);
-    font-size: 1.15rem;
-  }
-
-  .run-state {
-    padding: 0.36rem 0.72rem;
-    border-radius: 999px;
-    font-size: 0.86rem;
-  }
-
-  .run-state.is-complete {
-    background: rgba(22, 114, 94, 0.12);
-    color: #16725e;
-  }
-
-  .run-state.is-pending {
-    background: rgba(139, 90, 18, 0.12);
-    color: #8b5a12;
-  }
-
-  .run-meta-grid,
-  .form-grid,
-  .group-actions,
-  .run-checklist,
-  .battle-log-actions,
-  .log-tags,
-  .strategy-notes,
-  .reward-list,
-  .quick-start-list {
+  .portal-card {
     display: grid;
+    gap: 0.8rem;
+  }
+
+  .portal-card-top {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .portal-card h3 {
+    font-size: 1rem;
+    color: #d9e5ff;
+    word-break: break-all;
+  }
+
+  .portal-card p,
+  .article-card p,
+  .command-list li {
+    margin: 0;
+    line-height: 1.75;
+  }
+
+  .portal-actions {
+    margin-top: 0.15rem;
+  }
+
+  .primary-link {
+    background: linear-gradient(135deg, rgba(102, 167, 255, 0.16), rgba(135, 245, 221, 0.1));
+  }
+
+  .article-stack {
     gap: 0.85rem;
   }
 
-  .run-meta-grid,
-  .form-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 0.95rem;
-  }
-
-  .compact-grid {
-    margin-top: 0.75rem;
-  }
-
-  .field {
+  .article-card {
     display: grid;
-    gap: 0.42rem;
-  }
-
-  .field span {
-    font-size: 0.9rem;
-    color: var(--gray-dark);
-  }
-
-  .field input,
-  .field select,
-  .field textarea {
-    width: 100%;
-    border-radius: 16px;
-    border: 1px solid rgba(27, 27, 27, 0.12);
-    padding: 0.84rem 0.95rem;
-    font: inherit;
-    color: var(--gray-darkest);
-    background: rgba(248, 251, 252, 0.92);
-  }
-
-  .field textarea {
-    resize: vertical;
-  }
-
-  .field-full {
-    grid-column: 1 / -1;
-  }
-
-  .run-checklist {
-    margin-top: 0.95rem;
-  }
-
-  .run-checklist label {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    color: var(--gray-darkest);
-  }
-
-  .run-checklist input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-  }
-
-  .run-actions {
-    margin-top: 0.95rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
     gap: 0.8rem;
-    align-items: center;
   }
 
-  .run-actions small,
-  .group-note,
-  .article-card p,
-  .log-card p,
-  .strategy-note span,
-  .reward-list li,
-  .quick-start-list li {
-    color: var(--gray-dark);
-    line-height: 1.7;
+  .article-link.is-muted {
+    border-style: dashed;
+    color: rgba(231, 238, 255, 0.58);
+    pointer-events: none;
   }
 
-  .group-actions {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: 0.9rem;
-  }
-
-  .article-card.is-published {
-    border-color: rgba(129, 199, 212, 0.24);
-  }
-
-  .article-missing-link {
-    color: #8b5a12;
-    font-size: 0.9rem;
-  }
-
-  .battle-log-form {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .battle-log-actions {
-    align-items: center;
-  }
-
-  .battle-log-actions small {
-    color: var(--gray-dark);
-  }
-
-  .log-card-header span {
-    color: var(--gray-dark);
-    font-size: 0.9rem;
-  }
-
-  .log-tags {
-    grid-template-columns: repeat(2, minmax(0, max-content));
-    align-items: center;
-  }
-
-  .log-tags span,
-  .log-tags a {
-    display: inline-flex;
-    padding: 0.38rem 0.72rem;
-    border-radius: 999px;
-    background: rgba(129, 199, 212, 0.12);
-    color: var(--gray-darkest);
-    text-decoration: none;
-    font-size: 0.88rem;
-  }
-
-  .strategy-note {
-    display: grid;
-    gap: 0.28rem;
-    padding: 0.95rem 1rem;
-    border-radius: 20px;
-    background: rgba(248, 251, 252, 0.92);
-    border: 1px solid rgba(27, 27, 27, 0.07);
-  }
-
-  .strategy-note strong {
-    color: var(--gray-darkest);
-  }
-
-  .reward-list,
-  .quick-start-list {
+  .command-list {
     margin: 0;
-    padding-left: 1.2rem;
+    padding-left: 1.15rem;
   }
 
-  .empty-log {
-    margin: 0;
-    padding: 1rem;
-    border-radius: 18px;
-    background: rgba(248, 251, 252, 0.9);
-    color: var(--gray-dark);
-  }
-
-  @media (max-width: 1080px) {
+  @media (max-width: 1120px) {
     .ops-hero,
-    .ops-grid {
+    .ops-grid,
+    .quest-grid,
+    .portal-card-grid {
       grid-template-columns: 1fr;
     }
 
-    .score-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+    .command-metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 820px) {
+  @media (max-width: 720px) {
     .social-ops-page {
       padding-inline: 1rem;
     }
 
-    .score-grid,
-    .run-meta-grid,
-    .form-grid,
-    .group-actions {
-      grid-template-columns: 1fr;
+    .hero-actions,
+    .panel-heading,
+    .quest-footer,
+    .quest-portals,
+    .portal-actions {
+      flex-direction: column;
+      align-items: stretch;
     }
 
-    .run-card-header,
-    .article-card-header,
-    .log-card-header,
-    .run-actions {
-      flex-direction: column;
-      align-items: flex-start;
+    .command-metrics {
+      grid-template-columns: 1fr;
     }
   }
 </style>
