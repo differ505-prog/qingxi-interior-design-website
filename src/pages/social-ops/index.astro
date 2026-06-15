@@ -1,33 +1,45 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-const defaultGroups = [
+const defaultSources = [
   {
     id: "group-1654316948220005",
     alias: "汐止集團｜汐止人交流｜大小事",
-    groupId: "1654316948220005",
+    platform: "Facebook",
     url: "https://www.facebook.com/groups/1654316948220005/",
   },
   {
     id: "group-679286528824529",
     alias: "內湖 & 松山 & 南港 & 汐止 集團",
-    groupId: "679286528824529",
+    platform: "Facebook",
     url: "https://www.facebook.com/groups/679286528824529",
   },
   {
     id: "group-163175389244849",
     alias: "汐止 南港 台北 新北 租屋 買賣網",
-    groupId: "163175389244849",
+    platform: "Facebook",
     url: "https://www.facebook.com/groups/163175389244849",
+  },
+  {
+    id: "line-community-1",
+    alias: "LINE 社群 01",
+    platform: "LINE",
+    url: "",
+  },
+  {
+    id: "line-community-2",
+    alias: "LINE 社群 02",
+    platform: "LINE",
+    url: "",
   },
 ];
 
-const defaultGroupsJson = JSON.stringify(defaultGroups);
+const defaultSourcesJson = JSON.stringify(defaultSources);
 ---
 
 <BaseLayout
   title="設計師工作面板 - 青曦空間設計"
-  description="青曦內部使用的設計師工作面板，只留必要任務、進度與入口。"
+  description="青曦內部使用的設計師工作面板，只留必要任務、進度與來源入口。"
   noindex={true}
 >
   <section class="social-ops-page">
@@ -37,11 +49,11 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
           <p class="ops-eyebrow">青曦內部面板</p>
           <h1>設計師工作面板</h1>
           <p class="ops-description">
-            打開就做，做完就關。
+            一週任選三題，做完即可。
           </p>
           <div class="hero-actions">
             <a href="#quest-board" class="btn btn-primary">開始本週任務</a>
-            <a href="#portal-grid" class="btn btn-secondary">前往社團傳送門</a>
+            <a href="#portal-grid" class="btn btn-secondary">前往來源入口</a>
             <button type="button" id="reset-social-ops" class="btn btn-tertiary">重設</button>
           </div>
           <p id="ops-feedback" class="ops-feedback" aria-live="polite"></p>
@@ -94,7 +106,7 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
             <div class="panel-heading">
               <div>
                 <p class="panel-tag">社團入口</p>
-                <h2>社團傳送門</h2>
+                <h2>來源入口</h2>
               </div>
             </div>
             <div id="portal-card-grid" class="portal-card-grid"></div>
@@ -105,12 +117,12 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultGroupsJson }}>
+<script is:inline define:vars={{ defaultSourcesJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const WEEKLY_TARGET = 3;
   const RUN_XP = 100;
   const WEEKLY_BONUS_XP = 50;
-  const groupTemplate = JSON.parse(defaultGroupsJson);
+  const sourceTemplate = JSON.parse(defaultSourcesJson);
   const rankTitles = [
     "起稿中",
     "構圖中",
@@ -130,11 +142,10 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     return `${target.getFullYear()}-W${String(weekNo).padStart(2, "0")}`;
   }
 
-  function createRun(slot, keyword) {
+  function createRun(slot) {
     return {
       id: `run-${slot}`,
       slot,
-      keyword,
       actionSearch: false,
       actionAdvice: false,
       actionArticle: false,
@@ -145,9 +156,9 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
 
   function createWeeklyRuns() {
     return [
-      createRun(1, "南港"),
-      createRun(2, "汐止"),
-      createRun(3, "自由掃場"),
+      createRun(1),
+      createRun(2),
+      createRun(3),
     ];
   }
 
@@ -294,8 +305,8 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
         return `
           <article class="quest-card ${complete ? "is-complete" : ""}">
             <div class="quest-topline">
-              <span class="quest-slot">任務 ${run.slot}</span>
-              <span class="quest-keyword">${escapeHtml(run.keyword)}</span>
+              <span class="quest-slot">問題 ${run.slot}</span>
+              <span class="quest-keyword">任選題</span>
             </div>
             <div class="quest-checklist">
               <label class="quest-check ${run.actionSearch ? "is-checked" : ""}">
@@ -321,14 +332,17 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     const shell = document.getElementById("portal-card-grid");
     if (!shell) return;
 
-    shell.innerHTML = groupTemplate
-      .map((group) => `
+    shell.innerHTML = sourceTemplate
+      .map((source) => `
         <article class="portal-card">
           <div class="portal-card-top">
-            <span class="portal-card-label">${escapeHtml(group.alias)}</span>
+            <span class="portal-card-label">${escapeHtml(source.platform)}</span>
+            <strong>${escapeHtml(source.alias)}</strong>
           </div>
           <div class="portal-actions">
-            <a class="portal-link primary-link" href="${escapeHtml(group.url)}" target="_blank" rel="noreferrer">開啟社團</a>
+            ${source.url
+              ? `<a class="portal-link primary-link" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer">開啟入口</a>`
+              : `<span class="portal-link portal-link-muted">待補連結</span>`}
           </div>
         </article>
       `)
@@ -434,6 +448,13 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     letter-spacing: 0.14em;
     font-size: 0.72rem;
     color: rgba(220, 217, 210, 0.48);
+  }
+
+  .portal-card-top strong {
+    color: #f4f2ed;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
   }
 
   .hero-copy h1 {
@@ -743,6 +764,15 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
   }
 
+  .social-ops-page :global(.portal-link-muted) {
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    color: rgba(237, 234, 228, 0.5) !important;
+    box-shadow: none;
+    cursor: default;
+  }
+
   .social-ops-page :global(.portal-link:link),
   .social-ops-page :global(.portal-link:visited) {
     color: #f1efea !important;
@@ -753,6 +783,10 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
     content: "↗";
     font-size: 0.92rem;
     opacity: 0.8;
+  }
+
+  .social-ops-page :global(.portal-link-muted::after) {
+    content: "";
   }
 
   .social-ops-page :global(.portal-link:hover) {
@@ -769,12 +803,7 @@ const defaultGroupsJson = JSON.stringify(defaultGroups);
 
   .portal-card-top {
     display: grid;
-    gap: 0.2rem;
-  }
-
-  .portal-card p {
-    margin: 0;
-    line-height: 1.75;
+    gap: 0.3rem;
   }
 
   .portal-actions {
