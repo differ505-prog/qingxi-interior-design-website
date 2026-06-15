@@ -4,21 +4,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 const defaultGroups = [
   {
     id: "group-1654316948220005",
-    alias: "主社團 01",
+    alias: "社團入口 A",
     groupId: "1654316948220005",
     url: "https://www.facebook.com/groups/1654316948220005/",
     note: "先掃在地修繕題。",
   },
   {
     id: "group-679286528824529",
-    alias: "主社團 02",
+    alias: "社團入口 B",
     groupId: "679286528824529",
     url: "https://www.facebook.com/groups/679286528824529",
     note: "補第二輪搜尋。",
   },
   {
     id: "group-163175389244849",
-    alias: "主社團 03",
+    alias: "社團入口 C",
     groupId: "163175389244849",
     url: "https://www.facebook.com/groups/163175389244849",
     note: "沒好題時補掃。",
@@ -121,7 +121,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
                 <p class="panel-tag">GROUP PORTALS</p>
                 <h2>社團傳送門</h2>
               </div>
-              <p>每個社團直接給你 3 個入口。</p>
+              <p>只留直接可用入口。</p>
             </div>
             <div id="portal-card-grid" class="portal-card-grid"></div>
           </section>
@@ -292,24 +292,6 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     shell.textContent = message;
   }
 
-  function buildSearchUrl(group, keyword) {
-    return `https://www.facebook.com/groups/${encodeURIComponent(group.groupId)}/search/?q=${encodeURIComponent(keyword)}`;
-  }
-
-  function getRunPortals(run) {
-    if (run.keyword === "南港" || run.keyword === "汐止") {
-      return groupTemplate.map((group) => ({
-        label: `${group.alias} ${run.keyword}`,
-        url: buildSearchUrl(group, run.keyword),
-      }));
-    }
-
-    return groupTemplate.map((group) => ({
-      label: `${group.alias} 首頁`,
-      url: group.url,
-    }));
-  }
-
   function getCompletedRunCount() {
     return state.weekly.runs.filter(isRunComplete).length;
   }
@@ -361,9 +343,6 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     shell.innerHTML = state.weekly.runs
       .map((run, index) => {
         const complete = isRunComplete(run);
-        const portals = getRunPortals(run)
-          .map((portal) => `<a class="portal-chip" href="${escapeHtml(portal.url)}" target="_blank" rel="noreferrer">${escapeHtml(portal.label)}</a>`)
-          .join("");
 
         return `
           <article class="quest-card ${complete ? "is-complete" : ""}">
@@ -387,7 +366,6 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
                 <span>已附痛點文導流</span>
               </label>
             </div>
-            <div class="quest-portals">${portals}</div>
             <div class="quest-footer">
               <small>${complete ? `CLEAR：${new Date(run.completedAt).toLocaleString("zh-TW")}` : "清空三格 +100 XP"}</small>
               <strong>${complete ? "Quest Cleared" : "Quest Active"}</strong>
@@ -407,13 +385,10 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
         <article class="portal-card">
           <div class="portal-card-top">
             <span class="portal-card-label">${escapeHtml(group.alias)}</span>
-            <h3>${escapeHtml(group.groupId)}</h3>
           </div>
           <p>${escapeHtml(group.note)}</p>
           <div class="portal-actions">
-            <a class="portal-link primary-link" href="${escapeHtml(group.url)}" target="_blank" rel="noreferrer">社團首頁</a>
-            <a class="portal-link" href="${escapeHtml(buildSearchUrl(group, "南港"))}" target="_blank" rel="noreferrer">搜南港</a>
-            <a class="portal-link" href="${escapeHtml(buildSearchUrl(group, "汐止"))}" target="_blank" rel="noreferrer">搜汐止</a>
+            <a class="portal-link primary-link" href="${escapeHtml(group.url)}" target="_blank" rel="noreferrer">開啟社團</a>
           </div>
         </article>
       `)
@@ -744,7 +719,6 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   }
 
   .quest-topline,
-  .quest-portals,
   .portal-actions {
     display: flex;
     flex-wrap: wrap;
@@ -815,13 +789,8 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     accent-color: #dbdbd6;
   }
 
-  .quest-portals {
-    margin-top: 1rem;
-  }
-
-  .portal-chip,
-  .portal-link,
-  .article-link {
+  .social-ops-page :global(.portal-link),
+  .social-ops-page :global(.article-link) {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -838,27 +807,23 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .portal-chip:link,
-  .portal-chip:visited,
-  .portal-link:link,
-  .portal-link:visited,
-  .article-link:link,
-  .article-link:visited {
+  .social-ops-page :global(.portal-link:link),
+  .social-ops-page :global(.portal-link:visited),
+  .social-ops-page :global(.article-link:link),
+  .social-ops-page :global(.article-link:visited) {
     color: #f1efea !important;
     text-decoration: none !important;
   }
 
-  .portal-chip::after,
-  .portal-link::after,
-  .article-link::after {
+  .social-ops-page :global(.portal-link::after),
+  .social-ops-page :global(.article-link::after) {
     content: "↗";
     font-size: 0.85rem;
     opacity: 0.75;
   }
 
-  .portal-chip:hover,
-  .portal-link:hover,
-  .article-link:hover {
+  .social-ops-page :global(.portal-link:hover),
+  .social-ops-page :global(.article-link:hover) {
     transform: translateY(-2px);
     border-color: rgba(255, 255, 255, 0.14);
     background: linear-gradient(180deg, rgba(248, 247, 243, 0.14), rgba(255, 255, 255, 0.06));
@@ -891,12 +856,6 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     gap: 0.2rem;
   }
 
-  .portal-card h3 {
-    font-size: 1rem;
-    color: rgba(232, 229, 222, 0.82);
-    word-break: break-all;
-  }
-
   .portal-card p,
   .article-card p,
   .command-list li {
@@ -923,13 +882,13 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     gap: 0.95rem;
   }
 
-  .article-link.is-muted {
+  .social-ops-page :global(.article-link.is-muted) {
     border-style: dashed;
     color: rgba(225, 223, 216, 0.48) !important;
     pointer-events: none;
   }
 
-  .article-link.is-muted::after {
+  .social-ops-page :global(.article-link.is-muted::after) {
     content: "";
   }
 
@@ -980,8 +939,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
 
     .hero-actions,
     .panel-heading,
-    .quest-footer,
-    .quest-portals {
+    .quest-footer {
       flex-direction: column;
       align-items: stretch;
     }
