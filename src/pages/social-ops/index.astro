@@ -25,40 +25,22 @@ const defaultGroups = [
   },
 ];
 
-const defaultArticles = [
-  {
-    id: "soft-furnishing-sequence",
-    title: "軟裝進場順序",
-    status: "published",
-    url: "",
-    summary: "已可直接導流。",
-  },
-  {
-    id: "next-pain-point",
-    title: "下一篇痛點文",
-    status: "draft",
-    url: "",
-    summary: "待補下一篇。",
-  },
-];
-
 const defaultGroupsJson = JSON.stringify(defaultGroups);
-const defaultArticlesJson = JSON.stringify(defaultArticles);
 ---
 
 <BaseLayout
-  title="社群作戰台 - 青曦空間設計"
-  description="青曦內部使用的社群誘餌式回覆與知識導流作戰頁，採遊戲化任務面板設計。"
+  title="設計師工作面板 - 青曦空間設計"
+  description="青曦內部使用的設計師工作面板，以遊戲化任務節奏管理社群導流行動。"
   noindex={true}
 >
   <section class="social-ops-page">
     <div class="social-ops-shell">
       <header class="ops-hero">
         <div class="hero-copy">
-          <p class="ops-eyebrow">SOCIAL OPS COMMAND</p>
-          <h1>CEO 社群作戰台</h1>
+          <p class="ops-eyebrow">DESIGNER WORK PANEL</p>
+          <h1>設計師工作面板</h1>
           <p class="ops-description">
-            每週開頁、選任務、做完劃掉。
+            開頁就做，做完就劃掉。
           </p>
           <div class="hero-actions">
             <a href="#quest-board" class="btn btn-primary">開始本週任務</a>
@@ -126,58 +108,17 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
             <div id="portal-card-grid" class="portal-card-grid"></div>
           </section>
         </div>
-
-        <aside class="ops-sidebar">
-          <section class="ops-panel side-panel">
-            <div class="panel-heading compact-heading">
-              <div>
-                <p class="panel-tag">PLAYBOOK</p>
-                <h2>本局打法</h2>
-              </div>
-            </div>
-            <ul class="command-list">
-              <li>先找最好切入的一題。</li>
-              <li>先解問題，再帶文章。</li>
-              <li>做完直接打勾。</li>
-            </ul>
-          </section>
-
-          <section class="ops-panel side-panel">
-            <div class="panel-heading compact-heading">
-              <div>
-                <p class="panel-tag">ARSENAL</p>
-                <h2>導流武器庫</h2>
-              </div>
-            </div>
-            <div id="article-stack" class="article-stack"></div>
-          </section>
-
-          <section class="ops-panel side-panel">
-            <div class="panel-heading compact-heading">
-              <div>
-                <p class="panel-tag">REWARDS</p>
-                <h2>升級規則</h2>
-              </div>
-            </div>
-            <ul class="command-list reward-list">
-              <li>完成 1 個任務：+100 XP</li>
-              <li>本週全清：+50 XP</li>
-              <li>下週達標：連勝 +1</li>
-            </ul>
-          </section>
-        </aside>
       </div>
     </div>
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultGroupsJson, defaultArticlesJson }}>
+<script is:inline define:vars={{ defaultGroupsJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const WEEKLY_TARGET = 3;
   const RUN_XP = 100;
   const WEEKLY_BONUS_XP = 50;
   const groupTemplate = JSON.parse(defaultGroupsJson);
-  const articleTemplate = JSON.parse(defaultArticlesJson);
   const rankTitles = [
     "Apprentice Operator",
     "Lead Hunter",
@@ -395,29 +336,10 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
       .join("");
   }
 
-  function renderArticles() {
-    const shell = document.getElementById("article-stack");
-    if (!shell) return;
-
-    shell.innerHTML = articleTemplate
-      .map((article) => `
-        <article class="article-card ${article.status === "published" ? "is-published" : ""}">
-          <div class="article-head">
-            <span class="article-state">${article.status === "published" ? "READY" : "DRAFT"}</span>
-            <h3>${escapeHtml(article.title)}</h3>
-          </div>
-          <p>${escapeHtml(article.summary)}</p>
-          ${article.url ? `<a class="article-link" href="${escapeHtml(article.url)}" target="_blank" rel="noreferrer">開啟素材</a>` : `<span class="article-link is-muted">連結待補</span>`}
-        </article>
-      `)
-      .join("");
-  }
-
   function rerender() {
     renderHero();
     renderQuests();
     renderPortals();
-    renderArticles();
     saveState();
   }
 
@@ -462,6 +384,11 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     font-family: "Noto Sans TC", sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  .social-ops-shell {
+    max-width: 1220px;
+    margin: 0 auto;
   }
 
   .social-ops-page a,
@@ -516,7 +443,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     font-family: "Noto Serif TC", serif;
     font-size: clamp(2.45rem, 4vw, 4rem);
     line-height: 1.04;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
     color: #f7f6f2;
   }
 
@@ -531,8 +458,36 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.8rem;
-    margin-top: 1.4rem;
+    gap: 0.95rem;
+    margin-top: 1.55rem;
+  }
+
+  .hero-actions .btn {
+    min-height: 52px;
+    padding: 0.92rem 1.35rem;
+    border-radius: 18px;
+    border-width: 1px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.16);
+  }
+
+  .hero-actions .btn.btn-primary {
+    background: linear-gradient(180deg, rgba(247, 246, 241, 0.18), rgba(201, 197, 188, 0.12));
+    border-color: rgba(247, 246, 241, 0.18);
+    color: #f7f6f2;
+  }
+
+  .hero-actions .btn.btn-secondary {
+    background: linear-gradient(180deg, rgba(248, 247, 243, 0.12), rgba(255, 255, 255, 0.04));
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #ece9e2;
+  }
+
+  .hero-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.18);
   }
 
   .ops-feedback {
@@ -554,10 +509,8 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   .command-metrics,
   .ops-grid,
   .ops-main,
-  .ops-sidebar,
   .quest-grid,
-  .portal-card-grid,
-  .article-stack {
+  .portal-card-grid {
     display: grid;
     gap: 1rem;
   }
@@ -565,8 +518,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   .command-badge,
   .metric-card,
   .quest-card,
-  .portal-card,
-  .article-card {
+  .portal-card {
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background:
@@ -589,9 +541,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   .quest-guidance,
   .quest-footer small,
   .portal-card p,
-  .article-card p,
-  .panel-heading p,
-  .command-list li {
+  .panel-heading p {
     color: rgba(230, 228, 222, 0.66);
   }
 
@@ -649,7 +599,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   }
 
   .ops-grid {
-    grid-template-columns: minmax(0, 1.56fr) minmax(320px, 0.74fr);
+    grid-template-columns: 1fr;
     align-items: start;
   }
 
@@ -665,15 +615,11 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     margin-bottom: 1.15rem;
   }
 
-  .compact-heading {
-    margin-bottom: 0.95rem;
-  }
-
   .panel-heading h2 {
     margin: 0.2rem 0 0;
     font-family: "Noto Serif TC", serif;
     font-size: 1.5rem;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
     color: #f5f3ef;
   }
 
@@ -693,8 +639,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   }
 
   .quest-card,
-  .portal-card,
-  .article-card {
+  .portal-card {
     padding: 1.15rem;
   }
 
@@ -740,12 +685,11 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   }
 
   .quest-card h3,
-  .portal-card h3,
-  .article-card h3 {
+  .portal-card h3 {
     margin: 0.7rem 0 0;
     color: #f7f6f2;
     font-size: 1.16rem;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.015em;
   }
 
   .quest-guidance {
@@ -789,45 +733,41 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     accent-color: #dbdbd6;
   }
 
-  .social-ops-page :global(.portal-link),
-  .social-ops-page :global(.article-link) {
+  .social-ops-page :global(.portal-link) {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 48px;
-    padding: 0.85rem 1rem;
+    min-height: 54px;
+    padding: 0.95rem 1.1rem;
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    background: linear-gradient(180deg, rgba(248, 247, 243, 0.11), rgba(255, 255, 255, 0.035));
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, rgba(249, 248, 244, 0.15), rgba(255, 255, 255, 0.045));
     color: #f1efea !important;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 0.93rem;
-    letter-spacing: 0.015em;
-    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.16);
+    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
   }
 
   .social-ops-page :global(.portal-link:link),
-  .social-ops-page :global(.portal-link:visited),
-  .social-ops-page :global(.article-link:link),
-  .social-ops-page :global(.article-link:visited) {
+  .social-ops-page :global(.portal-link:visited) {
     color: #f1efea !important;
     text-decoration: none !important;
   }
 
-  .social-ops-page :global(.portal-link::after),
-  .social-ops-page :global(.article-link::after) {
+  .social-ops-page :global(.portal-link::after) {
     content: "↗";
-    font-size: 0.85rem;
-    opacity: 0.75;
+    font-size: 0.92rem;
+    opacity: 0.8;
   }
 
-  .social-ops-page :global(.portal-link:hover),
-  .social-ops-page :global(.article-link:hover) {
+  .social-ops-page :global(.portal-link:hover) {
     transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.14);
-    background: linear-gradient(180deg, rgba(248, 247, 243, 0.14), rgba(255, 255, 255, 0.06));
-    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.16);
+    border-color: rgba(255, 255, 255, 0.16);
+    background: linear-gradient(180deg, rgba(249, 248, 244, 0.18), rgba(255, 255, 255, 0.06));
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.18);
   }
 
   .quest-footer {
@@ -856,9 +796,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     gap: 0.2rem;
   }
 
-  .portal-card p,
-  .article-card p,
-  .command-list li {
+  .portal-card p {
     margin: 0;
     line-height: 1.75;
   }
@@ -870,51 +808,15 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   }
 
   .primary-link {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08));
-  }
-
-  .article-stack {
-    gap: 0.85rem;
-  }
-
-  .article-card {
-    display: grid;
-    gap: 0.95rem;
-  }
-
-  .social-ops-page :global(.article-link.is-muted) {
-    border-style: dashed;
-    color: rgba(225, 223, 216, 0.48) !important;
-    pointer-events: none;
-  }
-
-  .social-ops-page :global(.article-link.is-muted::after) {
-    content: "";
-  }
-
-  .command-list {
-    margin: 0;
-    padding-left: 1.15rem;
-    font-size: 0.93rem;
-  }
-
-  .side-panel {
-    padding: 1.15rem 1.15rem 1.25rem;
+    background: linear-gradient(180deg, rgba(250, 249, 245, 0.2), rgba(209, 204, 193, 0.09));
   }
 
   .ops-main {
     gap: 1.25rem;
   }
 
-  .ops-sidebar {
-    gap: 1.1rem;
-    position: sticky;
-    top: 1.5rem;
-  }
-
   @media (max-width: 1120px) {
     .ops-hero,
-    .ops-grid,
     .portal-card-grid {
       grid-template-columns: 1fr;
     }
@@ -927,9 +829,6 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .ops-sidebar {
-      position: static;
-    }
   }
 
   @media (max-width: 720px) {
