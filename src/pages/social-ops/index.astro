@@ -7,21 +7,21 @@ const defaultGroups = [
     alias: "主社團 01",
     groupId: "1654316948220005",
     url: "https://www.facebook.com/groups/1654316948220005/",
-    note: "先掃在地修繕題，再挑最值得導流的貼文。",
+    note: "先掃在地修繕題。",
   },
   {
     id: "group-679286528824529",
     alias: "主社團 02",
     groupId: "679286528824529",
     url: "https://www.facebook.com/groups/679286528824529",
-    note: "適合補第二輪搜尋，避免只集中在單一社團。",
+    note: "補第二輪搜尋。",
   },
   {
     id: "group-163175389244849",
     alias: "主社團 03",
     groupId: "163175389244849",
     url: "https://www.facebook.com/groups/163175389244849",
-    note: "當日沒好題時，也可先看留言區是否有待回答問題。",
+    note: "沒好題時補掃。",
   },
 ];
 
@@ -31,14 +31,14 @@ const defaultArticles = [
     title: "軟裝進場順序",
     status: "published",
     url: "",
-    summary: "你目前已完成的一篇痛點文，可作為回覆導流素材。",
+    summary: "已可直接導流。",
   },
   {
     id: "next-pain-point",
     title: "下一篇痛點文",
     status: "draft",
     url: "",
-    summary: "先留給下一篇，例如老屋翻新踩雷、收納尺寸或預算分配。",
+    summary: "待補下一篇。",
   },
 ];
 
@@ -58,7 +58,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
           <p class="ops-eyebrow">SOCIAL OPS COMMAND</p>
           <h1>CEO 社群作戰台</h1>
           <p class="ops-description">
-            這不是待辦清單，而是每週固定推進的任務面板。打開後直接選任務、進場回覆、完成後劃掉，讓導流像解主線一樣穩定推進。
+            每週開頁、選任務、做完劃掉。
           </p>
           <div class="hero-actions">
             <a href="#quest-board" class="btn btn-primary">開始本週任務</a>
@@ -78,7 +78,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
             <article class="metric-card metric-card-primary">
               <span>本週主線</span>
               <strong id="weekly-progress-count">0 / 3</strong>
-              <small id="weekly-progress-note">距離本週達標還差 3 次出擊</small>
+              <small id="weekly-progress-note">還差 3 個任務</small>
               <div class="progress-track">
                 <div id="weekly-progress-bar" class="progress-bar"></div>
               </div>
@@ -86,17 +86,17 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
             <article class="metric-card">
               <span>總 XP</span>
               <strong id="xp-value">0 XP</strong>
-              <small>每完成一個任務自動累積</small>
+              <small>完成任務自動累積</small>
             </article>
             <article class="metric-card">
               <span>連勝週數</span>
               <strong id="streak-value">0</strong>
-              <small>每週達標 3 次才算延續</small>
+              <small>每週達標才延續</small>
             </article>
             <article class="metric-card">
               <span>累積通關</span>
               <strong id="lifetime-runs-value">0</strong>
-              <small>本頁只算完整完成的任務數</small>
+              <small>已完成任務數</small>
             </article>
           </div>
         </div>
@@ -110,7 +110,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
                 <p class="panel-tag">WEEKLY QUESTS</p>
                 <h2>本週主線任務</h2>
               </div>
-              <p>每個任務只做三件事：找到題目、給專業建議、帶痛點文導流。完成就劃掉。</p>
+              <p>找到題目、回覆、導流。</p>
             </div>
             <div id="quest-grid" class="quest-grid"></div>
           </section>
@@ -121,7 +121,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
                 <p class="panel-tag">GROUP PORTALS</p>
                 <h2>社團傳送門</h2>
               </div>
-              <p>不再用會被瀏覽器擋掉的多開模式。每個社團直接給你首頁、南港、汐止三種入口。</p>
+              <p>每個社團直接給你 3 個入口。</p>
             </div>
             <div id="portal-card-grid" class="portal-card-grid"></div>
           </section>
@@ -136,9 +136,9 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
               </div>
             </div>
             <ul class="command-list">
-              <li>先進搜尋結果，挑最容易切進專業建議的一題。</li>
-              <li>先解決對方眼前問題，再貼最相近的痛點文。</li>
-              <li>完成後直接回來打勾，不要再額外填很多字。</li>
+              <li>先找最好切入的一題。</li>
+              <li>先解問題，再帶文章。</li>
+              <li>做完直接打勾。</li>
             </ul>
           </section>
 
@@ -161,8 +161,8 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
             </div>
             <ul class="command-list reward-list">
               <li>完成 1 個任務：+100 XP</li>
-              <li>本週 3 個任務全清：額外 +50 XP</li>
-              <li>下週繼續達標：連勝週數 +1</li>
+              <li>本週全清：+50 XP</li>
+              <li>下週達標：連勝 +1</li>
             </ul>
           </section>
         </aside>
@@ -215,8 +215,8 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
   function createWeeklyRuns() {
     return [
       createRun(1, "南港", "Quest 01｜南港主線", "先解在地修繕問題，再附最貼近的痛點文。"),
-      createRun(2, "汐止", "Quest 02｜汐止主線", "選最容易切進專業判斷的一題，快速完成。"),
-      createRun(3, "自由掃場", "Quest 03｜自由補刀", "自由挑一題最值得導流的貼文，不限南港或汐止。"),
+      createRun(2, "汐止", "Quest 02｜汐止主線", "挑一題，快速完成。"),
+      createRun(3, "自由掃場", "Quest 03｜自由補刀", "自由補一題。"),
     ];
   }
 
@@ -344,8 +344,8 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     const level = getLevel();
     document.getElementById("weekly-progress-count").textContent = `${completedRuns} / ${WEEKLY_TARGET}`;
     document.getElementById("weekly-progress-note").textContent = remaining === 0
-      ? "本週主線已清空，維持連勝節奏。"
-      : `距離本週達標還差 ${remaining} 個任務`;
+      ? "本週已清空。"
+      : `還差 ${remaining} 個任務`;
     document.getElementById("weekly-progress-bar").style.width = `${percent}%`;
     document.getElementById("xp-value").textContent = `${state.stats.xp} XP`;
     document.getElementById("streak-value").textContent = String(state.stats.streak);
@@ -389,7 +389,7 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
             </div>
             <div class="quest-portals">${portals}</div>
             <div class="quest-footer">
-              <small>${complete ? `CLEAR：${new Date(run.completedAt).toLocaleString("zh-TW")}` : "清空三格後自動獲得 +100 XP"}</small>
+              <small>${complete ? `CLEAR：${new Date(run.completedAt).toLocaleString("zh-TW")}` : "清空三格 +100 XP"}</small>
               <strong>${complete ? "Quest Cleared" : "Quest Active"}</strong>
             </div>
           </article>
@@ -814,6 +814,16 @@ const defaultArticlesJson = JSON.stringify(defaultArticles);
     font-weight: 600;
     letter-spacing: 0.01em;
     transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .portal-chip:link,
+  .portal-chip:visited,
+  .portal-link:link,
+  .portal-link:visited,
+  .article-link:link,
+  .article-link:visited {
+    color: #f2f2ef;
+    text-decoration: none;
   }
 
   .portal-chip::after,
