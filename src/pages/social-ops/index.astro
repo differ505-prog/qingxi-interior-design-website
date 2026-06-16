@@ -1215,12 +1215,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       ? [
           "本次模式：快速判題。",
           "請先完成『判題結論』、『書籍章節級別的文章標題』、『文章入庫卡』，再往下輸出其他段落。",
+          "不要輸出任何前言或收到指示的回應，第一行必須直接從「0. 【判題結論】」開始。",
           "若已有明確舊文可補，官網文章只需給精簡段落架構，不必完整展開。",
           "Copilot 生圖提示詞仍要照樣輸出，方便先備圖。",
         ].join("\n")
       : [
           "本次模式：完整初稿。",
           "請先完成『判題結論』、『書籍章節級別的文章標題』、『文章入庫卡』，再繼續輸出重複判斷、社團回覆、官網文章初稿與 Copilot 生圖提示詞。",
+          "不要輸出任何前言或收到指示的回應，第一行必須直接從「0. 【判題結論】」開始。",
         ].join("\n");
     const contextInstruction = isShortQuestion
       ? [
@@ -1232,6 +1234,53 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       : [
           "若原始問題已帶有足夠情境，就沿用原始問題，不必額外補太多假設。",
         ].join("\n");
+
+    if (mode === "quick") {
+      return [
+        "你是「青曦空間設計」的設計總監與內容策劃。",
+        "這次只做快速判題與落地欄位確認，不要寫前言，不要寒暄，不要解釋你收到指示。",
+        "你的第一行必須直接從「0. 【判題結論】」開始。",
+        "若沒有把握，也必須先依目前資訊給出最合理的暫定主書系與章節定位，不可留空。",
+        "",
+        "【真實社團問題】",
+        questionBlock,
+        "",
+        "【固定主書系】",
+        tracksText,
+        "",
+        "【既有文章清單】",
+        buildArticleCatalogText(),
+        "",
+        "【相似題處理規則】",
+        overlapRuleText,
+        "",
+        contextInstruction,
+        "",
+        `【文章入庫卡必填欄位】${intakeFieldText}`,
+        "",
+        "請只輸出以下 6 段，禁止多寫其他段落：",
+        "0. 【判題結論】",
+        "1. 【書籍章節級別的文章標題】",
+        "2. 【文章入庫卡】",
+        "3. 【情境補全假設】",
+        "4. 【社團回覆視角】",
+        "5. 【重複判斷】",
+        "",
+        "格式強制規則：",
+        "- 不要輸出任何前言、結語、說明、提醒。",
+        "- 每個段落標題都必須完整保留【】與編號。",
+        "- 【文章入庫卡】內至少必須逐行包含：",
+        "主書系：",
+        "章節定位：",
+        "網站分類：",
+        "搜尋主關鍵字：",
+        "相似舊文：",
+        "處理策略：",
+        "社團回覆角度：",
+        "導流目的：",
+        "下一篇延伸題目：",
+      ].join("\n");
+    }
 
     return [
       "【真實社團問題】",
@@ -1257,6 +1306,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       contextInstruction,
       "",
       "請根據以上【真實社團問題】，幫我產出一套完整的內容，並嚴格遵守以下結構：",
+      "- 禁止輸出任何前言、結語、補充說明或『我已收到』之類的句子。",
+      "- 各段標題必須完整保留編號與【】格式。",
       "",
       "0. 【判題結論】",
       "- 請只輸出一行結論，四選一：優先補舊文 / 可做同章延伸 / 值得另開新文 / 先改寫舊文。",
@@ -1340,13 +1391,31 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     return line.replace(/^[^：:]+[:：]\s*/, "").trim();
   }
 
+  function escapeRegExp(text) {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function extractFieldValueFromText(text, keys) {
+    if (!text.trim()) return "";
+    const keyPattern = keys.map((key) => escapeRegExp(key)).join("|");
+    const match = text.match(new RegExp(`(?:^|\\n)\\s*(?:[-*]\\s*)?(?:${keyPattern})\\s*[:：]\\s*(.+)`, "i"));
+    return match?.[1]?.trim() || "";
+  }
+
+  function findTrackFromText(text) {
+    return bookshelfTracks.find((track) => text.includes(track.title))?.title || "";
+  }
+
   function parseArticleIntakeCard(content) {
     const section = extractSectionText(content, "文章入庫卡");
     const lines = normalizeSectionLines(section);
+    const category = extractFieldValue(lines, ["網站分類", "分類"]) || extractFieldValueFromText(content, ["網站分類", "分類"]);
+    const track = extractFieldValue(lines, ["主書系"]) || extractFieldValueFromText(content, ["主書系"]) || findTrackFromText(section) || findTrackFromText(content);
+    const chapter = extractFieldValue(lines, ["章節定位"]) || extractFieldValueFromText(content, ["章節定位", "章節名稱", "章名"]);
     return {
-      category: extractFieldValue(lines, ["網站分類", "分類"]) || "尚未判定",
-      track: extractFieldValue(lines, ["主書系"]) || "尚未判定",
-      chapter: extractFieldValue(lines, ["章節定位"]) || "尚未判定",
+      category: category || "尚未判定",
+      track: track || "尚未判定",
+      chapter: chapter || "尚未判定",
     };
   }
 
@@ -1355,6 +1424,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const lines = normalizeSectionLines(section);
     return (
       extractFieldValue(lines, ["標題", "文章標題"]) ||
+      extractFieldValueFromText(section, ["標題", "文章標題"]) ||
+      extractFieldValueFromText(content, ["文章標題"]) ||
       lines.find((line) => !/建議分類|分類/.test(line)) ||
       "尚未判定"
     );

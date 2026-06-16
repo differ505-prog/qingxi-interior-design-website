@@ -10,6 +10,28 @@ type GeminiCandidate = {
   };
 };
 
+function normalizeArticleAssistContent(content: string) {
+  const trimmed = content.trim();
+  if (!trimmed) return "";
+
+  const markers = [
+    "0. 【判題結論】",
+    "0.【判題結論】",
+    "【判題結論】",
+    "A. 【定稿判斷】",
+    "A.【定稿判斷】",
+    "【定稿判斷】",
+  ];
+
+  const offsets = markers
+    .map((marker) => trimmed.indexOf(marker))
+    .filter((index) => index >= 0);
+
+  if (!offsets.length) return trimmed;
+
+  return trimmed.slice(Math.min(...offsets)).trim();
+}
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
@@ -47,9 +69,9 @@ export const POST: APIRoute = async ({ request }) => {
             },
           ],
           generationConfig: {
-            temperature: mode === "quick" ? 0.4 : 0.6,
+            temperature: mode === "quick" ? 0.2 : 0.6,
             topP: 0.9,
-            maxOutputTokens: mode === "quick" ? 2500 : 6000,
+            maxOutputTokens: mode === "quick" ? 1800 : 6000,
           },
         }),
       },
@@ -74,8 +96,9 @@ export const POST: APIRoute = async ({ request }) => {
           .join("\n\n")
           .trim()
       : "";
+    const normalizedContent = normalizeArticleAssistContent(content);
 
-    if (!content) {
+    if (!normalizedContent) {
       return new Response(JSON.stringify({ error: "GEMINI_EMPTY_RESPONSE" }), {
         status: 502,
         headers: { "Content-Type": "application/json" },
@@ -85,7 +108,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         mode,
-        content,
+        content: normalizedContent,
       }),
       {
         status: 200,
