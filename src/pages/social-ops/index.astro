@@ -85,9 +85,26 @@ const articleIntakeFields = [
   "章節定位",
   "網站分類",
   "搜尋主關鍵字",
+  "相似舊文",
+  "處理策略",
   "社團回覆角度",
   "導流目的",
   "下一篇延伸題目",
+];
+
+const overlapRules = [
+  {
+    title: "同核心問題",
+    detail: "若主判斷與既有文章相同，優先補強舊文，不重開新標題。",
+  },
+  {
+    title: "同主題不同角度",
+    detail: "若情境、預算、屋況或族群不同，可做同章延伸文，互相內鏈。",
+  },
+  {
+    title: "可併成系列",
+    detail: "若同一主書系下可串成前後篇，改做系列文，不做彼此搶重點的散文。",
+  },
 ];
 
 let blogPosts = [...fallbackBlogPosts];
@@ -311,6 +328,21 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
             <div class="bookshelf-preview">
               <div class="bookshelf-preview-head">
+                <p>去重規則</p>
+                <span>{overlapRules.length} 條</span>
+              </div>
+              <div class="bookshelf-rule-grid">
+                {overlapRules.map((rule) => (
+                  <article class="bookshelf-rule-card">
+                    <strong>{rule.title}</strong>
+                    <p>{rule.detail}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div class="bookshelf-preview">
+              <div class="bookshelf-preview-head">
                 <p>目前文章</p>
                 <span>{blogPosts.length} 篇</span>
               </div>
@@ -431,9 +463,25 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     "章節定位",
     "網站分類",
     "搜尋主關鍵字",
+    "相似舊文",
+    "處理策略",
     "社團回覆角度",
     "導流目的",
     "下一篇延伸題目",
+  ];
+  const overlapRules = [
+    {
+      title: "同核心問題",
+      detail: "若主判斷與既有文章相同，優先補強舊文，不重開新標題。",
+    },
+    {
+      title: "同主題不同角度",
+      detail: "若情境、預算、屋況或族群不同，可做同章延伸文，互相內鏈。",
+    },
+    {
+      title: "可併成系列",
+      detail: "若同一主書系下可串成前後篇，改做系列文，不做彼此搶重點的散文。",
+    },
   ];
   const rankTitles = [
     "起稿中",
@@ -688,6 +736,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       .join("\n");
   }
 
+  function buildArticleCatalogText() {
+    return articleLibrary
+      .map((post, index) => `${index + 1}. [${post.category}] ${post.title}｜${post.date}`)
+      .join("\n");
+  }
+
   function buildBookshelfLlmPrompt() {
     const categories = Array.from(new Set(articleLibrary.map((post) => post.category))).join("、");
     const tracksText = bookshelfTracks
@@ -755,6 +809,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       .map((track, index) => `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${track.chapters}`)
       .join("\n");
     const intakeFieldText = articleIntakeFields.join(" / ");
+    const overlapRuleText = overlapRules
+      .map((rule, index) => `${index + 1}. ${rule.title}：${rule.detail}`)
+      .join("\n");
 
     return [
       "【真實社團問題】",
@@ -769,27 +826,41 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "請優先把這篇內容收斂進以下固定主書系，不要任意發明過多新書名：",
       tracksText,
       "",
+      "以下是目前網站已存在的文章，請先比對相似題，不要直接忽略舊文：",
+      buildArticleCatalogText(),
+      "",
+      "相似題處理規則：",
+      overlapRuleText,
+      "",
       "請根據以上【真實社團問題】，幫我產出一套完整的內容，並嚴格遵守以下結構：",
       "",
-      "1. 【社團回覆誘餌（約 50-80 字）】",
+      "1. 【重複判斷】",
+      "- 先列出最相似的 1-3 篇既有文章標題。",
+      "- 判斷這題應該屬於：開新文 / 補強舊文 / 改寫舊文 / 同章延伸。",
+      "- 簡短說明原因，重點放在『是否真的提供新角度』。",
+      "",
+      "2. 【社團回覆誘餌（約 50-80 字）】",
       "- 目標：在社團中直接回覆發問者，展現專業但不長篇大論。",
       "- 語氣：客觀、同理、一針見血。",
       "- 絕對禁止：不要出現任何「歡迎私訊」、「找我們設計」等推銷字眼。",
       "- 結尾句型要求：請用類似「這個問題的細節比較多，我剛好把判斷標準整理成了一篇完整的分析，有需要可以參考：[預留網址空間]」的自然引導收尾。",
       "",
-      "2. 【書籍章節級別的文章標題】",
+      "3. 【書籍章節級別的文章標題】",
       "- 目標：符合我們「一魚多吃」出書計畫的標題風格，並兼顧 SEO。",
       "- 格式要求：主標題（感性/痛點）——副標題（理性/SEO關鍵字）。",
       "- 建議分類：請建議這篇文章應該歸類在哪一個主題（如：預算篇、格局篇、水電篇、軟裝篇、驗屋篇、客變篇）。",
       "",
-      "3. 【文章入庫卡】",
+      "4. 【文章入庫卡】",
       `- 請固定輸出以下欄位：${intakeFieldText}。`,
       "- 主書系必須從固定主書系中選 1 個。",
       "- 章節定位要明確到可直接放進未來書稿。",
+      "- 相似舊文請直接填最接近的一篇，若沒有就寫『無明確重複』。",
+      "- 處理策略請只選：開新文 / 補強舊文 / 改寫舊文 / 同章延伸。",
       "- 下一篇延伸題目請給 2 題，且要能接續這篇往下寫。",
       "",
-      "4. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
+      "5. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
       "- 目標：放在官網的「知識分享」區，作為高質量的 SEO 內容與導流落地頁。",
+      "- 若前面的重複判斷結果不是『開新文』，請在文中保留可回填到舊文的段落邏輯，不要硬寫成全新的重複文章。",
       "- 結構與段落要求：",
       "  - # H1 標題（使用上述生成的標題）",
       "  - 前言：點出這個問題背後，多數屋主真正的焦慮是什麼。自然帶入 1-2 個相關的裝修關鍵字（如：預售屋客變、中古屋翻修等）。",
@@ -1554,7 +1625,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   .bookshelf-track-grid,
-  .bookshelf-intake-grid {
+  .bookshelf-intake-grid,
+  .bookshelf-rule-grid {
     display: grid;
     gap: 0.8rem;
   }
@@ -1567,8 +1639,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .bookshelf-rule-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .bookshelf-track-card,
-  .bookshelf-intake-item {
+  .bookshelf-intake-item,
+  .bookshelf-rule-card {
     border-radius: 18px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     background: linear-gradient(180deg, rgba(55, 55, 54, 0.58), rgba(31, 31, 31, 0.82));
@@ -1611,6 +1688,30 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     display: flex;
     align-items: center;
     gap: 0.75rem;
+  }
+
+  .bookshelf-rule-card {
+    padding: 0.95rem 1rem;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .bookshelf-rule-card strong,
+  .bookshelf-rule-card p {
+    margin: 0;
+  }
+
+  .bookshelf-rule-card strong {
+    color: #f5f3ef;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .bookshelf-rule-card p {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.84rem;
+    line-height: 1.7;
   }
 
   .bookshelf-intake-item span {
@@ -2114,7 +2215,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     .bookshelf-summary,
-    .bookshelf-intake-grid {
+    .bookshelf-intake-grid,
+    .bookshelf-rule-grid {
       grid-template-columns: 1fr 1fr;
     }
 
@@ -2143,6 +2245,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .bookshelf-summary,
     .bookshelf-title-list,
     .bookshelf-intake-grid,
+    .bookshelf-rule-grid,
     .gemini-editor-grid {
       grid-template-columns: 1fr;
     }
