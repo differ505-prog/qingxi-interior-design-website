@@ -1221,14 +1221,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const modeInstruction = mode === "quick"
       ? [
           "本次模式：快速判題。",
-          "請先完成『判題結論』、『書籍章節級別的文章標題』、『文章入庫卡』，再往下輸出其他段落。",
+          "請先完成『判題結論』、『文章標題』、『章節名稱』、『文章入庫卡』，再往下輸出其他段落。",
           "不要輸出任何前言或收到指示的回應，第一行必須直接從「0. 【判題結論】」開始。",
           "若已有明確舊文可補，官網文章只需給精簡段落架構，不必完整展開。",
           "Copilot 生圖提示詞仍要照樣輸出，方便先備圖。",
         ].join("\n")
       : [
           "本次模式：完整初稿。",
-          "請先完成『判題結論』、『書籍章節級別的文章標題』、『文章入庫卡』，再繼續輸出重複判斷、社團回覆、官網文章初稿與 Copilot 生圖提示詞。",
+          "請先完成『判題結論』、『文章標題』、『章節名稱』、『文章入庫卡』，再繼續輸出重複判斷、社團回覆、官網文章初稿與 Copilot 生圖提示詞。",
           "不要輸出任何前言或收到指示的回應，第一行必須直接從「0. 【判題結論】」開始。",
         ].join("\n");
     const contextInstruction = isShortQuestion
@@ -1266,10 +1266,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "0. 【判題結論】",
         "- 只輸出一行結論，四選一：優先補舊文 / 可做同章延伸 / 值得另開新文 / 先改寫舊文。",
         "",
-        "1. 【書籍章節級別的文章標題】",
+        "1. 【文章標題】",
         "- 請固定輸出：文章標題：",
         "",
-        "2. 【文章入庫卡】",
+        "2. 【章節名稱】",
+        "- 請固定輸出：章節名稱：",
+        "",
+        "3. 【文章入庫卡】",
         "- 請逐行固定輸出：",
         "主書系：",
         "章節定位：",
@@ -1306,17 +1309,20 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "",
         `【文章入庫卡必填欄位】${intakeFieldText}`,
         "",
-        "請只輸出以下 6 段，禁止多寫其他段落：",
+        "請只輸出以下 7 段，禁止多寫其他段落：",
         "0. 【判題結論】",
-        "1. 【書籍章節級別的文章標題】",
-        "2. 【文章入庫卡】",
-        "3. 【情境補全假設】",
-        "4. 【社團回覆視角】",
-        "5. 【重複判斷】",
+        "1. 【文章標題】",
+        "2. 【章節名稱】",
+        "3. 【文章入庫卡】",
+        "4. 【情境補全假設】",
+        "5. 【社團回覆視角】",
+        "6. 【重複判斷】",
         "",
         "格式強制規則：",
         "- 不要輸出任何前言、結語、說明、提醒。",
         "- 每個段落標題都必須完整保留【】與編號。",
+        "- 【判題結論】只能有一行，不可補理由，不可加第二句。",
+        "- 【章節名稱】只能有一行，不可補說明。",
         "- 【文章入庫卡】內至少必須逐行包含：",
         "主書系：",
         "章節定位：",
@@ -1359,14 +1365,18 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "",
       "0. 【判題結論】",
       "- 請只輸出一行結論，四選一：優先補舊文 / 可做同章延伸 / 值得另開新文 / 先改寫舊文。",
-      "- 不要解釋太長，這一段只給決策結論。",
+      "- 這一段只能保留單行結論，不可補理由，不可加第二句。",
       "",
-      "1. 【書籍章節級別的文章標題】",
+      "1. 【文章標題】",
       "- 目標：符合我們「一魚多吃」出書計畫的標題風格，並兼顧 SEO。",
       "- 格式要求：主標題（感性/痛點）——副標題（理性/SEO關鍵字）。",
       "- 建議分類：請建議這篇文章應該歸類在哪一個主題（如：預算篇、格局篇、水電篇、軟裝篇、驗屋篇、客變篇）。",
       "",
-      "2. 【文章入庫卡】",
+      "2. 【章節名稱】",
+      "- 請只輸出一行章節名稱，必須與主書系對應，能直接放進未來書稿目錄。",
+      "- 不要補說明，不要附理由。",
+      "",
+      "3. 【文章入庫卡】",
       `- 請固定輸出以下欄位：${intakeFieldText}。`,
       "- 主書系必須從固定主書系中選 1 個。",
       "- 章節定位要明確到可直接放進未來書稿。",
@@ -1374,28 +1384,28 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 處理策略請只選：開新文 / 補強舊文 / 改寫舊文 / 同章延伸。",
       "- 下一篇延伸題目請給 2 題，且要能接續這篇往下寫。",
       "",
-      "3. 【情境補全假設】",
+      "4. 【情境補全假設】",
       "- 若原始問題資訊不足，請先補出 3-5 條最合理的情境假設，幫助後續文章成立。",
       "- 若原始問題已很完整，請簡短寫『原始問題情境已足夠，沿用原文』。",
       "- 假設必須貼近一般住宅裝修決策，不要幻想過度特殊案例。",
       "",
-      "4. 【社團回覆視角】",
+      "5. 【社團回覆視角】",
       "- 請先用一句話定義這次最適合切入的回覆視角。",
       "- 例如：先從屋主最怕日後不夠用切入 / 先從西曬與舒適度切入 / 先從預算與施工順序切入。",
       "- 這一段要短，目的是讓回覆更自然，不要像標準答案。",
       "",
-      "5. 【重複判斷】",
+      "6. 【重複判斷】",
       "- 先列出最相似的 1-3 篇既有文章標題。",
       "- 判斷這題應該屬於：開新文 / 補強舊文 / 改寫舊文 / 同章延伸。",
       "- 簡短說明原因，重點放在『是否真的提供新角度』。",
       "",
-      "6. 【社團回覆誘餌（約 50-80 字）】",
+      "7. 【社團回覆誘餌（約 50-80 字）】",
       "- 目標：在社團中直接回覆發問者，展現專業但不長篇大論。",
       "- 語氣：客觀、同理、一針見血。",
       "- 絕對禁止：不要出現任何「歡迎私訊」、「找我們設計」等推銷字眼。",
       "- 結尾句型要求：請用類似「這個問題的細節比較多，我剛好把判斷標準整理成了一篇完整的分析，有需要可以參考：[預留網址空間]」的自然引導收尾。",
       "",
-      "7. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
+      "8. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
       "- 目標：放在官網的「知識分享」區，作為高質量的 SEO 內容與導流落地頁。",
       "- 若前面的重複判斷結果不是『開新文』，請在文中保留可回填到舊文的段落邏輯，不要硬寫成全新的重複文章。",
       "- 結構與段落要求：",
@@ -1405,7 +1415,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "  - ## 常見迷思與避雷：點出一般人 DIY 或找單一工班容易忽略的盲點與隱藏成本。",
       "  - ## 為什麼你需要全盤整合（總結）：帶出為什麼這個環節需要室內設計師的全盤整合，不著痕跡地帶入青曦空間設計安定、耐看、重本質的服務價值，但不要有生硬的業務推銷。",
       "",
-      "8. 【Copilot 生圖提示詞】",
+      "9. 【Copilot 生圖提示詞】",
       "- 請固定輸出 3 組提示詞，不要多也不要少。",
       "- 每組都要包含：用途（封面主圖 / 內文輔圖 / 延伸情境圖）＋正向提示詞＋負面提示詞。",
       "- 視覺風格固定：色鉛筆或麥克筆手繪風格，莫蘭迪配色或低飽和配色，安定、耐看、乾淨、有設計感。",
@@ -1551,12 +1561,40 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     return bestScore >= 4 ? bestTitle : "";
   }
 
+  function extractSectionByTitles(content, titles) {
+    for (const title of titles) {
+      const section = extractSectionText(content, title);
+      if (section) return section;
+    }
+    return "";
+  }
+
+  function parseSingleLineSection(content, titles, keys = []) {
+    const section = extractSectionByTitles(content, titles);
+    const lines = normalizeSectionLines(section);
+    if (!lines.length) return "";
+    return (
+      (keys.length ? extractFieldValue(lines, keys) || extractFieldValueFromText(section, keys) : "") ||
+      lines[0] ||
+      ""
+    );
+  }
+
+  function normalizeDecisionLine(value) {
+    const line = value.split("\n")[0]?.trim() || "";
+    if (/優先補舊文|補強舊文/.test(line)) return "優先補舊文";
+    if (/改寫舊文|先改寫舊文/.test(line)) return "先改寫舊文";
+    if (/同章延伸|可做同章延伸/.test(line)) return "可做同章延伸";
+    if (/開新文|值得另開新文/.test(line)) return "值得另開新文";
+    return "";
+  }
+
   function parseArticleIntakeCard(content) {
     const section = extractSectionText(content, "文章入庫卡");
     const lines = normalizeSectionLines(section);
     const category = extractFieldValue(lines, ["網站分類", "分類"]) || extractFieldValueFromText(content, ["網站分類", "分類"]);
     const track = extractFieldValue(lines, ["主書系"]) || extractFieldValueFromText(content, ["主書系"]) || findTrackFromText(section) || findTrackFromText(content);
-    const explicitChapter = extractFieldValue(lines, ["章節定位"]) || extractFieldValueFromText(content, ["章節定位", "章節名稱", "章名"]);
+    const explicitChapter = extractFieldValue(lines, ["章節定位"]) || parseSingleLineSection(content, ["章節名稱"], ["章節名稱", "章節定位", "章名"]) || extractFieldValueFromText(content, ["章節定位", "章節名稱", "章名"]);
     const inferredChapter = track ? inferChapterFromTrack(track, parseArticleTitle(content), content) : "";
     return {
       category: category || "尚未判定",
@@ -1566,7 +1604,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   function parseArticleTitle(content) {
-    const section = extractSectionText(content, "書籍章節級別的文章標題");
+    const section = extractSectionByTitles(content, ["文章標題", "書籍章節級別的文章標題"]);
     const lines = normalizeSectionLines(section);
     return (
       extractFieldValue(lines, ["標題", "文章標題"]) ||
@@ -1620,20 +1658,24 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const baseConfirm = getArticleConfirmData(base);
     const baseDecisionTitle = summarizeDecisionTitle(base);
     const metadataDecision = extractSectionText(metadata, "判題結論");
-    const metadataTitle = extractSectionText(metadata, "書籍章節級別的文章標題");
+    const metadataTitle = extractSectionByTitles(metadata, ["文章標題", "書籍章節級別的文章標題"]);
+    const metadataChapter = extractSectionText(metadata, "章節名稱");
     const metadataIntake = extractSectionText(metadata, "文章入庫卡");
 
     if (baseDecisionTitle === "請看 AI 原文" && metadataDecision) {
       blocks.push(buildArticleSectionBlock(0, "判題結論", metadataDecision));
     }
     if (baseConfirm.title === "尚未判定" && metadataTitle) {
-      blocks.push(buildArticleSectionBlock(1, "書籍章節級別的文章標題", metadataTitle));
+      blocks.push(buildArticleSectionBlock(1, "文章標題", metadataTitle));
+    }
+    if (baseConfirm.chapter === "尚未判定" && metadataChapter) {
+      blocks.push(buildArticleSectionBlock(2, "章節名稱", metadataChapter));
     }
     if (
       (baseConfirm.track === "尚未判定" || baseConfirm.chapter === "尚未判定" || baseConfirm.category === "尚未判定") &&
       metadataIntake
     ) {
-      blocks.push(buildArticleSectionBlock(2, "文章入庫卡", metadataIntake));
+      blocks.push(buildArticleSectionBlock(3, "文章入庫卡", metadataIntake));
     }
 
     return blocks.filter(Boolean).join("\n\n");
@@ -1675,12 +1717,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   function summarizeDecisionTitle(content) {
     const decisionSection = extractSectionText(content, "判題結論");
-    const sourceText = `${decisionSection}\n${content}`;
-
-    if (/優先補舊文|補強舊文/.test(sourceText)) return "優先補舊文";
-    if (/改寫舊文|先改寫舊文/.test(sourceText)) return "先改寫舊文";
-    if (/同章延伸|可做同章延伸/.test(sourceText)) return "可做同章延伸";
-    if (/開新文|值得另開新文/.test(sourceText)) return "值得另開新文";
+    const singleLineDecision = normalizeDecisionLine(decisionSection);
+    if (singleLineDecision) return singleLineDecision;
+    const sourceText = content.split("\n").slice(0, 8).join("\n");
+    const fallbackDecision = normalizeDecisionLine(sourceText);
+    if (fallbackDecision) return fallbackDecision;
     return "請看 AI 原文";
   }
 
