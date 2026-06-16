@@ -360,7 +360,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <p class="panel-tag">內容書架</p>
                 <h2>內容書架</h2>
               </div>
-              <p>把既有文章慢慢整理成書。</p>
+              <p>把題目變文章，再慢慢收成書。</p>
             </div>
 
             <div class="bookshelf-prompt-tool">
@@ -404,40 +404,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               </details>
             </div>
 
-            <div class="bookshelf-preview">
-              <div class="bookshelf-preview-head">
-                <p>使用流程</p>
-                <span>{workflowGuideSteps.length} 步</span>
-              </div>
-              <div class="bookshelf-guide-grid">
-                {workflowGuideSteps.map((step, index) => (
-                  <article class="bookshelf-guide-card">
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <strong>{step.title}</strong>
-                    <p>{step.detail}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
-
-            <div class="bookshelf-preview">
-              <div class="bookshelf-preview-head">
-                <p>主書系</p>
-                <span>{bookshelfTracks.length} 軸</span>
-              </div>
-              <div class="bookshelf-track-grid">
-                {bookshelfTracks.map((track) => (
-                  <article class="bookshelf-track-card">
-                    <div class="bookshelf-track-top">
-                      <p>{track.title}</p>
-                    </div>
-                    <strong>{track.focus}</strong>
-                    <small>{track.chapters}</small>
-                  </article>
-                ))}
-              </div>
-            </div>
-
             <div class="bookshelf-summary">
               <article class="bookshelf-stat">
                 <span>現有文章</span>
@@ -460,80 +426,126 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               <a href="/blog" class="bookshelf-action" target="_blank" rel="noreferrer">前往知識分享</a>
             </div>
 
-            <div class="bookshelf-preview">
-              <div class="bookshelf-preview-head">
-                <p>入庫欄位</p>
-                <span>{articleIntakeFields.length} 項</span>
+            <details class="bookshelf-fold">
+              <summary>
+                <span>工作流程</span>
+                <small>{workflowGuideSteps.length} 步</small>
+              </summary>
+              <div class="bookshelf-preview bookshelf-fold-body">
+                <div class="bookshelf-guide-grid">
+                  {workflowGuideSteps.map((step, index) => (
+                    <article class="bookshelf-guide-card">
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <strong>{step.title}</strong>
+                      <p>{step.detail}</p>
+                    </article>
+                  ))}
+                </div>
               </div>
-              <div class="bookshelf-intake-grid">
-                {articleIntakeFields.map((field, index) => (
-                  <article class="bookshelf-intake-item">
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <p>{field}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
+            </details>
 
-            <div class="bookshelf-preview">
-              <div class="bookshelf-preview-head">
-                <p>去重規則</p>
-                <span>{overlapRules.length} 條</span>
-              </div>
-              <div class="bookshelf-rule-grid">
-                {overlapRules.map((rule) => (
-                  <article class="bookshelf-rule-card">
-                    <strong>{rule.title}</strong>
-                    <p>{rule.detail}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
+            <details class="bookshelf-fold">
+              <summary>
+                <span>系統規格</span>
+                <small>{bookshelfTracks.length} 書系 / {articleIntakeFields.length} 欄</small>
+              </summary>
+              <div class="bookshelf-fold-stack">
+                <div class="bookshelf-preview bookshelf-fold-body">
+                  <div class="bookshelf-preview-head">
+                    <p>主書系</p>
+                    <span>{bookshelfTracks.length} 軸</span>
+                  </div>
+                  <div class="bookshelf-track-grid">
+                    {bookshelfTracks.map((track) => (
+                      <article class="bookshelf-track-card">
+                        <div class="bookshelf-track-top">
+                          <p>{track.title}</p>
+                        </div>
+                        <strong>{track.focus}</strong>
+                        <small>{track.chapters}</small>
+                      </article>
+                    ))}
+                  </div>
+                </div>
 
-            <div class="bookshelf-preview">
-              <div class="bookshelf-preview-head">
-                <p>書架視圖</p>
-                <span>{bookshelfEntries.length} 篇</span>
+                <div class="bookshelf-preview bookshelf-fold-body">
+                  <div class="bookshelf-preview-head">
+                    <p>入庫欄位</p>
+                    <span>{articleIntakeFields.length} 項</span>
+                  </div>
+                  <div class="bookshelf-intake-grid">
+                    {articleIntakeFields.map((field, index) => (
+                      <article class="bookshelf-intake-item">
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+                        <p>{field}</p>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+
+                <div class="bookshelf-preview bookshelf-fold-body">
+                  <div class="bookshelf-preview-head">
+                    <p>去重規則</p>
+                    <span>{overlapRules.length} 條</span>
+                  </div>
+                  <div class="bookshelf-rule-grid">
+                    {overlapRules.map((rule) => (
+                      <article class="bookshelf-rule-card">
+                        <strong>{rule.title}</strong>
+                        <p>{rule.detail}</p>
+                      </article>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div class="bookshelf-shelf-grid">
-                {bookshelfViewGroups.map((group) => (
-                  <section class="bookshelf-shelf-card">
-                    <div class="bookshelf-shelf-head">
-                      <div>
-                        <p>{group.title}</p>
-                        <strong>{group.focus}</strong>
+            </details>
+
+            <details class="bookshelf-fold">
+              <summary>
+                <span>書架視圖</span>
+                <small>{bookshelfEntries.length} 篇</small>
+              </summary>
+              <div class="bookshelf-preview bookshelf-fold-body">
+                <div class="bookshelf-shelf-grid">
+                  {bookshelfViewGroups.map((group) => (
+                    <section class="bookshelf-shelf-card">
+                      <div class="bookshelf-shelf-head">
+                        <div>
+                          <p>{group.title}</p>
+                          <strong>{group.focus}</strong>
+                        </div>
+                        <span>{group.entries.length} 篇</span>
                       </div>
-                      <span>{group.entries.length} 篇</span>
-                    </div>
-                    <small>{group.chapters}</small>
-                    {group.entries.length > 0 ? (
-                      <div class="bookshelf-shelf-entries">
-                        {group.entries.map((entry) => (
-                          <article class="bookshelf-entry">
-                            <div class="bookshelf-entry-top">
-                              <span>{entry.chapter}</span>
-                              <p>{entry.strategy}</p>
-                            </div>
-                            <h3>{entry.title}</h3>
-                            <div class="bookshelf-entry-stack">
-                              <small>分類：{entry.category}</small>
-                              <small>關鍵字：{entry.searchKeyword}</small>
-                              <small>相似舊文：{entry.similarTitle}</small>
-                            </div>
-                            <div class="bookshelf-entry-meta">
-                              <span>{entry.date}</span>
-                              <a href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">查看文章</a>
-                            </div>
-                          </article>
-                        ))}
-                      </div>
-                    ) : (
-                      <div class="bookshelf-shelf-empty">待補主文</div>
-                    )}
-                  </section>
-                ))}
+                      <small>{group.chapters}</small>
+                      {group.entries.length > 0 ? (
+                        <div class="bookshelf-shelf-entries">
+                          {group.entries.map((entry) => (
+                            <article class="bookshelf-entry">
+                              <div class="bookshelf-entry-top">
+                                <span>{entry.chapter}</span>
+                                <p>{entry.strategy}</p>
+                              </div>
+                              <h3>{entry.title}</h3>
+                              <div class="bookshelf-entry-stack">
+                                <small>分類：{entry.category}</small>
+                                <small>關鍵字：{entry.searchKeyword}</small>
+                                <small>相似舊文：{entry.similarTitle}</small>
+                              </div>
+                              <div class="bookshelf-entry-meta">
+                                <span>{entry.date}</span>
+                                <a href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">查看文章</a>
+                              </div>
+                            </article>
+                          ))}
+                        </div>
+                      ) : (
+                        <div class="bookshelf-shelf-empty">待補主文</div>
+                      )}
+                    </section>
+                  ))}
+                </div>
               </div>
-            </div>
+            </details>
           </section>
 
           <section id="gemini-backup-board" class="ops-panel gemini-board">
@@ -1985,6 +1997,62 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     margin-bottom: 0.95rem;
   }
 
+  .bookshelf-fold {
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+    overflow: hidden;
+    margin-bottom: 0.9rem;
+  }
+
+  .bookshelf-fold summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    color: #f4f2ed;
+  }
+
+  .bookshelf-fold summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .bookshelf-fold summary span,
+  .bookshelf-fold summary small {
+    margin: 0;
+  }
+
+  .bookshelf-fold summary span {
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .bookshelf-fold summary small {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.82rem;
+  }
+
+  .bookshelf-fold[open] summary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .bookshelf-fold-body {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .bookshelf-fold-stack {
+    display: grid;
+    gap: 0.85rem;
+    padding: 0.95rem 1rem 1rem;
+  }
+
   .bookshelf-stat {
     padding: 0.95rem 1rem;
     display: grid;
@@ -2861,6 +2929,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .bookshelf-rule-grid,
     .gemini-editor-grid {
       grid-template-columns: 1fr;
+    }
+
+    .bookshelf-fold-stack {
+      padding-inline: 0.9rem;
     }
   }
 </style>
