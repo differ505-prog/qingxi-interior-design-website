@@ -107,6 +107,25 @@ const overlapRules = [
   },
 ];
 
+const workflowGuideSteps = [
+  {
+    title: "先貼問題",
+    detail: "把社團原始發問貼進工作台，保留真實語境。",
+  },
+  {
+    title: "先判題",
+    detail: "先用 AI 快速判題，決定開新文、補舊文或同章延伸。",
+  },
+  {
+    title: "再出稿",
+    detail: "值得寫的題目再生成初稿，不把時間浪費在低價值重複文。",
+  },
+  {
+    title: "最後入庫",
+    detail: "確認主書系、章節與延伸題，讓每篇文章都能集結成書。",
+  },
+];
+
 let blogPosts = [...fallbackBlogPosts];
 let blogSyncLabel = "目前先顯示已存在文章。";
 
@@ -280,6 +299,22 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 </summary>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
               </details>
+            </div>
+
+            <div class="bookshelf-preview">
+              <div class="bookshelf-preview-head">
+                <p>使用流程</p>
+                <span>{workflowGuideSteps.length} 步</span>
+              </div>
+              <div class="bookshelf-guide-grid">
+                {workflowGuideSteps.map((step, index) => (
+                  <article class="bookshelf-guide-card">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{step.title}</strong>
+                    <p>{step.detail}</p>
+                  </article>
+                ))}
+              </div>
             </div>
 
             <div class="bookshelf-preview">
@@ -1841,11 +1876,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   .bookshelf-track-grid,
   .bookshelf-intake-grid,
-  .bookshelf-rule-grid {
+  .bookshelf-rule-grid,
+  .bookshelf-guide-grid {
     display: grid;
     gap: 0.8rem;
   }
 
+  .bookshelf-guide-grid,
   .bookshelf-track-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1859,6 +1896,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   .bookshelf-track-card,
+  .bookshelf-guide-card,
   .bookshelf-intake-item,
   .bookshelf-rule-card {
     border-radius: 18px;
@@ -1873,10 +1911,38 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     gap: 0.45rem;
   }
 
+  .bookshelf-guide-card {
+    padding: 0.95rem 1rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
   .bookshelf-track-top p,
+  .bookshelf-guide-card span,
+  .bookshelf-guide-card strong,
+  .bookshelf-guide-card p,
   .bookshelf-intake-item p,
   .bookshelf-intake-item span {
     margin: 0;
+  }
+
+  .bookshelf-guide-card span {
+    color: rgba(224, 221, 214, 0.5);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+
+  .bookshelf-guide-card strong {
+    color: #f5f3ef;
+    font-size: 0.94rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .bookshelf-guide-card p {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.84rem;
+    line-height: 1.7;
   }
 
   .bookshelf-track-top p {
@@ -2417,6 +2483,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .ops-hero,
     .portal-card-grid,
     .bookshelf-title-list,
+    .bookshelf-guide-grid,
     .bookshelf-track-grid {
       grid-template-columns: 1fr;
     }
