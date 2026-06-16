@@ -639,51 +639,55 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               <div class="bookshelf-preview bookshelf-fold-body">
                 <div class="bookshelf-outline-grid">
                   {bookshelfOutlineGroups.map((group) => (
-                    <section class="bookshelf-outline-card">
-                      <div class="bookshelf-outline-head">
-                        <div>
-                          <p>{group.title}</p>
-                          <strong>{group.filledChapters} / {group.chapters.length} 章已成形</strong>
+                    <details class="bookshelf-outline-card">
+                      <summary class="bookshelf-outline-summary">
+                        <div class="bookshelf-outline-head">
+                          <div>
+                            <p>{group.title}</p>
+                            <strong>{group.filledChapters} / {group.chapters.length} 章已成形</strong>
+                          </div>
+                          <span>{group.entries.length} 篇文章</span>
                         </div>
-                        <span>{group.entries.length} 篇文章</span>
-                      </div>
-                      <div class="bookshelf-outline-priority">
-                        <p>{group.nextAction}</p>
-                        {group.missingChapters.length > 0 ? (
-                          <div class="bookshelf-outline-tags">
-                            {group.missingChapters.slice(0, 3).map((chapter) => (
-                              <span>{chapter}</span>
-                            ))}
-                          </div>
-                        ) : (
-                          <div class="bookshelf-outline-tags">
-                            <span>已具基本目錄</span>
-                          </div>
-                        )}
-                      </div>
-                      <div class="bookshelf-outline-chapters">
-                        {group.chapters.map((chapter, index) => (
-                          <article class="bookshelf-outline-chapter">
-                            <div class="bookshelf-outline-chapter-top">
-                              <span>{String(index + 1).padStart(2, "0")}</span>
-                              <p>{chapter.entries.length > 0 ? `${chapter.entries.length} 篇` : "待補主文"}</p>
+                        <div class="bookshelf-outline-priority">
+                          <p>{group.nextAction}</p>
+                          {group.missingChapters.length > 0 ? (
+                            <div class="bookshelf-outline-tags">
+                              {group.missingChapters.slice(0, 3).map((chapter) => (
+                                <span>{chapter}</span>
+                              ))}
                             </div>
-                            <strong>{chapter.title}</strong>
-                            {chapter.entries.length > 0 ? (
-                              <div class="bookshelf-outline-list">
-                                {chapter.entries.map((entry) => (
-                                  <a class="bookshelf-outline-link" href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">
-                                    <span>{entry.title}</span>
-                                  </a>
-                                ))}
+                          ) : (
+                            <div class="bookshelf-outline-tags">
+                              <span>已具基本目錄</span>
+                            </div>
+                          )}
+                        </div>
+                      </summary>
+                      <div class="bookshelf-outline-body">
+                        <div class="bookshelf-outline-chapters">
+                          {group.chapters.map((chapter, index) => (
+                            <article class="bookshelf-outline-chapter">
+                              <div class="bookshelf-outline-chapter-top">
+                                <span>{String(index + 1).padStart(2, "0")}</span>
+                                <p>{chapter.entries.length > 0 ? `${chapter.entries.length} 篇` : "待補主文"}</p>
                               </div>
-                            ) : (
-                              <div class="bookshelf-outline-empty">這章還沒有文章</div>
-                            )}
-                          </article>
-                        ))}
+                              <strong>{chapter.title}</strong>
+                              {chapter.entries.length > 0 ? (
+                                <div class="bookshelf-outline-list">
+                                  {chapter.entries.map((entry) => (
+                                    <a class="bookshelf-outline-link" href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">
+                                      <span>{entry.title}</span>
+                                    </a>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div class="bookshelf-outline-empty">這章還沒有文章</div>
+                              )}
+                            </article>
+                          ))}
+                        </div>
                       </div>
-                    </section>
+                    </details>
                   ))}
                 </div>
               </div>
@@ -3566,9 +3570,27 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   .bookshelf-outline-card {
-    padding: 1rem;
+    overflow: hidden;
+  }
+
+  .bookshelf-outline-summary {
+    list-style: none;
+    cursor: pointer;
     display: grid;
-    gap: 0.9rem;
+    gap: 0.75rem;
+    padding: 0.95rem 1rem;
+  }
+
+  .bookshelf-outline-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .bookshelf-outline-card[open] .bookshelf-outline-summary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .bookshelf-outline-body {
+    padding: 0.9rem 1rem 1rem;
   }
 
   .bookshelf-shelf-head {
@@ -3662,6 +3684,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .bookshelf-outline-list {
     display: grid;
     gap: 0.65rem;
+  }
+
+  .bookshelf-outline-card:not([open]) .bookshelf-outline-priority {
+    margin-top: -0.05rem;
   }
 
   .bookshelf-outline-priority {
