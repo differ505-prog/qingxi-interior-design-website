@@ -377,14 +377,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 ></textarea>
               </label>
               <div class="bookshelf-actions bookshelf-prompt-actions">
-                <button type="button" id="copy-article-prompt" class="bookshelf-action bookshelp-action-primary">複製文章生成提示詞</button>
-                <button type="button" id="run-article-ai-quick" class="bookshelf-action">AI 快速判題</button>
+                <button type="button" id="run-article-ai-quick" class="bookshelf-action bookshelp-action-primary">AI 快速判題</button>
                 <button type="button" id="run-article-ai-draft" class="bookshelf-action">AI 生成初稿</button>
-                <button type="button" id="copy-pro-finalize-prompt" class="bookshelf-action">複製 Pro 定稿提示詞</button>
                 <button type="button" id="copy-article-ai-result" class="bookshelf-action">複製 AI 結果</button>
+                <button type="button" id="copy-pro-finalize-prompt" class="bookshelf-action">複製 Pro 定稿提示詞</button>
+                <button type="button" id="copy-article-prompt" class="bookshelf-action">複製文章生成提示詞</button>
                 <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
               </div>
-              <p class="bookshelf-prompt-note">先用 Gemini Flash 做判題與初稿，再把結果交給 Gemini Pro 這類高階模型定稿；就算問題很短，也會先自動補全合理情境。</p>
+              <p class="bookshelf-prompt-note">主要順序是 Gemini Flash 判題 -> Gemini Flash 初稿 -> 複製結果交給 Gemini Pro 定稿；複製文章生成提示詞是手動備援路徑。就算問題很短，也會先自動補全合理情境。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <details id="article-ai-result-shell" class="bookshelf-ai-result">
                 <summary>
