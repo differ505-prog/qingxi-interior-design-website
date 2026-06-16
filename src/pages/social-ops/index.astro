@@ -377,8 +377,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 ></textarea>
               </label>
               <div class="bookshelf-actions bookshelf-prompt-actions">
-                <button type="button" id="run-article-ai-quick" class="bookshelf-action bookshelp-action-primary">AI 快速判題</button>
-                <button type="button" id="run-article-ai-draft" class="bookshelf-action">AI 生成初稿</button>
+                <button type="button" id="run-article-ai-flow" class="bookshelf-action bookshelp-action-primary">一鍵完成初稿</button>
+                <button type="button" id="run-article-ai-quick" class="bookshelf-action">AI 快速判題</button>
                 <button type="button" id="copy-pro-finalize-prompt" class="bookshelf-action">複製 Pro 定稿提示詞</button>
               </div>
               <details class="bookshelf-mini-fold">
@@ -387,12 +387,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                   <small>備援與清理</small>
                 </summary>
                 <div class="bookshelf-actions bookshelf-mini-actions">
+                  <button type="button" id="run-article-ai-draft" class="bookshelf-action">AI 生成初稿</button>
                   <button type="button" id="copy-article-ai-result" class="bookshelf-action">複製 AI 結果</button>
                   <button type="button" id="copy-article-prompt" class="bookshelf-action">複製文章生成提示詞</button>
                   <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
                 </div>
               </details>
-              <p class="bookshelf-prompt-note">最佳主路徑是 Gemini Flash 判題 -> Gemini Flash 初稿 -> 複製 Pro 定稿提示詞交給 Gemini Pro；其餘操作收在次要層，避免第一眼過滿。</p>
+              <p class="bookshelf-prompt-note">最佳主路徑是一鍵完成初稿：Gemini Flash 會先判題、再生成初稿，最後自動幫你備好可複製結果；需要拆步操作時，再用下方次要按鈕。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <details id="article-ai-result-shell" class="bookshelf-ai-result">
                 <summary>
@@ -1170,7 +1171,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   function setArticleAiBusy(isBusy) {
-    ["run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload"].forEach((id) => {
+    ["run-article-ai-flow", "run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload"].forEach((id) => {
       const button = document.getElementById(id);
       if (button instanceof HTMLButtonElement) {
         button.disabled = isBusy;
@@ -1466,16 +1467,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     };
   }
 
-  async function runArticleAi(mode) {
+  async function requestArticleAi(mode) {
     const question = persistArticleSourceQuestion();
     if (!question) {
       setFeedback("請先貼上真實社團問題。", "is-warning");
       setArticleAiFeedback("請先貼上真實社團問題。", "is-warning");
-      return;
+      return null;
     }
-
-    setArticleAiBusy(true);
-    setArticleAiFeedback(mode === "quick" ? "Gemini Flash 判題中..." : "Gemini Flash 生成初稿中...");
 
     try {
       const response = await fetch("/api/social-ops/article-assist", {
@@ -1496,20 +1494,63 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
           : "Gemini Flash 目前無法生成，請稍後再試。";
         setFeedback(errorMessage, "is-warning");
         setArticleAiFeedback(errorMessage, "is-warning");
-        return;
+        return null;
       }
 
-      articleAiResult = typeof result?.content === "string" ? result.content : "";
+      return typeof result?.content === "string" ? result.content : "";
+    } catch (error) {
+      console.error("Gemini Flash 生成失敗：", error);
+      setFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
+      setArticleAiFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
+      return null;
+    }
+  }
+
+  async function runArticleAi(mode) {
+    setArticleAiBusy(true);
+    setArticleAiFeedback(mode === "quick" ? "Gemini Flash 判題中..." : "Gemini Flash 生成初稿中...");
+
+    try {
+      const content = await requestArticleAi(mode);
+      if (!content) return false;
+      articleAiResult = content;
       articleAiMode = mode;
       saveArticleAiResult();
       renderArticleAiResult();
       const successMessage = mode === "quick" ? "已完成 AI 快速判題。" : "已完成 AI 初稿生成。";
       setFeedback(successMessage, "is-success");
       setArticleAiFeedback(successMessage, "is-success");
-    } catch (error) {
-      console.error("Gemini Flash 生成失敗：", error);
-      setFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
-      setArticleAiFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
+      return true;
+    } finally {
+      setArticleAiBusy(false);
+    }
+  }
+
+  async function runArticleAiFlow() {
+    setArticleAiBusy(true);
+    setArticleAiFeedback("一鍵流程啟動中：先判題，再生成初稿...", "is-success");
+
+    try {
+      const quickContent = await requestArticleAi("quick");
+      if (!quickContent) return;
+
+      articleAiResult = quickContent;
+      articleAiMode = "quick";
+      saveArticleAiResult();
+      renderArticleAiResult();
+
+      setArticleAiFeedback("已完成判題，繼續生成初稿...", "is-success");
+
+      const draftContent = await requestArticleAi("full");
+      if (!draftContent) return;
+
+      articleAiResult = draftContent;
+      articleAiMode = "full";
+      saveArticleAiResult();
+      renderArticleAiResult();
+
+      await copyText(articleAiResult, "已完成一鍵初稿並複製 AI 結果。");
+      setArticleAiFeedback("已完成一鍵初稿並複製 AI 結果。", "is-success");
     } finally {
       setArticleAiBusy(false);
     }
@@ -1799,6 +1840,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       ? "已複製文章生成提示詞。"
       : "已複製文章生成提示詞模板。";
     await copyText(buildArticlePrompt(question, "full"), successMessage);
+  });
+
+  document.getElementById("run-article-ai-flow")?.addEventListener("click", async () => {
+    await runArticleAiFlow();
   });
 
   document.getElementById("copy-pro-finalize-prompt")?.addEventListener("click", async () => {
