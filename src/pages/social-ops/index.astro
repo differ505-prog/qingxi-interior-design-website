@@ -200,6 +200,22 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               <p>把既有文章慢慢整理成書。</p>
             </div>
 
+            <div class="bookshelf-prompt-tool">
+              <label class="gemini-field bookshelf-prompt-field">
+                <span>真實社團問題</span>
+                <textarea
+                  id="article-source-question"
+                  rows="7"
+                  placeholder="直接貼上社團原始發問內容"
+                ></textarea>
+              </label>
+              <div class="bookshelf-actions bookshelf-prompt-actions">
+                <button type="button" id="copy-article-prompt" class="bookshelf-action bookshelp-action-primary">複製文章生成提示詞</button>
+                <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
+              </div>
+              <p class="bookshelf-prompt-note">先貼問題，再一鍵丟給 LLM。</p>
+            </div>
+
             <div class="bookshelf-summary">
               <article class="bookshelf-stat">
                 <span>現有文章</span>
@@ -301,6 +317,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
 <script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, geminiCanvasMasterJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
+  const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const GEMINI_DRAFT_KEY = "qingxi-gemini-canvas-draft-v1";
   const GEMINI_BACKUPS_KEY = "qingxi-gemini-canvas-backups-v1";
   const GEMINI_RECENT_LIMIT = 10;
@@ -318,6 +335,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     "定稿中",
     "主理中",
   ];
+  let articleSourceQuestion = "";
   let geminiDraft = null;
   let geminiBackups = [];
 
@@ -588,6 +606,66 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "",
       "現有文章清單：",
       buildArticleTitlesText(),
+    ].join("\n");
+  }
+
+  function loadArticleSourceQuestion() {
+    try {
+      articleSourceQuestion = localStorage.getItem(ARTICLE_SOURCE_QUESTION_KEY) || "";
+    } catch (error) {
+      console.error("讀取社團問題草稿失敗：", error);
+      articleSourceQuestion = "";
+    }
+  }
+
+  function applyArticleSourceQuestionToField() {
+    const field = document.getElementById("article-source-question");
+    if (!(field instanceof HTMLTextAreaElement)) return;
+    field.value = articleSourceQuestion;
+  }
+
+  function persistArticleSourceQuestion() {
+    const field = document.getElementById("article-source-question");
+    if (!(field instanceof HTMLTextAreaElement)) return "";
+    articleSourceQuestion = field.value.trim();
+    localStorage.setItem(ARTICLE_SOURCE_QUESTION_KEY, articleSourceQuestion);
+    return articleSourceQuestion;
+  }
+
+  function buildArticlePrompt(problemText = "") {
+    const questionBlock = problemText.trim() || "（請在此貼上社團的發問內容）";
+
+    return [
+      "【真實社團問題】",
+      questionBlock,
+      "",
+      "你是「青曦空間設計」的設計總監與內容策劃。",
+      "我們的品牌調性是：高級、極簡、安定、耐看、不強迫推銷，用專業與系統性的邏輯解決屋主的焦慮。",
+      "",
+      "我們目前正在執行「一魚多吃」的內容策略：",
+      "將社群中真實的裝修問題，轉化為有系統的知識文章，並計畫將這些文章集結出版成書。",
+      "",
+      "請根據以上【真實社團問題】，幫我產出一套完整的內容，並嚴格遵守以下結構：",
+      "",
+      "1. 【社團回覆誘餌（約 50-80 字）】",
+      "- 目標：在社團中直接回覆發問者，展現專業但不長篇大論。",
+      "- 語氣：客觀、同理、一針見血。",
+      "- 絕對禁止：不要出現任何「歡迎私訊」、「找我們設計」等推銷字眼。",
+      "- 結尾句型要求：請用類似「這個問題的細節比較多，我剛好把判斷標準整理成了一篇完整的分析，有需要可以參考：[預留網址空間]」的自然引導收尾。",
+      "",
+      "2. 【書籍章節級別的文章標題】",
+      "- 目標：符合我們「一魚多吃」出書計畫的標題風格，並兼顧 SEO。",
+      "- 格式要求：主標題（感性/痛點）——副標題（理性/SEO關鍵字）。",
+      "- 建議分類：請建議這篇文章應該歸類在哪一個主題（如：預算篇、格局篇、水電篇、軟裝篇、驗屋篇、客變篇）。",
+      "",
+      "3. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
+      "- 目標：放在官網的「知識分享」區，作為高質量的 SEO 內容與導流落地頁。",
+      "- 結構與段落要求：",
+      "  - # H1 標題（使用上述生成的標題）",
+      "  - 前言：點出這個問題背後，多數屋主真正的焦慮是什麼。自然帶入 1-2 個相關的裝修關鍵字（如：預售屋客變、中古屋翻修等）。",
+      "  - ## 核心觀念：用 2-3 個清晰的重點（條列式），給出專業的判斷標準。必須包含具體的尺寸、順序、材質特性或邏輯判斷，不要寫空泛的形容詞。",
+      "  - ## 常見迷思與避雷：點出一般人 DIY 或找單一工班容易忽略的盲點與隱藏成本。",
+      "  - ## 為什麼你需要全盤整合（總結）：帶出為什麼這個環節需要室內設計師的全盤整合，不著痕跡地帶入青曦空間設計安定、耐看、重本質的服務價值，但不要有生硬的業務推銷。",
     ].join("\n");
   }
 
@@ -862,6 +940,21 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     await copyText(buildArticleTitlesText(), "已複製文章標題清單。");
   });
 
+  document.getElementById("copy-article-prompt")?.addEventListener("click", async () => {
+    const question = persistArticleSourceQuestion();
+    const successMessage = question
+      ? "已複製文章生成提示詞。"
+      : "已複製文章生成提示詞模板。";
+    await copyText(buildArticlePrompt(question), successMessage);
+  });
+
+  document.getElementById("clear-article-question")?.addEventListener("click", () => {
+    articleSourceQuestion = "";
+    localStorage.setItem(ARTICLE_SOURCE_QUESTION_KEY, "");
+    applyArticleSourceQuestionToField();
+    setFeedback("已清空真實社團問題。", "is-warning");
+  });
+
   document.getElementById("load-gemini-master")?.addEventListener("click", () => {
     loadGeminiMasterIntoEditor();
   });
@@ -945,9 +1038,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
   });
 
+  document.getElementById("article-source-question")?.addEventListener("input", () => {
+    persistArticleSourceQuestion();
+  });
+
+  loadArticleSourceQuestion();
   loadGeminiBackupState();
   loadState();
   normalizeWeeklyState();
+  applyArticleSourceQuestionToField();
   applyGeminiDraftToFields();
   rerender();
 </script>
@@ -1290,6 +1389,31 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     flex-wrap: wrap;
     gap: 0.75rem;
     margin-bottom: 1rem;
+  }
+
+  .bookshelf-prompt-tool {
+    display: grid;
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .bookshelf-prompt-field textarea {
+    min-height: 168px;
+  }
+
+  .bookshelf-prompt-actions {
+    margin-bottom: 0;
+  }
+
+  .bookshelf-prompt-note {
+    margin: 0;
+    color: rgba(230, 228, 222, 0.58);
+    font-size: 0.84rem;
+    line-height: 1.7;
   }
 
   .bookshelf-action {
