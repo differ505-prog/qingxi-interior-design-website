@@ -250,34 +250,18 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <p class="panel-tag">Gemini 備份艙</p>
                 <h2>Gemini Canvas 備份</h2>
               </div>
-              <p>主檔落地，之後改版就留版本。</p>
-            </div>
-
-            <div class="gemini-summary">
-              <article class="gemini-stat">
-                <span>目前主檔</span>
-                <strong>{geminiCanvasMaster.title}</strong>
-              </article>
-              <article class="gemini-stat">
-                <span>最近備份</span>
-                <strong id="gemini-last-saved">{geminiCanvasMaster.updatedAt}</strong>
-              </article>
-              <article class="gemini-stat">
-                <span>版本策略</span>
-                <strong>最近 8 版 + 2 份釘選</strong>
-              </article>
+              <p>只留日期版本，點開才展開。</p>
             </div>
 
             <div class="gemini-actions gemini-actions-primary">
               <button type="button" id="run-gemini-backup" class="bookshelf-action bookshelp-action-primary">立即備份</button>
-              <p class="gemini-action-hint">沿用目前記住的連結與內容。只有改來源或下載檔案時，再展開下方設定。</p>
             </div>
 
             <p id="gemini-feedback" class="gemini-feedback" aria-live="polite"></p>
 
             <details class="gemini-composer" id="gemini-composer">
               <summary>
-                <span>來源與工具</span>
+                <span>進階設定</span>
                 <small>需要改連結、內容或下載時再展開</small>
               </summary>
               <div class="gemini-editor-grid">
@@ -302,34 +286,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
             </details>
 
             <div class="gemini-history">
-              <div class="gemini-history-shell">
-                <div class="bookshelf-preview-head">
-                  <p>釘選版本</p>
-                  <span id="gemini-pinned-count">0 / 2</span>
-                </div>
-                <div id="gemini-pinned-list" class="gemini-history-list"></div>
-              </div>
-              <div class="gemini-history-shell">
-                <div class="bookshelf-preview-head">
-                  <p>最近版本</p>
-                  <span id="gemini-history-count">0 / 8</span>
-                </div>
-                <div id="gemini-history-list" class="gemini-history-list"></div>
-              </div>
-            </div>
-
-            <div id="gemini-preview-panel" class="gemini-preview-panel is-hidden">
               <div class="bookshelf-preview-head">
-                <p>內容預覽</p>
-                <span id="gemini-preview-meta">未選擇</span>
+                <p>版本列表</p>
+                <span id="gemini-history-count">0 版</span>
               </div>
-              <div class="gemini-preview-card">
-                <div class="gemini-preview-top">
-                  <strong id="gemini-preview-title">未選擇備份</strong>
-                  <a id="gemini-preview-link" href="#" target="_blank" rel="noreferrer">開啟來源</a>
-                </div>
-                <pre id="gemini-preview-content" class="gemini-preview-content"></pre>
-              </div>
+              <div id="gemini-history-list" class="gemini-version-list"></div>
             </div>
           </section>
         </div>
@@ -342,8 +303,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const GEMINI_DRAFT_KEY = "qingxi-gemini-canvas-draft-v1";
   const GEMINI_BACKUPS_KEY = "qingxi-gemini-canvas-backups-v1";
-  const GEMINI_RECENT_LIMIT = 8;
-  const GEMINI_PINNED_LIMIT = 2;
+  const GEMINI_RECENT_LIMIT = 10;
   const WEEKLY_TARGET = 3;
   const RUN_XP = 100;
   const WEEKLY_BONUS_XP = 50;
@@ -360,7 +320,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   ];
   let geminiDraft = null;
   let geminiBackups = [];
-  let selectedGeminiBackupId = "";
 
   function getWeekKey(date = new Date()) {
     const target = new Date(date);
@@ -670,24 +629,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       .sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime());
   }
 
-  function splitGeminiBackups(backups = geminiBackups) {
-    return {
-      pinned: backups.filter((backup) => backup.isPinned).slice(0, GEMINI_PINNED_LIMIT),
-      recent: backups.filter((backup) => !backup.isPinned).slice(0, GEMINI_RECENT_LIMIT),
-    };
-  }
-
   function trimGeminiBackups(backups = geminiBackups) {
-    const { pinned, recent } = splitGeminiBackups(normalizeGeminiBackups(backups));
-    return normalizeGeminiBackups([...pinned, ...recent]);
-  }
-
-  function findGeminiBackupById(backupId) {
-    return geminiBackups.find((backup) => backup.id === backupId);
-  }
-
-  function getGeminiLastSavedAt() {
-    return geminiBackups[0]?.savedAt || geminiCanvasMasterData.updatedAt;
+    return normalizeGeminiBackups(backups).slice(0, GEMINI_RECENT_LIMIT);
   }
 
   function getGeminiFieldElements() {
@@ -740,8 +683,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       console.error("讀取 Gemini 備份失敗：", error);
       geminiBackups = [];
     }
-
-    selectedGeminiBackupId = geminiBackups[0]?.id || "";
   }
 
   function saveGeminiBackups() {
@@ -801,101 +742,54 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       sourceUrl: draft.sourceUrl,
       content: draft.content,
       savedAt: new Date().toISOString(),
-      isPinned: false,
     };
   }
 
-  function renderGeminiSummary() {
-    const shell = document.getElementById("gemini-last-saved");
-    if (!shell) return;
-    shell.textContent = formatTimestamp(getGeminiLastSavedAt());
+  function getGeminiVersionEntries() {
+    if (geminiBackups.length) return geminiBackups;
+
+    return [{
+      id: "gemini-master-version",
+      title: geminiCanvasMasterData.title,
+      sourceUrl: geminiCanvasMasterData.sourceUrl,
+      content: geminiCanvasMasterData.content,
+      savedAt: geminiCanvasMasterData.updatedAt,
+      isMaster: true,
+    }];
   }
 
-  function renderGeminiBackupCards(backups, emptyMessage) {
-    if (!backups.length) {
-      return `
-        <article class="gemini-history-empty">
-          <p>${escapeHtml(emptyMessage)}</p>
-        </article>
-      `;
-    }
-
-    return backups
-      .map((backup) => `
-        <article class="gemini-history-card">
-          <div class="gemini-history-top">
-            <div>
-              <strong>${escapeHtml(backup.title || "未命名備份")}</strong>
-              <p>${escapeHtml(formatTimestamp(backup.savedAt))}</p>
-            </div>
-            <span>${backup.isPinned ? "已釘選" : `${escapeHtml((backup.content || "").split("\n").length)} 行`}</span>
-          </div>
-          <div class="gemini-history-meta">
-            <p>${escapeHtml(backup.sourceUrl || "未填寫來源網址")}</p>
-          </div>
-          <div class="gemini-history-actions">
-            <button type="button" class="history-action-btn" data-backup-action="preview" data-backup-id="${escapeHtml(backup.id)}">查看內容</button>
-            <button type="button" class="history-action-btn" data-backup-action="restore" data-backup-id="${escapeHtml(backup.id)}">載入這版</button>
-            <button type="button" class="history-action-btn" data-backup-action="pin" data-backup-id="${escapeHtml(backup.id)}">${backup.isPinned ? "取消釘選" : "釘選版本"}</button>
-            <button type="button" class="history-action-btn" data-backup-action="copy" data-backup-id="${escapeHtml(backup.id)}">複製 Markdown</button>
-          </div>
-        </article>
-      `)
-      .join("");
+  function findGeminiBackupById(backupId) {
+    return getGeminiVersionEntries().find((backup) => backup.id === backupId) || null;
   }
 
   function renderGeminiHistory() {
-    const pinnedShell = document.getElementById("gemini-pinned-list");
     const historyShell = document.getElementById("gemini-history-list");
-    const pinnedCount = document.getElementById("gemini-pinned-count");
     const historyCount = document.getElementById("gemini-history-count");
-    if (!pinnedShell || !historyShell || !pinnedCount || !historyCount) return;
+    if (!historyShell || !historyCount) return;
 
-    const { pinned, recent } = splitGeminiBackups();
-    pinnedCount.textContent = `${pinned.length} / ${GEMINI_PINNED_LIMIT}`;
-    historyCount.textContent = `${recent.length} / ${GEMINI_RECENT_LIMIT}`;
+    const versions = getGeminiVersionEntries();
+    historyCount.textContent = `${versions.length} 版`;
 
-    pinnedShell.innerHTML = renderGeminiBackupCards(
-      pinned,
-      "還沒有釘選版本。重要節點再手動保留即可。",
-    );
-    historyShell.innerHTML = renderGeminiBackupCards(
-      recent,
-      "目前還沒有新版本。先按一次立即備份。",
-    );
-  }
-
-  function renderGeminiPreview() {
-    const panel = document.getElementById("gemini-preview-panel");
-    const title = document.getElementById("gemini-preview-title");
-    const link = document.getElementById("gemini-preview-link");
-    const meta = document.getElementById("gemini-preview-meta");
-    const content = document.getElementById("gemini-preview-content");
-    if (!panel || !title || !link || !meta || !content) return;
-
-    const selectedBackup = findGeminiBackupById(selectedGeminiBackupId);
-    if (!selectedBackup) {
-      panel.classList.add("is-hidden");
-      title.textContent = "未選擇備份";
-      meta.textContent = "未選擇";
-      content.textContent = "";
-      return;
-    }
-
-    panel.classList.remove("is-hidden");
-    title.textContent = selectedBackup.title || "未命名備份";
-    meta.textContent = `${formatTimestamp(selectedBackup.savedAt)}｜${(selectedBackup.content || "").split("\n").length} 行`;
-    content.textContent = selectedBackup.content || "";
-
-    if (selectedBackup.sourceUrl) {
-      link.setAttribute("href", selectedBackup.sourceUrl);
-      link.textContent = "開啟來源";
-      link.classList.remove("is-disabled");
-    } else {
-      link.setAttribute("href", "#");
-      link.textContent = "未填寫來源";
-      link.classList.add("is-disabled");
-    }
+    historyShell.innerHTML = versions
+      .map((backup) => `
+        <details class="gemini-version-item">
+          <summary class="gemini-version-summary">
+            <strong>${escapeHtml(formatTimestamp(backup.savedAt))}</strong>
+          </summary>
+          <div class="gemini-version-body">
+            <div class="gemini-version-meta">
+              <p>${escapeHtml(backup.title || "未命名備份")}</p>
+              <small>${escapeHtml(backup.sourceUrl || "未填寫來源網址")}</small>
+            </div>
+            <div class="gemini-history-actions">
+              <button type="button" class="history-action-btn" data-backup-action="restore" data-backup-id="${escapeHtml(backup.id)}">${backup.isMaster ? "載入主檔" : "載入這版"}</button>
+              <button type="button" class="history-action-btn" data-backup-action="copy" data-backup-id="${escapeHtml(backup.id)}">複製 Markdown</button>
+            </div>
+            <pre class="gemini-preview-content">${escapeHtml(backup.content || "")}</pre>
+          </div>
+        </details>
+      `)
+      .join("");
   }
 
   function loadGeminiMasterIntoEditor() {
@@ -922,41 +816,16 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       nextPayload,
       ...geminiBackups.filter((backup) => backup.id !== existing?.id),
     ]);
-    selectedGeminiBackupId = nextPayload.id;
     saveGeminiBackups();
-    renderGeminiSummary();
     renderGeminiHistory();
-    renderGeminiPreview();
     return { payload: nextPayload, updated: Boolean(existing) };
-  }
-
-  function toggleGeminiPin(backup) {
-    if (!backup.isPinned && splitGeminiBackups().pinned.length >= GEMINI_PINNED_LIMIT) {
-      setGeminiFeedback(`最多先釘選 ${GEMINI_PINNED_LIMIT} 份重要版本。`, "is-warning");
-      return;
-    }
-
-    geminiBackups = trimGeminiBackups(
-      geminiBackups.map((item) => (
-        item.id === backup.id
-          ? { ...item, isPinned: !item.isPinned }
-          : item
-      )),
-    );
-    saveGeminiBackups();
-    renderGeminiSummary();
-    renderGeminiHistory();
-    renderGeminiPreview();
-    setGeminiFeedback(backup.isPinned ? "已取消釘選版本。" : "已釘選這份重要版本。", "is-success");
   }
 
   function rerender() {
     renderHero();
     renderQuests();
     renderPortals();
-    renderGeminiSummary();
     renderGeminiHistory();
-    renderGeminiPreview();
     saveState();
   }
 
@@ -1046,13 +915,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const backup = findGeminiBackupById(backupId);
     if (!backup) return;
 
-    if (action === "preview") {
-      selectedGeminiBackupId = backup.id;
-      renderGeminiPreview();
-      setGeminiFeedback("已展開這份備份內容。", "is-success");
-      return;
-    }
-
     if (action === "restore") {
       geminiDraft = {
         title: backup.title,
@@ -1070,10 +932,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       await copyText(buildGeminiBackupMarkdown(backup), "已複製該版本 Markdown。");
       setGeminiFeedback("已複製該版本 Markdown。", "is-success");
       return;
-    }
-
-    if (action === "pin") {
-      toggleGeminiPin(backup);
     }
   });
 
@@ -1269,8 +1127,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .portal-card-grid,
   .bookshelf-summary,
   .bookshelf-title-list,
-  .gemini-summary,
-  .gemini-history-list,
+  .gemini-version-list,
   .gemini-editor-grid {
     display: grid;
     gap: 0.85rem;
@@ -1282,9 +1139,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .portal-card,
   .bookshelf-stat,
   .bookshelf-entry,
-  .gemini-stat,
-  .gemini-history-card,
-  .gemini-history-empty {
+  .gemini-version-item {
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     background:
@@ -1408,18 +1263,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     margin-bottom: 0.95rem;
   }
 
-  .gemini-summary {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-bottom: 0.95rem;
-  }
-
   .bookshelf-stat {
-    padding: 0.95rem 1rem;
-    display: grid;
-    gap: 0.35rem;
-  }
-
-  .gemini-stat {
     padding: 0.95rem 1rem;
     display: grid;
     gap: 0.35rem;
@@ -1430,22 +1274,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     font-size: 0.85rem;
   }
 
-  .gemini-stat span {
-    color: rgba(230, 228, 222, 0.62);
-    font-size: 0.85rem;
-  }
-
   .bookshelf-stat strong {
     color: #f7f6f2;
     font-size: 1.16rem;
     line-height: 1.55;
-    letter-spacing: 0.01em;
-  }
-
-  .gemini-stat strong {
-    color: #f7f6f2;
-    font-size: 1rem;
-    line-height: 1.65;
     letter-spacing: 0.01em;
   }
 
@@ -1504,14 +1336,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   .gemini-actions-primary {
     align-items: center;
-    justify-content: space-between;
-  }
-
-  .gemini-action-hint {
-    margin: 0;
-    color: rgba(226, 223, 216, 0.58);
-    font-size: 0.85rem;
-    line-height: 1.75;
   }
 
   .gemini-composer {
@@ -1621,52 +1445,85 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   .gemini-history {
     display: grid;
-    gap: 1rem;
-  }
-
-  .gemini-history-shell {
-    display: grid;
     gap: 0.85rem;
   }
 
-  .gemini-history-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .gemini-history-card,
-  .gemini-history-empty {
-    padding: 0.95rem 1rem;
+  .gemini-version-list {
     display: grid;
     gap: 0.75rem;
-  }
-
-  .gemini-history-top {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.8rem;
-    align-items: start;
-  }
-
-  .gemini-history-top strong {
-    color: #f5f3ef;
-    font-size: 0.98rem;
-    line-height: 1.5;
-  }
-
-  .gemini-history-top p,
-  .gemini-history-top span,
-  .gemini-history-empty p,
-  .gemini-history-meta p {
-    margin: 0;
-    color: rgba(224, 221, 214, 0.6);
-    font-size: 0.84rem;
-    line-height: 1.7;
   }
 
   .gemini-history-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.65rem;
+  }
+
+  .gemini-version-item {
+    overflow: hidden;
+  }
+
+  .gemini-version-summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+  }
+
+  .gemini-version-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .gemini-version-summary::after {
+    content: "+";
+    color: rgba(224, 221, 214, 0.62);
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .gemini-version-item[open] .gemini-version-summary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .gemini-version-item[open] .gemini-version-summary::after {
+    content: "−";
+  }
+
+  .gemini-version-summary strong {
+    color: #f5f3ef;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .gemini-version-body {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+  }
+
+  .gemini-version-meta {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .gemini-version-meta p,
+  .gemini-version-meta small {
+    margin: 0;
+    color: rgba(224, 221, 214, 0.62);
+    line-height: 1.7;
+  }
+
+  .gemini-version-meta p {
+    font-size: 0.9rem;
+  }
+
+  .gemini-version-meta small {
+    font-size: 0.82rem;
+    word-break: break-word;
   }
 
   .history-action-btn {
@@ -1683,49 +1540,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .history-action-btn:hover {
     border-color: rgba(255, 255, 255, 0.14);
     background: rgba(255, 255, 255, 0.06);
-  }
-
-  .gemini-preview-panel {
-    display: grid;
-    gap: 0.85rem;
-    margin-top: 0.2rem;
-  }
-
-  .gemini-preview-panel.is-hidden {
-    display: none;
-  }
-
-  .gemini-preview-card {
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: linear-gradient(180deg, rgba(55, 55, 54, 0.58), rgba(31, 31, 31, 0.82));
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 22px rgba(0, 0, 0, 0.11);
-    padding: 1rem;
-    display: grid;
-    gap: 0.85rem;
-  }
-
-  .gemini-preview-top {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .gemini-preview-top strong {
-    color: #f5f3ef;
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-
-  .gemini-preview-top a {
-    color: rgba(241, 239, 234, 0.78);
-    font-size: 0.84rem;
-  }
-
-  .gemini-preview-top a.is-disabled {
-    pointer-events: none;
-    opacity: 0.5;
   }
 
   .gemini-preview-content {
@@ -1952,8 +1766,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   @media (max-width: 1120px) {
     .ops-hero,
     .portal-card-grid,
-    .bookshelf-title-list,
-    .gemini-history-list {
+    .bookshelf-title-list {
       grid-template-columns: 1fr;
     }
 
@@ -1969,7 +1782,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       grid-template-columns: 1fr 1fr;
     }
 
-    .gemini-summary,
     .gemini-editor-grid {
       grid-template-columns: 1fr 1fr;
     }
@@ -1994,9 +1806,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .quest-grid,
     .bookshelf-summary,
     .bookshelf-title-list,
-    .gemini-summary,
-    .gemini-editor-grid,
-    .gemini-history-list {
+    .gemini-editor-grid {
       grid-template-columns: 1fr;
     }
   }
