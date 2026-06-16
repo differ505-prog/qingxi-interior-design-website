@@ -260,6 +260,22 @@ const bookshelfViewGroups = bookshelfTracks.map((track) => ({
   entries: bookshelfEntries.filter((entry) => entry.trackTitle === track.title),
 }));
 
+const bookshelfOutlineGroups = bookshelfTracks.map((track) => {
+  const trackEntries = bookshelfEntries.filter((entry) => entry.trackTitle === track.title);
+  const chapters = track.chapters.split("/").map((chapter) => chapter.trim()).filter(Boolean).map((chapter) => ({
+    title: chapter,
+    entries: trackEntries.filter((entry) => entry.chapter === chapter),
+  }));
+  const filledChapters = chapters.filter((chapter) => chapter.entries.length > 0).length;
+
+  return {
+    ...track,
+    entries: trackEntries,
+    chapters,
+    filledChapters,
+  };
+});
+
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
 const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
@@ -600,6 +616,55 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                       ) : (
                         <div class="bookshelf-shelf-empty">待補主文</div>
                       )}
+                    </section>
+                  ))}
+                </div>
+              </div>
+            </details>
+
+            <details class="bookshelf-fold">
+              <summary>
+                <span>書稿目錄</span>
+                <small>{bookshelfOutlineGroups.length} 本</small>
+              </summary>
+              <div class="bookshelf-preview bookshelf-fold-body">
+                <div class="bookshelf-outline-grid">
+                  {bookshelfOutlineGroups.map((group) => (
+                    <section class="bookshelf-outline-card">
+                      <div class="bookshelf-outline-head">
+                        <div>
+                          <p>{group.title}</p>
+                          <strong>{group.focus}</strong>
+                        </div>
+                        <span>{group.entries.length} 篇</span>
+                      </div>
+                      <div class="bookshelf-outline-meta">
+                        <small>已成形 {group.filledChapters} / {group.chapters.length} 章</small>
+                        <small>{group.chapters.length - group.filledChapters} 章待補</small>
+                      </div>
+                      <div class="bookshelf-outline-chapters">
+                        {group.chapters.map((chapter, index) => (
+                          <article class="bookshelf-outline-chapter">
+                            <div class="bookshelf-outline-chapter-top">
+                              <span>{String(index + 1).padStart(2, "0")}</span>
+                              <p>{chapter.entries.length > 0 ? `${chapter.entries.length} 篇` : "待補主文"}</p>
+                            </div>
+                            <strong>{chapter.title}</strong>
+                            {chapter.entries.length > 0 ? (
+                              <div class="bookshelf-outline-list">
+                                {chapter.entries.map((entry) => (
+                                  <a class="bookshelf-outline-link" href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">
+                                    <span>{entry.title}</span>
+                                    <small>{entry.category}</small>
+                                  </a>
+                                ))}
+                              </div>
+                            ) : (
+                              <div class="bookshelf-outline-empty">這章還沒有文章</div>
+                            )}
+                          </article>
+                        ))}
+                      </div>
                     </section>
                   ))}
                 </div>
@@ -3459,13 +3524,44 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .bookshelf-outline-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+
   .bookshelf-shelf-card {
     padding: 1rem;
     display: grid;
     gap: 0.8rem;
   }
 
+  .bookshelf-outline-card,
+  .bookshelf-outline-chapter {
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background:
+      linear-gradient(180deg, rgba(55, 55, 54, 0.58), rgba(31, 31, 31, 0.82));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 10px 22px rgba(0, 0, 0, 0.11);
+  }
+
+  .bookshelf-outline-card {
+    padding: 1rem;
+    display: grid;
+    gap: 0.9rem;
+  }
+
   .bookshelf-shelf-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .bookshelf-outline-head,
+  .bookshelf-outline-chapter-top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -3502,10 +3598,96 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     letter-spacing: 0.04em;
   }
 
+  .bookshelf-outline-head p,
+  .bookshelf-outline-head strong,
+  .bookshelf-outline-head span,
+  .bookshelf-outline-meta small,
+  .bookshelf-outline-chapter-top span,
+  .bookshelf-outline-chapter-top p,
+  .bookshelf-outline-empty,
+  .bookshelf-outline-link small {
+    margin: 0;
+  }
+
+  .bookshelf-outline-head p,
+  .bookshelf-outline-chapter-top span {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-outline-head strong,
+  .bookshelf-outline-chapter strong,
+  .bookshelf-outline-link span {
+    color: #f5f3ef;
+  }
+
+  .bookshelf-outline-head strong {
+    display: block;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  .bookshelf-outline-head span,
+  .bookshelf-outline-meta small,
+  .bookshelf-outline-chapter-top p,
+  .bookshelf-outline-link small {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
   .bookshelf-shelf-entries,
   .bookshelf-entry-stack {
     display: grid;
     gap: 0.62rem;
+  }
+
+  .bookshelf-outline-meta,
+  .bookshelf-outline-chapters,
+  .bookshelf-outline-list {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .bookshelf-outline-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bookshelf-outline-chapter {
+    padding: 0.9rem 0.95rem;
+    display: grid;
+    gap: 0.62rem;
+  }
+
+  .bookshelf-outline-chapter strong {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+
+  .bookshelf-outline-link {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.72rem 0.8rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
+    text-decoration: none;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+
+  .bookshelf-outline-link:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.045);
+    transform: translateY(-1px);
+  }
+
+  .bookshelf-outline-link span {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    font-weight: 500;
   }
 
   .bookshelf-shelf-empty {
@@ -3514,6 +3696,16 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     padding: 0.9rem 1rem;
     color: rgba(224, 221, 214, 0.52);
     font-size: 0.84rem;
+    line-height: 1.6;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .bookshelf-outline-empty {
+    border-radius: 16px;
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    padding: 0.8rem 0.9rem;
+    color: rgba(224, 221, 214, 0.52);
+    font-size: 0.82rem;
     line-height: 1.6;
     background: rgba(255, 255, 255, 0.02);
   }
@@ -3720,6 +3912,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .ops-hero,
     .portal-card-grid,
     .bookshelf-shelf-grid,
+    .bookshelf-outline-grid,
     .bookshelf-guide-grid,
     .bookshelf-track-grid {
       grid-template-columns: 1fr;
@@ -3735,6 +3928,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     .bookshelf-summary,
     .bookshelf-ai-decision,
+    .bookshelf-outline-meta,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid {
       grid-template-columns: 1fr 1fr;
@@ -3765,6 +3959,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .bookshelf-summary,
     .bookshelf-ai-decision,
     .bookshelf-shelf-grid,
+    .bookshelf-outline-grid,
+    .bookshelf-outline-meta,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
     .gemini-editor-grid {
