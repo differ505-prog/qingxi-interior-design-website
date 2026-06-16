@@ -379,7 +379,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <button type="button" id="copy-article-ai-result" class="bookshelf-action">複製 AI 結果</button>
                 <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
               </div>
-              <p class="bookshelf-prompt-note">先貼問題；可手動複製提示詞，也可在已設定 `GEMINI_API_KEY` 時直接用 AI 快速判題，並同步產出文章與 Copilot 生圖提示詞。</p>
+              <p class="bookshelf-prompt-note">先貼問題；就算問題很短，也會先自動補全合理情境，再做判題、文章與 Copilot 生圖提示詞。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <details id="article-ai-result-shell" class="bookshelf-ai-result">
                 <summary>
@@ -1067,6 +1067,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   function buildArticlePrompt(problemText = "", mode = "full") {
     const questionBlock = problemText.trim() || "（請在此貼上社團的發問內容）";
+    const isShortQuestion = questionBlock.length <= 90;
     const tracksText = bookshelfTracks
       .map((track, index) => `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${track.chapters}`)
       .join("\n");
@@ -1084,6 +1085,16 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       : [
           "本次模式：完整初稿。",
           "請輸出可直接進入編修的完整結果，包含重複判斷、文章入庫卡、社團回覆誘餌、官網文章初稿與 Copilot 生圖提示詞。",
+        ].join("\n");
+    const contextInstruction = isShortQuestion
+      ? [
+          "注意：這次原始問題偏短，資訊不足。",
+          "請先主動補出最合理的情境假設，再往後做判題與文章生成。",
+          "補全方向請優先涵蓋：屋況、空間位置、使用者情境、常見預算顧慮、施工或材料限制。",
+          "補全時要保持保守，不要亂編過度具體的數字或地址；請用『可能是 / 多半是 / 若以一般住宅情境推估』這種寫法。",
+        ].join("\n")
+      : [
+          "若原始問題已帶有足夠情境，就沿用原始問題，不必額外補太多假設。",
         ].join("\n");
 
     return [
@@ -1107,11 +1118,18 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "",
       modeInstruction,
       "",
+      contextInstruction,
+      "",
       "請根據以上【真實社團問題】，幫我產出一套完整的內容，並嚴格遵守以下結構：",
       "",
       "0. 【判題結論】",
       "- 請只輸出一行結論，四選一：優先補舊文 / 可做同章延伸 / 值得另開新文 / 先改寫舊文。",
       "- 不要解釋太長，這一段只給決策結論。",
+      "",
+      "0A. 【情境補全假設】",
+      "- 若原始問題資訊不足，請先補出 3-5 條最合理的情境假設，幫助後續文章成立。",
+      "- 若原始問題已很完整，請簡短寫『原始問題情境已足夠，沿用原文』。",
+      "- 假設必須貼近一般住宅裝修決策，不要幻想過度特殊案例。",
       "",
       "1. 【重複判斷】",
       "- 先列出最相似的 1-3 篇既有文章標題。",
