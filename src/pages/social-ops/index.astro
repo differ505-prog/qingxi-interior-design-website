@@ -266,9 +266,20 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               </label>
               <div class="bookshelf-actions bookshelf-prompt-actions">
                 <button type="button" id="copy-article-prompt" class="bookshelf-action bookshelp-action-primary">複製文章生成提示詞</button>
+                <button type="button" id="run-article-ai-quick" class="bookshelf-action">AI 快速判題</button>
+                <button type="button" id="run-article-ai-draft" class="bookshelf-action">AI 生成初稿</button>
+                <button type="button" id="copy-article-ai-result" class="bookshelf-action">複製 AI 結果</button>
                 <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
               </div>
-              <p class="bookshelf-prompt-note">先貼問題，再一鍵丟給 LLM。</p>
+              <p class="bookshelf-prompt-note">先貼問題；可手動複製提示詞，也可在已設定 `GEMINI_API_KEY` 時直接用 AI 快速判題。</p>
+              <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
+              <details id="article-ai-result-shell" class="bookshelf-ai-result">
+                <summary>
+                  <span>AI 結果</span>
+                  <small id="article-ai-result-label">尚未生成</small>
+                </summary>
+                <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
+              </details>
             </div>
 
             <div class="bookshelf-preview">
@@ -422,6 +433,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 <script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, geminiCanvasMasterJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
+  const ARTICLE_AI_RESULT_KEY = "qingxi-article-ai-result-v1";
   const GEMINI_DRAFT_KEY = "qingxi-gemini-canvas-draft-v1";
   const GEMINI_BACKUPS_KEY = "qingxi-gemini-canvas-backups-v1";
   const GEMINI_RECENT_LIMIT = 10;
@@ -492,6 +504,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     "主理中",
   ];
   let articleSourceQuestion = "";
+  let articleAiResult = "";
+  let articleAiMode = "";
   let geminiDraft = null;
   let geminiBackups = [];
 
@@ -803,7 +817,65 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     return articleSourceQuestion;
   }
 
-  function buildArticlePrompt(problemText = "") {
+  function loadArticleAiResult() {
+    try {
+      const raw = localStorage.getItem(ARTICLE_AI_RESULT_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      articleAiResult = typeof parsed?.content === "string" ? parsed.content : "";
+      articleAiMode = typeof parsed?.mode === "string" ? parsed.mode : "";
+    } catch (error) {
+      console.error("讀取 AI 結果失敗：", error);
+      articleAiResult = "";
+      articleAiMode = "";
+    }
+  }
+
+  function saveArticleAiResult() {
+    localStorage.setItem(
+      ARTICLE_AI_RESULT_KEY,
+      JSON.stringify({
+        content: articleAiResult,
+        mode: articleAiMode,
+      }),
+    );
+  }
+
+  function setArticleAiFeedback(message, mode = "") {
+    const shell = document.getElementById("article-ai-feedback");
+    if (!shell) return;
+    shell.className = `bookshelf-ai-feedback ${mode}`.trim();
+    shell.textContent = message;
+  }
+
+  function renderArticleAiResult() {
+    const shell = document.getElementById("article-ai-result-shell");
+    const label = document.getElementById("article-ai-result-label");
+    const content = document.getElementById("article-ai-result-content");
+    if (!(shell instanceof HTMLDetailsElement) || !(label instanceof HTMLElement) || !(content instanceof HTMLElement)) {
+      return;
+    }
+
+    const hasResult = Boolean(articleAiResult.trim());
+    label.textContent = hasResult
+      ? articleAiMode === "quick"
+        ? "快速判題"
+        : "完整初稿"
+      : "尚未生成";
+    content.textContent = articleAiResult;
+    shell.open = hasResult;
+  }
+
+  function setArticleAiBusy(isBusy) {
+    ["run-article-ai-quick", "run-article-ai-draft", "copy-article-ai-result"].forEach((id) => {
+      const button = document.getElementById(id);
+      if (button instanceof HTMLButtonElement) {
+        button.disabled = isBusy;
+      }
+    });
+  }
+
+  function buildArticlePrompt(problemText = "", mode = "full") {
     const questionBlock = problemText.trim() || "（請在此貼上社團的發問內容）";
     const tracksText = bookshelfTracks
       .map((track, index) => `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${track.chapters}`)
@@ -812,6 +884,16 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const overlapRuleText = overlapRules
       .map((rule, index) => `${index + 1}. ${rule.title}：${rule.detail}`)
       .join("\n");
+    const modeInstruction = mode === "quick"
+      ? [
+          "本次模式：快速判題。",
+          "請優先輸出『重複判斷』、『文章入庫卡』與『社團回覆誘餌』。",
+          "若已有明確舊文可補，官網文章只需給精簡段落架構，不必完整展開。",
+        ].join("\n")
+      : [
+          "本次模式：完整初稿。",
+          "請輸出可直接進入編修的完整結果，包含重複判斷、文章入庫卡、社團回覆誘餌與官網文章初稿。",
+        ].join("\n");
 
     return [
       "【真實社團問題】",
@@ -831,6 +913,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "",
       "相似題處理規則：",
       overlapRuleText,
+      "",
+      modeInstruction,
       "",
       "請根據以上【真實社團問題】，幫我產出一套完整的內容，並嚴格遵守以下結構：",
       "",
@@ -868,6 +952,55 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "  - ## 常見迷思與避雷：點出一般人 DIY 或找單一工班容易忽略的盲點與隱藏成本。",
       "  - ## 為什麼你需要全盤整合（總結）：帶出為什麼這個環節需要室內設計師的全盤整合，不著痕跡地帶入青曦空間設計安定、耐看、重本質的服務價值，但不要有生硬的業務推銷。",
     ].join("\n");
+  }
+
+  async function runArticleAi(mode) {
+    const question = persistArticleSourceQuestion();
+    if (!question) {
+      setFeedback("請先貼上真實社團問題。", "is-warning");
+      setArticleAiFeedback("請先貼上真實社團問題。", "is-warning");
+      return;
+    }
+
+    setArticleAiBusy(true);
+    setArticleAiFeedback(mode === "quick" ? "Gemini Flash 判題中..." : "Gemini Flash 生成初稿中...");
+
+    try {
+      const response = await fetch("/api/social-ops/article-assist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          mode,
+          prompt: buildArticlePrompt(question, mode),
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        const errorMessage = result?.error === "GEMINI_API_KEY_MISSING"
+          ? "尚未設定 GEMINI_API_KEY，先用手動提示詞模式。"
+          : "Gemini Flash 目前無法生成，請稍後再試。";
+        setFeedback(errorMessage, "is-warning");
+        setArticleAiFeedback(errorMessage, "is-warning");
+        return;
+      }
+
+      articleAiResult = typeof result?.content === "string" ? result.content : "";
+      articleAiMode = mode;
+      saveArticleAiResult();
+      renderArticleAiResult();
+      const successMessage = mode === "quick" ? "已完成 AI 快速判題。" : "已完成 AI 初稿生成。";
+      setFeedback(successMessage, "is-success");
+      setArticleAiFeedback(successMessage, "is-success");
+    } catch (error) {
+      console.error("Gemini Flash 生成失敗：", error);
+      setFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
+      setArticleAiFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
+    } finally {
+      setArticleAiBusy(false);
+    }
   }
 
   async function copyText(text, successMessage) {
@@ -1153,7 +1286,24 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const successMessage = question
       ? "已複製文章生成提示詞。"
       : "已複製文章生成提示詞模板。";
-    await copyText(buildArticlePrompt(question), successMessage);
+    await copyText(buildArticlePrompt(question, "full"), successMessage);
+  });
+
+  document.getElementById("run-article-ai-quick")?.addEventListener("click", async () => {
+    await runArticleAi("quick");
+  });
+
+  document.getElementById("run-article-ai-draft")?.addEventListener("click", async () => {
+    await runArticleAi("full");
+  });
+
+  document.getElementById("copy-article-ai-result")?.addEventListener("click", async () => {
+    if (!articleAiResult.trim()) {
+      setArticleAiFeedback("目前沒有 AI 結果可複製。", "is-warning");
+      return;
+    }
+    await copyText(articleAiResult, "已複製 AI 結果。");
+    setArticleAiFeedback("已複製 AI 結果。", "is-success");
   });
 
   document.getElementById("clear-article-question")?.addEventListener("click", () => {
@@ -1251,10 +1401,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   });
 
   loadArticleSourceQuestion();
+  loadArticleAiResult();
   loadGeminiBackupState();
   loadState();
   normalizeWeeklyState();
   applyArticleSourceQuestionToField();
+  renderArticleAiResult();
   applyGeminiDraftToFields();
   rerender();
 </script>
@@ -1622,6 +1774,69 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     color: rgba(230, 228, 222, 0.58);
     font-size: 0.84rem;
     line-height: 1.7;
+  }
+
+  .bookshelf-ai-feedback {
+    min-height: 1.4rem;
+    margin: 0;
+    color: rgba(233, 231, 225, 0.62);
+    font-size: 0.86rem;
+  }
+
+  .bookshelf-ai-feedback.is-success {
+    color: #e8e8e3;
+  }
+
+  .bookshelf-ai-feedback.is-warning {
+    color: #d9d2c6;
+  }
+
+  .bookshelf-ai-result {
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
+    overflow: hidden;
+  }
+
+  .bookshelf-ai-result summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    color: #f4f2ed;
+  }
+
+  .bookshelf-ai-result summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .bookshelf-ai-result summary span {
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .bookshelf-ai-result summary small {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.82rem;
+  }
+
+  .bookshelf-ai-result[open] summary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .bookshelf-ai-content {
+    margin: 0;
+    padding: 1rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: rgba(238, 235, 229, 0.84);
+    font: inherit;
+    line-height: 1.8;
+    max-height: 420px;
+    overflow: auto;
   }
 
   .bookshelf-track-grid,
