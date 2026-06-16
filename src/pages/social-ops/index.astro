@@ -379,7 +379,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <button type="button" id="copy-article-ai-result" class="bookshelf-action">複製 AI 結果</button>
                 <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
               </div>
-              <p class="bookshelf-prompt-note">先貼問題；可手動複製提示詞，也可在已設定 `GEMINI_API_KEY` 時直接用 AI 快速判題。</p>
+              <p class="bookshelf-prompt-note">先貼問題；可手動複製提示詞，也可在已設定 `GEMINI_API_KEY` 時直接用 AI 快速判題，並同步產出文章與 Copilot 生圖提示詞。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <details id="article-ai-result-shell" class="bookshelf-ai-result">
                 <summary>
@@ -1067,10 +1067,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
           "本次模式：快速判題。",
           "請優先輸出『重複判斷』、『文章入庫卡』與『社團回覆誘餌』。",
           "若已有明確舊文可補，官網文章只需給精簡段落架構，不必完整展開。",
+          "Copilot 生圖提示詞仍要照樣輸出，方便先備圖。",
         ].join("\n")
       : [
           "本次模式：完整初稿。",
-          "請輸出可直接進入編修的完整結果，包含重複判斷、文章入庫卡、社團回覆誘餌與官網文章初稿。",
+          "請輸出可直接進入編修的完整結果，包含重複判斷、文章入庫卡、社團回覆誘餌、官網文章初稿與 Copilot 生圖提示詞。",
         ].join("\n");
 
     return [
@@ -1133,6 +1134,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "  - ## 核心觀念：用 2-3 個清晰的重點（條列式），給出專業的判斷標準。必須包含具體的尺寸、順序、材質特性或邏輯判斷，不要寫空泛的形容詞。",
       "  - ## 常見迷思與避雷：點出一般人 DIY 或找單一工班容易忽略的盲點與隱藏成本。",
       "  - ## 為什麼你需要全盤整合（總結）：帶出為什麼這個環節需要室內設計師的全盤整合，不著痕跡地帶入青曦空間設計安定、耐看、重本質的服務價值，但不要有生硬的業務推銷。",
+      "",
+      "6. 【Copilot 生圖提示詞】",
+      "- 請固定輸出 3 組提示詞，不要多也不要少。",
+      "- 每組都要包含：用途（封面主圖 / 內文輔圖 / 延伸情境圖）＋完整生圖提示詞。",
+      "- 視覺風格固定：色鉛筆或麥克筆手繪風格，莫蘭迪配色或低飽和配色，安定、耐看、乾淨、有設計感。",
+      "- 圖像要求固定：純圖像、不要任何文字、不要數字、不要 logo、不要版面編排、不要 UI 畫面。",
+      "- 構圖要求：橫式 16:9，適合網站文章首圖或段落插圖。",
+      "- 提示詞內容要緊扣本文主題，把空間、材料、光線、情境描述清楚，避免只寫抽象形容詞。",
+      "- 若主題偏知識或工法，也要把它轉成可視覺化的空間場景或物件組合，不要生成資訊圖表。",
     ].join("\n");
   }
 
