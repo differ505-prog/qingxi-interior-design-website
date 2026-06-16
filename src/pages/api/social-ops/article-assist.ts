@@ -36,7 +36,11 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
     const prompt = typeof body?.prompt === "string" ? body.prompt.trim() : "";
-    const mode = body?.mode === "quick" ? "quick" : "full";
+    const mode = body?.mode === "quick"
+      ? "quick"
+      : body?.mode === "metadata"
+        ? "metadata"
+        : "full";
 
     if (!prompt) {
       return new Response(JSON.stringify({ error: "PROMPT_REQUIRED" }), {
@@ -69,9 +73,9 @@ export const POST: APIRoute = async ({ request }) => {
             },
           ],
           generationConfig: {
-            temperature: mode === "quick" ? 0.2 : 0.6,
+            temperature: mode === "metadata" ? 0.1 : mode === "quick" ? 0.2 : 0.6,
             topP: 0.9,
-            maxOutputTokens: mode === "quick" ? 1800 : 6000,
+            maxOutputTokens: mode === "metadata" ? 900 : mode === "quick" ? 1800 : 6000,
           },
         }),
       },

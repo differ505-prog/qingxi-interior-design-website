@@ -1201,9 +1201,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     });
   }
 
-  function buildArticlePrompt(problemText = "", mode = "full") {
+  function buildArticlePrompt(problemText = "", mode = "full", currentContent = "") {
     const questionBlock = problemText.trim() || "（請在此貼上社團的發問內容）";
     const isShortQuestion = questionBlock.length <= 90;
+    const currentContentBlock = currentContent.trim() || "（目前尚無 AI 初判內容）";
     const tracksText = bookshelfTracks
       .map((track, index) => `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${track.chapters}`)
       .join("\n");
@@ -1234,6 +1235,47 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       : [
           "若原始問題已帶有足夠情境，就沿用原始問題，不必額外補太多假設。",
         ].join("\n");
+
+    if (mode === "metadata") {
+      return [
+        "你是「青曦空間設計」的設計總監與內容策劃。",
+        "現在不是要寫文章，而是要把缺失的落地欄位補齊。",
+        "不要輸出任何前言、結語、解釋或收到指示的回應。",
+        "你的第一行必須直接從「0. 【判題結論】」開始。",
+        "若資訊不足，也要依目前問題與既有初判，給出最合理的暫定判斷，不可留空，不可寫尚未判定。",
+        "",
+        "【真實社團問題】",
+        questionBlock,
+        "",
+        "【目前 AI 初判內容】",
+        currentContentBlock,
+        "",
+        "【固定主書系】",
+        tracksText,
+        "",
+        "【既有文章清單】",
+        buildArticleCatalogText(),
+        "",
+        "請只輸出以下 3 段，不要多寫任何其他內容：",
+        "0. 【判題結論】",
+        "- 只輸出一行結論，四選一：優先補舊文 / 可做同章延伸 / 值得另開新文 / 先改寫舊文。",
+        "",
+        "1. 【書籍章節級別的文章標題】",
+        "- 請固定輸出：文章標題：",
+        "",
+        "2. 【文章入庫卡】",
+        "- 請逐行固定輸出：",
+        "主書系：",
+        "章節定位：",
+        "網站分類：",
+        "搜尋主關鍵字：",
+        "相似舊文：",
+        "處理策略：",
+        "社團回覆角度：",
+        "導流目的：",
+        "下一篇延伸題目：",
+      ].join("\n");
+    }
 
     if (mode === "quick") {
       return [
@@ -1448,6 +1490,51 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     };
   }
 
+  function needsArticleMetadataFallback(content) {
+    if (!content.trim()) return false;
+    const confirmData = getArticleConfirmData(content);
+    return (
+      summarizeDecisionTitle(content) === "請看 AI 原文" ||
+      confirmData.track === "尚未判定" ||
+      confirmData.chapter === "尚未判定" ||
+      confirmData.title === "尚未判定"
+    );
+  }
+
+  function buildArticleSectionBlock(order, title, body) {
+    if (!body.trim()) return "";
+    return `${order}. 【${title}】\n${body.trim()}`;
+  }
+
+  function mergeArticleAiContent(baseContent, metadataContent) {
+    const base = baseContent.trim();
+    const metadata = metadataContent.trim();
+    if (!base) return metadata;
+    if (!metadata) return base;
+
+    const blocks = [base];
+    const baseConfirm = getArticleConfirmData(base);
+    const baseDecisionTitle = summarizeDecisionTitle(base);
+    const metadataDecision = extractSectionText(metadata, "判題結論");
+    const metadataTitle = extractSectionText(metadata, "書籍章節級別的文章標題");
+    const metadataIntake = extractSectionText(metadata, "文章入庫卡");
+
+    if (baseDecisionTitle === "請看 AI 原文" && metadataDecision) {
+      blocks.push(buildArticleSectionBlock(0, "判題結論", metadataDecision));
+    }
+    if (baseConfirm.title === "尚未判定" && metadataTitle) {
+      blocks.push(buildArticleSectionBlock(1, "書籍章節級別的文章標題", metadataTitle));
+    }
+    if (
+      (baseConfirm.track === "尚未判定" || baseConfirm.chapter === "尚未判定" || baseConfirm.category === "尚未判定") &&
+      metadataIntake
+    ) {
+      blocks.push(buildArticleSectionBlock(2, "文章入庫卡", metadataIntake));
+    }
+
+    return blocks.filter(Boolean).join("\n\n");
+  }
+
   function buildArticleConfirmPayload(data) {
     return [
       `網站分類：${data.category}`,
@@ -1560,7 +1647,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     };
   }
 
-  async function requestArticleAi(mode) {
+  async function requestArticleAi(mode, currentContent = "") {
     const question = persistArticleSourceQuestion();
     if (!question) {
       setFeedback("請先貼上真實社團問題。", "is-warning");
@@ -1576,7 +1663,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         },
         body: JSON.stringify({
           mode,
-          prompt: buildArticlePrompt(question, mode),
+          prompt: buildArticlePrompt(question, mode, currentContent),
         }),
       });
 
@@ -1599,6 +1686,26 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
   }
 
+  async function enrichArticleMetadataIfNeeded(content, sourceMode) {
+    if (!needsArticleMetadataFallback(content)) {
+      return content;
+    }
+
+    setArticleAiFeedback(
+      sourceMode === "full"
+        ? "初稿已生成，正在自動補齊主書系、章節與標題..."
+        : "判題已完成，正在自動補齊主書系、章節與標題...",
+      "is-success",
+    );
+
+    const metadataContent = await requestArticleAi("metadata", content);
+    if (!metadataContent) {
+      return content;
+    }
+
+    return mergeArticleAiContent(content, metadataContent);
+  }
+
   async function runArticleAi(mode) {
     setArticleAiBusy(true);
     setArticleAiFeedback(mode === "quick" ? "Gemini Flash 判題中..." : "Gemini Flash 生成初稿中...");
@@ -1606,7 +1713,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     try {
       const content = await requestArticleAi(mode);
       if (!content) return false;
-      articleAiResult = content;
+      articleAiResult = await enrichArticleMetadataIfNeeded(content, mode);
       articleAiMode = mode;
       saveArticleAiResult();
       renderArticleAiResult();
@@ -1627,7 +1734,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       const quickContent = await requestArticleAi("quick");
       if (!quickContent) return;
 
-      articleAiResult = quickContent;
+      articleAiResult = await enrichArticleMetadataIfNeeded(quickContent, "quick");
       articleAiMode = "quick";
       saveArticleAiResult();
       renderArticleAiResult();
@@ -1637,7 +1744,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       const draftContent = await requestArticleAi("full");
       if (!draftContent) return;
 
-      articleAiResult = draftContent;
+      articleAiResult = await enrichArticleMetadataIfNeeded(draftContent, "full");
       articleAiMode = "full";
       saveArticleAiResult();
       renderArticleAiResult();
