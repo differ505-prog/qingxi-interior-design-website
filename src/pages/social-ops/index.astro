@@ -399,6 +399,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                     <span>相似舊文</span>
                     <strong id="article-ai-decision-similar">尚未比對</strong>
                   </article>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>回覆視角</span>
+                    <strong id="article-ai-decision-angle">先貼問題再判題</strong>
+                  </article>
                 </div>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
               </details>
@@ -1029,6 +1033,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const decisionTitle = document.getElementById("article-ai-decision-title");
     const decisionAction = document.getElementById("article-ai-decision-action");
     const decisionSimilar = document.getElementById("article-ai-decision-similar");
+    const decisionAngle = document.getElementById("article-ai-decision-angle");
     if (
       !(shell instanceof HTMLDetailsElement) ||
       !(label instanceof HTMLElement) ||
@@ -1036,7 +1041,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       !(decisionShell instanceof HTMLElement) ||
       !(decisionTitle instanceof HTMLElement) ||
       !(decisionAction instanceof HTMLElement) ||
-      !(decisionSimilar instanceof HTMLElement)
+      !(decisionSimilar instanceof HTMLElement) ||
+      !(decisionAngle instanceof HTMLElement)
     ) {
       return;
     }
@@ -1052,6 +1058,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     decisionTitle.textContent = decision.title;
     decisionAction.textContent = decision.action;
     decisionSimilar.textContent = decision.similar;
+    decisionAngle.textContent = decision.angle;
     content.textContent = articleAiResult;
     shell.open = hasResult;
   }
@@ -1130,6 +1137,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 若原始問題資訊不足，請先補出 3-5 條最合理的情境假設，幫助後續文章成立。",
       "- 若原始問題已很完整，請簡短寫『原始問題情境已足夠，沿用原文』。",
       "- 假設必須貼近一般住宅裝修決策，不要幻想過度特殊案例。",
+      "",
+      "0B. 【社團回覆視角】",
+      "- 請先用一句話定義這次最適合切入的回覆視角。",
+      "- 例如：先從屋主最怕日後不夠用切入 / 先從西曬與舒適度切入 / 先從預算與施工順序切入。",
+      "- 這一段要短，目的是讓回覆更自然，不要像標準答案。",
       "",
       "1. 【重複判斷】",
       "- 先列出最相似的 1-3 篇既有文章標題。",
@@ -1229,12 +1241,29 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     return candidateLine ? candidateLine.slice(0, 42) : "請看下方 AI 原文";
   }
 
+  function summarizeDecisionAngle(content) {
+    const angleSection = extractSectionText(content, "社團回覆視角");
+    if (angleSection) {
+      return angleSection
+        .split("\n")
+        .map((line) => line.replace(/^[-*\d.\s]+/, "").trim())
+        .filter(Boolean)[0]
+        ?.slice(0, 42) || "先從對方最在意的痛點切入";
+    }
+
+    if (/預算/.test(content)) return "先從預算與取捨切入";
+    if (/西曬|日照|溫度/.test(content)) return "先從舒適度與日照切入";
+    if (/插座|開關|收納|不夠用/.test(content)) return "先從日後是否夠用切入";
+    return "先從對方最在意的痛點切入";
+  }
+
   function getArticleAiDecision(content) {
     if (!content.trim()) {
       return {
         title: "尚未判定",
         action: "先貼問題再判題",
         similar: "尚未比對",
+        angle: "先貼問題再判題",
       };
     }
 
@@ -1243,6 +1272,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       title,
       action: summarizeDecisionAction(title),
       similar: summarizeDecisionSimilar(content),
+      angle: summarizeDecisionAngle(content),
     };
   }
 
