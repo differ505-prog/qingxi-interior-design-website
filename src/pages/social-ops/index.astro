@@ -406,6 +406,35 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 </div>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
               </details>
+              <div id="article-category-confirm" class="bookshelf-confirm" hidden>
+                <div class="bookshelf-preview-head">
+                  <p>正式落地確認</p>
+                  <span>不自動回寫</span>
+                </div>
+                <div class="bookshelf-confirm-grid">
+                  <article class="bookshelf-confirm-card">
+                    <span>網站分類</span>
+                    <strong id="article-confirm-category">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>主書系</span>
+                    <strong id="article-confirm-track">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>章節定位</span>
+                    <strong id="article-confirm-chapter">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>文章標題</span>
+                    <strong id="article-confirm-title">尚未判定</strong>
+                  </article>
+                </div>
+                <div class="bookshelf-actions bookshelf-confirm-actions">
+                  <button type="button" id="copy-article-category" class="bookshelf-action">複製正式分類</button>
+                  <button type="button" id="copy-article-confirm-payload" class="bookshelf-action">複製分類落地資訊</button>
+                </div>
+                <p class="bookshelf-confirm-note">這裡先做 AI 建議分類確認；確認後再手動貼回知識分享資料源，避免誤寫正式文章。</p>
+              </div>
             </div>
 
             <div class="bookshelf-summary">
@@ -1049,6 +1078,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     const hasResult = Boolean(articleAiResult.trim());
     const decision = getArticleAiDecision(articleAiResult);
+    renderArticleConfirm(articleAiResult);
     label.textContent = hasResult
       ? articleAiMode === "quick"
         ? "快速判題"
@@ -1064,7 +1094,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   function setArticleAiBusy(isBusy) {
-    ["run-article-ai-quick", "run-article-ai-draft", "copy-article-ai-result"].forEach((id) => {
+    ["run-article-ai-quick", "run-article-ai-draft", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload"].forEach((id) => {
       const button = document.getElementById(id);
       if (button instanceof HTMLButtonElement) {
         button.disabled = isBusy;
@@ -1196,6 +1226,90 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const pattern = new RegExp(`【${escapedTitle}】([\\s\\S]*?)(?=\\n\\s*\\d+\\.\\s*【|\\n\\s*【|$)`, "i");
     const match = content.match(pattern);
     return match?.[1]?.trim() || "";
+  }
+
+  function normalizeSectionLines(text) {
+    return text
+      .split("\n")
+      .map((line) => line.replace(/^[-*\d.\s]+/, "").trim())
+      .filter(Boolean);
+  }
+
+  function extractFieldValue(lines, keys) {
+    const line = lines.find((entry) => keys.some((key) => entry.startsWith(`${key}：`) || entry.startsWith(`${key}:`)));
+    if (!line) return "";
+    return line.replace(/^[^：:]+[:：]\s*/, "").trim();
+  }
+
+  function parseArticleIntakeCard(content) {
+    const section = extractSectionText(content, "文章入庫卡");
+    const lines = normalizeSectionLines(section);
+    return {
+      category: extractFieldValue(lines, ["網站分類", "分類"]) || "尚未判定",
+      track: extractFieldValue(lines, ["主書系"]) || "尚未判定",
+      chapter: extractFieldValue(lines, ["章節定位"]) || "尚未判定",
+    };
+  }
+
+  function parseArticleTitle(content) {
+    const section = extractSectionText(content, "書籍章節級別的文章標題");
+    const lines = normalizeSectionLines(section);
+    return (
+      extractFieldValue(lines, ["標題", "文章標題"]) ||
+      lines.find((line) => !/建議分類|分類/.test(line)) ||
+      "尚未判定"
+    );
+  }
+
+  function getArticleConfirmData(content) {
+    if (!content.trim()) {
+      return {
+        category: "尚未判定",
+        track: "尚未判定",
+        chapter: "尚未判定",
+        title: "尚未判定",
+      };
+    }
+
+    const intake = parseArticleIntakeCard(content);
+    return {
+      ...intake,
+      title: parseArticleTitle(content),
+    };
+  }
+
+  function buildArticleConfirmPayload(data) {
+    return [
+      `網站分類：${data.category}`,
+      `主書系：${data.track}`,
+      `章節定位：${data.chapter}`,
+      `文章標題：${data.title}`,
+    ].join("\n");
+  }
+
+  function renderArticleConfirm(content) {
+    const shell = document.getElementById("article-category-confirm");
+    const category = document.getElementById("article-confirm-category");
+    const track = document.getElementById("article-confirm-track");
+    const chapter = document.getElementById("article-confirm-chapter");
+    const title = document.getElementById("article-confirm-title");
+    if (
+      !(shell instanceof HTMLElement) ||
+      !(category instanceof HTMLElement) ||
+      !(track instanceof HTMLElement) ||
+      !(chapter instanceof HTMLElement) ||
+      !(title instanceof HTMLElement)
+    ) {
+      return;
+    }
+
+    const hasResult = Boolean(content.trim());
+    const data = getArticleConfirmData(content);
+    shell.hidden = !hasResult;
+    category.textContent = data.category;
+    track.textContent = data.track;
+    chapter.textContent = data.chapter;
+    title.textContent = data.title;
   }
 
   function summarizeDecisionTitle(content) {
@@ -1626,6 +1740,26 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
     await copyText(articleAiResult, "已複製 AI 結果。");
     setArticleAiFeedback("已複製 AI 結果。", "is-success");
+  });
+
+  document.getElementById("copy-article-category")?.addEventListener("click", async () => {
+    const data = getArticleConfirmData(articleAiResult);
+    if (data.category === "尚未判定") {
+      setArticleAiFeedback("請先生成 AI 結果。", "is-warning");
+      return;
+    }
+    await copyText(data.category, "已複製正式分類。");
+    setArticleAiFeedback("已複製正式分類。", "is-success");
+  });
+
+  document.getElementById("copy-article-confirm-payload")?.addEventListener("click", async () => {
+    const data = getArticleConfirmData(articleAiResult);
+    if (data.category === "尚未判定") {
+      setArticleAiFeedback("請先生成 AI 結果。", "is-warning");
+      return;
+    }
+    await copyText(buildArticleConfirmPayload(data), "已複製分類落地資訊。");
+    setArticleAiFeedback("已複製分類落地資訊。", "is-success");
   });
 
   document.getElementById("clear-article-question")?.addEventListener("click", () => {
@@ -2208,7 +2342,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   .bookshelf-ai-decision {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 0.75rem;
     padding: 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -2252,6 +2386,60 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     line-height: 1.8;
     max-height: 420px;
     overflow: auto;
+  }
+
+  .bookshelf-confirm {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 0.9rem;
+    padding: 0.95rem 1rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .bookshelf-confirm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .bookshelf-confirm-card {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(55, 55, 54, 0.48), rgba(31, 31, 31, 0.72));
+    padding: 0.9rem 0.95rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .bookshelf-confirm-card span,
+  .bookshelf-confirm-card strong,
+  .bookshelf-confirm-note {
+    margin: 0;
+  }
+
+  .bookshelf-confirm-card span {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-confirm-card strong {
+    color: #f4f2ed;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  .bookshelf-confirm-actions {
+    margin-bottom: 0;
+  }
+
+  .bookshelf-confirm-note {
+    color: rgba(230, 228, 222, 0.56);
+    font-size: 0.82rem;
+    line-height: 1.7;
   }
 
   .bookshelf-track-grid,
