@@ -386,6 +386,20 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                   <span>AI 結果</span>
                   <small id="article-ai-result-label">尚未生成</small>
                 </summary>
+                <div id="article-ai-decision" class="bookshelf-ai-decision" hidden>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>判題結論</span>
+                    <strong id="article-ai-decision-title">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>建議動作</span>
+                    <strong id="article-ai-decision-action">先貼問題再判題</strong>
+                  </article>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>相似舊文</span>
+                    <strong id="article-ai-decision-similar">尚未比對</strong>
+                  </article>
+                </div>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
               </details>
             </div>
@@ -999,16 +1013,33 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const shell = document.getElementById("article-ai-result-shell");
     const label = document.getElementById("article-ai-result-label");
     const content = document.getElementById("article-ai-result-content");
-    if (!(shell instanceof HTMLDetailsElement) || !(label instanceof HTMLElement) || !(content instanceof HTMLElement)) {
+    const decisionShell = document.getElementById("article-ai-decision");
+    const decisionTitle = document.getElementById("article-ai-decision-title");
+    const decisionAction = document.getElementById("article-ai-decision-action");
+    const decisionSimilar = document.getElementById("article-ai-decision-similar");
+    if (
+      !(shell instanceof HTMLDetailsElement) ||
+      !(label instanceof HTMLElement) ||
+      !(content instanceof HTMLElement) ||
+      !(decisionShell instanceof HTMLElement) ||
+      !(decisionTitle instanceof HTMLElement) ||
+      !(decisionAction instanceof HTMLElement) ||
+      !(decisionSimilar instanceof HTMLElement)
+    ) {
       return;
     }
 
     const hasResult = Boolean(articleAiResult.trim());
+    const decision = getArticleAiDecision(articleAiResult);
     label.textContent = hasResult
       ? articleAiMode === "quick"
         ? "快速判題"
         : "完整初稿"
       : "尚未生成";
+    decisionShell.hidden = !hasResult;
+    decisionTitle.textContent = decision.title;
+    decisionAction.textContent = decision.action;
+    decisionSimilar.textContent = decision.similar;
     content.textContent = articleAiResult;
     shell.open = hasResult;
   }
@@ -1065,6 +1096,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "",
       "請根據以上【真實社團問題】，幫我產出一套完整的內容，並嚴格遵守以下結構：",
       "",
+      "0. 【判題結論】",
+      "- 請只輸出一行結論，四選一：優先補舊文 / 可做同章延伸 / 值得另開新文 / 先改寫舊文。",
+      "- 不要解釋太長，這一段只給決策結論。",
+      "",
       "1. 【重複判斷】",
       "- 先列出最相似的 1-3 篇既有文章標題。",
       "- 判斷這題應該屬於：開新文 / 補強舊文 / 改寫舊文 / 同章延伸。",
@@ -1099,6 +1134,73 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "  - ## 常見迷思與避雷：點出一般人 DIY 或找單一工班容易忽略的盲點與隱藏成本。",
       "  - ## 為什麼你需要全盤整合（總結）：帶出為什麼這個環節需要室內設計師的全盤整合，不著痕跡地帶入青曦空間設計安定、耐看、重本質的服務價值，但不要有生硬的業務推銷。",
     ].join("\n");
+  }
+
+  function extractSectionText(content, sectionTitle) {
+    const escapedTitle = sectionTitle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(`【${escapedTitle}】([\\s\\S]*?)(?=\\n\\s*\\d+\\.\\s*【|\\n\\s*【|$)`, "i");
+    const match = content.match(pattern);
+    return match?.[1]?.trim() || "";
+  }
+
+  function summarizeDecisionTitle(content) {
+    const decisionSection = extractSectionText(content, "判題結論");
+    const sourceText = `${decisionSection}\n${content}`;
+
+    if (/優先補舊文|補強舊文/.test(sourceText)) return "優先補舊文";
+    if (/改寫舊文|先改寫舊文/.test(sourceText)) return "先改寫舊文";
+    if (/同章延伸|可做同章延伸/.test(sourceText)) return "可做同章延伸";
+    if (/開新文|值得另開新文/.test(sourceText)) return "值得另開新文";
+    return "請看 AI 原文";
+  }
+
+  function summarizeDecisionAction(title) {
+    if (title === "優先補舊文") return "先補強既有文章，再用舊文連結回覆社團。";
+    if (title === "先改寫舊文") return "先重整舊文標題與段落，再導回同一篇主文。";
+    if (title === "可做同章延伸") return "保留舊文主幹，另外開一篇延伸角度並互相內鏈。";
+    if (title === "值得另開新文") return "直接生成初稿，作為新主文收進對應書系。";
+    return "先看下方 AI 原文，再決定是補舊文還是另開新文。";
+  }
+
+  function summarizeDecisionSimilar(content) {
+    const duplicateSection = extractSectionText(content, "重複判斷");
+    if (!duplicateSection) return "請看下方 AI 原文";
+
+    const lines = duplicateSection
+      .split("\n")
+      .map((line) => line.replace(/^[-*\d.\s]+/, "").trim())
+      .filter(Boolean);
+
+    const similarLine = lines.find((line) =>
+      /最相似|相似舊文|既有文章|舊文/.test(line) &&
+      !/開新文|補強舊文|改寫舊文|同章延伸|原因/.test(line),
+    );
+
+    if (similarLine) {
+      return similarLine
+        .replace(/^(最相似的?\s*1-3\s*篇既有文章標題|最相似文章|相似舊文|既有文章)[:：]?\s*/i, "")
+        .slice(0, 42) || "請看下方 AI 原文";
+    }
+
+    const candidateLine = lines.find((line) => !/開新文|補強舊文|改寫舊文|同章延伸|原因/.test(line));
+    return candidateLine ? candidateLine.slice(0, 42) : "請看下方 AI 原文";
+  }
+
+  function getArticleAiDecision(content) {
+    if (!content.trim()) {
+      return {
+        title: "尚未判定",
+        action: "先貼問題再判題",
+        similar: "尚未比對",
+      };
+    }
+
+    const title = summarizeDecisionTitle(content);
+    return {
+      title,
+      action: summarizeDecisionAction(title),
+      similar: summarizeDecisionSimilar(content),
+    };
   }
 
   async function runArticleAi(mode) {
@@ -1975,6 +2077,42 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
+  .bookshelf-ai-decision {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .bookshelf-ai-decision-card {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(55, 55, 54, 0.48), rgba(31, 31, 31, 0.72));
+    padding: 0.9rem 0.95rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .bookshelf-ai-decision-card span,
+  .bookshelf-ai-decision-card strong {
+    margin: 0;
+  }
+
+  .bookshelf-ai-decision-card span {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-ai-decision-card strong {
+    color: #f4f2ed;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
   .bookshelf-ai-content {
     margin: 0;
     padding: 1rem;
@@ -2675,6 +2813,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     .bookshelf-summary,
+    .bookshelf-ai-decision,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid {
       grid-template-columns: 1fr 1fr;
@@ -2703,6 +2842,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     .quest-grid,
     .bookshelf-summary,
+    .bookshelf-ai-decision,
     .bookshelf-shelf-grid,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
