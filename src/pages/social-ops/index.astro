@@ -52,6 +52,44 @@ const fallbackBlogPosts = [
   },
 ];
 
+const bookshelfTracks = [
+  {
+    title: "老屋翻新系",
+    focus: "老屋翻修、基礎工程、動線重整、收納與耐久配置",
+    chapters: "現況判讀 / 基礎工程 / 空間重整 / 完工避雷",
+  },
+  {
+    title: "預售屋客變系",
+    focus: "客變、交屋前規劃、插座燈光、收納與機能預留",
+    chapters: "客變判斷 / 配置預留 / 生活動線 / 交屋銜接",
+  },
+  {
+    title: "驗屋交屋系",
+    focus: "驗屋、點交、缺失判讀、交屋後先後順序與修正重點",
+    chapters: "驗屋判讀 / 缺失排序 / 點交策略 / 交屋後進場",
+  },
+  {
+    title: "格局動線系",
+    focus: "小坪數規劃、收納、動線、尺度、空間效率與生活邏輯",
+    chapters: "空間尺度 / 動線配置 / 收納系統 / 使用情境",
+  },
+  {
+    title: "水電照明系",
+    focus: "插座、開關、迴路、照明、窗簾、智能控制與設備整合",
+    chapters: "插座開關 / 迴路安全 / 照明設計 / 智能整合",
+  },
+];
+
+const articleIntakeFields = [
+  "主書系",
+  "章節定位",
+  "網站分類",
+  "搜尋主關鍵字",
+  "社團回覆角度",
+  "導流目的",
+  "下一篇延伸題目",
+];
+
 let blogPosts = [...fallbackBlogPosts];
 let blogSyncLabel = "目前先顯示已存在文章。";
 
@@ -216,6 +254,24 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               <p class="bookshelf-prompt-note">先貼問題，再一鍵丟給 LLM。</p>
             </div>
 
+            <div class="bookshelf-preview">
+              <div class="bookshelf-preview-head">
+                <p>主書系</p>
+                <span>{bookshelfTracks.length} 軸</span>
+              </div>
+              <div class="bookshelf-track-grid">
+                {bookshelfTracks.map((track) => (
+                  <article class="bookshelf-track-card">
+                    <div class="bookshelf-track-top">
+                      <p>{track.title}</p>
+                    </div>
+                    <strong>{track.focus}</strong>
+                    <small>{track.chapters}</small>
+                  </article>
+                ))}
+              </div>
+            </div>
+
             <div class="bookshelf-summary">
               <article class="bookshelf-stat">
                 <span>現有文章</span>
@@ -233,8 +289,24 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
             <div class="bookshelf-actions">
               <button type="button" id="copy-book-plan" class="bookshelf-action bookshelp-action-primary">複製 LLM 書系整理稿</button>
+              <button type="button" id="copy-article-intake" class="bookshelf-action">複製文章入庫欄位</button>
               <button type="button" id="copy-book-titles" class="bookshelf-action">複製文章標題清單</button>
               <a href="/blog" class="bookshelf-action" target="_blank" rel="noreferrer">前往知識分享</a>
+            </div>
+
+            <div class="bookshelf-preview">
+              <div class="bookshelf-preview-head">
+                <p>入庫欄位</p>
+                <span>{articleIntakeFields.length} 項</span>
+              </div>
+              <div class="bookshelf-intake-grid">
+                {articleIntakeFields.map((field, index) => (
+                  <article class="bookshelf-intake-item">
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <p>{field}</p>
+                  </article>
+                ))}
+              </div>
             </div>
 
             <div class="bookshelf-preview">
@@ -327,6 +399,42 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const sourceTemplate = JSON.parse(defaultSourcesJson);
   const articleLibrary = JSON.parse(blogPostsJson);
   const geminiCanvasMasterData = JSON.parse(geminiCanvasMasterJson);
+  const bookshelfTracks = [
+    {
+      title: "老屋翻新系",
+      focus: "老屋翻修、基礎工程、動線重整、收納與耐久配置",
+      chapters: "現況判讀 / 基礎工程 / 空間重整 / 完工避雷",
+    },
+    {
+      title: "預售屋客變系",
+      focus: "客變、交屋前規劃、插座燈光、收納與機能預留",
+      chapters: "客變判斷 / 配置預留 / 生活動線 / 交屋銜接",
+    },
+    {
+      title: "驗屋交屋系",
+      focus: "驗屋、點交、缺失判讀、交屋後先後順序與修正重點",
+      chapters: "驗屋判讀 / 缺失排序 / 點交策略 / 交屋後進場",
+    },
+    {
+      title: "格局動線系",
+      focus: "小坪數規劃、收納、動線、尺度、空間效率與生活邏輯",
+      chapters: "空間尺度 / 動線配置 / 收納系統 / 使用情境",
+    },
+    {
+      title: "水電照明系",
+      focus: "插座、開關、迴路、照明、窗簾、智能控制與設備整合",
+      chapters: "插座開關 / 迴路安全 / 照明設計 / 智能整合",
+    },
+  ];
+  const articleIntakeFields = [
+    "主書系",
+    "章節定位",
+    "網站分類",
+    "搜尋主關鍵字",
+    "社團回覆角度",
+    "導流目的",
+    "下一篇延伸題目",
+  ];
   const rankTitles = [
     "起稿中",
     "構圖中",
@@ -582,24 +690,33 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   function buildBookshelfLlmPrompt() {
     const categories = Array.from(new Set(articleLibrary.map((post) => post.category))).join("、");
+    const tracksText = bookshelfTracks
+      .map((track, index) => `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${track.chapters}`)
+      .join("\n");
 
     return [
       "你是青曦空間設計的內容總編與出版策劃。",
       "以下是目前知識分享已存在的文章標題清單。請依照現有文章，幫我把內容整理成可持續完成與未來可出版的書系架構。",
+      "優先沿用下列固定主書系，不要另外發散出太多新書名；除非真的必要，否則請把文章收斂進既有母架構。",
+      "",
+      "固定主書系：",
+      tracksText,
       "",
       "工作目標：",
       "1. 把零散文章整理成一本一本可持續完成的書。",
-      "2. 先用『書名 -> 章節 -> 已有文章 -> 還缺文章』的方式規劃。",
+      "2. 先用『主書系 -> 章節 -> 已有文章 -> 還缺文章』的方式規劃。",
       "3. 優先找出最適合先完成的第一本書。",
+      "4. 每篇文章都要被分配到明確的主書系與章節，不要只做模糊分類。",
       "",
       "請直接輸出：",
-      "A. 建議先做的 3-5 本書名",
-      "B. 每本書的定位與目標讀者",
-      "C. 每本書的章節架構",
-      "D. 目前文章應歸到哪一本到哪一章",
-      "E. 每本書還缺哪些關鍵文章",
-      "F. 最優先下一篇該補哪 3 篇，並說明原因",
+      "A. 建議先主攻的 1 本主書系，以及原因",
+      "B. 各主書系的定位與目標讀者",
+      "C. 各主書系的章節架構",
+      "D. 目前文章應歸到哪個主書系、哪一章",
+      "E. 每個主書系還缺哪些關鍵文章",
+      "F. 最優先下一篇該補哪 5 篇，並說明原因",
       "G. 哪些現有標題適合改名，讓未來更像書稿章名",
+      "H. 請補一份『文章入庫規則』，格式固定為：主書系 / 章節定位 / 網站分類 / 搜尋主關鍵字 / 導流目的",
       "",
       `目前文章數：${articleLibrary.length}`,
       `目前分類：${categories || "未分類"}`,
@@ -634,6 +751,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   function buildArticlePrompt(problemText = "") {
     const questionBlock = problemText.trim() || "（請在此貼上社團的發問內容）";
+    const tracksText = bookshelfTracks
+      .map((track, index) => `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${track.chapters}`)
+      .join("\n");
+    const intakeFieldText = articleIntakeFields.join(" / ");
 
     return [
       "【真實社團問題】",
@@ -644,6 +765,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "",
       "我們目前正在執行「一魚多吃」的內容策略：",
       "將社群中真實的裝修問題，轉化為有系統的知識文章，並計畫將這些文章集結出版成書。",
+      "",
+      "請優先把這篇內容收斂進以下固定主書系，不要任意發明過多新書名：",
+      tracksText,
       "",
       "請根據以上【真實社團問題】，幫我產出一套完整的內容，並嚴格遵守以下結構：",
       "",
@@ -658,7 +782,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 格式要求：主標題（感性/痛點）——副標題（理性/SEO關鍵字）。",
       "- 建議分類：請建議這篇文章應該歸類在哪一個主題（如：預算篇、格局篇、水電篇、軟裝篇、驗屋篇、客變篇）。",
       "",
-      "3. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
+      "3. 【文章入庫卡】",
+      `- 請固定輸出以下欄位：${intakeFieldText}。`,
+      "- 主書系必須從固定主書系中選 1 個。",
+      "- 章節定位要明確到可直接放進未來書稿。",
+      "- 下一篇延伸題目請給 2 題，且要能接續這篇往下寫。",
+      "",
+      "4. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
       "- 目標：放在官網的「知識分享」區，作為高質量的 SEO 內容與導流落地頁。",
       "- 結構與段落要求：",
       "  - # H1 標題（使用上述生成的標題）",
@@ -938,6 +1068,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   document.getElementById("copy-book-titles")?.addEventListener("click", async () => {
     await copyText(buildArticleTitlesText(), "已複製文章標題清單。");
+  });
+
+  document.getElementById("copy-article-intake")?.addEventListener("click", async () => {
+    await copyText(
+      articleIntakeFields.map((field) => `${field}：`).join("\n"),
+      "已複製文章入庫欄位。",
+    );
   });
 
   document.getElementById("copy-article-prompt")?.addEventListener("click", async () => {
@@ -1416,6 +1553,79 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     line-height: 1.7;
   }
 
+  .bookshelf-track-grid,
+  .bookshelf-intake-grid {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .bookshelf-track-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bookshelf-intake-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bookshelf-track-card,
+  .bookshelf-intake-item {
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(55, 55, 54, 0.58), rgba(31, 31, 31, 0.82));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 22px rgba(0, 0, 0, 0.11);
+  }
+
+  .bookshelf-track-card {
+    padding: 0.95rem 1rem;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .bookshelf-track-top p,
+  .bookshelf-intake-item p,
+  .bookshelf-intake-item span {
+    margin: 0;
+  }
+
+  .bookshelf-track-top p {
+    color: rgba(224, 221, 214, 0.6);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+  }
+
+  .bookshelf-track-card strong {
+    color: #f5f3ef;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    font-weight: 600;
+  }
+
+  .bookshelf-track-card small {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .bookshelf-intake-item {
+    padding: 0.9rem 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .bookshelf-intake-item span {
+    color: rgba(224, 221, 214, 0.5);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-intake-item p {
+    color: #f5f3ef;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
   .bookshelf-action {
     display: inline-flex;
     align-items: center;
@@ -1890,7 +2100,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   @media (max-width: 1120px) {
     .ops-hero,
     .portal-card-grid,
-    .bookshelf-title-list {
+    .bookshelf-title-list,
+    .bookshelf-track-grid {
       grid-template-columns: 1fr;
     }
 
@@ -1902,7 +2113,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .bookshelf-summary {
+    .bookshelf-summary,
+    .bookshelf-intake-grid {
       grid-template-columns: 1fr 1fr;
     }
 
@@ -1930,6 +2142,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .quest-grid,
     .bookshelf-summary,
     .bookshelf-title-list,
+    .bookshelf-intake-grid,
     .gemini-editor-grid {
       grid-template-columns: 1fr;
     }
