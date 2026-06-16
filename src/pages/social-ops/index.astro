@@ -417,13 +417,25 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                     <span>回覆視角</span>
                     <strong id="article-ai-decision-angle">先貼問題再判題</strong>
                   </article>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>主書系</span>
+                    <strong id="article-ai-decision-track">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>章節名稱</span>
+                    <strong id="article-ai-decision-chapter">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>文章標題</span>
+                    <strong id="article-ai-decision-article-title">尚未判定</strong>
+                  </article>
                 </div>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
               </details>
               <div id="article-category-confirm" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
-                  <p>正式落地確認</p>
-                  <span>不自動回寫</span>
+                  <p>這題會寫成什麼</p>
+                  <span>可直接拿去定稿</span>
                 </div>
                 <div class="bookshelf-confirm-grid">
                   <article class="bookshelf-confirm-card">
@@ -1140,6 +1152,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const decisionAction = document.getElementById("article-ai-decision-action");
     const decisionSimilar = document.getElementById("article-ai-decision-similar");
     const decisionAngle = document.getElementById("article-ai-decision-angle");
+    const decisionTrack = document.getElementById("article-ai-decision-track");
+    const decisionChapter = document.getElementById("article-ai-decision-chapter");
+    const decisionArticleTitle = document.getElementById("article-ai-decision-article-title");
     if (
       !(shell instanceof HTMLDetailsElement) ||
       !(label instanceof HTMLElement) ||
@@ -1148,13 +1163,17 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       !(decisionTitle instanceof HTMLElement) ||
       !(decisionAction instanceof HTMLElement) ||
       !(decisionSimilar instanceof HTMLElement) ||
-      !(decisionAngle instanceof HTMLElement)
+      !(decisionAngle instanceof HTMLElement) ||
+      !(decisionTrack instanceof HTMLElement) ||
+      !(decisionChapter instanceof HTMLElement) ||
+      !(decisionArticleTitle instanceof HTMLElement)
     ) {
       return;
     }
 
     const hasResult = Boolean(articleAiResult.trim());
     const decision = getArticleAiDecision(articleAiResult);
+    const confirmData = getArticleConfirmData(articleAiResult);
     renderArticleConfirm(articleAiResult);
     label.textContent = hasResult
       ? articleAiMode === "quick"
@@ -1166,6 +1185,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     decisionAction.textContent = decision.action;
     decisionSimilar.textContent = decision.similar;
     decisionAngle.textContent = decision.angle;
+    decisionTrack.textContent = confirmData.track;
+    decisionChapter.textContent = confirmData.chapter;
+    decisionArticleTitle.textContent = confirmData.title;
     content.textContent = articleAiResult;
     shell.open = hasResult;
   }
