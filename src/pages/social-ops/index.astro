@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import * as contentful from "contentful";
+import { geminiCanvasMaster } from "../../lib/gemini-canvas-master";
 
 const defaultSources = [
   {
@@ -95,6 +96,7 @@ try {
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
 const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
+const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 ---
 
 <BaseLayout
@@ -241,19 +243,82 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
               </div>
             </div>
           </section>
+
+          <section id="gemini-backup-board" class="ops-panel gemini-board">
+            <div class="panel-heading">
+              <div>
+                <p class="panel-tag">Gemini 備份艙</p>
+                <h2>Gemini Canvas 備份</h2>
+              </div>
+              <p>主檔落地，之後改版就留版本。</p>
+            </div>
+
+            <div class="gemini-summary">
+              <article class="gemini-stat">
+                <span>目前主檔</span>
+                <strong>{geminiCanvasMaster.title}</strong>
+              </article>
+              <article class="gemini-stat">
+                <span>主檔更新</span>
+                <strong>{geminiCanvasMaster.updatedAt}</strong>
+              </article>
+              <article class="gemini-stat">
+                <span>當前進度</span>
+                <strong>{geminiCanvasMaster.progressLabel}</strong>
+              </article>
+            </div>
+
+            <div class="gemini-actions">
+              <button type="button" id="load-gemini-master" class="bookshelf-action bookshelp-action-primary">載入目前主檔</button>
+              <button type="button" id="save-gemini-backup" class="bookshelf-action">建立備份</button>
+              <button type="button" id="copy-gemini-markdown" class="bookshelf-action">複製 Markdown</button>
+              <button type="button" id="download-gemini-json" class="bookshelf-action">下載 JSON</button>
+            </div>
+
+            <div class="gemini-editor-grid">
+              <label class="gemini-field">
+                <span>分享網址</span>
+                <input id="gemini-source-url" type="url" placeholder="貼上 Gemini 分享網址" />
+              </label>
+              <label class="gemini-field">
+                <span>備份標題</span>
+                <input id="gemini-title" type="text" placeholder="這次備份名稱" />
+              </label>
+              <label class="gemini-field gemini-field-full">
+                <span>內容</span>
+                <textarea id="gemini-content" rows="16" placeholder="把 Gemini Canvas 內容整段貼進來"></textarea>
+              </label>
+            </div>
+
+            <div class="gemini-notes">
+              <p>最穩的流程是：在 Gemini 改完後，把分享網址與內容貼進來，按一次建立備份。</p>
+              <p>這裡會保留本機版本紀錄，也能隨時複製 Markdown，作為主檔或額外備份。</p>
+            </div>
+
+            <div class="gemini-history">
+              <div class="bookshelf-preview-head">
+                <p>最近版本</p>
+                <span id="gemini-history-count">0 份</span>
+              </div>
+              <div id="gemini-history-list" class="gemini-history-list"></div>
+            </div>
+          </section>
         </div>
       </div>
     </div>
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, geminiCanvasMasterJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
+  const GEMINI_DRAFT_KEY = "qingxi-gemini-canvas-draft-v1";
+  const GEMINI_BACKUPS_KEY = "qingxi-gemini-canvas-backups-v1";
   const WEEKLY_TARGET = 3;
   const RUN_XP = 100;
   const WEEKLY_BONUS_XP = 50;
   const sourceTemplate = JSON.parse(defaultSourcesJson);
   const articleLibrary = JSON.parse(blogPostsJson);
+  const geminiCanvasMasterData = JSON.parse(geminiCanvasMasterJson);
   const rankTitles = [
     "起稿中",
     "構圖中",
@@ -262,6 +327,8 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
     "定稿中",
     "主理中",
   ];
+  let geminiDraft = null;
+  let geminiBackups = [];
 
   function getWeekKey(date = new Date()) {
     const target = new Date(date);
@@ -540,10 +607,173 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
     }
   }
 
+  function createGeminiDraftFromMaster() {
+    return {
+      title: geminiCanvasMasterData.title,
+      sourceUrl: geminiCanvasMasterData.sourceUrl,
+      content: geminiCanvasMasterData.content,
+    };
+  }
+
+  function getGeminiFieldElements() {
+    return {
+      title: document.getElementById("gemini-title"),
+      sourceUrl: document.getElementById("gemini-source-url"),
+      content: document.getElementById("gemini-content"),
+    };
+  }
+
+  function applyGeminiDraftToFields() {
+    const { title, sourceUrl, content } = getGeminiFieldElements();
+    if (!(title instanceof HTMLInputElement) || !(sourceUrl instanceof HTMLInputElement) || !(content instanceof HTMLTextAreaElement)) {
+      return;
+    }
+
+    title.value = geminiDraft?.title || "";
+    sourceUrl.value = geminiDraft?.sourceUrl || "";
+    content.value = geminiDraft?.content || "";
+  }
+
+  function persistGeminiDraftFromFields() {
+    const { title, sourceUrl, content } = getGeminiFieldElements();
+    if (!(title instanceof HTMLInputElement) || !(sourceUrl instanceof HTMLInputElement) || !(content instanceof HTMLTextAreaElement)) {
+      return null;
+    }
+
+    geminiDraft = {
+      title: title.value.trim() || geminiCanvasMasterData.title,
+      sourceUrl: sourceUrl.value.trim() || geminiCanvasMasterData.sourceUrl,
+      content: content.value.trim(),
+    };
+    localStorage.setItem(GEMINI_DRAFT_KEY, JSON.stringify(geminiDraft));
+    return geminiDraft;
+  }
+
+  function loadGeminiBackupState() {
+    try {
+      const savedDraft = localStorage.getItem(GEMINI_DRAFT_KEY);
+      geminiDraft = savedDraft ? JSON.parse(savedDraft) : createGeminiDraftFromMaster();
+    } catch (error) {
+      console.error("讀取 Gemini 草稿失敗：", error);
+      geminiDraft = createGeminiDraftFromMaster();
+    }
+
+    try {
+      const savedBackups = localStorage.getItem(GEMINI_BACKUPS_KEY);
+      geminiBackups = savedBackups ? JSON.parse(savedBackups) : [];
+    } catch (error) {
+      console.error("讀取 Gemini 備份失敗：", error);
+      geminiBackups = [];
+    }
+  }
+
+  function saveGeminiBackups() {
+    localStorage.setItem(GEMINI_BACKUPS_KEY, JSON.stringify(geminiBackups));
+  }
+
+  function formatTimestamp(value) {
+    if (!value) return "未記錄";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return new Intl.DateTimeFormat("zh-TW", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  }
+
+  function buildGeminiBackupMarkdown(payload) {
+    return [
+      `# ${payload.title || geminiCanvasMasterData.title}`,
+      "",
+      `- 備份時間：${formatTimestamp(payload.savedAt || new Date().toISOString())}`,
+      `- 來源網址：${payload.sourceUrl || "未填寫"}`,
+      "",
+      "## 內容",
+      "",
+      payload.content || "",
+      "",
+    ].join("\n");
+  }
+
+  function downloadTextFile(fileName, text, mimeType = "text/plain;charset=utf-8") {
+    const blob = new Blob([text], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function buildGeminiBackupPayload() {
+    const draft = persistGeminiDraftFromFields();
+    if (!draft?.content) {
+      setFeedback("請先貼上 Gemini Canvas 內容，再建立備份。", "is-warning");
+      return null;
+    }
+
+    return {
+      id: `gemini-backup-${Date.now()}`,
+      title: draft.title,
+      sourceUrl: draft.sourceUrl,
+      content: draft.content,
+      savedAt: new Date().toISOString(),
+    };
+  }
+
+  function renderGeminiHistory() {
+    const shell = document.getElementById("gemini-history-list");
+    const count = document.getElementById("gemini-history-count");
+    if (!shell || !count) return;
+
+    count.textContent = `${geminiBackups.length} 份`;
+
+    if (!geminiBackups.length) {
+      shell.innerHTML = `
+        <article class="gemini-history-empty">
+          <p>目前還沒有新版本。先把 Gemini 內容貼進來，按一次建立備份。</p>
+        </article>
+      `;
+      return;
+    }
+
+    shell.innerHTML = geminiBackups
+      .map((backup) => `
+        <article class="gemini-history-card">
+          <div class="gemini-history-top">
+            <div>
+              <strong>${escapeHtml(backup.title || "未命名備份")}</strong>
+              <p>${escapeHtml(formatTimestamp(backup.savedAt))}</p>
+            </div>
+            <span>${escapeHtml((backup.content || "").split("\n").length)} 行</span>
+          </div>
+          <p class="gemini-history-snippet">${escapeHtml((backup.content || "").slice(0, 140))}${backup.content?.length > 140 ? "..." : ""}</p>
+          <div class="gemini-history-actions">
+            <button type="button" class="history-action-btn" data-backup-action="restore" data-backup-id="${escapeHtml(backup.id)}">載入這版</button>
+            <button type="button" class="history-action-btn" data-backup-action="copy" data-backup-id="${escapeHtml(backup.id)}">複製 Markdown</button>
+          </div>
+        </article>
+      `)
+      .join("");
+  }
+
+  function loadGeminiMasterIntoEditor() {
+    geminiDraft = createGeminiDraftFromMaster();
+    localStorage.setItem(GEMINI_DRAFT_KEY, JSON.stringify(geminiDraft));
+    applyGeminiDraftToFields();
+    setFeedback("已載入目前主檔。", "is-success");
+  }
+
   function rerender() {
     renderHero();
     renderQuests();
     renderPortals();
+    renderGeminiHistory();
     saveState();
   }
 
@@ -580,8 +810,88 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
     await copyText(buildArticleTitlesText(), "已複製文章標題清單。");
   });
 
+  document.getElementById("load-gemini-master")?.addEventListener("click", () => {
+    loadGeminiMasterIntoEditor();
+  });
+
+  document.getElementById("save-gemini-backup")?.addEventListener("click", () => {
+    const payload = buildGeminiBackupPayload();
+    if (!payload) return;
+
+    geminiBackups = [payload, ...geminiBackups.filter((backup) => backup.content !== payload.content)].slice(0, 12);
+    saveGeminiBackups();
+    renderGeminiHistory();
+    setFeedback("已建立 Gemini 備份版本。", "is-success");
+  });
+
+  document.getElementById("copy-gemini-markdown")?.addEventListener("click", async () => {
+    const payload = buildGeminiBackupPayload();
+    if (!payload) return;
+    await copyText(buildGeminiBackupMarkdown(payload), "已複製 Gemini Markdown 備份。");
+  });
+
+  document.getElementById("download-gemini-json")?.addEventListener("click", () => {
+    const payload = buildGeminiBackupPayload();
+    if (!payload) return;
+
+    downloadTextFile(
+      `qingxi-gemini-backup-${payload.savedAt.slice(0, 10)}.json`,
+      JSON.stringify(
+        {
+          master: geminiCanvasMasterData,
+          current: payload,
+          history: geminiBackups,
+        },
+        null,
+        2,
+      ),
+      "application/json;charset=utf-8",
+    );
+    setFeedback("已下載 Gemini JSON 備份。", "is-success");
+  });
+
+  document.getElementById("gemini-history-list")?.addEventListener("click", async (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    const action = target.dataset.backupAction;
+    const backupId = target.dataset.backupId;
+    if (!action || !backupId) return;
+
+    const backup = geminiBackups.find((item) => item.id === backupId);
+    if (!backup) return;
+
+    if (action === "restore") {
+      geminiDraft = {
+        title: backup.title,
+        sourceUrl: backup.sourceUrl,
+        content: backup.content,
+      };
+      localStorage.setItem(GEMINI_DRAFT_KEY, JSON.stringify(geminiDraft));
+      applyGeminiDraftToFields();
+      setFeedback("已載入指定備份版本。", "is-success");
+      return;
+    }
+
+    if (action === "copy") {
+      await copyText(buildGeminiBackupMarkdown(backup), "已複製該版本 Markdown。");
+    }
+  });
+
+  document.getElementById("gemini-backup-board")?.addEventListener("input", (event) => {
+    const target = event.target;
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement
+    ) {
+      persistGeminiDraftFromFields();
+    }
+  });
+
+  loadGeminiBackupState();
   loadState();
   normalizeWeeklyState();
+  applyGeminiDraftToFields();
   rerender();
 </script>
 
@@ -759,7 +1069,10 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
   .quest-grid,
   .portal-card-grid,
   .bookshelf-summary,
-  .bookshelf-title-list {
+  .bookshelf-title-list,
+  .gemini-summary,
+  .gemini-history-list,
+  .gemini-editor-grid {
     display: grid;
     gap: 0.85rem;
   }
@@ -769,7 +1082,10 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
   .quest-card,
   .portal-card,
   .bookshelf-stat,
-  .bookshelf-entry {
+  .bookshelf-entry,
+  .gemini-stat,
+  .gemini-history-card,
+  .gemini-history-empty {
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     background:
@@ -893,7 +1209,18 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
     margin-bottom: 0.95rem;
   }
 
+  .gemini-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 0.95rem;
+  }
+
   .bookshelf-stat {
+    padding: 0.95rem 1rem;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .gemini-stat {
     padding: 0.95rem 1rem;
     display: grid;
     gap: 0.35rem;
@@ -904,10 +1231,22 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
     font-size: 0.85rem;
   }
 
+  .gemini-stat span {
+    color: rgba(230, 228, 222, 0.62);
+    font-size: 0.85rem;
+  }
+
   .bookshelf-stat strong {
     color: #f7f6f2;
     font-size: 1.16rem;
     line-height: 1.55;
+    letter-spacing: 0.01em;
+  }
+
+  .gemini-stat strong {
+    color: #f7f6f2;
+    font-size: 1rem;
+    line-height: 1.65;
     letter-spacing: 0.01em;
   }
 
@@ -955,6 +1294,127 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
   .bookshelf-preview {
     display: grid;
     gap: 0.9rem;
+  }
+
+  .gemini-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .gemini-editor-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 0.95rem;
+  }
+
+  .gemini-field {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .gemini-field span {
+    color: rgba(232, 228, 220, 0.68);
+    font-size: 0.86rem;
+  }
+
+  .gemini-field input,
+  .gemini-field textarea {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    color: #f2f0eb;
+    padding: 0.9rem 1rem;
+    font: inherit;
+    line-height: 1.65;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+
+  .gemini-field input::placeholder,
+  .gemini-field textarea::placeholder {
+    color: rgba(230, 228, 222, 0.38);
+  }
+
+  .gemini-field input:focus,
+  .gemini-field textarea:focus {
+    outline: none;
+    border-color: rgba(247, 246, 241, 0.18);
+    box-shadow: 0 0 0 1px rgba(247, 246, 241, 0.08);
+  }
+
+  .gemini-field-full {
+    grid-column: 1 / -1;
+  }
+
+  .gemini-notes {
+    display: grid;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+  }
+
+  .gemini-notes p {
+    margin: 0;
+    color: rgba(224, 221, 214, 0.64);
+    font-size: 0.88rem;
+    line-height: 1.75;
+  }
+
+  .gemini-history {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .gemini-history-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gemini-history-card,
+  .gemini-history-empty {
+    padding: 0.95rem 1rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .gemini-history-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    align-items: start;
+  }
+
+  .gemini-history-top strong {
+    color: #f5f3ef;
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  .gemini-history-top p,
+  .gemini-history-top span,
+  .gemini-history-empty p,
+  .gemini-history-snippet {
+    margin: 0;
+    color: rgba(224, 221, 214, 0.6);
+    font-size: 0.84rem;
+    line-height: 1.7;
+  }
+
+  .gemini-history-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .history-action-btn {
+    min-height: 40px;
+    padding: 0.7rem 0.9rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: #f1efea;
+    font: inherit;
+    cursor: pointer;
   }
 
   .bookshelf-preview-head {
@@ -1170,7 +1630,8 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
   @media (max-width: 1120px) {
     .ops-hero,
     .portal-card-grid,
-    .bookshelf-title-list {
+    .bookshelf-title-list,
+    .gemini-history-list {
       grid-template-columns: 1fr;
     }
 
@@ -1183,6 +1644,11 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
     }
 
     .bookshelf-summary {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .gemini-summary,
+    .gemini-editor-grid {
       grid-template-columns: 1fr 1fr;
     }
 
@@ -1205,7 +1671,10 @@ const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
 
     .quest-grid,
     .bookshelf-summary,
-    .bookshelf-title-list {
+    .bookshelf-title-list,
+    .gemini-summary,
+    .gemini-editor-grid,
+    .gemini-history-list {
       grid-template-columns: 1fr;
     }
   }
