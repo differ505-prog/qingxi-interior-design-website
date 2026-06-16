@@ -167,6 +167,95 @@ try {
   blogSyncLabel = "同步失敗，先顯示已存在文章。";
 }
 
+function inferBookshelfTrack(post: { title: string; category: string }) {
+  const haystack = `${post.title} ${post.category}`.toLowerCase();
+
+  if (/驗屋|交屋|點交|缺失/.test(haystack)) return "驗屋交屋系";
+  if (/客變|預售屋/.test(haystack)) return "預售屋客變系";
+  if (/格局|動線|收納|小坪數|空間/.test(haystack)) return "格局動線系";
+  if (/水電|插座|開關|照明|燈光|迴路|智能|窗簾/.test(haystack)) return "水電照明系";
+  return "老屋翻新系";
+}
+
+function inferBookshelfChapter(trackTitle: string, post: { title: string; category: string }) {
+  const haystack = `${post.title} ${post.category}`.toLowerCase();
+
+  if (trackTitle === "驗屋交屋系") {
+    if (/缺失|裂縫|漏水/.test(haystack)) return "缺失排序";
+    if (/點交|交屋/.test(haystack)) return "點交策略";
+    return "驗屋判讀";
+  }
+
+  if (trackTitle === "預售屋客變系") {
+    if (/插座|開關|照明|燈光/.test(haystack)) return "配置預留";
+    if (/動線|收納|格局/.test(haystack)) return "生活動線";
+    return "客變判斷";
+  }
+
+  if (trackTitle === "格局動線系") {
+    if (/收納/.test(haystack)) return "收納系統";
+    if (/動線|走道/.test(haystack)) return "動線配置";
+    return "空間尺度";
+  }
+
+  if (trackTitle === "水電照明系") {
+    if (/插座|開關/.test(haystack)) return "插座開關";
+    if (/迴路|安全/.test(haystack)) return "迴路安全";
+    if (/智能|窗簾/.test(haystack)) return "智能整合";
+    return "照明設計";
+  }
+
+  if (/拆除|泥作|防水|基礎/.test(haystack)) return "基礎工程";
+  if (/格局|收納|動線/.test(haystack)) return "空間重整";
+  return "現況判讀";
+}
+
+function inferSearchKeyword(post: { title: string; category: string }) {
+  const haystack = `${post.title} ${post.category}`.toLowerCase();
+
+  if (/驗屋|交屋|點交/.test(haystack)) return "驗屋交屋";
+  if (/客變|預售屋/.test(haystack)) return "預售屋客變";
+  if (/收納|小坪數|格局|動線/.test(haystack)) return "格局動線規劃";
+  if (/插座|開關|水電|照明|燈光/.test(haystack)) return "水電照明規劃";
+  return "老屋翻新";
+}
+
+const bookshelfEntries = blogPosts.map((post, index) => {
+  const trackTitle = inferBookshelfTrack(post);
+  const chapter = inferBookshelfChapter(trackTitle, post);
+  const searchKeyword = inferSearchKeyword(post);
+  return {
+    ...post,
+    index,
+    trackTitle,
+    chapter,
+    searchKeyword,
+  };
+}).map((entry, _, entries) => {
+  const similarEntry = entries.find((candidate) =>
+    candidate.slug !== entry.slug &&
+    candidate.trackTitle === entry.trackTitle &&
+    (candidate.chapter === entry.chapter || candidate.category === entry.category),
+  );
+
+  const strategy = similarEntry
+    ? similarEntry.chapter === entry.chapter
+      ? "同章延伸"
+      : "補強舊文"
+    : "開新文";
+
+  return {
+    ...entry,
+    similarTitle: similarEntry?.title || "無明確重複",
+    strategy,
+  };
+});
+
+const bookshelfViewGroups = bookshelfTracks.map((track) => ({
+  ...track,
+  entries: bookshelfEntries.filter((entry) => entry.trackTitle === track.title),
+}));
+
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
 const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
@@ -389,22 +478,45 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
             <div class="bookshelf-preview">
               <div class="bookshelf-preview-head">
-                <p>目前文章</p>
-                <span>{blogPosts.length} 篇</span>
+                <p>書架視圖</p>
+                <span>{bookshelfEntries.length} 篇</span>
               </div>
-              <div class="bookshelf-title-list">
-                {blogPosts.map((post, index) => (
-                  <article class="bookshelf-entry">
-                    <div class="bookshelf-entry-top">
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      <p>{post.category}</p>
+              <div class="bookshelf-shelf-grid">
+                {bookshelfViewGroups.map((group) => (
+                  <section class="bookshelf-shelf-card">
+                    <div class="bookshelf-shelf-head">
+                      <div>
+                        <p>{group.title}</p>
+                        <strong>{group.focus}</strong>
+                      </div>
+                      <span>{group.entries.length} 篇</span>
                     </div>
-                    <h3>{post.title}</h3>
-                    <div class="bookshelf-entry-meta">
-                      <span>{post.date}</span>
-                      <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer">查看文章</a>
-                    </div>
-                  </article>
+                    <small>{group.chapters}</small>
+                    {group.entries.length > 0 ? (
+                      <div class="bookshelf-shelf-entries">
+                        {group.entries.map((entry) => (
+                          <article class="bookshelf-entry">
+                            <div class="bookshelf-entry-top">
+                              <span>{entry.chapter}</span>
+                              <p>{entry.strategy}</p>
+                            </div>
+                            <h3>{entry.title}</h3>
+                            <div class="bookshelf-entry-stack">
+                              <small>分類：{entry.category}</small>
+                              <small>關鍵字：{entry.searchKeyword}</small>
+                              <small>相似舊文：{entry.similarTitle}</small>
+                            </div>
+                            <div class="bookshelf-entry-meta">
+                              <span>{entry.date}</span>
+                              <a href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">查看文章</a>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+                    ) : (
+                      <div class="bookshelf-shelf-empty">待補主文</div>
+                    )}
+                  </section>
                 ))}
               </div>
             </div>
@@ -1620,7 +1732,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .quest-grid,
   .portal-card-grid,
   .bookshelf-summary,
-  .bookshelf-title-list,
+  .bookshelf-shelf-grid,
   .gemini-version-list,
   .gemini-editor-grid {
     display: grid;
@@ -1632,6 +1744,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .quest-card,
   .portal-card,
   .bookshelf-stat,
+  .bookshelf-shelf-card,
   .bookshelf-entry,
   .gemini-version-item {
     border-radius: 20px;
@@ -2283,8 +2396,67 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     font-size: 0.9rem;
   }
 
-  .bookshelf-title-list {
+  .bookshelf-shelf-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bookshelf-shelf-card {
+    padding: 1rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .bookshelf-shelf-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .bookshelf-shelf-head p,
+  .bookshelf-shelf-head strong,
+  .bookshelf-shelf-head span,
+  .bookshelf-shelf-card > small,
+  .bookshelf-entry-stack small,
+  .bookshelf-shelf-empty {
+    margin: 0;
+  }
+
+  .bookshelf-shelf-head p {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-shelf-head strong {
+    display: block;
+    color: #f5f3ef;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  .bookshelf-shelf-head span,
+  .bookshelf-shelf-card > small {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-shelf-entries,
+  .bookshelf-entry-stack {
+    display: grid;
+    gap: 0.62rem;
+  }
+
+  .bookshelf-shelf-empty {
+    border-radius: 16px;
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    padding: 0.9rem 1rem;
+    color: rgba(224, 221, 214, 0.52);
+    font-size: 0.84rem;
+    line-height: 1.6;
+    background: rgba(255, 255, 255, 0.02);
   }
 
   .bookshelf-entry {
@@ -2316,6 +2488,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     font-size: 1rem;
     line-height: 1.6;
     font-weight: 600;
+  }
+
+  .bookshelf-entry-stack small {
+    color: rgba(224, 221, 214, 0.6);
+    font-size: 0.8rem;
+    line-height: 1.65;
   }
 
   .bookshelf-entry-meta a {
@@ -2482,7 +2660,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   @media (max-width: 1120px) {
     .ops-hero,
     .portal-card-grid,
-    .bookshelf-title-list,
+    .bookshelf-shelf-grid,
     .bookshelf-guide-grid,
     .bookshelf-track-grid {
       grid-template-columns: 1fr;
@@ -2525,7 +2703,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     .quest-grid,
     .bookshelf-summary,
-    .bookshelf-title-list,
+    .bookshelf-shelf-grid,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
     .gemini-editor-grid {
