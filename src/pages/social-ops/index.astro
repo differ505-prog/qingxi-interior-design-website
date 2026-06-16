@@ -270,32 +270,35 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
             <div class="gemini-actions">
               <button type="button" id="load-gemini-master" class="bookshelf-action bookshelp-action-primary">載入目前主檔</button>
-              <button type="button" id="save-gemini-backup" class="bookshelf-action">建立備份</button>
               <button type="button" id="copy-gemini-markdown" class="bookshelf-action">複製 Markdown</button>
               <button type="button" id="download-gemini-json" class="bookshelf-action">下載 JSON</button>
             </div>
 
             <p id="gemini-feedback" class="gemini-feedback" aria-live="polite"></p>
 
-            <div class="gemini-editor-grid">
-              <label class="gemini-field">
-                <span>分享網址</span>
-                <input id="gemini-source-url" type="url" placeholder="貼上 Gemini 分享網址" />
-              </label>
-              <label class="gemini-field">
-                <span>備份標題</span>
-                <input id="gemini-title" type="text" placeholder="這次備份名稱" />
-              </label>
-              <label class="gemini-field gemini-field-full">
-                <span>內容</span>
-                <textarea id="gemini-content" rows="16" placeholder="把 Gemini Canvas 內容整段貼進來"></textarea>
-              </label>
-            </div>
-
-            <div class="gemini-notes">
-              <p>最穩的流程是：在 Gemini 改完後，把分享網址與內容貼進來，按一次建立備份。</p>
-              <p>這裡會保留本機版本紀錄，也能隨時複製 Markdown，作為主檔或額外備份。</p>
-            </div>
+            <details class="gemini-composer" id="gemini-composer">
+              <summary>
+                <span>新增或更新備份</span>
+                <small>需要時再展開內容</small>
+              </summary>
+              <div class="gemini-editor-grid">
+                <label class="gemini-field">
+                  <span>分享網址</span>
+                  <input id="gemini-source-url" type="url" placeholder="貼上 Gemini 分享網址" />
+                </label>
+                <label class="gemini-field">
+                  <span>備份標題</span>
+                  <input id="gemini-title" type="text" placeholder="這次備份名稱" />
+                </label>
+                <label class="gemini-field gemini-field-full">
+                  <span>內容</span>
+                  <textarea id="gemini-content" rows="16" placeholder="把 Gemini Canvas 內容整段貼進來"></textarea>
+                </label>
+              </div>
+              <div class="gemini-composer-actions">
+                <button type="button" id="save-gemini-backup" class="bookshelf-action bookshelp-action-primary">建立備份</button>
+              </div>
+            </details>
 
             <div class="gemini-history">
               <div class="bookshelf-preview-head">
@@ -303,6 +306,20 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <span id="gemini-history-count">0 份</span>
               </div>
               <div id="gemini-history-list" class="gemini-history-list"></div>
+            </div>
+
+            <div id="gemini-preview-panel" class="gemini-preview-panel is-hidden">
+              <div class="bookshelf-preview-head">
+                <p>內容預覽</p>
+                <span id="gemini-preview-meta">未選擇</span>
+              </div>
+              <div class="gemini-preview-card">
+                <div class="gemini-preview-top">
+                  <strong id="gemini-preview-title">未選擇備份</strong>
+                  <a id="gemini-preview-link" href="#" target="_blank" rel="noreferrer">開啟來源</a>
+                </div>
+                <pre id="gemini-preview-content" class="gemini-preview-content"></pre>
+              </div>
             </div>
           </section>
         </div>
@@ -331,6 +348,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   ];
   let geminiDraft = null;
   let geminiBackups = [];
+  let selectedGeminiBackupId = "";
 
   function getWeekKey(date = new Date()) {
     const target = new Date(date);
@@ -762,14 +780,50 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
             </div>
             <span>${escapeHtml((backup.content || "").split("\n").length)} 行</span>
           </div>
-          <p class="gemini-history-snippet">${escapeHtml((backup.content || "").slice(0, 140))}${backup.content?.length > 140 ? "..." : ""}</p>
+          <div class="gemini-history-meta">
+            <p>${escapeHtml(backup.sourceUrl || "未填寫來源網址")}</p>
+          </div>
           <div class="gemini-history-actions">
+            <button type="button" class="history-action-btn" data-backup-action="preview" data-backup-id="${escapeHtml(backup.id)}">查看內容</button>
             <button type="button" class="history-action-btn" data-backup-action="restore" data-backup-id="${escapeHtml(backup.id)}">載入這版</button>
             <button type="button" class="history-action-btn" data-backup-action="copy" data-backup-id="${escapeHtml(backup.id)}">複製 Markdown</button>
           </div>
         </article>
       `)
       .join("");
+  }
+
+  function renderGeminiPreview() {
+    const panel = document.getElementById("gemini-preview-panel");
+    const title = document.getElementById("gemini-preview-title");
+    const link = document.getElementById("gemini-preview-link");
+    const meta = document.getElementById("gemini-preview-meta");
+    const content = document.getElementById("gemini-preview-content");
+    if (!panel || !title || !link || !meta || !content) return;
+
+    const selectedBackup = geminiBackups.find((backup) => backup.id === selectedGeminiBackupId);
+    if (!selectedBackup) {
+      panel.classList.add("is-hidden");
+      title.textContent = "未選擇備份";
+      meta.textContent = "未選擇";
+      content.textContent = "";
+      return;
+    }
+
+    panel.classList.remove("is-hidden");
+    title.textContent = selectedBackup.title || "未命名備份";
+    meta.textContent = `${formatTimestamp(selectedBackup.savedAt)}｜${(selectedBackup.content || "").split("\n").length} 行`;
+    content.textContent = selectedBackup.content || "";
+
+    if (selectedBackup.sourceUrl) {
+      link.setAttribute("href", selectedBackup.sourceUrl);
+      link.textContent = "開啟來源";
+      link.classList.remove("is-disabled");
+    } else {
+      link.setAttribute("href", "#");
+      link.textContent = "未填寫來源";
+      link.classList.add("is-disabled");
+    }
   }
 
   function loadGeminiMasterIntoEditor() {
@@ -785,6 +839,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     renderQuests();
     renderPortals();
     renderGeminiHistory();
+    renderGeminiPreview();
     saveState();
   }
 
@@ -830,8 +885,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     if (!payload) return;
 
     geminiBackups = [payload, ...geminiBackups.filter((backup) => backup.content !== payload.content)].slice(0, 12);
+    selectedGeminiBackupId = payload.id;
     saveGeminiBackups();
     renderGeminiHistory();
+    renderGeminiPreview();
     setFeedback("已建立 Gemini 備份版本。", "is-success");
     setGeminiFeedback("已建立 Gemini 備份版本。", "is-success");
   });
@@ -874,6 +931,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     const backup = geminiBackups.find((item) => item.id === backupId);
     if (!backup) return;
+
+    if (action === "preview") {
+      selectedGeminiBackupId = backup.id;
+      renderGeminiPreview();
+      setGeminiFeedback("已展開這份備份內容。", "is-success");
+      return;
+    }
 
     if (action === "restore") {
       geminiDraft = {
@@ -1319,6 +1383,43 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     margin-bottom: 1rem;
   }
 
+  .gemini-composer {
+    margin-bottom: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
+    overflow: hidden;
+  }
+
+  .gemini-composer summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.05rem;
+    color: #f4f2ed;
+  }
+
+  .gemini-composer summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .gemini-composer summary span {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .gemini-composer summary small {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.82rem;
+  }
+
+  .gemini-composer[open] summary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
   .gemini-feedback {
     min-height: 1.5rem;
     margin: -0.2rem 0 1rem;
@@ -1336,7 +1437,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   .gemini-editor-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-bottom: 0.95rem;
+    margin: 1rem 1rem 0.95rem;
   }
 
   .gemini-field {
@@ -1379,17 +1480,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     grid-column: 1 / -1;
   }
 
-  .gemini-notes {
-    display: grid;
-    gap: 0.35rem;
-    margin-bottom: 1rem;
-  }
-
-  .gemini-notes p {
-    margin: 0;
-    color: rgba(224, 221, 214, 0.64);
-    font-size: 0.88rem;
-    line-height: 1.75;
+  .gemini-composer-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 1rem 1rem;
   }
 
   .gemini-history {
@@ -1424,7 +1518,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .gemini-history-top p,
   .gemini-history-top span,
   .gemini-history-empty p,
-  .gemini-history-snippet {
+  .gemini-history-meta p {
     margin: 0;
     color: rgba(224, 221, 214, 0.6);
     font-size: 0.84rem;
@@ -1446,6 +1540,60 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     color: #f1efea;
     font: inherit;
     cursor: pointer;
+  }
+
+  .gemini-preview-panel {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 0.2rem;
+  }
+
+  .gemini-preview-panel.is-hidden {
+    display: none;
+  }
+
+  .gemini-preview-card {
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(55, 55, 54, 0.58), rgba(31, 31, 31, 0.82));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 22px rgba(0, 0, 0, 0.11);
+    padding: 1rem;
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .gemini-preview-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .gemini-preview-top strong {
+    color: #f5f3ef;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .gemini-preview-top a {
+    color: rgba(241, 239, 234, 0.78);
+    font-size: 0.84rem;
+  }
+
+  .gemini-preview-top a.is-disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .gemini-preview-content {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: rgba(238, 235, 229, 0.82);
+    font: inherit;
+    line-height: 1.8;
+    max-height: 320px;
+    overflow: auto;
   }
 
   .bookshelf-preview-head {
