@@ -117,16 +117,16 @@ const workflowGuideSteps = [
     detail: "先用 AI 快速判題，決定開新文、補舊文或同章延伸。",
   },
   {
-    title: "再出稿",
-    detail: "值得寫的題目先交給 Gemini Flash 生成初稿，不把時間浪費在低價值重複文。",
+    title: "整理骨架",
+    detail: "讓 Gemini Flash 先整理主書系、章節、標題、入庫卡與回覆角度，不先浪費高階模型在分類小事。",
   },
   {
-    title: "再定稿",
-    detail: "把 Flash 結果交給 Gemini Pro 這類高階模型潤稿、覆核與拉高完成度。",
+    title: "Pro 生文",
+    detail: "把 Flash 結構化結果交給 Gemini Pro 直接生成正式內文，讓高階模型只專注在真正的文章品質。",
   },
   {
     title: "最後入庫",
-    detail: "確認主書系、章節、正式分類與發布草稿，讓每篇文章都能集結成書。",
+    detail: "確認主書系、章節、正式分類與發布欄位，讓每篇文章都能集結成書。",
   },
 ];
 
@@ -377,9 +377,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 ></textarea>
               </label>
               <div class="bookshelf-actions bookshelf-prompt-actions">
-                <button type="button" id="run-article-ai-flow" class="bookshelf-action bookshelp-action-primary">一鍵完成初稿</button>
+                <button type="button" id="run-article-ai-flow" class="bookshelf-action bookshelp-action-primary">一鍵備好 Pro 生文包</button>
                 <button type="button" id="run-article-ai-quick" class="bookshelf-action">AI 快速判題</button>
-                <button type="button" id="copy-pro-finalize-prompt" class="bookshelf-action">複製 Pro 定稿提示詞</button>
+                <button type="button" id="copy-pro-finalize-prompt" class="bookshelf-action">複製 Pro 生文提示詞</button>
               </div>
               <details class="bookshelf-mini-fold">
                 <summary>
@@ -387,13 +387,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                   <small>備援與清理</small>
                 </summary>
                 <div class="bookshelf-actions bookshelf-mini-actions">
-                  <button type="button" id="run-article-ai-draft" class="bookshelf-action">AI 生成初稿</button>
+                  <button type="button" id="run-article-ai-draft" class="bookshelf-action">Flash 生成長稿（備援）</button>
                   <button type="button" id="copy-article-ai-result" class="bookshelf-action">複製 AI 結果</button>
                   <button type="button" id="copy-article-prompt" class="bookshelf-action">複製文章生成提示詞</button>
                   <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
                 </div>
               </details>
-              <p class="bookshelf-prompt-note">最佳主路徑是一鍵完成初稿：Gemini Flash 會先判題、再生成初稿，最後自動幫你備好可複製結果；需要拆步操作時，再用下方次要按鈕。</p>
+              <p class="bookshelf-prompt-note">最佳主路徑是一鍵備好 Pro 生文包：Gemini Flash 先判題並整理主書系、章節、標題與入庫卡，再自動幫你備好可貼去 Gemini Pro 的完整生文提示詞；只有在想看 Flash 長稿時，才使用下方備援按鈕。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <details id="article-ai-result-shell" class="bookshelf-ai-result">
                 <summary>
@@ -1028,24 +1028,21 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   function buildProFinalizePrompt(problemText = "", aiDraft = "") {
     const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
-    const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的 AI 結果）";
+    const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
     const confirmData = getArticleConfirmData(aiDraftBlock);
+    const decision = getArticleAiDecision(aiDraftBlock);
 
     return [
-      "你是青曦空間設計的內容總編與定稿編輯，現在要接手 Gemini Flash 的初稿，將其提升為可正式發布的高品質版本。",
+      "你是青曦空間設計的內容總編與正式撰稿編輯，現在要根據 Gemini Flash 先整理好的結構化判題結果，直接產出可發布的正式文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
       "",
-      "你的任務不是重新亂寫一版，而是站在高階模型的角度，對既有初稿做：",
-      "1. 結構校正",
-      "2. 邏輯補強",
-      "3. 文氣收斂",
-      "4. SEO 與可讀性提升",
-      "5. 檢查是否與既有文章過度重複",
+      "你的任務不是覆寫一篇低階初稿，而是直接站在高階模型的角度完成正式內文。",
+      "請把 Flash 提供的判題、分類、標題與入庫資訊當成文章骨架，再把真正的文章品質、邏輯、文氣與 SEO 完整拉高。",
       "",
       "【真實社團問題】",
       questionBlock,
       "",
-      "【Gemini Flash 初稿 / 判題結果】",
+      "【Gemini Flash 結構化判題結果】",
       aiDraftBlock,
       "",
       "【目前工作台解析出的正式落地資訊】",
@@ -1053,13 +1050,16 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       `主書系：${confirmData.track}`,
       `章節定位：${confirmData.chapter}`,
       `文章標題：${confirmData.title}`,
+      `判題結論：${decision.title}`,
+      `建議動作：${decision.action}`,
+      `相似舊文：${decision.similar}`,
+      `回覆視角：${decision.angle}`,
       "",
       "請你輸出以下內容，並嚴格依照順序：",
       "",
-      "A. 【定稿判斷】",
-      "- 先判斷這篇內容是否已達可發佈水準。",
-      "- 請只選一種：可直接發布 / 小修即可發布 / 仍需大修。",
-      "- 用 2-4 句說明原因。",
+      "A. 【文章策略確認】",
+      "- 請先用 2-4 句確認這篇文章最適合切入的主軸。",
+      "- 若 Flash 的主書系、章節或標題不夠精準，可以微調，但不要整個偏離原始問題。",
       "",
       "B. 【重複風險覆核】",
       "- 判斷這篇文是否與既有舊文過於重複。",
@@ -1074,8 +1074,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 請輸出 120-160 字摘要，可直接作為知識分享摘要或 meta description 草稿。",
       "",
       "E. 【正式發布文章（Markdown）】",
-      "- 請輸出一篇真正可發佈的完整版本。",
+      "- 請直接輸出一篇真正可發佈的完整版本，不要再假裝是草稿。",
       "- 保留高資訊密度，但文氣要穩定、乾淨、有設計感。",
+      "- 文章內文必須真正根據原始問題展開，而不是只重述 Flash 判題結果。",
       "- 若某些段落屬於補舊文邏輯，請整理成可直接回填舊文的段落版本，不要無謂重複。",
       "- 絕對不要出現推銷腔、口號腔、空泛形容詞堆砌。",
       "",
@@ -1083,7 +1084,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 請用固定格式輸出：網站分類 / 主書系 / 章節定位 / 文章標題 / 摘要 / 建議 slug",
       "- slug 請使用英文小寫加連字號。",
       "",
-      "G. 【最後人工檢查清單】",
+      "G. 【Copilot 生圖提示詞】",
+      "- 請固定輸出 3 組：封面主圖 / 內文輔圖 / 延伸情境圖。",
+      "- 視覺風格固定：色鉛筆或麥克筆手繪風格、莫蘭迪或低飽和配色、純圖像、不得有文字。",
+      "- 每組都要包含：用途 / 正向提示詞 / 負面提示詞。",
+      "",
+      "H. 【最後人工檢查清單】",
       "- 請列出 3-5 條發布前應人工確認的地方。",
       "- 例如：是否與既有文章重複、是否需要補真實案例、是否需要調整分類等。",
     ].join("\n");
@@ -1178,7 +1184,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     label.textContent = hasResult
       ? articleAiMode === "quick"
         ? "快速判題"
-        : "完整初稿"
+        : "Flash 長稿備援"
       : "尚未生成";
     decisionShell.hidden = !hasResult;
     decisionTitle.textContent = decision.title;
@@ -1788,6 +1794,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
   }
 
+  async function copyProArticlePrompt(question, successMessage, warningMessage) {
+    const prompt = buildProFinalizePrompt(question, articleAiResult);
+    await copyText(prompt, successMessage);
+    setArticleAiFeedback(successMessage, articleAiResult.trim() ? "is-success" : "is-warning");
+    if (!articleAiResult.trim() && warningMessage) {
+      setFeedback(warningMessage, "is-warning");
+    }
+  }
+
   async function enrichArticleMetadataIfNeeded(content, sourceMode) {
     if (!needsArticleMetadataFallback(content)) {
       return content;
@@ -1810,7 +1825,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   async function runArticleAi(mode) {
     setArticleAiBusy(true);
-    setArticleAiFeedback(mode === "quick" ? "Gemini Flash 判題中..." : "Gemini Flash 生成初稿中...");
+    setArticleAiFeedback(mode === "quick" ? "Gemini Flash 判題中..." : "Gemini Flash 長稿備援生成中...");
 
     try {
       const content = await requestArticleAi(mode);
@@ -1819,7 +1834,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       articleAiMode = mode;
       saveArticleAiResult();
       renderArticleAiResult();
-      const successMessage = mode === "quick" ? "已完成 AI 快速判題。" : "已完成 AI 初稿生成。";
+      const successMessage = mode === "quick" ? "已完成 AI 快速判題。" : "已完成 Flash 長稿備援生成。";
       setFeedback(successMessage, "is-success");
       setArticleAiFeedback(successMessage, "is-success");
       return true;
@@ -1830,7 +1845,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   async function runArticleAiFlow() {
     setArticleAiBusy(true);
-    setArticleAiFeedback("一鍵流程啟動中：先判題，再生成初稿...", "is-success");
+    setArticleAiFeedback("一鍵流程啟動中：先判題，再備好 Pro 生文提示詞...", "is-success");
 
     try {
       const quickContent = await requestArticleAi("quick");
@@ -1841,18 +1856,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       saveArticleAiResult();
       renderArticleAiResult();
 
-      setArticleAiFeedback("已完成判題，繼續生成初稿...", "is-success");
-
-      const draftContent = await requestArticleAi("full");
-      if (!draftContent) return;
-
-      articleAiResult = await enrichArticleMetadataIfNeeded(draftContent, "full");
-      articleAiMode = "full";
-      saveArticleAiResult();
-      renderArticleAiResult();
-
-      await copyText(articleAiResult, "已完成一鍵初稿並複製 AI 結果。");
-      setArticleAiFeedback("已完成一鍵初稿並複製 AI 結果。", "is-success");
+      const question = persistArticleSourceQuestion();
+      await copyProArticlePrompt(question, "已完成判題並複製 Pro 生文提示詞。");
+      setArticleAiFeedback("已完成判題並複製 Pro 生文提示詞。", "is-success");
     } finally {
       setArticleAiBusy(false);
     }
@@ -2139,8 +2145,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   document.getElementById("copy-article-prompt")?.addEventListener("click", async () => {
     const question = persistArticleSourceQuestion();
     const successMessage = question
-      ? "已複製文章生成提示詞。"
-      : "已複製文章生成提示詞模板。";
+      ? "已複製 Flash 長稿備援提示詞。"
+      : "已複製 Flash 長稿備援提示詞模板。";
     await copyText(buildArticlePrompt(question, "full"), successMessage);
   });
 
@@ -2150,12 +2156,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   document.getElementById("copy-pro-finalize-prompt")?.addEventListener("click", async () => {
     const question = persistArticleSourceQuestion();
-    const prompt = buildProFinalizePrompt(question, articleAiResult);
     const successMessage = articleAiResult.trim()
-      ? "已複製 Pro 定稿提示詞。"
-      : "已複製 Pro 定稿提示詞模板，建議先生成 Flash 結果再使用。";
-    await copyText(prompt, successMessage);
-    setArticleAiFeedback(successMessage, articleAiResult.trim() ? "is-success" : "is-warning");
+      ? "已複製 Pro 生文提示詞。"
+      : "已複製 Pro 生文提示詞模板，建議先生成 Flash 判題結果再使用。";
+    await copyProArticlePrompt(question, successMessage);
   });
 
   document.getElementById("run-article-ai-quick")?.addEventListener("click", async () => {
