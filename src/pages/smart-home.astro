@@ -25,6 +25,7 @@ const capabilities = [
 const scenarios = [
   "回家模式：進門後燈光、冷氣、窗簾與背景音樂自動切換",
   "離家模式：一鍵關閉指定設備，同步確認門鎖與監控狀態",
+  "日照調節：依日照角度、西曬強度與戶外溫度，自動調整電動蜂巢簾開合",
   "夜間模式：走道感應微亮照明，不打擾家人休息",
   "NAS 支援：照片備份、監視錄影、媒體串流與遠端檔案存取",
 ];
@@ -59,6 +60,15 @@ const visualPlaceholders = [
   },
   {
     tag: "SCENE 04",
+    title: "蜂巢簾與日照聯動",
+    description: "把窗簾盒間接照明與電動蜂巢簾一起整合，讓遮光、採光與室內溫感可依日照角度、西曬強度與戶外溫度自動切換。",
+    note: "情境重點：遮陽、採光與溫度控制不必每次手動調整",
+    image: "/images/smart-home/honeycomb-shade.jpg",
+    alt: "窗簾盒間接照明與電動蜂巢簾情境",
+    frameLabel: "SMART SHADE",
+  },
+  {
+    tag: "SCENE 05",
     title: "弱電與設備整合",
     description: "把 NAS、網路設備與收納整合進住宅尺度中，讓技術配置清楚可維護，視覺上也不破壞空間質感。",
     note: "情境重點：設備、佈線與收納一起被整理到位",
@@ -67,7 +77,7 @@ const visualPlaceholders = [
     frameLabel: "TECH CORE",
   },
   {
-    tag: "SCENE 05",
+    tag: "SCENE 06",
     title: "夜間動線與感應",
     description: "用低照度感應燈光建立安靜夜間動線，讓半夜起身時不刺眼、不驚擾，也更有安全感。",
     note: "情境重點：感應照明只在需要時輕柔亮起",
