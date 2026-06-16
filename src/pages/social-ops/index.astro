@@ -1448,16 +1448,114 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     return bookshelfTracks.find((track) => text.includes(track.title))?.title || "";
   }
 
+  function getTrackConfig(trackTitle) {
+    return bookshelfTracks.find((track) => track.title === trackTitle) || null;
+  }
+
+  function getTrackChapters(trackTitle) {
+    const track = getTrackConfig(trackTitle);
+    if (!track?.chapters) return [];
+    return track.chapters.split("/").map((chapter) => chapter.trim()).filter(Boolean);
+  }
+
+  function getInferenceKeywordScore(text, keywords) {
+    return keywords.reduce((score, keyword) => score + (text.includes(keyword) ? 1 : 0), 0);
+  }
+
+  function inferChapterFromTrack(trackTitle, titleText = "", content = "") {
+    const track = getTrackConfig(trackTitle);
+    if (!track) return "";
+
+    const text = `${titleText}\n${content}`.replace(/\s+/g, "");
+    const chapterKeywordsMap = {
+      "老屋翻新系": {
+        "現況判讀": ["屋況", "老屋", "中古屋", "翻新前", "現況", "評估", "預算怎麼抓"],
+        "基礎工程": ["天花板", "輕鋼架", "地板", "磁磚", "水電", "泥作", "拆除", "基礎工程", "工法", "材料"],
+        "空間重整": ["客廳", "格局", "動線", "家具", "收納", "配置", "空間", "局部翻新", "改造"],
+        "完工避雷": ["驗收", "完工", "缺失", "避雷", "施工糾紛"],
+      },
+      "預售屋客變系": {
+        "客變判斷": ["客變", "預售屋", "客變要不要", "客變值得"],
+        "配置預留": ["預留", "插座", "迴路", "燈位", "弱電", "設備"],
+        "生活動線": ["動線", "收納", "生活習慣", "空間安排"],
+        "交屋銜接": ["交屋", "進場", "交屋後", "客變後"],
+      },
+      "驗屋交屋系": {
+        "驗屋判讀": ["驗屋", "檢查", "缺失", "裂縫", "漏水"],
+        "缺失排序": ["優先", "排序", "先修", "先處理"],
+        "點交策略": ["點交", "建商", "回報", "協調"],
+        "交屋後進場": ["交屋後", "進場", "裝修銜接"],
+      },
+      "格局動線系": {
+        "空間尺度": ["尺寸", "尺度", "坪數", "寬度", "深度"],
+        "動線配置": ["動線", "走道", "轉身", "配置"],
+        "收納系統": ["收納", "櫃體", "櫥櫃", "儲物"],
+        "使用情境": ["小孩", "長輩", "寵物", "生活習慣", "使用情境"],
+      },
+      "水電照明系": {
+        "插座開關": ["插座", "開關", "面板"],
+        "迴路安全": ["迴路", "電箱", "安全", "負載"],
+        "照明設計": ["照明", "燈光", "色溫", "間接照明"],
+        "智能整合": ["智能", "窗簾", "感應", "自動化", "設備整合"],
+      },
+    };
+
+    const chapterMap = chapterKeywordsMap[track.title] || {};
+    let bestChapter = "";
+    let bestScore = 0;
+
+    Object.entries(chapterMap).forEach(([chapter, keywords]) => {
+      const score = getInferenceKeywordScore(text, keywords);
+      if (score > bestScore) {
+        bestScore = score;
+        bestChapter = chapter;
+      }
+    });
+
+    if (bestChapter) return bestChapter;
+    return getTrackChapters(trackTitle)[0] || "";
+  }
+
+  function buildTitleKeywordSet(text) {
+    return Array.from(new Set(
+      text
+        .split(/[\s,，。、「」\/()（）\-｜—:：]+/)
+        .map((token) => token.trim())
+        .filter((token) => token.length >= 2),
+    ));
+  }
+
+  function inferSimilarArticleTitle(content, articleTitle = "") {
+    const queryText = `${articleTitle}\n${content}`;
+    const keywords = buildTitleKeywordSet(queryText);
+    if (!keywords.length) return "";
+
+    let bestTitle = "";
+    let bestScore = 0;
+
+    articleLibrary.forEach((post) => {
+      const haystack = `${post.title}\n${post.category}`.replace(/\s+/g, "");
+      const score = keywords.reduce((sum, keyword) => sum + (haystack.includes(keyword) ? keyword.length : 0), 0);
+      if (score > bestScore) {
+        bestScore = score;
+        bestTitle = post.title;
+      }
+    });
+
+    return bestScore >= 4 ? bestTitle : "";
+  }
+
   function parseArticleIntakeCard(content) {
     const section = extractSectionText(content, "文章入庫卡");
     const lines = normalizeSectionLines(section);
     const category = extractFieldValue(lines, ["網站分類", "分類"]) || extractFieldValueFromText(content, ["網站分類", "分類"]);
     const track = extractFieldValue(lines, ["主書系"]) || extractFieldValueFromText(content, ["主書系"]) || findTrackFromText(section) || findTrackFromText(content);
-    const chapter = extractFieldValue(lines, ["章節定位"]) || extractFieldValueFromText(content, ["章節定位", "章節名稱", "章名"]);
+    const explicitChapter = extractFieldValue(lines, ["章節定位"]) || extractFieldValueFromText(content, ["章節定位", "章節名稱", "章名"]);
+    const inferredChapter = track ? inferChapterFromTrack(track, parseArticleTitle(content), content) : "";
     return {
       category: category || "尚未判定",
       track: track || "尚未判定",
-      chapter: chapter || "尚未判定",
+      chapter: explicitChapter || inferredChapter || "尚未判定",
     };
   }
 
@@ -1590,7 +1688,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   function summarizeDecisionSimilar(content) {
     const duplicateSection = extractSectionText(content, "重複判斷");
-    if (!duplicateSection) return "請看下方 AI 原文";
+    if (!duplicateSection) {
+      return inferSimilarArticleTitle(content, parseArticleTitle(content)) || "暫未比對到明確舊文";
+    }
 
     const lines = duplicateSection
       .split("\n")
@@ -1609,7 +1709,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     const candidateLine = lines.find((line) => !/開新文|補強舊文|改寫舊文|同章延伸|原因/.test(line));
-    return candidateLine ? candidateLine.slice(0, 42) : "請看下方 AI 原文";
+    if (candidateLine) return candidateLine.slice(0, 42);
+
+    return inferSimilarArticleTitle(content, parseArticleTitle(content)) || "暫未比對到明確舊文";
   }
 
   function summarizeDecisionAngle(content) {
