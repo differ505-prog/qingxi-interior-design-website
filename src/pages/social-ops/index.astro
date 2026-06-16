@@ -267,12 +267,21 @@ const bookshelfOutlineGroups = bookshelfTracks.map((track) => {
     entries: trackEntries.filter((entry) => entry.chapter === chapter),
   }));
   const filledChapters = chapters.filter((chapter) => chapter.entries.length > 0).length;
+  const missingChapters = chapters.filter((chapter) => chapter.entries.length === 0).map((chapter) => chapter.title);
+  const densestChapter = [...chapters].sort((left, right) => right.entries.length - left.entries.length)[0];
+  const nextAction = missingChapters.length > 0
+    ? `下一步優先補：${missingChapters.slice(0, 3).join(" / ")}`
+    : densestChapter?.title
+      ? `主幹已成形，可優先延伸：${densestChapter.title}`
+      : "可開始補下一題";
 
   return {
     ...track,
     entries: trackEntries,
     chapters,
     filledChapters,
+    missingChapters,
+    nextAction,
   };
 });
 
@@ -641,6 +650,20 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                       <div class="bookshelf-outline-meta">
                         <small>已成形 {group.filledChapters} / {group.chapters.length} 章</small>
                         <small>{group.chapters.length - group.filledChapters} 章待補</small>
+                      </div>
+                      <div class="bookshelf-outline-priority">
+                        <p>{group.nextAction}</p>
+                        {group.missingChapters.length > 0 ? (
+                          <div class="bookshelf-outline-tags">
+                            {group.missingChapters.slice(0, 3).map((chapter) => (
+                              <span>{chapter}</span>
+                            ))}
+                          </div>
+                        ) : (
+                          <div class="bookshelf-outline-tags">
+                            <span>已具基本目錄</span>
+                          </div>
+                        )}
                       </div>
                       <div class="bookshelf-outline-chapters">
                         {group.chapters.map((chapter, index) => (
@@ -3651,8 +3674,46 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     gap: 0.65rem;
   }
 
+  .bookshelf-outline-priority {
+    display: grid;
+    gap: 0.55rem;
+    padding: 0.82rem 0.88rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
   .bookshelf-outline-meta {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bookshelf-outline-priority p,
+  .bookshelf-outline-tags span {
+    margin: 0;
+  }
+
+  .bookshelf-outline-priority p {
+    color: #f3f0ea;
+    font-size: 0.86rem;
+    line-height: 1.65;
+    font-weight: 500;
+  }
+
+  .bookshelf-outline-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .bookshelf-outline-tags span {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.28rem 0.62rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(232, 228, 220, 0.72);
+    font-size: 0.76rem;
+    letter-spacing: 0.03em;
   }
 
   .bookshelf-outline-chapter {
