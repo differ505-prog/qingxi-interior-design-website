@@ -713,6 +713,17 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     "導流目的",
     "下一篇延伸題目",
   ];
+  const siteCategoryOptions = [
+    "老屋翻新",
+    "預售屋客變",
+    "驗屋交屋",
+    "格局動線",
+    "水電照明",
+    "裝修預算",
+    "收納機能",
+    "材質設備",
+    "智能家居",
+  ];
   const overlapRules = [
     {
       title: "同核心問題",
@@ -1215,6 +1226,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       .map((track, index) => `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${track.chapters}`)
       .join("\n");
     const intakeFieldText = articleIntakeFields.join(" / ");
+    const siteCategoryText = siteCategoryOptions.join(" / ");
     const overlapRuleText = overlapRules
       .map((rule, index) => `${index + 1}. ${rule.title}：${rule.detail}`)
       .join("\n");
@@ -1262,6 +1274,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "【既有文章清單】",
         buildArticleCatalogText(),
         "",
+        "【固定網站分類】",
+        siteCategoryText,
+        "",
         "請只輸出以下 3 段，不要多寫任何其他內容：",
         "0. 【判題結論】",
         "- 只輸出一行結論，四選一：優先補舊文 / 可做同章延伸 / 值得另開新文 / 先改寫舊文。",
@@ -1302,6 +1317,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "【既有文章清單】",
         buildArticleCatalogText(),
         "",
+        "【固定網站分類】",
+        siteCategoryText,
+        "",
         "【相似題處理規則】",
         overlapRuleText,
         "",
@@ -1323,6 +1341,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "- 每個段落標題都必須完整保留【】與編號。",
         "- 【判題結論】只能有一行，不可補理由，不可加第二句。",
         "- 【章節名稱】只能有一行，不可補說明。",
+        "- 【網站分類】只能從固定網站分類中擇一，不可自創新分類名稱。",
         "- 【文章入庫卡】內至少必須逐行包含：",
         "主書系：",
         "章節定位：",
@@ -1348,6 +1367,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "",
       "請優先把這篇內容收斂進以下固定主書系，不要任意發明過多新書名：",
       tracksText,
+      "",
+      "固定網站分類如下，網站分類只能從這份清單擇一，不可自創：",
+      siteCategoryText,
       "",
       "以下是目前網站已存在的文章，請先比對相似題，不要直接忽略舊文：",
       buildArticleCatalogText(),
@@ -1380,6 +1402,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       `- 請固定輸出以下欄位：${intakeFieldText}。`,
       "- 主書系必須從固定主書系中選 1 個。",
       "- 章節定位要明確到可直接放進未來書稿。",
+      `- 網站分類必須只能從這些分類選 1 個：${siteCategoryText}。`,
       "- 相似舊文請直接填最接近的一篇，若沒有就寫『無明確重複』。",
       "- 處理策略請只選：開新文 / 補強舊文 / 改寫舊文 / 同章延伸。",
       "- 下一篇延伸題目請給 2 題，且要能接續這篇往下寫。",
@@ -1472,6 +1495,66 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const track = getTrackConfig(trackTitle);
     if (!track?.chapters) return [];
     return track.chapters.split("/").map((chapter) => chapter.trim()).filter(Boolean);
+  }
+
+  function normalizeSiteCategory(value = "") {
+    const text = value.trim();
+    if (!text) return "";
+
+    const aliasGroups = [
+      ["老屋翻新", ["老屋翻新", "老屋翻修", "中古屋翻新", "中古屋翻修", "老屋", "翻新"]],
+      ["預售屋客變", ["預售屋客變", "預售屋", "客變", "客變規劃"]],
+      ["驗屋交屋", ["驗屋交屋", "驗屋", "交屋", "點交"]],
+      ["格局動線", ["格局動線", "格局", "動線", "空間配置", "空間規劃"]],
+      ["水電照明", ["水電照明", "水電", "照明", "插座", "開關", "迴路"]],
+      ["裝修預算", ["裝修預算", "預算規劃", "裝潢預算", "裝修費用", "費用拆解", "報價"]],
+      ["收納機能", ["收納機能", "收納", "機能", "櫃體", "儲物"]],
+      ["材質設備", ["材質設備", "材質", "設備", "建材", "五金", "材料"]],
+      ["智能家居", ["智能家居", "智能", "智慧家庭", "智慧家居", "自動化"]],
+    ];
+
+    for (const [canonical, aliases] of aliasGroups) {
+      if (aliases.some((alias) => text.includes(alias))) return canonical;
+    }
+
+    return siteCategoryOptions.find((option) => text === option) || "";
+  }
+
+  function inferSiteCategory(trackTitle = "", titleText = "", content = "") {
+    const directTrackMap = {
+      "老屋翻新系": "老屋翻新",
+      "預售屋客變系": "預售屋客變",
+      "驗屋交屋系": "驗屋交屋",
+      "格局動線系": "格局動線",
+      "水電照明系": "水電照明",
+    };
+    const directCategory = directTrackMap[trackTitle];
+    const text = `${titleText}\n${content}`.replace(/\s+/g, "");
+
+    const categoryKeywordsMap = {
+      "裝修預算": ["預算", "費用", "報價", "多少錢", "怎麼抓", "單價", "省錢"],
+      "收納機能": ["收納", "櫃體", "儲物", "機能", "櫥櫃"],
+      "材質設備": ["材質", "材料", "設備", "五金", "磁磚", "地板", "面材"],
+      "智能家居": ["智能", "智慧", "自動化", "感應", "窗簾", "控制", "設備整合"],
+      "格局動線": ["格局", "動線", "配置", "空間", "客廳", "餐廳", "臥室"],
+      "水電照明": ["水電", "照明", "插座", "開關", "迴路", "燈光"],
+      "驗屋交屋": ["驗屋", "交屋", "點交", "缺失"],
+      "預售屋客變": ["客變", "預售屋"],
+      "老屋翻新": ["老屋", "中古屋", "翻新", "翻修", "局部裝修"],
+    };
+
+    let bestCategory = "";
+    let bestScore = 0;
+    Object.entries(categoryKeywordsMap).forEach(([category, keywords]) => {
+      const score = getInferenceKeywordScore(text, keywords);
+      if (score > bestScore) {
+        bestScore = score;
+        bestCategory = category;
+      }
+    });
+
+    if (bestScore > 0) return bestCategory;
+    return directCategory || "";
   }
 
   function getInferenceKeywordScore(text, keywords) {
@@ -1592,12 +1675,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   function parseArticleIntakeCard(content) {
     const section = extractSectionText(content, "文章入庫卡");
     const lines = normalizeSectionLines(section);
-    const category = extractFieldValue(lines, ["網站分類", "分類"]) || extractFieldValueFromText(content, ["網站分類", "分類"]);
     const track = extractFieldValue(lines, ["主書系"]) || extractFieldValueFromText(content, ["主書系"]) || findTrackFromText(section) || findTrackFromText(content);
+    const categoryValue = extractFieldValue(lines, ["網站分類", "分類"]) || extractFieldValueFromText(content, ["網站分類", "分類"]);
+    const category = normalizeSiteCategory(categoryValue);
     const explicitChapter = extractFieldValue(lines, ["章節定位"]) || parseSingleLineSection(content, ["章節名稱"], ["章節名稱", "章節定位", "章名"]) || extractFieldValueFromText(content, ["章節定位", "章節名稱", "章名"]);
     const inferredChapter = track ? inferChapterFromTrack(track, parseArticleTitle(content), content) : "";
+    const inferredCategory = inferSiteCategory(track, parseArticleTitle(content), content);
     return {
-      category: category || "尚未判定",
+      category: category || inferredCategory || "尚未判定",
       track: track || "尚未判定",
       chapter: explicitChapter || inferredChapter || "尚未判定",
     };
