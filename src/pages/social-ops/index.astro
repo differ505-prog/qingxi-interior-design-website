@@ -3357,7 +3357,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   rerender();
 </script>
 
-<style>
+<style is:global>
   .social-ops-page {
     padding: 5rem 1.25rem 6rem;
     background:
@@ -4933,7 +4933,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     accent-color: #dbdbd6;
   }
 
-  .social-ops-page :global(.portal-link) {
+  .social-ops-page .portal-link {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -4951,7 +4951,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
   }
 
-  .social-ops-page :global(.portal-link-muted) {
+  .social-ops-page .portal-link-muted {
     border-style: dashed;
     border-color: rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.02);
@@ -4960,23 +4960,23 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     cursor: default;
   }
 
-  .social-ops-page :global(.portal-link:link),
-  .social-ops-page :global(.portal-link:visited) {
+  .social-ops-page .portal-link:link,
+  .social-ops-page .portal-link:visited {
     color: #f1efea !important;
     text-decoration: none !important;
   }
 
-  .social-ops-page :global(.portal-link::after) {
+  .social-ops-page .portal-link::after {
     content: "↗";
     font-size: 0.92rem;
     opacity: 0.8;
   }
 
-  .social-ops-page :global(.portal-link-muted::after) {
+  .social-ops-page .portal-link-muted::after {
     content: "";
   }
 
-  .social-ops-page :global(.portal-link:hover) {
+  .social-ops-page .portal-link:hover {
     transform: translateY(-2px);
     border-color: rgba(255, 255, 255, 0.14);
     background: linear-gradient(180deg, rgba(249, 248, 244, 0.16), rgba(255, 255, 255, 0.05));
