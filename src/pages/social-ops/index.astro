@@ -130,16 +130,16 @@ function buildTopicModeRationale(modeValue: string, modeDashboard: any, modeReco
   if (!modeDashboard?.focusTrack || !modeRecommendation) return "目前資料不足，先沿用既有排序。";
 
   if (modeValue === "publishing") {
-    return `${modeDashboard.focusTrack.title} 目前距離出版基線還差 ${modeDashboard.focusTrack.remainingToBaseline} 篇，現在先補「${modeRecommendation.chapter} > ${modeRecommendation.subchapter}」最能直接推進整本完成度。`;
+    return `先補 ${modeRecommendation.chapter} > ${modeRecommendation.subchapter}，最快推進 ${modeDashboard.focusTrack.title} 出版進度。`;
   }
 
   if (modeValue === "balanced") {
-    return `目前仍以 ${modeDashboard.focusTrack.title} 為主線，但這題同時能補「${modeRecommendation.trackTitle}」的實用缺口，適合在出版進度與網站覆蓋之間取平衡。`;
+    return `主線仍是 ${modeDashboard.focusTrack.title}，但這題也能順手補到 ${modeRecommendation.trackTitle}。`;
   }
 
   return modeRecommendation.sameSubchapterArticles.length
-    ? `這個子章目前已有 ${modeRecommendation.sameSubchapterArticles.length} 篇相關文章，可讓 Flash 依既有內容滾動修題，補出新切角而不偏離書稿主線。`
-    : `這個子章目前仍缺第一篇主文，所以先用 Flash 探索模式找更靈活的切角，但仍留在 ${modeRecommendation.trackTitle} 的固定骨架內。`;
+    ? `Flash 依既有文章換切角，但仍留在 ${modeRecommendation.trackTitle} 的書稿骨架內。`
+    : `先用 Flash 找新切角，但不離開 ${modeRecommendation.trackTitle} 的固定骨架。`;
 }
 
 const publishingCoverage = getPublishingCoverageSummary(blogPosts, publishingFocusTrackTitle);

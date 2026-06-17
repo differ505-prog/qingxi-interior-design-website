@@ -7,6 +7,8 @@ const modeDashboard = modeState?.publishingDashboard;
 const modeRecommendation = modeState?.nextRecommendedTopic;
 /** @type {any[]} */
 const pendingChapters = modeDashboard?.focusTrack?.chapterGaps?.filter((chapter) => chapter.remainingToBaseline > 0) || [];
+const leadPendingChapter = pendingChapters[0] || null;
+const remainingPendingChapters = pendingChapters.slice(1);
 /** @type {any[]} */
 const otherTrackRecommendations = (modeState?.trackRecommendations || []).filter((recommendation) => (
   recommendation.trackTitle !== modeRecommendation?.trackTitle
@@ -67,70 +69,38 @@ const backupTitles = Array.isArray(modeRecommendation?.backupTitles) ? modeRecom
         <small>{pendingChapters.length} 章待補 / {otherTrackRecommendations.length} 本其他書可補位</small>
       </summary>
       <div class="bookshelf-fold-stack">
-        {otherTrackRecommendations.length > 0 && (
-          <div class="bookshelf-publishing-track-recommendations">
+        {leadPendingChapter && (
+          <section class="bookshelf-publishing-checklist">
             <div class="bookshelf-preview-head">
-              <p>其他書補位</p>
-              <span>主攻書主題已在上方，這裡只看其他書各自下一篇</span>
+              <p>現在先補這一章</p>
+              <span>先把最影響出版進度的缺口處理掉</span>
             </div>
-            <div class="bookshelf-publishing-track-recommendation-list">
-              {otherTrackRecommendations.map((recommendation) => (
-                <article class="bookshelf-publishing-track-recommendation-card">
-                  <div class="bookshelf-publishing-rank-top">
-                    <p>{recommendation.trackTitle}</p>
-                    <span>{recommendation.chapter}</span>
-                  </div>
-                  <strong>{recommendation.primaryTitle}</strong>
-                  <small>{recommendation.subchapter}</small>
-                </article>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div class="bookshelf-publishing-gap">
-          <div class="bookshelf-preview-head">
-            <p>{modeDashboard.focusTrack.title} 還差哪些章</p>
-            <span>只留待補章節</span>
-          </div>
-          <div class="bookshelf-publishing-gap-list">
-            {pendingChapters.map((chapter) => (
-              <article class="bookshelf-publishing-gap-card">
-                <div class="bookshelf-publishing-gap-top">
-                  <p>{chapter.chapter}</p>
-                  <span>還差 {chapter.remainingToBaseline} 篇</span>
-                </div>
-                <strong>目前 {chapter.articleCount} 篇</strong>
-                <small>{chapter.missingSubchapters.slice(0, 4).join(" / ")}</small>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <section class="bookshelf-publishing-checklist">
-          <div class="bookshelf-preview-head">
-            <p>{modeDashboard.focusTrack.title} 出版清單</p>
-            <span>只留出版勾選，不再逐章重複推薦</span>
-          </div>
-          <div class="bookshelf-publishing-checklist-list">
-            {pendingChapters.map((chapter) => (
+            <article class="bookshelf-publishing-gap-card">
+              <div class="bookshelf-publishing-gap-top">
+                <p>{leadPendingChapter.chapter}</p>
+                <span>還差 {leadPendingChapter.remainingToBaseline} 篇</span>
+              </div>
+              <strong>目前 {leadPendingChapter.articleCount} 篇</strong>
+              <small>{leadPendingChapter.missingSubchapters.slice(0, 4).join(" / ")}</small>
+            </article>
+            <div class="bookshelf-publishing-checklist-list">
               <details class="bookshelf-publishing-checklist-card" open>
                 <summary>
                   <div>
-                    <span>{chapter.chapter}</span>
-                    <strong>{chapter.missingSubchapters.slice(0, 2).join(" / ") || "本章主幹已立住"}</strong>
+                    <span>{leadPendingChapter.chapter}</span>
+                    <strong>{leadPendingChapter.missingSubchapters.slice(0, 2).join(" / ") || "本章主幹已立住"}</strong>
                   </div>
-                  <small data-publishing-chapter-progress={chapter.chapter}>已勾 0 / {chapter.subchapters.length}</small>
+                  <small data-publishing-chapter-progress={leadPendingChapter.chapter}>已勾 0 / {leadPendingChapter.subchapters.length}</small>
                 </summary>
                 <div class="bookshelf-publishing-checklist-body">
                   <div class="bookshelf-publishing-subchapter-list">
-                    {chapter.subchapters.map((subchapter) => (
+                    {leadPendingChapter.subchapters.map((subchapter) => (
                       <label
                         class={`bookshelf-publishing-subchapter-item ${subchapter.coveredByArticle ? "is-covered" : ""}`}
                         data-publishing-subchapter-item
                         data-topic-mode={modeOption.value}
                         data-track-title={modeDashboard.focusTrack?.title}
-                        data-chapter-title={chapter.chapter}
+                        data-chapter-title={leadPendingChapter.chapter}
                         data-subchapter-title={subchapter.title}
                         data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
                       >
@@ -139,7 +109,7 @@ const backupTitles = Array.isArray(modeRecommendation?.backupTitles) ? modeRecom
                           data-publishing-subchapter-checkbox
                           data-topic-mode={modeOption.value}
                           data-track-title={modeDashboard.focusTrack?.title}
-                          data-chapter-title={chapter.chapter}
+                          data-chapter-title={leadPendingChapter.chapter}
                           data-subchapter-title={subchapter.title}
                           data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
                           checked={subchapter.coveredByArticle}
@@ -160,13 +130,125 @@ const backupTitles = Array.isArray(modeRecommendation?.backupTitles) ? modeRecom
                   </div>
                 </div>
               </details>
-            ))}
-          </div>
-          <div class="bookshelf-actions bookshelf-confirm-actions">
-            <button type="button" class="bookshelf-action" data-reset-publishing-checklist={modeOption.value}>重置出版清單勾選</button>
-          </div>
-          <p class="bookshelf-confirm-note">這裡只留待補章節；每本書的推薦題目已集中在上方，不再逐章重複出題。</p>
-        </section>
+            </div>
+          </section>
+        )}
+
+        {(remainingPendingChapters.length > 0 || otherTrackRecommendations.length > 0) && (
+          <details class="bookshelf-mini-fold">
+            <summary>
+              <span>其餘缺口</span>
+              <small>{remainingPendingChapters.length} 章 / {otherTrackRecommendations.length} 本其他書</small>
+            </summary>
+            <div class="bookshelf-fold-stack">
+              {remainingPendingChapters.length > 0 && (
+                <div class="bookshelf-publishing-gap">
+                  <div class="bookshelf-preview-head">
+                    <p>{modeDashboard.focusTrack.title} 其餘待補章節</p>
+                    <span>低頻時再看完整缺口</span>
+                  </div>
+                  <div class="bookshelf-publishing-gap-list">
+                    {remainingPendingChapters.map((chapter) => (
+                      <article class="bookshelf-publishing-gap-card">
+                        <div class="bookshelf-publishing-gap-top">
+                          <p>{chapter.chapter}</p>
+                          <span>還差 {chapter.remainingToBaseline} 篇</span>
+                        </div>
+                        <strong>目前 {chapter.articleCount} 篇</strong>
+                        <small>{chapter.missingSubchapters.slice(0, 4).join(" / ")}</small>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {otherTrackRecommendations.length > 0 && (
+                <div class="bookshelf-publishing-track-recommendations">
+                  <div class="bookshelf-preview-head">
+                    <p>其他書補位</p>
+                    <span>主攻書主題已在上方，這裡只看其他書各自下一篇</span>
+                  </div>
+                  <div class="bookshelf-publishing-track-recommendation-list">
+                    {otherTrackRecommendations.map((recommendation) => (
+                      <article class="bookshelf-publishing-track-recommendation-card">
+                        <div class="bookshelf-publishing-rank-top">
+                          <p>{recommendation.trackTitle}</p>
+                          <span>{recommendation.chapter}</span>
+                        </div>
+                        <strong>{recommendation.primaryTitle}</strong>
+                        <small>{recommendation.subchapter}</small>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {remainingPendingChapters.length > 0 && (
+                <section class="bookshelf-publishing-checklist">
+                  <div class="bookshelf-preview-head">
+                    <p>{modeDashboard.focusTrack.title} 其餘出版清單</p>
+                    <span>完整勾選後退到低頻層</span>
+                  </div>
+                  <div class="bookshelf-publishing-checklist-list">
+                    {remainingPendingChapters.map((chapter) => (
+                      <details class="bookshelf-publishing-checklist-card">
+                        <summary>
+                          <div>
+                            <span>{chapter.chapter}</span>
+                            <strong>{chapter.missingSubchapters.slice(0, 2).join(" / ") || "本章主幹已立住"}</strong>
+                          </div>
+                          <small data-publishing-chapter-progress={chapter.chapter}>已勾 0 / {chapter.subchapters.length}</small>
+                        </summary>
+                        <div class="bookshelf-publishing-checklist-body">
+                          <div class="bookshelf-publishing-subchapter-list">
+                            {chapter.subchapters.map((subchapter) => (
+                              <label
+                                class={`bookshelf-publishing-subchapter-item ${subchapter.coveredByArticle ? "is-covered" : ""}`}
+                                data-publishing-subchapter-item
+                                data-topic-mode={modeOption.value}
+                                data-track-title={modeDashboard.focusTrack?.title}
+                                data-chapter-title={chapter.chapter}
+                                data-subchapter-title={subchapter.title}
+                                data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
+                              >
+                                <input
+                                  type="checkbox"
+                                  data-publishing-subchapter-checkbox
+                                  data-topic-mode={modeOption.value}
+                                  data-track-title={modeDashboard.focusTrack?.title}
+                                  data-chapter-title={chapter.chapter}
+                                  data-subchapter-title={subchapter.title}
+                                  data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
+                                  checked={subchapter.coveredByArticle}
+                                />
+                                <span class="bookshelf-publishing-subchapter-copy">
+                                  <strong>{subchapter.title}</strong>
+                                  <small>
+                                    {subchapter.coveredByArticle
+                                      ? `已有 ${subchapter.articleCount} 篇文章`
+                                      : "目前仍待補"}
+                                  </small>
+                                </span>
+                                <em data-publishing-subchapter-status>
+                                  {subchapter.coveredByArticle ? "已有文章" : "待補"}
+                                </em>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+          </details>
+        )}
+
+        <div class="bookshelf-actions bookshelf-confirm-actions">
+          <button type="button" class="bookshelf-action" data-reset-publishing-checklist={modeOption.value}>重置出版清單勾選</button>
+        </div>
+        <p class="bookshelf-confirm-note">先處理最缺的那一章；其餘缺口與完整清單後退到低頻層，避免同時做太多決策。</p>
       </div>
     </details>
   )}
