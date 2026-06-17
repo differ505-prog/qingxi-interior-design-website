@@ -564,6 +564,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                       <p>快速新增</p>
                       <span id="vendor-note-form-mode">新增模式</span>
                     </div>
+                    <p class="vendor-form-note">先記名稱、工種、價位、工的粗細與主連結，其餘低頻資訊再補。</p>
                     <div class="vendor-form-grid">
                       <label class="gemini-field">
                         <span>廠商名稱</span>
@@ -600,23 +601,31 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                         <span>主要連結</span>
                         <input id="vendor-note-primary-url" type="url" placeholder="貼官網、作品集或主要頁面" />
                       </label>
-                      <label class="gemini-field">
-                        <span>第二連結</span>
-                        <input id="vendor-note-secondary-url" type="url" placeholder="IG、Behance 或其他補充連結" />
-                      </label>
-                      <label class="gemini-field">
-                        <span>地區 / 來源</span>
-                        <input id="vendor-note-location" type="text" placeholder="例如：台北 / IG 逛到" />
-                      </label>
                       <label class="gemini-field gemini-field-full">
                         <span>一句印象</span>
                         <input id="vendor-note-impression" type="text" placeholder="第一眼想記下來的優點" />
                       </label>
-                      <label class="gemini-field gemini-field-full">
-                        <span>備註</span>
-                        <textarea id="vendor-note-memo" rows="5" placeholder="補充風格、質感、合作印象或未來適合案型"></textarea>
-                      </label>
                     </div>
+                    <details id="vendor-note-extra-fields" class="vendor-form-fold">
+                      <summary>
+                        <span>補充欄位</span>
+                        <small>地區、第二連結與備註</small>
+                      </summary>
+                      <div class="vendor-form-grid vendor-form-grid-extra">
+                        <label class="gemini-field">
+                          <span>地區 / 來源</span>
+                          <input id="vendor-note-location" type="text" placeholder="例如：台北 / IG 逛到" />
+                        </label>
+                        <label class="gemini-field">
+                          <span>第二連結</span>
+                          <input id="vendor-note-secondary-url" type="url" placeholder="IG、Behance 或其他補充連結" />
+                        </label>
+                        <label class="gemini-field gemini-field-full">
+                          <span>備註</span>
+                          <textarea id="vendor-note-memo" rows="5" placeholder="補充風格、質感、合作印象或未來適合案型"></textarea>
+                        </label>
+                      </div>
+                    </details>
                     <div class="bookshelf-actions vendor-form-actions">
                       <button type="button" id="save-vendor-note" class="bookshelf-action bookshelp-action-primary">儲存筆記</button>
                       <button type="button" id="clear-vendor-note-form" class="bookshelf-action">清空</button>
@@ -862,6 +871,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       location: document.getElementById("vendor-note-location"),
       impression: document.getElementById("vendor-note-impression"),
       memo: document.getElementById("vendor-note-memo"),
+      extras: document.getElementById("vendor-note-extra-fields"),
       mode: document.getElementById("vendor-note-form-mode"),
       save: document.getElementById("save-vendor-note"),
     };
@@ -895,6 +905,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     if (fields.location instanceof HTMLInputElement) fields.location.value = note.location || "";
     if (fields.impression instanceof HTMLInputElement) fields.impression.value = note.impression || "";
     if (fields.memo instanceof HTMLTextAreaElement) fields.memo.value = note.memo || "";
+    if (fields.extras instanceof HTMLDetailsElement) {
+      fields.extras.open = Boolean(note.secondaryUrl || note.location || note.memo);
+    }
     if (fields.mode instanceof HTMLElement) {
       fields.mode.textContent = vendorNoteEditingId ? "編輯模式" : "新增模式";
     }
@@ -5053,6 +5066,53 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   .vendor-form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .vendor-form-note {
+    margin: -0.1rem 0 0;
+    color: rgba(232, 228, 220, 0.58);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .vendor-form-fold {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.018);
+    overflow: hidden;
+  }
+
+  .vendor-form-fold summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    color: #f4f2ed;
+  }
+
+  .vendor-form-fold summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .vendor-form-fold summary span {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .vendor-form-fold summary small {
+    color: rgba(224, 221, 214, 0.52);
+    font-size: 0.8rem;
+  }
+
+  .vendor-form-fold[open] summary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .vendor-form-grid-extra {
+    padding: 1rem;
   }
 
   .vendor-list-head {
