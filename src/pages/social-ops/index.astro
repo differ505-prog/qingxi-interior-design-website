@@ -1562,6 +1562,26 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "D. 正式發布文章（Markdown）",
       "E. 最終發布欄位確認",
       "F. 出書收錄備註",
+      "G. 給 IDE 的提示詞優化建議",
+      "",
+      buildIdePromptOptimizationSection("G. 給 IDE 的提示詞優化建議"),
+    ].join("\n");
+  }
+
+  function buildIdePromptOptimizationSection(sectionTitle = "O. 給 IDE 的提示詞優化建議") {
+    return [
+      `${sectionTitle}`,
+      "- 這一段是給 IDE / 提示詞維護者看的，不是給最終讀者看的內容。",
+      "- 你的任務是提出『下次如何改寫這份高階提示詞，讓輸出更穩、更準、更可收進書稿』的局部優化建議。",
+      "- 不要重寫整份提示詞，不要改動整體架構，只能提出局部調整建議。",
+      "- 只有在本次輸出裡真的看見明確缺口、模糊指令、冗餘要求或結構衝突時才提出建議；若沒有，請直接寫：本次無需修改 IDE 提示詞。",
+      "- 最多提出 3 點，且每一點都必須具體、可直接改進，不可空泛。",
+      "- 請固定依序輸出：",
+      "1. 建議新增：只寫最值得新增的 1-3 條規則；若沒有，寫「無」。",
+      "2. 建議刪減：只寫最應刪除或縮短的 1-3 條規則；若沒有，寫「無」。",
+      "3. 建議改寫：只寫最應重寫的 1-3 條原指令，並說明應如何改寫；若沒有，寫「無」。",
+      "4. 本次觸發原因：用 2-4 句說明這些建議是因為本次哪裡不夠清楚、過度、衝突或缺漏。",
+      "5. 是否建議立即修改：只能回答「是」或「否」，並補 1 句原因。",
     ].join("\n");
   }
 
@@ -1638,6 +1658,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "L. 封面與首句文案",
       "M. Copilot 生圖提示詞（封面主圖 / 內文輔圖 / 延伸情境圖，各含正向提示詞與負面提示詞）",
       "N. 最後人工檢查清單",
+      "",
+      buildIdePromptOptimizationSection("O. 給 IDE 的提示詞優化建議"),
     ].join("\n");
   }
 
@@ -1778,6 +1800,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "P. 【最後人工檢查清單】",
       "- 請列出 3-5 條發布前應人工確認的地方。",
       "- 例如：是否與既有文章重複、是否需要補真實案例、是否需要調整分類、是否適合收進既定書稿章節等。",
+      "",
+      buildIdePromptOptimizationSection("Q. 【給 IDE 的提示詞優化建議】"),
     ].join("\n");
   }
 
