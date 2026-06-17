@@ -1164,12 +1164,36 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     ].join("\n");
   }
 
+  function buildProGapContext(confirmData, aiDraftBlock = "") {
+    const resolvedTrack = confirmData.track || findTrackFromText(aiDraftBlock) || "老屋翻新系";
+    const resolvedChapter = confirmData.chapter || inferChapterFromTrack(resolvedTrack, confirmData.title, aiDraftBlock);
+    const trackChapters = getTrackChapters(resolvedTrack);
+    const sameTrackEntries = bookshelfEntries.filter((entry) => entry.trackTitle === resolvedTrack);
+    const sameChapterEntries = sameTrackEntries.filter((entry) => entry.chapter === resolvedChapter);
+    const missingChapters = trackChapters.filter((chapter) => !sameTrackEntries.some((entry) => entry.chapter === chapter));
+    const chapterGapHint = sameChapterEntries.length === 0
+      ? "這一章目前仍是空章，請優先寫成能直接立住章節的主文。"
+      : sameChapterEntries.length === 1
+        ? "這一章目前只有 1 篇，請優先補成更完整的章節骨架。"
+        : "這一章已有基本內容，請優先補足不同情境、不同預算或不同決策切角。";
+
+    return [
+      "【本章缺稿方向】",
+      `主書系總篇數：${sameTrackEntries.length} 篇`,
+      `本章現有篇數：${sameChapterEntries.length} 篇`,
+      `本章補位判斷：${chapterGapHint}`,
+      `整本目前待補章：${missingChapters.slice(0, 3).join(" / ") || "主幹已具雛形"}`,
+      "寫作要求：請優先補強這一章目前最缺的判斷邏輯、情境分支、預算差異、施工順序或常見誤區，而不是重述已存在文章。",
+    ].join("\n");
+  }
+
   function buildProFinalizePrompt(problemText = "", aiDraft = "") {
     const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
     const confirmData = getArticleConfirmData(aiDraftBlock);
     const decision = getArticleAiDecision(aiDraftBlock);
     const relatedArticleContext = buildProRelatedArticleContext(confirmData, aiDraftBlock);
+    const gapContext = buildProGapContext(confirmData, aiDraftBlock);
 
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
@@ -1197,6 +1221,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       `回覆視角：${decision.angle}`,
       "",
       relatedArticleContext,
+      "",
+      gapContext,
       "",
       "【出版導向寫作原則】",
       "1. 請把這篇文視為未來書中的一個章節單元，不要寫成只追當下流量的短期文章。",
