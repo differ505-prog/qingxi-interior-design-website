@@ -5,6 +5,8 @@ const articleTitle = "客廳局部改造預算怎麼抓？天花板、地板與�
 const articleDescription =
   "整理客廳局部改造的預算分配邏輯，從天花板、地板到家具採購，拆解硬裝、軟裝與隱形成本，幫助你把有限預算花在真正有感的地方。";
 const articlePublishedTime = "2026-06-17T00:00:00+08:00";
+const articleDateLabel = "2026-06-17";
+const articleCategoryLabel = "裝修預算";
 const articleImage = "/images/blog/living-room-budget-cover.png";
 const articleFloorDetailImage = "/images/blog/living-room-budget-floor-detail.png";
 const articleSofaCornerImage = "/images/blog/living-room-budget-sofa-corner.png";
@@ -33,48 +35,75 @@ const articleStructuredData = [
 
 <style>
   .article-container {
-    max-width: 800px;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 4rem 1rem;
+    padding: 5.75rem 1.5rem 6rem;
   }
 
   .article-header {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid #e8d5c4;
+    max-width: 860px;
+    margin: 0 auto 4rem;
+    text-align: center;
   }
 
   .article-meta {
+    justify-content: center;
+    align-items: center;
     display: flex;
     gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    color: #6b7280;
+    margin-bottom: 1.15rem;
+    font-size: 0.84rem;
+    letter-spacing: 0.14em;
+    color: #7b8794;
     flex-wrap: wrap;
+    text-transform: uppercase;
+  }
+
+  .article-kicker {
+    margin: 0 0 1rem;
+    color: var(--tiffany-dark);
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
   }
 
   .article-category {
-    background: var(--accent);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
+    background: rgba(129, 199, 212, 0.12);
+    color: var(--tiffany-dark);
+    padding: 0.38rem 0.82rem;
+    border-radius: 999px;
     font-weight: 500;
+    letter-spacing: 0.12em;
   }
 
   .article-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary);
-    line-height: 1.35;
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(2.65rem, 4.4vw, 4.45rem);
+    font-weight: 500;
+    color: #23313f;
+    line-height: 1.42;
+    letter-spacing: 0.035em;
     margin: 0;
   }
 
+  .article-dek {
+    max-width: 42rem;
+    margin: 1.4rem auto 0;
+    color: #5f6d7b;
+    font-size: 1.06rem;
+    line-height: 1.95;
+    letter-spacing: 0.01em;
+  }
+
   .article-cover {
+    max-width: 980px;
     width: 100%;
-    margin: 0 0 2.25rem;
-    border-radius: 14px;
+    margin: 0 auto 4rem;
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 26px 60px rgba(31, 41, 55, 0.12);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 244, 238, 0.92));
   }
 
   .article-cover img {
@@ -85,111 +114,152 @@ const articleStructuredData = [
   }
 
   .article-content {
-    font-size: 1.1rem;
-    line-height: 1.9;
-    color: #374151;
+    max-width: 720px;
+    margin: 0 auto;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.08rem;
+    line-height: 2.02;
+    color: #3f4a57;
+    letter-spacing: 0.015em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
   }
 
   .article-content h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: var(--primary);
-    margin-top: 3rem;
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--secondary);
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.85rem;
+    font-weight: 500;
+    color: #243342;
+    margin-top: 4rem;
+    margin-bottom: 1.4rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(129, 199, 212, 0.28);
+    letter-spacing: 0.025em;
+    line-height: 1.55;
   }
 
   .article-content h3 {
-    font-size: 1.35rem;
-    font-weight: 600;
-    color: var(--primary-light);
-    margin-top: 2rem;
-    margin-bottom: 0.8rem;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.34rem;
+    font-weight: 500;
+    color: #324253;
+    margin-top: 2.3rem;
+    margin-bottom: 0.9rem;
+    letter-spacing: 0.015em;
+    line-height: 1.7;
   }
 
   .article-content p {
-    margin-bottom: 1.35rem;
+    margin: 0 0 1.55rem;
+  }
+
+  .article-content .article-lead {
+    font-size: 1.24rem;
+    line-height: 1.98;
+    color: #2f3c4a;
+    letter-spacing: 0.018em;
+    margin-bottom: 2rem;
   }
 
   .article-content strong {
-    color: var(--primary);
+    color: #243342;
     font-weight: 600;
   }
 
   .article-content ul {
-    margin: 0 0 1.5rem;
-    padding-left: 1.5rem;
+    margin: 0 0 1.75rem;
+    padding-left: 1.35rem;
   }
 
   .article-content li {
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.85rem;
+    padding-left: 0.2rem;
   }
 
   .article-content blockquote {
-    margin: 2rem 0;
-    padding: 1.1rem 1.25rem;
-    border-left: 4px solid var(--accent);
-    background: rgba(129, 199, 212, 0.08);
-    color: #4b5563;
+    margin: 2.75rem 0;
+    padding: 1.35rem 1.6rem;
+    border-top: 1px solid rgba(129, 199, 212, 0.26);
+    border-bottom: 1px solid rgba(129, 199, 212, 0.26);
+    background: linear-gradient(180deg, rgba(129, 199, 212, 0.06), rgba(129, 199, 212, 0.02));
+    color: #4f5b67;
+    font-size: 1.04rem;
+    line-height: 1.95;
   }
 
   .article-figure {
-    margin: 2.3rem 0;
+    margin: 2.8rem 0;
   }
 
   .article-figure img {
     width: 100%;
     display: block;
-    border-radius: 14px;
-    box-shadow: 0 12px 30px rgba(31, 41, 55, 0.1);
+    border-radius: 18px;
+    box-shadow: 0 18px 42px rgba(31, 41, 55, 0.1);
     background: #f7f4ee;
+    border: 1px solid rgba(129, 199, 212, 0.12);
   }
 
   .article-figure figcaption {
-    margin-top: 0.9rem;
-    font-size: 0.95rem;
-    line-height: 1.7;
-    color: #6b7280;
+    max-width: 32rem;
+    margin: 0.95rem auto 0;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #768391;
     text-align: center;
+    letter-spacing: 0.015em;
   }
 
   .article-gallery {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem;
-    margin: 2.8rem 0 0.5rem;
+    gap: 1.45rem;
+    margin: 3rem 0 0.75rem;
   }
 
   .back-link {
     display: inline-block;
-    margin-top: 3rem;
-    padding: 0.75rem 1.5rem;
-    background: var(--secondary);
-    color: var(--primary);
+    margin-top: 4rem;
+    padding: 0.85rem 1.55rem;
+    background: rgba(129, 199, 212, 0.12);
+    color: #243342;
     text-decoration: none;
-    border-radius: 8px;
+    border-radius: 999px;
     font-weight: 500;
+    letter-spacing: 0.08em;
     transition: all 0.3s ease;
+    border: 1px solid rgba(129, 199, 212, 0.2);
   }
 
   .back-link:hover {
-    background: var(--accent);
-    color: white;
-    transform: translateX(-4px);
+    background: rgba(129, 199, 212, 0.2);
+    transform: translateX(-3px);
   }
 
   @media (max-width: 768px) {
-    .article-title {
-      font-size: 1.9rem;
+    .article-container {
+      padding: 4.75rem 1.15rem 5rem;
     }
 
+    .article-header {
+      margin-bottom: 3rem;
+    }
+
+    .article-title {
+      font-size: 2.15rem;
+    }
+
+    .article-dek,
     .article-content {
       font-size: 1rem;
     }
 
+    .article-content .article-lead {
+      font-size: 1.08rem;
+    }
+
     .article-content h2 {
-      font-size: 1.45rem;
+      font-size: 1.5rem;
     }
 
     .article-gallery {
@@ -209,11 +279,13 @@ const articleStructuredData = [
 >
   <article class="article-container">
     <header class="article-header">
+      <p class="article-kicker">Qingxi Journal</p>
       <div class="article-meta">
-        <span class="article-category">裝修預算</span>
-        <span class="article-date">2026-06-17</span>
+        <span class="article-category">{articleCategoryLabel}</span>
+        <span class="article-date">{articleDateLabel}</span>
       </div>
       <h1 class="article-title">{articleTitle}</h1>
+      <p class="article-dek">{articleDescription}</p>
     </header>
 
     <figure class="article-cover">
@@ -221,7 +293,7 @@ const articleStructuredData = [
     </figure>
 
     <div class="article-content">
-      <p>
+      <p class="article-lead">
         客廳局部改造看似只是換一片天花板、重整一塊地板，再添幾件家具，但真正進到施工與採購階段，預算往往不是照面積等比例縮小。局部裝修最大的難點，不在「做了多少」，而在「新舊之間要如何銜接」。
       </p>
 
