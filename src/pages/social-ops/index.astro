@@ -455,6 +455,31 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                     <strong id="article-ai-decision-article-title">尚未判定</strong>
                   </article>
                 </div>
+                <div id="article-social-replies" class="bookshelf-reply-shell" hidden>
+                  <div class="bookshelf-preview-head">
+                    <p>社團回覆稿</p>
+                    <span>可直接貼社團</span>
+                  </div>
+                  <div class="bookshelf-reply-grid">
+                    <article class="bookshelf-reply-card">
+                      <span>簡短版</span>
+                      <p id="article-social-reply-short">尚未生成</p>
+                    </article>
+                    <article class="bookshelf-reply-card">
+                      <span>專業版</span>
+                      <p id="article-social-reply-pro">尚未生成</p>
+                    </article>
+                    <article class="bookshelf-reply-card">
+                      <span>導流版</span>
+                      <p id="article-social-reply-lead">尚未生成</p>
+                    </article>
+                  </div>
+                  <div class="bookshelf-actions bookshelf-reply-actions">
+                    <button type="button" id="copy-social-reply-short" class="bookshelf-action">複製簡短版</button>
+                    <button type="button" id="copy-social-reply-pro" class="bookshelf-action">複製專業版</button>
+                    <button type="button" id="copy-social-reply-lead" class="bookshelf-action">複製導流版</button>
+                  </div>
+                </div>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
               </details>
               <div id="article-category-confirm" class="bookshelf-confirm" hidden>
@@ -1365,6 +1390,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const decision = getArticleAiDecision(articleAiResult);
     const confirmData = getArticleConfirmData(articleAiResult);
     renderArticleConfirm(articleAiResult);
+    renderArticleSocialReplies(articleAiResult);
     label.textContent = hasResult
       ? articleAiMode === "quick"
         ? "快速判題"
@@ -1383,7 +1409,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   function setArticleAiBusy(isBusy) {
-    ["run-article-ai-flow", "run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload"].forEach((id) => {
+    ["run-article-ai-flow", "run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload", "copy-social-reply-short", "copy-social-reply-pro", "copy-social-reply-lead"].forEach((id) => {
       const button = document.getElementById(id);
       if (button instanceof HTMLButtonElement) {
         button.disabled = isBusy;
@@ -1500,7 +1526,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "",
         `【文章入庫卡必填欄位】${intakeFieldText}`,
         "",
-        "請只輸出以下 7 段，禁止多寫其他段落：",
+        "請只輸出以下 8 段，禁止多寫其他段落：",
         "0. 【判題結論】",
         "1. 【文章標題】",
         "2. 【章節名稱】",
@@ -1508,6 +1534,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "4. 【情境補全假設】",
         "5. 【社團回覆視角】",
         "6. 【重複判斷】",
+        "7. 【社團回覆稿】",
         "",
         "格式強制規則：",
         "- 不要輸出任何前言、結語、說明、提醒。",
@@ -1515,6 +1542,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "- 【判題結論】只能有一行，不可補理由，不可加第二句。",
         "- 【章節名稱】只能有一行，不可補說明。",
         "- 【網站分類】只能從固定網站分類中擇一，不可自創新分類名稱。",
+        "- 【社團回覆稿】必須逐行固定輸出：簡短版： / 專業版： / 導流版：",
         "- 【文章入庫卡】內至少必須逐行包含：",
         "主書系：",
         "章節定位：",
@@ -1595,11 +1623,16 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 判斷這題應該屬於：開新文 / 補強舊文 / 改寫舊文 / 同章延伸。",
       "- 簡短說明原因，重點放在『是否真的提供新角度』。",
       "",
-      "7. 【社團回覆誘餌（約 50-80 字）】",
-      "- 目標：在社團中直接回覆發問者，展現專業但不長篇大論。",
-      "- 語氣：客觀、同理、一針見血。",
-      "- 絕對禁止：不要出現任何「歡迎私訊」、「找我們設計」等推銷字眼。",
-      "- 結尾句型要求：請用類似「這個問題的細節比較多，我剛好把判斷標準整理成了一篇完整的分析，有需要可以參考：[預留網址空間]」的自然引導收尾。",
+      "7. 【社團回覆稿】",
+      "- 請固定輸出三段，且每段各自只用一小段文字，不要分點。",
+      "- 請逐行固定輸出：",
+      "簡短版：",
+      "專業版：",
+      "導流版：",
+      "- 簡短版：控制在 45-70 字，適合快速回覆，不帶連結感。",
+      "- 專業版：控制在 70-110 字，保留更多判斷依據，但不要像文章。",
+      "- 導流版：控制在 70-110 字，要自然收尾到『我剛好整理成一篇完整分析，有需要可以參考：[預留網址空間]』這類句型。",
+      "- 三版都必須客觀、同理、像真人，不可出現『歡迎私訊』『找我們設計』等推銷字眼。",
       "",
       "8. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
       "- 目標：放在官網的「知識分享」區，作為高質量的 SEO 內容與導流落地頁。",
@@ -1873,6 +1906,29 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     );
   }
 
+  function parseArticleSocialReplies(content) {
+    const section = extractSectionByTitles(content, ["社團回覆稿", "社團回覆誘餌（約 50-80 字）", "社團回覆誘餌"]);
+    const lines = normalizeSectionLines(section);
+    const short = extractFieldValue(lines, ["簡短版"]) || extractFieldValueFromText(section, ["簡短版"]);
+    const pro = extractFieldValue(lines, ["專業版"]) || extractFieldValueFromText(section, ["專業版"]);
+    const lead = extractFieldValue(lines, ["導流版"]) || extractFieldValueFromText(section, ["導流版"]);
+    const fallback = lines.join(" ").trim();
+
+    if (short || pro || lead) {
+      return {
+        short: short || pro || lead || "",
+        pro: pro || short || lead || "",
+        lead: lead || pro || short || "",
+      };
+    }
+
+    return {
+      short: fallback,
+      pro: fallback,
+      lead: fallback,
+    };
+  }
+
   function getArticleConfirmData(content) {
     if (!content.trim()) {
       return {
@@ -1973,6 +2029,29 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     title.textContent = data.title;
   }
 
+  function renderArticleSocialReplies(content) {
+    const shell = document.getElementById("article-social-replies");
+    const short = document.getElementById("article-social-reply-short");
+    const pro = document.getElementById("article-social-reply-pro");
+    const lead = document.getElementById("article-social-reply-lead");
+    if (
+      !(shell instanceof HTMLElement) ||
+      !(short instanceof HTMLElement) ||
+      !(pro instanceof HTMLElement) ||
+      !(lead instanceof HTMLElement)
+    ) {
+      return;
+    }
+
+    const hasResult = Boolean(content.trim());
+    const replies = parseArticleSocialReplies(content);
+    const hasReplies = Boolean(replies.short || replies.pro || replies.lead);
+    shell.hidden = !(hasResult && hasReplies);
+    short.textContent = replies.short || "尚未生成";
+    pro.textContent = replies.pro || "尚未生成";
+    lead.textContent = replies.lead || "尚未生成";
+  }
+
   function summarizeDecisionTitle(content) {
     const decisionSection = extractSectionText(content, "判題結論");
     const singleLineDecision = normalizeDecisionLine(decisionSection);
@@ -2033,6 +2112,17 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     if (/西曬|日照|溫度/.test(content)) return "先從舒適度與日照切入";
     if (/插座|開關|收納|不夠用/.test(content)) return "先從日後是否夠用切入";
     return "先從對方最在意的痛點切入";
+  }
+
+  async function copyArticleSocialReply(variant, successMessage) {
+    const replies = parseArticleSocialReplies(articleAiResult);
+    const text = replies[variant]?.trim();
+    if (!text) {
+      setArticleAiFeedback("目前沒有可複製的社團回覆稿。", "is-warning");
+      return;
+    }
+    await copyText(text, successMessage);
+    setArticleAiFeedback(successMessage, "is-success");
   }
 
   function getArticleAiDecision(content) {
@@ -2133,7 +2223,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       articleAiMode = mode;
       saveArticleAiResult();
       renderArticleAiResult();
-      const successMessage = mode === "quick" ? "已完成 AI 快速判題。" : "已完成 Flash 長稿備援生成。";
+      const successMessage = mode === "quick" ? "已完成 AI 快速判題與社團回覆稿整理。" : "已完成 Flash 長稿備援生成。";
       setFeedback(successMessage, "is-success");
       setArticleAiFeedback(successMessage, "is-success");
       return true;
@@ -2496,6 +2586,18 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
     await copyText(buildArticleConfirmPayload(data), "已複製分類落地資訊。");
     setArticleAiFeedback("已複製分類落地資訊。", "is-success");
+  });
+
+  document.getElementById("copy-social-reply-short")?.addEventListener("click", async () => {
+    await copyArticleSocialReply("short", "已複製簡短版社團回覆。");
+  });
+
+  document.getElementById("copy-social-reply-pro")?.addEventListener("click", async () => {
+    await copyArticleSocialReply("pro", "已複製專業版社團回覆。");
+  });
+
+  document.getElementById("copy-social-reply-lead")?.addEventListener("click", async () => {
+    await copyArticleSocialReply("lead", "已複製導流版社團回覆。");
   });
 
   document.getElementById("clear-article-question")?.addEventListener("click", () => {
@@ -3151,6 +3253,50 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     font-size: 0.9rem;
     line-height: 1.6;
     font-weight: 600;
+  }
+
+  .bookshelf-reply-shell {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-reply-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .bookshelf-reply-card {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(55, 55, 54, 0.42), rgba(31, 31, 31, 0.68));
+    padding: 0.9rem 0.95rem;
+    display: grid;
+    gap: 0.42rem;
+  }
+
+  .bookshelf-reply-card span,
+  .bookshelf-reply-card p {
+    margin: 0;
+  }
+
+  .bookshelf-reply-card span {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-reply-card p {
+    color: #f4f2ed;
+    font-size: 0.88rem;
+    line-height: 1.72;
+  }
+
+  .bookshelf-reply-actions {
+    margin-bottom: 0;
   }
 
   .bookshelf-ai-content {
