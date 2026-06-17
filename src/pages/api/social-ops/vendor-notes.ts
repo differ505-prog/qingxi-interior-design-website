@@ -287,10 +287,12 @@ export const POST: APIRoute = async ({ request }) => {
       }),
     }).catch(() => {});
     // #endregion
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    const errorMessage = error instanceof Error ? error.message : String(error);
     return jsonResponse({
       status: "error",
       configured: true,
-      note: "共享廠商筆記寫入失敗，請稍後再試。",
+      note: `共享廠商筆記寫入失敗：${errorName} - ${errorMessage}`,
     }, 500);
   }
 };
