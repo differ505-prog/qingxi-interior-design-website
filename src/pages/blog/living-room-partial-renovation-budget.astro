@@ -1,0 +1,315 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const articleTitle = "客廳局部改造預算怎麼抓？天花板、地板與家具的費用拆解與取捨";
+const articleDescription =
+  "整理客廳局部改造的預算分配邏輯，從天花板、地板到家具採購，拆解硬裝、軟裝與隱形成本，幫助你把有限預算花在真正有感的地方。";
+const articlePublishedTime = "2026-06-17T00:00:00+08:00";
+const articleImage = "/images/portfolio/xizhi-zhongxing-rd/living-room-after.jpg";
+const articleStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: articleTitle,
+    description: articleDescription,
+    image: [articleImage],
+    datePublished: articlePublishedTime,
+    dateModified: articlePublishedTime,
+    articleSection: "裝修預算",
+    author: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    mainEntityOfPage: "https://qingxidesign.tw/blog/living-room-partial-renovation-budget",
+  },
+];
+---
+
+<style>
+  .article-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 4rem 1rem;
+  }
+
+  .article-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #e8d5c4;
+  }
+
+  .article-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #6b7280;
+    flex-wrap: wrap;
+  }
+
+  .article-category {
+    background: var(--accent);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .article-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  .article-cover {
+    width: 100%;
+    margin: 0 0 2.25rem;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .article-cover img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .article-content {
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: #374151;
+  }
+
+  .article-content h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 3rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--secondary);
+  }
+
+  .article-content h3 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--primary-light);
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .article-content p {
+    margin-bottom: 1.35rem;
+  }
+
+  .article-content strong {
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .article-content ul {
+    margin: 0 0 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .article-content li {
+    margin-bottom: 0.7rem;
+  }
+
+  .article-content blockquote {
+    margin: 2rem 0;
+    padding: 1.1rem 1.25rem;
+    border-left: 4px solid var(--accent);
+    background: rgba(129, 199, 212, 0.08);
+    color: #4b5563;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 3rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--secondary);
+    color: var(--primary);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .back-link:hover {
+    background: var(--accent);
+    color: white;
+    transform: translateX(-4px);
+  }
+
+  @media (max-width: 768px) {
+    .article-title {
+      font-size: 1.9rem;
+    }
+
+    .article-content {
+      font-size: 1rem;
+    }
+
+    .article-content h2 {
+      font-size: 1.45rem;
+    }
+  }
+</style>
+
+<BaseLayout
+  title={`${articleTitle} - 青曦空間設計`}
+  description={articleDescription}
+  ogImage={articleImage}
+  pageType="article"
+  publishedTime={articlePublishedTime}
+  modifiedTime={articlePublishedTime}
+  structuredData={articleStructuredData}
+>
+  <article class="article-container">
+    <header class="article-header">
+      <div class="article-meta">
+        <span class="article-category">裝修預算</span>
+        <span class="article-date">2026-06-17</span>
+      </div>
+      <h1 class="article-title">{articleTitle}</h1>
+    </header>
+
+    <figure class="article-cover">
+      <img src={articleImage} alt={articleTitle} />
+    </figure>
+
+    <div class="article-content">
+      <p>
+        客廳局部改造看似只是換一片天花板、重整一塊地板，再添幾件家具，但真正進到施工與採購階段，預算往往不是照面積等比例縮小。局部裝修最大的難點，不在「做了多少」，而在「新舊之間要如何銜接」。
+      </p>
+
+      <p>
+        在實務上，我們常遇到這樣的問題：想把客廳整理得更乾淨、更耐看，卻不打算把全室打掉重做。這時候，預算分配的重點就不是追求面面俱到，而是先判斷哪些項目最影響視覺質感、哪些項目會吃掉大量工資、哪些地方其實可以透過更聰明的做法省下來。
+      </p>
+
+      <p>
+        如果你的目標是把有限預算花在真正有感的地方，客廳局部改造通常可以從三個軸線來思考：天花板、地板，以及家具。前兩者決定空間的乾淨度與施工複雜度，後者則直接決定日常使用的舒適感。
+      </p>
+
+      <h2>局部改造的預算，為什麼常常比想像中難抓？</h2>
+
+      <p>
+        很多人以為局部裝修只是「把客廳那一塊弄好」，但施工現場並不會只處理你看得見的表面。只要牽涉到拆除、保護、清運或新舊介面的收邊，費用就不會單純跟坪數成正比。
+      </p>
+
+      <p>
+        舉例來說，若只重做客廳地板，卻要保留鄰接走道與餐廳地坪，那麼兩個區域之間的高低差、壓條、轉角與材質收頭，都會變成額外工序。又或者，若天花板只做客廳，但原本的空調、燈具、窗簾盒與牆面油漆沒有一起調整，視覺上很容易留下「局部翻新後仍然不夠完整」的斷裂感。
+      </p>
+
+      <blockquote>
+        預算規劃的核心，不是把每個項目都做到，而是先分辨哪些支出真正影響質感，哪些支出只是把問題從一個角落移到另一個角落。
+      </blockquote>
+
+      <h2>一、天花板：先判斷你在解決什麼問題</h2>
+
+      <p>
+        客廳天花板的改造，常見原因包括管線整理、冷氣移位、燈光重配，或只是想讓視覺更平整。若只是單純想「變漂亮」，往往最容易在這裡花超過必要的預算。
+      </p>
+
+      <h3>輕鋼架天花板：預算友善，但未必適合客廳主視覺</h3>
+
+      <p>
+        輕鋼架的優點是施工快、維修方便，價格通常也比木作平釘更容易控制。以 2026 年市場的保守區間來看，常見連工帶料約落在每坪
+        2,500 至 4,500 元左右。但若是傳統明架系統，網格分割感明顯，較容易讓客廳看起來偏商業空間，不一定符合住宅追求的安定與完整度。
+      </p>
+
+      <h3>木作平釘天花板：視覺完整，但要留意是否真的有必要做滿</h3>
+
+      <p>
+        若希望客廳更乾淨、燈具配置更完整，木作平釘通常仍是較成熟的做法。常見行情約每坪 4,000 至 6,500 元，但實際費用仍會受到造型、燈槽、冷氣包覆與現場高度限制影響。
+      </p>
+
+      <p>
+        預算有限時，不一定非得整間做滿。若真正需要處理的只是冷媒管線或局部樑位，可以優先考慮局部包管、精簡燈光層次，或避免過多造型線條，把經費集中在真正影響整體觀感的位置。
+      </p>
+
+      <h2>二、地板：拆除重鋪與覆蓋工法，差的是整體策略</h2>
+
+      <p>
+        客廳地板的更換，往往是局部改造中最容易失控的預算項目，因為地坪不只是材料費，真正吃重的通常是拆除、清運、泥作整平與工期管理。
+      </p>
+
+      <h3>拆除後重鋪磁磚：效果穩，但代價通常最高</h3>
+
+      <p>
+        若要把舊地坪拆到底，再重新貼磁磚，除了新磁磚材料，還會牽涉到拆除清運、打底、找平、貼磚、填縫與收邊。這種做法在需要徹底處理高低差、破損、空鼓或漏水風險時很合理，但如果只是為了更新視覺，整體花費很容易超過一開始對「局部翻新」的期待。
+      </p>
+
+      <h3>木地板或 SPC 地板覆蓋：省下的不只是工錢</h3>
+
+      <p>
+        若原有地坪平整、沒有空鼓、滲水或嚴重高低差，覆蓋式工法通常更值得優先評估。超耐磨木地板常見區間約每坪 3,500 至 8,000 元；SPC 石塑地板約每坪 2,500 至 6,500 元。除了材料與施工速度較好控制，更重要的是能同步減少拆除噪音、粉塵與清運成本。
+      </p>
+
+      <p>
+        不過，覆蓋式工法並不是便宜就一定適合。門片淨高、與其他空間的介面收邊、原始地坪是否穩定，都是決策前一定要先確認的條件。真正合理的做法，是先判斷現場條件，再決定要不要把預算花在「拆到最底」。
+      </p>
+
+      <h2>三、家具更新：有限預算，應優先投資高頻接觸區</h2>
+
+      <p>
+        客廳局部改造最容易忽略的一點，是屋主常把大部分預算投在硬裝，最後家具只能倉促補齊。但對日常生活來說，真正被身體反覆接觸的，是沙發、茶几、單椅、邊几與燈具，而不是複雜的造型板材。
+      </p>
+
+      <p>
+        若你已經用較節制的方式控制住天花板與地板預算，後續更值得把經費放在坐感穩定、尺度合適、材質耐看的家具上。尤其是沙發，它往往比電視牆更能決定客廳是否舒服；一張比例正確、布料細節乾淨的沙發，對空間質感的幫助，通常比多一層造型天花板更直接。
+      </p>
+
+      <h3>局部改造的預算比例，可以怎麼抓？</h3>
+
+      <p>
+        若客廳本身基礎條件不差，局部改造可以考慮把軟裝與家具比例拉高到整體預算的 40% 左右，甚至更高。這不是固定公式，而是一個提醒：不要把預算全數耗在不一定需要的硬裝裡，反而讓真正影響日常感受的家具變成最後才補的項目。
+      </p>
+
+      <ul>
+        <li><strong>若天花板與地板只做必要更新：</strong>可讓家具與燈具承擔更多風格塑造。</li>
+        <li><strong>若地坪必須拆除重做：</strong>就要更保守看待後續家具預算，避免前重後輕。</li>
+        <li><strong>若預算非常有限：</strong>比起做滿木作電視牆，通常更建議保留留白，改用比例俐落的獨立家具完成畫面。</li>
+      </ul>
+
+      <h2>四、不要忘了真正會超支的，是隱形帳單</h2>
+
+      <p>
+        無論是局部翻新還是微整型改造，最容易被低估的往往不是主材，而是那些「看不到、但一定會發生」的費用，例如保護工程、搬運動線、分區施工、舊料清運與清潔復原。
+      </p>
+
+      <p>
+        若施工期間屋主仍住在現場，或其他空間維持原狀，那麼電梯、梯間、廊道、既有家具與未施工區域的保護就不能省。這些支出雖然不會直接變成設計亮點，卻是局部施工能否順利進行的必要條件。
+      </p>
+
+      <p>
+        實務上，抓取整體預算時，通常建議額外預留 10% 至 15% 作為這類隱形成本與彈性修正空間。尤其老屋現場常會在拆除後才看見額外問題，若完全沒有緩衝，後續決策就很容易被迫妥協。
+      </p>
+
+      <h2>結語：把預算花在真正改善生活的地方</h2>
+
+      <p>
+        客廳的局部改造，不必追求每個面向都徹底翻新。更成熟的做法，是先確認自己想改善的是什麼，再把預算投到最能改變日常感受的地方。對多數住宅而言，與其做滿複雜造型，不如留下呼吸感，把經費用在平整乾淨的基礎、溫潤穩定的地坪，以及真正會被每天使用的家具上。
+      </p>
+
+      <p>
+        當預算有限時，真正重要的不是面面俱到，而是有判斷地取捨。只要策略清楚，局部改造同樣能讓客廳從雜亂與勉強，走向更安定、耐看，也更符合生活節奏的樣子。
+      </p>
+
+      <p>
+        註：本文提及的單價區間為 2026 年市場概估參考，實際報價仍需依地區、屋況、材料等級、施工介面與工班安排綜合評估。
+      </p>
+    </div>
+
+    <a href="/blog" class="back-link">← 返回知識分享</a>
+  </article>
+</BaseLayout>
