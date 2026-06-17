@@ -1,0 +1,144 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SOCIAL_OPS_AUTH_CONFIG } from "../lib/social-ops-auth";
+
+if (!SOCIAL_OPS_AUTH_CONFIG.enabled) {
+  return Astro.redirect(SOCIAL_OPS_AUTH_CONFIG.defaultNextPath);
+}
+
+const requestedNextPath = Astro.url.searchParams.get("next") || SOCIAL_OPS_AUTH_CONFIG.defaultNextPath;
+const nextPath = requestedNextPath.startsWith("/") ? requestedNextPath : SOCIAL_OPS_AUTH_CONFIG.defaultNextPath;
+const cookieMaxAge = SOCIAL_OPS_AUTH_CONFIG.cookieMaxAgeDays * 24 * 60 * 60;
+let errorMessage = "";
+
+if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+  const password = String(formData.get("password") || "").trim();
+
+  if (password === SOCIAL_OPS_AUTH_CONFIG.password) {
+    Astro.cookies.set(SOCIAL_OPS_AUTH_CONFIG.cookieName, "true", {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: !import.meta.env.DEV,
+      maxAge: cookieMaxAge,
+    });
+    return Astro.redirect(nextPath);
+  }
+
+  errorMessage = "密碼不正確，請再試一次。";
+}
+---
+
+<BaseLayout title="工作台解鎖 - 青曦空間設計" description="青曦內部工作台簡易密碼入口。" noindex={true}>
+  <section class="ops-login-page">
+    <div class="ops-login-card">
+      <p class="ops-login-eyebrow">青曦內部面板</p>
+      <h1>先輸入工作台密碼</h1>
+      <p class="ops-login-description">只有知道密碼的人，才能進入工作台與共享廠商筆記。</p>
+
+      <form method="POST" class="ops-login-form">
+        <input type="hidden" name="next" value={nextPath} />
+        <label class="ops-login-field" for="password">
+          <span>密碼</span>
+          <input id="password" name="password" type="password" placeholder="請輸入工作台密碼" autofocus required />
+        </label>
+        <button type="submit" class="ops-login-submit">進入工作台</button>
+      </form>
+
+      <p class={`ops-login-feedback ${errorMessage ? "is-error" : ""}`}>{errorMessage || "輸入一次後，七天內同裝置不需重複輸入。"}</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .ops-login-page {
+    min-height: calc(100vh - 4rem);
+    display: grid;
+    place-items: center;
+    padding: 3rem 1.25rem 4rem;
+    background:
+      radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 24%),
+      linear-gradient(180deg, #111111 0%, #161616 48%, #1a1a19 100%);
+  }
+
+  .ops-login-card {
+    width: min(100%, 420px);
+    display: grid;
+    gap: 1rem;
+    padding: 2rem;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(36, 36, 36, 0.94), rgba(22, 22, 23, 0.98));
+    box-shadow:
+      0 20px 52px rgba(0, 0, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    color: #f1efea;
+  }
+
+  .ops-login-eyebrow {
+    margin: 0;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    color: rgba(220, 217, 210, 0.48);
+  }
+
+  .ops-login-card h1 {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.2rem);
+    line-height: 1.2;
+  }
+
+  .ops-login-description,
+  .ops-login-feedback {
+    margin: 0;
+    color: rgba(233, 230, 224, 0.72);
+    line-height: 1.7;
+  }
+
+  .ops-login-form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .ops-login-field {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .ops-login-field span {
+    font-size: 0.82rem;
+    color: rgba(220, 217, 210, 0.7);
+  }
+
+  .ops-login-field input {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: #f7f3ea;
+    padding: 0.9rem 1rem;
+    font: inherit;
+  }
+
+  .ops-login-field input:focus {
+    outline: none;
+    border-color: rgba(247, 246, 241, 0.18);
+    box-shadow: 0 0 0 1px rgba(247, 246, 241, 0.12);
+  }
+
+  .ops-login-submit {
+    border: 0;
+    border-radius: 999px;
+    padding: 0.92rem 1.1rem;
+    font: inherit;
+    font-weight: 600;
+    color: #151515;
+    background: linear-gradient(180deg, #f7f3ea, #dcd4c5);
+    cursor: pointer;
+  }
+
+  .ops-login-feedback.is-error {
+    color: #ffb7b7;
+  }
+</style>

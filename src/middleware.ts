@@ -1,5 +1,6 @@
 import type { MiddlewareHandler } from 'astro';
 import { PASSWORD_PROTECTION_CONFIG, isLocalDevelopment } from './lib/password-config';
+import { SOCIAL_OPS_AUTH_CONFIG, isProtectedSocialOpsPath } from './lib/social-ops-auth';
 
 // ==================== 預覽密碼保護 ====================
 // 密碼保護邏輯
@@ -27,6 +28,36 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     if (!authCookie || authCookie.value !== 'true') {
       // 未認證，重定向到登錄頁面
       return context.redirect('/preview-login');
+    }
+  }
+
+  if (SOCIAL_OPS_AUTH_CONFIG.enabled) {
+    if (pathname === SOCIAL_OPS_AUTH_CONFIG.loginPath) {
+      return next();
+    }
+
+    if (isProtectedSocialOpsPath(pathname)) {
+      const authCookie = context.cookies.get(SOCIAL_OPS_AUTH_CONFIG.cookieName);
+      if (!authCookie || authCookie.value !== 'true') {
+        if (pathname.startsWith('/api/social-ops/')) {
+          return new Response(
+            JSON.stringify({
+              status: 'unauthorized',
+              configured: false,
+              note: '需要先輸入工作台密碼，才能讀寫共享內容。',
+            }),
+            {
+              status: 401,
+              headers: { 'Content-Type': 'application/json' },
+            },
+          );
+        }
+
+        const nextPath = `${pathname}${search}`;
+        return context.redirect(
+          `${SOCIAL_OPS_AUTH_CONFIG.loginPath}?next=${encodeURIComponent(nextPath)}`,
+        );
+      }
     }
   }
 
