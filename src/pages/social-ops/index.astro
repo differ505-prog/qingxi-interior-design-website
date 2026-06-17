@@ -641,10 +641,21 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
                         <span id="vendor-note-summary">先按工種看</span>
                       </div>
                       <div id="vendor-trade-filter" class="vendor-trade-filter"></div>
-                      <label class="gemini-field vendor-search-field">
-                        <span>搜尋</span>
-                        <input id="vendor-note-search" type="search" placeholder="搜尋名稱、地區、印象或備註" />
-                      </label>
+                      <div class="vendor-list-tools">
+                        <label class="gemini-field vendor-sort-field">
+                          <span>排序</span>
+                          <select id="vendor-note-sort">
+                            <option value="default">預設</option>
+                            <option value="pinned">優先名單</option>
+                            <option value="recent">最近更新</option>
+                            <option value="price-desc">價位高低</option>
+                          </select>
+                        </label>
+                        <label class="gemini-field vendor-search-field">
+                          <span>搜尋</span>
+                          <input id="vendor-note-search" type="search" placeholder="搜尋名稱、地區、印象或備註" />
+                        </label>
+                      </div>
                     </div>
                     <div id="vendor-note-list" class="vendor-note-list">
                       <div class="vendor-note-empty">尚未建立優質廠商筆記。</div>
@@ -811,6 +822,7 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
   let vendorNoteEditingId = "";
   let vendorNoteSearch = "";
   let vendorNoteTradeFilter = "";
+  let vendorNoteSort = "default";
   let contentAnalyticsState = {
     status: "idle",
     configured: false,
@@ -923,12 +935,35 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
   }
 
   function sortVendorNotes(notes = []) {
+    const priceRank = {
+      低: 1,
+      中低: 2,
+      中: 3,
+      中高: 4,
+      高: 5,
+    };
     return [...notes].sort((left, right) => {
-      if (Boolean(left.isPinned) !== Boolean(right.isPinned)) {
-        return Number(Boolean(right.isPinned)) - Number(Boolean(left.isPinned));
-      }
       const rightTime = new Date(right.updatedAt || right.createdAt || 0).getTime();
       const leftTime = new Date(left.updatedAt || left.createdAt || 0).getTime();
+      const pinnedDelta = Number(Boolean(right.isPinned)) - Number(Boolean(left.isPinned));
+
+      if (vendorNoteSort === "pinned") {
+        if (pinnedDelta !== 0) return pinnedDelta;
+        return rightTime - leftTime;
+      }
+
+      if (vendorNoteSort === "recent") {
+        return rightTime - leftTime;
+      }
+
+      if (vendorNoteSort === "price-desc") {
+        const priceDelta = (priceRank[right.priceLevel] || 0) - (priceRank[left.priceLevel] || 0);
+        if (priceDelta !== 0) return priceDelta;
+        if (pinnedDelta !== 0) return pinnedDelta;
+        return rightTime - leftTime;
+      }
+
+      if (pinnedDelta !== 0) return pinnedDelta;
       return rightTime - leftTime;
     });
   }
@@ -1520,12 +1555,14 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     const countNode = document.getElementById("vendor-note-count");
     const summaryNode = document.getElementById("vendor-note-summary");
     const searchNode = document.getElementById("vendor-note-search");
+    const sortNode = document.getElementById("vendor-note-sort");
     const filterNode = document.getElementById("vendor-trade-filter");
     const listNode = document.getElementById("vendor-note-list");
     if (
       !(countNode instanceof HTMLElement) ||
       !(summaryNode instanceof HTMLElement) ||
       !(searchNode instanceof HTMLInputElement) ||
+      !(sortNode instanceof HTMLSelectElement) ||
       !(filterNode instanceof HTMLElement) ||
       !(listNode instanceof HTMLElement)
     ) {
@@ -1534,6 +1571,10 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
 
     if (searchNode.value !== vendorNoteSearch) {
       searchNode.value = vendorNoteSearch;
+    }
+
+    if (sortNode.value !== vendorNoteSort) {
+      sortNode.value = vendorNoteSort;
     }
 
     const items = getFilteredVendorNotes();
@@ -4161,6 +4202,12 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     renderVendorNotes();
   });
 
+  document.getElementById("vendor-note-sort")?.addEventListener("change", (event) => {
+    if (!(event.target instanceof HTMLSelectElement)) return;
+    vendorNoteSort = event.target.value || "default";
+    renderVendorNotes();
+  });
+
   document.getElementById("vendor-trade-filter")?.addEventListener("click", (event) => {
     const target = event.target instanceof Element ? event.target.closest("[data-vendor-trade-filter]") : null;
     if (!(target instanceof HTMLElement)) return;
@@ -5122,6 +5169,13 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     gap: 0.9rem;
   }
 
+  .vendor-list-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: end;
+  }
+
   .vendor-trade-filter {
     display: flex;
     flex-wrap: wrap;
@@ -5156,6 +5210,10 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
 
   .vendor-search-field {
     max-width: 320px;
+  }
+
+  .vendor-sort-field {
+    min-width: 150px;
   }
 
   .vendor-note-card {
@@ -6560,6 +6618,12 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     .vendor-form-grid {
       grid-template-columns: 1fr 1fr;
     }
+
+    .vendor-search-field,
+    .vendor-sort-field {
+      max-width: none;
+    }
+
 
     .gemini-editor-grid {
       grid-template-columns: 1fr 1fr;
