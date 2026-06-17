@@ -716,6 +716,7 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
                 <button type="button" id="run-gemini-backup" class="bookshelf-action bookshelp-action-primary">立即備份</button>
               </div>
 
+              <p class="gemini-note">每按一次都會留下一版，最近保留 10 版。</p>
               <p id="gemini-feedback" class="gemini-feedback" aria-live="polite"></p>
 
               <details class="gemini-composer" id="gemini-composer">
@@ -3849,7 +3850,7 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     }
 
     return {
-      id: `gemini-backup-${Date.now()}`,
+      id: `gemini-backup-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
       title: draft.title,
       sourceUrl: draft.sourceUrl,
       content: draft.content,
@@ -3912,25 +3913,14 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     setGeminiFeedback("已載入目前主檔。", "is-success");
   }
 
-  function upsertGeminiBackup(payload) {
-    const existing = geminiBackups.find((backup) => backup.content === payload.content);
-    const nextPayload = existing
-      ? {
-          ...existing,
-          title: payload.title,
-          sourceUrl: payload.sourceUrl,
-          content: payload.content,
-          savedAt: payload.savedAt,
-        }
-      : payload;
-
+  function appendGeminiBackup(payload) {
     geminiBackups = trimGeminiBackups([
-      nextPayload,
-      ...geminiBackups.filter((backup) => backup.id !== existing?.id),
+      payload,
+      ...geminiBackups,
     ]);
     saveGeminiBackups();
     renderGeminiHistory();
-    return { payload: nextPayload, updated: Boolean(existing) };
+    return payload;
   }
 
   function rerender() {
@@ -4134,10 +4124,9 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     const payload = buildGeminiBackupPayload();
     if (!payload) return;
 
-    const result = upsertGeminiBackup(payload);
-    const feedback = result.updated ? "已更新 Gemini 最新備份。" : "已建立 Gemini 備份版本。";
-    setFeedback(feedback, "is-success");
-    setGeminiFeedback(feedback, "is-success");
+    appendGeminiBackup(payload);
+    setFeedback("已建立 Gemini 備份版本。", "is-success");
+    setGeminiFeedback("已建立 Gemini 備份版本。", "is-success");
   });
 
   document.getElementById("copy-gemini-markdown")?.addEventListener("click", async () => {
@@ -5702,6 +5691,12 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
 
   .gemini-actions-primary {
     align-items: center;
+  }
+
+  .gemini-note {
+    margin: -0.25rem 0 0.55rem;
+    color: rgba(233, 231, 225, 0.56);
+    font-size: 0.84rem;
   }
 
   .gemini-composer {
