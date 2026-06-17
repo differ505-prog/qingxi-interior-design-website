@@ -47,6 +47,37 @@ const defaultSources = [
   },
 ];
 
+const vendorTradeOptions = [
+  "木作",
+  "系統櫃",
+  "泥作",
+  "水電",
+  "油漆",
+  "燈光",
+  "窗簾",
+  "地板",
+  "鐵件",
+  "玻璃",
+  "軟裝",
+  "清潔",
+  "其他",
+];
+
+const vendorPriceLevelOptions = [
+  "低",
+  "中低",
+  "中",
+  "中高",
+  "高",
+];
+
+const vendorCraftLevelOptions = [
+  "粗工",
+  "標準",
+  "細緻",
+  "很細",
+];
+
 const bookshelfTracks = [
   {
     title: "老屋翻新系",
@@ -548,6 +579,97 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               </div>
             </div>
 
+            <details id="vendor-notes-board" class="bookshelf-fold" open>
+              <summary>
+                <span>優質廠商筆記</span>
+                <small><span id="vendor-note-count">0</span> 筆</small>
+              </summary>
+              <div class="bookshelf-preview bookshelf-fold-body">
+                <div class="vendor-board-layout">
+                  <section class="vendor-panel">
+                    <div class="bookshelf-preview-head">
+                      <p>快速新增</p>
+                      <span id="vendor-note-form-mode">新增模式</span>
+                    </div>
+                    <div class="vendor-form-grid">
+                      <label class="gemini-field">
+                        <span>廠商名稱</span>
+                        <input id="vendor-note-name" type="text" placeholder="例如：某某木作工作室" />
+                      </label>
+                      <label class="gemini-field">
+                        <span>工種</span>
+                        <select id="vendor-note-trade">
+                          <option value="">選擇工種</option>
+                          {vendorTradeOptions.map((trade) => (
+                            <option value={trade}>{trade}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label class="gemini-field">
+                        <span>價位分級</span>
+                        <select id="vendor-note-price-level">
+                          <option value="">選擇價位</option>
+                          {vendorPriceLevelOptions.map((level) => (
+                            <option value={level}>{level}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label class="gemini-field">
+                        <span>工的粗細</span>
+                        <select id="vendor-note-craft-level">
+                          <option value="">選擇細緻度</option>
+                          {vendorCraftLevelOptions.map((level) => (
+                            <option value={level}>{level}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label class="gemini-field gemini-field-full">
+                        <span>主要連結</span>
+                        <input id="vendor-note-primary-url" type="url" placeholder="貼官網、作品集或主要頁面" />
+                      </label>
+                      <label class="gemini-field">
+                        <span>第二連結</span>
+                        <input id="vendor-note-secondary-url" type="url" placeholder="IG、Behance 或其他補充連結" />
+                      </label>
+                      <label class="gemini-field">
+                        <span>地區 / 來源</span>
+                        <input id="vendor-note-location" type="text" placeholder="例如：台北 / IG 逛到" />
+                      </label>
+                      <label class="gemini-field gemini-field-full">
+                        <span>一句印象</span>
+                        <input id="vendor-note-impression" type="text" placeholder="第一眼想記下來的優點" />
+                      </label>
+                      <label class="gemini-field gemini-field-full">
+                        <span>備註</span>
+                        <textarea id="vendor-note-memo" rows="5" placeholder="補充風格、質感、合作印象或未來適合案型"></textarea>
+                      </label>
+                    </div>
+                    <div class="bookshelf-actions vendor-form-actions">
+                      <button type="button" id="save-vendor-note" class="bookshelf-action bookshelp-action-primary">儲存筆記</button>
+                      <button type="button" id="clear-vendor-note-form" class="bookshelf-action">清空</button>
+                    </div>
+                    <p id="vendor-note-feedback" class="vendor-note-feedback" aria-live="polite"></p>
+                  </section>
+
+                  <section class="vendor-panel">
+                    <div class="vendor-list-head">
+                      <div class="bookshelf-preview-head">
+                        <p>廠商清單</p>
+                        <span id="vendor-note-summary">依更新時間排序</span>
+                      </div>
+                      <label class="gemini-field vendor-search-field">
+                        <span>搜尋</span>
+                        <input id="vendor-note-search" type="search" placeholder="搜尋名稱、工種、印象或備註" />
+                      </label>
+                    </div>
+                    <div id="vendor-note-list" class="vendor-note-list">
+                      <div class="vendor-note-empty">尚未建立優質廠商筆記。</div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </details>
+
             <details class="bookshelf-fold">
               <summary>
                 <span>已上線文章</span>
@@ -644,6 +766,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const ARTICLE_AI_TIMEOUT_MS = 45000;
   const ARTICLE_AI_METADATA_TIMEOUT_MS = 18000;
   const CONTENT_ANALYTICS_URL = "/api/social-ops/analytics";
+  const VENDOR_NOTES_API_URL = "/api/social-ops/vendor-notes";
   const socialReplyShortUrlCache = new Map();
   const sourceTemplate = JSON.parse(defaultSourcesJson);
   const articleLibrary = JSON.parse(blogPostsJson);
@@ -700,6 +823,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   let articleProFinalizePrompt = "";
   let geminiDraft = null;
   let geminiBackups = [];
+  let vendorNoteEditingId = "";
+  let vendorNoteSearch = "";
   let contentAnalyticsState = {
     status: "idle",
     configured: false,
@@ -715,6 +840,138 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     topPosts: [],
     note: "",
   };
+  let vendorNotesState = {
+    status: "idle",
+    configured: false,
+    items: [],
+    note: "",
+  };
+
+  function createVendorNoteId() {
+    return `vendor-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  function createVendorNoteTemplate() {
+    return {
+      id: "",
+      name: "",
+      trade: "",
+      priceLevel: "",
+      craftLevel: "",
+      primaryUrl: "",
+      secondaryUrl: "",
+      location: "",
+      impression: "",
+      memo: "",
+      isPinned: false,
+      createdAt: "",
+      updatedAt: "",
+    };
+  }
+
+  function setVendorNoteFeedback(message, mode = "") {
+    const shell = document.getElementById("vendor-note-feedback");
+    if (!(shell instanceof HTMLElement)) return;
+    shell.className = `vendor-note-feedback ${mode}`.trim();
+    shell.textContent = message;
+  }
+
+  function getVendorNoteFormFields() {
+    return {
+      name: document.getElementById("vendor-note-name"),
+      trade: document.getElementById("vendor-note-trade"),
+      priceLevel: document.getElementById("vendor-note-price-level"),
+      craftLevel: document.getElementById("vendor-note-craft-level"),
+      primaryUrl: document.getElementById("vendor-note-primary-url"),
+      secondaryUrl: document.getElementById("vendor-note-secondary-url"),
+      location: document.getElementById("vendor-note-location"),
+      impression: document.getElementById("vendor-note-impression"),
+      memo: document.getElementById("vendor-note-memo"),
+      mode: document.getElementById("vendor-note-form-mode"),
+      save: document.getElementById("save-vendor-note"),
+    };
+  }
+
+  function readVendorNoteForm() {
+    const fields = getVendorNoteFormFields();
+    return {
+      id: vendorNoteEditingId,
+      name: fields.name instanceof HTMLInputElement ? fields.name.value.trim() : "",
+      trade: fields.trade instanceof HTMLSelectElement ? fields.trade.value.trim() : "",
+      priceLevel: fields.priceLevel instanceof HTMLSelectElement ? fields.priceLevel.value.trim() : "",
+      craftLevel: fields.craftLevel instanceof HTMLSelectElement ? fields.craftLevel.value.trim() : "",
+      primaryUrl: fields.primaryUrl instanceof HTMLInputElement ? normalizeLinkValue(fields.primaryUrl.value) : "",
+      secondaryUrl: fields.secondaryUrl instanceof HTMLInputElement ? normalizeLinkValue(fields.secondaryUrl.value) : "",
+      location: fields.location instanceof HTMLInputElement ? fields.location.value.trim() : "",
+      impression: fields.impression instanceof HTMLInputElement ? fields.impression.value.trim() : "",
+      memo: fields.memo instanceof HTMLTextAreaElement ? fields.memo.value.trim() : "",
+    };
+  }
+
+  function applyVendorNoteToForm(note = createVendorNoteTemplate()) {
+    const fields = getVendorNoteFormFields();
+    vendorNoteEditingId = note.id || "";
+    if (fields.name instanceof HTMLInputElement) fields.name.value = note.name || "";
+    if (fields.trade instanceof HTMLSelectElement) fields.trade.value = note.trade || "";
+    if (fields.priceLevel instanceof HTMLSelectElement) fields.priceLevel.value = note.priceLevel || "";
+    if (fields.craftLevel instanceof HTMLSelectElement) fields.craftLevel.value = note.craftLevel || "";
+    if (fields.primaryUrl instanceof HTMLInputElement) fields.primaryUrl.value = note.primaryUrl || "";
+    if (fields.secondaryUrl instanceof HTMLInputElement) fields.secondaryUrl.value = note.secondaryUrl || "";
+    if (fields.location instanceof HTMLInputElement) fields.location.value = note.location || "";
+    if (fields.impression instanceof HTMLInputElement) fields.impression.value = note.impression || "";
+    if (fields.memo instanceof HTMLTextAreaElement) fields.memo.value = note.memo || "";
+    if (fields.mode instanceof HTMLElement) {
+      fields.mode.textContent = vendorNoteEditingId ? "編輯模式" : "新增模式";
+    }
+    if (fields.save instanceof HTMLButtonElement) {
+      fields.save.textContent = vendorNoteEditingId ? "更新筆記" : "儲存筆記";
+    }
+  }
+
+  function resetVendorNoteForm() {
+    applyVendorNoteToForm(createVendorNoteTemplate());
+  }
+
+  function sortVendorNotes(notes = []) {
+    return [...notes].sort((left, right) => {
+      if (Boolean(left.isPinned) !== Boolean(right.isPinned)) {
+        return Number(Boolean(right.isPinned)) - Number(Boolean(left.isPinned));
+      }
+      const rightTime = new Date(right.updatedAt || right.createdAt || 0).getTime();
+      const leftTime = new Date(left.updatedAt || left.createdAt || 0).getTime();
+      return rightTime - leftTime;
+    });
+  }
+
+  function getFilteredVendorNotes() {
+    const query = vendorNoteSearch.trim().toLowerCase();
+    const notes = sortVendorNotes(vendorNotesState.items || []);
+    if (!query) return notes;
+    return notes.filter((note) =>
+      [
+        note.name,
+        note.trade,
+        note.priceLevel,
+        note.craftLevel,
+        note.location,
+        note.impression,
+        note.memo,
+      ]
+        .join("\n")
+        .toLowerCase()
+        .includes(query),
+    );
+  }
+
+  function formatVendorNoteTimestamp(value = "") {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("zh-TW", {
+      month: "2-digit",
+      day: "2-digit",
+    });
+  }
 
   function getWeekKey(date = new Date()) {
     const target = new Date(date);
@@ -1228,6 +1485,171 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
           `)
           .join("")
       : "<li>近 7 天尚無文章瀏覽資料。</li>";
+  }
+
+  function renderVendorNotes() {
+    const countNode = document.getElementById("vendor-note-count");
+    const summaryNode = document.getElementById("vendor-note-summary");
+    const searchNode = document.getElementById("vendor-note-search");
+    const listNode = document.getElementById("vendor-note-list");
+    if (
+      !(countNode instanceof HTMLElement) ||
+      !(summaryNode instanceof HTMLElement) ||
+      !(searchNode instanceof HTMLInputElement) ||
+      !(listNode instanceof HTMLElement)
+    ) {
+      return;
+    }
+
+    if (searchNode.value !== vendorNoteSearch) {
+      searchNode.value = vendorNoteSearch;
+    }
+
+    const items = getFilteredVendorNotes();
+    countNode.textContent = String(vendorNotesState.items.length || 0);
+
+    if (vendorNotesState.status === "loading") {
+      summaryNode.textContent = "同步中";
+      listNode.innerHTML = '<div class="vendor-note-empty">正在讀取共享筆記...</div>';
+      return;
+    }
+
+    if (vendorNotesState.status === "setup_required") {
+      summaryNode.textContent = "待接共享儲存";
+      listNode.innerHTML = `<div class="vendor-note-empty">${escapeHtml(vendorNotesState.note || "尚未接通共享儲存。")}</div>`;
+      return;
+    }
+
+    if (vendorNotesState.status === "error") {
+      summaryNode.textContent = "讀取失敗";
+      listNode.innerHTML = `<div class="vendor-note-empty">${escapeHtml(vendorNotesState.note || "共享筆記暫時讀取失敗。")}</div>`;
+      return;
+    }
+
+    summaryNode.textContent = vendorNoteSearch
+      ? `顯示 ${items.length} / ${vendorNotesState.items.length} 筆`
+      : vendorNotesState.items.length
+        ? "共享名錄已同步"
+        : "尚未建立筆記";
+
+    if (!items.length) {
+      listNode.innerHTML = vendorNoteSearch
+        ? '<div class="vendor-note-empty">目前沒有符合搜尋的廠商筆記。</div>'
+        : '<div class="vendor-note-empty">尚未建立優質廠商筆記。</div>';
+      return;
+    }
+
+    listNode.innerHTML = items
+      .map((note) => {
+        const primaryUrl = normalizeLinkValue(note.primaryUrl);
+        const secondaryUrl = normalizeLinkValue(note.secondaryUrl);
+        const metaItems = [
+          note.location ? `<span>${escapeHtml(note.location)}</span>` : "",
+          note.updatedAt ? `<span>更新 ${escapeHtml(formatVendorNoteTimestamp(note.updatedAt))}</span>` : "",
+        ].filter(Boolean).join("");
+
+        return `
+          <article class="vendor-note-card ${note.isPinned ? "is-pinned" : ""}">
+            <div class="vendor-note-card-head">
+              <div class="vendor-note-card-main">
+                <div class="vendor-note-badges">
+                  <span class="vendor-note-badge vendor-note-badge-trade">${escapeHtml(note.trade || "未分類")}</span>
+                  ${note.priceLevel ? `<span class="vendor-note-badge">${escapeHtml(note.priceLevel)}價位</span>` : ""}
+                  ${note.craftLevel ? `<span class="vendor-note-badge">${escapeHtml(note.craftLevel)}</span>` : ""}
+                  ${note.isPinned ? '<span class="vendor-note-badge vendor-note-badge-star">優先</span>' : ""}
+                </div>
+                <strong>${escapeHtml(note.name || "未命名廠商")}</strong>
+                <p>${escapeHtml(note.impression || note.memo || "尚未補一句印象")}</p>
+                <div class="vendor-note-meta">${metaItems || "<span>尚未補地區或更新資訊</span>"}</div>
+              </div>
+              <div class="vendor-note-card-actions">
+                ${primaryUrl
+                  ? `<a class="vendor-note-action-link" href="${escapeHtml(primaryUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                  : '<span class="vendor-note-action-link is-disabled">無連結</span>'}
+                <button type="button" class="vendor-note-mini-btn" data-vendor-action="edit" data-vendor-id="${escapeHtml(note.id)}">編輯</button>
+                <button type="button" class="vendor-note-mini-btn" data-vendor-action="pin" data-vendor-id="${escapeHtml(note.id)}">${note.isPinned ? "取消置頂" : "置頂"}</button>
+                <button type="button" class="vendor-note-mini-btn vendor-note-mini-btn-danger" data-vendor-action="delete" data-vendor-id="${escapeHtml(note.id)}">刪除</button>
+              </div>
+            </div>
+            ${(secondaryUrl || note.memo)
+              ? `<div class="vendor-note-card-body">
+                  ${note.memo ? `<p class="vendor-note-memo">${escapeHtml(note.memo)}</p>` : ""}
+                  ${secondaryUrl ? `<a class="vendor-note-secondary-link" href="${escapeHtml(secondaryUrl)}" target="_blank" rel="noreferrer">補充連結</a>` : ""}
+                </div>`
+              : ""}
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function updateVendorNotesState(result, fallbackItems = []) {
+    vendorNotesState = {
+      status: typeof result?.status === "string" ? result.status : "error",
+      configured: Boolean(result?.configured),
+      items: Array.isArray(result?.items) ? result.items : fallbackItems,
+      note: typeof result?.note === "string" ? result.note : "",
+    };
+  }
+
+  async function loadVendorNotes() {
+    vendorNotesState = {
+      ...vendorNotesState,
+      status: "loading",
+    };
+    renderVendorNotes();
+
+    try {
+      const response = await fetch(VENDOR_NOTES_API_URL, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      const result = await response.json();
+      updateVendorNotesState(result, []);
+    } catch (error) {
+      console.error("讀取共享廠商筆記失敗：", error);
+      vendorNotesState = {
+        ...vendorNotesState,
+        status: "error",
+        configured: false,
+        note: "共享廠商筆記暫時讀取失敗，請稍後再試。",
+      };
+    }
+
+    renderVendorNotes();
+  }
+
+  async function saveVendorNote(note) {
+    const response = await fetch(VENDOR_NOTES_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ note }),
+    });
+    const result = await response.json();
+    updateVendorNotesState(result, vendorNotesState.items || []);
+    renderVendorNotes();
+    if (!response.ok || result?.status !== "ok") {
+      throw new Error(result?.note || `SAVE_VENDOR_NOTE_FAILED:${response.status}`);
+    }
+  }
+
+  async function removeVendorNote(noteId) {
+    const response = await fetch(`${VENDOR_NOTES_API_URL}?id=${encodeURIComponent(noteId)}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    const result = await response.json();
+    updateVendorNotesState(result, vendorNotesState.items || []);
+    renderVendorNotes();
+    if (!response.ok || result?.status !== "ok") {
+      throw new Error(result?.note || `DELETE_VENDOR_NOTE_FAILED:${response.status}`);
+    }
   }
 
   async function loadContentAnalytics() {
@@ -3383,6 +3805,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     renderHero();
     renderQuests();
     renderPortals();
+    renderVendorNotes();
     renderGeminiHistory();
     saveState();
   }
@@ -3658,6 +4081,94 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     loadContentAnalytics();
   });
 
+  document.getElementById("vendor-note-search")?.addEventListener("input", (event) => {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    vendorNoteSearch = event.target.value.trim();
+    renderVendorNotes();
+  });
+
+  document.getElementById("clear-vendor-note-form")?.addEventListener("click", () => {
+    resetVendorNoteForm();
+    setVendorNoteFeedback("已清空廠商筆記表單。", "is-warning");
+  });
+
+  document.getElementById("save-vendor-note")?.addEventListener("click", async () => {
+    const formNote = readVendorNoteForm();
+    if (!formNote.name || !formNote.trade) {
+      setVendorNoteFeedback("至少請填廠商名稱與工種。", "is-warning");
+      return;
+    }
+
+    const existingNote = (vendorNotesState.items || []).find((entry) => entry.id === formNote.id);
+    const now = new Date().toISOString();
+    const payload = {
+      ...createVendorNoteTemplate(),
+      ...existingNote,
+      ...formNote,
+      id: formNote.id || createVendorNoteId(),
+      createdAt: existingNote?.createdAt || now,
+      updatedAt: now,
+      isPinned: Boolean(existingNote?.isPinned),
+    };
+
+    try {
+      await saveVendorNote(payload);
+      resetVendorNoteForm();
+      setVendorNoteFeedback(existingNote ? "已更新共享廠商筆記。" : "已新增共享廠商筆記。", "is-success");
+    } catch (error) {
+      console.error("儲存共享廠商筆記失敗：", error);
+      setVendorNoteFeedback(error instanceof Error ? error.message : "共享廠商筆記儲存失敗，請稍後再試。", "is-warning");
+    }
+  });
+
+  document.getElementById("vendor-note-list")?.addEventListener("click", async (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    const actionButton = target.closest("[data-vendor-action]");
+    if (!(actionButton instanceof HTMLButtonElement)) return;
+
+    const noteId = actionButton.dataset.vendorId;
+    const action = actionButton.dataset.vendorAction;
+    const currentNote = (vendorNotesState.items || []).find((entry) => entry.id === noteId);
+    if (!noteId || !action || !currentNote) return;
+
+    if (action === "edit") {
+      applyVendorNoteToForm(currentNote);
+      setVendorNoteFeedback("已載入這筆廠商筆記，可直接修改。", "is-success");
+      return;
+    }
+
+    if (action === "pin") {
+      try {
+        await saveVendorNote({
+          ...currentNote,
+          isPinned: !currentNote.isPinned,
+          updatedAt: new Date().toISOString(),
+        });
+        setVendorNoteFeedback(currentNote.isPinned ? "已取消優先標記。" : "已標記為優先合作名單。", "is-success");
+      } catch (error) {
+        console.error("更新廠商優先標記失敗：", error);
+        setVendorNoteFeedback(error instanceof Error ? error.message : "更新優先標記失敗，請稍後再試。", "is-warning");
+      }
+      return;
+    }
+
+    if (action === "delete") {
+      if (!window.confirm(`確定要刪除「${currentNote.name}」嗎？`)) return;
+      try {
+        await removeVendorNote(noteId);
+        if (vendorNoteEditingId === noteId) {
+          resetVendorNoteForm();
+        }
+        setVendorNoteFeedback("已刪除這筆共享廠商筆記。", "is-success");
+      } catch (error) {
+        console.error("刪除共享廠商筆記失敗：", error);
+        setVendorNoteFeedback(error instanceof Error ? error.message : "刪除失敗，請稍後再試。", "is-warning");
+      }
+    }
+  });
+
   document.getElementById("article-source-question")?.addEventListener("input", () => {
     persistArticleSourceQuestion();
   });
@@ -3681,6 +4192,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   rerender();
   renderContentAnalytics();
   loadContentAnalytics();
+  resetVendorNoteForm();
+  loadVendorNotes();
 </script>
 
 <style is:global>
@@ -4451,6 +4964,202 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     white-space: nowrap;
   }
 
+  .vendor-board-layout,
+  .vendor-form-grid,
+  .vendor-note-list {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .vendor-board-layout {
+    grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.08fr);
+    align-items: start;
+  }
+
+  .vendor-panel {
+    display: grid;
+    gap: 0.9rem;
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .vendor-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .vendor-list-head {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .vendor-search-field {
+    max-width: 320px;
+  }
+
+  .vendor-note-card {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(55, 55, 54, 0.42), rgba(31, 31, 31, 0.68));
+  }
+
+  .vendor-note-card.is-pinned {
+    border-color: rgba(247, 246, 241, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 14px 26px rgba(0, 0, 0, 0.14);
+  }
+
+  .vendor-note-card-head,
+  .vendor-note-card-main,
+  .vendor-note-card-actions,
+  .vendor-note-badges,
+  .vendor-note-meta,
+  .vendor-note-card-body {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .vendor-note-card-head {
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .vendor-note-card-main,
+  .vendor-note-card-body {
+    flex-direction: column;
+  }
+
+  .vendor-note-card-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .vendor-note-card-main strong,
+  .vendor-note-card-main p,
+  .vendor-note-memo {
+    margin: 0;
+  }
+
+  .vendor-note-card-main strong {
+    color: #f7f6f2;
+    font-size: 0.98rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .vendor-note-card-main p,
+  .vendor-note-memo {
+    color: rgba(232, 228, 220, 0.7);
+    font-size: 0.86rem;
+    line-height: 1.75;
+  }
+
+  .vendor-note-card-main p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .vendor-note-badges,
+  .vendor-note-meta {
+    flex-wrap: wrap;
+  }
+
+  .vendor-note-badge,
+  .vendor-note-meta span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0.28rem 0.62rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.75rem;
+    line-height: 1;
+  }
+
+  .vendor-note-badge {
+    color: rgba(244, 242, 237, 0.88);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .vendor-note-badge-trade {
+    background: linear-gradient(180deg, rgba(250, 249, 245, 0.14), rgba(209, 204, 193, 0.06));
+    border-color: rgba(247, 246, 241, 0.16);
+  }
+
+  .vendor-note-badge-star {
+    color: #f7f6f2;
+  }
+
+  .vendor-note-meta span {
+    color: rgba(224, 221, 214, 0.52);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .vendor-note-card-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .vendor-note-action-link,
+  .vendor-note-mini-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 0.6rem 0.82rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    color: #f2f0eb;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .vendor-note-action-link.is-disabled {
+    opacity: 0.42;
+    pointer-events: none;
+  }
+
+  .vendor-note-mini-btn-danger {
+    color: rgba(236, 220, 214, 0.78);
+  }
+
+  .vendor-note-secondary-link {
+    color: rgba(244, 242, 237, 0.78);
+    font-size: 0.82rem;
+  }
+
+  .vendor-note-empty {
+    padding: 1rem;
+    border-radius: 16px;
+    border: 1px dashed rgba(255, 255, 255, 0.08);
+    color: rgba(224, 221, 214, 0.54);
+    font-size: 0.86rem;
+    line-height: 1.7;
+  }
+
+  .vendor-note-feedback {
+    min-height: 1.4rem;
+    margin: 0;
+    color: rgba(232, 228, 220, 0.62);
+    font-size: 0.84rem;
+  }
+
+  .vendor-note-feedback.is-success {
+    color: #e8e8e3;
+  }
+
+  .vendor-note-feedback.is-warning {
+    color: #d9d2c6;
+  }
+
   .bookshelf-library-list,
   .bookshelf-track-grid,
   .bookshelf-intake-grid,
@@ -4747,6 +5456,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   .gemini-field input,
+  .gemini-field select,
   .gemini-field textarea {
     width: 100%;
     border-radius: 16px;
@@ -4761,11 +5471,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   .gemini-field input::placeholder,
+  .gemini-field select::placeholder,
   .gemini-field textarea::placeholder {
     color: rgba(230, 228, 222, 0.38);
   }
 
   .gemini-field input:focus,
+  .gemini-field select:focus,
   .gemini-field textarea:focus {
     outline: none;
     border-color: rgba(247, 246, 241, 0.18);
@@ -5627,7 +6339,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .bookshelf-shelf-grid,
     .bookshelf-outline-grid,
     .bookshelf-guide-grid,
-    .bookshelf-track-grid {
+    .bookshelf-track-grid,
+    .vendor-board-layout {
       grid-template-columns: 1fr;
     }
 
@@ -5648,7 +6361,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .bookshelf-ai-decision,
     .bookshelf-outline-meta,
     .bookshelf-intake-grid,
-    .bookshelf-rule-grid {
+    .bookshelf-rule-grid,
+    .vendor-form-grid {
       grid-template-columns: 1fr 1fr;
     }
 
@@ -5682,7 +6396,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     .bookshelf-outline-meta,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
-    .gemini-editor-grid {
+    .gemini-editor-grid,
+    .vendor-form-grid {
       grid-template-columns: 1fr;
     }
 
@@ -5700,6 +6415,16 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     .quest-link-btn {
       width: 100%;
+    }
+
+    .vendor-note-card-head,
+    .vendor-note-card-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .vendor-search-field {
+      max-width: none;
     }
   }
 </style>
