@@ -630,6 +630,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                         <p>工種名錄</p>
                         <span id="vendor-note-summary">先按工種看</span>
                       </div>
+                      <div id="vendor-trade-filter" class="vendor-trade-filter"></div>
                       <label class="gemini-field vendor-search-field">
                         <span>搜尋</span>
                         <input id="vendor-note-search" type="search" placeholder="搜尋名稱、地區、印象或備註" />
@@ -798,6 +799,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   let geminiBackups = [];
   let vendorNoteEditingId = "";
   let vendorNoteSearch = "";
+  let vendorNoteTradeFilter = "";
   let contentAnalyticsState = {
     status: "idle",
     configured: false,
@@ -918,7 +920,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   function getFilteredVendorNotes() {
     const query = vendorNoteSearch.trim().toLowerCase();
-    const notes = sortVendorNotes(vendorNotesState.items || []);
+    const notes = sortVendorNotes(vendorNotesState.items || []).filter((note) =>
+      !vendorNoteTradeFilter || (note.trade || "未分類") === vendorNoteTradeFilter,
+    );
     if (!query) return notes;
     return notes.filter((note) =>
       [
@@ -955,6 +959,22 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       trade,
       items: groups.get(trade) || [],
     }));
+  }
+
+  function getVendorTradeFilterOptions() {
+    const grouped = groupVendorNotesByTrade(sortVendorNotes(vendorNotesState.items || []));
+    return [
+      {
+        value: "",
+        label: "全部",
+        count: vendorNotesState.items.length || 0,
+      },
+      ...grouped.map((group) => ({
+        value: group.trade,
+        label: group.trade,
+        count: group.items.length,
+      })),
+    ];
   }
 
   function formatVendorNoteTimestamp(value = "") {
@@ -1485,11 +1505,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const countNode = document.getElementById("vendor-note-count");
     const summaryNode = document.getElementById("vendor-note-summary");
     const searchNode = document.getElementById("vendor-note-search");
+    const filterNode = document.getElementById("vendor-trade-filter");
     const listNode = document.getElementById("vendor-note-list");
     if (
       !(countNode instanceof HTMLElement) ||
       !(summaryNode instanceof HTMLElement) ||
       !(searchNode instanceof HTMLInputElement) ||
+      !(filterNode instanceof HTMLElement) ||
       !(listNode instanceof HTMLElement)
     ) {
       return;
@@ -1500,6 +1522,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     const items = getFilteredVendorNotes();
+    const filterOptions = getVendorTradeFilterOptions();
     countNode.textContent = String(vendorNotesState.items.length || 0);
 
     if (vendorNotesState.status === "loading") {
@@ -1521,10 +1544,24 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     const groupedItems = groupVendorNotesByTrade(items);
+    filterNode.innerHTML = filterOptions
+      .map((option) => `
+        <button
+          type="button"
+          class="vendor-trade-chip ${option.value === vendorNoteTradeFilter ? "is-active" : ""}"
+          data-vendor-trade-filter="${escapeHtml(option.value)}"
+        >
+          <span>${escapeHtml(option.label)}</span>
+          <small>${escapeHtml(String(option.count))}</small>
+        </button>
+      `)
+      .join("");
     summaryNode.textContent = vendorNoteSearch
       ? `顯示 ${items.length} 筆，分成 ${groupedItems.length} 類`
-      : vendorNotesState.items.length
-        ? `已按 ${groupedItems.length} 個工種整理`
+      : vendorNoteTradeFilter
+        ? `${vendorNoteTradeFilter} 共 ${items.length} 筆`
+        : vendorNotesState.items.length
+          ? `已按 ${groupedItems.length} 個工種整理`
         : "尚未建立筆記";
 
     if (!items.length) {
@@ -4109,6 +4146,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     renderVendorNotes();
   });
 
+  document.getElementById("vendor-trade-filter")?.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target.closest("[data-vendor-trade-filter]") : null;
+    if (!(target instanceof HTMLElement)) return;
+    vendorNoteTradeFilter = target.dataset.vendorTradeFilter || "";
+    renderVendorNotes();
+  });
+
   document.getElementById("clear-vendor-note-form")?.addEventListener("click", () => {
     resetVendorNoteForm();
     setVendorNoteFeedback("已清空廠商筆記表單。", "is-warning");
@@ -5014,6 +5058,38 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .vendor-list-head {
     display: grid;
     gap: 0.9rem;
+  }
+
+  .vendor-trade-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .vendor-trade-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 36px;
+    padding: 0.45rem 0.72rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.025);
+    color: rgba(240, 236, 228, 0.74);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .vendor-trade-chip small {
+    color: rgba(224, 221, 214, 0.44);
+    font-size: 0.72rem;
+  }
+
+  .vendor-trade-chip.is-active {
+    border-color: rgba(247, 246, 241, 0.18);
+    background: linear-gradient(180deg, rgba(250, 249, 245, 0.14), rgba(209, 204, 193, 0.06));
+    color: #f7f3ea;
   }
 
   .vendor-search-field {
