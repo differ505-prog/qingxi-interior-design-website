@@ -1528,6 +1528,80 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     ].join("\n");
   }
 
+  function buildBasicProFinalizePrompt(problemText = "", aiDraft = "") {
+    const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
+    const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
+    let confirmData = {
+      category: "尚未判定",
+      track: "尚未判定",
+      chapter: "尚未判定",
+      title: "尚未判定",
+    };
+    let decision = {
+      title: "尚未判定",
+      action: "請先檢查 Flash 判題結果",
+      similar: "尚未比對",
+      angle: "請先檢查 Flash 判題結果",
+    };
+
+    try {
+      confirmData = getArticleConfirmData(aiDraftBlock);
+    } catch (error) {
+      console.error("解析 Pro 提示詞落地資訊失敗，改用預設值：", error);
+    }
+
+    try {
+      decision = getArticleAiDecision(aiDraftBlock);
+    } catch (error) {
+      console.error("解析 Pro 提示詞判題摘要失敗，改用預設值：", error);
+    }
+
+    return [
+      "你是青曦空間設計的內容總編與正式撰稿編輯。",
+      "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網的高品質文章。",
+      "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
+      "",
+      "【真實社團問題】",
+      questionBlock,
+      "",
+      "【Gemini Flash 結構化判題結果】",
+      aiDraftBlock,
+      "",
+      "【目前工作台解析出的正式落地資訊】",
+      `網站分類：${confirmData.category}`,
+      `主書系：${confirmData.track}`,
+      `章節定位：${confirmData.chapter}`,
+      `文章標題：${confirmData.title}`,
+      `判題結論：${decision.title}`,
+      `建議動作：${decision.action}`,
+      `相似舊文：${decision.similar}`,
+      `回覆視角：${decision.angle}`,
+      "",
+      "寫作要求：",
+      "1. 請把題目自然延伸成一篇完整文章，不要只重述原始發問。",
+      "2. 若地區名稱不影響法規、屋況、日照、通勤或生活條件，正式標題與內文不要把地區寫死。",
+      "3. 若牽涉預算、費用、單價或報價，只能寫保守區間、條件差異與影響因子，不可寫成保證價或正式估價口吻。",
+      "4. 文氣要穩定、乾淨、有設計感，不要推銷腔。",
+      "5. 若 Flash 的分類或標題不夠精準，你可以微調，但不要偏離原始問題。",
+      "",
+      "請固定依序輸出：",
+      "A. 文章策略確認",
+      "B. 重複風險覆核",
+      "C. 正式發布標題（1 個最推薦 + 2 個備選）",
+      "D. 正式發布摘要（120-160 字）",
+      "E. 正式發布文章（Markdown）",
+      "F. 最終發布欄位確認（網站分類 / 主書系 / 章節定位 / 文章標題 / 摘要 / 建議 slug）",
+      "G. 出書收錄備註",
+      "H. FB 粉專版",
+      "I. IG 版",
+      "J. Threads 版",
+      "K. 小紅書版",
+      "L. 封面與首句文案",
+      "M. Copilot 生圖提示詞（封面主圖 / 內文輔圖 / 延伸情境圖，各含正向提示詞與負面提示詞）",
+      "N. 最後人工檢查清單",
+    ].join("\n");
+  }
+
   function buildProFinalizePrompt(problemText = "", aiDraft = "") {
     const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
@@ -1807,13 +1881,29 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   function prepareProFinalizePrompt(question = "") {
-    articleProFinalizePrompt = buildProFinalizePrompt(question || articleSourceQuestion, articleAiResult);
+    const resolvedQuestion = question || articleSourceQuestion;
+    let usedFallback = false;
+
+    try {
+      articleProFinalizePrompt = buildProFinalizePrompt(resolvedQuestion, articleAiResult);
+    } catch (error) {
+      console.error("完整 Pro 生文提示詞生成失敗，改用穩定版：", error);
+      articleProFinalizePrompt = buildBasicProFinalizePrompt(resolvedQuestion, articleAiResult);
+      usedFallback = true;
+    }
+
+    if (!articleProFinalizePrompt.trim()) {
+      articleProFinalizePrompt = buildBasicProFinalizePrompt(resolvedQuestion, articleAiResult);
+      usedFallback = true;
+    }
+
     const saved = saveArticleProFinalizePrompt();
     renderArticleProPrompt();
     return {
       prompt: articleProFinalizePrompt,
       saved,
       hasAiResult: Boolean(articleAiResult.trim()),
+      usedFallback,
     };
   }
 
@@ -3014,23 +3104,32 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       setArticleAiFeedback("結果已整理，正在備好 Pro 生文提示詞...", "is-success");
       const promptState = prepareProFinalizePrompt(question);
       const storageOk = saved && promptState.saved;
-      setArticleAiFeedback("Pro 生文提示詞已備好，正在嘗試自動複製...", storageOk ? "is-success" : "is-warning");
+      setArticleAiFeedback(
+        promptState.usedFallback ? "Pro 生文提示詞已用穩定版備好，正在嘗試自動複製..." : "Pro 生文提示詞已備好，正在嘗試自動複製...",
+        storageOk ? "is-success" : "is-warning",
+      );
       const copyState = await copyText(promptState.prompt, "已完成判題並複製 Pro 生文提示詞。", {
         fallbackToPrompt: false,
       });
       if (copyState === "clipboard") {
-        const finalMessage = saved
-          ? (promptState.saved ? "已完成判題並複製 Pro 生文提示詞。" : "已完成判題並複製 Pro 生文提示詞，但 Pro 提示詞本機暫存寫入失敗。")
-          : "已完成判題並複製 Pro 生文提示詞，但本機暫存寫入失敗。";
+        const finalMessage = promptState.usedFallback
+          ? (storageOk ? "已完成判題並複製 Pro 生文提示詞（穩定版）。" : "已完成判題並複製 Pro 生文提示詞（穩定版），但本機暫存寫入失敗。")
+          : saved
+            ? (promptState.saved ? "已完成判題並複製 Pro 生文提示詞。" : "已完成判題並複製 Pro 生文提示詞，但 Pro 提示詞本機暫存寫入失敗。")
+            : "已完成判題並複製 Pro 生文提示詞，但本機暫存寫入失敗。";
         setFeedback(finalMessage, storageOk ? "is-success" : "is-warning");
         setArticleAiFeedback(finalMessage, storageOk ? "is-success" : "is-warning");
       } else {
         revealArticleProPrompt();
         spotlightActionButton("copy-pro-finalize-prompt");
         spotlightActionButton("copy-pro-finalize-prompt-inline");
-        const fallbackMessage = storageOk
-          ? "已完成判題，Pro 生文提示詞也已備好，但瀏覽器未完成自動複製；可直接展開下方內容手動複製，或再按一次「複製 Pro 生文提示詞」。"
-          : "已完成判題，Pro 生文提示詞也已備好，但本機暫存或自動複製未完成；目前頁面仍可直接展開下方內容手動複製。";
+        const fallbackMessage = promptState.usedFallback
+          ? (storageOk
+            ? "已完成判題，並已改用穩定版 Pro 生文提示詞；瀏覽器未完成自動複製，可直接展開下方內容手動複製。"
+            : "已完成判題，並已改用穩定版 Pro 生文提示詞；本機暫存或自動複製未完成，但頁面仍可直接展開下方內容手動複製。")
+          : storageOk
+            ? "已完成判題，Pro 生文提示詞也已備好，但瀏覽器未完成自動複製；可直接展開下方內容手動複製，或再按一次「複製 Pro 生文提示詞」。"
+            : "已完成判題，Pro 生文提示詞也已備好，但本機暫存或自動複製未完成；目前頁面仍可直接展開下方內容手動複製。";
         setFeedback(fallbackMessage, "is-warning");
         setArticleAiFeedback(fallbackMessage, "is-warning");
       }
