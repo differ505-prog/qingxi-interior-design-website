@@ -622,6 +622,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <p id="article-pro-prompt-note" class="bookshelf-confirm-note">一鍵流程完成後，這裡會先備好可直接貼去 Gemini 高階模型、用來生成 Gemini 內建 Canvas 文件稿的正式生文提示詞，再嘗試自動複製。</p>
                 <div class="bookshelf-actions bookshelf-confirm-actions">
                   <button type="button" id="copy-pro-finalize-prompt-inline" class="bookshelf-action">再次複製 Pro 生文提示詞</button>
+                  <a href="https://copilot.microsoft.com/" class="bookshelf-action" target="_blank" rel="noreferrer">開啟 Copilot 生圖</a>
                 </div>
                 <details id="article-pro-prompt-details" class="bookshelf-mini-fold">
                   <summary>
@@ -1121,6 +1122,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       actionWebsite: false,
       actionThreads: false,
       actionInstagram: false,
+      actionFacebook: false,
       actionXiaohongshu: false,
       rewardClaimed: false,
       completedAt: "",
@@ -1167,6 +1169,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         actionWebsite: migratedWebsite,
         actionThreads: Boolean(savedRun?.actionThreads),
         actionInstagram: Boolean(savedRun?.actionInstagram),
+        actionFacebook: Boolean(savedRun?.actionFacebook),
         actionXiaohongshu: Boolean(savedRun?.actionXiaohongshu),
       };
     });
@@ -1201,7 +1204,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   function isRunComplete(run) {
-    return run.actionOutreach && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionXiaohongshu;
+    return run.actionOutreach && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
   }
 
   function normalizeWeeklyState() {
@@ -1303,12 +1306,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     const complete = isRunComplete(run);
     const actionOneComplete = run.actionOutreach;
-    const actionTwoComplete = run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionXiaohongshu;
+    const actionTwoComplete = run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
     const completedSteps = [
       run.actionOutreach,
       run.actionWebsite,
       run.actionThreads,
       run.actionInstagram,
+      run.actionFacebook,
       run.actionXiaohongshu,
     ].filter(Boolean).length;
     const progressLabel = `(${activeRunIndex + 1}/${WEEKLY_TARGET})`;
@@ -1331,10 +1335,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
             </div>
             <p class="quest-main-copy">在 FB 或 LINE 社團給予專業建議，附上官網文章或估價器連結。</p>
             <div class="quest-checklist">
-              <label class="quest-check ${run.actionOutreach ? "is-checked" : ""}">
-                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionOutreach" ${run.actionOutreach ? "checked" : ""} />
-                <span>已在 FB 或 LINE 社團完成一次專業回覆並附上文章或估價器</span>
-              </label>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionOutreach ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionOutreach" ${run.actionOutreach ? "checked" : ""} />
+                  <span>已在 FB 或 LINE 社團完成一次專業回覆並附上文章或估價器</span>
+                </label>
+              </div>
             </div>
           </section>
           <section class="quest-main ${actionTwoComplete ? "is-complete" : ""}">
@@ -1346,28 +1352,41 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               <span>${actionTwoComplete ? "已完成" : "進行中"}</span>
             </div>
             <p class="quest-main-copy">利用 LLM 完成官網發布（含圖），再同步分發至 Threads、IG 與小紅書（COPE 戰略）。</p>
-            <div class="quest-link-row">
-              <a class="quest-link-btn" href="${THREADS_PROFILE_URL}" target="_blank" rel="noreferrer">Threads</a>
-              <a class="quest-link-btn" href="${INSTAGRAM_PROFILE_URL}" target="_blank" rel="noreferrer">Instagram</a>
-              <a class="quest-link-btn" href="${FACEBOOK_PAGE_URL}" target="_blank" rel="noreferrer">Facebook 粉專</a>
-            </div>
             <div class="quest-checklist">
-              <label class="quest-check ${run.actionWebsite ? "is-checked" : ""}">
-                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionWebsite" ${run.actionWebsite ? "checked" : ""} />
-                <span>已完成官網 po 文與配圖上稿</span>
-              </label>
-              <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
-                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
-                <span>已改寫並發佈 Threads</span>
-              </label>
-              <label class="quest-check ${run.actionInstagram ? "is-checked" : ""}">
-                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionInstagram" ${run.actionInstagram ? "checked" : ""} />
-                <span>已改寫並發佈 IG</span>
-              </label>
-              <label class="quest-check ${run.actionXiaohongshu ? "is-checked" : ""}">
-                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionXiaohongshu" ${run.actionXiaohongshu ? "checked" : ""} />
-                <span>已改寫並發佈小紅書</span>
-              </label>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionWebsite ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionWebsite" ${run.actionWebsite ? "checked" : ""} />
+                  <span>已完成官網 po 文與配圖上稿</span>
+                </label>
+                <a class="quest-link-btn" href="${BLOG_INDEX_URL}" target="_blank" rel="noreferrer">官網</a>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
+                  <span>已改寫並發佈 Threads</span>
+                </label>
+                <a class="quest-link-btn" href="${THREADS_PROFILE_URL}" target="_blank" rel="noreferrer">Threads</a>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionInstagram ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionInstagram" ${run.actionInstagram ? "checked" : ""} />
+                  <span>已改寫並發佈 Instagram</span>
+                </label>
+                <a class="quest-link-btn" href="${INSTAGRAM_PROFILE_URL}" target="_blank" rel="noreferrer">Instagram</a>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionFacebook ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionFacebook" ${run.actionFacebook ? "checked" : ""} />
+                  <span>已改寫並轉 po Facebook 粉專</span>
+                </label>
+                <a class="quest-link-btn" href="${FACEBOOK_PAGE_URL}" target="_blank" rel="noreferrer">Facebook</a>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionXiaohongshu ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionXiaohongshu" ${run.actionXiaohongshu ? "checked" : ""} />
+                  <span>已改寫並發佈小紅書</span>
+                </label>
+              </div>
             </div>
           </section>
         </div>
@@ -5348,11 +5367,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     line-height: 1.7;
   }
 
-  .quest-link-row {
+  .quest-check-row {
     display: flex;
+    align-items: stretch;
     flex-wrap: wrap;
     gap: 0.58rem;
-    margin-top: -0.06rem;
+  }
+
+  .quest-check-row .quest-check {
+    flex: 1 1 260px;
   }
 
   .quest-link-btn {
@@ -5360,6 +5383,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     align-items: center;
     justify-content: center;
     min-height: 2rem;
+    min-width: 6.75rem;
     padding: 0.52rem 0.82rem;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -5555,6 +5579,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     .bookshelf-fold-stack {
       padding-inline: 0.9rem;
+    }
+
+    .quest-check-row {
+      flex-direction: column;
+    }
+
+    .quest-link-btn {
+      width: 100%;
     }
   }
 </style>
