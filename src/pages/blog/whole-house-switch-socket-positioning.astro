@@ -1,10 +1,12 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
 
 const articleTitle = "畫出家的神經系統——全屋開關與插座的最適定位";
 const articleDescription =
   "整理全屋開關與插座定位原則，從生活動線、家具尺寸到常見錯誤，幫助裝修前先把隱蔽工程規劃清楚。";
 const articlePublishedTime = "2025-11-12T00:00:00+08:00";
+const articleDateLabel = "2025-11-12";
+const articleCategoryLabel = "水電篇";
 const articleImage = "/images/blog/插座被沙發遮蓋住.png";
 const articleStructuredData = [
   {
@@ -28,168 +30,19 @@ const articleStructuredData = [
   },
 ];
 ---
-
-<style>
-  .article-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 4rem 1rem;
-  }
-  
-  .article-header {
-    margin-bottom: 3rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid #E8D5C4;
-  }
-  
-  .article-meta {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    color: #6B7280;
-  }
-  
-  .article-category {
-    background: var(--accent);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
-    font-weight: 500;
-  }
-  
-  .article-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary);
-    line-height: 1.3;
-    margin: 0;
-  }
-  
-  .article-content {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: #374151;
-  }
-  
-  .article-content h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: var(--primary);
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--secondary);
-  }
-  
-  .article-content h3 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--primary-light);
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-  }
-  
-  .article-content p {
-    margin-bottom: 1.5rem;
-  }
-  
-  .article-content strong {
-    color: var(--primary);
-    font-weight: 600;
-  }
-  
-  .article-content ul, .article-content ol {
-    margin-bottom: 1.5rem;
-    padding-left: 2rem;
-  }
-  
-  .article-content li {
-    margin-bottom: 0.75rem;
-  }
-  
-  .article-content ul ul {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .article-content img {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 2rem 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-  
-  .article-content .image-caption {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #6B7280;
-    margin-top: -1rem;
-    margin-bottom: 2rem;
-    font-style: italic;
-  }
-  
-  .back-link {
-    display: inline-block;
-    margin-top: 3rem;
-    padding: 0.75rem 1.5rem;
-    background: var(--secondary);
-    color: var(--primary);
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
-  
-  .back-link:hover {
-    background: var(--accent);
-    color: white;
-    transform: translateX(-4px);
-  }
-  
-  @media (max-width: 768px) {
-    .article-title {
-      font-size: 1.75rem;
-    }
-    
-    .article-content {
-      font-size: 1rem;
-    }
-    
-    .article-content h2 {
-      font-size: 1.5rem;
-    }
-    
-    .article-content h3 {
-      font-size: 1.25rem;
-    }
-  }
-</style>
-
-<BaseLayout
-  title="畫出家的神經系統——全屋開關與插座的最適定位 - 青曦空間設計"
+<EditorialArticleLayout
+  title={articleTitle}
   description={articleDescription}
   ogImage={articleImage}
-  pageType="article"
   publishedTime={articlePublishedTime}
   modifiedTime={articlePublishedTime}
   structuredData={articleStructuredData}
+  category={articleCategoryLabel}
+  dateLabel={articleDateLabel}
 >
-  <article class="article-container">
-    <header class="article-header">
-      <div class="article-meta">
-        <span class="article-category">水電篇</span>
-        <span class="article-date">2025-11-12</span>
-      </div>
-      <h1 class="article-title">第一章：畫出家的神經系統——全屋開關與插座的最適定位</h1>
-    </header>
-    
-    <div class="article-content">
-      <p>水電工程是裝修的「隱蔽工程」，如同人體的神經與血脈，深藏在牆體與地板之下。而開關與插座的定位，則是這套神經系統的「使用者介面」，是居住者每日互動最頻繁的部分。</p>
+      <p class="article-lead">水電工程是裝修的隱蔽工程，如同人體的神經與血脈，深藏在牆體與地板之下。而開關與插座的定位，則是這套系統真正與生活接觸的介面，是居住者每天都會反覆使用的細節。</p>
       
-      <p>定位失當，是裝修後滿意度最低、且最難以補救的項目之一。許多人直到傢俱進場，才驚覺插座被遮擋，或開關位置極不順手。本章節的核心，便是教導讀者如何依據「生活動線」與「傢俱配置」，規劃出真正符合人體工學的迴路。</p>
+      <p>定位失當，是裝修後滿意度最低、也最難補救的項目之一。許多人直到家具進場，才驚覺插座被遮擋，或開關位置極不順手。本章的核心，便是教讀者如何依據生活動線與家具配置，規劃出真正符合人體工學的迴路。</p>
       
       <h2>第一節：開關配置黃金律——動線與高度</h2>
       
@@ -209,7 +62,7 @@ const articleStructuredData = [
       <p>插座規劃的失敗，九成來自於「未精確考量傢俱尺寸」。插座高度必須「高於」或「避開」對應的傢俱。</p>
       
       <img src="/images/blog/插座被沙發遮蓋住.png" alt="插座被沙發遮擋的錯誤示範">
-      <p class="image-caption">圖：常見錯誤——插座被沙發完全遮擋，無法使用</p>
+      <p class="image-caption">常見錯誤示範：插座被沙發完全遮擋，等到入住後才發現根本無法使用。</p>
       
       <h3>1. 各區域建議配置參考（離地高度）</h3>
       
@@ -240,7 +93,7 @@ const articleStructuredData = [
       </ul>
       
       <img src="/images/blog/床頭櫃插座黃金高度.png" alt="床頭櫃插座正確高度示意">
-      <p class="image-caption">圖：床頭插座的黃金高度（60-75 cm），高於床頭櫃</p>
+      <p class="image-caption">床頭插座的黃金高度約為 60 至 75 公分，應高於床頭櫃檯面，才能保有真正順手的使用體驗。</p>
       
       <ul>
         <li><strong>書桌/梳妝台 (90-110 cm)：</strong>關鍵高度。必須高於桌面（通常 75-80 cm），避免被遮擋。</li>
@@ -260,8 +113,4 @@ const articleStructuredData = [
         <li><strong>專屬插座：</strong>固定電器的專屬插座，最好就近安置並隱藏。</li>
         <li><strong>弱化存在感：</strong>備用插座可採用與牆面同色系的面板，降低視覺雜亂感。</li>
       </ul>
-    </div>
-    
-    <a href="/blog" class="back-link">← 返回知識分享</a>
-  </article>
-</BaseLayout>
+</EditorialArticleLayout>

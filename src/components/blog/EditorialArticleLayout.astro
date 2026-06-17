@@ -1,0 +1,341 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage: string;
+  publishedTime: string;
+  modifiedTime?: string;
+  structuredData?: unknown;
+  category: string;
+  dateLabel: string;
+  kicker?: string;
+  dek?: string;
+  coverAlt?: string;
+  backHref?: string;
+  backLabel?: string;
+  htmlContent?: string;
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  publishedTime,
+  modifiedTime = publishedTime,
+  structuredData,
+  category,
+  dateLabel,
+  kicker = "Qingxi Journal",
+  dek = description,
+  coverAlt = title,
+  backHref = "/blog",
+  backLabel = "← 返回知識分享",
+  htmlContent,
+} = Astro.props;
+---
+
+<style>
+  .article-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 5.75rem 1.5rem 6rem;
+  }
+
+  .article-header {
+    max-width: 860px;
+    margin: 0 auto 4rem;
+    text-align: center;
+  }
+
+  .article-kicker {
+    margin: 0 0 1rem;
+    color: var(--tiffany-dark);
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  .article-meta {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.15rem;
+    font-size: 0.84rem;
+    letter-spacing: 0.14em;
+    color: #7b8794;
+    flex-wrap: wrap;
+    text-transform: uppercase;
+  }
+
+  .article-category {
+    background: rgba(129, 199, 212, 0.12);
+    color: var(--tiffany-dark);
+    padding: 0.38rem 0.82rem;
+    border-radius: 999px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+  }
+
+  .article-title {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(2.65rem, 4.4vw, 4.45rem);
+    font-weight: 500;
+    color: #23313f;
+    line-height: 1.42;
+    letter-spacing: 0.035em;
+  }
+
+  .article-dek {
+    max-width: 42rem;
+    margin: 1.4rem auto 0;
+    color: #5f6d7b;
+    font-size: 1.06rem;
+    line-height: 1.95;
+    letter-spacing: 0.01em;
+  }
+
+  .article-cover {
+    max-width: 980px;
+    width: 100%;
+    margin: 0 auto 4rem;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 26px 60px rgba(31, 41, 55, 0.12);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.92),
+      rgba(247, 244, 238, 0.92)
+    );
+  }
+
+  .article-cover img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  .article-content {
+    max-width: 720px;
+    margin: 0 auto;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.08rem;
+    line-height: 2.02;
+    color: #3f4a57;
+    letter-spacing: 0.015em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .article-content :global(h2) {
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.85rem;
+    font-weight: 500;
+    color: #243342;
+    margin-top: 4rem;
+    margin-bottom: 1.4rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(129, 199, 212, 0.28);
+    letter-spacing: 0.025em;
+    line-height: 1.55;
+  }
+
+  .article-content :global(h3) {
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.34rem;
+    font-weight: 500;
+    color: #324253;
+    margin-top: 2.3rem;
+    margin-bottom: 0.9rem;
+    letter-spacing: 0.015em;
+    line-height: 1.7;
+  }
+
+  .article-content :global(p) {
+    margin: 0 0 1.55rem;
+  }
+
+  .article-content :global(.article-lead) {
+    font-size: 1.24rem;
+    line-height: 1.98;
+    color: #2f3c4a;
+    letter-spacing: 0.018em;
+    margin-bottom: 2rem;
+  }
+
+  .article-content :global(strong) {
+    color: #243342;
+    font-weight: 600;
+  }
+
+  .article-content :global(ul),
+  .article-content :global(ol) {
+    margin: 0 0 1.75rem;
+    padding-left: 1.35rem;
+  }
+
+  .article-content :global(li) {
+    margin-bottom: 0.85rem;
+    padding-left: 0.2rem;
+  }
+
+  .article-content :global(blockquote) {
+    margin: 2.75rem 0;
+    padding: 1.35rem 1.6rem;
+    border-top: 1px solid rgba(129, 199, 212, 0.26);
+    border-bottom: 1px solid rgba(129, 199, 212, 0.26);
+    background: linear-gradient(
+      180deg,
+      rgba(129, 199, 212, 0.06),
+      rgba(129, 199, 212, 0.02)
+    );
+    color: #4f5b67;
+    font-size: 1.04rem;
+    line-height: 1.95;
+  }
+
+  .article-content :global(a) {
+    color: var(--tiffany-dark);
+    text-decoration: underline;
+    text-decoration-color: rgba(129, 199, 212, 0.4);
+    text-underline-offset: 0.16em;
+  }
+
+  .article-content :global(img) {
+    width: 100%;
+    display: block;
+    border-radius: 18px;
+    box-shadow: 0 18px 42px rgba(31, 41, 55, 0.1);
+    background: #f7f4ee;
+    border: 1px solid rgba(129, 199, 212, 0.12);
+    margin: 2.8rem 0 0;
+  }
+
+  .article-content :global(.image-caption) {
+    max-width: 32rem;
+    margin: 0.95rem auto 2.2rem;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #768391;
+    text-align: center;
+    letter-spacing: 0.015em;
+  }
+
+  .article-content :global(.article-figure) {
+    margin: 2.8rem 0;
+  }
+
+  .article-content :global(.article-figure img) {
+    margin: 0;
+  }
+
+  .article-content :global(.article-figure figcaption) {
+    max-width: 32rem;
+    margin: 0.95rem auto 0;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    color: #768391;
+    text-align: center;
+    letter-spacing: 0.015em;
+  }
+
+  .article-content :global(.article-gallery) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.45rem;
+    margin: 3rem 0 0.75rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 4rem;
+    padding: 0.85rem 1.55rem;
+    background: rgba(129, 199, 212, 0.12);
+    color: #243342;
+    text-decoration: none;
+    border-radius: 999px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(129, 199, 212, 0.2);
+  }
+
+  .back-link:hover {
+    background: rgba(129, 199, 212, 0.2);
+    transform: translateX(-3px);
+  }
+
+  @media (max-width: 768px) {
+    .article-shell {
+      padding: 4.75rem 1.15rem 5rem;
+    }
+
+    .article-header {
+      margin-bottom: 3rem;
+    }
+
+    .article-title {
+      font-size: 2.15rem;
+    }
+
+    .article-dek,
+    .article-content {
+      font-size: 1rem;
+    }
+
+    .article-content :global(.article-lead) {
+      font-size: 1.08rem;
+    }
+
+    .article-content :global(h2) {
+      font-size: 1.5rem;
+    }
+
+    .article-content :global(.article-gallery) {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<BaseLayout
+  title={`${title} - 青曦空間設計`}
+  description={description}
+  ogImage={ogImage}
+  pageType="article"
+  publishedTime={publishedTime}
+  modifiedTime={modifiedTime}
+  structuredData={structuredData}
+>
+  <article class="article-shell">
+    <header class="article-header">
+      <p class="article-kicker">{kicker}</p>
+      <div class="article-meta">
+        <span class="article-category">{category}</span>
+        <span class="article-date">{dateLabel}</span>
+      </div>
+      <h1 class="article-title">{title}</h1>
+      <p class="article-dek">{dek}</p>
+    </header>
+
+    <figure class="article-cover">
+      <img src={ogImage} alt={coverAlt} />
+    </figure>
+
+    {
+      htmlContent ? (
+        <div class="article-content" set:html={htmlContent} />
+      ) : (
+        <div class="article-content">
+          <slot />
+        </div>
+      )
+    }
+
+    <a href={backHref} class="back-link">{backLabel}</a>
+  </article>
+</BaseLayout>

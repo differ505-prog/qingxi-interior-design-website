@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
 import * as contentful from "contentful";
 import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
 
@@ -69,21 +69,30 @@ if (response.items.length === 0) {
 }
 
 const item = response.items[0];
+const fields = item.fields as Record<string, any>;
+const postTitle = String(fields.title ?? "");
+const postSlug = String(fields.slug ?? slug ?? "");
+const postDateSource = String(fields.date ?? "");
+const postSummary = String(fields.summary ?? "");
+const postCategory = String(fields.category ?? "");
+const postContent = fields.content as any;
+const coverImageUrl = fields.coverImage?.fields?.file?.url;
+
 const post = {
-  title: item.fields.title,
-  slug: item.fields.slug,
-  date: new Date(item.fields.date).toISOString().split("T")[0],
-  summary: item.fields.summary,
-  category: item.fields.category,
-  content: item.fields.content,
-  coverImage: item.fields.coverImage?.fields?.file?.url
-    ? `https:${item.fields.coverImage.fields.file.url}`
+  title: postTitle,
+  slug: postSlug,
+  date: new Date(postDateSource).toISOString().split("T")[0],
+  summary: postSummary,
+  category: postCategory,
+  content: postContent,
+  coverImage: coverImageUrl
+    ? `https:${coverImageUrl}`
     : "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=1200",
 };
 
 // 將 Rich Text 轉換為 HTML
 const contentHtml = documentToHtmlString(post.content);
-const publishedTime = new Date(item.fields.date).toISOString();
+const publishedTime = new Date(postDateSource).toISOString();
 const modifiedTime = item.sys?.updatedAt ? new Date(item.sys.updatedAt).toISOString() : publishedTime;
 const articleStructuredData = [
   {
@@ -107,187 +116,14 @@ const articleStructuredData = [
   },
 ];
 ---
-
-<style>
-  /* 文章頁面 - 文學雜誌質感 - 強制應用襯線字體 */
-  article {
-    font-family: "Noto Serif TC", serif !important;
-  }
-  .article-header {
-    max-width: 900px;
-    margin: 0 auto 3rem;
-    text-align: center;
-  }
-
-  .article-category {
-    display: inline-block;
-    background: var(--accent);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 1rem;
-  }
-
-  .article-title {
-    font-family: "Noto Serif TC", serif;
-    font-size: 2.5rem;
-    font-weight: 500;
-    color: #2c3e50;
-    margin-bottom: 1rem;
-    line-height: 1.4;
-    letter-spacing: 0.02em;
-  }
-
-  .article-date {
-    font-size: 1rem;
-    color: #6b7280;
-    margin-bottom: 2rem;
-  }
-
-  .article-cover {
-    width: 100%;
-    max-width: 900px;
-    height: 400px;
-    margin: 0 auto 3rem;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  }
-
-  .article-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .article-content {
-    max-width: 800px;
-    margin: 0 auto;
-    font-family: "Noto Serif TC", serif;
-    font-size: 1.125rem;
-    font-weight: 400;
-    line-height: 2;
-    color: #374151;
-    letter-spacing: 0.03em;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .article-content :global(h2) {
-    font-family: "Noto Serif TC", serif;
-    font-size: 1.875rem;
-    font-weight: 500;
-    color: #2c3e50;
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
-    letter-spacing: 0.02em;
-    line-height: 1.5;
-  }
-
-  .article-content :global(h3) {
-    font-family: "Noto Serif TC", serif;
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #2c3e50;
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
-    letter-spacing: 0.02em;
-    line-height: 1.5;
-  }
-
-  .article-content :global(p) {
-    margin-bottom: 1.8rem;
-    text-indent: 0em;
-  }
-
-  .article-content :global(ul),
-  .article-content :global(ol) {
-    margin-bottom: 1.5rem;
-    padding-left: 2rem;
-  }
-
-  .article-content :global(li) {
-    margin-bottom: 0.5rem;
-  }
-
-  .article-content :global(strong) {
-    font-weight: 600;
-    color: #1f2937;
-  }
-
-  .article-content :global(a) {
-    color: var(--accent);
-    text-decoration: underline;
-  }
-
-  .article-content :global(blockquote) {
-    border-left: 4px solid var(--tiffany-primary);
-    padding-left: 2rem;
-    padding-right: 1rem;
-    margin: 2.5rem 0;
-    font-style: italic;
-    font-size: 1.05rem;
-    color: #6b7280;
-    line-height: 1.9;
-    background: var(--tiffany-pale);
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    border-radius: 0 8px 8px 0;
-  }
-
-  .back-link {
-    display: inline-block;
-    color: var(--accent);
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-  }
-
-  .back-link:hover {
-    transform: translateX(-5px);
-  }
-
-  @media (max-width: 768px) {
-    .article-title {
-      font-size: 2rem;
-    }
-
-    .article-cover {
-      height: 250px;
-    }
-
-    .article-content {
-      font-size: 1rem;
-    }
-  }
-</style>
-
-<BaseLayout
-  title={`${post.title} - 青曦空間設計`}
+<EditorialArticleLayout
+  title={post.title}
   description={post.summary}
   ogImage={post.coverImage}
-  pageType="article"
   publishedTime={publishedTime}
   modifiedTime={modifiedTime}
   structuredData={articleStructuredData}
->
-  <article style="padding: 4rem 1rem;">
-    <div class="article-header">
-      <span class="article-category">{post.category}</span>
-      <h1 class="article-title">{post.title}</h1>
-      <p class="article-date">{post.date}</p>
-    </div>
-
-    <div class="article-cover">
-      <img src={post.coverImage} alt={post.title} />
-    </div>
-
-    <div class="article-content" set:html={contentHtml} />
-
-    <div style="text-align: center; margin-top: 3rem;">
-      <a href="/blog" class="back-link">← 返回知識分享</a>
-    </div>
-  </article>
-</BaseLayout>
+  category={post.category}
+  dateLabel={post.date}
+  htmlContent={contentHtml}
+/>

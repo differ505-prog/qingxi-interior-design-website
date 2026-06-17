@@ -160,8 +160,60 @@ const mergedPosts = [...posts, ...staticPosts]
   .category-filters {
     display: flex;
     gap: 0.75rem;
-    margin-bottom: 2.75rem;
+    margin: 1.5rem 0 0;
     flex-wrap: wrap;
+  }
+
+  .blog-library {
+    padding: 2rem;
+    border-radius: 32px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 244, 238, 0.94));
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 24px 55px rgba(47, 47, 47, 0.05);
+  }
+
+  .library-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1.5rem;
+    margin-bottom: 2.4rem;
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid rgba(129, 199, 212, 0.18);
+  }
+
+  .library-kicker {
+    margin: 0 0 0.85rem;
+    color: var(--tiffany-dark);
+    font-size: 0.78rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  .library-title {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(1.8rem, 2.8vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+    color: var(--gray-darkest);
+  }
+
+  .library-description {
+    margin: 0.75rem 0 0;
+    max-width: 40rem;
+    color: var(--gray-medium);
+    line-height: 1.9;
+  }
+
+  .library-count {
+    margin: 0;
+    color: var(--gray-light);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .category-btn {
@@ -335,8 +387,13 @@ const mergedPosts = [...posts, ...staticPosts]
 
   @media (max-width: 900px) {
     .blog-hero,
+    .library-header,
     .post-card {
       grid-template-columns: 1fr;
+    }
+
+    .library-header {
+      align-items: start;
     }
   }
 
@@ -346,7 +403,8 @@ const mergedPosts = [...posts, ...staticPosts]
     }
 
     .post-content,
-    .blog-panel {
+    .blog-panel,
+    .blog-library {
       padding: 1.5rem;
     }
 
@@ -380,57 +438,70 @@ const mergedPosts = [...posts, ...staticPosts]
       </aside>
     </div>
 
-    <div class="category-filters">
-      <button class="category-btn active" data-category="全部">全部</button>
-      <button class="category-btn" data-category="裝修預算">裝修預算</button>
-      <button class="category-btn" data-category="水電篇">水電篇</button>
-      <button class="category-btn" data-category="木工篇">木工篇</button>
-      <button class="category-btn" data-category="泥作篇">泥作篇</button>
-      <button class="category-btn" data-category="油漆篇">油漆篇</button>
-      <button class="category-btn" data-category="估價篇">估價篇</button>
-      <button class="category-btn" data-category="設計篇">設計篇</button>
-      <button class="category-btn" data-category="軟裝佈置">軟裝佈置</button>
-    </div>
+    <section class="blog-library">
+      <div class="library-header">
+        <div>
+          <p class="library-kicker">Editorial Archive</p>
+          <h2 class="library-title">以設計判斷為核心，整理可慢慢閱讀的裝修知識。</h2>
+          <p class="library-description">
+            內容依照預算、基礎施工與生活尺度分門整理，讓你從做決策之前，就先看見真正會影響入住感受的重點。
+          </p>
+        </div>
+        <p class="library-count">{mergedPosts.length} articles</p>
+      </div>
 
-    <div class="blog-list">
-      {
-        mergedPosts.length > 0 ? (
-          mergedPosts.map((post) => (
-            <a
-              href={`/blog/${post.slug}`}
-              class="post-card"
-              data-post-category={post.category}
-            >
-              <div class="post-image">
-                <img src={post.coverImage} alt={post.title} />
-              </div>
-              <div class="post-content">
-                <span class="post-category">{post.category}</span>
-                <h2 class="post-title">{post.title}</h2>
-                <p class="post-date">{post.date}</p>
-                <p class="post-summary">{post.summary}</p>
-                <span class="post-link">閱讀文章</span>
-              </div>
-            </a>
-          ))
-        ) : (
-          <div class="empty-state">
-            <strong>知識內容正在整理中</strong>
-            {errorMessage ? (
-              <>
-                <p>{errorMessage}</p>
-                <p>請檢查 `.env` 文件或部署環境中的 Contentful 設定。</p>
-              </>
-            ) : (
-              <>
-                <p>請在 `.env` 中配置 Contentful 環境變數以連接內容管理系統。</p>
-                <p>需要設置：`CONTENTFUL_SPACE_ID` 與 `CONTENTFUL_ACCESS_TOKEN`。</p>
-              </>
-            )}
-          </div>
-        )
-      }
-    </div>
+      <div class="category-filters">
+        <button class="category-btn active" data-category="全部">全部</button>
+        <button class="category-btn" data-category="裝修預算">裝修預算</button>
+        <button class="category-btn" data-category="水電篇">水電篇</button>
+        <button class="category-btn" data-category="木工篇">木工篇</button>
+        <button class="category-btn" data-category="泥作篇">泥作篇</button>
+        <button class="category-btn" data-category="油漆篇">油漆篇</button>
+        <button class="category-btn" data-category="估價篇">估價篇</button>
+        <button class="category-btn" data-category="設計篇">設計篇</button>
+        <button class="category-btn" data-category="軟裝佈置">軟裝佈置</button>
+      </div>
+
+      <div class="blog-list">
+        {
+          mergedPosts.length > 0 ? (
+            mergedPosts.map((post) => (
+              <a
+                href={`/blog/${post.slug}`}
+                class="post-card"
+                data-post-category={post.category}
+              >
+                <div class="post-image">
+                  <img src={post.coverImage} alt={post.title} />
+                </div>
+                <div class="post-content">
+                  <span class="post-category">{post.category}</span>
+                  <h2 class="post-title">{post.title}</h2>
+                  <p class="post-date">{post.date}</p>
+                  <p class="post-summary">{post.summary}</p>
+                  <span class="post-link">閱讀文章</span>
+                </div>
+              </a>
+            ))
+          ) : (
+            <div class="empty-state">
+              <strong>知識內容正在整理中</strong>
+              {errorMessage ? (
+                <>
+                  <p>{errorMessage}</p>
+                  <p>請檢查 `.env` 文件或部署環境中的 Contentful 設定。</p>
+                </>
+              ) : (
+                <>
+                  <p>請在 `.env` 中配置 Contentful 環境變數以連接內容管理系統。</p>
+                  <p>需要設置：`CONTENTFUL_SPACE_ID` 與 `CONTENTFUL_ACCESS_TOKEN`。</p>
+                </>
+              )}
+            </div>
+          )
+        }
+      </div>
+    </section>
   </section>
 
   <script>
