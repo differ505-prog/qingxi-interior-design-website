@@ -105,7 +105,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
 <BaseLayout
   title="裝修估價器 - 青曦空間設計"
-  description="簡單快速估算室內裝修預算，了解您的設計花費範圍"
+  description="先抓出裝修預算帶，判斷要不要往下談。"
   ogImage="/images/portfolio/xizhi-3.jpg"
   pageType="service"
 >
@@ -114,16 +114,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       <div class="calculator-header">
         <p class="eyebrow">RENOVATION ESTIMATOR</p>
         <h1>裝修估價器</h1>
-        <p class="subtitle">先抓出預算帶與工程方向。</p>
+        <p class="subtitle">先抓出預算帶，判斷下一步。</p>
         <div class="calculator-lead-note">
           <span>快速試算預算帶</span>
           <span>結果可直接帶入需求表</span>
-          <span>讓諮詢更快進重點</span>
-        </div>
-        <div class="hero-reassurance">
-          <span>不需先留電話</span>
-          <span>約 1 分鐘完成</span>
-          <span>結果可直接帶入諮詢</span>
         </div>
         <div class="hero-actions">
           <a href="#estimator-form" class="btn btn-primary" data-estimator-cta="start-estimate">開始試算</a>
@@ -135,7 +129,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         <section class="landing-card">
           <div class="landing-card-header">
             <h2>這個工具適合誰</h2>
-            <p>如果你還在前期判斷，先試算會更有效。</p>
+            <p>如果你還在前期判斷，先試算就夠了。</p>
           </div>
           <div class="landing-points">
             <div class="landing-point">
@@ -144,11 +138,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             </div>
             <div class="landing-point">
               <strong>老屋翻新或局部整理</strong>
-              <span>先判斷哪些工項是主要成本來源。</span>
-            </div>
-            <div class="landing-point">
-              <strong>想先做前期判讀</strong>
-              <span>還沒準備好完整需求，也能先了解大概規模。</span>
+              <span>還沒準備好完整需求，也能先抓大概規模與主要成本。</span>
             </div>
           </div>
         </section>
@@ -160,12 +150,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           </div>
           <div class="landing-points">
             <div class="landing-point">
-              <strong>預算帶與每坪抓法</strong>
-              <span>先知道總價區間、設計費與工程費。</span>
-            </div>
-            <div class="landing-point">
-              <strong>工程拆解與判讀建議</strong>
-              <span>幫你看出預算主要落點。</span>
+              <strong>預算帶與主要落點</strong>
+              <span>先知道總價區間、每坪抓法與主要工項。</span>
             </div>
             <div class="landing-point">
               <strong>可直接帶入需求表</strong>
@@ -294,7 +280,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         <div class="result-section">
           <h2>預估結果</h2>
           <p class="result-subtitle" id="result-subtitle">
-            先整理出適合討論的預算帶與工程範圍。
+            先看目前可討論的預算帶。
           </p>
 
           <div class="result-card">
@@ -332,7 +318,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="breakdown-card">
             <div class="breakdown-header">
               <h3>工程拆解</h3>
-              <p>先看目前工項的大致比例。</p>
+                <p>先看目前工項比例。</p>
             </div>
             <div class="breakdown-list" id="breakdown-list"></div>
           </div>
@@ -341,7 +327,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             <div class="advice-card">
               <div class="advice-header">
                 <h3>估算判讀</h3>
-                <p>只保留目前最值得先注意的 2 個重點，幫你快速判讀方向。</p>
+                <p>只留目前最值得先注意的 2 個重點。</p>
               </div>
               <ul class="advice-list" id="advice-list"></ul>
             </div>
@@ -357,7 +343,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="estimator-handoff-card">
             <div class="estimator-handoff-copy">
               <p class="estimator-handoff-eyebrow">BEST NEXT STEP</p>
-              <h3 id="estimator-handoff-title">把這次估算帶進完整需求表？</h3>
+              <h3 id="estimator-handoff-title">下一步：帶著估算填需求表</h3>
               <p id="estimator-handoff-description" class="estimator-handoff-description">
                 再補需求、照片與時程，青曦就能更快判斷方向。
               </p>
@@ -367,8 +353,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                   <span>這次試算摘要會一起帶進需求表。</span>
                 </div>
                 <div class="estimator-handoff-point">
-                  <strong id="estimator-handoff-point-title">最適合下一步整理需求</strong>
-                  <span id="estimator-handoff-point-description">如果你已經有大致預算方向，這一步最有效率。</span>
+                  <strong id="estimator-handoff-point-title">這一步最有效率</strong>
+                  <span id="estimator-handoff-point-description">如果你已經有大致預算方向，就直接往下整理需求。</span>
                 </div>
               </div>
             </div>
@@ -387,16 +373,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               >
                 先帶著結果諮詢
               </a>
-              <p class="estimator-handoff-note">若你只想先抓範圍，也可以先保留這次結果。</p>
+              <p class="estimator-handoff-note">若你只想先抓範圍，也可以先保留結果。</p>
             </div>
           </div>
 
           <div class="report-offer-card">
             <div class="report-offer-copy">
               <p class="report-offer-eyebrow">ESTIMATE FOLLOW-UP</p>
-              <h3>如果你想更看懂這次試算，可直接索取費用拆解報告。</h3>
+              <h3>想更看懂這次試算，可直接索取拆解報告。</h3>
               <p class="report-offer-description">
-                青曦會依這次條件整理初步拆解方向，幫你更快看懂預算主要落點。
+                青曦會依這次條件整理初步拆解方向，幫你更快看懂預算落點。
               </p>
               <div class="report-offer-points">
                 <div class="report-offer-point">
@@ -406,10 +392,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 <div class="report-offer-point">
                   <strong>適合目前這種前期階段</strong>
                   <span id="report-context">特別適合正在抓新成屋或住宅裝修預算方向的人。</span>
-                </div>
-                <div class="report-offer-point">
-                  <strong>最推薦的下一步</strong>
-                  <span>先索取報告，再安排到工作室看材質與聊方向。</span>
                 </div>
               </div>
             </div>
@@ -498,18 +480,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             <p>{estimatorConfig.disclaimer}</p>
           </div>
 
-          <div class="cta-buttons">
-            <a href="/requirement-form" class="btn btn-primary" data-estimator-cta="requirement-form">帶著估算結果填完整需求表</a>
-            <a href="/contact?intent=budget-review&source=estimator" class="btn btn-secondary" data-estimator-cta="contact">先帶著結果諮詢</a>
-          </div>
-          <p class="cta-note">若你已有大致預算方向，最有效的下一步通常是先補完整需求。</p>
         </div>
       </div>
 
       <section class="faq-panel">
         <div class="faq-header">
           <h2>常見問題</h2>
-          <p>先回答最常被問的 3 個問題。</p>
+          <p>先看 3 個最常被問的問題。</p>
         </div>
         <div class="faq-list">
           <details class="faq-item" open>
@@ -564,32 +541,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     color: var(--gray-dark);
     box-shadow: 0 10px 20px rgba(47, 47, 47, 0.04);
     font-size: 0.92rem;
-  }
-
-  .hero-reassurance {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 1rem;
-    color: var(--gray-medium);
-    font-size: 0.94rem;
-  }
-
-  .hero-reassurance span {
-    position: relative;
-    padding-left: 0.95rem;
-  }
-
-  .hero-reassurance span::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.48rem;
-    width: 0.34rem;
-    height: 0.34rem;
-    border-radius: 999px;
-    background: var(--tiffany-dark);
   }
 
   .hero-actions {
@@ -1324,19 +1275,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     line-height: 1.6;
   }
 
-  .cta-buttons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
-
-  .cta-note {
-    margin: 1rem 0 0;
-    color: var(--gray-medium);
-    line-height: 1.75;
-    font-size: 0.92rem;
-  }
-
   .btn {
     flex: 1;
     padding: 0.95rem 1.5rem;
@@ -1471,10 +1409,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     }
 
     .breakdown-item {
-      flex-direction: column;
-    }
-
-    .cta-buttons {
       flex-direction: column;
     }
 
@@ -1826,16 +1760,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         estimatorHandoffTitle.textContent = "把設計方向整理成完整需求表？";
         estimatorHandoffDescription.textContent =
           "把需求、空間痛點與參考風格整理清楚，第一次討論會更有效率。";
-        estimatorHandoffPointTitle.textContent = "這一步最能提高設計討論效率";
+        estimatorHandoffPointTitle.textContent = "這一步最有效率";
         estimatorHandoffPointDescription.textContent =
           "把需求、參考圖與理想交付內容先講清楚就可以。";
       } else {
-        estimatorHandoffTitle.textContent = "把這次估算帶進完整需求表？";
+        estimatorHandoffTitle.textContent = "下一步：帶著估算填需求表";
         estimatorHandoffDescription.textContent =
           "再補需求、照片與時程，青曦就能更快判斷你的案件方向。";
-        estimatorHandoffPointTitle.textContent = "最適合下一步整理需求";
+        estimatorHandoffPointTitle.textContent = "這一步最有效率";
         estimatorHandoffPointDescription.textContent =
-          "如果你已經有大致預算方向，這一步最有效率。";
+          "如果你已經有大致預算方向，就直接往下整理需求。";
       }
     }
 
