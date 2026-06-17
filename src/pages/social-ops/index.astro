@@ -254,6 +254,7 @@ const blogPostsJson = JSON.stringify(blogPosts);
 const bookshelfTracksJson = JSON.stringify(bookshelfTracks);
 const bookshelfSubchapterPoolsJson = JSON.stringify(bookshelfSubchapterPools);
 const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
+const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
 ---
 
 <BaseLayout
@@ -730,7 +731,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const ARTICLE_AI_RESULT_KEY = "qingxi-article-ai-result-v1";
@@ -756,6 +757,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const bookshelfTracks = JSON.parse(bookshelfTracksJson);
   const bookshelfSubchapterPools = JSON.parse(bookshelfSubchapterPoolsJson);
   const geminiCanvasMasterData = JSON.parse(geminiCanvasMasterJson);
+  const vendorTradeOptions = JSON.parse(vendorTradeOptionsJson);
   const articleIntakeFields = [
     "主書系",
     "章節定位",
