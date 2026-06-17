@@ -80,6 +80,139 @@ const bookshelfTracks = [
   },
 ];
 
+const bookshelfSubchapterPools = {
+  "老屋翻新系": {
+    "現況判讀": {
+      "屋況盤點": ["屋況", "現況", "中古屋", "老屋", "盤點", "評估"],
+      "翻新範圍": ["局部翻新", "翻新範圍", "要不要拆", "整修範圍", "改造範圍"],
+      "翻新起手式": ["先做什麼", "第一步", "從哪開始", "翻新前", "準備階段"],
+    },
+    "預算拆解": {
+      "預算分級": ["預算", "費用", "多少錢", "怎麼抓", "抓多少"],
+      "報價拆讀": ["報價", "單價", "估價", "報價單", "費用拆解"],
+      "追加風險": ["追加", "超支", "爆預算", "變更多", "加價"],
+    },
+    "基礎工程": {
+      "拆除泥作": ["拆除", "泥作", "砌牆", "打底"],
+      "水電更新": ["水電", "配線", "配管", "電路", "管線"],
+      "防水地坪": ["防水", "地坪", "找平", "浴室", "漏水"],
+    },
+    "空間重整": {
+      "格局調整": ["格局", "隔間", "空間重整", "動線重整"],
+      "收納補強": ["收納", "櫃體", "儲物", "機能"],
+      "家具配置": ["家具", "沙發", "餐桌", "床架", "配置"],
+    },
+    "完工避雷": {
+      "驗收重點": ["驗收", "完工", "缺失"],
+      "保固界線": ["保固", "責任", "保修"],
+      "糾紛預防": ["糾紛", "避雷", "爭議", "扯皮"],
+    },
+  },
+  "預售屋客變系": {
+    "客變判斷": {
+      "客變時機": ["客變時間", "客變時機", "什麼時候"],
+      "值不值得改": ["要不要客變", "值得", "必要", "划算"],
+      "先決條件": ["先決定", "先確認", "客變前", "前置"],
+    },
+    "配置預留": {
+      "插座迴路": ["插座", "迴路", "回路", "開關"],
+      "燈位弱電": ["燈位", "弱電", "網路", "監控"],
+      "設備預留": ["預留", "設備", "冷氣", "新風", "管線"],
+    },
+    "材質設備": {
+      "廚具衛浴": ["廚具", "衛浴", "水龍頭", "馬桶"],
+      "地板磁磚": ["地板", "磁磚", "石材"],
+      "五金面材": ["五金", "面材", "板材", "建材"],
+    },
+    "生活動線": {
+      "收納配置": ["收納", "櫃體", "機能"],
+      "家務動線": ["家務", "廚房", "洗衣", "清潔"],
+      "起居情境": ["生活習慣", "起居", "使用情境"],
+    },
+    "交屋銜接": {
+      "交屋清單": ["交屋", "點交", "清單"],
+      "進場排序": ["進場", "排序", "先後"],
+      "客變銜接裝修": ["客變後", "銜接", "裝修"],
+    },
+  },
+  "驗屋交屋系": {
+    "驗屋判讀": {
+      "結構防水": ["裂縫", "防水", "漏水", "壁癌"],
+      "水電機電": ["水電", "插座", "開關", "設備"],
+      "尺寸平整": ["尺寸", "平整", "水平", "垂直"],
+    },
+    "缺失排序": {
+      "必修先修": ["優先", "先修", "先處理"],
+      "可觀察項": ["觀察", "後續看", "先記錄"],
+      "後續追蹤": ["追蹤", "複驗", "回報"],
+    },
+    "點交策略": {
+      "建商回報": ["建商", "回報", "提報"],
+      "紀錄佐證": ["照片", "紀錄", "佐證", "證據"],
+      "協調節奏": ["協調", "溝通", "節奏"],
+    },
+    "交屋後進場": {
+      "裝修前準備": ["準備", "交屋後", "進場前"],
+      "保護措施": ["保護", "養護", "包覆"],
+      "進場銜接": ["進場", "銜接", "施工順序"],
+    },
+  },
+  "格局動線系": {
+    "空間尺度": {
+      "家具尺寸": ["家具", "尺寸", "沙發", "床架", "餐桌"],
+      "走道淨寬": ["走道", "寬度", "淨寬"],
+      "開門迴旋": ["開門", "門片", "轉身", "迴旋"],
+    },
+    "動線配置": {
+      "公共區動線": ["客廳", "餐廳", "公共區"],
+      "家務動線": ["廚房", "清潔", "洗衣", "家務"],
+      "通行轉身": ["轉身", "通行", "卡住", "動線"],
+    },
+    "收納系統": {
+      "櫃體深度": ["深度", "櫃體", "櫥櫃"],
+      "分區收納": ["分區", "分類", "收納"],
+      "異形角落": ["畸零", "轉角", "角落", "異形"],
+    },
+    "家具配置": {
+      "客餐家具": ["沙發", "餐桌", "茶几", "餐椅"],
+      "臥室家具": ["床架", "床頭", "衣櫃"],
+      "工作家具": ["書桌", "工作桌", "辦公"],
+    },
+    "使用情境": {
+      "有小孩": ["小孩", "兒童"],
+      "有長輩": ["長輩", "老人"],
+      "有寵物或居家工作": ["寵物", "居家工作", "遠端", "在家上班"],
+    },
+  },
+  "水電照明系": {
+    "插座開關": {
+      "插座數量": ["插座", "數量", "不夠用"],
+      "高度位置": ["高度", "位置", "面板"],
+      "開關配置": ["開關", "雙切", "情境開關"],
+    },
+    "迴路安全": {
+      "負載分配": ["負載", "跳電", "用電"],
+      "電箱保護": ["電箱", "保護", "無熔絲"],
+      "高耗電設備": ["冷氣", "烘衣", "IH", "高耗電"],
+    },
+    "照明設計": {
+      "基礎照明": ["主燈", "基礎照明", "亮度"],
+      "情境照明": ["情境", "層次", "間接照明"],
+      "眩光色溫": ["眩光", "色溫", "刺眼"],
+    },
+    "設備整合": {
+      "冷氣新風": ["冷氣", "新風", "空調"],
+      "弱電網路": ["弱電", "網路", "wifi"],
+      "監控門禁": ["監控", "門禁", "對講"],
+    },
+    "智能控制": {
+      "智能窗簾": ["窗簾", "電動窗簾", "蜂巢簾"],
+      "感應自動化": ["感應", "自動化", "人體感應"],
+      "情境聯動": ["語音", "情境", "聯動", "智慧"],
+    },
+  },
+};
+
 const articleIntakeFields = [
   "主書系",
   "章節定位",
@@ -181,6 +314,35 @@ function inferBookshelfTrack(post: { title: string; category: string }) {
   return "老屋翻新系";
 }
 
+function getTrackChapters(trackTitle: string) {
+  const track = bookshelfTracks.find((entry) => entry.title === trackTitle);
+  if (!track?.chapters) return [];
+  return track.chapters.split("/").map((chapter) => chapter.trim()).filter(Boolean);
+}
+
+function getTrackSubchapterMap(trackTitle: string, chapterTitle: string): Record<string, string[]> {
+  return (bookshelfSubchapterPools[trackTitle as keyof typeof bookshelfSubchapterPools]?.[chapterTitle as never] || {}) as Record<string, string[]>;
+}
+
+function inferBookshelfSubchapter(trackTitle: string, chapterTitle: string, post: { title: string; category: string; summary?: string }) {
+  const haystack = `${post.title} ${post.category} ${post.summary || ""}`.toLowerCase();
+  const subchapterMap = getTrackSubchapterMap(trackTitle, chapterTitle);
+  const subchapterEntries = Object.entries(subchapterMap);
+  if (!subchapterEntries.length) return "";
+
+  let bestSubchapter = "";
+  let bestScore = 0;
+  subchapterEntries.forEach(([subchapter, keywords]) => {
+    const score = keywords.reduce((sum, keyword) => sum + (haystack.includes(String(keyword).toLowerCase()) ? 1 : 0), 0);
+    if (score > bestScore) {
+      bestScore = score;
+      bestSubchapter = subchapter;
+    }
+  });
+
+  return bestSubchapter || subchapterEntries[0][0] || "";
+}
+
 function inferBookshelfChapter(trackTitle: string, post: { title: string; category: string }) {
   const haystack = `${post.title} ${post.category}`.toLowerCase();
 
@@ -236,12 +398,14 @@ function inferSearchKeyword(post: { title: string; category: string }) {
 const bookshelfEntries = blogPosts.map((post, index) => {
   const trackTitle = inferBookshelfTrack(post);
   const chapter = inferBookshelfChapter(trackTitle, post);
+  const subchapter = inferBookshelfSubchapter(trackTitle, chapter, post);
   const searchKeyword = inferSearchKeyword(post);
   return {
     ...post,
     index,
     trackTitle,
     chapter,
+    subchapter,
     searchKeyword,
   };
 }).map((entry, _, entries) => {
@@ -271,15 +435,33 @@ const bookshelfViewGroups = bookshelfTracks.map((track) => ({
 
 const bookshelfOutlineGroups = bookshelfTracks.map((track) => {
   const trackEntries = bookshelfEntries.filter((entry) => entry.trackTitle === track.title);
-  const chapters = track.chapters.split("/").map((chapter) => chapter.trim()).filter(Boolean).map((chapter) => ({
-    title: chapter,
-    entries: trackEntries.filter((entry) => entry.chapter === chapter),
-  }));
+  const chapters = getTrackChapters(track.title).map((chapter) => {
+    const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter);
+    const subchapterMap = getTrackSubchapterMap(track.title, chapter);
+    const subchapterTitles = Object.keys(subchapterMap);
+    const subchapters = subchapterTitles.map((subchapter) => ({
+      title: subchapter,
+      entries: chapterEntries.filter((entry) => entry.subchapter === subchapter),
+    }));
+    const missingSubchapters = subchapters.filter((subchapter) => subchapter.entries.length === 0).map((subchapter) => subchapter.title);
+
+    return {
+      title: chapter,
+      entries: chapterEntries,
+      subchapters,
+      missingSubchapters,
+    };
+  });
   const filledChapters = chapters.filter((chapter) => chapter.entries.length > 0).length;
   const missingChapters = chapters.filter((chapter) => chapter.entries.length === 0).map((chapter) => chapter.title);
+  const missingSubchapters = chapters.flatMap((chapter) =>
+    chapter.missingSubchapters.map((subchapter) => `${chapter.title}・${subchapter}`),
+  );
   const densestChapter = [...chapters].sort((left, right) => right.entries.length - left.entries.length)[0];
   const nextAction = missingChapters.length > 0
     ? `優先補章：${missingChapters.slice(0, 3).join(" / ")}`
+    : missingSubchapters.length > 0
+      ? `優先補子章：${missingSubchapters.slice(0, 2).join(" / ")}`
     : densestChapter?.title
       ? `優先延伸：${densestChapter.title}`
       : "可補下一題";
@@ -290,6 +472,7 @@ const bookshelfOutlineGroups = bookshelfTracks.map((track) => {
     chapters,
     filledChapters,
     missingChapters,
+    missingSubchapters,
     nextAction,
   };
 });
@@ -297,6 +480,8 @@ const bookshelfOutlineGroups = bookshelfTracks.map((track) => {
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
 const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
+const bookshelfTracksJson = JSON.stringify(bookshelfTracks);
+const bookshelfSubchapterPoolsJson = JSON.stringify(bookshelfSubchapterPools);
 const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 ---
 
@@ -706,7 +891,42 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                                 <p>{chapter.entries.length > 0 ? `${chapter.entries.length} 篇` : "待補主文"}</p>
                               </div>
                               <strong>{chapter.title}</strong>
-                              {chapter.entries.length > 0 ? (
+                              {chapter.subchapters.length > 0 ? (
+                                <div class="bookshelf-outline-subchapter-shell">
+                                  {chapter.missingSubchapters.length > 0 ? (
+                                    <div class="bookshelf-outline-subchapter-tags">
+                                      {chapter.missingSubchapters.slice(0, 3).map((subchapter) => (
+                                        <span>{subchapter}</span>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <div class="bookshelf-outline-subchapter-tags">
+                                      <span>子章節已具基本骨架</span>
+                                    </div>
+                                  )}
+                                  <div class="bookshelf-outline-subchapter-grid">
+                                    {chapter.subchapters.map((subchapter) => (
+                                      <article class="bookshelf-outline-subchapter">
+                                        <div class="bookshelf-outline-subchapter-top">
+                                          <p>{subchapter.title}</p>
+                                          <span>{subchapter.entries.length > 0 ? `${subchapter.entries.length} 篇` : "待補子文"}</span>
+                                        </div>
+                                        {subchapter.entries.length > 0 ? (
+                                          <div class="bookshelf-outline-list">
+                                            {subchapter.entries.map((entry) => (
+                                              <a class="bookshelf-outline-link" href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">
+                                                <span>{entry.title}</span>
+                                              </a>
+                                            ))}
+                                          </div>
+                                        ) : (
+                                          <div class="bookshelf-outline-empty">這個子章節還沒有文章</div>
+                                        )}
+                                      </article>
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : chapter.entries.length > 0 ? (
                                 <div class="bookshelf-outline-list">
                                   {chapter.entries.map((entry) => (
                                     <a class="bookshelf-outline-link" href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">
@@ -783,7 +1003,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, geminiCanvasMasterJson }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const ARTICLE_AI_RESULT_KEY = "qingxi-article-ai-result-v1";
@@ -798,34 +1018,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const socialReplyShortUrlCache = new Map();
   const sourceTemplate = JSON.parse(defaultSourcesJson);
   const articleLibrary = JSON.parse(blogPostsJson);
+  const bookshelfTracks = JSON.parse(bookshelfTracksJson);
+  const bookshelfSubchapterPools = JSON.parse(bookshelfSubchapterPoolsJson);
   const geminiCanvasMasterData = JSON.parse(geminiCanvasMasterJson);
-  const bookshelfTracks = [
-    {
-      title: "老屋翻新系",
-      focus: "老屋翻修、屋況判讀、預算拆解、基礎工程、空間重整與完工避雷",
-      chapters: "現況判讀 / 預算拆解 / 基礎工程 / 空間重整 / 完工避雷",
-    },
-    {
-      title: "預售屋客變系",
-      focus: "客變、交屋前規劃、配置預留、材質設備、收納與機能預留",
-      chapters: "客變判斷 / 配置預留 / 材質設備 / 生活動線 / 交屋銜接",
-    },
-    {
-      title: "驗屋交屋系",
-      focus: "驗屋、點交、缺失判讀、交屋後先後順序與修正重點",
-      chapters: "驗屋判讀 / 缺失排序 / 點交策略 / 交屋後進場",
-    },
-    {
-      title: "格局動線系",
-      focus: "小坪數規劃、收納、動線、尺度、家具配置與生活邏輯",
-      chapters: "空間尺度 / 動線配置 / 收納系統 / 家具配置 / 使用情境",
-    },
-    {
-      title: "水電照明系",
-      focus: "插座、開關、迴路、照明、設備整合、窗簾與智能控制",
-      chapters: "插座開關 / 迴路安全 / 照明設計 / 設備整合 / 智能控制",
-    },
-  ];
   const articleIntakeFields = [
     "主書系",
     "章節定位",
@@ -1123,11 +1318,26 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       .join("\n");
   }
 
+  function formatTrackStructureText() {
+    return bookshelfTracks
+      .map((track, index) => {
+        const chapterText = getTrackChapters(track.title)
+          .map((chapter) => {
+            const subchapters = getTrackSubchapters(track.title, chapter);
+            return subchapters.length
+              ? `${chapter}（子章：${subchapters.join(" / ")}）`
+              : chapter;
+          })
+          .join("；");
+
+        return `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${chapterText}`;
+      })
+      .join("\n");
+  }
+
   function buildBookshelfLlmPrompt() {
     const categories = Array.from(new Set(articleLibrary.map((post) => post.category))).join("、");
-    const tracksText = bookshelfTracks
-      .map((track, index) => `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${track.chapters}`)
-      .join("\n");
+    const tracksText = formatTrackStructureText();
 
     return [
       "你是青曦空間設計的內容總編與出版策劃。",
@@ -1139,16 +1349,16 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "",
       "工作目標：",
       "1. 把零散文章整理成一本一本可持續完成的書。",
-      "2. 先用『主書系 -> 章節 -> 已有文章 -> 還缺文章』的方式規劃。",
+      "2. 先用『主書系 -> 章節 -> 子章節 -> 已有文章 -> 還缺文章』的方式規劃。",
       "3. 優先找出最適合先完成的第一本書。",
-      "4. 每篇文章都要被分配到明確的主書系與章節，不要只做模糊分類。",
+      "4. 每篇文章都要被分配到明確的主書系、章節與子章節，不要只做模糊分類。",
       "",
       "請直接輸出：",
       "A. 建議先主攻的 1 本主書系，以及原因",
       "B. 各主書系的定位與目標讀者",
-      "C. 各主書系的章節架構",
-      "D. 目前文章應歸到哪個主書系、哪一章",
-      "E. 每個主書系還缺哪些關鍵文章",
+      "C. 各主書系的章節與子章節架構",
+      "D. 目前文章應歸到哪個主書系、哪一章、哪個子章節",
+      "E. 每個主書系還缺哪些關鍵文章與子章節補位",
       "F. 最優先下一篇該補哪 5 篇，並說明原因",
       "G. 哪些現有標題適合改名，讓未來更像書稿章名",
       "H. 請補一份『文章入庫規則』，格式固定為：主書系 / 章節定位 / 網站分類 / 搜尋主關鍵字 / 導流目的",
@@ -1169,13 +1379,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     if (!entries.length) return "（目前沒有明確可參考的既有文章）";
     return entries
       .slice(0, limit)
-      .map((entry, index) => `${index + 1}. ${entry.title}｜${entry.chapter}｜${entry.category}`)
+      .map((entry, index) => `${index + 1}. ${entry.title}｜${entry.chapter}${entry.subchapter ? ` > ${entry.subchapter}` : ""}｜${entry.category}`)
       .join("\n");
   }
 
   function buildProRelatedArticleContext(confirmData, aiDraftBlock = "") {
     const resolvedTrack = confirmData.track || findTrackFromText(aiDraftBlock) || "老屋翻新系";
     const resolvedChapter = confirmData.chapter || inferChapterFromTrack(resolvedTrack, confirmData.title, aiDraftBlock);
+    const resolvedSubchapter = inferSubchapterFromTrack(resolvedTrack, resolvedChapter, confirmData.title, aiDraftBlock);
     const normalizedTitle = normalizeComparableText(confirmData.title);
 
     const sameTrackEntries = bookshelfEntries.filter((entry) =>
@@ -1184,14 +1395,20 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     );
 
     const sameChapterEntries = sameTrackEntries.filter((entry) => entry.chapter === resolvedChapter);
+    const sameSubchapterEntries = sameChapterEntries.filter((entry) => entry.subchapter === resolvedSubchapter);
     const neighboringChapterEntries = sameTrackEntries.filter((entry) => entry.chapter !== resolvedChapter);
 
     return [
       "【同書系既有文章脈絡】",
       `主書系：${resolvedTrack || "尚未判定"}`,
       `章節定位：${resolvedChapter || "尚未判定"}`,
+      `子章節定位：${resolvedSubchapter || "待 AI 補位"}`,
       `同書系既有文章數：${sameTrackEntries.length} 篇`,
       `同章既有文章數：${sameChapterEntries.length} 篇`,
+      `同子章既有文章數：${sameSubchapterEntries.length} 篇`,
+      "",
+      "同子章既有文章：",
+      formatRelatedArticleList(sameSubchapterEntries, 4),
       "",
       "同章既有文章：",
       formatRelatedArticleList(sameChapterEntries, 5),
@@ -1204,22 +1421,35 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   function buildProGapContext(confirmData, aiDraftBlock = "") {
     const resolvedTrack = confirmData.track || findTrackFromText(aiDraftBlock) || "老屋翻新系";
     const resolvedChapter = confirmData.chapter || inferChapterFromTrack(resolvedTrack, confirmData.title, aiDraftBlock);
+    const resolvedSubchapter = inferSubchapterFromTrack(resolvedTrack, resolvedChapter, confirmData.title, aiDraftBlock);
     const trackChapters = getTrackChapters(resolvedTrack);
     const sameTrackEntries = bookshelfEntries.filter((entry) => entry.trackTitle === resolvedTrack);
     const sameChapterEntries = sameTrackEntries.filter((entry) => entry.chapter === resolvedChapter);
+    const sameSubchapterEntries = sameChapterEntries.filter((entry) => entry.subchapter === resolvedSubchapter);
     const missingChapters = trackChapters.filter((chapter) => !sameTrackEntries.some((entry) => entry.chapter === chapter));
+    const chapterSubchapters = getTrackSubchapters(resolvedTrack, resolvedChapter);
+    const missingSubchapters = chapterSubchapters.filter((subchapter) => !sameChapterEntries.some((entry) => entry.subchapter === subchapter));
     const chapterGapHint = sameChapterEntries.length === 0
       ? "這一章目前仍是空章，請優先寫成能直接立住章節的主文。"
       : sameChapterEntries.length === 1
         ? "這一章目前只有 1 篇，請優先補成更完整的章節骨架。"
         : "這一章已有基本內容，請優先補足不同情境、不同預算或不同決策切角。";
+    const subchapterGapHint = sameSubchapterEntries.length === 0
+      ? "這個子章節目前還沒有文章，請優先補成能站得住的第一篇。"
+      : sameSubchapterEntries.length === 1
+        ? "這個子章節目前只有 1 篇，可再補一篇互補角度。"
+        : "這個子章節已有基本文章，可優先補不同情境或不同決策切角。";
 
     return [
       "【本章缺稿方向】",
       `主書系總篇數：${sameTrackEntries.length} 篇`,
       `本章現有篇數：${sameChapterEntries.length} 篇`,
+      `子章節定位：${resolvedSubchapter || "待 AI 補位"}`,
+      `本子章現有篇數：${sameSubchapterEntries.length} 篇`,
       `本章補位判斷：${chapterGapHint}`,
+      `本子章補位判斷：${subchapterGapHint}`,
       `整本目前待補章：${missingChapters.slice(0, 3).join(" / ") || "主幹已具雛形"}`,
+      `本章目前待補子章：${missingSubchapters.slice(0, 3).join(" / ") || "子章主幹已具雛形"}`,
       "寫作要求：請優先補強這一章目前最缺的判斷邏輯、情境分支、預算差異、施工順序或常見誤區，而不是重述已存在文章。",
     ].join("\n");
   }
@@ -1480,9 +1710,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const questionBlock = problemText.trim() || "（請在此貼上社團的發問內容）";
     const isShortQuestion = questionBlock.length <= 90;
     const currentContentBlock = currentContent.trim() || "（目前尚無 AI 初判內容）";
-    const tracksText = bookshelfTracks
-      .map((track, index) => `${index + 1}. ${track.title}｜核心：${track.focus}｜章節：${track.chapters}`)
-      .join("\n");
+    const tracksText = formatTrackStructureText();
     const intakeFieldText = articleIntakeFields.join(" / ");
     const siteCategoryText = siteCategoryOptions.join(" / ");
     const overlapRuleText = overlapRules
@@ -1768,6 +1996,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     return track.chapters.split("/").map((chapter) => chapter.trim()).filter(Boolean);
   }
 
+  function getTrackSubchapterMap(trackTitle, chapterTitle) {
+    return bookshelfSubchapterPools?.[trackTitle]?.[chapterTitle] || {};
+  }
+
+  function getTrackSubchapters(trackTitle, chapterTitle) {
+    return Object.keys(getTrackSubchapterMap(trackTitle, chapterTitle));
+  }
+
   function normalizeSiteCategory(value = "") {
     const text = value.trim();
     if (!text) return "";
@@ -1888,6 +2124,26 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     if (bestChapter) return bestChapter;
     return getTrackChapters(trackTitle)[0] || "";
+  }
+
+  function inferSubchapterFromTrack(trackTitle, chapterTitle, titleText = "", content = "") {
+    const subchapterMap = getTrackSubchapterMap(trackTitle, chapterTitle);
+    const subchapterEntries = Object.entries(subchapterMap);
+    if (!subchapterEntries.length) return "";
+
+    const text = `${titleText}\n${content}`.replace(/\s+/g, "");
+    let bestSubchapter = "";
+    let bestScore = 0;
+
+    subchapterEntries.forEach(([subchapter, keywords]) => {
+      const score = getInferenceKeywordScore(text, keywords);
+      if (score > bestScore) {
+        bestScore = score;
+        bestSubchapter = subchapter;
+      }
+    });
+
+    return bestSubchapter || subchapterEntries[0][0] || "";
   }
 
   function buildTitleKeywordSet(text) {
@@ -4201,6 +4457,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     gap: 0.65rem;
   }
 
+  .bookshelf-outline-subchapter-shell,
+  .bookshelf-outline-subchapter-grid {
+    display: grid;
+    gap: 0.62rem;
+  }
+
   .bookshelf-outline-card:not([open]) .bookshelf-outline-priority {
     margin-top: -0.05rem;
   }
@@ -4245,10 +4507,62 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     letter-spacing: 0.03em;
   }
 
+  .bookshelf-outline-subchapter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.42rem;
+  }
+
+  .bookshelf-outline-subchapter-tags span,
+  .bookshelf-outline-subchapter-top p,
+  .bookshelf-outline-subchapter-top span {
+    margin: 0;
+  }
+
+  .bookshelf-outline-subchapter-tags span {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.22rem 0.54rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.036);
+    color: rgba(225, 221, 214, 0.62);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+  }
+
   .bookshelf-outline-chapter {
     padding: 0.9rem 0.95rem;
     display: grid;
     gap: 0.62rem;
+  }
+
+  .bookshelf-outline-subchapter {
+    display: grid;
+    gap: 0.58rem;
+    padding: 0.78rem 0.82rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-outline-subchapter-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .bookshelf-outline-subchapter-top p {
+    color: #f3f1ec;
+    font-size: 0.84rem;
+    line-height: 1.55;
+    font-weight: 500;
+  }
+
+  .bookshelf-outline-subchapter-top span {
+    color: rgba(224, 221, 214, 0.54);
+    font-size: 0.76rem;
+    letter-spacing: 0.03em;
   }
 
   .bookshelf-outline-chapter strong {
