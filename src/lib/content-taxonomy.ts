@@ -375,6 +375,22 @@ function resolveTrackRootLabel(trackTitle = "") {
 function getTopicTemplateSet(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
   const root = resolveTrackRootLabel(trackTitle);
 
+  if (chapterTitle === "現況判讀") {
+    return [
+      `${root}前怎麼做${subchapterTitle}？先抓最關鍵的判斷點`,
+      `${root}${subchapterTitle}先看什麼，才知道值不值得做？`,
+      `${root}${subchapterTitle}最容易漏看的 3 個地方`,
+    ];
+  }
+
+  if (chapterTitle === "客變判斷" || chapterTitle === "驗屋判讀") {
+    return [
+      `${root}${subchapterTitle}怎麼判斷？先抓最核心的決策點`,
+      `${root}${subchapterTitle}先看這幾件事，就知道要不要做`,
+      `${root}${subchapterTitle}最容易忽略的 3 個重點`,
+    ];
+  }
+
   if (chapterTitle === "預算拆解") {
     return [
       `${root}${subchapterTitle}怎麼抓？先看最容易失手的地方`,
