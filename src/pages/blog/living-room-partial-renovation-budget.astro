@@ -6,7 +6,6 @@ const articleMeta = getStaticBlogPost("living-room-partial-renovation-budget");
 const articleTitle = articleMeta.title;
 const articleDescription = articleMeta.summary;
 const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
-const articleCategoryLabel = articleMeta.category;
 const articleImage = articleMeta.coverImage;
 const articleFloorDetailImage = "/images/blog/living-room-budget-floor-detail.png";
 const articleSofaCornerImage = "/images/blog/living-room-budget-sofa-corner.png";
@@ -19,7 +18,8 @@ const articleStructuredData = [
     image: [articleImage],
     datePublished: articlePublishedTime,
     dateModified: articlePublishedTime,
-    articleSection: "裝修預算",
+    articleSection: articleMeta.track,
+    keywords: articleMeta.tags.join(", "),
     author: {
       "@type": "Organization",
       name: "青曦空間設計",
@@ -39,7 +39,10 @@ const articleStructuredData = [
   publishedTime={articlePublishedTime}
   modifiedTime={articlePublishedTime}
   structuredData={articleStructuredData}
-  category={articleCategoryLabel}
+  track={articleMeta.track}
+  chapter={articleMeta.chapter}
+  siteCategory={articleMeta.siteCategory}
+  tags={articleMeta.tags}
 >
       <p class="article-lead">
         客廳局部改造看似只是換一片天花板、重整一塊地板，再添幾件家具，但真正進到施工與採購階段，預算往往不是照面積等比例縮小。局部裝修最大的難點，不在「做了多少」，而在「新舊之間要如何銜接」。

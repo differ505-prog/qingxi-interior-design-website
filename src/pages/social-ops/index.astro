@@ -6,6 +6,7 @@ import {
   mergeBlogPosts,
   staticBlogPosts,
 } from "../../lib/blog-catalog";
+import { bookshelfTracks } from "../../lib/content-taxonomy";
 import { geminiCanvasMaster } from "../../lib/gemini-canvas-master";
 
 const defaultSources = [
@@ -76,34 +77,6 @@ const vendorCraftLevelOptions = [
   "標準",
   "細緻",
   "很細",
-];
-
-const bookshelfTracks = [
-  {
-    title: "老屋翻新系",
-    focus: "老屋翻修、屋況判讀、預算拆解、基礎工程、空間重整與完工避雷",
-    chapters: "現況判讀 / 預算拆解 / 基礎工程 / 空間重整 / 完工避雷",
-  },
-  {
-    title: "預售屋客變系",
-    focus: "客變、交屋前規劃、配置預留、材質設備、收納與機能預留",
-    chapters: "客變判斷 / 配置預留 / 材質設備 / 生活動線 / 交屋銜接",
-  },
-  {
-    title: "驗屋交屋系",
-    focus: "驗屋、點交、缺失判讀、交屋後先後順序與修正重點",
-    chapters: "驗屋判讀 / 缺失排序 / 點交策略 / 交屋後進場",
-  },
-  {
-    title: "格局動線系",
-    focus: "小坪數規劃、收納、動線、尺度、家具配置與生活邏輯",
-    chapters: "空間尺度 / 動線配置 / 收納系統 / 家具配置 / 使用情境",
-  },
-  {
-    title: "水電照明系",
-    focus: "插座、開關、迴路、照明、設備整合、窗簾與智能控制",
-    chapters: "插座開關 / 迴路安全 / 照明設計 / 設備整合 / 智能控制",
-  },
 ];
 
 const bookshelfSubchapterPools = {
@@ -681,7 +654,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                     <a class="bookshelf-library-link" href={`/blog/${post.slug}`} target="_blank" rel="noreferrer">
                       <div class="bookshelf-library-copy">
                         <strong>{post.title}</strong>
-                        <p>{post.category}</p>
+                        <p>{post.track} / {post.chapter} / {post.siteCategory}</p>
                       </div>
                       <span>{post.date}</span>
                     </a>
@@ -1695,15 +1668,27 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     renderContentAnalytics();
   }
 
+  function formatArticleLibraryTaxonomy(post) {
+    const track = post?.track || "未分配主書系";
+    const chapter = post?.chapter || "未分配章節";
+    const siteCategory = post?.siteCategory || post?.category || "未分配網站分類";
+    return `${track}｜${chapter}｜${siteCategory}`;
+  }
+
+  function formatArticleLibraryTags(post) {
+    if (!Array.isArray(post?.tags)) return "";
+    return post.tags.filter(Boolean).join(" ");
+  }
+
   function buildArticleTitlesText() {
     return articleLibrary
-      .map((post, index) => `${index + 1}. [${post.category}] ${post.title}`)
+      .map((post, index) => `${index + 1}. [${formatArticleLibraryTaxonomy(post)}] ${post.title}`)
       .join("\n");
   }
 
   function buildArticleCatalogText() {
     return articleLibrary
-      .map((post, index) => `${index + 1}. [${post.category}] ${post.title}｜${post.date}`)
+      .map((post, index) => `${index + 1}. [${formatArticleLibraryTaxonomy(post)}] ${post.title}｜${post.date}`)
       .join("\n");
   }
 
@@ -1725,7 +1710,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   function buildBookshelfLlmPrompt() {
-    const categories = Array.from(new Set(articleLibrary.map((post) => post.category))).join("、");
+    const categories = Array.from(
+      new Set(articleLibrary.map((post) => post.siteCategory || post.category).filter(Boolean)),
+    ).join("、");
     const tracksText = formatTrackStructureText();
 
     return [
@@ -1753,7 +1740,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "H. 請補一份『文章入庫規則』，格式固定為：主書系 / 章節定位 / 網站分類 / 搜尋主關鍵字 / 導流目的",
       "",
       `目前文章數：${articleLibrary.length}`,
-      `目前分類：${categories || "未分類"}`,
+      `目前網站分類：${categories || "未分類"}`,
       "",
       "現有文章清單：",
       buildArticleTitlesText(),
@@ -2846,7 +2833,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     let bestScore = 0;
 
     articleLibrary.forEach((post) => {
-      const haystack = `${post.title}\n${post.category}`.replace(/\s+/g, "");
+      const haystack = `${post.title}\n${formatArticleLibraryTaxonomy(post)}\n${formatArticleLibraryTags(post)}`.replace(/\s+/g, "");
       const score = keywords.reduce((sum, keyword) => sum + (haystack.includes(keyword) ? keyword.length : 0), 0);
       if (score > bestScore) {
         bestScore = score;
@@ -2878,7 +2865,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     let bestScore = 0;
 
     articleLibrary.forEach((post) => {
-      const haystack = `${post.title}\n${post.category}\n${post.summary || ""}`.replace(/\s+/g, "");
+      const haystack = `${post.title}\n${formatArticleLibraryTaxonomy(post)}\n${formatArticleLibraryTags(post)}\n${post.summary || ""}`.replace(/\s+/g, "");
       const score = keywords.reduce((sum, keyword) => sum + (haystack.includes(keyword) ? keyword.length : 0), 0);
       if (score > bestScore) {
         bestScore = score;

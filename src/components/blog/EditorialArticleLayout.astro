@@ -8,7 +8,10 @@ interface Props {
   publishedTime: string;
   modifiedTime?: string;
   structuredData?: unknown;
-  category: string;
+  track: string;
+  chapter: string;
+  siteCategory: string;
+  tags?: string[];
   kicker?: string;
   dek?: string;
   coverAlt?: string;
@@ -24,7 +27,10 @@ const {
   publishedTime,
   modifiedTime = publishedTime,
   structuredData,
-  category,
+  track,
+  chapter,
+  siteCategory,
+  tags = [],
   kicker = "Qingxi Journal",
   dek = description,
   coverAlt = title,
@@ -77,6 +83,13 @@ const {
     letter-spacing: 0.12em;
   }
 
+  .article-meta-detail {
+    padding: 0.38rem 0.78rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+  }
+
   .article-title {
     margin: 0;
     font-family: "Noto Serif TC", serif;
@@ -94,6 +107,24 @@ const {
     font-size: 1.06rem;
     line-height: 1.95;
     letter-spacing: 0.01em;
+  }
+
+  .article-tags {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin: 1.25rem auto 0;
+    max-width: 42rem;
+  }
+
+  .article-tag {
+    padding: 0.35rem 0.72rem;
+    border-radius: 999px;
+    background: rgba(129, 199, 212, 0.08);
+    color: #5f6d7b;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
   }
 
   .article-cover {
@@ -313,10 +344,19 @@ const {
     <header class="article-header">
       <p class="article-kicker">{kicker}</p>
       <div class="article-meta">
-        <span class="article-category">{category}</span>
+        <span class="article-category">{track}</span>
+        <span class="article-meta-detail">{chapter}</span>
+        <span class="article-meta-detail">{siteCategory}</span>
       </div>
       <h1 class="article-title">{title}</h1>
       <p class="article-dek">{dek}</p>
+      {tags.length > 0 && (
+        <div class="article-tags">
+          {tags.map((tag) => (
+            <span class="article-tag">{tag}</span>
+          ))}
+        </div>
+      )}
     </header>
 
     <figure class="article-cover">

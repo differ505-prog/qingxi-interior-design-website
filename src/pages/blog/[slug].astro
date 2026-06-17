@@ -2,6 +2,7 @@
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
 import * as contentful from "contentful";
 import { documentToHtmlString } from "@contentful/rich-text-html-renderer";
+import { mapContentfulBlogPosts } from "../../lib/blog-catalog";
 
 // getStaticPaths 函數 - 告訴 Astro 有哪些路徑
 export async function getStaticPaths() {
@@ -70,24 +71,12 @@ if (response.items.length === 0) {
 
 const item = response.items[0];
 const fields = item.fields as Record<string, any>;
-const postTitle = String(fields.title ?? "");
-const postSlug = String(fields.slug ?? slug ?? "");
 const postDateSource = String(fields.date ?? "");
-const postSummary = String(fields.summary ?? "");
-const postCategory = String(fields.category ?? "");
 const postContent = fields.content as any;
-const coverImageUrl = fields.coverImage?.fields?.file?.url;
-
+const postMeta = mapContentfulBlogPosts([item])[0];
 const post = {
-  title: postTitle,
-  slug: postSlug,
-  date: new Date(postDateSource).toISOString().split("T")[0],
-  summary: postSummary,
-  category: postCategory,
+  ...postMeta,
   content: postContent,
-  coverImage: coverImageUrl
-    ? `https:${coverImageUrl}`
-    : "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=1200",
 };
 
 // 將 Rich Text 轉換為 HTML
@@ -111,7 +100,8 @@ const articleStructuredData = [
       "@type": "Organization",
       name: "青曦空間設計",
     },
-    articleSection: post.category,
+    articleSection: post.track || post.siteCategory,
+    keywords: post.tags.join(", "),
     mainEntityOfPage: `https://qingxidesign.tw/blog/${post.slug}`,
   },
 ];
@@ -123,6 +113,9 @@ const articleStructuredData = [
   publishedTime={publishedTime}
   modifiedTime={modifiedTime}
   structuredData={articleStructuredData}
-  category={post.category}
+  track={post.track}
+  chapter={post.chapter}
+  siteCategory={post.siteCategory}
+  tags={post.tags}
   htmlContent={contentHtml}
 />
