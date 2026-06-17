@@ -1,6 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import * as contentful from "contentful";
+import {
+  mapContentfulBlogPosts,
+  mergeBlogPosts,
+  staticBlogPosts,
+} from "../../lib/blog-catalog";
 import { geminiCanvasMaster } from "../../lib/gemini-canvas-master";
 
 const defaultSources = [
@@ -39,16 +44,6 @@ const defaultSources = [
     alias: "Google 商家編輯",
     platform: "Google",
     url: "https://www.google.com/search?q=%E9%9D%92%E6%9B%A6%E7%A9%BA%E9%96%93%E8%A8%AD%E8%A8%88&stick=H4sIAAAAAAAA_wE8AMP_CAYiIzB4Y2Y1NzIzYWQyN2I2OGVmOjB4MzMzYmU1YWI0ZDAxYjBiogUS6Z2S5pum56m66ZaT6Kit6KiI6b38AjwAAAA&hl=zh-TW&mat=CZzruPD9kuTbElcBa0lj_0QRxYoywBlV9k9DYHoy-VFRkTjl1IkHR0qufOOE0MNc1wkNSVfDEkXxAJyYs12m8HUMY9ODzhD28iMbxLDtTMqjl02vI5c77ni0KGBTZjiz2vc&authuser=9",
-  },
-];
-
-const fallbackBlogPosts = [
-  {
-    title: "畫出家的神經系統——全屋開關與插座的最適定位",
-    slug: "whole-house-switch-socket-positioning",
-    date: "2025-11-12",
-    summary: "整理全屋開關與插座定位原則，從生活動線、家具尺寸到常見錯誤，幫助裝修前先把隱蔽工程規劃清楚。",
-    category: "水電篇",
   },
 ];
 
@@ -263,7 +258,7 @@ const workflowGuideSteps = [
   },
 ];
 
-let blogPosts = [...fallbackBlogPosts];
+let blogPosts = staticBlogPosts.map(({ coverImage, ...post }) => post);
 let blogSyncLabel = "目前先顯示已存在文章。";
 
 try {
@@ -279,20 +274,16 @@ try {
       order: ["-fields.date"],
     });
 
-    const syncedPosts = response.items.map((item: any) => ({
-      title: item.fields.title,
-      slug: item.fields.slug,
-      date: new Date(item.fields.date).toISOString().split("T")[0],
-      summary: item.fields.summary,
-      category: item.fields.category,
-    }));
+    const syncedPosts = mapContentfulBlogPosts(response.items).map(
+      ({ coverImage, ...post }) => post,
+    );
 
     if (syncedPosts.length > 0) {
-      const postMap = new Map(
-        [...fallbackBlogPosts, ...syncedPosts].map((post) => [post.slug, post]),
-      );
-      blogPosts = Array.from(postMap.values()).sort((a, b) => b.date.localeCompare(a.date));
-      blogSyncLabel = `已同步 ${syncedPosts.length} 篇知識文章。`;
+      blogPosts = mergeBlogPosts([
+        ...staticBlogPosts.map(({ coverImage, ...post }) => post),
+        ...syncedPosts,
+      ]);
+      blogSyncLabel = `已同步 ${blogPosts.length} 篇知識文章。`;
     } else {
       blogSyncLabel = "Contentful 目前無文章，先顯示已存在文章。";
     }

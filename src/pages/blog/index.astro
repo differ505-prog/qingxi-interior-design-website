@@ -1,6 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import * as contentful from "contentful";
+import {
+  mapContentfulBlogPosts,
+  mergeBlogPosts,
+  staticBlogPosts,
+} from "../../lib/blog-catalog";
 
 // 獲取所有文章（帶錯誤處理）
 let posts: Array<{
@@ -12,27 +17,6 @@ let posts: Array<{
   coverImage: string;
 }> = [];
 let errorMessage = "";
-
-const staticPosts = [
-  {
-    title: "客廳局部改造預算怎麼抓？天花板、地板與家具的費用拆解與取捨",
-    slug: "living-room-partial-renovation-budget",
-    date: "2026-06-17",
-    summary:
-      "拆解客廳局部改造的預算分配邏輯，從天花板、地板到家具更新，整理硬裝、軟裝與隱形成本的取捨思路。",
-    category: "裝修預算",
-    coverImage: "/images/blog/living-room-budget-cover.png",
-  },
-  {
-    title: "畫出家的神經系統——全屋開關與插座的最適定位",
-    slug: "whole-house-switch-socket-positioning",
-    date: "2025-11-12",
-    summary:
-      "整理全屋開關與插座定位原則，從生活動線、家具尺寸到常見錯誤，幫助裝修前先把隱蔽工程規劃清楚。",
-    category: "水電篇",
-    coverImage: "/images/blog/插座被沙發遮蓋住.png",
-  },
-];
 
 try {
   // 連接 Contentful（恢復原來的邏輯，不檢查環境變數是否存在）
@@ -48,16 +32,7 @@ try {
     order: ["-fields.date"],
   });
 
-  posts = response.items.map((item: any) => ({
-    title: item.fields.title,
-    slug: item.fields.slug,
-    date: new Date(item.fields.date).toISOString().split("T")[0],
-    summary: item.fields.summary,
-    category: item.fields.category,
-    coverImage: item.fields.coverImage?.fields?.file?.url
-      ? `https:${item.fields.coverImage.fields.file.url}`
-      : "https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600",
-  }));
+  posts = mapContentfulBlogPosts(response.items);
 } catch (error: any) {
   console.error("Contentful 連接錯誤:", error);
   console.error(
@@ -79,12 +54,7 @@ try {
   // 如果連接失敗，posts 保持為空數組
 }
 
-const mergedPosts = [...posts, ...staticPosts]
-  .filter(
-    (post, index, array) =>
-      array.findIndex((entry) => entry.slug === post.slug) === index,
-  )
-  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+const mergedPosts = mergeBlogPosts([...posts, ...staticBlogPosts]);
 ---
 
 <style>

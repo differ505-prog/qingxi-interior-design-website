@@ -1,12 +1,13 @@
 ---
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogPost } from "../../lib/blog-catalog";
 
-const articleTitle = "客廳局部改造預算怎麼抓？天花板、地板與家具的費用拆解與取捨";
-const articleDescription =
-  "整理客廳局部改造的預算分配邏輯，從天花板、地板到家具採購，拆解硬裝、軟裝與隱形成本，幫助你把有限預算花在真正有感的地方。";
-const articlePublishedTime = "2026-06-17T00:00:00+08:00";
-const articleCategoryLabel = "裝修預算";
-const articleImage = "/images/blog/living-room-budget-cover.png";
+const articleMeta = getStaticBlogPost("living-room-partial-renovation-budget");
+const articleTitle = articleMeta.title;
+const articleDescription = articleMeta.summary;
+const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
+const articleCategoryLabel = articleMeta.category;
+const articleImage = articleMeta.coverImage;
 const articleFloorDetailImage = "/images/blog/living-room-budget-floor-detail.png";
 const articleSofaCornerImage = "/images/blog/living-room-budget-sofa-corner.png";
 const articleStructuredData = [

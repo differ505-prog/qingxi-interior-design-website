@@ -1,12 +1,13 @@
 ---
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogPost } from "../../lib/blog-catalog";
 
-const articleTitle = "畫出家的神經系統——全屋開關與插座的最適定位";
-const articleDescription =
-  "整理全屋開關與插座定位原則，從生活動線、家具尺寸到常見錯誤，幫助裝修前先把隱蔽工程規劃清楚。";
-const articlePublishedTime = "2025-11-12T00:00:00+08:00";
-const articleCategoryLabel = "水電篇";
-const articleImage = "/images/blog/插座被沙發遮蓋住.png";
+const articleMeta = getStaticBlogPost("whole-house-switch-socket-positioning");
+const articleTitle = articleMeta.title;
+const articleDescription = articleMeta.summary;
+const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
+const articleCategoryLabel = articleMeta.category;
+const articleImage = articleMeta.coverImage;
 const articleStructuredData = [
   {
     "@context": "https://schema.org",
