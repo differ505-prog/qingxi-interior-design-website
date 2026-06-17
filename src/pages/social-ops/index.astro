@@ -1256,7 +1256,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "2. 文氣要能長期保存，可讀性高，但不要浮誇、不要過度聳動、不要把簡單問題硬寫得過度戲劇化。",
       "3. 若題目很小，請自然往上補足成一篇完整章節該有的背景、判斷邏輯、常見誤區與實務建議。",
       "4. 若與同書系既有文章可能重疊，請優先選擇補位角度，而不是重寫同樣內容。",
-      "5. 若 Flash 給的主書系、章節或標題不夠精準，你可以微調，但調整後仍需維持在同一套書稿脈絡內。",
+      "5. 若原始問題帶有地區名稱，例如南港、內湖、汐止，請先判斷該地區是否真的影響法規、屋況、行情、日照、西曬、通勤或生活條件；若沒有實質影響，正式文章標題與內文請優先寫成可跨區閱讀的通用版本，不要把地區寫死。",
+      "6. 若 Flash 給的主書系、章節或標題不夠精準，你可以微調，但調整後仍需維持在同一套書稿脈絡內。",
       "",
       "請你輸出以下內容，並嚴格依照順序：",
       "",
@@ -1543,6 +1544,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "社團回覆角度：",
         "導流目的：",
         "下一篇延伸題目：",
+        "- 若原始問題出現南港、內湖、汐止等地區，請先判斷那是否只是社團來源背景；除非地區本身會影響法規、行情、採光、西曬、生活條件或施工判斷，否則文章標題、章節名稱與官網文章方向都不要把地區寫死。",
       ].join("\n");
     }
 
@@ -1640,6 +1642,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 目標：符合我們「一魚多吃」出書計畫的標題風格，並兼顧 SEO。",
       "- 格式要求：主標題（感性/痛點）——副標題（理性/SEO關鍵字）。",
       "- 建議分類：請建議這篇文章應該歸類在哪一個主題（如：預算篇、格局篇、水電篇、軟裝篇、驗屋篇、客變篇）。",
+      "- 若原始問題帶有南港、內湖、汐止等地區名稱，但不影響核心判斷，標題不要硬綁地區，優先寫成跨區也成立的版本。",
       "",
       "2. 【章節名稱】",
       "- 請只輸出一行章節名稱，必須與主書系對應，能直接放進未來書稿目錄。",
@@ -1677,7 +1680,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "導流版：",
       "- 簡短版：控制在 45-70 字，適合快速回覆，不帶連結感。",
       "- 專業版：控制在 70-110 字，保留更多判斷依據，但不要像文章。",
-      "- 導流版：控制在 70-110 字，語氣要像真人順手補充，不要像在導購或貼模板；可用『我之前有順手整理過』『有空再慢慢看就好』這類自然句型，最後再接 [預留網址空間]。",
+      "- 導流版：控制在 70-110 字，語氣要像真人順手補充，不要像在導購或貼模板；可用『我之前有整理過』『貼這篇給你參考』這類自然句型，最後再接 [預留網址空間]。",
       "- 三版都必須客觀、同理、像真人，不可出現『歡迎私訊』『找我們設計』『完整分析』『歡迎參考』這類推銷或 AI 模板味太重的字眼。",
       "",
       "8. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
@@ -1958,8 +1961,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const cleanText = String(text || "").trim();
     const fallbackSentence =
       target.title === "知識分享"
-        ? `這類題目我有陸續放在網站裡，你有空再慢慢看就好：${target.url}`
-        : `這題我之前有順手整理過，放這裡給你慢慢看就好：${target.url}`;
+        ? `這類題目我有陸續整理，貼這篇給你參考：${target.url}`
+        : `這題我之前有整理過，貼這篇給你參考：${target.url}`;
 
     if (!cleanText) return fallbackSentence;
     if (/https?:\/\//i.test(cleanText)) return cleanText;
@@ -1980,12 +1983,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     const replacementPairs = [
       [/完整分析/g, "幾個判斷重點"],
-      [/歡迎參考/g, "你有空再看"],
-      [/有需要可以先看這裡/g, "你有空再慢慢看就好"],
-      [/有需要可以先看這篇/g, "放這裡給你慢慢看就好"],
+      [/歡迎參考/g, "貼給你參考"],
+      [/有需要可以先看這裡/g, "貼這篇給你參考"],
+      [/有需要可以先看這篇/g, "貼這篇給你參考"],
       [/官網知識分享/g, "網站裡"],
-      [/我剛好整理過一篇/g, "我之前有順手整理過"],
-      [/我剛好整理成一篇/g, "我之前有順手整理成"],
+      [/我剛好整理過一篇/g, "我之前有整理過"],
+      [/我剛好整理成一篇/g, "我之前有整理成"],
     ];
     replacementPairs.forEach(([pattern, replacement]) => {
       value = value.replace(pattern, replacement);
@@ -2038,8 +2041,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const core = inferSocialReplyCore(content);
     const lead =
       target.title === "知識分享"
-        ? `${core.pro} 這類題目我有陸續放在網站裡，你有空再慢慢看就好：${target.url}`
-        : `${core.pro} 我之前有順手整理過一篇，放這裡給你慢慢看就好：${target.url}`;
+        ? `${core.pro} 這類題目我有陸續整理，貼這篇給你參考：${target.url}`
+        : `${core.pro} 我之前有整理過，貼這篇給你參考：${target.url}`;
 
     return {
       short: core.short,
