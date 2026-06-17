@@ -1659,7 +1659,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const field = document.getElementById("article-source-question");
     if (!(field instanceof HTMLTextAreaElement)) return "";
     articleSourceQuestion = field.value.trim();
-    localStorage.setItem(ARTICLE_SOURCE_QUESTION_KEY, articleSourceQuestion);
+    try {
+      localStorage.setItem(ARTICLE_SOURCE_QUESTION_KEY, articleSourceQuestion);
+    } catch (error) {
+      console.error("儲存社團問題草稿失敗：", error);
+    }
     return articleSourceQuestion;
   }
 
@@ -1678,13 +1682,19 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   function saveArticleAiResult() {
-    localStorage.setItem(
-      ARTICLE_AI_RESULT_KEY,
-      JSON.stringify({
-        content: articleAiResult,
-        mode: articleAiMode,
-      }),
-    );
+    try {
+      localStorage.setItem(
+        ARTICLE_AI_RESULT_KEY,
+        JSON.stringify({
+          content: articleAiResult,
+          mode: articleAiMode,
+        }),
+      );
+      return true;
+    } catch (error) {
+      console.error("儲存 AI 結果失敗：", error);
+      return false;
+    }
   }
 
   function setArticleAiFeedback(message, mode = "") {
@@ -2836,11 +2846,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       articleAiResult = await enrichArticleMetadataIfNeeded(content, mode);
       articleAiMode = mode;
       setArticleAiFeedback("結果整理完成，正在寫入工作台...", "is-success");
-      saveArticleAiResult();
+      const saved = saveArticleAiResult();
       renderArticleAiResult();
       const successMessage = mode === "quick" ? "已完成 AI 快速判題與社團回覆稿整理。" : "已完成 Flash 長稿備援生成。";
-      setFeedback(successMessage, "is-success");
-      setArticleAiFeedback(successMessage, "is-success");
+      const finalMessage = saved ? successMessage : `${successMessage} 但本機暫存寫入失敗。`;
+      setFeedback(finalMessage, saved ? "is-success" : "is-warning");
+      setArticleAiFeedback(finalMessage, saved ? "is-success" : "is-warning");
       return true;
     } catch (error) {
       console.error("Gemini Flash 結果整理失敗：", error);
@@ -2866,13 +2877,25 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       articleAiResult = await enrichArticleMetadataIfNeeded(quickContent, "quick");
       articleAiMode = "quick";
       setArticleAiFeedback("結果整理完成，正在寫入工作台...", "is-success");
-      saveArticleAiResult();
+      const saved = saveArticleAiResult();
       renderArticleAiResult();
 
       const question = persistArticleSourceQuestion();
       setArticleAiFeedback("結果已整理，正在複製 Pro 生文提示詞...", "is-success");
-      await copyProArticlePrompt(question, "已完成判題並複製 Pro 生文提示詞。");
-      setArticleAiFeedback("已完成判題並複製 Pro 生文提示詞。", "is-success");
+      try {
+        await copyProArticlePrompt(question, "已完成判題並複製 Pro 生文提示詞。");
+        const finalMessage = saved
+          ? "已完成判題並複製 Pro 生文提示詞。"
+          : "已完成判題並複製 Pro 生文提示詞，但本機暫存寫入失敗。";
+        setArticleAiFeedback(finalMessage, saved ? "is-success" : "is-warning");
+      } catch (error) {
+        console.error("複製 Pro 生文提示詞失敗：", error);
+        const fallbackMessage = saved
+          ? "已完成判題，但自動複製 Pro 生文提示詞失敗，可改用下方按鈕手動複製。"
+          : "已完成判題，但本機暫存與自動複製失敗，可改用下方按鈕手動複製。";
+        setFeedback(fallbackMessage, "is-warning");
+        setArticleAiFeedback(fallbackMessage, "is-warning");
+      }
     } catch (error) {
       console.error("一鍵流程整理失敗：", error);
       setFeedback("判題已完成，但整理或複製提示詞時發生問題，請重試一次。", "is-warning");
@@ -4797,9 +4820,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     display: grid;
     gap: 0.62rem;
     margin-top: 0.82rem;
-    margin-left: 1rem;
-    padding-left: 1rem;
+    margin-left: 1.45rem;
+    padding: 0.28rem 0 0.1rem 1.05rem;
     position: relative;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .quest-checklist::before {
@@ -4878,9 +4902,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     align-items: center;
     gap: 0.62rem;
     padding: 0.74rem 0.8rem;
+    margin-left: 0.18rem;
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.02);
     color: #f1efea;
     transition: background 0.25s ease, border-color 0.25s ease;
     position: relative;
@@ -4889,11 +4914,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .quest-check::before {
     content: "";
     position: absolute;
-    left: -1rem;
+    left: -1.06rem;
     top: 50%;
-    width: 0.72rem;
+    width: 0.82rem;
     height: 1px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.14);
     transform: translateY(-50%);
   }
 
