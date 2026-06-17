@@ -795,6 +795,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const WEEKLY_BONUS_XP = 50;
   const SITE_ORIGIN = "https://qingxidesign.tw";
   const BLOG_INDEX_URL = `${SITE_ORIGIN}/blog`;
+  const socialReplyShortUrlCache = new Map();
   const sourceTemplate = JSON.parse(defaultSourcesJson);
   const articleLibrary = JSON.parse(blogPostsJson);
   const geminiCanvasMasterData = JSON.parse(geminiCanvasMasterJson);
@@ -1955,6 +1956,36 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     return `${SITE_ORIGIN}/blog/${post.slug}`;
   }
 
+  async function getShortBlogUrl(url) {
+    const normalizedUrl = String(url || "").trim();
+    if (!normalizedUrl) return "";
+    if (normalizedUrl.includes("/r/")) return normalizedUrl;
+    if (socialReplyShortUrlCache.has(normalizedUrl)) {
+      return socialReplyShortUrlCache.get(normalizedUrl);
+    }
+
+    try {
+      const response = await fetch("/api/links/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: normalizedUrl }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Short link request failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const resolvedUrl = typeof result?.url === "string" && result.url.trim() ? result.url.trim() : normalizedUrl;
+      socialReplyShortUrlCache.set(normalizedUrl, resolvedUrl);
+      return resolvedUrl;
+    } catch (error) {
+      console.error("建立社團導流短網址失敗：", error);
+      socialReplyShortUrlCache.set(normalizedUrl, normalizedUrl);
+      return normalizedUrl;
+    }
+  }
+
   function resolveSocialReplyTarget(content) {
     const decisionSimilar = summarizeDecisionSimilar(content);
     const articleTitle = parseArticleTitle(content);
@@ -2149,9 +2180,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     };
   }
 
-  function getResolvedArticleSocialReplies(content) {
+  function getResolvedArticleSocialReplies(content, target = resolveSocialReplyTarget(content)) {
     const replies = parseArticleSocialReplies(content);
-    const target = resolveSocialReplyTarget(content);
     const fallbackReplies = buildFallbackSocialReplies(content, target);
     return {
       short: softenSocialReplyTone(replies.short || fallbackReplies.short, "short", target),
@@ -2260,7 +2290,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     title.textContent = data.title;
   }
 
-  function renderArticleSocialReplies(content) {
+  async function renderArticleSocialReplies(content) {
     const shell = document.getElementById("article-social-replies");
     const short = document.getElementById("article-social-reply-short");
     const pro = document.getElementById("article-social-reply-pro");
@@ -2275,12 +2305,24 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     const hasResult = Boolean(content.trim());
-    const replies = getResolvedArticleSocialReplies(content);
+    const target = resolveSocialReplyTarget(content);
+    const replies = getResolvedArticleSocialReplies(content, target);
     const hasReplies = Boolean(replies.short || replies.pro || replies.lead);
     shell.hidden = !(hasResult && hasReplies);
     short.textContent = replies.short || "尚未生成";
     pro.textContent = replies.pro || "尚未生成";
     lead.textContent = replies.lead || "尚未生成";
+
+    if (!hasResult || !hasReplies || !target.url) return;
+
+    const shortUrl = await getShortBlogUrl(target.url);
+    if (!shortUrl || shortUrl === target.url || content !== articleAiResult) return;
+
+    const shortReplies = getResolvedArticleSocialReplies(content, {
+      ...target,
+      url: shortUrl,
+    });
+    lead.textContent = shortReplies.lead || "尚未生成";
   }
 
   function summarizeDecisionTitle(content) {
@@ -2346,7 +2388,17 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   async function copyArticleSocialReply(variant, successMessage) {
-    const replies = getResolvedArticleSocialReplies(articleAiResult);
+    let replies = getResolvedArticleSocialReplies(articleAiResult);
+
+    if (variant === "lead") {
+      const target = resolveSocialReplyTarget(articleAiResult);
+      const shortUrl = await getShortBlogUrl(target.url);
+      replies = getResolvedArticleSocialReplies(articleAiResult, {
+        ...target,
+        url: shortUrl || target.url,
+      });
+    }
+
     const text = replies[variant]?.trim();
     if (!text) {
       setArticleAiFeedback("目前沒有可複製的社團回覆稿。", "is-warning");
