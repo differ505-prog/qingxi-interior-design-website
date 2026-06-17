@@ -255,7 +255,7 @@ const workflowGuideSteps = [
   },
   {
     title: "Pro 生文",
-    detail: "把 Flash 結構化結果交給 Gemini Pro 直接生成正式內文，並同步備好四平台轉貼文案、短標題與封面首句。",
+    detail: "把 Flash 結構化結果交給 Gemini 高階模型，直接生成可放進 Gemini Canvas 的正式文件稿，並同步備好四平台轉貼文案、短標題與封面首句。",
   },
   {
     title: "最後入庫",
@@ -612,14 +612,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                   <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
                 </div>
               </details>
-              <p class="bookshelf-prompt-note">最佳主路徑是一鍵備好 Pro 生文包：Gemini Flash 先判題並整理主書系、章節、標題與入庫卡，再自動幫你備好可貼去 Gemini Pro 的完整生文提示詞；高階模型除了正式文章，也會一起產出 FB、IG、Threads、小紅書轉貼文案，以及短標題、封面一句話、首圖文案。只有在想看 Flash 長稿時，才使用下方備援按鈕。</p>
+              <p class="bookshelf-prompt-note">最佳主路徑是一鍵備好 Pro 生文包：Gemini Flash 先判題並整理主書系、章節、標題與入庫卡，再自動幫你備好可貼去 Gemini 高階模型的完整生文提示詞；高階模型除了正式文章，也會一起產出可直接放進 Gemini 內建 Canvas 的文件稿、FB、IG、Threads、小紅書轉貼文案，以及短標題、封面一句話、首圖文案。只有在想看 Flash 長稿時，才使用下方備援按鈕。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <div id="article-pro-prompt-shell" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
                   <p>Pro 生文提示詞</p>
                   <span id="article-pro-prompt-label">尚未備好</span>
                 </div>
-                <p id="article-pro-prompt-note" class="bookshelf-confirm-note">一鍵流程完成後，這裡會先備好可直接貼去 Gemini Pro 的正式生文提示詞，再嘗試自動複製。</p>
+                <p id="article-pro-prompt-note" class="bookshelf-confirm-note">一鍵流程完成後，這裡會先備好可直接貼去 Gemini 高階模型、用來生成 Gemini 內建 Canvas 文件稿的正式生文提示詞，再嘗試自動複製。</p>
                 <div class="bookshelf-actions bookshelf-confirm-actions">
                   <button type="button" id="copy-pro-finalize-prompt-inline" class="bookshelf-action">再次複製 Pro 生文提示詞</button>
                 </div>
@@ -1548,6 +1548,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
       "這篇文章不是一次性流量稿，而是未來可持續收錄、整併、出版的內容資產；寫作時請同時滿足網站發布與出書收錄兩個目的。",
+      "請把正式文章主體輸出成可直接放進 Gemini 內建 Canvas 的單一完整文件稿，方便後續在 Canvas 內繼續編修。",
       "",
       "【真實社團問題】",
       questionBlock,
@@ -1559,7 +1560,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "A. 文章策略確認",
       "B. 正式發布標題",
       "C. 正式發布摘要",
-      "D. 正式發布文章（Markdown）",
+      "D. Gemini Canvas 文件稿（Markdown 單一完整文件）",
       "E. 最終發布欄位確認",
       "F. 出書收錄備註",
       "G. 給 IDE 的提示詞優化建議",
@@ -1618,6 +1619,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
       "這篇文章不是一次性流量稿，而是未來要整理成書的內容資產；請一開始就用『可發布、可收錄、可長期保存』的標準寫作。",
+      "請把正式文章主體輸出成可直接放進 Gemini 內建 Canvas 的單一完整文件稿，方便後續在 Canvas 內繼續編修。",
       "",
       "【真實社團問題】",
       questionBlock,
@@ -1638,17 +1640,18 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "寫作要求：",
       "1. 請把題目自然延伸成一篇完整文章，不要只重述原始發問。",
       "2. 這篇文要能直接收進未來書稿的對應章節，所以結構、邏輯與段落成熟度都要符合出書標準。",
-      "3. 若地區名稱不影響法規、屋況、日照、通勤或生活條件，正式標題與內文不要把地區寫死。",
-      "4. 若牽涉預算、費用、單價或報價，只能寫保守區間、條件差異與影響因子，不可寫成保證價或正式估價口吻。",
-      "5. 文氣要穩定、乾淨、有設計感，不要推銷腔。",
-      "6. 若 Flash 的分類或標題不夠精準，你可以微調，但不要偏離原始問題，而且調整後仍要留在同一套書稿脈絡內。",
+      "3. 若原始問題帶有強烈地域性或極度私人條件，請先萃取其背後具普適性的裝修痛點，再展開成可跨讀者閱讀的通用論述；只有在確實影響判斷時，才保留該地區或私人條件。",
+      "4. 若地區名稱不影響法規、屋況、日照、通勤或生活條件，正式標題與內文不要把地區寫死。",
+      "5. 若牽涉預算、費用、單價或報價，只能寫保守區間、條件差異與影響因子，不可寫成保證價或正式估價口吻。",
+      "6. 文氣要穩定、乾淨、有設計感，不要推銷腔。",
+      "7. 若 Flash 的分類或標題不夠精準，你可以微調，但不要偏離原始問題，而且調整後仍要留在同一套書稿脈絡內。",
       "",
       "請固定依序輸出：",
       "A. 文章策略確認",
       "B. 重複風險覆核",
       "C. 正式發布標題（1 個最推薦 + 2 個備選）",
       "D. 正式發布摘要（120-160 字）",
-      "E. 正式發布文章（Markdown）",
+      "E. Gemini Canvas 文件稿（Markdown 單一完整文件）",
       "F. 最終發布欄位確認（網站分類 / 主書系 / 章節定位 / 文章標題 / 摘要 / 建議 slug）",
       "G. 出書收錄備註",
       "H. FB 粉專版",
@@ -1676,6 +1679,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "你現在不是只在寫一篇官網文章，而是在替一套未來可集結成書的內容系統，完成其中一個可長期保存的章節單元。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場、業配腔或短影音口語稿。",
       "請把『這篇文未來一定會被納入書稿』視為硬性前提，而不是可有可無的附帶備註。",
+      "請把正式文章主體輸出成可直接放進 Gemini 內建 Canvas 的單一完整文件稿，方便後續在 Canvas 內繼續編修，而不是零碎片段。",
       "",
       "你的任務不是覆寫一篇低階初稿，而是直接站在高階模型的角度完成正式內文。",
       "請把 Flash 提供的判題、分類、標題與入庫資訊當成文章骨架，再把真正的文章品質、邏輯、文氣、內部連貫與 SEO 完整拉高。",
@@ -1705,10 +1709,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "1. 請把這篇文視為未來書中的一個章節單元，不要寫成只追當下流量的短期文章。",
       "2. 文氣要能長期保存，可讀性高，但不要浮誇、不要過度聳動、不要把簡單問題硬寫得過度戲劇化。",
       "3. 若題目很小，請自然往上補足成一篇完整章節該有的背景、判斷邏輯、常見誤區與實務建議。",
-      "4. 若與同書系既有文章可能重疊，請優先選擇補位角度，而不是重寫同樣內容。",
-      "5. 若原始問題帶有地區名稱，例如南港、內湖、汐止，請先判斷該地區是否真的影響法規、屋況、行情、日照、西曬、通勤或生活條件；若沒有實質影響，正式文章標題與內文請優先寫成可跨區閱讀的通用版本，不要把地區寫死。",
-      "6. 若牽涉預算、費用、單價或報價，請只寫保守區間、情境差異與影響因子，不可寫成保證價、固定單價、精準總價或像正式估價單的口吻，避免讓讀者把文章當成日後對價依據。",
-      "7. 若 Flash 給的主書系、章節或標題不夠精準，你可以微調，但調整後仍需維持在同一套書稿脈絡內。",
+      "4. 若原始問題帶有強烈地域性或極度私人條件，請先萃取其背後具普適性的裝修痛點，再展開成可跨讀者閱讀的通用論述；只有在確實影響判斷時，才保留該地區或私人條件。",
+      "5. 若與同書系既有文章可能重疊，請優先選擇補位角度，而不是重寫同樣內容。",
+      "6. 若原始問題帶有地區名稱，例如南港、內湖、汐止，請先判斷該地區是否真的影響法規、屋況、行情、日照、西曬、通勤或生活條件；若沒有實質影響，正式文章標題與內文請優先寫成可跨區閱讀的通用版本，不要把地區寫死。",
+      "7. 若牽涉預算、費用、單價或報價，請只寫保守區間、情境差異與影響因子，不可寫成保證價、固定單價、精準總價或像正式估價單的口吻，避免讓讀者把文章當成日後對價依據。",
+      "8. 若 Flash 給的主書系、章節或標題不夠精準，你可以微調，但調整後仍需維持在同一套書稿脈絡內。",
       "",
       "請你輸出以下內容，並嚴格依照順序：",
       "",
@@ -1730,8 +1735,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "D. 【正式發布摘要】",
       "- 請輸出 120-160 字摘要，可直接作為知識分享摘要或 meta description 草稿。",
       "",
-      "E. 【正式發布文章（Markdown）】",
-      "- 請直接輸出一篇真正可發佈的完整版本，不要再假裝是草稿。",
+      "E. 【Gemini Canvas 文件稿（Markdown 單一完整文件）】",
+      "- 請直接輸出一篇真正可發佈、且可直接放進 Gemini 內建 Canvas 的完整文件稿，不要再假裝是草稿。",
+      "- 這一段請只輸出文件本體，不要在文件前後再補額外說明、註解或操作提醒。",
+      "- 請用適合 Canvas 續修的 Markdown 結構整理內容，讓標題、小標、列表與段落層次清楚完整。",
       "- 保留高資訊密度，但文氣要穩定、乾淨、有設計感，且要有可收進書稿的成熟度。",
       "- 文章內文必須真正根據原始問題展開，而不是只重述 Flash 判題結果。",
       "- 若題目原始資訊不足，請合理補全背景與情境，讓文章仍能成立為完整章節。",
@@ -1927,9 +1934,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     label.textContent = hasPrompt ? (hasAiResult ? "已備好" : "模板已備好") : "尚未備好";
     note.textContent = hasPrompt
       ? hasAiResult
-        ? "下方是最近一次備好的版本；若你修改了問題內容，再按一次「複製 Pro 生文提示詞」就會自動更新。"
+        ? "下方是最近一次備好的版本；若你修改了問題內容，再按一次「複製 Pro 生文提示詞」就會自動更新，並繼續用於 Gemini 內建 Canvas 文件稿。"
         : "目前先備好的是模板版；若先完成 Flash 判題，再按一次複製會自動改成正式版本。"
-      : "一鍵流程完成後，這裡會先備好可直接貼去 Gemini Pro 的正式生文提示詞，再嘗試自動複製。";
+      : "一鍵流程完成後，這裡會先備好可直接貼去 Gemini 高階模型、用來生成 Gemini 內建 Canvas 文件稿的正式生文提示詞，再嘗試自動複製。";
     content.value = articleProFinalizePrompt;
   }
 
