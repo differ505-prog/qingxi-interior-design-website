@@ -208,56 +208,6 @@ const bookshelfSubchapterPools = {
   },
 };
 
-const articleIntakeFields = [
-  "主書系",
-  "章節定位",
-  "網站分類",
-  "搜尋主關鍵字",
-  "相似舊文",
-  "處理策略",
-  "社團回覆角度",
-  "導流目的",
-  "下一篇延伸題目",
-];
-
-const overlapRules = [
-  {
-    title: "同核心問題",
-    detail: "若主判斷與既有文章相同，優先補強舊文，不重開新標題。",
-  },
-  {
-    title: "同主題不同角度",
-    detail: "若情境、預算、屋況或族群不同，可做同章延伸文，互相內鏈。",
-  },
-  {
-    title: "可併成系列",
-    detail: "若同一主書系下可串成前後篇，改做系列文，不做彼此搶重點的散文。",
-  },
-];
-
-const workflowGuideSteps = [
-  {
-    title: "先貼問題",
-    detail: "把社團原始發問貼進工作台，保留真實語境。",
-  },
-  {
-    title: "先判題",
-    detail: "先用 AI 快速判題，決定開新文、補舊文或同章延伸。",
-  },
-  {
-    title: "整理骨架",
-    detail: "讓 Gemini Flash 先整理主書系、章節、標題、入庫卡與回覆角度，不先浪費高階模型在分類小事。",
-  },
-  {
-    title: "Pro 生文",
-    detail: "把 Flash 結構化結果交給 Gemini 高階模型，直接生成可放進 Gemini Canvas 的正式文件稿，並同步備好四平台轉貼文案、短標題與封面首句。",
-  },
-  {
-    title: "最後入庫",
-    detail: "確認主書系、章節、正式分類與發布欄位，讓每篇文章都能集結成書。",
-  },
-];
-
 let blogPosts = staticBlogPosts.map(({ coverImage, ...post }) => post);
 let blogSyncLabel = "目前先顯示已存在文章。";
 
@@ -295,182 +245,8 @@ try {
   blogSyncLabel = "同步失敗，先顯示已存在文章。";
 }
 
-function inferBookshelfTrack(post: { title: string; category: string }) {
-  const haystack = `${post.title} ${post.category}`.toLowerCase();
-
-  if (/驗屋|交屋|點交|缺失/.test(haystack)) return "驗屋交屋系";
-  if (/客變|預售屋/.test(haystack)) return "預售屋客變系";
-  if (/格局|動線|收納|小坪數|空間/.test(haystack)) return "格局動線系";
-  if (/水電|插座|開關|照明|燈光|迴路|智能|窗簾/.test(haystack)) return "水電照明系";
-  return "老屋翻新系";
-}
-
-function getTrackChapters(trackTitle: string) {
-  const track = bookshelfTracks.find((entry) => entry.title === trackTitle);
-  if (!track?.chapters) return [];
-  return track.chapters.split("/").map((chapter) => chapter.trim()).filter(Boolean);
-}
-
-function getTrackSubchapterMap(trackTitle: string, chapterTitle: string): Record<string, string[]> {
-  return (bookshelfSubchapterPools[trackTitle as keyof typeof bookshelfSubchapterPools]?.[chapterTitle as never] || {}) as Record<string, string[]>;
-}
-
-function inferBookshelfSubchapter(trackTitle: string, chapterTitle: string, post: { title: string; category: string; summary?: string }) {
-  const haystack = `${post.title} ${post.category} ${post.summary || ""}`.toLowerCase();
-  const subchapterMap = getTrackSubchapterMap(trackTitle, chapterTitle);
-  const subchapterEntries = Object.entries(subchapterMap);
-  if (!subchapterEntries.length) return "";
-
-  let bestSubchapter = "";
-  let bestScore = 0;
-  subchapterEntries.forEach(([subchapter, keywords]) => {
-    const score = keywords.reduce((sum, keyword) => sum + (haystack.includes(String(keyword).toLowerCase()) ? 1 : 0), 0);
-    if (score > bestScore) {
-      bestScore = score;
-      bestSubchapter = subchapter;
-    }
-  });
-
-  return bestSubchapter || subchapterEntries[0][0] || "";
-}
-
-function inferBookshelfChapter(trackTitle: string, post: { title: string; category: string }) {
-  const haystack = `${post.title} ${post.category}`.toLowerCase();
-
-  if (trackTitle === "驗屋交屋系") {
-    if (/交屋後|進場|裝修銜接/.test(haystack)) return "交屋後進場";
-    if (/優先|排序|先修|先處理/.test(haystack)) return "缺失排序";
-    if (/點交|交屋|建商|回報|協調/.test(haystack)) return "點交策略";
-    if (/缺失|裂縫|漏水/.test(haystack)) return "缺失排序";
-    return "驗屋判讀";
-  }
-
-  if (trackTitle === "預售屋客變系") {
-    if (/交屋|進場|客變後/.test(haystack)) return "交屋銜接";
-    if (/材質|建材|面材|板材|磁磚|地板|五金|廚具|衛浴/.test(haystack)) return "材質設備";
-    if (/插座|開關|照明|燈光|燈位|迴路|弱電/.test(haystack)) return "配置預留";
-    if (/動線|收納|格局/.test(haystack)) return "生活動線";
-    return "客變判斷";
-  }
-
-  if (trackTitle === "格局動線系") {
-    if (/小孩|長輩|寵物|生活習慣|使用情境|工作型態/.test(haystack)) return "使用情境";
-    if (/家具|沙發|餐桌|床架|書桌|餐椅/.test(haystack)) return "家具配置";
-    if (/收納/.test(haystack)) return "收納系統";
-    if (/動線|走道/.test(haystack)) return "動線配置";
-    return "空間尺度";
-  }
-
-  if (trackTitle === "水電照明系") {
-    if (/插座|開關/.test(haystack)) return "插座開關";
-    if (/迴路|安全/.test(haystack)) return "迴路安全";
-    if (/弱電|網路|監控|冷氣|新風|設備整合/.test(haystack)) return "設備整合";
-    if (/智能|窗簾|感應|自動化|語音|情境/.test(haystack)) return "智能控制";
-    return "照明設計";
-  }
-
-  if (/預算|費用|報價|單價|怎麼抓|追加/.test(haystack)) return "預算拆解";
-  if (/拆除|泥作|防水|基礎/.test(haystack)) return "基礎工程";
-  if (/驗收|完工|缺失|避雷|糾紛|保固/.test(haystack)) return "完工避雷";
-  if (/格局|收納|動線/.test(haystack)) return "空間重整";
-  return "現況判讀";
-}
-
-function inferSearchKeyword(post: { title: string; category: string }) {
-  const haystack = `${post.title} ${post.category}`.toLowerCase();
-
-  if (/驗屋|交屋|點交/.test(haystack)) return "驗屋交屋";
-  if (/客變|預售屋/.test(haystack)) return "預售屋客變";
-  if (/收納|小坪數|格局|動線/.test(haystack)) return "格局動線規劃";
-  if (/插座|開關|水電|照明|燈光/.test(haystack)) return "水電照明規劃";
-  return "老屋翻新";
-}
-
-const bookshelfEntries = blogPosts.map((post, index) => {
-  const trackTitle = inferBookshelfTrack(post);
-  const chapter = inferBookshelfChapter(trackTitle, post);
-  const subchapter = inferBookshelfSubchapter(trackTitle, chapter, post);
-  const searchKeyword = inferSearchKeyword(post);
-  return {
-    ...post,
-    index,
-    trackTitle,
-    chapter,
-    subchapter,
-    searchKeyword,
-  };
-}).map((entry, _, entries) => {
-  const similarEntry = entries.find((candidate) =>
-    candidate.slug !== entry.slug &&
-    candidate.trackTitle === entry.trackTitle &&
-    (candidate.chapter === entry.chapter || candidate.category === entry.category),
-  );
-
-  const strategy = similarEntry
-    ? similarEntry.chapter === entry.chapter
-      ? "同章延伸"
-      : "補強舊文"
-    : "開新文";
-
-  return {
-    ...entry,
-    similarTitle: similarEntry?.title || "無明確重複",
-    strategy,
-  };
-});
-
-const bookshelfViewGroups = bookshelfTracks.map((track) => ({
-  ...track,
-  entries: bookshelfEntries.filter((entry) => entry.trackTitle === track.title),
-}));
-
-const bookshelfOutlineGroups = bookshelfTracks.map((track) => {
-  const trackEntries = bookshelfEntries.filter((entry) => entry.trackTitle === track.title);
-  const chapters = getTrackChapters(track.title).map((chapter) => {
-    const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter);
-    const subchapterMap = getTrackSubchapterMap(track.title, chapter);
-    const subchapterTitles = Object.keys(subchapterMap);
-    const subchapters = subchapterTitles.map((subchapter) => ({
-      title: subchapter,
-      entries: chapterEntries.filter((entry) => entry.subchapter === subchapter),
-    }));
-    const missingSubchapters = subchapters.filter((subchapter) => subchapter.entries.length === 0).map((subchapter) => subchapter.title);
-
-    return {
-      title: chapter,
-      entries: chapterEntries,
-      subchapters,
-      missingSubchapters,
-    };
-  });
-  const filledChapters = chapters.filter((chapter) => chapter.entries.length > 0).length;
-  const missingChapters = chapters.filter((chapter) => chapter.entries.length === 0).map((chapter) => chapter.title);
-  const missingSubchapters = chapters.flatMap((chapter) =>
-    chapter.missingSubchapters.map((subchapter) => `${chapter.title}・${subchapter}`),
-  );
-  const densestChapter = [...chapters].sort((left, right) => right.entries.length - left.entries.length)[0];
-  const nextAction = missingChapters.length > 0
-    ? `優先補章：${missingChapters.slice(0, 3).join(" / ")}`
-    : missingSubchapters.length > 0
-      ? `優先補子章：${missingSubchapters.slice(0, 2).join(" / ")}`
-    : densestChapter?.title
-      ? `優先延伸：${densestChapter.title}`
-      : "可補下一題";
-
-  return {
-    ...track,
-    entries: trackEntries,
-    chapters,
-    filledChapters,
-    missingChapters,
-    missingSubchapters,
-    nextAction,
-  };
-});
-
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
-const blogCategoryCount = new Set(blogPosts.map((post) => post.category)).size;
 const bookshelfTracksJson = JSON.stringify(bookshelfTracks);
 const bookshelfSubchapterPoolsJson = JSON.stringify(bookshelfSubchapterPools);
 const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
@@ -492,8 +268,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
           </p>
           <div class="hero-actions">
             <a href="#quest-board" class="btn btn-primary">開始本週任務</a>
-            <a href="#portal-grid" class="btn btn-secondary">前往來源入口</a>
-            <button type="button" id="reset-social-ops" class="btn btn-tertiary">重設</button>
           </div>
           <p id="ops-feedback" class="ops-feedback" aria-live="polite"></p>
         </div>
@@ -541,32 +315,35 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
             <div id="quest-grid" class="quest-grid"></div>
           </section>
 
-          <section id="portal-grid" class="ops-panel portal-board">
-            <div class="panel-heading">
+          <details id="portal-grid" class="ops-panel ops-fold portal-board">
+            <summary class="ops-fold-summary">
               <div>
                 <p class="panel-tag">來源入口</p>
                 <h2>來源入口</h2>
               </div>
-            </div>
-            <div class="portal-section">
-              <div class="portal-section-heading">
-                <p>Facebook 社團</p>
+              <small>低頻時再展開</small>
+            </summary>
+            <div class="ops-fold-body">
+              <div class="portal-section">
+                <div class="portal-section-heading">
+                  <p>Facebook 社團</p>
+                </div>
+                <div id="facebook-card-grid" class="portal-card-grid"></div>
               </div>
-              <div id="facebook-card-grid" class="portal-card-grid"></div>
-            </div>
-            <div class="portal-section">
-              <div class="portal-section-heading">
-                <p>LINE 社群</p>
+              <div class="portal-section">
+                <div class="portal-section-heading">
+                  <p>LINE 社群</p>
+                </div>
+                <div id="line-card-grid" class="portal-card-grid"></div>
               </div>
-              <div id="line-card-grid" class="portal-card-grid"></div>
-            </div>
-            <div class="portal-section">
-              <div class="portal-section-heading">
-                <p>Google 商家</p>
+              <div class="portal-section">
+                <div class="portal-section-heading">
+                  <p>Google 商家</p>
+                </div>
+                <div id="google-card-grid" class="portal-card-grid"></div>
               </div>
-              <div id="google-card-grid" class="portal-card-grid"></div>
             </div>
-          </section>
+          </details>
 
           <section id="bookshelf-board" class="ops-panel bookshelf-board">
             <div class="panel-heading">
@@ -574,7 +351,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <p class="panel-tag">內容書架</p>
                 <h2>內容書架</h2>
               </div>
-              <p>把題目變文章，再慢慢收成書。</p>
+              <p>只留判題、生文、暫存與成效。</p>
             </div>
 
             <div class="bookshelf-prompt-tool">
@@ -589,21 +366,18 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               <div class="bookshelf-actions bookshelf-prompt-actions">
                 <button type="button" id="run-article-ai-flow" class="bookshelf-action bookshelp-action-primary">一鍵備好 Pro 生文包</button>
                 <button type="button" id="run-article-ai-quick" class="bookshelf-action">AI 快速判題</button>
-                <button type="button" id="copy-pro-finalize-prompt" class="bookshelf-action">複製 Pro 生文提示詞</button>
               </div>
               <details class="bookshelf-mini-fold">
                 <summary>
-                  <span>其他操作</span>
-                  <small>備援與清理</small>
+                  <span>備援操作</span>
+                  <small>需要時才展開</small>
                 </summary>
                 <div class="bookshelf-actions bookshelf-mini-actions">
                   <button type="button" id="run-article-ai-draft" class="bookshelf-action">Flash 生成長稿（備援）</button>
-                  <button type="button" id="copy-article-ai-result" class="bookshelf-action">複製 AI 結果</button>
-                  <button type="button" id="copy-article-prompt" class="bookshelf-action">複製文章生成提示詞</button>
                   <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
                 </div>
               </details>
-              <p class="bookshelf-prompt-note">最佳主路徑是一鍵備好 Pro 生文包：Gemini Flash 先判題並整理主書系、章節、標題與入庫卡，再自動幫你備好可貼去 Gemini 高階模型的完整生文提示詞；高階模型除了正式文章，也會一起產出可直接放進 Gemini 內建 Canvas 的文件稿、FB、IG、Threads、小紅書轉貼文案，以及短標題、封面一句話、首圖文案。只有在想看 Flash 長稿時，才使用下方備援按鈕。</p>
+              <p class="bookshelf-prompt-note">主路徑只用一鍵備好 Pro 生文包；備援按鈕只在例外情況再打開。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <div id="article-pro-prompt-shell" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
@@ -729,10 +503,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <span>現有文章</span>
                 <strong>{blogPosts.length}</strong>
               </article>
-              <article class="bookshelf-stat">
-                <span>現有分類</span>
-                <strong>{blogCategoryCount}</strong>
-              </article>
               <article class="bookshelf-stat bookshelf-stat-wide">
                 <span>同步狀態</span>
                 <strong>{blogSyncLabel}</strong>
@@ -778,281 +548,77 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               </div>
             </div>
 
-            <div class="bookshelf-actions">
-              <button type="button" id="copy-book-plan" class="bookshelf-action bookshelp-action-primary">複製 LLM 書系整理稿</button>
-              <button type="button" id="copy-article-intake" class="bookshelf-action">複製文章入庫欄位</button>
-              <button type="button" id="copy-book-titles" class="bookshelf-action">複製文章標題清單</button>
-              <a href="/blog" class="bookshelf-action" target="_blank" rel="noreferrer">前往知識分享</a>
-            </div>
-
             <details class="bookshelf-fold">
               <summary>
-                <span>工作流程</span>
-                <small>{workflowGuideSteps.length} 步</small>
+                <span>已上線文章</span>
+                <small>{blogPosts.length} 篇</small>
               </summary>
               <div class="bookshelf-preview bookshelf-fold-body">
-                <div class="bookshelf-guide-grid">
-                  {workflowGuideSteps.map((step, index) => (
-                    <article class="bookshelf-guide-card">
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      <strong>{step.title}</strong>
-                      <p>{step.detail}</p>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            </details>
-
-            <details class="bookshelf-fold">
-              <summary>
-                <span>系統規格</span>
-                <small>{bookshelfTracks.length} 書系 / {articleIntakeFields.length} 欄</small>
-              </summary>
-              <div class="bookshelf-fold-stack">
-                <div class="bookshelf-preview bookshelf-fold-body">
-                  <div class="bookshelf-preview-head">
-                    <p>主書系</p>
-                    <span>{bookshelfTracks.length} 軸</span>
-                  </div>
-                  <div class="bookshelf-track-grid">
-                    {bookshelfTracks.map((track) => (
-                      <article class="bookshelf-track-card">
-                        <div class="bookshelf-track-top">
-                          <p>{track.title}</p>
-                        </div>
-                        <strong>{track.focus}</strong>
-                        <small>{track.chapters}</small>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-
-                <div class="bookshelf-preview bookshelf-fold-body">
-                  <div class="bookshelf-preview-head">
-                    <p>入庫欄位</p>
-                    <span>{articleIntakeFields.length} 項</span>
-                  </div>
-                  <div class="bookshelf-intake-grid">
-                    {articleIntakeFields.map((field, index) => (
-                      <article class="bookshelf-intake-item">
-                        <span>{String(index + 1).padStart(2, "0")}</span>
-                        <p>{field}</p>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-
-                <div class="bookshelf-preview bookshelf-fold-body">
-                  <div class="bookshelf-preview-head">
-                    <p>去重規則</p>
-                    <span>{overlapRules.length} 條</span>
-                  </div>
-                  <div class="bookshelf-rule-grid">
-                    {overlapRules.map((rule) => (
-                      <article class="bookshelf-rule-card">
-                        <strong>{rule.title}</strong>
-                        <p>{rule.detail}</p>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </details>
-
-            <details class="bookshelf-fold">
-              <summary>
-                <span>書架視圖</span>
-                <small>{bookshelfEntries.length} 篇</small>
-              </summary>
-              <div class="bookshelf-preview bookshelf-fold-body">
-                <div class="bookshelf-shelf-grid">
-                  {bookshelfViewGroups.map((group) => (
-                    <section class="bookshelf-shelf-card">
-                      <div class="bookshelf-shelf-head">
-                        <div>
-                          <p>{group.title}</p>
-                          <strong>{group.focus}</strong>
-                        </div>
-                        <span>{group.entries.length} 篇</span>
+                <div class="bookshelf-library-list">
+                  {blogPosts.map((post) => (
+                    <a class="bookshelf-library-link" href={`/blog/${post.slug}`} target="_blank" rel="noreferrer">
+                      <div class="bookshelf-library-copy">
+                        <strong>{post.title}</strong>
+                        <p>{post.category}</p>
                       </div>
-                      <small>{group.chapters}</small>
-                      {group.entries.length > 0 ? (
-                        <div class="bookshelf-shelf-entries">
-                          {group.entries.map((entry) => (
-                            <article class="bookshelf-entry">
-                              <div class="bookshelf-entry-top">
-                                <span>{entry.chapter}</span>
-                                <p>{entry.strategy}</p>
-                              </div>
-                              <h3>{entry.title}</h3>
-                              <div class="bookshelf-entry-stack">
-                                <small>分類：{entry.category}</small>
-                                <small>關鍵字：{entry.searchKeyword}</small>
-                                <small>相似舊文：{entry.similarTitle}</small>
-                              </div>
-                              <div class="bookshelf-entry-meta">
-                                <span>{entry.date}</span>
-                                <a href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">查看文章</a>
-                              </div>
-                            </article>
-                          ))}
-                        </div>
-                      ) : (
-                        <div class="bookshelf-shelf-empty">待補主文</div>
-                      )}
-                    </section>
-                  ))}
-                </div>
-              </div>
-            </details>
-
-            <details class="bookshelf-fold">
-              <summary>
-                <span>書稿目錄</span>
-                <small>{bookshelfOutlineGroups.length} 本</small>
-              </summary>
-              <div class="bookshelf-preview bookshelf-fold-body">
-                <div class="bookshelf-outline-grid">
-                  {bookshelfOutlineGroups.map((group) => (
-                    <details class="bookshelf-outline-card">
-                      <summary class="bookshelf-outline-summary">
-                        <div class="bookshelf-outline-head">
-                          <div>
-                            <p>{group.title}</p>
-                            <strong>{group.filledChapters} / {group.chapters.length} 章已成形</strong>
-                          </div>
-                          <span>{group.entries.length} 篇文章</span>
-                        </div>
-                        <div class="bookshelf-outline-priority">
-                          <p>{group.nextAction}</p>
-                          {group.missingChapters.length > 0 ? (
-                            <div class="bookshelf-outline-tags">
-                              {group.missingChapters.slice(0, 3).map((chapter) => (
-                                <span>{chapter}</span>
-                              ))}
-                            </div>
-                          ) : (
-                            <div class="bookshelf-outline-tags">
-                              <span>已具基本目錄</span>
-                            </div>
-                          )}
-                        </div>
-                      </summary>
-                      <div class="bookshelf-outline-body">
-                        <div class="bookshelf-outline-chapters">
-                          {group.chapters.map((chapter, index) => (
-                            <article class="bookshelf-outline-chapter">
-                              <div class="bookshelf-outline-chapter-top">
-                                <span>{String(index + 1).padStart(2, "0")}</span>
-                                <p>{chapter.entries.length > 0 ? `${chapter.entries.length} 篇` : "待補主文"}</p>
-                              </div>
-                              <strong>{chapter.title}</strong>
-                              {chapter.subchapters.length > 0 ? (
-                                <div class="bookshelf-outline-subchapter-shell">
-                                  {chapter.missingSubchapters.length > 0 ? (
-                                    <div class="bookshelf-outline-subchapter-tags">
-                                      {chapter.missingSubchapters.slice(0, 3).map((subchapter) => (
-                                        <span>{subchapter}</span>
-                                      ))}
-                                    </div>
-                                  ) : (
-                                    <div class="bookshelf-outline-subchapter-tags">
-                                      <span>子章節已具基本骨架</span>
-                                    </div>
-                                  )}
-                                  <div class="bookshelf-outline-subchapter-grid">
-                                    {chapter.subchapters.map((subchapter) => (
-                                      <article class="bookshelf-outline-subchapter">
-                                        <div class="bookshelf-outline-subchapter-top">
-                                          <p>{subchapter.title}</p>
-                                          <span>{subchapter.entries.length > 0 ? `${subchapter.entries.length} 篇` : "待補子文"}</span>
-                                        </div>
-                                        {subchapter.entries.length > 0 ? (
-                                          <div class="bookshelf-outline-list">
-                                            {subchapter.entries.map((entry) => (
-                                              <a class="bookshelf-outline-link" href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">
-                                                <span>{entry.title}</span>
-                                              </a>
-                                            ))}
-                                          </div>
-                                        ) : (
-                                          <div class="bookshelf-outline-empty">這個子章節還沒有文章</div>
-                                        )}
-                                      </article>
-                                    ))}
-                                  </div>
-                                </div>
-                              ) : chapter.entries.length > 0 ? (
-                                <div class="bookshelf-outline-list">
-                                  {chapter.entries.map((entry) => (
-                                    <a class="bookshelf-outline-link" href={`/blog/${entry.slug}`} target="_blank" rel="noreferrer">
-                                      <span>{entry.title}</span>
-                                    </a>
-                                  ))}
-                                </div>
-                              ) : (
-                                <div class="bookshelf-outline-empty">這章還沒有文章</div>
-                              )}
-                            </article>
-                          ))}
-                        </div>
-                      </div>
-                    </details>
+                      <span>{post.date}</span>
+                    </a>
                   ))}
                 </div>
               </div>
             </details>
           </section>
 
-          <section id="gemini-backup-board" class="ops-panel gemini-board">
-            <div class="panel-heading">
+          <details id="gemini-backup-board" class="ops-panel ops-fold gemini-board">
+            <summary class="ops-fold-summary">
               <div>
                 <p class="panel-tag">Gemini 備份艙</p>
                 <h2>Gemini Canvas 備份</h2>
               </div>
-              <p>只留日期版本，點開才展開。</p>
-            </div>
-
-            <div class="gemini-actions gemini-actions-primary">
-              <button type="button" id="run-gemini-backup" class="bookshelf-action bookshelp-action-primary">立即備份</button>
-            </div>
-
-            <p id="gemini-feedback" class="gemini-feedback" aria-live="polite"></p>
-
-            <details class="gemini-composer" id="gemini-composer">
-              <summary>
-                <span>進階設定</span>
-                <small>需要改連結、內容或下載時再展開</small>
-              </summary>
-              <div class="gemini-editor-grid">
-                <label class="gemini-field">
-                  <span>分享網址</span>
-                  <input id="gemini-source-url" type="url" placeholder="貼上 Gemini 分享網址" />
-                </label>
-                <label class="gemini-field">
-                  <span>備份標題</span>
-                  <input id="gemini-title" type="text" placeholder="這次備份名稱" />
-                </label>
-                <label class="gemini-field gemini-field-full">
-                  <span>內容</span>
-                  <textarea id="gemini-content" rows="16" placeholder="把 Gemini Canvas 內容整段貼進來"></textarea>
-                </label>
+              <small>低頻時再展開</small>
+            </summary>
+            <div class="ops-fold-body">
+              <div class="gemini-actions gemini-actions-primary">
+                <button type="button" id="run-gemini-backup" class="bookshelf-action bookshelp-action-primary">立即備份</button>
               </div>
-              <div class="gemini-composer-actions">
-                <button type="button" id="load-gemini-master" class="bookshelf-action">載入主檔</button>
-                <button type="button" id="copy-gemini-markdown" class="bookshelf-action">複製 Markdown</button>
-                <button type="button" id="download-gemini-json" class="bookshelf-action">下載 JSON</button>
-              </div>
-            </details>
 
-            <div class="gemini-history">
-              <div class="bookshelf-preview-head">
-                <p>版本列表</p>
-                <span id="gemini-history-count">0 版</span>
+              <p id="gemini-feedback" class="gemini-feedback" aria-live="polite"></p>
+
+              <details class="gemini-composer" id="gemini-composer">
+                <summary>
+                  <span>進階設定</span>
+                  <small>需要改連結、內容或下載時再展開</small>
+                </summary>
+                <div class="gemini-editor-grid">
+                  <label class="gemini-field">
+                    <span>分享網址</span>
+                    <input id="gemini-source-url" type="url" placeholder="貼上 Gemini 分享網址" />
+                  </label>
+                  <label class="gemini-field">
+                    <span>備份標題</span>
+                    <input id="gemini-title" type="text" placeholder="這次備份名稱" />
+                  </label>
+                  <label class="gemini-field gemini-field-full">
+                    <span>內容</span>
+                    <textarea id="gemini-content" rows="16" placeholder="把 Gemini Canvas 內容整段貼進來"></textarea>
+                  </label>
+                </div>
+                <div class="gemini-composer-actions">
+                  <button type="button" id="load-gemini-master" class="bookshelf-action">載入主檔</button>
+                  <button type="button" id="copy-gemini-markdown" class="bookshelf-action">複製 Markdown</button>
+                  <button type="button" id="download-gemini-json" class="bookshelf-action">下載 JSON</button>
+                </div>
+              </details>
+
+              <div class="gemini-history">
+                <div class="bookshelf-preview-head">
+                  <p>版本列表</p>
+                  <span id="gemini-history-count">0 版</span>
+                </div>
+                <div id="gemini-history-list" class="gemini-version-list"></div>
               </div>
-              <div id="gemini-history-list" class="gemini-version-list"></div>
             </div>
-          </section>
+          </details>
         </div>
       </div>
     </div>
@@ -4392,6 +3958,42 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     padding: 1.2rem;
   }
 
+  .ops-fold {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .ops-fold-summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.2rem;
+  }
+
+  .ops-fold-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .ops-fold-summary small {
+    color: rgba(224, 221, 214, 0.52);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    text-align: right;
+  }
+
+  .ops-fold[open] .ops-fold-summary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .ops-fold-body {
+    display: grid;
+    gap: 1rem;
+    padding: 0 1.2rem 1.2rem;
+  }
+
   .panel-heading {
     display: flex;
     justify-content: space-between;
@@ -4425,7 +4027,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   .bookshelf-summary {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-bottom: 0.95rem;
   }
 
@@ -4473,6 +4075,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
   .bookshelf-fold-body {
     margin: 0;
+    padding: 0.95rem 1rem 1rem;
     border: 0;
     border-radius: 0;
     background: transparent;
@@ -4848,12 +4451,54 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     white-space: nowrap;
   }
 
+  .bookshelf-library-list,
   .bookshelf-track-grid,
   .bookshelf-intake-grid,
   .bookshelf-rule-grid,
   .bookshelf-guide-grid {
     display: grid;
     gap: 0.8rem;
+  }
+
+  .bookshelf-library-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(55, 55, 54, 0.42), rgba(31, 31, 31, 0.68));
+    text-decoration: none;
+  }
+
+  .bookshelf-library-copy {
+    display: grid;
+    gap: 0.32rem;
+  }
+
+  .bookshelf-library-copy strong,
+  .bookshelf-library-copy p,
+  .bookshelf-library-link span {
+    margin: 0;
+  }
+
+  .bookshelf-library-copy strong {
+    color: #f4f2ed;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  .bookshelf-library-copy p,
+  .bookshelf-library-link span {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  .bookshelf-library-link span {
+    white-space: nowrap;
   }
 
   .bookshelf-guide-grid,
