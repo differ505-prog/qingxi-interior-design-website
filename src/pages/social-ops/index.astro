@@ -614,6 +614,31 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               </details>
               <p class="bookshelf-prompt-note">最佳主路徑是一鍵備好 Pro 生文包：Gemini Flash 先判題並整理主書系、章節、標題與入庫卡，再自動幫你備好可貼去 Gemini Pro 的完整生文提示詞；高階模型除了正式文章，也會一起產出 FB、IG、Threads、小紅書轉貼文案，以及短標題、封面一句話、首圖文案。只有在想看 Flash 長稿時，才使用下方備援按鈕。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
+              <div id="article-pro-prompt-shell" class="bookshelf-confirm" hidden>
+                <div class="bookshelf-preview-head">
+                  <p>Pro 生文提示詞</p>
+                  <span id="article-pro-prompt-label">尚未備好</span>
+                </div>
+                <p id="article-pro-prompt-note" class="bookshelf-confirm-note">一鍵流程完成後，這裡會先備好可直接貼去 Gemini Pro 的正式生文提示詞，再嘗試自動複製。</p>
+                <div class="bookshelf-actions bookshelf-confirm-actions">
+                  <button type="button" id="copy-pro-finalize-prompt-inline" class="bookshelf-action">再次複製 Pro 生文提示詞</button>
+                </div>
+                <details id="article-pro-prompt-details" class="bookshelf-mini-fold">
+                  <summary>
+                    <span>查看提示詞內容</span>
+                    <small>手動複製備援</small>
+                  </summary>
+                  <div class="bookshelf-pro-prompt-body">
+                    <textarea
+                      id="article-pro-prompt-content"
+                      class="bookshelf-pro-prompt-content"
+                      rows="16"
+                      readonly
+                      placeholder="一鍵流程完成後，這裡會出現可直接手動複製的 Pro 生文提示詞"
+                    ></textarea>
+                  </div>
+                </details>
+              </div>
               <details id="article-ai-result-shell" class="bookshelf-ai-result">
                 <summary>
                   <span>AI 結果</span>
@@ -1007,6 +1032,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const ARTICLE_AI_RESULT_KEY = "qingxi-article-ai-result-v1";
+  const ARTICLE_PRO_FINALIZE_PROMPT_KEY = "qingxi-article-pro-finalize-prompt-v1";
   const GEMINI_DRAFT_KEY = "qingxi-gemini-canvas-draft-v1";
   const GEMINI_BACKUPS_KEY = "qingxi-gemini-canvas-backups-v1";
   const GEMINI_RECENT_LIMIT = 10;
@@ -1070,6 +1096,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   let articleSourceQuestion = "";
   let articleAiResult = "";
   let articleAiMode = "";
+  let articleProFinalizePrompt = "";
   let geminiDraft = null;
   let geminiBackups = [];
 
@@ -1697,11 +1724,107 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
   }
 
+  function loadArticleProFinalizePrompt() {
+    try {
+      articleProFinalizePrompt = localStorage.getItem(ARTICLE_PRO_FINALIZE_PROMPT_KEY) || "";
+    } catch (error) {
+      console.error("讀取 Pro 生文提示詞失敗：", error);
+      articleProFinalizePrompt = "";
+    }
+  }
+
+  function saveArticleProFinalizePrompt() {
+    try {
+      localStorage.setItem(ARTICLE_PRO_FINALIZE_PROMPT_KEY, articleProFinalizePrompt);
+      return true;
+    } catch (error) {
+      console.error("儲存 Pro 生文提示詞失敗：", error);
+      return false;
+    }
+  }
+
+  function clearArticleProFinalizePrompt() {
+    articleProFinalizePrompt = "";
+    try {
+      localStorage.removeItem(ARTICLE_PRO_FINALIZE_PROMPT_KEY);
+    } catch (error) {
+      console.error("清除 Pro 生文提示詞失敗：", error);
+    }
+    renderArticleProPrompt();
+  }
+
   function setArticleAiFeedback(message, mode = "") {
     const shell = document.getElementById("article-ai-feedback");
     if (!shell) return;
     shell.className = `bookshelf-ai-feedback ${mode}`.trim();
     shell.textContent = message;
+  }
+
+  function spotlightActionButton(id) {
+    const button = document.getElementById(id);
+    if (!(button instanceof HTMLButtonElement)) return;
+    button.classList.remove("is-guided");
+    void button.offsetWidth;
+    button.classList.add("is-guided");
+    window.setTimeout(() => button.classList.remove("is-guided"), 2400);
+  }
+
+  function renderArticleProPrompt() {
+    const shell = document.getElementById("article-pro-prompt-shell");
+    const label = document.getElementById("article-pro-prompt-label");
+    const note = document.getElementById("article-pro-prompt-note");
+    const content = document.getElementById("article-pro-prompt-content");
+    if (
+      !(shell instanceof HTMLElement) ||
+      !(label instanceof HTMLElement) ||
+      !(note instanceof HTMLElement) ||
+      !(content instanceof HTMLTextAreaElement)
+    ) {
+      return;
+    }
+
+    const hasPrompt = Boolean(articleProFinalizePrompt.trim());
+    const hasAiResult = Boolean(articleAiResult.trim());
+    shell.hidden = !hasPrompt;
+    label.textContent = hasPrompt ? (hasAiResult ? "已備好" : "模板已備好") : "尚未備好";
+    note.textContent = hasPrompt
+      ? hasAiResult
+        ? "下方是最近一次備好的版本；若你修改了問題內容，再按一次「複製 Pro 生文提示詞」就會自動更新。"
+        : "目前先備好的是模板版；若先完成 Flash 判題，再按一次複製會自動改成正式版本。"
+      : "一鍵流程完成後，這裡會先備好可直接貼去 Gemini Pro 的正式生文提示詞，再嘗試自動複製。";
+    content.value = articleProFinalizePrompt;
+  }
+
+  function revealArticleProPrompt() {
+    const shell = document.getElementById("article-pro-prompt-shell");
+    const details = document.getElementById("article-pro-prompt-details");
+    if (shell instanceof HTMLElement) {
+      shell.hidden = false;
+    }
+    if (details instanceof HTMLDetailsElement) {
+      details.open = true;
+    }
+  }
+
+  function prepareProFinalizePrompt(question = "") {
+    articleProFinalizePrompt = buildProFinalizePrompt(question || articleSourceQuestion, articleAiResult);
+    const saved = saveArticleProFinalizePrompt();
+    renderArticleProPrompt();
+    return {
+      prompt: articleProFinalizePrompt,
+      saved,
+      hasAiResult: Boolean(articleAiResult.trim()),
+    };
+  }
+
+  function getCopyFeedbackState(result, successMessage, manualMessage, failureMessage = "複製失敗，請直接手動複製。") {
+    if (result === "clipboard") {
+      return { message: successMessage, mode: "is-success" };
+    }
+    if (result === "manual") {
+      return { message: manualMessage, mode: "is-warning" };
+    }
+    return { message: failureMessage, mode: "is-warning" };
   }
 
   function getArticleAiTimeoutMs(mode) {
@@ -2728,8 +2851,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       setArticleAiFeedback("目前沒有可複製的社團回覆稿。", "is-warning");
       return;
     }
-    await copyText(text, successMessage);
-    setArticleAiFeedback(successMessage, "is-success");
+    const result = await copyText(text, successMessage);
+    const feedback = getCopyFeedbackState(
+      result,
+      successMessage,
+      "已開啟手動複製視窗，可直接複製社團回覆稿。",
+    );
+    setArticleAiFeedback(feedback.message, feedback.mode);
   }
 
   function getArticleAiDecision(content) {
@@ -2802,13 +2930,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
   }
 
-  async function copyProArticlePrompt(question, successMessage, warningMessage) {
-    const prompt = buildProFinalizePrompt(question, articleAiResult);
-    await copyText(prompt, successMessage);
-    setArticleAiFeedback(successMessage, articleAiResult.trim() ? "is-success" : "is-warning");
-    if (!articleAiResult.trim() && warningMessage) {
-      setFeedback(warningMessage, "is-warning");
-    }
+  async function copyProArticlePrompt(question, successMessage, options = {}) {
+    const prepared = prepareProFinalizePrompt(question);
+    const copyResult = await copyText(prepared.prompt, successMessage, options);
+    return {
+      ...prepared,
+      copyResult,
+    };
   }
 
   async function enrichArticleMetadataIfNeeded(content, sourceMode) {
@@ -2845,6 +2973,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       if (!content) return false;
       articleAiResult = await enrichArticleMetadataIfNeeded(content, mode);
       articleAiMode = mode;
+      clearArticleProFinalizePrompt();
       setArticleAiFeedback("結果整理完成，正在寫入工作台...", "is-success");
       const saved = saveArticleAiResult();
       renderArticleAiResult();
@@ -2876,47 +3005,75 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
       articleAiResult = await enrichArticleMetadataIfNeeded(quickContent, "quick");
       articleAiMode = "quick";
+      clearArticleProFinalizePrompt();
       setArticleAiFeedback("結果整理完成，正在寫入工作台...", "is-success");
       const saved = saveArticleAiResult();
       renderArticleAiResult();
 
       const question = persistArticleSourceQuestion();
-      setArticleAiFeedback("結果已整理，正在複製 Pro 生文提示詞...", "is-success");
-      try {
-        await copyProArticlePrompt(question, "已完成判題並複製 Pro 生文提示詞。");
+      setArticleAiFeedback("結果已整理，正在備好 Pro 生文提示詞...", "is-success");
+      const promptState = prepareProFinalizePrompt(question);
+      const storageOk = saved && promptState.saved;
+      setArticleAiFeedback("Pro 生文提示詞已備好，正在嘗試自動複製...", storageOk ? "is-success" : "is-warning");
+      const copyState = await copyText(promptState.prompt, "已完成判題並複製 Pro 生文提示詞。", {
+        fallbackToPrompt: false,
+      });
+      if (copyState === "clipboard") {
         const finalMessage = saved
-          ? "已完成判題並複製 Pro 生文提示詞。"
+          ? (promptState.saved ? "已完成判題並複製 Pro 生文提示詞。" : "已完成判題並複製 Pro 生文提示詞，但 Pro 提示詞本機暫存寫入失敗。")
           : "已完成判題並複製 Pro 生文提示詞，但本機暫存寫入失敗。";
-        setArticleAiFeedback(finalMessage, saved ? "is-success" : "is-warning");
-      } catch (error) {
-        console.error("複製 Pro 生文提示詞失敗：", error);
-        const fallbackMessage = saved
-          ? "已完成判題，但自動複製 Pro 生文提示詞失敗，可改用下方按鈕手動複製。"
-          : "已完成判題，但本機暫存與自動複製失敗，可改用下方按鈕手動複製。";
+        setFeedback(finalMessage, storageOk ? "is-success" : "is-warning");
+        setArticleAiFeedback(finalMessage, storageOk ? "is-success" : "is-warning");
+      } else {
+        revealArticleProPrompt();
+        spotlightActionButton("copy-pro-finalize-prompt");
+        spotlightActionButton("copy-pro-finalize-prompt-inline");
+        const fallbackMessage = storageOk
+          ? "已完成判題，Pro 生文提示詞也已備好，但瀏覽器未完成自動複製；可直接展開下方內容手動複製，或再按一次「複製 Pro 生文提示詞」。"
+          : "已完成判題，Pro 生文提示詞也已備好，但本機暫存或自動複製未完成；目前頁面仍可直接展開下方內容手動複製。";
         setFeedback(fallbackMessage, "is-warning");
         setArticleAiFeedback(fallbackMessage, "is-warning");
       }
     } catch (error) {
       console.error("一鍵流程整理失敗：", error);
-      setFeedback("判題已完成，但整理或複製提示詞時發生問題，請重試一次。", "is-warning");
-      setArticleAiFeedback("判題已完成，但整理或複製提示詞時發生問題，請重試一次。", "is-warning");
+      setFeedback("判題已完成，但備好 Pro 生文提示詞時發生問題，請重試一次。", "is-warning");
+      setArticleAiFeedback("判題已完成，但備好 Pro 生文提示詞時發生問題，請重試一次。", "is-warning");
     } finally {
       setArticleAiBusy(false);
     }
   }
 
-  async function copyText(text, successMessage) {
+  async function copyText(text, successMessage, options = {}) {
+    const {
+      fallbackToPrompt = true,
+      manualFallbackMessage = "已開啟手動複製視窗。",
+      failureMessage = "複製失敗，請再試一次。",
+    } = options;
+
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(text);
-      } else {
-        window.prompt("請手動複製以下內容", text);
+        setFeedback(successMessage, "is-success");
+        return "clipboard";
       }
-      setFeedback(successMessage, "is-success");
     } catch (error) {
-      console.error("複製失敗：", error);
-      setFeedback("複製失敗，請再試一次。", "is-warning");
+      console.error("自動複製失敗：", error);
     }
+
+    if (fallbackToPrompt) {
+      try {
+        window.prompt("請手動複製以下內容", text);
+        setFeedback(manualFallbackMessage, "is-warning");
+        return "manual";
+      } catch (error) {
+        console.error("手動複製視窗開啟失敗：", error);
+      }
+    }
+
+    if (failureMessage) {
+      setFeedback(failureMessage, "is-warning");
+    }
+    return "failed";
   }
 
   function createGeminiDraftFromMaster() {
@@ -3200,7 +3357,47 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const successMessage = articleAiResult.trim()
       ? "已複製 Pro 生文提示詞。"
       : "已複製 Pro 生文提示詞模板，建議先生成 Flash 判題結果再使用。";
-    await copyProArticlePrompt(question, successMessage);
+    const result = await copyProArticlePrompt(question, successMessage, {
+      manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。",
+    });
+    if (result.copyResult !== "clipboard") {
+      revealArticleProPrompt();
+    }
+    const feedback = getCopyFeedbackState(
+      result.copyResult,
+      successMessage,
+      result.hasAiResult
+        ? "Pro 生文提示詞已備好，已開啟手動複製視窗。"
+        : "Pro 生文提示詞模板已備好，已開啟手動複製視窗。",
+      result.hasAiResult
+        ? "Pro 生文提示詞已備好，但複製失敗，請直接展開下方內容手動複製。"
+        : "Pro 生文提示詞模板已備好，但複製失敗，請直接展開下方內容手動複製。",
+    );
+    setArticleAiFeedback(feedback.message, feedback.mode);
+  });
+
+  document.getElementById("copy-pro-finalize-prompt-inline")?.addEventListener("click", async () => {
+    const question = persistArticleSourceQuestion();
+    const successMessage = articleAiResult.trim()
+      ? "已複製 Pro 生文提示詞。"
+      : "已複製 Pro 生文提示詞模板，建議先生成 Flash 判題結果再使用。";
+    const result = await copyProArticlePrompt(question, successMessage, {
+      manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。",
+    });
+    if (result.copyResult !== "clipboard") {
+      revealArticleProPrompt();
+    }
+    const feedback = getCopyFeedbackState(
+      result.copyResult,
+      successMessage,
+      result.hasAiResult
+        ? "Pro 生文提示詞已備好，已開啟手動複製視窗。"
+        : "Pro 生文提示詞模板已備好，已開啟手動複製視窗。",
+      result.hasAiResult
+        ? "Pro 生文提示詞已備好，但複製失敗，請直接手動複製下方內容。"
+        : "Pro 生文提示詞模板已備好，但複製失敗，請直接手動複製下方內容。",
+    );
+    setArticleAiFeedback(feedback.message, feedback.mode);
   });
 
   document.getElementById("run-article-ai-quick")?.addEventListener("click", async () => {
@@ -3216,8 +3413,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       setArticleAiFeedback("目前沒有 AI 結果可複製。", "is-warning");
       return;
     }
-    await copyText(articleAiResult, "已複製 AI 結果。");
-    setArticleAiFeedback("已複製 AI 結果。", "is-success");
+    const result = await copyText(articleAiResult, "已複製 AI 結果。");
+    const feedback = getCopyFeedbackState(result, "已複製 AI 結果。", "已開啟手動複製視窗，可直接複製 AI 結果。");
+    setArticleAiFeedback(feedback.message, feedback.mode);
   });
 
   document.getElementById("copy-article-category")?.addEventListener("click", async () => {
@@ -3226,8 +3424,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       setArticleAiFeedback("請先生成 AI 結果。", "is-warning");
       return;
     }
-    await copyText(data.category, "已複製正式分類。");
-    setArticleAiFeedback("已複製正式分類。", "is-success");
+    const result = await copyText(data.category, "已複製正式分類。");
+    const feedback = getCopyFeedbackState(result, "已複製正式分類。", "已開啟手動複製視窗，可直接複製正式分類。");
+    setArticleAiFeedback(feedback.message, feedback.mode);
   });
 
   document.getElementById("copy-article-confirm-payload")?.addEventListener("click", async () => {
@@ -3236,8 +3435,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       setArticleAiFeedback("請先生成 AI 結果。", "is-warning");
       return;
     }
-    await copyText(buildArticleConfirmPayload(data), "已複製分類落地資訊。");
-    setArticleAiFeedback("已複製分類落地資訊。", "is-success");
+    const result = await copyText(buildArticleConfirmPayload(data), "已複製分類落地資訊。");
+    const feedback = getCopyFeedbackState(result, "已複製分類落地資訊。", "已開啟手動複製視窗，可直接複製分類落地資訊。");
+    setArticleAiFeedback(feedback.message, feedback.mode);
   });
 
   document.getElementById("copy-social-reply-short")?.addEventListener("click", async () => {
@@ -3255,6 +3455,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   document.getElementById("clear-article-question")?.addEventListener("click", () => {
     articleSourceQuestion = "";
     localStorage.setItem(ARTICLE_SOURCE_QUESTION_KEY, "");
+    clearArticleProFinalizePrompt();
     applyArticleSourceQuestionToField();
     setFeedback("已清空真實社團問題。", "is-warning");
   });
@@ -3346,13 +3547,21 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     persistArticleSourceQuestion();
   });
 
+  document.getElementById("article-pro-prompt-content")?.addEventListener("focus", (event) => {
+    if (event.target instanceof HTMLTextAreaElement) {
+      event.target.select();
+    }
+  });
+
   loadArticleSourceQuestion();
   loadArticleAiResult();
+  loadArticleProFinalizePrompt();
   loadGeminiBackupState();
   loadState();
   normalizeWeeklyState();
   applyArticleSourceQuestionToField();
   renderArticleAiResult();
+  renderArticleProPrompt();
   applyGeminiDraftToFields();
   rerender();
 </script>
@@ -3813,6 +4022,27 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     padding: 0.9rem 0.95rem 0.95rem;
   }
 
+  .bookshelf-pro-prompt-body {
+    padding: 0.9rem 0.95rem 0.95rem;
+  }
+
+  .bookshelf-pro-prompt-content {
+    width: 100%;
+    min-height: 280px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    background: rgba(17, 17, 17, 0.62);
+    color: rgba(238, 235, 229, 0.86);
+    font: inherit;
+    line-height: 1.72;
+    padding: 1rem;
+    resize: vertical;
+  }
+
+  .bookshelf-pro-prompt-content::placeholder {
+    color: rgba(224, 221, 214, 0.34);
+  }
+
   .bookshelf-prompt-note {
     margin: 0;
     color: rgba(230, 228, 222, 0.58);
@@ -4179,6 +4409,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     transform: translateY(-2px);
     border-color: rgba(255, 255, 255, 0.14);
     box-shadow: 0 18px 28px rgba(0, 0, 0, 0.16);
+  }
+
+  .bookshelf-action.is-guided {
+    border-color: rgba(245, 243, 236, 0.34);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.18), rgba(214, 210, 200, 0.08));
+    box-shadow: 0 0 0 1px rgba(247, 246, 241, 0.12), 0 18px 30px rgba(0, 0, 0, 0.2);
   }
 
   .bookshelf-preview {
