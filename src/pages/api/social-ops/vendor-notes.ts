@@ -1,6 +1,9 @@
 import type { APIRoute } from "astro";
 import { list, put } from "@vercel/blob";
 
+const DEBUG_SERVER_URL = "http://127.0.0.1:7778/event";
+const DEBUG_SESSION_ID = "vendor-notes-write-fail";
+
 type VendorNoteRecord = {
   id: string;
   name: string;
@@ -90,6 +93,26 @@ async function readVendorNotes(token: string) {
 }
 
 async function writeVendorNotes(token: string, notes: VendorNoteRecord[]) {
+  // #region debug-point B:before-put
+  fetch(DEBUG_SERVER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: DEBUG_SESSION_ID,
+      runId: "pre-fix",
+      hypothesisId: "B",
+      location: "src/pages/api/social-ops/vendor-notes.ts:writeVendorNotes",
+      msg: "[DEBUG] about to put vendor notes blob",
+      data: {
+        pathname: VENDOR_NOTES_BLOB_PATH,
+        noteCount: notes.length,
+        access: "public",
+        tokenPresent: Boolean(token),
+      },
+      ts: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
   await put(VENDOR_NOTES_BLOB_PATH, JSON.stringify(notes, null, 2), {
     token,
     access: "public",
@@ -97,6 +120,24 @@ async function writeVendorNotes(token: string, notes: VendorNoteRecord[]) {
     allowOverwrite: true,
     contentType: "application/json; charset=utf-8",
   });
+  // #region debug-point B:after-put
+  fetch(DEBUG_SERVER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: DEBUG_SESSION_ID,
+      runId: "pre-fix",
+      hypothesisId: "B",
+      location: "src/pages/api/social-ops/vendor-notes.ts:writeVendorNotes",
+      msg: "[DEBUG] put vendor notes blob completed",
+      data: {
+        pathname: VENDOR_NOTES_BLOB_PATH,
+        noteCount: notes.length,
+      },
+      ts: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
 }
 
 export const GET: APIRoute = async () => {
@@ -130,6 +171,23 @@ export const GET: APIRoute = async () => {
 
 export const POST: APIRoute = async ({ request }) => {
   const token = getBlobToken();
+  // #region debug-point A:post-entry
+  fetch(DEBUG_SERVER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId: DEBUG_SESSION_ID,
+      runId: "pre-fix",
+      hypothesisId: "A",
+      location: "src/pages/api/social-ops/vendor-notes.ts:POST",
+      msg: "[DEBUG] vendor notes POST entered",
+      data: {
+        tokenPresent: Boolean(token),
+      },
+      ts: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
   if (!token) {
     return jsonResponse({
       status: "setup_required",
@@ -142,6 +200,24 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
     const rawNote = body?.note;
+    // #region debug-point D:request-shape
+    fetch(DEBUG_SERVER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: DEBUG_SESSION_ID,
+        runId: "pre-fix",
+        hypothesisId: "D",
+        location: "src/pages/api/social-ops/vendor-notes.ts:POST",
+        msg: "[DEBUG] vendor notes POST parsed request body",
+        data: {
+          hasNote: Boolean(rawNote),
+          noteType: typeof rawNote,
+        },
+        ts: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
     if (!rawNote || typeof rawNote !== "object") {
       return jsonResponse({
         status: "error",
@@ -160,6 +236,25 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const existingNotes = await readVendorNotes(token);
+    // #region debug-point C:after-read
+    fetch(DEBUG_SERVER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: DEBUG_SESSION_ID,
+        runId: "pre-fix",
+        hypothesisId: "C",
+        location: "src/pages/api/social-ops/vendor-notes.ts:POST",
+        msg: "[DEBUG] vendor notes existing records loaded before write",
+        data: {
+          existingCount: existingNotes.length,
+          incomingId: note.id,
+          incomingTrade: note.trade,
+        },
+        ts: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
     const nextNotes = [
       note,
       ...existingNotes.filter((entry) => entry.id !== note.id),
@@ -173,6 +268,25 @@ export const POST: APIRoute = async ({ request }) => {
     });
   } catch (error) {
     console.error("寫入共享廠商筆記失敗：", error);
+    // #region debug-point E:post-catch
+    fetch(DEBUG_SERVER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: DEBUG_SESSION_ID,
+        runId: "pre-fix",
+        hypothesisId: "E",
+        location: "src/pages/api/social-ops/vendor-notes.ts:POST",
+        msg: "[DEBUG] vendor notes POST failed in catch",
+        data: {
+          errorName: error instanceof Error ? error.name : typeof error,
+          errorMessage: error instanceof Error ? error.message : String(error),
+          errorStack: error instanceof Error ? error.stack : "",
+        },
+        ts: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
     return jsonResponse({
       status: "error",
       configured: true,
