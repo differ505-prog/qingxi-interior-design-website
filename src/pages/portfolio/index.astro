@@ -9,19 +9,19 @@ const featuredProject = {
   label: 'RESIDENTIAL INTERIOR',
 };
 
-const editorialNotes = ['住宅', '商空', '泳池', '改造前後', '設計圖面'];
+const editorialNotes = ['住宅完工', '前後對照', '商空與戶外'];
 const poolFeature = {
   image: '/images/portfolio/hualien-sherlock-pool.jpg',
   alt: '夜間泳池與建築外觀畫面',
   title: '泳池與戶外水景規劃',
-  summary: '除了室內空間，青曦也能協助規劃泳池、水景與戶外動線，讓整體使用更完整。',
+  summary: '除了室內空間，也能協助規劃泳池、水景與戶外動線。',
 };
 const commercialFeature = {
   image: '/images/portfolio/restaurant-commercial-the-wrice.jpg',
   alt: '餐飲商空門面與室內畫面',
   title: '餐飲商空與店面形象規劃',
   summary:
-    '從門面到室內，協助整理品牌形象、第一印象與實際使用動線。',
+    '從門面到室內，協助整理品牌形象與使用動線。',
 };
 
 const spatialMoments = [
@@ -120,7 +120,7 @@ const secondaryMoments = spatialMoments.slice(2);
   .portfolio-metrics {
     margin: 2rem auto 0;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     max-width: 880px;
   }
@@ -529,8 +529,7 @@ const secondaryMoments = spatialMoments.slice(2);
       <h6 class="section-subtitle">CURATED WORK</h6>
       <h1>精選作品</h1>
       <p class="portfolio-intro">
-        以住宅為主，也收錄商空與戶外規劃，
-        讓你直接看見空間做完後的樣子。
+        以住宅為主，也收錄商空與戶外規劃，讓你直接看完成後的樣子。
       </p>
       <div class="portfolio-notes">
         {editorialNotes.map((note) => (
@@ -540,15 +539,11 @@ const secondaryMoments = spatialMoments.slice(2);
       <div class="portfolio-metrics">
         <article class="portfolio-metric">
           <strong>住宅案例</strong>
-          <span>直接看主要空間的完工照片。</span>
+          <span>直接看主要空間完工照。</span>
         </article>
         <article class="portfolio-metric">
           <strong>前後對照</strong>
           <span>更快判斷是不是你要的方向。</span>
-        </article>
-        <article class="portfolio-metric">
-          <strong>更多類型</strong>
-          <span>除了住宅，也能快速看商空與戶外。</span>
         </article>
       </div>
     </header>
@@ -561,10 +556,9 @@ const secondaryMoments = spatialMoments.slice(2);
 
         <div class="featured-copy">
           <p class="featured-label">{featuredProject.label}</p>
-          <h2>直接看住宅空間完成後的樣子</h2>
+          <h2>先看住宅完工後的樣子</h2>
           <p>
-            從客廳、餐廚到臥室，
-            直接判斷這個完成度是不是你要的方向。
+            從客廳、餐廚到臥室，直接判斷這是不是你要的方向。
           </p>
           <div class="featured-actions">
             <a
@@ -631,12 +625,12 @@ const secondaryMoments = spatialMoments.slice(2);
 
       <section class="portfolio-cta">
         <div>
-          <h2>如果你已經看出偏好，下一步就可以開始聊。</h2>
+          <h2>如果你已經看出偏好，下一步就直接講需求。</h2>
           <p>
-            把喜歡的案例、需求與預算講清楚，後面的方向就會快很多。
+            把喜歡的案例、需求與預算講清楚，方向就會快很多。
           </p>
         </div>
-        <a href="/contact">開始聊需求</a>
+        <a href="/contact">直接聊需求</a>
       </section>
     </div>
   </div>

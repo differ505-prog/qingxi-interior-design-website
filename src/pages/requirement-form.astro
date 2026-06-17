@@ -12,20 +12,19 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
 <BaseLayout
   title="設計需求表 - 青曦空間設計"
-  description="先留下聯絡方式、屋況、預算與時程，讓青曦更快判斷這次裝修方向；其餘細節可後補。"
+  description="先留下聯絡方式、屋況、預算與時程，讓青曦先判斷這次裝修方向；其餘細節可後補。"
   ogImage="/images/portfolio/xizhi-1.jpg"
 >
   <section class="form-page-hero">
     <div class="form-hero-shell">
       <div class="hero-copy">
         <p class="hero-eyebrow">DESIGN BRIEF</p>
-        <h1>先把這次裝修方向講清楚。</h1>
+        <h1>先把需求講清楚。</h1>
         <p class="hero-description">
           先留下聯絡方式、屋況、預算與時程，青曦就能先判斷方向。
         </p>
         <div class="hero-highlights">
           <span>先填核心資訊</span>
-          <span>約 1 分鐘送出</span>
           <span>其餘細節後補</span>
         </div>
       </div>
@@ -35,7 +34,6 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
         <ul>
           <li>剛完成快速諮詢可直接續填</li>
           <li>先準備地區、坪數與交屋時間</li>
-          <li>先勾必要空間即可</li>
           <li>送出後青曦會依聯絡方式回覆</li>
         </ul>
         <div class="panel-credential">
@@ -53,11 +51,11 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
       <div class="form-header">
         <p class="form-eyebrow">CONSULTATION FORM</p>
         <h1>設計需求表</h1>
-          <p class="form-subtitle">先填前面幾個核心欄位就能送出。</p>
+          <p class="form-subtitle">先填核心欄位就能送出。</p>
         <div class="form-assurance">
-            <p class="form-assurance-title">先把核心資訊交給青曦就好</p>
+            <p class="form-assurance-title">先把關鍵交給青曦就好</p>
           <p class="form-assurance-description">
-            不用一次講完，後續再補細節。
+            不用一次講完，細節後補就可以。
           </p>
         </div>
         
@@ -290,7 +288,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
         <!-- 空間配置需求 -->
         <section class="form-section">
           <h2 class="section-title">第三步｜空間與方向</h2>
-          <p class="field-hint">這些資訊會幫助青曦先判斷配置方向與是否預留智慧家庭整合。</p>
+          <p class="field-hint">這些資訊會幫助青曦先判斷配置方向。</p>
           
           <div class="form-group">
             <label for="expected-completion">希望什麼時候完工</label>
@@ -484,7 +482,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
         <section class="form-section">
           <h2 class="section-title">進階補充（選填）</h2>
-          <p class="field-hint">以下都不是必填；若你現在已有明確想法，再補即可。</p>
+          <p class="field-hint">以下都不是必填；現在有想法再補即可。</p>
 
           <div class="form-group">
             <label for="residents">居住人數</label>
@@ -829,7 +827,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
         <!-- 提示訊息 -->
         <div class="form-notice">
-          <p>送出後青曦會依你留下的聯絡方式接續；若你習慣用 LINE，也可補一句訊息。</p>
+          <p>送出後青曦會依你留下的聯絡方式接續；若你習慣用 LINE，也可補一句。</p>
           <a href="https://lin.ee/U1HCeW4" target="_blank" rel="noreferrer" class="line-button">加入官方LINE</a>
         </div>
 
