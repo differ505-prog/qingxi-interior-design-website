@@ -1030,6 +1030,37 @@ export function getChapterRecommendedTopic(
   return getChapterRecommendedTopicFromEntries(buildBookshelfEntries(posts), trackTitle, chapterTitle, focusTrackTitle, mode);
 }
 
+function getTrackRecommendedTopicFromEntries(
+  entries: BookshelfEntry[],
+  trackTitle: string,
+  focusTrackTitle = publishingFocusTrackTitle,
+  mode: PublishingTopicMode = "publishing",
+) {
+  const best = buildRecommendationCandidates(entries, focusTrackTitle, mode, { trackTitle })[0];
+  if (!best) return null;
+  return buildRecommendationFromCandidate(entries, best, focusTrackTitle, mode);
+}
+
+export function getTrackRecommendedTopic(
+  posts: PublishingCatalogPost[] = [],
+  trackTitle: string,
+  focusTrackTitle = publishingFocusTrackTitle,
+  mode: PublishingTopicMode = "publishing",
+) {
+  return getTrackRecommendedTopicFromEntries(buildBookshelfEntries(posts), trackTitle, focusTrackTitle, mode);
+}
+
+export function getTrackRecommendedTopics(
+  posts: PublishingCatalogPost[] = [],
+  focusTrackTitle = publishingFocusTrackTitle,
+  mode: PublishingTopicMode = "publishing",
+) {
+  const entries = buildBookshelfEntries(posts);
+  return bookshelfTrackPlans
+    .map((track) => getTrackRecommendedTopicFromEntries(entries, track.title, focusTrackTitle, mode))
+    .filter((recommendation): recommendation is NextTopicRecommendation => Boolean(recommendation));
+}
+
 export function getNextRecommendedTopic(
   posts: PublishingCatalogPost[] = [],
   focusTrackTitle = publishingFocusTrackTitle,

@@ -11,6 +11,7 @@ import {
   bookshelfTracks,
   getPublishingDashboard,
   getNextRecommendedTopic,
+  getTrackRecommendedTopics,
   getPublishingCoverageSummary,
   publishingFocusTrackTitle,
   publishingTopicModeOptions,
@@ -145,12 +146,19 @@ const topicModeMap = Object.fromEntries(
   publishingTopicModeOptions.map((modeOption) => {
     const publishingDashboard = getPublishingDashboard(blogPosts, publishingFocusTrackTitle, modeOption.value);
     const nextRecommendedTopic = getNextRecommendedTopic(blogPosts, publishingFocusTrackTitle, modeOption.value);
+    const trackRecommendations = getTrackRecommendedTopics(blogPosts, publishingFocusTrackTitle, modeOption.value)
+      .sort((left, right) => {
+        const leftRank = publishingDashboard.rankedTracks.findIndex((track) => track.title === left.trackTitle);
+        const rightRank = publishingDashboard.rankedTracks.findIndex((track) => track.title === right.trackTitle);
+        return leftRank - rightRank;
+      });
     return [
       modeOption.value,
       {
         ...modeOption,
         publishingDashboard,
         nextRecommendedTopic,
+        trackRecommendations,
         modeRationale: buildTopicModeRationale(modeOption.value, publishingDashboard, nextRecommendedTopic),
       },
     ];
@@ -549,6 +557,25 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                           <small>{pendingChapters.length} 章待補 / {completedChaptersCount} 章已立住</small>
                         </summary>
                         <div class="bookshelf-fold-stack">
+                          <div class="bookshelf-publishing-track-recommendations">
+                            <div class="bookshelf-preview-head">
+                              <p>每本書下一篇</p>
+                              <span>每本只留 1 篇最值得先補的題目</span>
+                            </div>
+                            <div class="bookshelf-publishing-track-recommendation-list">
+                              {modeState.trackRecommendations.map((recommendation) => (
+                                <article class={`bookshelf-publishing-track-recommendation-card ${recommendation.trackTitle === modeDashboard.focusTrack?.title ? "is-focus" : ""}`}>
+                                  <div class="bookshelf-publishing-rank-top">
+                                    <p>{recommendation.trackTitle}</p>
+                                    <span>{recommendation.chapter}</span>
+                                  </div>
+                                  <strong>{recommendation.primaryTitle}</strong>
+                                  <small>{recommendation.subchapter}</small>
+                                </article>
+                              ))}
+                            </div>
+                          </div>
+
                           <div class="bookshelf-publishing-gap">
                             <div class="bookshelf-preview-head">
                               <p>{modeDashboard.focusTrack.title} 還差哪些章</p>
@@ -571,7 +598,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                           <section class="bookshelf-publishing-checklist">
                             <div class="bookshelf-preview-head">
                               <p>{modeDashboard.focusTrack.title} 出版清單</p>
-                              <span>{modeOption.label}下每章最推薦補位</span>
+                              <span>只留出版勾選，不再逐章重複推薦</span>
                             </div>
                             <div class="bookshelf-publishing-checklist-list">
                               {pendingChapters.map((chapter) => (
@@ -579,44 +606,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                                   <summary>
                                     <div>
                                       <span>{chapter.chapter}</span>
-                                      <strong>{chapter.recommendedTopic?.primaryTitle || "這章目前沒有推薦題目"}</strong>
+                                      <strong>{chapter.missingSubchapters.slice(0, 2).join(" / ") || "本章主幹已立住"}</strong>
                                     </div>
                                     <small data-publishing-chapter-progress={chapter.chapter}>已勾 0 / {chapter.subchapters.length}</small>
                                   </summary>
                                   <div class="bookshelf-publishing-checklist-body">
-                                    {chapter.recommendedTopic && (
-                                      <article class="bookshelf-publishing-topic-card">
-                                        <span>這章現在最該補</span>
-                                        <strong>{chapter.recommendedTopic.primaryTitle}</strong>
-                                        <p>{chapter.recommendedTopic.reason}</p>
-                                        <div class="bookshelf-actions bookshelf-confirm-actions">
-                                          <button
-                                            type="button"
-                                            class="bookshelf-action"
-                                            data-copy-chapter-brief={chapter.chapter}
-                                            data-topic-mode={modeOption.value}
-                                          >
-                                            複製本章補位資訊
-                                          </button>
-                                          <button
-                                            type="button"
-                                            class="bookshelf-action"
-                                            data-copy-chapter-outline={chapter.chapter}
-                                            data-topic-mode={modeOption.value}
-                                          >
-                                            複製本章發文大綱
-                                          </button>
-                                          <button
-                                            type="button"
-                                            class="bookshelf-action bookshelp-action-primary"
-                                            data-copy-chapter-flash-prompt={chapter.chapter}
-                                            data-topic-mode={modeOption.value}
-                                          >
-                                            複製 Flash 滾動潤題
-                                          </button>
-                                        </div>
-                                      </article>
-                                    )}
                                     <div class="bookshelf-publishing-subchapter-list">
                                       {chapter.subchapters.map((subchapter) => (
                                         <label
@@ -659,7 +653,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                             <div class="bookshelf-actions bookshelf-confirm-actions">
                               <button type="button" class="bookshelf-action" data-reset-publishing-checklist={modeOption.value}>重置出版清單勾選</button>
                             </div>
-                            <p class="bookshelf-confirm-note">這裡只留待補章節；已立住的章先不佔第一層視線，等整書統稿時再回看。</p>
+                            <p class="bookshelf-confirm-note">這裡只留待補章節；每本書的推薦題目已集中在上方，不再逐章重複出題。</p>
                           </section>
                         </div>
                       </details>
@@ -2128,77 +2122,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       return Boolean(publishingChecklistOverrides[key]);
     }
     return coveredByArticle;
-  }
-
-  function findPublishingChapterGap(chapterTitle = "", mode = currentTopicMode) {
-    return getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack?.chapterGaps?.find((chapter) => chapter.chapter === chapterTitle) || null;
-  }
-
-  function buildChapterTopicBriefText(chapterTitle = "", mode = currentTopicMode) {
-    const modeState = getCurrentTopicModeState(mode);
-    const chapter = findPublishingChapterGap(chapterTitle, mode);
-    const recommendation = chapter?.recommendedTopic;
-    if (!chapter || !recommendation) return "";
-
-    return [
-      `決題模式：${modeState?.label || mode}`,
-      `模式判斷：${modeState?.modeRationale || "尚未產生"}`,
-      `主攻書系：${modeState?.publishingDashboard?.focusTrack?.title || recommendation.focusTrackTitle}`,
-      `章節：${recommendation.chapter}`,
-      `子章節：${recommendation.subchapter}`,
-      `網站分類：${recommendation.category}`,
-      `本章最推薦主題：${recommendation.primaryTitle}`,
-      `備選 1：${recommendation.backupTitles?.[0] || "無"}`,
-      `備選 2：${recommendation.backupTitles?.[1] || "無"}`,
-      `推薦原因：${recommendation.reason}`,
-      `本章目前篇數：${recommendation.articleCountInChapter}`,
-      `本子章目前篇數：${recommendation.articleCountInSubchapter}`,
-      `同子章既有文章：${recommendation.sameSubchapterArticles.join(" / ") || "目前沒有"}`,
-      `同章既有文章：${recommendation.sameChapterArticles.join(" / ") || "目前沒有"}`,
-      `同書系其他文章：${recommendation.sameTrackArticles.join(" / ") || "目前沒有"}`,
-    ].join("\n");
-  }
-
-  function buildChapterOutlineText(chapterTitle = "", mode = currentTopicMode) {
-    const modeState = getCurrentTopicModeState(mode);
-    const recommendation = findPublishingChapterGap(chapterTitle, mode)?.recommendedTopic;
-    if (!recommendation) return "";
-
-    const sameSubchapterText = recommendation.sameSubchapterArticles.join(" / ") || "目前沒有同子章文章，這篇可先立第一篇主文。";
-    const sameChapterText = recommendation.sameChapterArticles.join(" / ") || "目前沒有同章其他文章，可先把章節骨架立住。";
-    const sameTrackText = recommendation.sameTrackArticles.join(" / ") || "目前沒有同書系其他文章，可把這篇寫成書稿起手段。";
-
-    return [
-      `決題模式：${modeState?.label || mode}`,
-      `模式判斷：${modeState?.modeRationale || "尚未產生"}`,
-      `主攻書系：${recommendation.trackTitle}`,
-      `章節：${recommendation.chapter}`,
-      `子章節：${recommendation.subchapter}`,
-      `建議標題：${recommendation.primaryTitle}`,
-      "",
-      "大綱：",
-      "1. 開頭",
-      `- 先點出讀者在「${recommendation.subchapter}」最容易卡住的判斷點。`,
-      `- 交代這篇為何現在要先寫：${recommendation.reason}`,
-      "",
-      "2. 先把基本判斷講清楚",
-      `- 用最少段落說清楚 ${recommendation.subchapter} 的核心判斷邏輯。`,
-      `- 若有必要，先區分屋況、預算、施工順序或生活情境。`,
-      "",
-      "3. 補上最容易漏掉的差異",
-      "- 補條件差異、預算級距、材料選擇或前後順序。",
-      "- 讓讀者知道哪裡最容易誤判、追加或做錯。",
-      "",
-      "4. 與既有文章錯位",
-      `- 同子章既有文章：${sameSubchapterText}`,
-      `- 同章既有文章：${sameChapterText}`,
-      `- 同書系其他文章：${sameTrackText}`,
-      "- 這篇請刻意避開已寫過的主角度，改補更缺的判斷、情境或取捨。",
-      "",
-      "5. 收尾",
-      "- 收成可執行的判斷結論，不要只停在抽象建議。",
-      "- 最後帶出下一個自然延伸題，讓它能接回同一章或下一章。",
-    ].join("\n");
   }
 
   function renderPublishingChecklist() {
@@ -4351,7 +4274,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   document.addEventListener("click", async (event) => {
     const target = event.target instanceof HTMLElement
-      ? event.target.closest("[data-copy-next-topic-brief],[data-copy-next-topic-flash-prompt],[data-copy-chapter-brief],[data-copy-chapter-outline],[data-copy-chapter-flash-prompt],[data-reset-publishing-checklist]")
+      ? event.target.closest("[data-copy-next-topic-brief],[data-copy-next-topic-flash-prompt],[data-reset-publishing-checklist]")
       : null;
     if (!(target instanceof HTMLElement)) return;
 
@@ -4373,42 +4296,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         return;
       }
       await copyText(recommendation.flashPrompt, "已複製 Flash 潤題提示詞。");
-      return;
-    }
-
-    if (target.hasAttribute("data-copy-chapter-brief")) {
-      const chapterTitle = target.dataset.copyChapterBrief || "";
-      const mode = target.dataset.topicMode || currentTopicMode;
-      const text = buildChapterTopicBriefText(chapterTitle, mode);
-      if (!text) {
-        setFeedback("這一章目前還沒有可複製的補位題目。", "is-warning");
-        return;
-      }
-      await copyText(text, `已複製「${chapterTitle}」補位資訊。`);
-      return;
-    }
-
-    if (target.hasAttribute("data-copy-chapter-outline")) {
-      const chapterTitle = target.dataset.copyChapterOutline || "";
-      const mode = target.dataset.topicMode || currentTopicMode;
-      const text = buildChapterOutlineText(chapterTitle, mode);
-      if (!text) {
-        setFeedback("這一章目前還沒有可複製的發文大綱。", "is-warning");
-        return;
-      }
-      await copyText(text, `已複製「${chapterTitle}」發文大綱。`);
-      return;
-    }
-
-    if (target.hasAttribute("data-copy-chapter-flash-prompt")) {
-      const chapterTitle = target.dataset.copyChapterFlashPrompt || "";
-      const mode = target.dataset.topicMode || currentTopicMode;
-      const recommendation = findPublishingChapterGap(chapterTitle, mode)?.recommendedTopic;
-      if (!recommendation?.flashPrompt) {
-        setFeedback("這一章目前還沒有可複製的 Flash 潤題提示詞。", "is-warning");
-        return;
-      }
-      await copyText(recommendation.flashPrompt, `已複製「${chapterTitle}」Flash 滾動潤題。`);
       return;
     }
 
@@ -5521,6 +5408,47 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     gap: 0.8rem;
   }
 
+  .bookshelf-publishing-track-recommendations {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .bookshelf-publishing-track-recommendation-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .bookshelf-publishing-track-recommendation-card {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-publishing-track-recommendation-card.is-focus {
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.08), rgba(214, 210, 200, 0.03));
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .bookshelf-publishing-track-recommendation-card strong,
+  .bookshelf-publishing-track-recommendation-card small {
+    margin: 0;
+  }
+
+  .bookshelf-publishing-track-recommendation-card strong {
+    color: #f7f6f2;
+    font-size: 0.98rem;
+    line-height: 1.66;
+  }
+
+  .bookshelf-publishing-track-recommendation-card small {
+    color: rgba(233, 231, 225, 0.6);
+    line-height: 1.65;
+  }
+
   .bookshelf-publishing-checklist {
     display: grid;
     gap: 0.85rem;
@@ -5567,15 +5495,13 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     gap: 0.25rem;
   }
 
-  .bookshelf-publishing-checklist-card summary span,
-  .bookshelf-publishing-topic-card span {
+  .bookshelf-publishing-checklist-card summary span {
     color: rgba(230, 228, 222, 0.58);
     font-size: 0.78rem;
     letter-spacing: 0.04em;
   }
 
-  .bookshelf-publishing-checklist-card summary strong,
-  .bookshelf-publishing-topic-card strong {
+  .bookshelf-publishing-checklist-card summary strong {
     color: #f7f6f2;
     font-size: 0.98rem;
     line-height: 1.65;
@@ -5595,21 +5521,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     display: grid;
     gap: 0.85rem;
     padding: 0.95rem 1rem 1rem;
-  }
-
-  .bookshelf-publishing-topic-card {
-    display: grid;
-    gap: 0.45rem;
-    padding: 0.95rem 1rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    background: rgba(255, 255, 255, 0.02);
-  }
-
-  .bookshelf-publishing-topic-card p {
-    margin: 0;
-    color: rgba(233, 231, 225, 0.68);
-    line-height: 1.72;
   }
 
   .bookshelf-publishing-subchapter-list {
