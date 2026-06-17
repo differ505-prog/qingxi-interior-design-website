@@ -51,6 +51,20 @@ export interface PublishingTrackCoverage {
   coverageRate: number;
 }
 
+export interface PublishingChapterGap {
+  chapter: string;
+  articleCount: number;
+  missingSubchapters: string[];
+  remainingToBaseline: number;
+}
+
+export interface PublishingTrackDashboard extends PublishingTrackCoverage {
+  missingChapterTitles: string[];
+  remainingToBaseline: number;
+  readyToPublish: boolean;
+  chapterGaps: PublishingChapterGap[];
+}
+
 export interface NextTopicRecommendation {
   focusTrackTitle: string;
   trackTitle: string;
@@ -627,6 +641,65 @@ export function getPublishingCoverageSummary(posts: PublishingCatalogPost[] = []
     focusTrackTitle,
     tracks,
     focusTrack: tracks.find((track) => track.title === focusTrackTitle) || tracks[0] || null,
+  };
+}
+
+export function getPublishingDashboard(posts: PublishingCatalogPost[] = [], focusTrackTitle = publishingFocusTrackTitle) {
+  const entries = buildBookshelfEntries(posts);
+  const tracks = bookshelfTrackPlans.map((track) => {
+    const trackEntries = entries.filter((entry) => entry.trackTitle === track.title);
+    const chapterGaps = track.chapters.map((chapter) => {
+      const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter.title);
+      const missingSubchapters = chapter.subchapters
+        .filter((subchapter) => !chapterEntries.some((entry) => entry.subchapter === subchapter.title))
+        .map((subchapter) => subchapter.title);
+
+      return {
+        chapter: chapter.title,
+        articleCount: chapterEntries.length,
+        missingSubchapters,
+        remainingToBaseline: missingSubchapters.length,
+      } satisfies PublishingChapterGap;
+    });
+
+    const totalChapters = track.chapters.length;
+    const completedChapters = chapterGaps.filter((gap) => gap.articleCount > 0).length;
+    const totalSubchapters = track.chapters.reduce((sum, chapter) => sum + chapter.subchapters.length, 0);
+    const completedSubchapters = totalSubchapters - chapterGaps.reduce((sum, gap) => sum + gap.remainingToBaseline, 0);
+    const remainingToBaseline = chapterGaps.reduce((sum, gap) => sum + gap.remainingToBaseline, 0);
+    const missingChapterTitles = chapterGaps.filter((gap) => gap.articleCount === 0).map((gap) => gap.chapter);
+
+    return {
+      title: track.title,
+      articleCount: trackEntries.length,
+      completedChapters,
+      totalChapters,
+      completedSubchapters,
+      totalSubchapters,
+      coverageRate: totalSubchapters ? Math.round((completedSubchapters / totalSubchapters) * 100) : 0,
+      missingChapterTitles,
+      remainingToBaseline,
+      readyToPublish: remainingToBaseline === 0,
+      chapterGaps: chapterGaps.sort((left, right) => right.remainingToBaseline - left.remainingToBaseline),
+    } satisfies PublishingTrackDashboard;
+  });
+
+  const rankedTracks = [...tracks].sort((left, right) => {
+    if (left.remainingToBaseline !== right.remainingToBaseline) {
+      return left.remainingToBaseline - right.remainingToBaseline;
+    }
+    if (left.coverageRate !== right.coverageRate) {
+      return right.coverageRate - left.coverageRate;
+    }
+    return right.articleCount - left.articleCount;
+  });
+
+  return {
+    focusTrackTitle,
+    tracks,
+    rankedTracks,
+    focusTrack: tracks.find((track) => track.title === focusTrackTitle) || tracks[0] || null,
+    nearestTrack: rankedTracks[0] || null,
   };
 }
 

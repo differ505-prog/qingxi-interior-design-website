@@ -9,6 +9,7 @@ import {
 import {
   bookshelfSubchapterPools,
   bookshelfTracks,
+  getPublishingDashboard,
   getNextRecommendedTopic,
   getPublishingCoverageSummary,
   publishingFocusTrackTitle,
@@ -123,6 +124,7 @@ try {
 }
 
 const publishingCoverage = getPublishingCoverageSummary(blogPosts, publishingFocusTrackTitle);
+const publishingDashboard = getPublishingDashboard(blogPosts, publishingFocusTrackTitle);
 const nextRecommendedTopic = getNextRecommendedTopic(blogPosts, publishingFocusTrackTitle);
 
 const defaultSourcesJson = JSON.stringify(defaultSources);
@@ -397,6 +399,10 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
                 <span>主攻書完成度</span>
                 <strong>{publishingCoverage.focusTrack ? `${publishingCoverage.focusTrack.coverageRate}%` : "0%"}</strong>
               </article>
+              <article class="bookshelf-stat">
+                <span>距離出版基線</span>
+                <strong>{publishingDashboard.focusTrack ? `還差 ${publishingDashboard.focusTrack.remainingToBaseline} 篇` : "尚未計算"}</strong>
+              </article>
               <article class="bookshelf-stat bookshelf-stat-wide">
                 <span>同步狀態</span>
                 <strong>{blogSyncLabel}</strong>
@@ -449,6 +455,71 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
                   <button type="button" id="copy-next-topic-flash-prompt" class="bookshelf-action bookshelp-action-primary">複製 Flash 潤題提示詞</button>
                 </div>
                 <p class="bookshelf-confirm-note">這裡的主題不是直接讓 Flash 自由發散，而是先固定缺口，再讓 Flash 只做標題潤題。</p>
+              </section>
+            )}
+
+            {publishingDashboard.focusTrack && (
+              <section class="bookshelf-publishing-board">
+                <div class="bookshelf-preview-head">
+                  <p>出版進度</p>
+                  <span>先看哪一本到基線版最近</span>
+                </div>
+                <div class="bookshelf-publishing-meta">
+                  <article class="bookshelf-confirm-card">
+                    <span>主攻書</span>
+                    <strong>{publishingDashboard.focusTrack.title}</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>還差幾篇</span>
+                    <strong>{publishingDashboard.focusTrack.remainingToBaseline} 篇</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>最接近出版</span>
+                    <strong>{publishingDashboard.nearestTrack?.title || "尚未計算"}</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>最近距離</span>
+                    <strong>{publishingDashboard.nearestTrack ? `還差 ${publishingDashboard.nearestTrack.remainingToBaseline} 篇` : "尚未計算"}</strong>
+                  </article>
+                </div>
+                <div class="bookshelf-publishing-rank">
+                  {publishingDashboard.rankedTracks.map((track) => (
+                    <article class={`bookshelf-publishing-rank-card ${track.title === publishingDashboard.focusTrackTitle ? "is-focus" : ""}`}>
+                      <div class="bookshelf-publishing-rank-top">
+                        <p>{track.title}</p>
+                        <span>{track.coverageRate}%</span>
+                      </div>
+                      <strong>{track.articleCount} 篇 / 還差 {track.remainingToBaseline} 篇</strong>
+                      <small>
+                        {track.readyToPublish
+                          ? "已達基線版，可開始整書統稿。"
+                          : track.missingChapterTitles.length
+                            ? `空章：${track.missingChapterTitles.slice(0, 3).join(" / ")}`
+                            : "主幹已立住，優先補剩餘子章。"}
+                      </small>
+                    </article>
+                  ))}
+                </div>
+                <div class="bookshelf-publishing-gap">
+                  <div class="bookshelf-preview-head">
+                    <p>{publishingDashboard.focusTrack.title} 還差哪些章</p>
+                    <span>只看主攻書缺口</span>
+                  </div>
+                  <div class="bookshelf-publishing-gap-list">
+                    {publishingDashboard.focusTrack.chapterGaps
+                      .filter((chapter) => chapter.remainingToBaseline > 0)
+                      .map((chapter) => (
+                        <article class="bookshelf-publishing-gap-card">
+                          <div class="bookshelf-publishing-gap-top">
+                            <p>{chapter.chapter}</p>
+                            <span>還差 {chapter.remainingToBaseline} 篇</span>
+                          </div>
+                          <strong>目前 {chapter.articleCount} 篇</strong>
+                          <small>{chapter.missingSubchapters.slice(0, 4).join(" / ")}</small>
+                        </article>
+                      ))}
+                  </div>
+                </div>
               </section>
             )}
 
@@ -4850,6 +4921,87 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
     line-height: 1.7;
   }
 
+  .bookshelf-publishing-board {
+    display: grid;
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.022);
+  }
+
+  .bookshelf-publishing-meta,
+  .bookshelf-publishing-rank,
+  .bookshelf-publishing-gap-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .bookshelf-publishing-rank-card,
+  .bookshelf-publishing-gap-card {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-publishing-rank-card.is-focus {
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.08), rgba(214, 210, 200, 0.03));
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .bookshelf-publishing-rank-top,
+  .bookshelf-publishing-gap-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .bookshelf-publishing-rank-top p,
+  .bookshelf-publishing-gap-top p,
+  .bookshelf-publishing-rank-card strong,
+  .bookshelf-publishing-gap-card strong,
+  .bookshelf-publishing-rank-card small,
+  .bookshelf-publishing-gap-card small {
+    margin: 0;
+  }
+
+  .bookshelf-publishing-rank-top p,
+  .bookshelf-publishing-gap-top p {
+    color: #f4f2ed;
+    font-size: 0.94rem;
+    font-weight: 600;
+  }
+
+  .bookshelf-publishing-rank-top span,
+  .bookshelf-publishing-gap-top span {
+    color: rgba(230, 228, 222, 0.58);
+    font-size: 0.82rem;
+  }
+
+  .bookshelf-publishing-rank-card strong,
+  .bookshelf-publishing-gap-card strong {
+    color: #f7f6f2;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .bookshelf-publishing-rank-card small,
+  .bookshelf-publishing-gap-card small {
+    color: rgba(233, 231, 225, 0.62);
+    line-height: 1.7;
+  }
+
+  .bookshelf-publishing-gap {
+    display: grid;
+    gap: 0.8rem;
+  }
+
   .bookshelf-actions {
     display: flex;
     flex-wrap: wrap;
@@ -6720,6 +6872,9 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
     .bookshelf-ai-decision,
     .bookshelf-next-topic-grid,
     .bookshelf-next-topic-alt,
+    .bookshelf-publishing-meta,
+    .bookshelf-publishing-rank,
+    .bookshelf-publishing-gap-list,
     .bookshelf-outline-meta,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
@@ -6764,6 +6919,9 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
     .bookshelf-ai-decision,
     .bookshelf-next-topic-grid,
     .bookshelf-next-topic-alt,
+    .bookshelf-publishing-meta,
+    .bookshelf-publishing-rank,
+    .bookshelf-publishing-gap-list,
     .bookshelf-shelf-grid,
     .bookshelf-outline-grid,
     .bookshelf-outline-meta,
