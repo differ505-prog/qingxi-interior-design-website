@@ -437,7 +437,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <strong>{publishingDashboard.focusTrack ? `還差 ${publishingDashboard.focusTrack.remainingToBaseline} 篇` : "尚未計算"}</strong>
               </article>
               <article class="bookshelf-stat bookshelf-stat-wide">
-                <span>同步狀態</span>
+                <span>同步</span>
                 <strong>{blogSyncLabel}</strong>
               </article>
             </div>
@@ -466,6 +466,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               const modeState = topicModeMap[modeOption.value];
               const modeDashboard = modeState.publishingDashboard;
               const modeRecommendation = modeState.nextRecommendedTopic;
+              const pendingChapters = modeDashboard.focusTrack?.chapterGaps?.filter((chapter) => chapter.remainingToBaseline > 0) || [];
+              const completedChaptersCount = (modeDashboard.focusTrack?.chapterGaps?.length || 0) - pendingChapters.length;
               return (
                 <div
                   class="bookshelf-topic-mode-panel"
@@ -478,50 +480,41 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                         <p>下一篇最推薦</p>
                         <span>{modeOption.label}：{modeOption.description}</span>
                       </div>
-                      <article class="bookshelf-mode-rationale-card">
-                        <span>現在為什麼這樣排</span>
-                        <strong>{modeState.modeRationale}</strong>
-                      </article>
-                      <div class="bookshelf-next-topic-grid">
-                        <article class="bookshelf-confirm-card">
-                          <span>主攻書</span>
-                          <strong>{modeRecommendation.focusTrackTitle}</strong>
-                        </article>
-                        <article class="bookshelf-confirm-card">
-                          <span>這次補位</span>
-                          <strong>{modeRecommendation.trackTitle}</strong>
-                        </article>
-                        <article class="bookshelf-confirm-card">
-                          <span>章節</span>
-                          <strong>{modeRecommendation.chapter}</strong>
-                        </article>
-                        <article class="bookshelf-confirm-card">
-                          <span>子章節</span>
-                          <strong>{modeRecommendation.subchapter}</strong>
-                        </article>
-                      </div>
                       <article class="bookshelf-next-topic-hero">
                         <span class="bookshelf-next-topic-eyebrow">最推薦主題</span>
                         <h3>{modeRecommendation.primaryTitle}</h3>
-                        <p>{modeRecommendation.reason}</p>
+                        <p>{modeState.modeRationale}</p>
+                        <div class="bookshelf-next-topic-meta">
+                          <span>{modeRecommendation.focusTrackTitle}</span>
+                          <span>{modeRecommendation.chapter}</span>
+                          <span>{modeRecommendation.subchapter}</span>
+                        </div>
                         <div class="bookshelf-next-topic-progress">
                           <span>補前 {modeRecommendation.coverageBefore}%</span>
                           <strong>補後 {modeRecommendation.coverageAfter}%</strong>
                         </div>
                       </article>
-                      <div class="bookshelf-next-topic-alt">
-                        {modeRecommendation.backupTitles.map((title) => (
-                          <article class="bookshelf-next-topic-alt-card">
-                            <span>備選</span>
-                            <strong>{title}</strong>
-                          </article>
-                        ))}
-                      </div>
                       <div class="bookshelf-actions bookshelf-confirm-actions">
                         <button type="button" class="bookshelf-action" data-copy-next-topic-brief={modeOption.value}>複製補位資訊</button>
                         <button type="button" class="bookshelf-action bookshelp-action-primary" data-copy-next-topic-flash-prompt={modeOption.value}>複製 Flash 潤題提示詞</button>
                       </div>
-                      <p class="bookshelf-confirm-note">這裡維持固定缺口決策；{modeOption.label} 只改變缺口排序，不把決策權整個交給 Flash。</p>
+                      <details class="bookshelf-mini-fold">
+                        <summary>
+                          <span>備選與說明</span>
+                          <small>低頻時再展開</small>
+                        </summary>
+                        <div class="bookshelf-next-topic-fold">
+                          <p class="bookshelf-confirm-note">這裡維持固定缺口決策；{modeOption.label} 只改變缺口排序，不把決策權整個交給 Flash。</p>
+                          <div class="bookshelf-next-topic-alt">
+                            {modeRecommendation.backupTitles.map((title) => (
+                              <article class="bookshelf-next-topic-alt-card">
+                                <span>備選</span>
+                                <strong>{title}</strong>
+                              </article>
+                            ))}
+                          </div>
+                        </div>
+                      </details>
                     </section>
                   )}
 
@@ -529,7 +522,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <section class="bookshelf-publishing-board">
                       <div class="bookshelf-preview-head">
                         <p>出版進度</p>
-                        <span>{modeOption.label}下的章節補位排序</span>
+                        <span>先看主攻書距離出版還差多少</span>
                       </div>
                       <div class="bookshelf-publishing-meta">
                         <article class="bookshelf-confirm-card">
@@ -545,154 +538,131 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                           <strong>{modeDashboard.nearestTrack?.title || "尚未計算"}</strong>
                         </article>
                         <article class="bookshelf-confirm-card">
-                          <span>最近距離</span>
-                          <strong>{modeDashboard.nearestTrack ? `還差 ${modeDashboard.nearestTrack.remainingToBaseline} 篇` : "尚未計算"}</strong>
+                          <span>待補章節</span>
+                          <strong>{pendingChapters.length} 章</strong>
                         </article>
                       </div>
-                      <div class="bookshelf-publishing-rank">
-                        {modeDashboard.rankedTracks.map((track) => (
-                          <article class={`bookshelf-publishing-rank-card ${track.title === modeDashboard.focusTrackTitle ? "is-focus" : ""}`}>
-                            <div class="bookshelf-publishing-rank-top">
-                              <p>{track.title}</p>
-                              <span>{track.coverageRate}%</span>
-                            </div>
-                            <strong>{track.articleCount} 篇 / 還差 {track.remainingToBaseline} 篇</strong>
-                            <small>
-                              {track.readyToPublish
-                                ? "已達基線版，可開始整書統稿。"
-                                : track.missingChapterTitles.length
-                                  ? `空章：${track.missingChapterTitles.slice(0, 3).join(" / ")}`
-                                  : "主幹已立住，優先補剩餘子章。"}
-                            </small>
-                          </article>
-                        ))}
-                      </div>
-                      <div class="bookshelf-publishing-gap">
-                        <div class="bookshelf-preview-head">
-                          <p>{modeDashboard.focusTrack.title} 還差哪些章</p>
-                          <span>只看主攻書缺口</span>
-                        </div>
-                        <div class="bookshelf-publishing-gap-list">
-                          {modeDashboard.focusTrack.chapterGaps
-                            .filter((chapter) => chapter.remainingToBaseline > 0)
-                            .map((chapter) => (
-                              <article class="bookshelf-publishing-gap-card">
-                                <div class="bookshelf-publishing-gap-top">
-                                  <p>{chapter.chapter}</p>
-                                  <span>還差 {chapter.remainingToBaseline} 篇</span>
-                                </div>
-                                <strong>目前 {chapter.articleCount} 篇</strong>
-                                <small>{chapter.missingSubchapters.slice(0, 4).join(" / ")}</small>
-                              </article>
-                            ))}
-                        </div>
-                      </div>
 
-                      <section class="bookshelf-publishing-checklist">
-                        <div class="bookshelf-preview-head">
-                          <p>{modeDashboard.focusTrack.title} 出版清單</p>
-                          <span>{modeOption.label}下每章最推薦補位</span>
-                        </div>
-                        <div class="bookshelf-publishing-checklist-list">
-                          {modeDashboard.focusTrack.chapterGaps.map((chapter) => (
-                            <details class="bookshelf-publishing-checklist-card" open={chapter.remainingToBaseline > 0}>
-                              <summary>
-                                <div>
-                                  <span>{chapter.chapter}</span>
-                                  <strong>{chapter.recommendedTopic?.primaryTitle || "這章目前沒有推薦題目"}</strong>
-                                </div>
-                                <small data-publishing-chapter-progress={chapter.chapter}>已勾 0 / {chapter.subchapters.length}</small>
-                              </summary>
-                              <div class="bookshelf-publishing-checklist-body">
-                                {chapter.recommendedTopic && (
-                                  <>
-                                    <article class="bookshelf-publishing-topic-card">
-                                      <span>這章現在最該補</span>
-                                      <strong>{chapter.recommendedTopic.primaryTitle}</strong>
-                                      <p>{chapter.recommendedTopic.reason}</p>
-                                      <div class="bookshelf-actions bookshelf-confirm-actions">
-                                        <button
-                                          type="button"
-                                          class="bookshelf-action"
-                                          data-copy-chapter-brief={chapter.chapter}
+                      <details class="bookshelf-fold">
+                        <summary>
+                          <span>缺口與清單</span>
+                          <small>{pendingChapters.length} 章待補 / {completedChaptersCount} 章已立住</small>
+                        </summary>
+                        <div class="bookshelf-fold-stack">
+                          <div class="bookshelf-publishing-gap">
+                            <div class="bookshelf-preview-head">
+                              <p>{modeDashboard.focusTrack.title} 還差哪些章</p>
+                              <span>只留待補章節</span>
+                            </div>
+                            <div class="bookshelf-publishing-gap-list">
+                              {pendingChapters.map((chapter) => (
+                                <article class="bookshelf-publishing-gap-card">
+                                  <div class="bookshelf-publishing-gap-top">
+                                    <p>{chapter.chapter}</p>
+                                    <span>還差 {chapter.remainingToBaseline} 篇</span>
+                                  </div>
+                                  <strong>目前 {chapter.articleCount} 篇</strong>
+                                  <small>{chapter.missingSubchapters.slice(0, 4).join(" / ")}</small>
+                                </article>
+                              ))}
+                            </div>
+                          </div>
+
+                          <section class="bookshelf-publishing-checklist">
+                            <div class="bookshelf-preview-head">
+                              <p>{modeDashboard.focusTrack.title} 出版清單</p>
+                              <span>{modeOption.label}下每章最推薦補位</span>
+                            </div>
+                            <div class="bookshelf-publishing-checklist-list">
+                              {pendingChapters.map((chapter) => (
+                                <details class="bookshelf-publishing-checklist-card" open>
+                                  <summary>
+                                    <div>
+                                      <span>{chapter.chapter}</span>
+                                      <strong>{chapter.recommendedTopic?.primaryTitle || "這章目前沒有推薦題目"}</strong>
+                                    </div>
+                                    <small data-publishing-chapter-progress={chapter.chapter}>已勾 0 / {chapter.subchapters.length}</small>
+                                  </summary>
+                                  <div class="bookshelf-publishing-checklist-body">
+                                    {chapter.recommendedTopic && (
+                                      <article class="bookshelf-publishing-topic-card">
+                                        <span>這章現在最該補</span>
+                                        <strong>{chapter.recommendedTopic.primaryTitle}</strong>
+                                        <p>{chapter.recommendedTopic.reason}</p>
+                                        <div class="bookshelf-actions bookshelf-confirm-actions">
+                                          <button
+                                            type="button"
+                                            class="bookshelf-action"
+                                            data-copy-chapter-brief={chapter.chapter}
+                                            data-topic-mode={modeOption.value}
+                                          >
+                                            複製本章補位資訊
+                                          </button>
+                                          <button
+                                            type="button"
+                                            class="bookshelf-action"
+                                            data-copy-chapter-outline={chapter.chapter}
+                                            data-topic-mode={modeOption.value}
+                                          >
+                                            複製本章發文大綱
+                                          </button>
+                                          <button
+                                            type="button"
+                                            class="bookshelf-action bookshelp-action-primary"
+                                            data-copy-chapter-flash-prompt={chapter.chapter}
+                                            data-topic-mode={modeOption.value}
+                                          >
+                                            複製 Flash 滾動潤題
+                                          </button>
+                                        </div>
+                                      </article>
+                                    )}
+                                    <div class="bookshelf-publishing-subchapter-list">
+                                      {chapter.subchapters.map((subchapter) => (
+                                        <label
+                                          class={`bookshelf-publishing-subchapter-item ${subchapter.coveredByArticle ? "is-covered" : ""}`}
+                                          data-publishing-subchapter-item
                                           data-topic-mode={modeOption.value}
+                                          data-track-title={modeDashboard.focusTrack?.title}
+                                          data-chapter-title={chapter.chapter}
+                                          data-subchapter-title={subchapter.title}
+                                          data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
                                         >
-                                          複製本章補位資訊
-                                        </button>
-                                        <button
-                                          type="button"
-                                          class="bookshelf-action"
-                                          data-copy-chapter-outline={chapter.chapter}
-                                          data-topic-mode={modeOption.value}
-                                        >
-                                          複製本章發文大綱
-                                        </button>
-                                        <button
-                                          type="button"
-                                          class="bookshelf-action bookshelp-action-primary"
-                                          data-copy-chapter-flash-prompt={chapter.chapter}
-                                          data-topic-mode={modeOption.value}
-                                        >
-                                          複製 Flash 滾動潤題
-                                        </button>
-                                      </div>
-                                    </article>
-                                    <article class="bookshelf-outline-mini-card">
-                                      <span>發文大綱</span>
-                                      <ul>
-                                        <li>開頭：先點出這題此刻最該判斷的核心問題。</li>
-                                        <li>主段一：先釐清 {chapter.recommendedTopic.subchapter} 的基本判斷邏輯。</li>
-                                        <li>主段二：補上最容易忽略的條件差異、預算或施工順序。</li>
-                                        <li>主段三：對照既有文章，刻意錯開已寫過的切角。</li>
-                                        <li>收尾：把這題接回書稿主線，帶出下一個自然延伸題。</li>
-                                      </ul>
-                                    </article>
-                                  </>
-                                )}
-                                <div class="bookshelf-publishing-subchapter-list">
-                                  {chapter.subchapters.map((subchapter) => (
-                                    <label
-                                      class={`bookshelf-publishing-subchapter-item ${subchapter.coveredByArticle ? "is-covered" : ""}`}
-                                      data-publishing-subchapter-item
-                                      data-topic-mode={modeOption.value}
-                                      data-track-title={modeDashboard.focusTrack?.title}
-                                      data-chapter-title={chapter.chapter}
-                                      data-subchapter-title={subchapter.title}
-                                      data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        data-publishing-subchapter-checkbox
-                                        data-topic-mode={modeOption.value}
-                                        data-track-title={modeDashboard.focusTrack?.title}
-                                        data-chapter-title={chapter.chapter}
-                                        data-subchapter-title={subchapter.title}
-                                        data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
-                                        checked={subchapter.coveredByArticle}
-                                      />
-                                      <span class="bookshelf-publishing-subchapter-copy">
-                                        <strong>{subchapter.title}</strong>
-                                        <small>
-                                          {subchapter.coveredByArticle
-                                            ? `已有 ${subchapter.articleCount} 篇文章`
-                                            : "目前仍待補"}
-                                        </small>
-                                      </span>
-                                      <em data-publishing-subchapter-status>
-                                        {subchapter.coveredByArticle ? "已有文章" : "待補"}
-                                      </em>
-                                    </label>
-                                  ))}
-                                </div>
-                              </div>
-                            </details>
-                          ))}
+                                          <input
+                                            type="checkbox"
+                                            data-publishing-subchapter-checkbox
+                                            data-topic-mode={modeOption.value}
+                                            data-track-title={modeDashboard.focusTrack?.title}
+                                            data-chapter-title={chapter.chapter}
+                                            data-subchapter-title={subchapter.title}
+                                            data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
+                                            checked={subchapter.coveredByArticle}
+                                          />
+                                          <span class="bookshelf-publishing-subchapter-copy">
+                                            <strong>{subchapter.title}</strong>
+                                            <small>
+                                              {subchapter.coveredByArticle
+                                                ? `已有 ${subchapter.articleCount} 篇文章`
+                                                : "目前仍待補"}
+                                            </small>
+                                          </span>
+                                          <em data-publishing-subchapter-status>
+                                            {subchapter.coveredByArticle ? "已有文章" : "待補"}
+                                          </em>
+                                        </label>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </details>
+                              ))}
+                            </div>
+                            <div class="bookshelf-actions bookshelf-confirm-actions">
+                              <button type="button" class="bookshelf-action" data-reset-publishing-checklist={modeOption.value}>重置出版清單勾選</button>
+                            </div>
+                            <p class="bookshelf-confirm-note">這裡只留待補章節；已立住的章先不佔第一層視線，等整書統稿時再回看。</p>
+                          </section>
                         </div>
-                        <div class="bookshelf-actions bookshelf-confirm-actions">
-                          <button type="button" class="bookshelf-action" data-reset-publishing-checklist={modeOption.value}>重置出版清單勾選</button>
-                        </div>
-                        <p class="bookshelf-confirm-note">這裡讓你手動判斷哪些子章已可收書；即使已有文章，也可先取消勾選，等定稿後再納入。</p>
-                      </section>
+                      </details>
                     </section>
                   )}
                 </div>
@@ -5415,6 +5385,21 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     line-height: 1.75;
   }
 
+  .bookshelf-next-topic-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .bookshelf-next-topic-meta span {
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+    color: rgba(240, 237, 231, 0.72);
+    font-size: 0.8rem;
+  }
+
   .bookshelf-next-topic-progress {
     display: flex;
     align-items: center;
@@ -5447,6 +5432,12 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     color: #f1efea;
     font-size: 0.96rem;
     line-height: 1.7;
+  }
+
+  .bookshelf-next-topic-fold {
+    display: grid;
+    gap: 0.85rem;
+    padding: 0.9rem 0.95rem 0.95rem;
   }
 
   .bookshelf-publishing-board {
@@ -5533,6 +5524,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   .bookshelf-publishing-checklist {
     display: grid;
     gap: 0.85rem;
+  }
+
+  .bookshelf-publishing-checklist .bookshelf-actions {
+    margin-bottom: 0;
   }
 
   .bookshelf-publishing-checklist-list {
