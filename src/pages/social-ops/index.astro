@@ -458,7 +458,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <div id="article-social-replies" class="bookshelf-reply-shell" hidden>
                   <div class="bookshelf-preview-head">
                     <p>社團回覆稿</p>
-                    <span>可直接貼社團</span>
+                    <span>導流版會自動帶官網連結</span>
                   </div>
                   <div class="bookshelf-reply-grid">
                     <article class="bookshelf-reply-card">
@@ -784,6 +784,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const WEEKLY_TARGET = 3;
   const RUN_XP = 100;
   const WEEKLY_BONUS_XP = 50;
+  const SITE_ORIGIN = "https://qingxidesign.tw";
+  const BLOG_INDEX_URL = `${SITE_ORIGIN}/blog`;
   const sourceTemplate = JSON.parse(defaultSourcesJson);
   const articleLibrary = JSON.parse(blogPostsJson);
   const geminiCanvasMasterData = JSON.parse(geminiCanvasMasterJson);
@@ -1850,6 +1852,84 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     return bestScore >= 4 ? bestTitle : "";
   }
 
+  function findArticleByTitle(title = "") {
+    const normalizedTitle = normalizeComparableText(title.replace(/[《》「」]/g, ""));
+    if (!normalizedTitle || /暫未比對|請看下方 AI 原文|尚未判定/.test(title)) return null;
+
+    return (
+      articleLibrary.find((post) => normalizeComparableText(post.title) === normalizedTitle) ||
+      articleLibrary.find((post) => normalizeComparableText(post.title).includes(normalizedTitle)) ||
+      articleLibrary.find((post) => normalizedTitle.includes(normalizeComparableText(post.title))) ||
+      null
+    );
+  }
+
+  function inferSimilarArticle(content, articleTitle = "") {
+    const queryText = `${articleTitle}\n${content}`;
+    const keywords = buildTitleKeywordSet(queryText);
+    if (!keywords.length) return null;
+
+    let bestPost = null;
+    let bestScore = 0;
+
+    articleLibrary.forEach((post) => {
+      const haystack = `${post.title}\n${post.category}\n${post.summary || ""}`.replace(/\s+/g, "");
+      const score = keywords.reduce((sum, keyword) => sum + (haystack.includes(keyword) ? keyword.length : 0), 0);
+      if (score > bestScore) {
+        bestScore = score;
+        bestPost = post;
+      }
+    });
+
+    return bestScore >= 4 ? bestPost : null;
+  }
+
+  function getBlogPostUrl(post) {
+    if (!post?.slug) return BLOG_INDEX_URL;
+    return `${SITE_ORIGIN}/blog/${post.slug}`;
+  }
+
+  function resolveSocialReplyTarget(content) {
+    const decisionSimilar = summarizeDecisionSimilar(content);
+    const articleTitle = parseArticleTitle(content);
+    const matchedPost =
+      findArticleByTitle(decisionSimilar) ||
+      findArticleByTitle(articleTitle) ||
+      inferSimilarArticle(content, articleTitle);
+
+    if (matchedPost) {
+      return {
+        title: matchedPost.title,
+        url: getBlogPostUrl(matchedPost),
+      };
+    }
+
+    return {
+      title: "知識分享",
+      url: BLOG_INDEX_URL,
+    };
+  }
+
+  function injectLeadReplyUrl(text, target) {
+    const cleanText = String(text || "").trim();
+    const fallbackSentence =
+      target.title === "知識分享"
+        ? `這題細節比較多，我有持續整理在官網知識分享，有需要可以先看這裡：${target.url}`
+        : `這題細節比較多，我剛好整理過一篇更完整的分析，有需要可以先看這篇：${target.url}`;
+
+    if (!cleanText) return fallbackSentence;
+    if (/https?:\/\//i.test(cleanText)) return cleanText;
+
+    const replaced = cleanText.replace(/\[預留網址空間\]|\(預留網址空間\)|（預留網址空間）|預留網址空間/g, target.url);
+    if (replaced !== cleanText) return replaced;
+
+    if (/參考|看這篇|看這裡|看完整|完整分析/.test(cleanText)) {
+      return `${cleanText} ${target.url}`.trim();
+    }
+
+    return `${cleanText}${/[。！？!?]$/.test(cleanText) ? "" : "。"}${fallbackSentence}`;
+  }
+
   function extractSectionByTitles(content, titles) {
     for (const title of titles) {
       const section = extractSectionText(content, title);
@@ -1926,6 +2006,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       short: fallback,
       pro: fallback,
       lead: fallback,
+    };
+  }
+
+  function getResolvedArticleSocialReplies(content) {
+    const replies = parseArticleSocialReplies(content);
+    const target = resolveSocialReplyTarget(content);
+    return {
+      ...replies,
+      lead: injectLeadReplyUrl(replies.lead, target),
     };
   }
 
@@ -2044,7 +2133,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     const hasResult = Boolean(content.trim());
-    const replies = parseArticleSocialReplies(content);
+    const replies = getResolvedArticleSocialReplies(content);
     const hasReplies = Boolean(replies.short || replies.pro || replies.lead);
     shell.hidden = !(hasResult && hasReplies);
     short.textContent = replies.short || "尚未生成";
@@ -2115,7 +2204,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   async function copyArticleSocialReply(variant, successMessage) {
-    const replies = parseArticleSocialReplies(articleAiResult);
+    const replies = getResolvedArticleSocialReplies(articleAiResult);
     const text = replies[variant]?.trim();
     if (!text) {
       setArticleAiFeedback("目前沒有可複製的社團回覆稿。", "is-warning");
