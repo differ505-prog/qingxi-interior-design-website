@@ -1041,6 +1041,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const WEEKLY_BONUS_XP = 50;
   const SITE_ORIGIN = "https://qingxidesign.tw";
   const BLOG_INDEX_URL = `${SITE_ORIGIN}/blog`;
+  const THREADS_PROFILE_URL = "https://www.threads.com/@qingxi.ds?hl=zh-tw";
+  const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/qingxi.ds/";
+  const FACEBOOK_PAGE_URL = "https://www.facebook.com/profile.php?id=61562661642204";
   const ARTICLE_AI_TIMEOUT_MS = 45000;
   const ARTICLE_AI_METADATA_TIMEOUT_MS = 18000;
   const socialReplyShortUrlCache = new Map();
@@ -1343,6 +1346,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
               <span>${actionTwoComplete ? "已完成" : "進行中"}</span>
             </div>
             <p class="quest-main-copy">利用 LLM 完成官網發布（含圖），再同步分發至 Threads、IG 與小紅書（COPE 戰略）。</p>
+            <div class="quest-link-row">
+              <a class="quest-link-btn" href="${THREADS_PROFILE_URL}" target="_blank" rel="noreferrer">Threads</a>
+              <a class="quest-link-btn" href="${INSTAGRAM_PROFILE_URL}" target="_blank" rel="noreferrer">Instagram</a>
+              <a class="quest-link-btn" href="${FACEBOOK_PAGE_URL}" target="_blank" rel="noreferrer">Facebook 粉專</a>
+            </div>
             <div class="quest-checklist">
               <label class="quest-check ${run.actionWebsite ? "is-checked" : ""}">
                 <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionWebsite" ${run.actionWebsite ? "checked" : ""} />
@@ -5338,6 +5346,35 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     color: rgba(233, 229, 221, 0.66);
     font-size: 0.84rem;
     line-height: 1.7;
+  }
+
+  .quest-link-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.58rem;
+    margin-top: -0.06rem;
+  }
+
+  .quest-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2rem;
+    padding: 0.52rem 0.82rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(16, 16, 16, 0.42);
+    color: rgba(243, 241, 236, 0.86);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  }
+
+  .quest-link-btn:hover {
+    background: rgba(42, 42, 42, 0.56);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
   }
 
   .quest-check {

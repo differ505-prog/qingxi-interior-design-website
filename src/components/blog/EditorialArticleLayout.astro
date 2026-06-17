@@ -9,7 +9,6 @@ interface Props {
   modifiedTime?: string;
   structuredData?: unknown;
   category: string;
-  dateLabel: string;
   kicker?: string;
   dek?: string;
   coverAlt?: string;
@@ -26,7 +25,6 @@ const {
   modifiedTime = publishedTime,
   structuredData,
   category,
-  dateLabel,
   kicker = "Qingxi Journal",
   dek = description,
   coverAlt = title,
@@ -316,7 +314,6 @@ const {
       <p class="article-kicker">{kicker}</p>
       <div class="article-meta">
         <span class="article-category">{category}</span>
-        <span class="article-date">{dateLabel}</span>
       </div>
       <h1 class="article-title">{title}</h1>
       <p class="article-dek">{dek}</p>
