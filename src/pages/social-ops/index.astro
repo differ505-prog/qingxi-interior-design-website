@@ -1677,8 +1677,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "導流版：",
       "- 簡短版：控制在 45-70 字，適合快速回覆，不帶連結感。",
       "- 專業版：控制在 70-110 字，保留更多判斷依據，但不要像文章。",
-      "- 導流版：控制在 70-110 字，要自然收尾到『我剛好整理成一篇完整分析，有需要可以參考：[預留網址空間]』這類句型。",
-      "- 三版都必須客觀、同理、像真人，不可出現『歡迎私訊』『找我們設計』等推銷字眼。",
+      "- 導流版：控制在 70-110 字，語氣要像真人順手補充，不要像在導購或貼模板；可用『我之前有順手整理過』『有空再慢慢看就好』這類自然句型，最後再接 [預留網址空間]。",
+      "- 三版都必須客觀、同理、像真人，不可出現『歡迎私訊』『找我們設計』『完整分析』『歡迎參考』這類推銷或 AI 模板味太重的字眼。",
       "",
       "8. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
       "- 目標：放在官網的「知識分享」區，作為高質量的 SEO 內容與導流落地頁。",
@@ -1958,8 +1958,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const cleanText = String(text || "").trim();
     const fallbackSentence =
       target.title === "知識分享"
-        ? `這題細節比較多，我有持續整理在官網知識分享，有需要可以先看這裡：${target.url}`
-        : `這題細節比較多，我剛好整理過一篇更完整的分析，有需要可以先看這篇：${target.url}`;
+        ? `這類題目我有陸續放在網站裡，你有空再慢慢看就好：${target.url}`
+        : `這題我之前有順手整理過，放這裡給你慢慢看就好：${target.url}`;
 
     if (!cleanText) return fallbackSentence;
     if (/https?:\/\//i.test(cleanText)) return cleanText;
@@ -1972,6 +1972,80 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     return `${cleanText}${/[。！？!?]$/.test(cleanText) ? "" : "。"}${fallbackSentence}`;
+  }
+
+  function softenSocialReplyTone(text, variant, target) {
+    let value = String(text || "").trim();
+    if (!value) return "";
+
+    const replacementPairs = [
+      [/完整分析/g, "幾個判斷重點"],
+      [/歡迎參考/g, "你有空再看"],
+      [/有需要可以先看這裡/g, "你有空再慢慢看就好"],
+      [/有需要可以先看這篇/g, "放這裡給你慢慢看就好"],
+      [/官網知識分享/g, "網站裡"],
+      [/我剛好整理過一篇/g, "我之前有順手整理過"],
+      [/我剛好整理成一篇/g, "我之前有順手整理成"],
+    ];
+    replacementPairs.forEach(([pattern, replacement]) => {
+      value = value.replace(pattern, replacement);
+    });
+    value = value.replace(/\s{2,}/g, " ").trim();
+
+    if (variant === "lead" && !/https?:\/\//i.test(value)) {
+      value = injectLeadReplyUrl(value, target);
+    }
+    return value;
+  }
+
+  function buildSocialReplySeed(content) {
+    return `${articleSourceQuestion}\n${parseArticleTitle(content)}\n${content}`;
+  }
+
+  function inferSocialReplyCore(content) {
+    const seed = buildSocialReplySeed(content);
+    if (/預算|報價|費用|單價|抓多少/.test(seed)) {
+      return {
+        short: "這種通常不是先抓一個總價就好，範圍跟材料一變，預算就會差很多。",
+        pro: "這種通常要先把施工範圍、材料層級跟現場條件拆開看，不然只看一個報價數字，後面很容易一直追加。",
+      };
+    }
+    if (/格局|動線|客廳|餐廳|臥室|空間/.test(seed)) {
+      return {
+        short: "這種通常要先把動線跟尺寸抓清楚，不然做完才發現不好用。",
+        pro: "這類問題通常不是單看平面或風格，還要一起看家具尺寸、收納位置跟實際使用習慣，不然很容易做完又想改。",
+      };
+    }
+    if (/收納|櫃|衣櫃|鞋櫃|櫥櫃/.test(seed)) {
+      return {
+        short: "這種通常不是櫃子做多就好，位置跟深度如果抓錯，反而會更卡。",
+        pro: "這類問題通常要先看使用習慣、物品尺寸跟動線，不然櫃子一做下去，空間壓迫感跟不好拿會一起出來。",
+      };
+    }
+    if (/燈|照明|西曬|日照|溫度|窗簾|蜂巢簾/.test(seed)) {
+      return {
+        short: "這種通常要先看使用情境，不是單換設備就一定會比較舒服。",
+        pro: "這類問題通常要一起看採光、遮陽、迴路和使用時間，不然只換其中一個設備，改善幅度常常沒有想像中大。",
+      };
+    }
+    return {
+      short: "這種通常要先把現場條件跟需求講清楚，不然很容易越做越亂。",
+      pro: "這類問題通常不是一句話就能定案，先把現場條件、使用需求跟想解決的重點拆清楚，後面才比較不會白花錢。",
+    };
+  }
+
+  function buildFallbackSocialReplies(content, target) {
+    const core = inferSocialReplyCore(content);
+    const lead =
+      target.title === "知識分享"
+        ? `${core.pro} 這類題目我有陸續放在網站裡，你有空再慢慢看就好：${target.url}`
+        : `${core.pro} 我之前有順手整理過一篇，放這裡給你慢慢看就好：${target.url}`;
+
+    return {
+      short: core.short,
+      pro: core.pro,
+      lead,
+    };
   }
 
   function extractSectionByTitles(content, titles) {
@@ -2056,9 +2130,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   function getResolvedArticleSocialReplies(content) {
     const replies = parseArticleSocialReplies(content);
     const target = resolveSocialReplyTarget(content);
+    const fallbackReplies = buildFallbackSocialReplies(content, target);
     return {
-      ...replies,
-      lead: injectLeadReplyUrl(replies.lead, target),
+      short: softenSocialReplyTone(replies.short || fallbackReplies.short, "short", target),
+      pro: softenSocialReplyTone(replies.pro || fallbackReplies.pro, "pro", target),
+      lead: softenSocialReplyTone(injectLeadReplyUrl(replies.lead || fallbackReplies.lead, target), "lead", target),
     };
   }
 
