@@ -74,6 +74,7 @@ export interface PublishingSubchapterStatus {
 }
 
 export interface NextTopicRecommendation {
+  mode: PublishingTopicMode;
   focusTrackTitle: string;
   trackTitle: string;
   chapter: string;
@@ -90,7 +91,33 @@ export interface NextTopicRecommendation {
   flashPrompt: string;
 }
 
+export type PublishingTopicMode = "publishing" | "balanced" | "flash";
+
+export interface PublishingTopicModeOption {
+  value: PublishingTopicMode;
+  label: string;
+  description: string;
+}
+
 export const publishingFocusTrackTitle = "老屋翻新系";
+
+export const publishingTopicModeOptions: PublishingTopicModeOption[] = [
+  {
+    value: "publishing",
+    label: "出版優先",
+    description: "先補主攻書缺章，最快推進一本到可出版。",
+  },
+  {
+    value: "balanced",
+    label: "平衡模式",
+    description: "兼顧主攻書完成度與跨書系的實用補位。",
+  },
+  {
+    value: "flash",
+    label: "Flash 探索",
+    description: "保留書系骨架，但讓 Flash 更有空間滾動修題與找新角度。",
+  },
+];
 
 export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
   {
@@ -652,7 +679,11 @@ export function getPublishingCoverageSummary(posts: PublishingCatalogPost[] = []
   };
 }
 
-export function getPublishingDashboard(posts: PublishingCatalogPost[] = [], focusTrackTitle = publishingFocusTrackTitle) {
+export function getPublishingDashboard(
+  posts: PublishingCatalogPost[] = [],
+  focusTrackTitle = publishingFocusTrackTitle,
+  mode: PublishingTopicMode = "publishing",
+) {
   const entries = buildBookshelfEntries(posts);
   const tracks = bookshelfTrackPlans.map((track) => {
     const trackEntries = entries.filter((entry) => entry.trackTitle === track.title);
@@ -676,7 +707,7 @@ export function getPublishingDashboard(posts: PublishingCatalogPost[] = [], focu
         missingSubchapters,
         remainingToBaseline: missingSubchapters.length,
         subchapters,
-        recommendedTopic: getChapterRecommendedTopicFromEntries(entries, track.title, chapter.title, focusTrackTitle),
+        recommendedTopic: getChapterRecommendedTopicFromEntries(entries, track.title, chapter.title, focusTrackTitle, mode),
       } satisfies PublishingChapterGap;
     });
 
@@ -722,9 +753,15 @@ export function getPublishingDashboard(posts: PublishingCatalogPost[] = [], focu
 }
 
 export function buildNextTopicFlashPrompt(recommendation: Omit<NextTopicRecommendation, "flashPrompt">) {
+  const modeLeadMap: Record<PublishingTopicMode, string> = {
+    publishing: "這次以『出版優先』模式運作，目標是最快補齊主攻書缺口。",
+    balanced: "這次以『平衡模式』運作，目標是在出版進度與跨題材實用性之間取得平衡。",
+    flash: "這次以『Flash 探索模式』運作，允許在不脫離書系骨架下，找更靈活的新切角。",
+  };
   return [
     "你是青曦空間設計的內容總編，現在只要替『下一篇最推薦主題』潤題，不要改變主題缺口本身。",
     "請根據下列固定缺口，輸出 1 個最推薦正式標題 + 2 個備選標題。",
+    modeLeadMap[recommendation.mode],
     "要求：",
     "1. 不能跳出指定主書系、章節與子章節。",
     "2. 目標是加速補全書稿完整度，而不是追求花俏流量題。",
@@ -762,6 +799,7 @@ function buildRecommendationFromCandidate(
     coverageAfter: number;
   },
   focusTrackTitle: string,
+  mode: PublishingTopicMode,
 ) {
   const [primaryTitle, ...backupTitles] = getTopicTemplateSet(candidate.trackTitle, candidate.chapter, candidate.subchapter);
   const reason = buildRecommendationReason(
@@ -771,6 +809,7 @@ function buildRecommendationFromCandidate(
     candidate.articleCountInSubchapter,
   );
   const recommendationBase = {
+    mode,
     focusTrackTitle,
     trackTitle: candidate.trackTitle,
     chapter: candidate.chapter,
@@ -792,14 +831,64 @@ function buildRecommendationFromCandidate(
   } satisfies NextTopicRecommendation;
 }
 
+function getRecommendationScoreWeights(mode: PublishingTopicMode) {
+  const weights: Record<
+    PublishingTopicMode,
+    {
+      focusBoost: number;
+      otherTrackBoost: number;
+      emptyChapterBoost: [number, number, number];
+      emptySubchapterBoost: [number, number, number];
+      trackCoverageBoost: number;
+      recentPenalty: [number, number];
+      seededSubchapterBoost: number;
+      multiTrackDiversityBoost: number;
+    }
+  > = {
+    publishing: {
+      focusBoost: 60,
+      otherTrackBoost: 0,
+      emptyChapterBoost: [34, 18, 6],
+      emptySubchapterBoost: [52, 16, 0],
+      trackCoverageBoost: 24,
+      recentPenalty: [28, 12],
+      seededSubchapterBoost: 0,
+      multiTrackDiversityBoost: 0,
+    },
+    balanced: {
+      focusBoost: 34,
+      otherTrackBoost: 8,
+      emptyChapterBoost: [26, 14, 6],
+      emptySubchapterBoost: [40, 18, 4],
+      trackCoverageBoost: 18,
+      recentPenalty: [20, 9],
+      seededSubchapterBoost: 10,
+      multiTrackDiversityBoost: 10,
+    },
+    flash: {
+      focusBoost: 14,
+      otherTrackBoost: 20,
+      emptyChapterBoost: [18, 12, 8],
+      emptySubchapterBoost: [26, 20, 10],
+      trackCoverageBoost: 12,
+      recentPenalty: [10, 4],
+      seededSubchapterBoost: 18,
+      multiTrackDiversityBoost: 16,
+    },
+  };
+  return weights[mode];
+}
+
 function buildRecommendationCandidates(
   entries: BookshelfEntry[],
   focusTrackTitle: string,
+  mode: PublishingTopicMode,
   filters: { trackTitle?: string; chapterTitle?: string } = {},
 ) {
   const recentEntries = [...entries]
     .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime())
     .slice(0, 3);
+  const weights = getRecommendationScoreWeights(mode);
 
   const candidates = bookshelfTrackPlans.flatMap((track) =>
     (filters.trackTitle && track.title !== filters.trackTitle ? [] : track.chapters).flatMap((chapter) =>
@@ -822,17 +911,34 @@ function buildRecommendationCandidates(
         const recentPenalty = recentEntries.some((entry) =>
           entry.trackTitle === track.title && entry.subchapter === subchapter.title,
         )
-          ? 28
+          ? weights.recentPenalty[0]
           : recentEntries.some((entry) =>
               entry.trackTitle === track.title && entry.chapter === chapter.title,
             )
-            ? 12
+            ? weights.recentPenalty[1]
             : 0;
-        const focusBoost = track.title === focusTrackTitle ? 60 : 0;
-        const emptyChapterBoost = chapterEntries.length === 0 ? 34 : chapterEntries.length === 1 ? 18 : 6;
-        const emptySubchapterBoost = subchapterEntries.length === 0 ? 52 : subchapterEntries.length === 1 ? 16 : 0;
-        const trackCoverageBoost = Math.max(0, 24 - trackEntries.length * 2);
-        const score = focusBoost + emptyChapterBoost + emptySubchapterBoost + trackCoverageBoost - recentPenalty;
+        const focusBoost = track.title === focusTrackTitle ? weights.focusBoost : weights.otherTrackBoost;
+        const emptyChapterBoost = chapterEntries.length === 0
+          ? weights.emptyChapterBoost[0]
+          : chapterEntries.length === 1
+            ? weights.emptyChapterBoost[1]
+            : weights.emptyChapterBoost[2];
+        const emptySubchapterBoost = subchapterEntries.length === 0
+          ? weights.emptySubchapterBoost[0]
+          : subchapterEntries.length === 1
+            ? weights.emptySubchapterBoost[1]
+            : weights.emptySubchapterBoost[2];
+        const trackCoverageBoost = Math.max(0, weights.trackCoverageBoost - trackEntries.length * 2);
+        const seededSubchapterBoost = subchapterEntries.length > 0 ? weights.seededSubchapterBoost : 0;
+        const multiTrackDiversityBoost = track.title !== focusTrackTitle ? weights.multiTrackDiversityBoost : 0;
+        const score =
+          focusBoost +
+          emptyChapterBoost +
+          emptySubchapterBoost +
+          trackCoverageBoost +
+          seededSubchapterBoost +
+          multiTrackDiversityBoost -
+          recentPenalty;
 
         return {
           trackTitle: track.title,
@@ -858,10 +964,11 @@ function getChapterRecommendedTopicFromEntries(
   trackTitle: string,
   chapterTitle: string,
   focusTrackTitle = publishingFocusTrackTitle,
+  mode: PublishingTopicMode = "publishing",
 ) {
-  const best = buildRecommendationCandidates(entries, focusTrackTitle, { trackTitle, chapterTitle })[0];
+  const best = buildRecommendationCandidates(entries, focusTrackTitle, mode, { trackTitle, chapterTitle })[0];
   if (!best) return null;
-  return buildRecommendationFromCandidate(best, focusTrackTitle);
+  return buildRecommendationFromCandidate(best, focusTrackTitle, mode);
 }
 
 export function getChapterRecommendedTopic(
@@ -869,13 +976,18 @@ export function getChapterRecommendedTopic(
   trackTitle: string,
   chapterTitle: string,
   focusTrackTitle = publishingFocusTrackTitle,
+  mode: PublishingTopicMode = "publishing",
 ) {
-  return getChapterRecommendedTopicFromEntries(buildBookshelfEntries(posts), trackTitle, chapterTitle, focusTrackTitle);
+  return getChapterRecommendedTopicFromEntries(buildBookshelfEntries(posts), trackTitle, chapterTitle, focusTrackTitle, mode);
 }
 
-export function getNextRecommendedTopic(posts: PublishingCatalogPost[] = [], focusTrackTitle = publishingFocusTrackTitle): NextTopicRecommendation | null {
+export function getNextRecommendedTopic(
+  posts: PublishingCatalogPost[] = [],
+  focusTrackTitle = publishingFocusTrackTitle,
+  mode: PublishingTopicMode = "publishing",
+): NextTopicRecommendation | null {
   const entries = buildBookshelfEntries(posts);
-  const best = buildRecommendationCandidates(entries, focusTrackTitle)[0];
+  const best = buildRecommendationCandidates(entries, focusTrackTitle, mode)[0];
   if (!best) return null;
-  return buildRecommendationFromCandidate(best, focusTrackTitle);
+  return buildRecommendationFromCandidate(best, focusTrackTitle, mode);
 }
