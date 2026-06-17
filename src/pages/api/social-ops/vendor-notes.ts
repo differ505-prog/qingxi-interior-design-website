@@ -1,8 +1,9 @@
 import type { APIRoute } from "astro";
-import { list, put } from "@vercel/blob";
+import { get, put } from "@vercel/blob";
 
 const DEBUG_SERVER_URL = "http://127.0.0.1:7778/event";
 const DEBUG_SESSION_ID = "vendor-notes-write-fail";
+const VENDOR_NOTES_BLOB_ACCESS = "private" as const;
 
 type VendorNoteRecord = {
   id: string;
@@ -68,24 +69,15 @@ function normalizeVendorNote(input: Record<string, unknown>): VendorNoteRecord {
 }
 
 async function readVendorNotes(token: string) {
-  const result = await list({
+  const result = await get(VENDOR_NOTES_BLOB_PATH, {
     token,
-    prefix: VENDOR_NOTES_BLOB_PATH,
-    limit: 1,
+    access: VENDOR_NOTES_BLOB_ACCESS,
+    useCache: false,
   });
+  if (!result?.stream) return [];
 
-  const blob = result.blobs.find((entry) => entry.pathname === VENDOR_NOTES_BLOB_PATH) || result.blobs[0];
-  if (!blob?.url) return [];
-
-  const response = await fetch(blob.url, {
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(`READ_VENDOR_NOTES_FAILED:${response.status}`);
-  }
-
-  const data = await response.json();
+  const payload = await new Response(result.stream).text();
+  const data = JSON.parse(payload);
   if (!Array.isArray(data)) return [];
   return data
     .filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === "object")
@@ -106,7 +98,7 @@ async function writeVendorNotes(token: string, notes: VendorNoteRecord[]) {
       data: {
         pathname: VENDOR_NOTES_BLOB_PATH,
         noteCount: notes.length,
-        access: "public",
+        access: VENDOR_NOTES_BLOB_ACCESS,
         tokenPresent: Boolean(token),
       },
       ts: Date.now(),
@@ -115,7 +107,7 @@ async function writeVendorNotes(token: string, notes: VendorNoteRecord[]) {
   // #endregion
   await put(VENDOR_NOTES_BLOB_PATH, JSON.stringify(notes, null, 2), {
     token,
-    access: "public",
+    access: VENDOR_NOTES_BLOB_ACCESS,
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json; charset=utf-8",

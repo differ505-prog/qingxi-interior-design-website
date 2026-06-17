@@ -18,3 +18,16 @@
 - Add runtime instrumentation around token detection, request parsing, read-before-write, and `put()` failure details.
 - Reproduce the failing save once after deployment.
 - Compare the returned error evidence to the five hypotheses above.
+
+## Evidence
+
+- User reproduced the failure after token setup and received:
+  - `共享廠商筆記寫入失敗：Error - Vercel Blob: Cannot use public access on a private store. The store is configured with private access.`
+
+## Hypothesis Status
+
+- H1 `token exists but no write permission`: not supported by current evidence.
+- H2 `store is private but code writes as public`: confirmed.
+- H3 `project and store mismatch`: not supported by current evidence.
+- H4 `runtime / SDK issue`: rejected as primary cause.
+- H5 `generic catch hid the real Blob error`: confirmed as a contributing visibility issue.
