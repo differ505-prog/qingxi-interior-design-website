@@ -2835,12 +2835,21 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       if (!content) return false;
       articleAiResult = await enrichArticleMetadataIfNeeded(content, mode);
       articleAiMode = mode;
+      setArticleAiFeedback("結果整理完成，正在寫入工作台...", "is-success");
       saveArticleAiResult();
       renderArticleAiResult();
       const successMessage = mode === "quick" ? "已完成 AI 快速判題與社團回覆稿整理。" : "已完成 Flash 長稿備援生成。";
       setFeedback(successMessage, "is-success");
       setArticleAiFeedback(successMessage, "is-success");
       return true;
+    } catch (error) {
+      console.error("Gemini Flash 結果整理失敗：", error);
+      const errorMessage = mode === "quick"
+        ? "判題已完成，但整理結果時發生問題，請重試一次。"
+        : "長稿已生成，但整理結果時發生問題，請重試一次。";
+      setFeedback(errorMessage, "is-warning");
+      setArticleAiFeedback(errorMessage, "is-warning");
+      return false;
     } finally {
       setArticleAiBusy(false);
     }
@@ -2856,12 +2865,18 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
       articleAiResult = await enrichArticleMetadataIfNeeded(quickContent, "quick");
       articleAiMode = "quick";
+      setArticleAiFeedback("結果整理完成，正在寫入工作台...", "is-success");
       saveArticleAiResult();
       renderArticleAiResult();
 
       const question = persistArticleSourceQuestion();
+      setArticleAiFeedback("結果已整理，正在複製 Pro 生文提示詞...", "is-success");
       await copyProArticlePrompt(question, "已完成判題並複製 Pro 生文提示詞。");
       setArticleAiFeedback("已完成判題並複製 Pro 生文提示詞。", "is-success");
+    } catch (error) {
+      console.error("一鍵流程整理失敗：", error);
+      setFeedback("判題已完成，但整理或複製提示詞時發生問題，請重試一次。", "is-warning");
+      setArticleAiFeedback("判題已完成，但整理或複製提示詞時發生問題，請重試一次。", "is-warning");
     } finally {
       setArticleAiBusy(false);
     }
@@ -4782,6 +4797,19 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     display: grid;
     gap: 0.62rem;
     margin-top: 0.82rem;
+    margin-left: 1rem;
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .quest-checklist::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.12rem;
+    bottom: 0.12rem;
+    width: 1px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03));
   }
 
   .quest-main-list {
@@ -4855,6 +4883,18 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     background: rgba(255, 255, 255, 0.03);
     color: #f1efea;
     transition: background 0.25s ease, border-color 0.25s ease;
+    position: relative;
+  }
+
+  .quest-check::before {
+    content: "";
+    position: absolute;
+    left: -1rem;
+    top: 50%;
+    width: 0.72rem;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-50%);
   }
 
   .quest-check.is-checked {
