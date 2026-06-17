@@ -1124,11 +1124,52 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     ].join("\n");
   }
 
+  function normalizeComparableText(value = "") {
+    return String(value).replace(/\s+/g, "").trim().toLowerCase();
+  }
+
+  function formatRelatedArticleList(entries = [], limit = 5) {
+    if (!entries.length) return "（目前沒有明確可參考的既有文章）";
+    return entries
+      .slice(0, limit)
+      .map((entry, index) => `${index + 1}. ${entry.title}｜${entry.chapter}｜${entry.category}`)
+      .join("\n");
+  }
+
+  function buildProRelatedArticleContext(confirmData, aiDraftBlock = "") {
+    const resolvedTrack = confirmData.track || findTrackFromText(aiDraftBlock) || "老屋翻新系";
+    const resolvedChapter = confirmData.chapter || inferChapterFromTrack(resolvedTrack, confirmData.title, aiDraftBlock);
+    const normalizedTitle = normalizeComparableText(confirmData.title);
+
+    const sameTrackEntries = bookshelfEntries.filter((entry) =>
+      entry.trackTitle === resolvedTrack &&
+      (!normalizedTitle || normalizeComparableText(entry.title) !== normalizedTitle),
+    );
+
+    const sameChapterEntries = sameTrackEntries.filter((entry) => entry.chapter === resolvedChapter);
+    const neighboringChapterEntries = sameTrackEntries.filter((entry) => entry.chapter !== resolvedChapter);
+
+    return [
+      "【同書系既有文章脈絡】",
+      `主書系：${resolvedTrack || "尚未判定"}`,
+      `章節定位：${resolvedChapter || "尚未判定"}`,
+      `同書系既有文章數：${sameTrackEntries.length} 篇`,
+      `同章既有文章數：${sameChapterEntries.length} 篇`,
+      "",
+      "同章既有文章：",
+      formatRelatedArticleList(sameChapterEntries, 5),
+      "",
+      "同書系其他文章：",
+      formatRelatedArticleList(neighboringChapterEntries, 6),
+    ].join("\n");
+  }
+
   function buildProFinalizePrompt(problemText = "", aiDraft = "") {
     const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
     const confirmData = getArticleConfirmData(aiDraftBlock);
     const decision = getArticleAiDecision(aiDraftBlock);
+    const relatedArticleContext = buildProRelatedArticleContext(confirmData, aiDraftBlock);
 
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
@@ -1155,6 +1196,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       `相似舊文：${decision.similar}`,
       `回覆視角：${decision.angle}`,
       "",
+      relatedArticleContext,
+      "",
       "【出版導向寫作原則】",
       "1. 請把這篇文視為未來書中的一個章節單元，不要寫成只追當下流量的短期文章。",
       "2. 文氣要能長期保存，可讀性高，但不要浮誇、不要過度聳動、不要把簡單問題硬寫得過度戲劇化。",
@@ -1172,7 +1215,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "B. 【重複風險覆核】",
       "- 判斷這篇文是否與既有舊文過於重複。",
       "- 若重複風險高，請明確指出應該保留哪個主軸、刪掉哪類重複段落。",
-      "- 請優先思考如何與同書系其他文章互補，而不是只判斷能不能發布。",
+      "- 請優先根據上方既有文章清單，思考如何與同書系其他文章互補，而不是只判斷能不能發布。",
       "",
       "C. 【發布版標題】",
       "- 給出 1 個最推薦正式發布標題。",
@@ -1188,7 +1231,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 文章內文必須真正根據原始問題展開，而不是只重述 Flash 判題結果。",
       "- 若題目原始資訊不足，請合理補全背景與情境，讓文章仍能成立為完整章節。",
       "- 若某些段落屬於補舊文邏輯，請整理成可直接回填舊文的段落版本，不要無謂重複。",
-      "- 內文請自然安排 1-3 個可延伸閱讀的位置，指出適合連到哪類同主題文章，但不要硬塞推銷句。",
+      "- 內文請自然安排 1-3 個可延伸閱讀的位置，優先參照上方既有文章清單，指出適合互鏈的文章方向，但不要硬塞推銷句。",
       "- 絕對不要出現推銷腔、口號腔、空泛形容詞堆砌。",
       "",
       "F. 【最終發布欄位確認】",
