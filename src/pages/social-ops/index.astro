@@ -1289,12 +1289,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         const complete = isRunComplete(run);
         const actionOneComplete = run.actionSearch && run.actionAdvice;
         const actionTwoComplete = run.actionThreads && run.actionInstagram && run.actionXiaohongshu;
+        const completedSteps = [actionOneComplete, actionTwoComplete].filter(Boolean).length;
+        const progressLabel = `(${index + 1}/${WEEKLY_TARGET})`;
+        const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
 
         return `
           <article class="quest-card ${complete ? "is-complete" : ""}">
             <div class="quest-topline">
-              <span class="quest-slot">回合 ${run.slot}</span>
-              <span class="quest-keyword">${complete ? "本回合完成" : "任選題"}</span>
+              <span class="quest-slot">${progressLabel}</span>
+              <span class="quest-keyword">${progressState}</span>
             </div>
             <div class="quest-main-list">
               <section class="quest-main ${actionOneComplete ? "is-complete" : ""}">
@@ -1525,6 +1528,31 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       `整本目前待補章：${missingChapters.slice(0, 3).join(" / ") || "主幹已具雛形"}`,
       `本章目前待補子章：${missingSubchapters.slice(0, 3).join(" / ") || "子章主幹已具雛形"}`,
       "寫作要求：請優先補強這一章目前最缺的判斷邏輯、情境分支、預算差異、施工順序或常見誤區，而不是重述已存在文章。",
+    ].join("\n");
+  }
+
+  function buildEmergencyProFinalizePrompt(problemText = "", aiDraft = "") {
+    const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
+    const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
+
+    return [
+      "你是青曦空間設計的內容總編與正式撰稿編輯。",
+      "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網的高品質文章。",
+      "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
+      "",
+      "【真實社團問題】",
+      questionBlock,
+      "",
+      "【Gemini Flash 結構化判題結果】",
+      aiDraftBlock,
+      "",
+      "請固定依序輸出：",
+      "A. 文章策略確認",
+      "B. 正式發布標題",
+      "C. 正式發布摘要",
+      "D. 正式發布文章（Markdown）",
+      "E. 最終發布欄位確認",
+      "F. 出書收錄備註",
     ].join("\n");
   }
 
@@ -1885,15 +1913,21 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     let usedFallback = false;
 
     try {
-      articleProFinalizePrompt = buildProFinalizePrompt(resolvedQuestion, articleAiResult);
-    } catch (error) {
-      console.error("完整 Pro 生文提示詞生成失敗，改用穩定版：", error);
-      articleProFinalizePrompt = buildBasicProFinalizePrompt(resolvedQuestion, articleAiResult);
-      usedFallback = true;
-    }
+      try {
+        articleProFinalizePrompt = buildProFinalizePrompt(resolvedQuestion, articleAiResult);
+      } catch (error) {
+        console.error("完整 Pro 生文提示詞生成失敗，改用穩定版：", error);
+        articleProFinalizePrompt = buildBasicProFinalizePrompt(resolvedQuestion, articleAiResult);
+        usedFallback = true;
+      }
 
-    if (!articleProFinalizePrompt.trim()) {
-      articleProFinalizePrompt = buildBasicProFinalizePrompt(resolvedQuestion, articleAiResult);
+      if (!articleProFinalizePrompt.trim()) {
+        articleProFinalizePrompt = buildBasicProFinalizePrompt(resolvedQuestion, articleAiResult);
+        usedFallback = true;
+      }
+    } catch (error) {
+      console.error("穩定版 Pro 生文提示詞生成失敗，改用緊急保底版：", error);
+      articleProFinalizePrompt = buildEmergencyProFinalizePrompt(resolvedQuestion, articleAiResult);
       usedFallback = true;
     }
 
@@ -3135,6 +3169,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       }
     } catch (error) {
       console.error("一鍵流程整理失敗：", error);
+      if (articleProFinalizePrompt.trim()) {
+        renderArticleProPrompt();
+        revealArticleProPrompt();
+        spotlightActionButton("copy-pro-finalize-prompt");
+        spotlightActionButton("copy-pro-finalize-prompt-inline");
+        setFeedback("判題已完成，Pro 生文提示詞也已備好，但後續流程中斷；可直接展開下方內容手動複製。", "is-warning");
+        setArticleAiFeedback("判題已完成，Pro 生文提示詞也已備好，但後續流程中斷；可直接展開下方內容手動複製。", "is-warning");
+        return;
+      }
       setFeedback("判題已完成，但備好 Pro 生文提示詞時發生問題，請重試一次。", "is-warning");
       setArticleAiFeedback("判題已完成，但備好 Pro 生文提示詞時發生問題，請重試一次。", "is-warning");
     } finally {
@@ -3447,7 +3490,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     await copyText(buildArticlePrompt(question, "full"), successMessage);
   });
 
-  document.getElementById("run-article-ai-flow")?.addEventListener("click", async () => {
+  const runArticleAiFlowButton = document.getElementById("run-article-ai-flow");
+  runArticleAiFlowButton?.addEventListener("click", async () => {
     await runArticleAiFlow();
   });
 
