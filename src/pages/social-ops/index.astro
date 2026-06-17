@@ -6,7 +6,13 @@ import {
   mergeBlogPosts,
   staticBlogPosts,
 } from "../../lib/blog-catalog";
-import { bookshelfTracks } from "../../lib/content-taxonomy";
+import {
+  bookshelfSubchapterPools,
+  bookshelfTracks,
+  getNextRecommendedTopic,
+  getPublishingCoverageSummary,
+  publishingFocusTrackTitle,
+} from "../../lib/content-taxonomy";
 import { geminiCanvasMaster } from "../../lib/gemini-canvas-master";
 
 const defaultSources = [
@@ -79,139 +85,6 @@ const vendorCraftLevelOptions = [
   "很細",
 ];
 
-const bookshelfSubchapterPools = {
-  "老屋翻新系": {
-    "現況判讀": {
-      "屋況盤點": ["屋況", "現況", "中古屋", "老屋", "盤點", "評估"],
-      "翻新範圍": ["局部翻新", "翻新範圍", "要不要拆", "整修範圍", "改造範圍"],
-      "翻新起手式": ["先做什麼", "第一步", "從哪開始", "翻新前", "準備階段"],
-    },
-    "預算拆解": {
-      "預算分級": ["預算", "費用", "多少錢", "怎麼抓", "抓多少"],
-      "報價拆讀": ["報價", "單價", "估價", "報價單", "費用拆解"],
-      "追加風險": ["追加", "超支", "爆預算", "變更多", "加價"],
-    },
-    "基礎工程": {
-      "拆除泥作": ["拆除", "泥作", "砌牆", "打底"],
-      "水電更新": ["水電", "配線", "配管", "電路", "管線"],
-      "防水地坪": ["防水", "地坪", "找平", "浴室", "漏水"],
-    },
-    "空間重整": {
-      "格局調整": ["格局", "隔間", "空間重整", "動線重整"],
-      "收納補強": ["收納", "櫃體", "儲物", "機能"],
-      "家具配置": ["家具", "沙發", "餐桌", "床架", "配置"],
-    },
-    "完工避雷": {
-      "驗收重點": ["驗收", "完工", "缺失"],
-      "保固界線": ["保固", "責任", "保修"],
-      "糾紛預防": ["糾紛", "避雷", "爭議", "扯皮"],
-    },
-  },
-  "預售屋客變系": {
-    "客變判斷": {
-      "客變時機": ["客變時間", "客變時機", "什麼時候"],
-      "值不值得改": ["要不要客變", "值得", "必要", "划算"],
-      "先決條件": ["先決定", "先確認", "客變前", "前置"],
-    },
-    "配置預留": {
-      "插座迴路": ["插座", "迴路", "回路", "開關"],
-      "燈位弱電": ["燈位", "弱電", "網路", "監控"],
-      "設備預留": ["預留", "設備", "冷氣", "新風", "管線"],
-    },
-    "材質設備": {
-      "廚具衛浴": ["廚具", "衛浴", "水龍頭", "馬桶"],
-      "地板磁磚": ["地板", "磁磚", "石材"],
-      "五金面材": ["五金", "面材", "板材", "建材"],
-    },
-    "生活動線": {
-      "收納配置": ["收納", "櫃體", "機能"],
-      "家務動線": ["家務", "廚房", "洗衣", "清潔"],
-      "起居情境": ["生活習慣", "起居", "使用情境"],
-    },
-    "交屋銜接": {
-      "交屋清單": ["交屋", "點交", "清單"],
-      "進場排序": ["進場", "排序", "先後"],
-      "客變銜接裝修": ["客變後", "銜接", "裝修"],
-    },
-  },
-  "驗屋交屋系": {
-    "驗屋判讀": {
-      "結構防水": ["裂縫", "防水", "漏水", "壁癌"],
-      "水電機電": ["水電", "插座", "開關", "設備"],
-      "尺寸平整": ["尺寸", "平整", "水平", "垂直"],
-    },
-    "缺失排序": {
-      "必修先修": ["優先", "先修", "先處理"],
-      "可觀察項": ["觀察", "後續看", "先記錄"],
-      "後續追蹤": ["追蹤", "複驗", "回報"],
-    },
-    "點交策略": {
-      "建商回報": ["建商", "回報", "提報"],
-      "紀錄佐證": ["照片", "紀錄", "佐證", "證據"],
-      "協調節奏": ["協調", "溝通", "節奏"],
-    },
-    "交屋後進場": {
-      "裝修前準備": ["準備", "交屋後", "進場前"],
-      "保護措施": ["保護", "養護", "包覆"],
-      "進場銜接": ["進場", "銜接", "施工順序"],
-    },
-  },
-  "格局動線系": {
-    "空間尺度": {
-      "家具尺寸": ["家具", "尺寸", "沙發", "床架", "餐桌"],
-      "走道淨寬": ["走道", "寬度", "淨寬"],
-      "開門迴旋": ["開門", "門片", "轉身", "迴旋"],
-    },
-    "動線配置": {
-      "公共區動線": ["客廳", "餐廳", "公共區"],
-      "家務動線": ["廚房", "清潔", "洗衣", "家務"],
-      "通行轉身": ["轉身", "通行", "卡住", "動線"],
-    },
-    "收納系統": {
-      "櫃體深度": ["深度", "櫃體", "櫥櫃"],
-      "分區收納": ["分區", "分類", "收納"],
-      "異形角落": ["畸零", "轉角", "角落", "異形"],
-    },
-    "家具配置": {
-      "客餐家具": ["沙發", "餐桌", "茶几", "餐椅"],
-      "臥室家具": ["床架", "床頭", "衣櫃"],
-      "工作家具": ["書桌", "工作桌", "辦公"],
-    },
-    "使用情境": {
-      "有小孩": ["小孩", "兒童"],
-      "有長輩": ["長輩", "老人"],
-      "有寵物或居家工作": ["寵物", "居家工作", "遠端", "在家上班"],
-    },
-  },
-  "水電照明系": {
-    "插座開關": {
-      "插座數量": ["插座", "數量", "不夠用"],
-      "高度位置": ["高度", "位置", "面板"],
-      "開關配置": ["開關", "雙切", "情境開關"],
-    },
-    "迴路安全": {
-      "負載分配": ["負載", "跳電", "用電"],
-      "電箱保護": ["電箱", "保護", "無熔絲"],
-      "高耗電設備": ["冷氣", "烘衣", "IH", "高耗電"],
-    },
-    "照明設計": {
-      "基礎照明": ["主燈", "基礎照明", "亮度"],
-      "情境照明": ["情境", "層次", "間接照明"],
-      "眩光色溫": ["眩光", "色溫", "刺眼"],
-    },
-    "設備整合": {
-      "冷氣新風": ["冷氣", "新風", "空調"],
-      "弱電網路": ["弱電", "網路", "wifi"],
-      "監控門禁": ["監控", "門禁", "對講"],
-    },
-    "智能控制": {
-      "智能窗簾": ["窗簾", "電動窗簾", "蜂巢簾"],
-      "感應自動化": ["感應", "自動化", "人體感應"],
-      "情境聯動": ["語音", "情境", "聯動", "智慧"],
-    },
-  },
-};
-
 let blogPosts = staticBlogPosts.map(({ coverImage, ...post }) => post);
 let blogSyncLabel = "目前先顯示已存在文章。";
 
@@ -249,12 +122,16 @@ try {
   blogSyncLabel = "同步失敗，先顯示已存在文章。";
 }
 
+const publishingCoverage = getPublishingCoverageSummary(blogPosts, publishingFocusTrackTitle);
+const nextRecommendedTopic = getNextRecommendedTopic(blogPosts, publishingFocusTrackTitle);
+
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
 const bookshelfTracksJson = JSON.stringify(bookshelfTracks);
 const bookshelfSubchapterPoolsJson = JSON.stringify(bookshelfSubchapterPools);
 const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
+const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
 ---
 
 <BaseLayout
@@ -516,11 +393,64 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
                 <span>現有文章</span>
                 <strong>{blogPosts.length}</strong>
               </article>
+              <article class="bookshelf-stat">
+                <span>主攻書完成度</span>
+                <strong>{publishingCoverage.focusTrack ? `${publishingCoverage.focusTrack.coverageRate}%` : "0%"}</strong>
+              </article>
               <article class="bookshelf-stat bookshelf-stat-wide">
                 <span>同步狀態</span>
                 <strong>{blogSyncLabel}</strong>
               </article>
             </div>
+
+            {nextRecommendedTopic && (
+              <section class="bookshelf-next-topic">
+                <div class="bookshelf-preview-head">
+                  <p>下一篇最推薦</p>
+                  <span>先由缺章規則決定，再交給 Flash 潤題</span>
+                </div>
+                <div class="bookshelf-next-topic-grid">
+                  <article class="bookshelf-confirm-card">
+                    <span>主攻書</span>
+                    <strong>{nextRecommendedTopic.focusTrackTitle}</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>這次補位</span>
+                    <strong>{nextRecommendedTopic.trackTitle}</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>章節</span>
+                    <strong>{nextRecommendedTopic.chapter}</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>子章節</span>
+                    <strong>{nextRecommendedTopic.subchapter}</strong>
+                  </article>
+                </div>
+                <article class="bookshelf-next-topic-hero">
+                  <span class="bookshelf-next-topic-eyebrow">最推薦主題</span>
+                  <h3>{nextRecommendedTopic.primaryTitle}</h3>
+                  <p>{nextRecommendedTopic.reason}</p>
+                  <div class="bookshelf-next-topic-progress">
+                    <span>補前 {nextRecommendedTopic.coverageBefore}%</span>
+                    <strong>補後 {nextRecommendedTopic.coverageAfter}%</strong>
+                  </div>
+                </article>
+                <div class="bookshelf-next-topic-alt">
+                  {nextRecommendedTopic.backupTitles.map((title) => (
+                    <article class="bookshelf-next-topic-alt-card">
+                      <span>備選</span>
+                      <strong>{title}</strong>
+                    </article>
+                  ))}
+                </div>
+                <div class="bookshelf-actions bookshelf-confirm-actions">
+                  <button type="button" id="copy-next-topic-brief" class="bookshelf-action">複製補位資訊</button>
+                  <button type="button" id="copy-next-topic-flash-prompt" class="bookshelf-action bookshelp-action-primary">複製 Flash 潤題提示詞</button>
+                </div>
+                <p class="bookshelf-confirm-note">這裡的主題不是直接讓 Flash 自由發散，而是先固定缺口，再讓 Flash 只做標題潤題。</p>
+              </section>
+            )}
 
             <details id="vendor-notes-board" class="bookshelf-fold" open>
               <summary>
@@ -760,7 +690,7 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, nextRecommendedTopicJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const ARTICLE_AI_RESULT_KEY = "qingxi-article-ai-result-v1";
@@ -787,6 +717,7 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
   const bookshelfSubchapterPools = JSON.parse(bookshelfSubchapterPoolsJson);
   const geminiCanvasMasterData = JSON.parse(geminiCanvasMasterJson);
   const vendorTradeOptions = JSON.parse(vendorTradeOptionsJson);
+  const nextRecommendedTopicData = nextRecommendedTopicJson ? JSON.parse(nextRecommendedTopicJson) : null;
   const articleIntakeFields = [
     "主書系",
     "章節定位",
@@ -1890,6 +1821,24 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
       "",
       "現有文章清單：",
       buildArticleTitlesText(),
+    ].join("\n");
+  }
+
+  function buildNextTopicBriefText() {
+    if (!nextRecommendedTopicData) return "";
+
+    return [
+      `主攻書系：${nextRecommendedTopicData.focusTrackTitle}`,
+      `這次補位：${nextRecommendedTopicData.trackTitle}`,
+      `章節：${nextRecommendedTopicData.chapter}`,
+      `子章節：${nextRecommendedTopicData.subchapter}`,
+      `網站分類：${nextRecommendedTopicData.category}`,
+      `最推薦主題：${nextRecommendedTopicData.primaryTitle}`,
+      `備選 1：${nextRecommendedTopicData.backupTitles?.[0] || "無"}`,
+      `備選 2：${nextRecommendedTopicData.backupTitles?.[1] || "無"}`,
+      `推薦原因：${nextRecommendedTopicData.reason}`,
+      `補前完成度：${nextRecommendedTopicData.coverageBefore}%`,
+      `補後完成度：${nextRecommendedTopicData.coverageAfter}%`,
     ].join("\n");
   }
 
@@ -3980,6 +3929,22 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     setFeedback("本週任務已重設，XP 與連勝保留。", "is-warning");
   });
 
+  document.getElementById("copy-next-topic-brief")?.addEventListener("click", async () => {
+    if (!nextRecommendedTopicData) {
+      setFeedback("目前還沒有可複製的補位主題。", "is-warning");
+      return;
+    }
+    await copyText(buildNextTopicBriefText(), "已複製下一篇補位資訊。");
+  });
+
+  document.getElementById("copy-next-topic-flash-prompt")?.addEventListener("click", async () => {
+    if (!nextRecommendedTopicData?.flashPrompt) {
+      setFeedback("目前還沒有可複製的 Flash 潤題提示詞。", "is-warning");
+      return;
+    }
+    await copyText(nextRecommendedTopicData.flashPrompt, "已複製 Flash 潤題提示詞。");
+  });
+
   document.getElementById("copy-book-plan")?.addEventListener("click", async () => {
     await copyText(buildBookshelfLlmPrompt(), "已複製 LLM 書系整理稿。");
   });
@@ -4800,6 +4765,89 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
 
   .bookshelf-stat-wide {
     grid-column: span 1;
+  }
+
+  .bookshelf-next-topic {
+    display: grid;
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .bookshelf-next-topic-grid,
+  .bookshelf-next-topic-alt {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .bookshelf-next-topic-hero {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.08), rgba(214, 210, 200, 0.03));
+  }
+
+  .bookshelf-next-topic-eyebrow {
+    color: rgba(233, 231, 225, 0.56);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .bookshelf-next-topic-hero h3,
+  .bookshelf-next-topic-hero p {
+    margin: 0;
+  }
+
+  .bookshelf-next-topic-hero h3 {
+    font-size: 1.12rem;
+    line-height: 1.55;
+    color: #f7f6f2;
+  }
+
+  .bookshelf-next-topic-hero p {
+    color: rgba(233, 231, 225, 0.74);
+    line-height: 1.75;
+  }
+
+  .bookshelf-next-topic-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    color: rgba(233, 231, 225, 0.62);
+    font-size: 0.84rem;
+  }
+
+  .bookshelf-next-topic-progress strong {
+    color: #f3efe7;
+    font-size: 0.9rem;
+  }
+
+  .bookshelf-next-topic-alt-card {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.9rem 0.95rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-next-topic-alt-card span {
+    color: rgba(230, 228, 222, 0.56);
+    font-size: 0.8rem;
+  }
+
+  .bookshelf-next-topic-alt-card strong {
+    color: #f1efea;
+    font-size: 0.96rem;
+    line-height: 1.7;
   }
 
   .bookshelf-actions {
@@ -6670,6 +6718,8 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     .bookshelf-summary,
     .bookshelf-analytics-grid,
     .bookshelf-ai-decision,
+    .bookshelf-next-topic-grid,
+    .bookshelf-next-topic-alt,
     .bookshelf-outline-meta,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
@@ -6712,6 +6762,8 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
     .bookshelf-summary,
     .bookshelf-analytics-grid,
     .bookshelf-ai-decision,
+    .bookshelf-next-topic-grid,
+    .bookshelf-next-topic-alt,
     .bookshelf-shelf-grid,
     .bookshelf-outline-grid,
     .bookshelf-outline-meta,
