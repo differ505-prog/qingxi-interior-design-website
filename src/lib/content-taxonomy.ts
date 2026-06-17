@@ -88,6 +88,9 @@ export interface NextTopicRecommendation {
   primaryTitle: string;
   backupTitles: string[];
   reason: string;
+  sameSubchapterArticles: string[];
+  sameChapterArticles: string[];
+  sameTrackArticles: string[];
   flashPrompt: string;
 }
 
@@ -779,14 +782,53 @@ export function buildNextTopicFlashPrompt(recommendation: Omit<NextTopicRecommen
     `本子章篇數：${recommendation.articleCountInSubchapter}`,
     `推薦原因：${recommendation.reason}`,
     "",
+    "同子章既有文章：",
+    recommendation.sameSubchapterArticles.length ? recommendation.sameSubchapterArticles.join(" / ") : "目前沒有同子章文章，可直接立第一篇。",
+    "",
+    "同章既有文章：",
+    recommendation.sameChapterArticles.length ? recommendation.sameChapterArticles.join(" / ") : "目前沒有同章文章，請直接立住章節主幹。",
+    "",
+    "同書系其他既有文章：",
+    recommendation.sameTrackArticles.length ? recommendation.sameTrackArticles.join(" / ") : "目前沒有同書系其他文章，請把這篇寫成可立主幹的起手文。",
+    "",
     "請直接輸出：",
     "A. 最推薦標題（1 個）",
     "B. 備選標題（2 個）",
     "C. 為什麼這一題最適合現在先寫（2-4 句）",
+    "D. 與既有文章如何錯位，避免重寫舊題（2-4 句）",
   ].join("\n");
 }
 
+function listEntryTitles(entries: BookshelfEntry[] = [], limit = 6) {
+  return entries
+    .slice(0, limit)
+    .map((entry) => entry.title)
+    .filter(Boolean);
+}
+
+function buildExistingArticleContext(
+  entries: BookshelfEntry[],
+  trackTitle: string,
+  chapterTitle: string,
+  subchapterTitle: string,
+) {
+  const sameTrackEntries = entries.filter((entry) => entry.trackTitle === trackTitle);
+  const sameChapterEntries = sameTrackEntries.filter((entry) => entry.chapter === chapterTitle);
+  const sameSubchapterEntries = sameChapterEntries.filter((entry) => entry.subchapter === subchapterTitle);
+  const neighboringTrackEntries = sameTrackEntries.filter((entry) => entry.chapter !== chapterTitle);
+
+  return {
+    sameSubchapterArticles: listEntryTitles(sameSubchapterEntries, 4),
+    sameChapterArticles: listEntryTitles(
+      sameChapterEntries.filter((entry) => entry.subchapter !== subchapterTitle),
+      5,
+    ),
+    sameTrackArticles: listEntryTitles(neighboringTrackEntries, 6),
+  };
+}
+
 function buildRecommendationFromCandidate(
+  entries: BookshelfEntry[],
   candidate: {
     trackTitle: string;
     chapter: string;
@@ -808,6 +850,12 @@ function buildRecommendationFromCandidate(
     candidate.articleCountInChapter,
     candidate.articleCountInSubchapter,
   );
+  const existingArticleContext = buildExistingArticleContext(
+    entries,
+    candidate.trackTitle,
+    candidate.chapter,
+    candidate.subchapter,
+  );
   const recommendationBase = {
     mode,
     focusTrackTitle,
@@ -823,6 +871,7 @@ function buildRecommendationFromCandidate(
     primaryTitle,
     backupTitles,
     reason,
+    ...existingArticleContext,
   };
 
   return {
@@ -968,7 +1017,7 @@ function getChapterRecommendedTopicFromEntries(
 ) {
   const best = buildRecommendationCandidates(entries, focusTrackTitle, mode, { trackTitle, chapterTitle })[0];
   if (!best) return null;
-  return buildRecommendationFromCandidate(best, focusTrackTitle, mode);
+  return buildRecommendationFromCandidate(entries, best, focusTrackTitle, mode);
 }
 
 export function getChapterRecommendedTopic(
@@ -989,5 +1038,5 @@ export function getNextRecommendedTopic(
   const entries = buildBookshelfEntries(posts);
   const best = buildRecommendationCandidates(entries, focusTrackTitle, mode)[0];
   if (!best) return null;
-  return buildRecommendationFromCandidate(best, focusTrackTitle, mode);
+  return buildRecommendationFromCandidate(entries, best, focusTrackTitle, mode);
 }

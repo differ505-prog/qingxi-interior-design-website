@@ -124,16 +124,37 @@ try {
   blogSyncLabel = "同步失敗，先顯示已存在文章。";
 }
 
+function buildTopicModeRationale(modeValue: string, modeDashboard: any, modeRecommendation: any) {
+  if (!modeDashboard?.focusTrack || !modeRecommendation) return "目前資料不足，先沿用既有排序。";
+
+  if (modeValue === "publishing") {
+    return `${modeDashboard.focusTrack.title} 目前距離出版基線還差 ${modeDashboard.focusTrack.remainingToBaseline} 篇，現在先補「${modeRecommendation.chapter} > ${modeRecommendation.subchapter}」最能直接推進整本完成度。`;
+  }
+
+  if (modeValue === "balanced") {
+    return `目前仍以 ${modeDashboard.focusTrack.title} 為主線，但這題同時能補「${modeRecommendation.trackTitle}」的實用缺口，適合在出版進度與網站覆蓋之間取平衡。`;
+  }
+
+  return modeRecommendation.sameSubchapterArticles.length
+    ? `這個子章目前已有 ${modeRecommendation.sameSubchapterArticles.length} 篇相關文章，可讓 Flash 依既有內容滾動修題，補出新切角而不偏離書稿主線。`
+    : `這個子章目前仍缺第一篇主文，所以先用 Flash 探索模式找更靈活的切角，但仍留在 ${modeRecommendation.trackTitle} 的固定骨架內。`;
+}
+
 const publishingCoverage = getPublishingCoverageSummary(blogPosts, publishingFocusTrackTitle);
 const topicModeMap = Object.fromEntries(
-  publishingTopicModeOptions.map((modeOption) => [
-    modeOption.value,
-    {
-      ...modeOption,
-      publishingDashboard: getPublishingDashboard(blogPosts, publishingFocusTrackTitle, modeOption.value),
-      nextRecommendedTopic: getNextRecommendedTopic(blogPosts, publishingFocusTrackTitle, modeOption.value),
-    },
-  ]),
+  publishingTopicModeOptions.map((modeOption) => {
+    const publishingDashboard = getPublishingDashboard(blogPosts, publishingFocusTrackTitle, modeOption.value);
+    const nextRecommendedTopic = getNextRecommendedTopic(blogPosts, publishingFocusTrackTitle, modeOption.value);
+    return [
+      modeOption.value,
+      {
+        ...modeOption,
+        publishingDashboard,
+        nextRecommendedTopic,
+        modeRationale: buildTopicModeRationale(modeOption.value, publishingDashboard, nextRecommendedTopic),
+      },
+    ];
+  }),
 );
 const defaultTopicMode = publishingTopicModeOptions[0]?.value || "publishing";
 const publishingDashboard = topicModeMap[defaultTopicMode].publishingDashboard;
@@ -457,6 +478,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                         <p>下一篇最推薦</p>
                         <span>{modeOption.label}：{modeOption.description}</span>
                       </div>
+                      <article class="bookshelf-mode-rationale-card">
+                        <span>現在為什麼這樣排</span>
+                        <strong>{modeState.modeRationale}</strong>
+                      </article>
                       <div class="bookshelf-next-topic-grid">
                         <article class="bookshelf-confirm-card">
                           <span>主攻書</span>
@@ -580,29 +605,49 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                               </summary>
                               <div class="bookshelf-publishing-checklist-body">
                                 {chapter.recommendedTopic && (
-                                  <article class="bookshelf-publishing-topic-card">
-                                    <span>這章現在最該補</span>
-                                    <strong>{chapter.recommendedTopic.primaryTitle}</strong>
-                                    <p>{chapter.recommendedTopic.reason}</p>
-                                    <div class="bookshelf-actions bookshelf-confirm-actions">
-                                      <button
-                                        type="button"
-                                        class="bookshelf-action"
-                                        data-copy-chapter-brief={chapter.chapter}
-                                        data-topic-mode={modeOption.value}
-                                      >
-                                        複製本章補位資訊
-                                      </button>
-                                      <button
-                                        type="button"
-                                        class="bookshelf-action bookshelp-action-primary"
-                                        data-copy-chapter-flash-prompt={chapter.chapter}
-                                        data-topic-mode={modeOption.value}
-                                      >
-                                        複製 Flash 滾動潤題
-                                      </button>
-                                    </div>
-                                  </article>
+                                  <>
+                                    <article class="bookshelf-publishing-topic-card">
+                                      <span>這章現在最該補</span>
+                                      <strong>{chapter.recommendedTopic.primaryTitle}</strong>
+                                      <p>{chapter.recommendedTopic.reason}</p>
+                                      <div class="bookshelf-actions bookshelf-confirm-actions">
+                                        <button
+                                          type="button"
+                                          class="bookshelf-action"
+                                          data-copy-chapter-brief={chapter.chapter}
+                                          data-topic-mode={modeOption.value}
+                                        >
+                                          複製本章補位資訊
+                                        </button>
+                                        <button
+                                          type="button"
+                                          class="bookshelf-action"
+                                          data-copy-chapter-outline={chapter.chapter}
+                                          data-topic-mode={modeOption.value}
+                                        >
+                                          複製本章發文大綱
+                                        </button>
+                                        <button
+                                          type="button"
+                                          class="bookshelf-action bookshelp-action-primary"
+                                          data-copy-chapter-flash-prompt={chapter.chapter}
+                                          data-topic-mode={modeOption.value}
+                                        >
+                                          複製 Flash 滾動潤題
+                                        </button>
+                                      </div>
+                                    </article>
+                                    <article class="bookshelf-outline-mini-card">
+                                      <span>發文大綱</span>
+                                      <ul>
+                                        <li>開頭：先點出這題此刻最該判斷的核心問題。</li>
+                                        <li>主段一：先釐清 {chapter.recommendedTopic.subchapter} 的基本判斷邏輯。</li>
+                                        <li>主段二：補上最容易忽略的條件差異、預算或施工順序。</li>
+                                        <li>主段三：對照既有文章，刻意錯開已寫過的切角。</li>
+                                        <li>收尾：把這題接回書稿主線，帶出下一個自然延伸題。</li>
+                                      </ul>
+                                    </article>
+                                  </>
                                 )}
                                 <div class="bookshelf-publishing-subchapter-list">
                                   {chapter.subchapters.map((subchapter) => (
@@ -2065,11 +2110,13 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function buildNextTopicBriefText(mode = currentTopicMode) {
-    const recommendation = getCurrentTopicModeState(mode)?.nextRecommendedTopic;
+    const modeState = getCurrentTopicModeState(mode);
+    const recommendation = modeState?.nextRecommendedTopic;
     if (!recommendation) return "";
 
     return [
-      `決題模式：${getCurrentTopicModeState(mode)?.label || mode}`,
+      `決題模式：${modeState?.label || mode}`,
+      `模式判斷：${modeState?.modeRationale || "尚未產生"}`,
       `主攻書系：${recommendation.focusTrackTitle}`,
       `這次補位：${recommendation.trackTitle}`,
       `章節：${recommendation.chapter}`,
@@ -2081,6 +2128,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       `推薦原因：${recommendation.reason}`,
       `補前完成度：${recommendation.coverageBefore}%`,
       `補後完成度：${recommendation.coverageAfter}%`,
+      `同子章既有文章：${recommendation.sameSubchapterArticles.join(" / ") || "目前沒有"}`,
+      `同章既有文章：${recommendation.sameChapterArticles.join(" / ") || "目前沒有"}`,
+      `同書系其他文章：${recommendation.sameTrackArticles.join(" / ") || "目前沒有"}`,
     ].join("\n");
   }
 
@@ -2115,13 +2165,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function buildChapterTopicBriefText(chapterTitle = "", mode = currentTopicMode) {
+    const modeState = getCurrentTopicModeState(mode);
     const chapter = findPublishingChapterGap(chapterTitle, mode);
     const recommendation = chapter?.recommendedTopic;
     if (!chapter || !recommendation) return "";
 
     return [
-      `決題模式：${getCurrentTopicModeState(mode)?.label || mode}`,
-      `主攻書系：${getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack?.title || recommendation.focusTrackTitle}`,
+      `決題模式：${modeState?.label || mode}`,
+      `模式判斷：${modeState?.modeRationale || "尚未產生"}`,
+      `主攻書系：${modeState?.publishingDashboard?.focusTrack?.title || recommendation.focusTrackTitle}`,
       `章節：${recommendation.chapter}`,
       `子章節：${recommendation.subchapter}`,
       `網站分類：${recommendation.category}`,
@@ -2131,6 +2183,51 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       `推薦原因：${recommendation.reason}`,
       `本章目前篇數：${recommendation.articleCountInChapter}`,
       `本子章目前篇數：${recommendation.articleCountInSubchapter}`,
+      `同子章既有文章：${recommendation.sameSubchapterArticles.join(" / ") || "目前沒有"}`,
+      `同章既有文章：${recommendation.sameChapterArticles.join(" / ") || "目前沒有"}`,
+      `同書系其他文章：${recommendation.sameTrackArticles.join(" / ") || "目前沒有"}`,
+    ].join("\n");
+  }
+
+  function buildChapterOutlineText(chapterTitle = "", mode = currentTopicMode) {
+    const modeState = getCurrentTopicModeState(mode);
+    const recommendation = findPublishingChapterGap(chapterTitle, mode)?.recommendedTopic;
+    if (!recommendation) return "";
+
+    const sameSubchapterText = recommendation.sameSubchapterArticles.join(" / ") || "目前沒有同子章文章，這篇可先立第一篇主文。";
+    const sameChapterText = recommendation.sameChapterArticles.join(" / ") || "目前沒有同章其他文章，可先把章節骨架立住。";
+    const sameTrackText = recommendation.sameTrackArticles.join(" / ") || "目前沒有同書系其他文章，可把這篇寫成書稿起手段。";
+
+    return [
+      `決題模式：${modeState?.label || mode}`,
+      `模式判斷：${modeState?.modeRationale || "尚未產生"}`,
+      `主攻書系：${recommendation.trackTitle}`,
+      `章節：${recommendation.chapter}`,
+      `子章節：${recommendation.subchapter}`,
+      `建議標題：${recommendation.primaryTitle}`,
+      "",
+      "大綱：",
+      "1. 開頭",
+      `- 先點出讀者在「${recommendation.subchapter}」最容易卡住的判斷點。`,
+      `- 交代這篇為何現在要先寫：${recommendation.reason}`,
+      "",
+      "2. 先把基本判斷講清楚",
+      `- 用最少段落說清楚 ${recommendation.subchapter} 的核心判斷邏輯。`,
+      `- 若有必要，先區分屋況、預算、施工順序或生活情境。`,
+      "",
+      "3. 補上最容易漏掉的差異",
+      "- 補條件差異、預算級距、材料選擇或前後順序。",
+      "- 讓讀者知道哪裡最容易誤判、追加或做錯。",
+      "",
+      "4. 與既有文章錯位",
+      `- 同子章既有文章：${sameSubchapterText}`,
+      `- 同章既有文章：${sameChapterText}`,
+      `- 同書系其他文章：${sameTrackText}`,
+      "- 這篇請刻意避開已寫過的主角度，改補更缺的判斷、情境或取捨。",
+      "",
+      "5. 收尾",
+      "- 收成可執行的判斷結論，不要只停在抽象建議。",
+      "- 最後帶出下一個自然延伸題，讓它能接回同一章或下一章。",
     ].join("\n");
   }
 
@@ -4284,7 +4381,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   document.addEventListener("click", async (event) => {
     const target = event.target instanceof HTMLElement
-      ? event.target.closest("[data-copy-next-topic-brief],[data-copy-next-topic-flash-prompt],[data-copy-chapter-brief],[data-copy-chapter-flash-prompt],[data-reset-publishing-checklist]")
+      ? event.target.closest("[data-copy-next-topic-brief],[data-copy-next-topic-flash-prompt],[data-copy-chapter-brief],[data-copy-chapter-outline],[data-copy-chapter-flash-prompt],[data-reset-publishing-checklist]")
       : null;
     if (!(target instanceof HTMLElement)) return;
 
@@ -4318,6 +4415,18 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         return;
       }
       await copyText(text, `已複製「${chapterTitle}」補位資訊。`);
+      return;
+    }
+
+    if (target.hasAttribute("data-copy-chapter-outline")) {
+      const chapterTitle = target.dataset.copyChapterOutline || "";
+      const mode = target.dataset.topicMode || currentTopicMode;
+      const text = buildChapterOutlineText(chapterTitle, mode);
+      if (!text) {
+        setFeedback("這一章目前還沒有可複製的發文大綱。", "is-warning");
+        return;
+      }
+      await copyText(text, `已複製「${chapterTitle}」發文大綱。`);
       return;
     }
 
@@ -5221,6 +5330,40 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     border-color: rgba(255, 255, 255, 0.1);
     background: linear-gradient(180deg, rgba(251, 250, 246, 0.08), rgba(214, 210, 200, 0.03));
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .bookshelf-mode-rationale-card,
+  .bookshelf-outline-mini-card {
+    display: grid;
+    gap: 0.42rem;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-mode-rationale-card span,
+  .bookshelf-outline-mini-card span {
+    color: rgba(230, 228, 222, 0.56);
+    font-size: 0.8rem;
+  }
+
+  .bookshelf-mode-rationale-card strong {
+    color: #f6f4ef;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    font-weight: 600;
+  }
+
+  .bookshelf-outline-mini-card ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: rgba(233, 231, 225, 0.72);
+    line-height: 1.75;
+  }
+
+  .bookshelf-outline-mini-card li + li {
+    margin-top: 0.28rem;
   }
 
   .bookshelf-next-topic {
