@@ -530,16 +530,12 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <section class="bookshelf-publishing-board">
                       <div class="bookshelf-preview-head">
                         <p>出版進度</p>
-                        <span>先看主攻書距離出版還差多少</span>
+                        <span>摘要已給出版距離，這裡只看差在哪裡</span>
                       </div>
                       <div class="bookshelf-publishing-meta">
                         <article class="bookshelf-confirm-card">
-                          <span>主攻書</span>
-                          <strong>{modeDashboard.focusTrack.title}</strong>
-                        </article>
-                        <article class="bookshelf-confirm-card">
-                          <span>還差幾篇</span>
-                          <strong>{modeDashboard.focusTrack.remainingToBaseline} 篇</strong>
+                          <span>主攻書章數</span>
+                          <strong>{modeDashboard.focusTrack.chapterGaps.length} 章</strong>
                         </article>
                         <article class="bookshelf-confirm-card">
                           <span>最接近出版</span>
@@ -548,6 +544,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                         <article class="bookshelf-confirm-card">
                           <span>待補章節</span>
                           <strong>{pendingChapters.length} 章</strong>
+                        </article>
+                        <article class="bookshelf-confirm-card">
+                          <span>已立住章節</span>
+                          <strong>{completedChaptersCount} 章</strong>
                         </article>
                       </div>
 
