@@ -1170,6 +1170,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       actionInstagram: false,
       actionFacebook: false,
       actionXiaohongshu: false,
+      linkStash: {
+        gemini: "",
+        website: "",
+        threads: "",
+        instagram: "",
+        facebook: "",
+        xiaohongshu: "",
+      },
       rewardClaimed: false,
       completedAt: "",
     };
@@ -1208,6 +1216,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       const migratedWebsite = savedRun?.actionWebsite !== undefined
         ? Boolean(savedRun?.actionWebsite)
         : Boolean(savedRun?.actionArticle);
+      const savedLinkStash = savedRun?.linkStash && typeof savedRun.linkStash === "object"
+        ? savedRun.linkStash
+        : {};
       return {
         ...templateRun,
         ...savedRun,
@@ -1217,6 +1228,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         actionInstagram: Boolean(savedRun?.actionInstagram),
         actionFacebook: Boolean(savedRun?.actionFacebook),
         actionXiaohongshu: Boolean(savedRun?.actionXiaohongshu),
+        linkStash: {
+          ...templateRun.linkStash,
+          gemini: typeof savedLinkStash?.gemini === "string" ? savedLinkStash.gemini : "",
+          website: typeof savedLinkStash?.website === "string" ? savedLinkStash.website : "",
+          threads: typeof savedLinkStash?.threads === "string" ? savedLinkStash.threads : "",
+          instagram: typeof savedLinkStash?.instagram === "string" ? savedLinkStash.instagram : "",
+          facebook: typeof savedLinkStash?.facebook === "string" ? savedLinkStash.facebook : "",
+          xiaohongshu: typeof savedLinkStash?.xiaohongshu === "string" ? savedLinkStash.xiaohongshu : "",
+        },
       };
     });
   }
@@ -1274,6 +1294,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function normalizeLinkValue(value = "") {
+    const trimmed = String(value ?? "").trim();
+    if (!trimmed) return "";
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return `https://${trimmed.replace(/^\/+/, "")}`;
   }
 
   function setFeedback(message, mode = "") {
@@ -1363,6 +1390,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     ].filter(Boolean).length;
     const progressLabel = `(${activeRunIndex + 1}/${WEEKLY_TARGET})`;
     const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
+    const geminiDraftUrl = normalizeLinkValue(run.linkStash?.gemini);
+    const websiteDraftUrl = normalizeLinkValue(run.linkStash?.website);
+    const threadsDraftUrl = normalizeLinkValue(run.linkStash?.threads);
+    const instagramDraftUrl = normalizeLinkValue(run.linkStash?.instagram);
+    const facebookDraftUrl = normalizeLinkValue(run.linkStash?.facebook);
+    const xiaohongshuDraftUrl = normalizeLinkValue(run.linkStash?.xiaohongshu);
 
     shell.innerHTML = `
       <article class="quest-card ${complete ? "is-complete" : ""}">
@@ -1431,6 +1464,68 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                 <label class="quest-check ${run.actionXiaohongshu ? "is-checked" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionXiaohongshu" ${run.actionXiaohongshu ? "checked" : ""} />
                   <span>已改寫並發佈小紅書</span>
+                </label>
+              </div>
+            </div>
+            <div class="quest-link-stash">
+              <div class="quest-link-stash-head">
+                <p>臨時稿件網址</p>
+                <span>貼上 Gemini / Canvas / 分享連結，會暫存在這一輪任務裡</span>
+              </div>
+              <div class="quest-link-stash-grid">
+                <label class="quest-link-field">
+                  <span>Gemini 主稿</span>
+                  <div class="quest-link-field-row">
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="gemini" value="${escapeHtml(run.linkStash?.gemini || "")}" placeholder="貼 Gemini Canvas 或分享網址" />
+                    ${geminiDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(geminiDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                  </div>
+                </label>
+                <label class="quest-link-field">
+                  <span>官網稿</span>
+                  <div class="quest-link-field-row">
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="website" value="${escapeHtml(run.linkStash?.website || "")}" placeholder="貼官網文章或上稿頁網址" />
+                    ${websiteDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(websiteDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                  </div>
+                </label>
+                <label class="quest-link-field">
+                  <span>Threads 稿</span>
+                  <div class="quest-link-field-row">
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="threads" value="${escapeHtml(run.linkStash?.threads || "")}" placeholder="貼 Threads 文案或分享網址" />
+                    ${threadsDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(threadsDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                  </div>
+                </label>
+                <label class="quest-link-field">
+                  <span>Instagram 稿</span>
+                  <div class="quest-link-field-row">
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="instagram" value="${escapeHtml(run.linkStash?.instagram || "")}" placeholder="貼 IG 文案或分享網址" />
+                    ${instagramDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(instagramDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                  </div>
+                </label>
+                <label class="quest-link-field">
+                  <span>Facebook 稿</span>
+                  <div class="quest-link-field-row">
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="facebook" value="${escapeHtml(run.linkStash?.facebook || "")}" placeholder="貼 FB 粉專文案或分享網址" />
+                    ${facebookDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(facebookDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                  </div>
+                </label>
+                <label class="quest-link-field">
+                  <span>小紅書稿</span>
+                  <div class="quest-link-field-row">
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="xiaohongshu" value="${escapeHtml(run.linkStash?.xiaohongshu || "")}" placeholder="貼小紅書文案或分享網址" />
+                    ${xiaohongshuDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(xiaohongshuDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                  </div>
                 </label>
               </div>
             </div>
@@ -3729,6 +3824,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   document.addEventListener("change", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLInputElement)) return;
+    if (target.dataset.runLinkKey) {
+      const index = Number(target.dataset.runIndex);
+      const linkKey = target.dataset.runLinkKey;
+      const run = state.weekly.runs[index];
+      if (!run || !linkKey || !run.linkStash) return;
+      run.linkStash[linkKey] = target.value.trim();
+      rerender();
+      return;
+    }
     if (!target.dataset.runCheck) return;
 
     const index = Number(target.dataset.runIndex);
@@ -3739,6 +3843,20 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     run[key] = target.checked;
     maybeClaimRunReward(run);
     rerender();
+  });
+
+  document.addEventListener("input", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    if (!target.dataset.runLinkKey) return;
+
+    const index = Number(target.dataset.runIndex);
+    const linkKey = target.dataset.runLinkKey;
+    const run = state.weekly.runs[index];
+    if (!run || !linkKey || !run.linkStash) return;
+
+    run.linkStash[linkKey] = target.value.trim();
+    saveState();
   });
 
   document.getElementById("reset-social-ops")?.addEventListener("click", () => {
@@ -5620,6 +5738,91 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     flex: 1 1 260px;
   }
 
+  .quest-link-stash {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 0.3rem;
+    padding: 0.95rem 1rem 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(17, 17, 17, 0.42), rgba(9, 9, 9, 0.24));
+  }
+
+  .quest-link-stash-head,
+  .quest-link-field,
+  .quest-link-field-row {
+    display: grid;
+  }
+
+  .quest-link-stash-head {
+    gap: 0.28rem;
+  }
+
+  .quest-link-stash-head p,
+  .quest-link-stash-head span,
+  .quest-link-field span {
+    margin: 0;
+  }
+
+  .quest-link-stash-head p {
+    color: #f3f1ec;
+    font-size: 0.86rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .quest-link-stash-head span {
+    color: rgba(231, 228, 221, 0.56);
+    font-size: 0.8rem;
+    line-height: 1.65;
+  }
+
+  .quest-link-stash-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.72rem;
+  }
+
+  .quest-link-field {
+    gap: 0.42rem;
+  }
+
+  .quest-link-field span {
+    color: rgba(227, 223, 215, 0.68);
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+  }
+
+  .quest-link-field-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    align-items: center;
+  }
+
+  .quest-link-field input {
+    width: 100%;
+    min-height: 2.7rem;
+    padding: 0.72rem 0.84rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(15, 15, 15, 0.56);
+    color: #f2f0eb;
+    font: inherit;
+    line-height: 1.5;
+    outline: none;
+    transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .quest-link-field input::placeholder {
+    color: rgba(231, 228, 221, 0.3);
+  }
+
+  .quest-link-field input:focus {
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(20, 20, 20, 0.72);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+
   .quest-link-btn {
     display: inline-flex;
     align-items: center;
@@ -5641,6 +5844,19 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     background: rgba(42, 42, 42, 0.56);
     border-color: rgba(255, 255, 255, 0.15);
     transform: translateY(-1px);
+  }
+
+  .quest-link-btn-soft {
+    min-width: 5.4rem;
+    background: rgba(28, 28, 28, 0.46);
+  }
+
+  .quest-link-btn.is-disabled,
+  .quest-link-btn:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   .quest-check {
@@ -5774,6 +5990,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .quest-link-stash-grid {
+      grid-template-columns: 1fr;
+    }
+
     .command-metrics {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -5827,6 +6047,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
     .quest-check-row {
       flex-direction: column;
+    }
+
+    .quest-link-field-row {
+      grid-template-columns: 1fr;
     }
 
     .quest-link-btn {
