@@ -55,13 +55,13 @@ const fallbackBlogPosts = [
 const bookshelfTracks = [
   {
     title: "老屋翻新系",
-    focus: "老屋翻修、基礎工程、動線重整、收納與耐久配置",
-    chapters: "現況判讀 / 基礎工程 / 空間重整 / 完工避雷",
+    focus: "老屋翻修、屋況判讀、預算拆解、基礎工程、空間重整與完工避雷",
+    chapters: "現況判讀 / 預算拆解 / 基礎工程 / 空間重整 / 完工避雷",
   },
   {
     title: "預售屋客變系",
-    focus: "客變、交屋前規劃、插座燈光、收納與機能預留",
-    chapters: "客變判斷 / 配置預留 / 生活動線 / 交屋銜接",
+    focus: "客變、交屋前規劃、配置預留、材質設備、收納與機能預留",
+    chapters: "客變判斷 / 配置預留 / 材質設備 / 生活動線 / 交屋銜接",
   },
   {
     title: "驗屋交屋系",
@@ -70,13 +70,13 @@ const bookshelfTracks = [
   },
   {
     title: "格局動線系",
-    focus: "小坪數規劃、收納、動線、尺度、空間效率與生活邏輯",
-    chapters: "空間尺度 / 動線配置 / 收納系統 / 使用情境",
+    focus: "小坪數規劃、收納、動線、尺度、家具配置與生活邏輯",
+    chapters: "空間尺度 / 動線配置 / 收納系統 / 家具配置 / 使用情境",
   },
   {
     title: "水電照明系",
-    focus: "插座、開關、迴路、照明、窗簾、智能控制與設備整合",
-    chapters: "插座開關 / 迴路安全 / 照明設計 / 智能整合",
+    focus: "插座、開關、迴路、照明、設備整合、窗簾與智能控制",
+    chapters: "插座開關 / 迴路安全 / 照明設計 / 設備整合 / 智能控制",
   },
 ];
 
@@ -185,18 +185,24 @@ function inferBookshelfChapter(trackTitle: string, post: { title: string; catego
   const haystack = `${post.title} ${post.category}`.toLowerCase();
 
   if (trackTitle === "驗屋交屋系") {
+    if (/交屋後|進場|裝修銜接/.test(haystack)) return "交屋後進場";
+    if (/優先|排序|先修|先處理/.test(haystack)) return "缺失排序";
+    if (/點交|交屋|建商|回報|協調/.test(haystack)) return "點交策略";
     if (/缺失|裂縫|漏水/.test(haystack)) return "缺失排序";
-    if (/點交|交屋/.test(haystack)) return "點交策略";
     return "驗屋判讀";
   }
 
   if (trackTitle === "預售屋客變系") {
-    if (/插座|開關|照明|燈光/.test(haystack)) return "配置預留";
+    if (/交屋|進場|客變後/.test(haystack)) return "交屋銜接";
+    if (/材質|建材|面材|板材|磁磚|地板|五金|廚具|衛浴/.test(haystack)) return "材質設備";
+    if (/插座|開關|照明|燈光|燈位|迴路|弱電/.test(haystack)) return "配置預留";
     if (/動線|收納|格局/.test(haystack)) return "生活動線";
     return "客變判斷";
   }
 
   if (trackTitle === "格局動線系") {
+    if (/小孩|長輩|寵物|生活習慣|使用情境|工作型態/.test(haystack)) return "使用情境";
+    if (/家具|沙發|餐桌|床架|書桌|餐椅/.test(haystack)) return "家具配置";
     if (/收納/.test(haystack)) return "收納系統";
     if (/動線|走道/.test(haystack)) return "動線配置";
     return "空間尺度";
@@ -205,11 +211,14 @@ function inferBookshelfChapter(trackTitle: string, post: { title: string; catego
   if (trackTitle === "水電照明系") {
     if (/插座|開關/.test(haystack)) return "插座開關";
     if (/迴路|安全/.test(haystack)) return "迴路安全";
-    if (/智能|窗簾/.test(haystack)) return "智能整合";
+    if (/弱電|網路|監控|冷氣|新風|設備整合/.test(haystack)) return "設備整合";
+    if (/智能|窗簾|感應|自動化|語音|情境/.test(haystack)) return "智能控制";
     return "照明設計";
   }
 
+  if (/預算|費用|報價|單價|怎麼抓|追加/.test(haystack)) return "預算拆解";
   if (/拆除|泥作|防水|基礎/.test(haystack)) return "基礎工程";
+  if (/驗收|完工|缺失|避雷|糾紛|保固/.test(haystack)) return "完工避雷";
   if (/格局|收納|動線/.test(haystack)) return "空間重整";
   return "現況判讀";
 }
@@ -792,13 +801,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const bookshelfTracks = [
     {
       title: "老屋翻新系",
-      focus: "老屋翻修、基礎工程、動線重整、收納與耐久配置",
-      chapters: "現況判讀 / 基礎工程 / 空間重整 / 完工避雷",
+      focus: "老屋翻修、屋況判讀、預算拆解、基礎工程、空間重整與完工避雷",
+      chapters: "現況判讀 / 預算拆解 / 基礎工程 / 空間重整 / 完工避雷",
     },
     {
       title: "預售屋客變系",
-      focus: "客變、交屋前規劃、插座燈光、收納與機能預留",
-      chapters: "客變判斷 / 配置預留 / 生活動線 / 交屋銜接",
+      focus: "客變、交屋前規劃、配置預留、材質設備、收納與機能預留",
+      chapters: "客變判斷 / 配置預留 / 材質設備 / 生活動線 / 交屋銜接",
     },
     {
       title: "驗屋交屋系",
@@ -807,13 +816,13 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     },
     {
       title: "格局動線系",
-      focus: "小坪數規劃、收納、動線、尺度、空間效率與生活邏輯",
-      chapters: "空間尺度 / 動線配置 / 收納系統 / 使用情境",
+      focus: "小坪數規劃、收納、動線、尺度、家具配置與生活邏輯",
+      chapters: "空間尺度 / 動線配置 / 收納系統 / 家具配置 / 使用情境",
     },
     {
       title: "水電照明系",
-      focus: "插座、開關、迴路、照明、窗簾、智能控制與設備整合",
-      chapters: "插座開關 / 迴路安全 / 照明設計 / 智能整合",
+      focus: "插座、開關、迴路、照明、設備整合、窗簾與智能控制",
+      chapters: "插座開關 / 迴路安全 / 照明設計 / 設備整合 / 智能控制",
     },
   ];
   const articleIntakeFields = [
@@ -1830,13 +1839,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const chapterKeywordsMap = {
       "老屋翻新系": {
         "現況判讀": ["屋況", "老屋", "中古屋", "翻新前", "現況", "評估", "預算怎麼抓"],
+        "預算拆解": ["預算", "費用", "報價", "單價", "怎麼抓", "追加", "取捨"],
         "基礎工程": ["天花板", "輕鋼架", "地板", "磁磚", "水電", "泥作", "拆除", "基礎工程", "工法", "材料"],
         "空間重整": ["客廳", "格局", "動線", "家具", "收納", "配置", "空間", "局部翻新", "改造"],
-        "完工避雷": ["驗收", "完工", "缺失", "避雷", "施工糾紛"],
+        "完工避雷": ["驗收", "完工", "缺失", "避雷", "施工糾紛", "保固"],
       },
       "預售屋客變系": {
         "客變判斷": ["客變", "預售屋", "客變要不要", "客變值得"],
-        "配置預留": ["預留", "插座", "迴路", "燈位", "弱電", "設備"],
+        "配置預留": ["預留", "插座", "迴路", "燈位", "弱電", "開關"],
+        "材質設備": ["材質", "建材", "面材", "板材", "磁磚", "地板", "五金", "廚具", "衛浴"],
         "生活動線": ["動線", "收納", "生活習慣", "空間安排"],
         "交屋銜接": ["交屋", "進場", "交屋後", "客變後"],
       },
@@ -1850,13 +1861,15 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         "空間尺度": ["尺寸", "尺度", "坪數", "寬度", "深度"],
         "動線配置": ["動線", "走道", "轉身", "配置"],
         "收納系統": ["收納", "櫃體", "櫥櫃", "儲物"],
+        "家具配置": ["家具", "沙發", "餐桌", "床架", "書桌", "餐椅"],
         "使用情境": ["小孩", "長輩", "寵物", "生活習慣", "使用情境"],
       },
       "水電照明系": {
         "插座開關": ["插座", "開關", "面板"],
         "迴路安全": ["迴路", "電箱", "安全", "負載"],
         "照明設計": ["照明", "燈光", "色溫", "間接照明"],
-        "智能整合": ["智能", "窗簾", "感應", "自動化", "設備整合"],
+        "設備整合": ["弱電", "網路", "監控", "冷氣", "新風", "設備整合"],
+        "智能控制": ["智能", "窗簾", "感應", "自動化", "語音", "情境"],
       },
     };
 
