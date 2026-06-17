@@ -1015,6 +1015,8 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   const WEEKLY_BONUS_XP = 50;
   const SITE_ORIGIN = "https://qingxidesign.tw";
   const BLOG_INDEX_URL = `${SITE_ORIGIN}/blog`;
+  const ARTICLE_AI_TIMEOUT_MS = 45000;
+  const ARTICLE_AI_METADATA_TIMEOUT_MS = 18000;
   const socialReplyShortUrlCache = new Map();
   const sourceTemplate = JSON.parse(defaultSourcesJson);
   const articleLibrary = JSON.parse(blogPostsJson);
@@ -1690,6 +1692,17 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     if (!shell) return;
     shell.className = `bookshelf-ai-feedback ${mode}`.trim();
     shell.textContent = message;
+  }
+
+  function getArticleAiTimeoutMs(mode) {
+    return mode === "metadata" ? ARTICLE_AI_METADATA_TIMEOUT_MS : ARTICLE_AI_TIMEOUT_MS;
+  }
+
+  function buildArticleAiTimeoutMessage(mode) {
+    if (mode === "metadata") {
+      return "主書系、章節與標題補齊逾時，已保留目前判題結果。";
+    }
+    return "Gemini Flash 回應逾時，請再試一次。";
   }
 
   function renderArticleAiResult() {
@@ -2737,16 +2750,20 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     try {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), getArticleAiTimeoutMs(mode));
       const response = await fetch("/api/social-ops/article-assist", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        signal: controller.signal,
         body: JSON.stringify({
           mode,
           prompt: buildArticlePrompt(question, mode, currentContent),
         }),
       });
+      window.clearTimeout(timeoutId);
 
       const result = await response.json();
       if (!response.ok) {
@@ -2762,6 +2779,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
       return typeof result?.content === "string" ? result.content : "";
     } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        const timeoutMessage = buildArticleAiTimeoutMessage(mode);
+        setFeedback(timeoutMessage, "is-warning");
+        setArticleAiFeedback(timeoutMessage, "is-warning");
+        return null;
+      }
       console.error("Gemini Flash 生成失敗：", error);
       setFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
       setArticleAiFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
@@ -2784,17 +2807,22 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     setArticleAiFeedback(
-      sourceMode === "full"
-        ? "初稿已生成，正在自動補齊主書系、章節與標題..."
-        : "判題已完成，正在自動補齊主書系、章節與標題...",
+      "第 2 步進行中：正在補齊主書系、章節與標題...",
       "is-success",
     );
 
     const metadataContent = await requestArticleAi("metadata", content);
     if (!metadataContent) {
+      setArticleAiFeedback(
+        sourceMode === "full"
+          ? "初稿已生成，但主書系、章節與標題補齊未完成，已保留目前結果。"
+          : "判題已完成，但主書系、章節與標題補齊未完成，已保留目前結果。",
+        "is-warning",
+      );
       return content;
     }
 
+    setArticleAiFeedback("主書系、章節與標題已補齊，正在整理結果...", "is-success");
     return mergeArticleAiContent(content, metadataContent);
   }
 
