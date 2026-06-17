@@ -122,7 +122,7 @@ const workflowGuideSteps = [
   },
   {
     title: "Pro 生文",
-    detail: "把 Flash 結構化結果交給 Gemini Pro 直接生成正式內文，並同步備好 FB、IG、Threads、小紅書轉貼文案。",
+    detail: "把 Flash 結構化結果交給 Gemini Pro 直接生成正式內文，並同步備好四平台轉貼文案、短標題與封面首句。",
   },
   {
     title: "最後入庫",
@@ -418,7 +418,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                   <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
                 </div>
               </details>
-              <p class="bookshelf-prompt-note">最佳主路徑是一鍵備好 Pro 生文包：Gemini Flash 先判題並整理主書系、章節、標題與入庫卡，再自動幫你備好可貼去 Gemini Pro 的完整生文提示詞；高階模型除了正式文章，也會一起產出 FB、IG、Threads、小紅書轉貼文案。只有在想看 Flash 長稿時，才使用下方備援按鈕。</p>
+              <p class="bookshelf-prompt-note">最佳主路徑是一鍵備好 Pro 生文包：Gemini Flash 先判題並整理主書系、章節、標題與入庫卡，再自動幫你備好可貼去 Gemini Pro 的完整生文提示詞；高階模型除了正式文章，也會一起產出 FB、IG、Threads、小紅書轉貼文案，以及短標題、封面一句話、首圖文案。只有在想看 Flash 長稿時，才使用下方備援按鈕。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <details id="article-ai-result-shell" class="bookshelf-ai-result">
                 <summary>
@@ -1332,12 +1332,19 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 長度控制在 220-420 字。",
       "- 請補 5-8 個適合的小紅書標籤關鍵詞。",
       "",
-      "N. 【Copilot 生圖提示詞】",
+      "N. 【封面與首句文案】",
+      "- 請固定輸出以下 4 項：短標題 / 封面一句話 / 首圖文案 / 開場首句。",
+      "- 短標題：控制在 12-22 字，適合圖卡封面或社群卡片標題。",
+      "- 封面一句話：控制在 18-32 字，適合放在封面圖或首張圖卡上，不要太像廣告標語。",
+      "- 首圖文案：控制在 28-48 字，適合搭配官網首圖、FB 貼文首圖或 IG 首張圖說明。",
+      "- 開場首句：控制在 18-36 字，適合作為 FB、IG、Threads 或小紅書貼文的第一句，需有吸引力但不聳動。",
+      "",
+      "O. 【Copilot 生圖提示詞】",
       "- 請固定輸出 3 組：封面主圖 / 內文輔圖 / 延伸情境圖。",
       "- 視覺風格固定：色鉛筆或麥克筆手繪風格、莫蘭迪或低飽和配色、純圖像、不得有文字。",
       "- 每組都要包含：用途 / 正向提示詞 / 負面提示詞。",
       "",
-      "O. 【最後人工檢查清單】",
+      "P. 【最後人工檢查清單】",
       "- 請列出 3-5 條發布前應人工確認的地方。",
       "- 例如：是否與既有文章重複、是否需要補真實案例、是否需要調整分類、是否適合收進既定書稿章節等。",
     ].join("\n");
