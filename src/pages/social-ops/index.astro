@@ -1240,6 +1240,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     return state.weekly.runs.filter(isRunComplete).length;
   }
 
+  function getActiveRunIndex() {
+    const nextIndex = state.weekly.runs.findIndex((run) => !isRunComplete(run));
+    return nextIndex === -1 ? Math.max(state.weekly.runs.length - 1, 0) : nextIndex;
+  }
+
   function getLevel() {
     return Math.floor(state.stats.xp / 200) + 1;
   }
@@ -1284,71 +1289,74 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const shell = document.getElementById("quest-grid");
     if (!shell) return;
 
-    shell.innerHTML = state.weekly.runs
-      .map((run, index) => {
-        const complete = isRunComplete(run);
-        const actionOneComplete = run.actionSearch && run.actionAdvice;
-        const actionTwoComplete = run.actionThreads && run.actionInstagram && run.actionXiaohongshu;
-        const completedSteps = [actionOneComplete, actionTwoComplete].filter(Boolean).length;
-        const progressLabel = `(${index + 1}/${WEEKLY_TARGET})`;
-        const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
+    const activeRunIndex = getActiveRunIndex();
+    const run = state.weekly.runs[activeRunIndex];
+    if (!run) {
+      shell.innerHTML = "";
+      return;
+    }
 
-        return `
-          <article class="quest-card ${complete ? "is-complete" : ""}">
-            <div class="quest-topline">
-              <span class="quest-slot">${progressLabel}</span>
-              <span class="quest-keyword">${progressState}</span>
+    const complete = isRunComplete(run);
+    const actionOneComplete = run.actionSearch && run.actionAdvice;
+    const actionTwoComplete = run.actionThreads && run.actionInstagram && run.actionXiaohongshu;
+    const completedSteps = [actionOneComplete, actionTwoComplete].filter(Boolean).length;
+    const progressLabel = `(${activeRunIndex + 1}/${WEEKLY_TARGET})`;
+    const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
+
+    shell.innerHTML = `
+      <article class="quest-card ${complete ? "is-complete" : ""}">
+        <div class="quest-topline">
+          <span class="quest-slot">${progressLabel}</span>
+          <span class="quest-keyword">${progressState}</span>
+        </div>
+        <div class="quest-main-list">
+          <section class="quest-main ${actionOneComplete ? "is-complete" : ""}">
+            <div class="quest-main-head">
+              <div>
+                <p class="quest-main-index">主任務 1</p>
+                <strong>行動 1（釣魚）</strong>
+              </div>
+              <span>${actionOneComplete ? "已完成" : "進行中"}</span>
             </div>
-            <div class="quest-main-list">
-              <section class="quest-main ${actionOneComplete ? "is-complete" : ""}">
-                <div class="quest-main-head">
-                  <div>
-                    <p class="quest-main-index">主任務 1</p>
-                    <strong>行動 1（釣魚）</strong>
-                  </div>
-                  <span>${actionOneComplete ? "已完成" : "進行中"}</span>
-                </div>
-                <p class="quest-main-copy">在 FB 或 LINE 社團給予專業建議，附上官網文章或估價器連結。</p>
-                <div class="quest-checklist">
-                  <label class="quest-check ${run.actionSearch ? "is-checked" : ""}">
-                    <input type="checkbox" data-run-index="${index}" data-run-check="actionSearch" ${run.actionSearch ? "checked" : ""} />
-                    <span>已在 FB 或 LINE 社團給專業建議</span>
-                  </label>
-                  <label class="quest-check ${run.actionAdvice ? "is-checked" : ""}">
-                    <input type="checkbox" data-run-index="${index}" data-run-check="actionAdvice" ${run.actionAdvice ? "checked" : ""} />
-                    <span>已附官網文章或估價器連結</span>
-                  </label>
-                </div>
-              </section>
-              <section class="quest-main ${actionTwoComplete ? "is-complete" : ""}">
-                <div class="quest-main-head">
-                  <div>
-                    <p class="quest-main-index">主任務 2</p>
-                    <strong>行動 2（分發）</strong>
-                  </div>
-                  <span>${actionTwoComplete ? "已完成" : "進行中"}</span>
-                </div>
-                <p class="quest-main-copy">利用 LLM 將回覆文改寫，同步分發至 Threads、IG 與小紅書（COPE 戰略）。</p>
-                <div class="quest-checklist">
-                  <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
-                    <input type="checkbox" data-run-index="${index}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
-                    <span>已改寫並發佈 Threads</span>
-                  </label>
-                  <label class="quest-check ${run.actionInstagram ? "is-checked" : ""}">
-                    <input type="checkbox" data-run-index="${index}" data-run-check="actionInstagram" ${run.actionInstagram ? "checked" : ""} />
-                    <span>已改寫並發佈 IG</span>
-                  </label>
-                  <label class="quest-check ${run.actionXiaohongshu ? "is-checked" : ""}">
-                    <input type="checkbox" data-run-index="${index}" data-run-check="actionXiaohongshu" ${run.actionXiaohongshu ? "checked" : ""} />
-                    <span>已改寫並發佈小紅書</span>
-                  </label>
-                </div>
-              </section>
+            <p class="quest-main-copy">在 FB 或 LINE 社團給予專業建議，附上官網文章或估價器連結。</p>
+            <div class="quest-checklist">
+              <label class="quest-check ${run.actionSearch ? "is-checked" : ""}">
+                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionSearch" ${run.actionSearch ? "checked" : ""} />
+                <span>已在 FB 或 LINE 社團給專業建議</span>
+              </label>
+              <label class="quest-check ${run.actionAdvice ? "is-checked" : ""}">
+                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionAdvice" ${run.actionAdvice ? "checked" : ""} />
+                <span>已附官網文章或估價器連結</span>
+              </label>
             </div>
-          </article>
-        `;
-      })
-      .join("");
+          </section>
+          <section class="quest-main ${actionTwoComplete ? "is-complete" : ""}">
+            <div class="quest-main-head">
+              <div>
+                <p class="quest-main-index">主任務 2</p>
+                <strong>行動 2（分發）</strong>
+              </div>
+              <span>${actionTwoComplete ? "已完成" : "進行中"}</span>
+            </div>
+            <p class="quest-main-copy">利用 LLM 將回覆文改寫，同步分發至 Threads、IG 與小紅書（COPE 戰略）。</p>
+            <div class="quest-checklist">
+              <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
+                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
+                <span>已改寫並發佈 Threads</span>
+              </label>
+              <label class="quest-check ${run.actionInstagram ? "is-checked" : ""}">
+                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionInstagram" ${run.actionInstagram ? "checked" : ""} />
+                <span>已改寫並發佈 IG</span>
+              </label>
+              <label class="quest-check ${run.actionXiaohongshu ? "is-checked" : ""}">
+                <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionXiaohongshu" ${run.actionXiaohongshu ? "checked" : ""} />
+                <span>已改寫並發佈小紅書</span>
+              </label>
+            </div>
+          </section>
+        </div>
+      </article>
+    `;
   }
 
   function renderPortalCards(sources) {
@@ -1536,9 +1544,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
 
     return [
-      "你是青曦空間設計的內容總編與正式撰稿編輯。",
-      "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網的高品質文章。",
+      "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
+      "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
+      "這篇文章不是一次性流量稿，而是未來可持續收錄、整併、出版的內容資產；寫作時請同時滿足網站發布與出書收錄兩個目的。",
       "",
       "【真實社團問題】",
       questionBlock,
@@ -1585,9 +1594,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     }
 
     return [
-      "你是青曦空間設計的內容總編與正式撰稿編輯。",
-      "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網的高品質文章。",
+      "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
+      "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
+      "這篇文章不是一次性流量稿，而是未來要整理成書的內容資產；請一開始就用『可發布、可收錄、可長期保存』的標準寫作。",
       "",
       "【真實社團問題】",
       questionBlock,
@@ -1607,10 +1617,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "",
       "寫作要求：",
       "1. 請把題目自然延伸成一篇完整文章，不要只重述原始發問。",
-      "2. 若地區名稱不影響法規、屋況、日照、通勤或生活條件，正式標題與內文不要把地區寫死。",
-      "3. 若牽涉預算、費用、單價或報價，只能寫保守區間、條件差異與影響因子，不可寫成保證價或正式估價口吻。",
-      "4. 文氣要穩定、乾淨、有設計感，不要推銷腔。",
-      "5. 若 Flash 的分類或標題不夠精準，你可以微調，但不要偏離原始問題。",
+      "2. 這篇文要能直接收進未來書稿的對應章節，所以結構、邏輯與段落成熟度都要符合出書標準。",
+      "3. 若地區名稱不影響法規、屋況、日照、通勤或生活條件，正式標題與內文不要把地區寫死。",
+      "4. 若牽涉預算、費用、單價或報價，只能寫保守區間、條件差異與影響因子，不可寫成保證價或正式估價口吻。",
+      "5. 文氣要穩定、乾淨、有設計感，不要推銷腔。",
+      "6. 若 Flash 的分類或標題不夠精準，你可以微調，但不要偏離原始問題，而且調整後仍要留在同一套書稿脈絡內。",
       "",
       "請固定依序輸出：",
       "A. 文章策略確認",
@@ -1642,6 +1653,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
       "你現在不是只在寫一篇官網文章，而是在替一套未來可集結成書的內容系統，完成其中一個可長期保存的章節單元。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場、業配腔或短影音口語稿。",
+      "請把『這篇文未來一定會被納入書稿』視為硬性前提，而不是可有可無的附帶備註。",
       "",
       "你的任務不是覆寫一篇低階初稿，而是直接站在高階模型的角度完成正式內文。",
       "請把 Flash 提供的判題、分類、標題與入庫資訊當成文章骨架，再把真正的文章品質、邏輯、文氣、內部連貫與 SEO 完整拉高。",
