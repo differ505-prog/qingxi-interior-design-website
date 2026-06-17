@@ -1087,7 +1087,9 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       slot,
       actionSearch: false,
       actionAdvice: false,
-      actionArticle: false,
+      actionThreads: false,
+      actionInstagram: false,
+      actionXiaohongshu: false,
       rewardClaimed: false,
       completedAt: "",
     };
@@ -1120,9 +1122,18 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     const templateRuns = createWeeklyRuns();
     return templateRuns.map((templateRun, index) => {
       const savedRun = savedRuns.find((run) => run?.id === templateRun.id) ?? savedRuns[index] ?? {};
+      const shouldMigrateArticleAction = Boolean(
+        savedRun?.actionArticle &&
+        savedRun?.actionThreads === undefined &&
+        savedRun?.actionInstagram === undefined &&
+        savedRun?.actionXiaohongshu === undefined,
+      );
       return {
         ...templateRun,
         ...savedRun,
+        actionThreads: shouldMigrateArticleAction ? true : Boolean(savedRun?.actionThreads),
+        actionInstagram: shouldMigrateArticleAction ? true : Boolean(savedRun?.actionInstagram),
+        actionXiaohongshu: shouldMigrateArticleAction ? true : Boolean(savedRun?.actionXiaohongshu),
       };
     });
   }
@@ -1156,7 +1167,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   }
 
   function isRunComplete(run) {
-    return run.actionSearch && run.actionAdvice && run.actionArticle;
+    return run.actionSearch && run.actionAdvice && run.actionThreads && run.actionInstagram && run.actionXiaohongshu;
   }
 
   function normalizeWeeklyState() {
@@ -1247,26 +1258,60 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     shell.innerHTML = state.weekly.runs
       .map((run, index) => {
         const complete = isRunComplete(run);
+        const actionOneComplete = run.actionSearch && run.actionAdvice;
+        const actionTwoComplete = run.actionThreads && run.actionInstagram && run.actionXiaohongshu;
 
         return `
           <article class="quest-card ${complete ? "is-complete" : ""}">
             <div class="quest-topline">
-              <span class="quest-slot">問題 ${run.slot}</span>
-              <span class="quest-keyword">任選題</span>
+              <span class="quest-slot">回合 ${run.slot}</span>
+              <span class="quest-keyword">${complete ? "本回合完成" : "任選題"}</span>
             </div>
-            <div class="quest-checklist">
-              <label class="quest-check ${run.actionSearch ? "is-checked" : ""}">
-                <input type="checkbox" data-run-index="${index}" data-run-check="actionSearch" ${run.actionSearch ? "checked" : ""} />
-                <span>已在 FB 或 LINE 社群給專業建議</span>
-              </label>
-              <label class="quest-check ${run.actionAdvice ? "is-checked" : ""}">
-                <input type="checkbox" data-run-index="${index}" data-run-check="actionAdvice" ${run.actionAdvice ? "checked" : ""} />
-                <span>已附官網文章或估價器連結</span>
-              </label>
-              <label class="quest-check ${run.actionArticle ? "is-checked" : ""}">
-                <input type="checkbox" data-run-index="${index}" data-run-check="actionArticle" ${run.actionArticle ? "checked" : ""} />
-                <span>已改寫並分發到 Threads、IG、小紅書</span>
-              </label>
+            <div class="quest-main-list">
+              <section class="quest-main ${actionOneComplete ? "is-complete" : ""}">
+                <div class="quest-main-head">
+                  <div>
+                    <p class="quest-main-index">主任務 1</p>
+                    <strong>行動 1（釣魚）</strong>
+                  </div>
+                  <span>${actionOneComplete ? "已完成" : "進行中"}</span>
+                </div>
+                <p class="quest-main-copy">在 FB 或 LINE 社團給予專業建議，附上官網文章或估價器連結。</p>
+                <div class="quest-checklist">
+                  <label class="quest-check ${run.actionSearch ? "is-checked" : ""}">
+                    <input type="checkbox" data-run-index="${index}" data-run-check="actionSearch" ${run.actionSearch ? "checked" : ""} />
+                    <span>已在 FB 或 LINE 社團給專業建議</span>
+                  </label>
+                  <label class="quest-check ${run.actionAdvice ? "is-checked" : ""}">
+                    <input type="checkbox" data-run-index="${index}" data-run-check="actionAdvice" ${run.actionAdvice ? "checked" : ""} />
+                    <span>已附官網文章或估價器連結</span>
+                  </label>
+                </div>
+              </section>
+              <section class="quest-main ${actionTwoComplete ? "is-complete" : ""}">
+                <div class="quest-main-head">
+                  <div>
+                    <p class="quest-main-index">主任務 2</p>
+                    <strong>行動 2（分發）</strong>
+                  </div>
+                  <span>${actionTwoComplete ? "已完成" : "進行中"}</span>
+                </div>
+                <p class="quest-main-copy">利用 LLM 將回覆文改寫，同步分發至 Threads、IG 與小紅書（COPE 戰略）。</p>
+                <div class="quest-checklist">
+                  <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
+                    <input type="checkbox" data-run-index="${index}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
+                    <span>已改寫並發佈 Threads</span>
+                  </label>
+                  <label class="quest-check ${run.actionInstagram ? "is-checked" : ""}">
+                    <input type="checkbox" data-run-index="${index}" data-run-check="actionInstagram" ${run.actionInstagram ? "checked" : ""} />
+                    <span>已改寫並發佈 IG</span>
+                  </label>
+                  <label class="quest-check ${run.actionXiaohongshu ? "is-checked" : ""}">
+                    <input type="checkbox" data-run-index="${index}" data-run-check="actionXiaohongshu" ${run.actionXiaohongshu ? "checked" : ""} />
+                    <span>已改寫並發佈小紅書</span>
+                  </label>
+                </div>
+              </section>
             </div>
           </article>
         `;
@@ -4709,6 +4754,67 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     display: grid;
     gap: 0.62rem;
     margin-top: 0.82rem;
+  }
+
+  .quest-main-list {
+    display: grid;
+    gap: 0.82rem;
+    margin-top: 0.82rem;
+  }
+
+  .quest-main {
+    display: grid;
+    gap: 0.7rem;
+    padding: 0.86rem 0.88rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .quest-main.is-complete {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.045);
+  }
+
+  .quest-main-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  .quest-main-head strong,
+  .quest-main-head span,
+  .quest-main-index,
+  .quest-main-copy {
+    margin: 0;
+  }
+
+  .quest-main-head strong {
+    color: #f3f1ec;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .quest-main-head span {
+    color: rgba(232, 228, 220, 0.58);
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .quest-main-index {
+    color: rgba(224, 221, 214, 0.48);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .quest-main-copy {
+    color: rgba(233, 229, 221, 0.66);
+    font-size: 0.84rem;
+    line-height: 1.7;
   }
 
   .quest-check {
