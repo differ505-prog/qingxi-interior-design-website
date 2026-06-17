@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PublishingModePanel from "../../components/PublishingModePanel.astro";
 import * as contentful from "contentful";
 import {
   mapContentfulBlogPosts,
@@ -165,6 +166,8 @@ const topicModeMap = Object.fromEntries(
   }),
 );
 const defaultTopicMode = publishingTopicModeOptions[0]?.value || "publishing";
+const defaultModeOption = publishingTopicModeOptions.find((modeOption) => modeOption.value === defaultTopicMode) || publishingTopicModeOptions[0];
+const defaultModeState = topicModeMap[defaultTopicMode];
 const publishingDashboard = topicModeMap[defaultTopicMode].publishingDashboard;
 
 const defaultSourcesJson = JSON.stringify(defaultSources);
@@ -470,177 +473,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </div>
             </section>
 
-            {publishingTopicModeOptions.map((modeOption) => {
-              const modeState = topicModeMap[modeOption.value];
-              const modeDashboard = modeState.publishingDashboard;
-              const modeRecommendation = modeState.nextRecommendedTopic;
-              const pendingChapters = modeDashboard.focusTrack?.chapterGaps?.filter((chapter) => chapter.remainingToBaseline > 0) || [];
-              const otherTrackRecommendations = modeState.trackRecommendations.filter((recommendation) => (
-                recommendation.trackTitle !== modeRecommendation?.trackTitle
-              ));
-              return (
-                <div
-                  class="bookshelf-topic-mode-panel"
-                  data-topic-mode-panel={modeOption.value}
-                  hidden={modeOption.value !== defaultTopicMode}
-                >
-                  {modeRecommendation && (
-                    <section class="bookshelf-next-topic">
-                      <div class="bookshelf-preview-head">
-                        <p>下一篇最推薦</p>
-                        <span>{modeOption.label}：{modeOption.description}</span>
-                      </div>
-                      <article class="bookshelf-next-topic-hero">
-                        <span class="bookshelf-next-topic-eyebrow">最推薦主題</span>
-                        <h3>{modeRecommendation.primaryTitle}</h3>
-                        <p>{modeState.modeRationale}</p>
-                        <div class="bookshelf-next-topic-meta">
-                          <span>{modeRecommendation.focusTrackTitle}</span>
-                          <span>{modeRecommendation.chapter}</span>
-                          <span>{modeRecommendation.subchapter}</span>
-                        </div>
-                        <div class="bookshelf-next-topic-progress">
-                          <span>補前 {modeRecommendation.coverageBefore}%</span>
-                          <strong>補後 {modeRecommendation.coverageAfter}%</strong>
-                        </div>
-                      </article>
-                      <div class="bookshelf-actions bookshelf-confirm-actions">
-                        <button type="button" class="bookshelf-action" data-copy-next-topic-brief={modeOption.value}>複製補位資訊</button>
-                        <button type="button" class="bookshelf-action bookshelp-action-primary" data-copy-next-topic-flash-prompt={modeOption.value}>複製 Flash 潤題提示詞</button>
-                      </div>
-                      <details class="bookshelf-mini-fold">
-                        <summary>
-                          <span>備選與說明</span>
-                          <small>低頻時再展開</small>
-                        </summary>
-                        <div class="bookshelf-next-topic-fold">
-                          <p class="bookshelf-confirm-note">這裡維持固定缺口決策；{modeOption.label} 只改變缺口排序，不把決策權整個交給 Flash。</p>
-                          <div class="bookshelf-next-topic-alt">
-                            {modeRecommendation.backupTitles.map((title) => (
-                              <article class="bookshelf-next-topic-alt-card">
-                                <span>備選</span>
-                                <strong>{title}</strong>
-                              </article>
-                            ))}
-                          </div>
-                        </div>
-                      </details>
-                    </section>
-                  )}
+            <div data-topic-mode-root>
+              <PublishingModePanel modeOption={defaultModeOption} modeState={defaultModeState} />
+            </div>
 
-                  {modeDashboard.focusTrack && (
-                    <details class="bookshelf-fold">
-                      <summary>
-                        <span>出版缺口與清單</span>
-                        <small>{pendingChapters.length} 章待補 / {otherTrackRecommendations.length} 本其他書可補位</small>
-                      </summary>
-                      <div class="bookshelf-fold-stack">
-                        {otherTrackRecommendations.length > 0 && (
-                          <div class="bookshelf-publishing-track-recommendations">
-                            <div class="bookshelf-preview-head">
-                              <p>其他書補位</p>
-                              <span>主攻書主題已在上方，這裡只看其他書各自下一篇</span>
-                            </div>
-                            <div class="bookshelf-publishing-track-recommendation-list">
-                              {otherTrackRecommendations.map((recommendation) => (
-                                <article class="bookshelf-publishing-track-recommendation-card">
-                                  <div class="bookshelf-publishing-rank-top">
-                                    <p>{recommendation.trackTitle}</p>
-                                    <span>{recommendation.chapter}</span>
-                                  </div>
-                                  <strong>{recommendation.primaryTitle}</strong>
-                                  <small>{recommendation.subchapter}</small>
-                                </article>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        <div class="bookshelf-publishing-gap">
-                          <div class="bookshelf-preview-head">
-                            <p>{modeDashboard.focusTrack.title} 還差哪些章</p>
-                            <span>只留待補章節</span>
-                          </div>
-                          <div class="bookshelf-publishing-gap-list">
-                            {pendingChapters.map((chapter) => (
-                              <article class="bookshelf-publishing-gap-card">
-                                <div class="bookshelf-publishing-gap-top">
-                                  <p>{chapter.chapter}</p>
-                                  <span>還差 {chapter.remainingToBaseline} 篇</span>
-                                </div>
-                                <strong>目前 {chapter.articleCount} 篇</strong>
-                                <small>{chapter.missingSubchapters.slice(0, 4).join(" / ")}</small>
-                              </article>
-                            ))}
-                          </div>
-                        </div>
-
-                        <section class="bookshelf-publishing-checklist">
-                          <div class="bookshelf-preview-head">
-                            <p>{modeDashboard.focusTrack.title} 出版清單</p>
-                            <span>只留出版勾選，不再逐章重複推薦</span>
-                          </div>
-                          <div class="bookshelf-publishing-checklist-list">
-                            {pendingChapters.map((chapter) => (
-                              <details class="bookshelf-publishing-checklist-card" open>
-                                <summary>
-                                  <div>
-                                    <span>{chapter.chapter}</span>
-                                    <strong>{chapter.missingSubchapters.slice(0, 2).join(" / ") || "本章主幹已立住"}</strong>
-                                  </div>
-                                  <small data-publishing-chapter-progress={chapter.chapter}>已勾 0 / {chapter.subchapters.length}</small>
-                                </summary>
-                                <div class="bookshelf-publishing-checklist-body">
-                                  <div class="bookshelf-publishing-subchapter-list">
-                                    {chapter.subchapters.map((subchapter) => (
-                                      <label
-                                        class={`bookshelf-publishing-subchapter-item ${subchapter.coveredByArticle ? "is-covered" : ""}`}
-                                        data-publishing-subchapter-item
-                                        data-topic-mode={modeOption.value}
-                                        data-track-title={modeDashboard.focusTrack?.title}
-                                        data-chapter-title={chapter.chapter}
-                                        data-subchapter-title={subchapter.title}
-                                        data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
-                                      >
-                                        <input
-                                          type="checkbox"
-                                          data-publishing-subchapter-checkbox
-                                          data-topic-mode={modeOption.value}
-                                          data-track-title={modeDashboard.focusTrack?.title}
-                                          data-chapter-title={chapter.chapter}
-                                          data-subchapter-title={subchapter.title}
-                                          data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
-                                          checked={subchapter.coveredByArticle}
-                                        />
-                                        <span class="bookshelf-publishing-subchapter-copy">
-                                          <strong>{subchapter.title}</strong>
-                                          <small>
-                                            {subchapter.coveredByArticle
-                                              ? `已有 ${subchapter.articleCount} 篇文章`
-                                              : "目前仍待補"}
-                                          </small>
-                                        </span>
-                                        <em data-publishing-subchapter-status>
-                                          {subchapter.coveredByArticle ? "已有文章" : "待補"}
-                                        </em>
-                                      </label>
-                                    ))}
-                                  </div>
-                                </div>
-                              </details>
-                            ))}
-                          </div>
-                          <div class="bookshelf-actions bookshelf-confirm-actions">
-                            <button type="button" class="bookshelf-action" data-reset-publishing-checklist={modeOption.value}>重置出版清單勾選</button>
-                          </div>
-                          <p class="bookshelf-confirm-note">這裡只留待補章節；每本書的推薦題目已集中在上方，不再逐章重複出題。</p>
-                        </section>
-                      </div>
-                    </details>
-                  )}
-                </div>
-              );
-            })}
+            {publishingTopicModeOptions.map((modeOption) => (
+              <template data-topic-mode-template={modeOption.value}>
+                <PublishingModePanel modeOption={modeOption} modeState={topicModeMap[modeOption.value]} />
+              </template>
+            ))}
 
             <details id="vendor-notes-board" class="bookshelf-fold" open>
               <summary>
@@ -2046,10 +1887,16 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       button.setAttribute("aria-pressed", active ? "true" : "false");
     });
 
-    document.querySelectorAll("[data-topic-mode-panel]").forEach((panel) => {
-      if (!(panel instanceof HTMLElement)) return;
-      panel.hidden = panel.dataset.topicModePanel !== currentTopicMode;
-    });
+    const panelRoot = document.querySelector("[data-topic-mode-root]");
+    if (!(panelRoot instanceof HTMLElement)) return;
+
+    const template = [...document.querySelectorAll("[data-topic-mode-template]")].find((node) => (
+      node instanceof HTMLTemplateElement && node.dataset.topicModeTemplate === currentTopicMode
+    ));
+
+    if (!(template instanceof HTMLTemplateElement)) return;
+
+    panelRoot.replaceChildren(template.content.cloneNode(true));
   }
 
   function buildNextTopicBriefText(mode = currentTopicMode) {
