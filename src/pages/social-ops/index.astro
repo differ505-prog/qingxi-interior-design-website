@@ -627,12 +627,12 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
                   <section class="vendor-panel">
                     <div class="vendor-list-head">
                       <div class="bookshelf-preview-head">
-                        <p>廠商清單</p>
-                        <span id="vendor-note-summary">依更新時間排序</span>
+                        <p>工種名錄</p>
+                        <span id="vendor-note-summary">先按工種看</span>
                       </div>
                       <label class="gemini-field vendor-search-field">
                         <span>搜尋</span>
-                        <input id="vendor-note-search" type="search" placeholder="搜尋名稱、工種、印象或備註" />
+                        <input id="vendor-note-search" type="search" placeholder="搜尋名稱、地區、印象或備註" />
                       </label>
                     </div>
                     <div id="vendor-note-list" class="vendor-note-list">
@@ -934,6 +934,27 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
         .toLowerCase()
         .includes(query),
     );
+  }
+
+  function groupVendorNotesByTrade(notes = []) {
+    const groups = new Map();
+    notes.forEach((note) => {
+      const trade = note.trade || "未分類";
+      if (!groups.has(trade)) {
+        groups.set(trade, []);
+      }
+      groups.get(trade).push(note);
+    });
+
+    const orderedTrades = [
+      ...vendorTradeOptions.filter((trade) => groups.has(trade)),
+      ...[...groups.keys()].filter((trade) => !vendorTradeOptions.includes(trade)),
+    ];
+
+    return orderedTrades.map((trade) => ({
+      trade,
+      items: groups.get(trade) || [],
+    }));
   }
 
   function formatVendorNoteTimestamp(value = "") {
@@ -1499,10 +1520,11 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       return;
     }
 
+    const groupedItems = groupVendorNotesByTrade(items);
     summaryNode.textContent = vendorNoteSearch
-      ? `顯示 ${items.length} / ${vendorNotesState.items.length} 筆`
+      ? `顯示 ${items.length} 筆，分成 ${groupedItems.length} 類`
       : vendorNotesState.items.length
-        ? "共享名錄已同步"
+        ? `已按 ${groupedItems.length} 個工種整理`
         : "尚未建立筆記";
 
     if (!items.length) {
@@ -1512,47 +1534,60 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       return;
     }
 
-    listNode.innerHTML = items
-      .map((note) => {
-        const primaryUrl = normalizeLinkValue(note.primaryUrl);
-        const secondaryUrl = normalizeLinkValue(note.secondaryUrl);
-        const metaItems = [
-          note.location ? `<span>${escapeHtml(note.location)}</span>` : "",
-          note.updatedAt ? `<span>更新 ${escapeHtml(formatVendorNoteTimestamp(note.updatedAt))}</span>` : "",
-        ].filter(Boolean).join("");
-
-        return `
-          <article class="vendor-note-card ${note.isPinned ? "is-pinned" : ""}">
-            <div class="vendor-note-card-head">
-              <div class="vendor-note-card-main">
-                <div class="vendor-note-badges">
-                  <span class="vendor-note-badge vendor-note-badge-trade">${escapeHtml(note.trade || "未分類")}</span>
-                  ${note.priceLevel ? `<span class="vendor-note-badge">${escapeHtml(note.priceLevel)}價位</span>` : ""}
-                  ${note.craftLevel ? `<span class="vendor-note-badge">${escapeHtml(note.craftLevel)}</span>` : ""}
-                  ${note.isPinned ? '<span class="vendor-note-badge vendor-note-badge-star">優先</span>' : ""}
-                </div>
-                <strong>${escapeHtml(note.name || "未命名廠商")}</strong>
-                <p>${escapeHtml(note.impression || note.memo || "尚未補一句印象")}</p>
-                <div class="vendor-note-meta">${metaItems || "<span>尚未補地區或更新資訊</span>"}</div>
-              </div>
-              <div class="vendor-note-card-actions">
-                ${primaryUrl
-                  ? `<a class="vendor-note-action-link" href="${escapeHtml(primaryUrl)}" target="_blank" rel="noreferrer">開啟</a>`
-                  : '<span class="vendor-note-action-link is-disabled">無連結</span>'}
-                <button type="button" class="vendor-note-mini-btn" data-vendor-action="edit" data-vendor-id="${escapeHtml(note.id)}">編輯</button>
-                <button type="button" class="vendor-note-mini-btn" data-vendor-action="pin" data-vendor-id="${escapeHtml(note.id)}">${note.isPinned ? "取消置頂" : "置頂"}</button>
-                <button type="button" class="vendor-note-mini-btn vendor-note-mini-btn-danger" data-vendor-action="delete" data-vendor-id="${escapeHtml(note.id)}">刪除</button>
-              </div>
+    listNode.innerHTML = groupedItems
+      .map((group) => `
+        <section class="vendor-trade-group">
+          <div class="vendor-trade-group-head">
+            <div class="vendor-trade-group-title">
+              <strong>${escapeHtml(group.trade)}</strong>
+              <span>${group.items.length} 筆</span>
             </div>
-            ${(secondaryUrl || note.memo)
-              ? `<div class="vendor-note-card-body">
-                  ${note.memo ? `<p class="vendor-note-memo">${escapeHtml(note.memo)}</p>` : ""}
-                  ${secondaryUrl ? `<a class="vendor-note-secondary-link" href="${escapeHtml(secondaryUrl)}" target="_blank" rel="noreferrer">補充連結</a>` : ""}
-                </div>`
-              : ""}
-          </article>
-        `;
-      })
+          </div>
+          <div class="vendor-trade-group-list">
+            ${group.items
+              .map((note) => {
+                const primaryUrl = normalizeLinkValue(note.primaryUrl);
+                const secondaryUrl = normalizeLinkValue(note.secondaryUrl);
+                const metaItems = [
+                  note.location ? `<span>${escapeHtml(note.location)}</span>` : "",
+                  note.updatedAt ? `<span>更新 ${escapeHtml(formatVendorNoteTimestamp(note.updatedAt))}</span>` : "",
+                ].filter(Boolean).join("");
+
+                return `
+                  <article class="vendor-note-card ${note.isPinned ? "is-pinned" : ""}">
+                    <div class="vendor-note-card-head">
+                      <div class="vendor-note-card-main">
+                        <div class="vendor-note-badges">
+                          ${note.priceLevel ? `<span class="vendor-note-badge">${escapeHtml(note.priceLevel)}價位</span>` : ""}
+                          ${note.craftLevel ? `<span class="vendor-note-badge">${escapeHtml(note.craftLevel)}</span>` : ""}
+                          ${note.isPinned ? '<span class="vendor-note-badge vendor-note-badge-star">優先</span>' : ""}
+                        </div>
+                        <strong>${escapeHtml(note.name || "未命名廠商")}</strong>
+                        <p>${escapeHtml(note.impression || note.memo || "尚未補一句印象")}</p>
+                        <div class="vendor-note-meta">${metaItems || "<span>尚未補地區或更新資訊</span>"}</div>
+                      </div>
+                      <div class="vendor-note-card-actions">
+                        ${primaryUrl
+                          ? `<a class="vendor-note-action-link" href="${escapeHtml(primaryUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                          : '<span class="vendor-note-action-link is-disabled">無連結</span>'}
+                        <button type="button" class="vendor-note-mini-btn" data-vendor-action="edit" data-vendor-id="${escapeHtml(note.id)}">編輯</button>
+                        <button type="button" class="vendor-note-mini-btn" data-vendor-action="pin" data-vendor-id="${escapeHtml(note.id)}">${note.isPinned ? "取消優先" : "優先"}</button>
+                        <button type="button" class="vendor-note-mini-btn vendor-note-mini-btn-danger" data-vendor-action="delete" data-vendor-id="${escapeHtml(note.id)}">刪除</button>
+                      </div>
+                    </div>
+                    ${(secondaryUrl || note.memo)
+                      ? `<div class="vendor-note-card-body">
+                          ${note.memo ? `<p class="vendor-note-memo">${escapeHtml(note.memo)}</p>` : ""}
+                          ${secondaryUrl ? `<a class="vendor-note-secondary-link" href="${escapeHtml(secondaryUrl)}" target="_blank" rel="noreferrer">補充連結</a>` : ""}
+                        </div>`
+                      : ""}
+                  </article>
+                `;
+              })
+              .join("")}
+          </div>
+        </section>
+      `)
       .join("");
   }
 
@@ -4994,6 +5029,46 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     background: linear-gradient(180deg, rgba(55, 55, 54, 0.42), rgba(31, 31, 31, 0.68));
   }
 
+  .vendor-trade-group,
+  .vendor-trade-group-list,
+  .vendor-trade-group-title {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .vendor-trade-group {
+    gap: 0.9rem;
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.015);
+  }
+
+  .vendor-trade-group-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .vendor-trade-group-title strong,
+  .vendor-trade-group-title span {
+    margin: 0;
+  }
+
+  .vendor-trade-group-title strong {
+    color: #f6f3ed;
+    font-size: 0.96rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .vendor-trade-group-title span {
+    color: rgba(224, 221, 214, 0.52);
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
   .vendor-note-card.is-pinned {
     border-color: rgba(247, 246, 241, 0.16);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 14px 26px rgba(0, 0, 0, 0.14);
@@ -5071,11 +5146,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
   .vendor-note-badge {
     color: rgba(244, 242, 237, 0.88);
     background: rgba(255, 255, 255, 0.04);
-  }
-
-  .vendor-note-badge-trade {
-    background: linear-gradient(180deg, rgba(250, 249, 245, 0.14), rgba(209, 204, 193, 0.06));
-    border-color: rgba(247, 246, 241, 0.16);
   }
 
   .vendor-note-badge-star {
