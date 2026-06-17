@@ -1586,6 +1586,23 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
     ].join("\n");
   }
 
+  function buildCopilotImagePromptSection(sectionTitle = "O. 【Copilot 生圖提示詞】") {
+    return [
+      `${sectionTitle}`,
+      "- 請固定輸出 3 組：封面主圖 / 內文輔圖 / 延伸情境圖。",
+      "- 視覺風格固定：只能是色鉛筆手繪風格或麥克筆手繪風格，且必須採用莫蘭迪配色或低飽和配色。",
+      "- 畫面氣質固定：安定、耐看、乾淨、有設計感；不要做成商業攝影、室內寫真或寫實渲染圖。",
+      "- 圖像形式固定：純圖像、不得有文字、不得有數字、不得有 logo、不得有版面編排、不得有 UI 畫面。",
+      "- 正向提示詞禁止出現任何會把模型導向寫實攝影的語彙，例如：photorealistic、photography、photo、8k、cinematic lighting、architectural photography、architectural digest style、render、3d render。",
+      "- 若你寫出上述寫實攝影語彙，代表這組提示詞不合格，必須改寫成手繪插畫導向。",
+      "- 每組都要包含：用途 / 正向提示詞 / 負面提示詞。",
+      "- 正向提示詞請直接寫成可貼進 Copilot 的完整句子，並在句中明確寫出 colored pencil sketch 或 marker rendering 之類的手繪指向，以及 muted Morandi palette 或 low-saturation palette 之類的低飽和配色指向。",
+      "- 負面提示詞請固定排除：photorealistic、photography、photo、realistic render、3d render、text、letters、numbers、logo、watermark、infographic、UI screen、harsh flash、neon colors、high saturation、glossy showroom style、messy background、distorted perspective、low resolution、blur。",
+      "- 若主題偏知識或工法，也要把它轉成可視覺化的空間場景、材料組合或局部細節，不要生成圖表、海報或簡報。",
+      "- 構圖要求：橫式 16:9，適合網站首圖或文章段落插圖。",
+    ].join("\n");
+  }
+
   function buildBasicProFinalizePrompt(problemText = "", aiDraft = "") {
     const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
@@ -1659,8 +1676,10 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "J. Threads 版",
       "K. 小紅書版",
       "L. 封面與首句文案",
-      "M. Copilot 生圖提示詞（封面主圖 / 內文輔圖 / 延伸情境圖，各含正向提示詞與負面提示詞）",
+      "M. Copilot 生圖提示詞（封面主圖 / 內文輔圖 / 延伸情境圖，各含正向提示詞與負面提示詞，必須為色鉛筆或麥克筆手繪、莫蘭迪或低飽和配色，禁止寫實攝影語彙）",
       "N. 最後人工檢查清單",
+      "",
+      buildCopilotImagePromptSection("M. Copilot 生圖提示詞補充限制"),
       "",
       buildIdePromptOptimizationSection("O. 給 IDE 的提示詞優化建議"),
     ].join("\n");
@@ -1799,10 +1818,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "- 首圖文案：控制在 28-48 字，適合搭配官網首圖、FB 貼文首圖或 IG 首張圖說明。",
       "- 開場首句：控制在 18-36 字，適合作為 FB、IG、Threads 或小紅書貼文的第一句，需有吸引力但不聳動。",
       "",
-      "O. 【Copilot 生圖提示詞】",
-      "- 請固定輸出 3 組：封面主圖 / 內文輔圖 / 延伸情境圖。",
-      "- 視覺風格固定：色鉛筆或麥克筆手繪風格、莫蘭迪或低飽和配色、純圖像、不得有文字。",
-      "- 每組都要包含：用途 / 正向提示詞 / 負面提示詞。",
+      buildCopilotImagePromptSection("O. 【Copilot 生圖提示詞】"),
       "",
       "P. 【最後人工檢查清單】",
       "- 請列出 3-5 條發布前應人工確認的地方。",
@@ -2298,13 +2314,14 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       "9. 【Copilot 生圖提示詞】",
       "- 請固定輸出 3 組提示詞，不要多也不要少。",
       "- 每組都要包含：用途（封面主圖 / 內文輔圖 / 延伸情境圖）＋正向提示詞＋負面提示詞。",
-      "- 視覺風格固定：色鉛筆或麥克筆手繪風格，莫蘭迪配色或低飽和配色，安定、耐看、乾淨、有設計感。",
+      "- 視覺風格固定：只能是色鉛筆手繪風格或麥克筆手繪風格，莫蘭迪配色或低飽和配色，安定、耐看、乾淨、有設計感。",
       "- 圖像要求固定：純圖像、不要任何文字、不要數字、不要 logo、不要版面編排、不要 UI 畫面。",
       "- 構圖要求：橫式 16:9，適合網站文章首圖或段落插圖。",
       "- 提示詞內容要緊扣本文主題，把空間、材料、光線、情境描述清楚，避免只寫抽象形容詞。",
       "- 若主題偏知識或工法，也要把它轉成可視覺化的空間場景或物件組合，不要生成資訊圖表。",
-      "- 正向提示詞請直接寫成可貼進 Copilot 的完整句子。",
-      "- 負面提示詞請固定排除：文字、字母、數字、標誌、logo、浮水印、資訊圖表、介面截圖、人物五官特寫、過度寫實攝影感、高飽和螢光色、雜亂背景、扭曲透視、低解析度、模糊。",
+      "- 正向提示詞請直接寫成可貼進 Copilot 的完整句子，並明確寫出 colored pencil sketch 或 marker rendering，以及 muted Morandi palette 或 low-saturation palette。",
+      "- 正向提示詞禁止出現 photorealistic、photography、photo、8k、cinematic lighting、architectural photography、architectural digest style、render、3d render 這類寫實攝影語彙。",
+      "- 負面提示詞請固定排除：文字、字母、數字、標誌、logo、浮水印、資訊圖表、介面截圖、人物五官特寫、過度寫實攝影感、photorealistic、photography、photo、realistic render、3d render、高飽和螢光色、雜亂背景、扭曲透視、低解析度、模糊。",
       "- 若主題適合，優先生成空間透視、角落情境、材料組合或光線氛圍，不要生成海報或簡報版面。",
     ].join("\n");
   }
