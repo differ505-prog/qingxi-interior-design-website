@@ -2704,27 +2704,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
       });
 
       const result = await response.json();
-      // #region debug-point D:frontend-response
-      fetch("http://127.0.0.1:7777/event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: "gemini-flash-failure",
-          runId: "pre-fix",
-          hypothesisId: "D",
-          location: "social-ops/index.astro:2707",
-          msg: "[DEBUG] frontend received article assist response",
-          data: {
-            mode,
-            status: response.status,
-            ok: response.ok,
-            error: result?.error || "",
-            detail: result?.detail || "",
-          },
-          ts: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
       if (!response.ok) {
         const errorMessage = result?.error === "GEMINI_API_KEY_MISSING"
           ? "尚未設定 GEMINI_API_KEY，先用手動提示詞模式。"
@@ -2738,25 +2717,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 
       return typeof result?.content === "string" ? result.content : "";
     } catch (error) {
-      // #region debug-point D:frontend-catch
-      fetch("http://127.0.0.1:7777/event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: "gemini-flash-failure",
-          runId: "pre-fix",
-          hypothesisId: "D",
-          location: "social-ops/index.astro:2724",
-          msg: "[DEBUG] frontend article assist request threw",
-          data: {
-            mode,
-            errorName: error instanceof Error ? error.name : typeof error,
-            errorMessage: error instanceof Error ? error.message : String(error),
-          },
-          ts: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
       console.error("Gemini Flash 生成失敗：", error);
       setFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
       setArticleAiFeedback("Gemini Flash 連線失敗，請稍後再試。", "is-warning");
