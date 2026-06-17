@@ -133,6 +133,7 @@ const bookshelfTracksJson = JSON.stringify(bookshelfTracks);
 const bookshelfSubchapterPoolsJson = JSON.stringify(bookshelfSubchapterPools);
 const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
+const publishingDashboardJson = JSON.stringify(publishingDashboard);
 const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
 ---
 
@@ -520,6 +521,88 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
                       ))}
                   </div>
                 </div>
+
+                <section class="bookshelf-publishing-checklist">
+                  <div class="bookshelf-preview-head">
+                    <p>{publishingDashboard.focusTrack.title} 出版清單</p>
+                    <span>文章覆蓋先自動勾，仍可人工覆寫是否可收書</span>
+                  </div>
+                  <div class="bookshelf-publishing-checklist-list">
+                    {publishingDashboard.focusTrack.chapterGaps.map((chapter) => (
+                      <details class="bookshelf-publishing-checklist-card" open={chapter.remainingToBaseline > 0}>
+                        <summary>
+                          <div>
+                            <span>{chapter.chapter}</span>
+                            <strong>{chapter.recommendedTopic?.primaryTitle || "這章目前沒有推薦題目"}</strong>
+                          </div>
+                          <small data-publishing-chapter-progress={chapter.chapter}>已勾 0 / {chapter.subchapters.length}</small>
+                        </summary>
+                        <div class="bookshelf-publishing-checklist-body">
+                          {chapter.recommendedTopic && (
+                            <article class="bookshelf-publishing-topic-card">
+                              <span>這章現在最該補</span>
+                              <strong>{chapter.recommendedTopic.primaryTitle}</strong>
+                              <p>{chapter.recommendedTopic.reason}</p>
+                              <div class="bookshelf-actions bookshelf-confirm-actions">
+                                <button
+                                  type="button"
+                                  class="bookshelf-action"
+                                  data-copy-chapter-brief={chapter.chapter}
+                                >
+                                  複製本章補位資訊
+                                </button>
+                                <button
+                                  type="button"
+                                  class="bookshelf-action bookshelp-action-primary"
+                                  data-copy-chapter-flash-prompt={chapter.chapter}
+                                >
+                                  複製 Flash 滾動潤題
+                                </button>
+                              </div>
+                            </article>
+                          )}
+                          <div class="bookshelf-publishing-subchapter-list">
+                            {chapter.subchapters.map((subchapter) => (
+                              <label
+                                class={`bookshelf-publishing-subchapter-item ${subchapter.coveredByArticle ? "is-covered" : ""}`}
+                                data-publishing-subchapter-item
+                                data-track-title={publishingDashboard.focusTrack?.title}
+                                data-chapter-title={chapter.chapter}
+                                data-subchapter-title={subchapter.title}
+                                data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
+                              >
+                                <input
+                                  type="checkbox"
+                                  data-publishing-subchapter-checkbox
+                                  data-track-title={publishingDashboard.focusTrack?.title}
+                                  data-chapter-title={chapter.chapter}
+                                  data-subchapter-title={subchapter.title}
+                                  data-covered-by-article={subchapter.coveredByArticle ? "true" : "false"}
+                                  checked={subchapter.coveredByArticle}
+                                />
+                                <span class="bookshelf-publishing-subchapter-copy">
+                                  <strong>{subchapter.title}</strong>
+                                  <small>
+                                    {subchapter.coveredByArticle
+                                      ? `已有 ${subchapter.articleCount} 篇文章`
+                                      : "目前仍待補"}
+                                  </small>
+                                </span>
+                                <em data-publishing-subchapter-status>
+                                  {subchapter.coveredByArticle ? "已有文章" : "待補"}
+                                </em>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                  <div class="bookshelf-actions bookshelf-confirm-actions">
+                    <button type="button" id="reset-publishing-checklist" class="bookshelf-action">重置出版清單勾選</button>
+                  </div>
+                  <p class="bookshelf-confirm-note">這裡讓你手動判斷哪些子章已可收書；即使已有文章，也可先取消勾選，等定稿後再納入。</p>
+                </section>
               </section>
             )}
 
@@ -761,13 +844,14 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, nextRecommendedTopicJson }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, publishingDashboardJson, nextRecommendedTopicJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const ARTICLE_AI_RESULT_KEY = "qingxi-article-ai-result-v1";
   const ARTICLE_PRO_FINALIZE_PROMPT_KEY = "qingxi-article-pro-finalize-prompt-v1";
   const GEMINI_DRAFT_KEY = "qingxi-gemini-canvas-draft-v1";
   const GEMINI_BACKUPS_KEY = "qingxi-gemini-canvas-backups-v1";
+  const PUBLISHING_CHECKLIST_KEY = "qingxi-publishing-checklist-v1";
   const GEMINI_RECENT_LIMIT = 10;
   const WEEKLY_TARGET = 3;
   const RUN_XP = 100;
@@ -788,6 +872,7 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
   const bookshelfSubchapterPools = JSON.parse(bookshelfSubchapterPoolsJson);
   const geminiCanvasMasterData = JSON.parse(geminiCanvasMasterJson);
   const vendorTradeOptions = JSON.parse(vendorTradeOptionsJson);
+  const publishingDashboardData = publishingDashboardJson ? JSON.parse(publishingDashboardJson) : null;
   const nextRecommendedTopicData = nextRecommendedTopicJson ? JSON.parse(nextRecommendedTopicJson) : null;
   const articleIntakeFields = [
     "主書系",
@@ -839,6 +924,7 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
   let articleProFinalizePrompt = "";
   let geminiDraft = null;
   let geminiBackups = [];
+  let publishingChecklistOverrides = {};
   let vendorNoteEditingId = "";
   let vendorNoteSearch = "";
   let vendorNoteTradeFilter = "";
@@ -1911,6 +1997,93 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
       `補前完成度：${nextRecommendedTopicData.coverageBefore}%`,
       `補後完成度：${nextRecommendedTopicData.coverageAfter}%`,
     ].join("\n");
+  }
+
+  function getPublishingChecklistEntryKey(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
+    return [trackTitle, chapterTitle, subchapterTitle].join("::");
+  }
+
+  function loadPublishingChecklist() {
+    try {
+      const raw = localStorage.getItem(PUBLISHING_CHECKLIST_KEY);
+      publishingChecklistOverrides = raw ? JSON.parse(raw) : {};
+    } catch (error) {
+      console.error("讀取出版清單失敗：", error);
+      publishingChecklistOverrides = {};
+    }
+  }
+
+  function savePublishingChecklist() {
+    localStorage.setItem(PUBLISHING_CHECKLIST_KEY, JSON.stringify(publishingChecklistOverrides));
+  }
+
+  function getPublishingChecklistChecked(trackTitle = "", chapterTitle = "", subchapterTitle = "", coveredByArticle = false) {
+    const key = getPublishingChecklistEntryKey(trackTitle, chapterTitle, subchapterTitle);
+    if (Object.prototype.hasOwnProperty.call(publishingChecklistOverrides, key)) {
+      return Boolean(publishingChecklistOverrides[key]);
+    }
+    return coveredByArticle;
+  }
+
+  function findPublishingChapterGap(chapterTitle = "") {
+    return publishingDashboardData?.focusTrack?.chapterGaps?.find((chapter) => chapter.chapter === chapterTitle) || null;
+  }
+
+  function buildChapterTopicBriefText(chapterTitle = "") {
+    const chapter = findPublishingChapterGap(chapterTitle);
+    const recommendation = chapter?.recommendedTopic;
+    if (!chapter || !recommendation) return "";
+
+    return [
+      `主攻書系：${publishingDashboardData?.focusTrack?.title || recommendation.focusTrackTitle}`,
+      `章節：${recommendation.chapter}`,
+      `子章節：${recommendation.subchapter}`,
+      `網站分類：${recommendation.category}`,
+      `本章最推薦主題：${recommendation.primaryTitle}`,
+      `備選 1：${recommendation.backupTitles?.[0] || "無"}`,
+      `備選 2：${recommendation.backupTitles?.[1] || "無"}`,
+      `推薦原因：${recommendation.reason}`,
+      `本章目前篇數：${recommendation.articleCountInChapter}`,
+      `本子章目前篇數：${recommendation.articleCountInSubchapter}`,
+    ].join("\n");
+  }
+
+  function renderPublishingChecklist() {
+    document.querySelectorAll("[data-publishing-subchapter-item]").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      const trackTitle = node.dataset.trackTitle || "";
+      const chapterTitle = node.dataset.chapterTitle || "";
+      const subchapterTitle = node.dataset.subchapterTitle || "";
+      const coveredByArticle = node.dataset.coveredByArticle === "true";
+      const checkbox = node.querySelector("[data-publishing-subchapter-checkbox]");
+      const status = node.querySelector("[data-publishing-subchapter-status]");
+      if (!(checkbox instanceof HTMLInputElement) || !(status instanceof HTMLElement)) return;
+
+      const checked = getPublishingChecklistChecked(trackTitle, chapterTitle, subchapterTitle, coveredByArticle);
+      checkbox.checked = checked;
+      node.classList.toggle("is-checked", checked);
+      node.classList.toggle("is-covered", coveredByArticle);
+      node.classList.toggle("is-manual", checked && !coveredByArticle);
+      node.classList.toggle("is-withheld", !checked && coveredByArticle);
+      status.textContent = checked
+        ? (coveredByArticle ? "已收書" : "人工納入")
+        : (coveredByArticle ? "有文未收" : "待補");
+    });
+
+    document.querySelectorAll("[data-publishing-chapter-progress]").forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      const chapterTitle = node.dataset.publishingChapterProgress || "";
+      const chapterCard = node.closest(".bookshelf-publishing-checklist-card");
+      if (!(chapterCard instanceof HTMLElement)) return;
+      const checkboxes = [...chapterCard.querySelectorAll("[data-publishing-subchapter-checkbox]")].filter(
+        (input) => input instanceof HTMLInputElement,
+      );
+      const checkedCount = checkboxes.filter((input) => input.checked).length;
+      node.textContent = `已勾 ${checkedCount} / ${checkboxes.length}`;
+      if (chapterTitle) {
+        chapterCard.classList.toggle("is-ready", checkedCount === checkboxes.length);
+      }
+    });
   }
 
   function normalizeComparableText(value = "") {
@@ -3955,6 +4128,16 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
   document.addEventListener("change", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLInputElement)) return;
+    if (target.hasAttribute("data-publishing-subchapter-checkbox")) {
+      const trackTitle = target.dataset.trackTitle || "";
+      const chapterTitle = target.dataset.chapterTitle || "";
+      const subchapterTitle = target.dataset.subchapterTitle || "";
+      const key = getPublishingChecklistEntryKey(trackTitle, chapterTitle, subchapterTitle);
+      publishingChecklistOverrides[key] = target.checked;
+      savePublishingChecklist();
+      renderPublishingChecklist();
+      return;
+    }
     if (target.dataset.runLinkKey) {
       const index = Number(target.dataset.runIndex);
       const linkKey = target.dataset.runLinkKey;
@@ -4014,6 +4197,39 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
       return;
     }
     await copyText(nextRecommendedTopicData.flashPrompt, "已複製 Flash 潤題提示詞。");
+  });
+
+  document.querySelectorAll("[data-copy-chapter-brief]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!(button instanceof HTMLElement)) return;
+      const chapterTitle = button.dataset.copyChapterBrief || "";
+      const text = buildChapterTopicBriefText(chapterTitle);
+      if (!text) {
+        setFeedback("這一章目前還沒有可複製的補位題目。", "is-warning");
+        return;
+      }
+      await copyText(text, `已複製「${chapterTitle}」補位資訊。`);
+    });
+  });
+
+  document.querySelectorAll("[data-copy-chapter-flash-prompt]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!(button instanceof HTMLElement)) return;
+      const chapterTitle = button.dataset.copyChapterFlashPrompt || "";
+      const recommendation = findPublishingChapterGap(chapterTitle)?.recommendedTopic;
+      if (!recommendation?.flashPrompt) {
+        setFeedback("這一章目前還沒有可複製的 Flash 潤題提示詞。", "is-warning");
+        return;
+      }
+      await copyText(recommendation.flashPrompt, `已複製「${chapterTitle}」Flash 滾動潤題。`);
+    });
+  });
+
+  document.getElementById("reset-publishing-checklist")?.addEventListener("click", () => {
+    publishingChecklistOverrides = {};
+    savePublishingChecklist();
+    renderPublishingChecklist();
+    setFeedback("已重置出版清單勾選。", "is-warning");
   });
 
   document.getElementById("copy-book-plan")?.addEventListener("click", async () => {
@@ -4353,12 +4569,14 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
   loadArticleAiResult();
   loadArticleProFinalizePrompt();
   loadGeminiBackupState();
+  loadPublishingChecklist();
   loadState();
   normalizeWeeklyState();
   applyArticleSourceQuestionToField();
   renderArticleAiResult();
   renderArticleProPrompt();
   applyGeminiDraftToFields();
+  renderPublishingChecklist();
   rerender();
   renderContentAnalytics();
   loadContentAnalytics();
@@ -5000,6 +5218,152 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
   .bookshelf-publishing-gap {
     display: grid;
     gap: 0.8rem;
+  }
+
+  .bookshelf-publishing-checklist {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .bookshelf-publishing-checklist-list {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .bookshelf-publishing-checklist-card {
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.018);
+    overflow: hidden;
+  }
+
+  .bookshelf-publishing-checklist-card.is-ready {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.07), rgba(214, 210, 200, 0.025));
+  }
+
+  .bookshelf-publishing-checklist-card summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    color: #f3efe7;
+  }
+
+  .bookshelf-publishing-checklist-card summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .bookshelf-publishing-checklist-card summary div {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .bookshelf-publishing-checklist-card summary span,
+  .bookshelf-publishing-topic-card span {
+    color: rgba(230, 228, 222, 0.58);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-publishing-checklist-card summary strong,
+  .bookshelf-publishing-topic-card strong {
+    color: #f7f6f2;
+    font-size: 0.98rem;
+    line-height: 1.65;
+  }
+
+  .bookshelf-publishing-checklist-card summary small {
+    color: rgba(230, 228, 222, 0.62);
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .bookshelf-publishing-checklist-card[open] summary {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .bookshelf-publishing-checklist-body {
+    display: grid;
+    gap: 0.85rem;
+    padding: 0.95rem 1rem 1rem;
+  }
+
+  .bookshelf-publishing-topic-card {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.95rem 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .bookshelf-publishing-topic-card p {
+    margin: 0;
+    color: rgba(233, 231, 225, 0.68);
+    line-height: 1.72;
+  }
+
+  .bookshelf-publishing-subchapter-list {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .bookshelf-publishing-subchapter-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.85rem;
+    align-items: center;
+    padding: 0.85rem 0.95rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.014);
+  }
+
+  .bookshelf-publishing-subchapter-item.is-checked {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .bookshelf-publishing-subchapter-item.is-manual {
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.05), rgba(214, 210, 200, 0.02));
+  }
+
+  .bookshelf-publishing-subchapter-item input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #d6d2c8;
+  }
+
+  .bookshelf-publishing-subchapter-copy {
+    display: grid;
+    gap: 0.18rem;
+  }
+
+  .bookshelf-publishing-subchapter-copy strong,
+  .bookshelf-publishing-subchapter-copy small,
+  .bookshelf-publishing-subchapter-status {
+    margin: 0;
+  }
+
+  .bookshelf-publishing-subchapter-copy strong {
+    color: #f5f3ee;
+    font-size: 0.94rem;
+  }
+
+  .bookshelf-publishing-subchapter-copy small {
+    color: rgba(233, 231, 225, 0.58);
+    line-height: 1.6;
+  }
+
+  .bookshelf-publishing-subchapter-item em {
+    color: rgba(230, 228, 222, 0.64);
+    font-style: normal;
+    font-size: 0.8rem;
+    white-space: nowrap;
   }
 
   .bookshelf-actions {
@@ -6875,6 +7239,7 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
     .bookshelf-publishing-meta,
     .bookshelf-publishing-rank,
     .bookshelf-publishing-gap-list,
+    .bookshelf-publishing-checklist-list,
     .bookshelf-outline-meta,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
@@ -6922,6 +7287,7 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
     .bookshelf-publishing-meta,
     .bookshelf-publishing-rank,
     .bookshelf-publishing-gap-list,
+    .bookshelf-publishing-checklist-list,
     .bookshelf-shelf-grid,
     .bookshelf-outline-grid,
     .bookshelf-outline-meta,
@@ -6934,6 +7300,16 @@ const nextRecommendedTopicJson = JSON.stringify(nextRecommendedTopic);
 
     .bookshelf-fold-stack {
       padding-inline: 0.9rem;
+    }
+
+    .bookshelf-publishing-checklist-card summary,
+    .bookshelf-publishing-subchapter-item {
+      grid-template-columns: 1fr;
+    }
+
+    .bookshelf-publishing-checklist-card summary small,
+    .bookshelf-publishing-subchapter-item em {
+      white-space: normal;
     }
 
     .quest-check-row {

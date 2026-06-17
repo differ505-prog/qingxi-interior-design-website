@@ -56,6 +56,8 @@ export interface PublishingChapterGap {
   articleCount: number;
   missingSubchapters: string[];
   remainingToBaseline: number;
+  subchapters: PublishingSubchapterStatus[];
+  recommendedTopic: NextTopicRecommendation | null;
 }
 
 export interface PublishingTrackDashboard extends PublishingTrackCoverage {
@@ -63,6 +65,12 @@ export interface PublishingTrackDashboard extends PublishingTrackCoverage {
   remainingToBaseline: number;
   readyToPublish: boolean;
   chapterGaps: PublishingChapterGap[];
+}
+
+export interface PublishingSubchapterStatus {
+  title: string;
+  articleCount: number;
+  coveredByArticle: boolean;
 }
 
 export interface NextTopicRecommendation {
@@ -650,6 +658,14 @@ export function getPublishingDashboard(posts: PublishingCatalogPost[] = [], focu
     const trackEntries = entries.filter((entry) => entry.trackTitle === track.title);
     const chapterGaps = track.chapters.map((chapter) => {
       const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter.title);
+      const subchapters = chapter.subchapters.map((subchapter) => {
+        const articleCount = chapterEntries.filter((entry) => entry.subchapter === subchapter.title).length;
+        return {
+          title: subchapter.title,
+          articleCount,
+          coveredByArticle: articleCount > 0,
+        } satisfies PublishingSubchapterStatus;
+      });
       const missingSubchapters = chapter.subchapters
         .filter((subchapter) => !chapterEntries.some((entry) => entry.subchapter === subchapter.title))
         .map((subchapter) => subchapter.title);
@@ -659,6 +675,8 @@ export function getPublishingDashboard(posts: PublishingCatalogPost[] = [], focu
         articleCount: chapterEntries.length,
         missingSubchapters,
         remainingToBaseline: missingSubchapters.length,
+        subchapters,
+        recommendedTopic: getChapterRecommendedTopicFromEntries(entries, track.title, chapter.title, focusTrackTitle),
       } satisfies PublishingChapterGap;
     });
 
@@ -731,15 +749,61 @@ export function buildNextTopicFlashPrompt(recommendation: Omit<NextTopicRecommen
   ].join("\n");
 }
 
-export function getNextRecommendedTopic(posts: PublishingCatalogPost[] = [], focusTrackTitle = publishingFocusTrackTitle): NextTopicRecommendation | null {
-  const entries = buildBookshelfEntries(posts);
+function buildRecommendationFromCandidate(
+  candidate: {
+    trackTitle: string;
+    chapter: string;
+    subchapter: string;
+    category: string;
+    articleCountInTrack: number;
+    articleCountInChapter: number;
+    articleCountInSubchapter: number;
+    coverageBefore: number;
+    coverageAfter: number;
+  },
+  focusTrackTitle: string,
+) {
+  const [primaryTitle, ...backupTitles] = getTopicTemplateSet(candidate.trackTitle, candidate.chapter, candidate.subchapter);
+  const reason = buildRecommendationReason(
+    candidate.trackTitle,
+    candidate.subchapter,
+    candidate.articleCountInChapter,
+    candidate.articleCountInSubchapter,
+  );
+  const recommendationBase = {
+    focusTrackTitle,
+    trackTitle: candidate.trackTitle,
+    chapter: candidate.chapter,
+    subchapter: candidate.subchapter,
+    category: candidate.category,
+    articleCountInTrack: candidate.articleCountInTrack,
+    articleCountInChapter: candidate.articleCountInChapter,
+    articleCountInSubchapter: candidate.articleCountInSubchapter,
+    coverageBefore: candidate.coverageBefore,
+    coverageAfter: candidate.coverageAfter,
+    primaryTitle,
+    backupTitles,
+    reason,
+  };
+
+  return {
+    ...recommendationBase,
+    flashPrompt: buildNextTopicFlashPrompt(recommendationBase),
+  } satisfies NextTopicRecommendation;
+}
+
+function buildRecommendationCandidates(
+  entries: BookshelfEntry[],
+  focusTrackTitle: string,
+  filters: { trackTitle?: string; chapterTitle?: string } = {},
+) {
   const recentEntries = [...entries]
     .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime())
     .slice(0, 3);
 
   const candidates = bookshelfTrackPlans.flatMap((track) =>
-    track.chapters.flatMap((chapter) =>
-      chapter.subchapters.map((subchapter) => {
+    (filters.trackTitle && track.title !== filters.trackTitle ? [] : track.chapters).flatMap((chapter) =>
+      (filters.chapterTitle && chapter.title !== filters.chapterTitle ? [] : chapter.subchapters).map((subchapter) => {
         const trackEntries = entries.filter((entry) => entry.trackTitle === track.title);
         const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter.title);
         const subchapterEntries = chapterEntries.filter((entry) => entry.subchapter === subchapter.title);
@@ -786,34 +850,32 @@ export function getNextRecommendedTopic(posts: PublishingCatalogPost[] = [], foc
     ),
   );
 
-  const best = candidates.sort((left, right) => right.score - left.score)[0];
+  return candidates.sort((left, right) => right.score - left.score);
+}
+
+function getChapterRecommendedTopicFromEntries(
+  entries: BookshelfEntry[],
+  trackTitle: string,
+  chapterTitle: string,
+  focusTrackTitle = publishingFocusTrackTitle,
+) {
+  const best = buildRecommendationCandidates(entries, focusTrackTitle, { trackTitle, chapterTitle })[0];
   if (!best) return null;
+  return buildRecommendationFromCandidate(best, focusTrackTitle);
+}
 
-  const [primaryTitle, ...backupTitles] = getTopicTemplateSet(best.trackTitle, best.chapter, best.subchapter);
-  const reason = buildRecommendationReason(
-    best.trackTitle,
-    best.subchapter,
-    best.articleCountInChapter,
-    best.articleCountInSubchapter,
-  );
-  const recommendationBase = {
-    focusTrackTitle,
-    trackTitle: best.trackTitle,
-    chapter: best.chapter,
-    subchapter: best.subchapter,
-    category: best.category,
-    articleCountInTrack: best.articleCountInTrack,
-    articleCountInChapter: best.articleCountInChapter,
-    articleCountInSubchapter: best.articleCountInSubchapter,
-    coverageBefore: best.coverageBefore,
-    coverageAfter: best.coverageAfter,
-    primaryTitle,
-    backupTitles,
-    reason,
-  };
+export function getChapterRecommendedTopic(
+  posts: PublishingCatalogPost[] = [],
+  trackTitle: string,
+  chapterTitle: string,
+  focusTrackTitle = publishingFocusTrackTitle,
+) {
+  return getChapterRecommendedTopicFromEntries(buildBookshelfEntries(posts), trackTitle, chapterTitle, focusTrackTitle);
+}
 
-  return {
-    ...recommendationBase,
-    flashPrompt: buildNextTopicFlashPrompt(recommendationBase),
-  };
+export function getNextRecommendedTopic(posts: PublishingCatalogPost[] = [], focusTrackTitle = publishingFocusTrackTitle): NextTopicRecommendation | null {
+  const entries = buildBookshelfEntries(posts);
+  const best = buildRecommendationCandidates(entries, focusTrackTitle)[0];
+  if (!best) return null;
+  return buildRecommendationFromCandidate(best, focusTrackTitle);
 }
