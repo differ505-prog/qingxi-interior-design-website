@@ -162,27 +162,6 @@ const backupTitles = Array.isArray(modeRecommendation?.backupTitles) ? modeRecom
                 </div>
               )}
 
-              {otherTrackRecommendations.length > 0 && (
-                <div class="bookshelf-publishing-track-recommendations">
-                  <div class="bookshelf-preview-head">
-                    <p>其他書補位</p>
-                    <span>主攻書主題已在上方，這裡只看其他書各自下一篇</span>
-                  </div>
-                  <div class="bookshelf-publishing-track-recommendation-list">
-                    {otherTrackRecommendations.map((recommendation) => (
-                      <article class="bookshelf-publishing-track-recommendation-card">
-                        <div class="bookshelf-publishing-rank-top">
-                          <p>{recommendation.trackTitle}</p>
-                          <span>{recommendation.chapter}</span>
-                        </div>
-                        <strong>{recommendation.primaryTitle}</strong>
-                        <small>{recommendation.subchapter}</small>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {remainingPendingChapters.length > 0 && (
                 <section class="bookshelf-publishing-checklist">
                   <div class="bookshelf-preview-head">
@@ -240,6 +219,33 @@ const backupTitles = Array.isArray(modeRecommendation?.backupTitles) ? modeRecom
                     ))}
                   </div>
                 </section>
+              )}
+
+              {otherTrackRecommendations.length > 0 && (
+                <details class="bookshelf-mini-fold">
+                  <summary>
+                    <span>其他書補位</span>
+                    <small>{otherTrackRecommendations.length} 本</small>
+                  </summary>
+                  <div class="bookshelf-publishing-track-recommendations">
+                    <div class="bookshelf-preview-head">
+                      <p>其他書補位</p>
+                      <span>主攻書缺口優先，其他書放到更低頻再看</span>
+                    </div>
+                    <div class="bookshelf-publishing-track-recommendation-list">
+                      {otherTrackRecommendations.map((recommendation) => (
+                        <article class="bookshelf-publishing-track-recommendation-card">
+                          <div class="bookshelf-publishing-rank-top">
+                            <p>{recommendation.trackTitle}</p>
+                            <span>{recommendation.chapter}</span>
+                          </div>
+                          <strong>{recommendation.primaryTitle}</strong>
+                          <small>{recommendation.subchapter}</small>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                </details>
               )}
             </div>
           </details>
