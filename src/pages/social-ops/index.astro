@@ -4100,7 +4100,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   document.addEventListener("click", async (event) => {
     const target = event.target instanceof HTMLElement
-      ? event.target.closest("[data-copy-next-topic-brief],[data-copy-next-topic-flash-prompt],[data-reset-publishing-checklist]")
+      ? event.target.closest("[data-copy-next-topic-brief],[data-reset-publishing-checklist]")
       : null;
     if (!(target instanceof HTMLElement)) return;
 
@@ -4111,17 +4111,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         return;
       }
       await copyText(buildNextTopicBriefText(mode), "已複製下一篇補位資訊。");
-      return;
-    }
-
-    if (target.hasAttribute("data-copy-next-topic-flash-prompt")) {
-      const mode = target.dataset.copyNextTopicFlashPrompt || currentTopicMode;
-      const recommendation = getCurrentTopicModeState(mode)?.nextRecommendedTopic;
-      if (!recommendation?.flashPrompt) {
-        setFeedback("目前還沒有可複製的 Flash 潤題提示詞。", "is-warning");
-        return;
-      }
-      await copyText(recommendation.flashPrompt, "已複製 Flash 潤題提示詞。");
       return;
     }
 
