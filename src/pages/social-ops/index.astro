@@ -1076,6 +1076,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       id: `run-${slot}`,
       slot,
       actionOutreach: false,
+      actionImageGeneration: false,
       actionWebsite: false,
       actionThreads: false,
       actionInstagram: false,
@@ -1124,6 +1125,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       const migratedOutreach = savedRun?.actionOutreach !== undefined
         ? Boolean(savedRun?.actionOutreach)
         : Boolean(savedRun?.actionSearch) && Boolean(savedRun?.actionAdvice);
+      const migratedImageGeneration = savedRun?.actionImageGeneration !== undefined
+        ? Boolean(savedRun?.actionImageGeneration)
+        : Boolean(savedRun?.actionImage) || Boolean(savedRun?.actionVisual) || Boolean(savedRun?.actionIllustration);
       const migratedWebsite = savedRun?.actionWebsite !== undefined
         ? Boolean(savedRun?.actionWebsite)
         : Boolean(savedRun?.actionArticle);
@@ -1134,6 +1138,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         ...templateRun,
         ...savedRun,
         actionOutreach: migratedOutreach,
+        actionImageGeneration: migratedImageGeneration,
         actionWebsite: migratedWebsite,
         actionThreads: Boolean(savedRun?.actionThreads),
         actionInstagram: Boolean(savedRun?.actionInstagram),
@@ -1181,7 +1186,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function isRunComplete(run) {
-    return run.actionOutreach && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
+    return run.actionOutreach && run.actionImageGeneration && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
   }
 
   function normalizeWeeklyState() {
@@ -1290,9 +1295,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
     const complete = isRunComplete(run);
     const actionOneComplete = run.actionOutreach;
-    const actionTwoComplete = run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
+    const actionTwoComplete = run.actionImageGeneration && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
     const completedSteps = [
       run.actionOutreach,
+      run.actionImageGeneration,
       run.actionWebsite,
       run.actionThreads,
       run.actionInstagram,
@@ -1341,12 +1347,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </div>
               <span>${actionTwoComplete ? "已完成" : "進行中"}</span>
             </div>
-            <p class="quest-main-copy">利用 LLM 完成官網發布（含圖），再依序同步分發至 Facebook 粉專、IG、Threads 與小紅書（COPE 戰略）。</p>
+            <p class="quest-main-copy">利用 LLM 先完成生圖，再上稿官網文章，最後依序同步分發至 Facebook 粉專、IG、Threads 與小紅書（COPE 戰略）。</p>
             <div class="quest-checklist">
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionImageGeneration ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionImageGeneration" ${run.actionImageGeneration ? "checked" : ""} />
+                  <span>已完成這篇文章需要的封面圖與內文配圖</span>
+                </label>
+                <a class="quest-link-btn" href="https://copilot.microsoft.com/" target="_blank" rel="noreferrer">Copilot 生圖</a>
+              </div>
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionWebsite ? "is-checked" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionWebsite" ${run.actionWebsite ? "checked" : ""} />
-                  <span>已完成官網 po 文與配圖上稿</span>
+                  <span>已完成官網文章上稿</span>
                 </label>
                 <a class="quest-link-btn" href="${BLOG_INDEX_URL}" target="_blank" rel="noreferrer">官網</a>
               </div>
