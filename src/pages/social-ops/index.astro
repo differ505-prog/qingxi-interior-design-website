@@ -736,6 +736,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   </label>
                 </div>
                 <div class="gemini-composer-actions">
+                  <button type="button" id="import-gemini-share" class="bookshelf-action bookshelp-action-primary">從分享網址載入</button>
                   <button type="button" id="load-gemini-master" class="bookshelf-action">載入主檔</button>
                   <button type="button" id="copy-gemini-markdown" class="bookshelf-action">複製 Markdown</button>
                   <button type="button" id="download-gemini-json" class="bookshelf-action">下載 JSON</button>
@@ -4231,6 +4232,78 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     setGeminiFeedback("已換成新網址；請同步貼上新的 Gemini Canvas 內容後再備份。", "is-warning");
   }
 
+  function applyImportedGeminiShare(payload) {
+    const { title, sourceUrl, content } = getGeminiFieldElements();
+    if (!(title instanceof HTMLInputElement) || !(sourceUrl instanceof HTMLInputElement) || !(content instanceof HTMLTextAreaElement)) {
+      return false;
+    }
+
+    title.value = typeof payload?.title === "string" ? payload.title.trim() : "";
+    sourceUrl.value = typeof payload?.sourceUrl === "string" ? payload.sourceUrl.trim() : "";
+    content.value = typeof payload?.content === "string" ? payload.content.trim() : "";
+    persistGeminiDraftFromFields();
+    return true;
+  }
+
+  async function importGeminiShareFromUrl(options = {}) {
+    const {
+      silent = false,
+      sourceUrl = "",
+    } = options;
+    const { sourceUrl: sourceUrlField } = getGeminiFieldElements();
+    const rawUrl = sourceUrl || (sourceUrlField instanceof HTMLInputElement ? sourceUrlField.value.trim() : "");
+    if (!rawUrl) {
+      if (!silent) {
+        setFeedback("請先貼上 Gemini 分享網址。", "is-warning");
+        setGeminiFeedback("請先貼上 Gemini 分享網址。", "is-warning");
+      }
+      return null;
+    }
+
+    try {
+      if (!silent) {
+        setGeminiFeedback("正在從 Gemini 分享網址載入內容...", "is-success");
+      }
+      const response = await fetch("/api/social-ops/gemini-share", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: rawUrl }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        const errorMessage = result?.error === "TARGET_NOT_ALLOWED"
+          ? "目前只支援匯入 Gemini 分享網址。"
+          : result?.error === "INVALID_URL"
+            ? "請貼上有效的 Gemini 分享網址。"
+            : result?.error === "EMPTY_CONTENT"
+              ? "這個 Gemini 分享網址目前沒有可匯入的內容。"
+              : "Gemini 分享內容暫時無法載入，請稍後再試。";
+        if (!silent) {
+          setFeedback(errorMessage, "is-warning");
+          setGeminiFeedback(errorMessage, "is-warning");
+        }
+        return null;
+      }
+
+      const applied = applyImportedGeminiShare(result);
+      if (!applied) return null;
+      if (!silent) {
+        setFeedback("已從 Gemini 分享網址載入最新內容。", "is-success");
+        setGeminiFeedback("已從 Gemini 分享網址載入最新內容。", "is-success");
+      }
+      return result;
+    } catch (error) {
+      console.error("載入 Gemini 分享內容失敗：", error);
+      if (!silent) {
+        setFeedback("Gemini 分享內容載入失敗，請稍後再試。", "is-warning");
+        setGeminiFeedback("Gemini 分享內容載入失敗，請稍後再試。", "is-warning");
+      }
+      return null;
+    }
+  }
+
   function loadGeminiBackupState() {
     try {
       const savedDraft = localStorage.getItem(GEMINI_DRAFT_KEY);
@@ -4620,7 +4693,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     loadGeminiMasterIntoEditor();
   });
 
-  document.getElementById("run-gemini-backup")?.addEventListener("click", () => {
+  document.getElementById("import-gemini-share")?.addEventListener("click", async () => {
+    await importGeminiShareFromUrl();
+  });
+
+  document.getElementById("run-gemini-backup")?.addEventListener("click", async () => {
+    const currentDraft = readGeminiDraftFromFields();
+    if (currentDraft?.sourceUrl && !currentDraft.content) {
+      await importGeminiShareFromUrl({ sourceUrl: currentDraft.sourceUrl, silent: false });
+    }
     const payload = buildGeminiBackupPayload();
     if (!payload) return;
 
