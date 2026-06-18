@@ -1348,55 +1348,55 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <label class="quest-link-field">
                   <span>Gemini 主稿</span>
                   <div class="quest-link-field-row">
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="gemini" value="${escapeHtml(run.linkStash?.gemini || "")}" placeholder="貼 Gemini Canvas 或分享網址" />
                     ${geminiDraftUrl
                       ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(geminiDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="gemini" value="${escapeHtml(run.linkStash?.gemini || "")}" placeholder="貼 Gemini Canvas 或分享網址" />
                   </div>
                 </label>
                 <label class="quest-link-field">
                   <span>官網稿</span>
                   <div class="quest-link-field-row">
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="website" value="${escapeHtml(run.linkStash?.website || "")}" placeholder="貼官網文章或上稿頁網址" />
                     ${websiteDraftUrl
                       ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(websiteDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="website" value="${escapeHtml(run.linkStash?.website || "")}" placeholder="貼官網文章或上稿頁網址" />
                   </div>
                 </label>
                 <label class="quest-link-field">
                   <span>Threads 稿</span>
                   <div class="quest-link-field-row">
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="threads" value="${escapeHtml(run.linkStash?.threads || "")}" placeholder="貼 Threads 文案或分享網址" />
                     ${threadsDraftUrl
                       ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(threadsDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="threads" value="${escapeHtml(run.linkStash?.threads || "")}" placeholder="貼 Threads 文案或分享網址" />
                   </div>
                 </label>
                 <label class="quest-link-field">
                   <span>Instagram 稿</span>
                   <div class="quest-link-field-row">
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="instagram" value="${escapeHtml(run.linkStash?.instagram || "")}" placeholder="貼 IG 文案或分享網址" />
                     ${instagramDraftUrl
                       ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(instagramDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="instagram" value="${escapeHtml(run.linkStash?.instagram || "")}" placeholder="貼 IG 文案或分享網址" />
                   </div>
                 </label>
                 <label class="quest-link-field">
                   <span>Facebook 稿</span>
                   <div class="quest-link-field-row">
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="facebook" value="${escapeHtml(run.linkStash?.facebook || "")}" placeholder="貼 FB 粉專文案或分享網址" />
                     ${facebookDraftUrl
                       ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(facebookDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="facebook" value="${escapeHtml(run.linkStash?.facebook || "")}" placeholder="貼 FB 粉專文案或分享網址" />
                   </div>
                 </label>
                 <label class="quest-link-field">
                   <span>小紅書稿</span>
                   <div class="quest-link-field-row">
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="xiaohongshu" value="${escapeHtml(run.linkStash?.xiaohongshu || "")}" placeholder="貼小紅書文案或分享網址" />
                     ${xiaohongshuDraftUrl
                       ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(xiaohongshuDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="xiaohongshu" value="${escapeHtml(run.linkStash?.xiaohongshu || "")}" placeholder="貼小紅書文案或分享網址" />
                   </div>
                 </label>
               </div>
@@ -7069,7 +7069,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   .quest-link-field-row {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 0.55rem;
     align-items: center;
   }
@@ -7367,10 +7367,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
 
     .quest-link-field-row {
-      grid-template-columns: 1fr;
+      grid-template-columns: auto minmax(0, 1fr);
     }
 
-    .quest-link-btn {
+    .quest-link-field-row .quest-link-btn {
+      width: auto;
+    }
+
+    .quest-check-row .quest-link-btn {
       width: 100%;
     }
 
