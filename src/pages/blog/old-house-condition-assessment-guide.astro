@@ -1,0 +1,168 @@
+---
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogPost } from "../../lib/blog-catalog";
+
+const articleMeta = getStaticBlogPost("old-house-condition-assessment-guide");
+const articleTitle = articleMeta.title;
+const articleDescription = articleMeta.summary;
+const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
+const articleImage = articleMeta.coverImage;
+const articleUtilityDetailImage = "/images/blog/old-house-condition-assessment-utility-detail.png";
+const articleSpaceLightImage = "/images/blog/old-house-condition-assessment-space-light.png";
+const articleStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: articleTitle,
+    description: articleDescription,
+    image: [articleImage],
+    datePublished: articlePublishedTime,
+    dateModified: articlePublishedTime,
+    articleSection: articleMeta.track,
+    keywords: articleMeta.tags.join(", "),
+    author: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    mainEntityOfPage: "https://qingxidesign.tw/blog/old-house-condition-assessment-guide",
+  },
+];
+---
+<EditorialArticleLayout
+  title={articleTitle}
+  description={articleDescription}
+  ogImage={articleImage}
+  publishedTime={articlePublishedTime}
+  modifiedTime={articlePublishedTime}
+  structuredData={articleStructuredData}
+  track={articleMeta.track}
+  chapter={articleMeta.chapter}
+  siteCategory={articleMeta.siteCategory}
+  tags={articleMeta.tags}
+>
+      <p class="article-lead">
+        老屋翻新，往往承載著屋主對全新生活的嚮往。我們總容易在初期就將目光聚焦於木地板材質、廚具面板顏色，或是客廳沙發款式；但真正決定翻新成敗與居住品質的，往往不是最後披上的那層美麗外衣，而是隱藏在牆體與樓板之下的空間體質。
+      </p>
+
+      <p>
+        如同替空間進行一場深度的健康檢查，在投入預算與設計心力之前，精準的屋況盤點是不可或缺的第一步。唯有看清老屋的真實狀態，才能將預算合理分配於基礎工程與裝飾工程之間，避免日後產生難以挽回的居住遺憾。
+      </p>
+
+      <p>
+        以下是青曦空間設計在老屋翻新實務中，最建議屋主優先確認的五個核心判斷點。若這五個面向沒有先盤清，後面的格局、美感與收納規劃，都很容易建立在不夠穩定的基礎上。
+      </p>
+
+      <blockquote>
+        老屋翻新的第一筆預算，不該先花在看得見的表面，而是先花在看清空間真正的問題。
+      </blockquote>
+
+      <h2>1. 基礎結構與防水：空間的安全底線</h2>
+
+      <p>
+        這是屋況盤點中最優先、也最不容妥協的環節。老屋經過歲月洗禮，最常面臨的便是牆面裂縫、壁癌與漏水問題。若一開始只把它們當成表面髒污或油漆老化，後續再漂亮的裝修也可能很快被打回原形。
+      </p>
+
+      <h3>裂縫的語彙：先分清是表面龜裂還是結構警訊</h3>
+
+      <p>
+        牆面上的裂縫大致可分為粉刷層龜裂與結構性裂縫。若裂縫出現在樑柱接縫處，或呈現深且長的交叉狀，通常暗示結構體可能已有受損或位移，需要專業結構技師進一步介入評估，而不是只靠批土補平。
+      </p>
+
+      <h3>漏水與壁癌：處理真正水源，而不是只處理表面</h3>
+
+      <p>
+        壁癌是漏水的結果，而不是單純的表面污損。盤點時需特別留意窗框四周、迎風面外牆、衛浴外側牆面以及天花板角落。找到水從哪裡進來，並徹底安排防水工程，才是老屋翻新最不能省略的隱形預算。
+      </p>
+
+      <h2>2. 水電管線與安培數：現代生活的隱形神經</h2>
+
+      <p>
+        屋齡超過二十年的老屋，其水電配置往往無法負荷現代人大量使用高功率電器的需求。洗碗機、烤箱、冷暖空調、除濕機與多組廚房小家電，同時都在考驗老屋原本的配置上限。
+      </p>
+
+      <h3>電力總安培數：別讓新生活卡在舊電力條件</h3>
+
+      <p>
+        早期老屋的總電量可能僅有 30 至 50 安培，現代家庭通常建議提升至 70 至 100 安培。這不只是配電箱更新而已，往往也牽涉到向台電重新申請電錶、全室拉線與迴路重整，因此一定要在前期盤點階段就先釐清。
+      </p>
+
+      <h3>管線老化：該更新時，就把它視為標準配備</h3>
+
+      <p>
+        隱藏在牆內的老舊電線，容易因絕緣層脆化而提高短路風險；老舊鐵製或橘色塑膠水管，也常伴隨生鏽、積垢與滲漏問題。若屋齡已高，在盤點時就應將全室水電管線更新視為老屋翻新的標準配備，而不是可有可無的加分項。
+      </p>
+
+      <figure class="article-figure">
+        <img src={articleUtilityDetailImage} alt="老屋牆內水電管線與配電箱更新手繪示意" />
+        <figcaption>
+          老屋真正影響安全與舒適度的，往往是藏在牆體裡的水電系統，而不是最後表面看到的材料樣貌。
+        </figcaption>
+      </figure>
+
+      <h2>3. 採光通風與格局本質：看透空間的靈魂</h2>
+
+      <p>
+        許多老屋受限於早期的建築思維，常有隔間破碎、長型屋中段採光不良，或動線不佳的痛點。若只急著看現在牆面長什麼樣子，很容易忽略這個空間真正的光線來源與呼吸方式。
+      </p>
+
+      <p>
+        在盤點時，請試著暫時褪去現有的隔間牆，重新觀察空間的本質。陽光從哪個方向進來？風的流動路徑為何？哪些牆是不可拆除的剪力牆或承重牆？先釐清這些不可逆的物理條件，後續的格局重組與設計調整才會有真正的依據。
+      </p>
+
+      <h2>4. 門窗框與邊界防護：室內外的氣候緩衝區</h2>
+
+      <p>
+        門窗是室內與室外環境交界的緩衝區，其氣密性與水密性會直接影響居住舒適度，也會連動冷氣效能、噪音感受與雨天滲水風險。若這一層邊界防護薄弱，再多室內裝修都很難真正換來安定的居住品質。
+      </p>
+
+      <h3>窗框檢視：不要只看玻璃，要看整個窗體系統</h3>
+
+      <p>
+        盤點時請檢查現有鋁窗是否變形、膠條是否老化，以及窗框與牆體交界處是否有水痕。若位處車流量大的地段，或迎風面高樓層，更應同步把隔音與抗風壓等級納入考量，而不是只憑外觀新舊做決定。
+      </p>
+
+      <h3>玄關與陽台：真正阻隔城市干擾的第一道邊界</h3>
+
+      <p>
+        玄關大門的密合度、前陽台的進退面與窗邊節點，都會影響室內外氣候交換。更新氣密窗與大門，不只是為了美觀，更是為了隔絕城市喧囂與極端氣候的侵擾。
+      </p>
+
+      <h2>5. 樓板承重與隔音：被忽略的垂直干擾</h2>
+
+      <p>
+        在老屋翻新中，樓板厚度與隔音效果經常被忽略。早期建築法規對樓板厚度要求較低，導致上下樓層的腳步聲、拖拉聲與物件掉落聲，更容易在日常裡互相干擾。
+      </p>
+
+      <p>
+        若翻新後希望鋪設較沉重的石材，或希望空間更安靜，在盤點階段就必須評估樓板承載力與隔音策略。適度規劃隔音墊、架高地板或在天花板增設隔音材質，能在看不見的地方大幅提升居住安定感。
+      </p>
+
+      <div class="article-gallery">
+        <figure class="article-figure">
+          <img src={articleSpaceLightImage} alt="老屋空間採光與格局本質手繪示意" />
+          <figcaption>
+            當採光、結構與格局條件先被看清，後續的翻新策略才有可能真正把光線與動線導回空間中心。
+          </figcaption>
+        </figure>
+        <figure class="article-figure">
+          <img src={articleImage} alt="老屋翻新屋況盤點封面主圖手繪示意" />
+          <figcaption>
+            屋況盤點的目的不是放大問題，而是替翻新建立一張更可靠的地形圖，讓預算與設計決策都有依據。
+          </figcaption>
+        </figure>
+      </div>
+
+      <h2>結語：精準盤點，是為了更踏實的未來</h2>
+
+      <p>
+        屋況盤點，就像是在繪製一張空間的地形圖。這張圖或許會揭露一些不完美的缺陷，但也正是這些真實資訊，指引我們做出更正確的設計決策。當預算優先挹注於修復結構、更新管線與改善體質後，空間才有機會擁有健康的骨幹。
+      </p>
+
+      <p>
+        在這個基礎上生長出的美學與風格，才真正經得起時間考驗，也更能成為一個安定、耐看且長久陪伴生活的家。若你正準備啟動老屋翻新，與其急著想像完工後的樣子，不如先讓盤點做得更紮實，後面的每一步都會更踏實。
+      </p>
+</EditorialArticleLayout>
