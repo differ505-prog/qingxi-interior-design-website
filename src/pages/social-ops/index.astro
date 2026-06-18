@@ -2284,6 +2284,16 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     ].join("\n");
   }
 
+  function buildSocialPlatformToneGuardSection(sectionTitle = "社群平台品牌護欄") {
+    return [
+      `${sectionTitle}`,
+      "- 社群平台版（FB／IG／Threads／小紅書）雖可依平台節奏微調長短、分段與口語感，但品牌主調不可改變。",
+      "- 所有社群文案都必須維持：高級、極簡、安定、耐看、不油膩，不可滑向內容農場、罐頭小編、過度煽情、廉價共鳴或硬廣告腔。",
+      "- 可以提高可讀性與互動感，但不可因平台特性退化成浮誇、討好、刻意聳動、廉價反問句或情緒操弄式文案。",
+      "- 若平台常見語氣與品牌主調衝突，優先守住品牌質感，而不是迎合平台慣性。",
+    ].join("\n");
+  }
+
   function buildBasicProFinalizePrompt(problemText = "", aiDraft = "") {
     const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
@@ -2359,6 +2369,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "L. 封面與首句文案",
       "M. Copilot 生圖提示詞（封面主圖 / 內文輔圖 / 延伸情境圖，各含正向提示詞與負面提示詞，必須為色鉛筆或麥克筆手繪、莫蘭迪或低飽和配色，禁止寫實攝影語彙）",
       "N. 最後人工檢查清單",
+      "",
+      buildSocialPlatformToneGuardSection("社群平台版統一護欄"),
       "",
       buildCopilotImagePromptSection("M. Copilot 生圖提示詞補充限制"),
       "",
@@ -2459,6 +2471,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "- 請先判斷這篇正式文章轉貼到 FB 粉專、IG、Threads、小紅書時，哪些內容可以共用基底，哪些一定要分開改寫。",
       "- 請用 3-6 點簡潔說明，不要空話。",
       "- 需明確指出：哪些平台可共用同一個核心文案，哪些平台只適合獨立版本。",
+      "",
+      buildSocialPlatformToneGuardSection("H0. 【社群平台品牌護欄】"),
       "",
       "I. 【共用基底文案】",
       "- 請先輸出 1 版可作為跨平台共用核心的基底文案。",
