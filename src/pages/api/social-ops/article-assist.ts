@@ -15,6 +15,9 @@ function normalizeArticleAssistContent(content: string) {
   if (!trimmed) return "";
 
   const markers = [
+    "0. 【決題摘要】",
+    "0.【決題摘要】",
+    "【決題摘要】",
     "0. 【判題結論】",
     "0.【判題結論】",
     "【判題結論】",
@@ -46,6 +49,8 @@ export const POST: APIRoute = async ({ request }) => {
     const prompt = typeof body?.prompt === "string" ? body.prompt.trim() : "";
     const mode = body?.mode === "quick"
       ? "quick"
+      : body?.mode === "topic"
+        ? "topic"
       : body?.mode === "metadata"
         ? "metadata"
         : "full";
@@ -81,9 +86,9 @@ export const POST: APIRoute = async ({ request }) => {
             },
           ],
           generationConfig: {
-            temperature: mode === "metadata" ? 0.1 : mode === "quick" ? 0.2 : 0.6,
+            temperature: mode === "metadata" ? 0.1 : mode === "quick" ? 0.2 : mode === "topic" ? 0.3 : 0.6,
             topP: 0.9,
-            maxOutputTokens: mode === "metadata" ? 900 : mode === "quick" ? 1800 : 6000,
+            maxOutputTokens: mode === "metadata" ? 900 : mode === "topic" ? 1200 : mode === "quick" ? 1800 : 6000,
           },
         }),
       },

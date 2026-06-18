@@ -12,6 +12,7 @@ import {
   bookshelfTracks,
   getPublishingDashboard,
   getNextRecommendedTopic,
+  getNextRecommendedTopics,
   getTrackRecommendedTopics,
   getPublishingCoverageSummary,
   publishingFocusTrackTitle,
@@ -147,6 +148,7 @@ const topicModeMap = Object.fromEntries(
   publishingTopicModeOptions.map((modeOption) => {
     const publishingDashboard = getPublishingDashboard(blogPosts, publishingFocusTrackTitle, modeOption.value);
     const nextRecommendedTopic = getNextRecommendedTopic(blogPosts, publishingFocusTrackTitle, modeOption.value);
+    const nextTopicCandidates = getNextRecommendedTopics(blogPosts, publishingFocusTrackTitle, modeOption.value, 6);
     const trackRecommendations = getTrackRecommendedTopics(blogPosts, publishingFocusTrackTitle, modeOption.value)
       .sort((left, right) => {
         const leftRank = publishingDashboard.rankedTracks.findIndex((track) => track.title === left.trackTitle);
@@ -159,6 +161,7 @@ const topicModeMap = Object.fromEntries(
         ...modeOption,
         publishingDashboard,
         nextRecommendedTopic,
+        nextTopicCandidates,
         trackRecommendations,
         modeRationale: buildTopicModeRationale(modeOption.value, publishingDashboard, nextRecommendedTopic),
       },
@@ -315,6 +318,39 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </details>
               <p class="bookshelf-prompt-note">主路徑只用一鍵備好 Pro 生文包；備援按鈕只在例外情況再打開。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
+              <div id="article-topic-shell" class="bookshelf-confirm" hidden>
+                <div class="bookshelf-preview-head">
+                  <p>本題動態決題</p>
+                  <span id="article-topic-label">尚未決題</span>
+                </div>
+                <div class="bookshelf-confirm-grid">
+                  <article class="bookshelf-confirm-card">
+                    <span>決題模式</span>
+                    <strong id="article-topic-mode">尚未決題</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>主書系</span>
+                    <strong id="article-topic-track">尚未決題</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>章節</span>
+                    <strong id="article-topic-chapter">尚未決題</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>子章節</span>
+                    <strong id="article-topic-subchapter">尚未決題</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card bookshelf-confirm-card-wide">
+                    <span>建議標題</span>
+                    <strong id="article-topic-title">尚未決題</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card bookshelf-confirm-card-wide">
+                    <span>決題理由</span>
+                    <strong id="article-topic-reason">先貼上真實社團問題，再由 Flash 在出版候選裡選最適合的切角。</strong>
+                  </article>
+                </div>
+                <p id="article-topic-note" class="bookshelf-confirm-note">這一步會先依真實社團問題理解痛點，再從系統候選缺口內挑最適合落進書稿的題目。</p>
+              </div>
               <div id="article-pro-prompt-shell" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
                   <p>Pro 生文提示詞</p>
@@ -456,7 +492,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <section class="bookshelf-topic-modes">
               <div class="bookshelf-preview-head">
                 <p>決題模式</p>
-                <span>先決定策略，再看推薦主題</span>
+                <span>先決定出版補位策略，再看長線推薦主題</span>
               </div>
               <div class="bookshelf-topic-mode-switch" role="tablist" aria-label="決題模式">
                 {publishingTopicModeOptions.map((modeOption) => (
@@ -724,6 +760,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 <script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
+  const ARTICLE_TOPIC_DECISION_KEY = "qingxi-article-topic-decision-v1";
   const ARTICLE_AI_RESULT_KEY = "qingxi-article-ai-result-v1";
   const ARTICLE_PRO_FINALIZE_PROMPT_KEY = "qingxi-article-pro-finalize-prompt-v1";
   const GEMINI_DRAFT_KEY = "qingxi-gemini-canvas-draft-v1";
@@ -797,6 +834,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     "主理中",
   ];
   let articleSourceQuestion = "";
+  let articleTopicDecision = null;
   let articleAiResult = "";
   let articleAiMode = "";
   let articleProFinalizePrompt = "";
@@ -1924,6 +1962,114 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     ].join("\n");
   }
 
+  function getCurrentTopicCandidates(mode = currentTopicMode) {
+    const modeState = getCurrentTopicModeState(mode);
+    return Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates : [];
+  }
+
+  function buildArticleTopicCandidateText(mode = currentTopicMode) {
+    const candidates = getCurrentTopicCandidates(mode);
+    return candidates
+      .map((candidate, index) => [
+        `候選 ${index + 1}`,
+        `主書系：${candidate.trackTitle}`,
+        `章節：${candidate.chapter}`,
+        `子章節：${candidate.subchapter}`,
+        `網站分類：${candidate.category}`,
+        `基準標題：${candidate.primaryTitle}`,
+        `備選標題：${candidate.backupTitles?.slice(0, 2).join(" / ") || "無"}`,
+        `系統理由：${candidate.reason}`,
+        `補前完成度：${candidate.coverageBefore}%`,
+        `補後完成度：${candidate.coverageAfter}%`,
+        `同子章既有文章：${candidate.sameSubchapterArticles?.join(" / ") || "目前沒有"}`,
+        `同章既有文章：${candidate.sameChapterArticles?.join(" / ") || "目前沒有"}`,
+      ].join("\n"))
+      .join("\n\n");
+  }
+
+  function buildArticleTopicPrompt(question = "", mode = currentTopicMode) {
+    const questionBlock = question.trim() || "（請在此貼上社團原始發問內容）";
+    const modeState = getCurrentTopicModeState(mode);
+    const candidateText = buildArticleTopicCandidateText(mode);
+    const candidateCount = getCurrentTopicCandidates(mode).length;
+
+    return [
+      "你是青曦空間設計的內容總編、出版策劃與第一線接案設計師。",
+      "現在只做『本題動態決題』，不是直接寫文章。",
+      "你的任務是先理解真實社團問題，再從系統提供的出版候選裡，挑出最適合落進書稿的一個題目。",
+      "你不能跳出候選清單自創新的主書系、章節或子章節。",
+      "但你必須讓最後選出的標題，更貼近這次真實問題，而不是只複誦系統模板。",
+      "",
+      "決策原則：",
+      "1. 先抓這次社團問題真正的痛點、情境與決策點。",
+      "2. 最終只能從候選清單中擇一落位。",
+      "3. 標題要能回答這次問題，也要能自然收進未來書稿章名。",
+      "4. 若多個候選都可用，優先選最能兼顧真實回覆價值與出版補位效率者。",
+      "5. 除非原始問題明顯不適合，否則不要偏離這次模式的前段候選。",
+      "",
+      `【本次決題模式】${modeState?.label || mode}`,
+      modeState?.modeRationale || "目前先沿用既有模式。",
+      "",
+      "【真實社團問題】",
+      questionBlock,
+      "",
+      `【系統候選清單】共 ${candidateCount} 個`,
+      candidateText || "目前沒有可用候選，請沿用固定出版骨架做最保守的判斷。",
+      "",
+      "請固定輸出以下 4 段，不要多寫任何其他內容：",
+      "0. 【決題摘要】",
+      "- 只輸出一行，摘要這次為什麼這樣落位。",
+      "",
+      "1. 【採用候選】",
+      "- 請固定輸出：候選編號：",
+      "- 請固定輸出：決題模式：",
+      "",
+      "2. 【落位決策】",
+      "- 請逐行固定輸出：",
+      "主書系：",
+      "章節：",
+      "子章節：",
+      "建議標題：",
+      "決策理由：",
+      "",
+      "3. 【保留說明】",
+      "- 請逐行固定輸出：",
+      "問題連結：",
+      "書稿連結：",
+    ].join("\n");
+  }
+
+  function parseArticleTopicDecision(content, mode = currentTopicMode, question = articleSourceQuestion) {
+    const summary = extractSectionText(content, "決題摘要");
+    const picked = extractSectionText(content, "採用候選");
+    const decision = extractSectionText(content, "落位決策");
+    const note = extractSectionText(content, "保留說明");
+    const candidateIndex = Number.parseInt(extractFieldValueFromText(picked, ["候選編號"]), 10);
+    const modeState = getCurrentTopicModeState(mode);
+    const noteLines = normalizeSectionLines(note);
+
+    const parsed = {
+      question,
+      mode,
+      modeLabel: extractFieldValueFromText(picked, ["決題模式"]) || modeState?.label || mode,
+      candidateIndex: Number.isFinite(candidateIndex) ? candidateIndex : 0,
+      summary: summary || "已完成本題動態決題。",
+      track: extractFieldValueFromText(decision, ["主書系"]),
+      chapter: extractFieldValueFromText(decision, ["章節"]),
+      subchapter: extractFieldValueFromText(decision, ["子章節"]),
+      title: extractFieldValueFromText(decision, ["建議標題"]),
+      reason: extractFieldValueFromText(decision, ["決策理由"]),
+      questionLink: extractFieldValueFromText(note, ["問題連結"]) || noteLines[0] || "",
+      bookLink: extractFieldValueFromText(note, ["書稿連結"]) || noteLines[1] || "",
+    };
+
+    if (!parsed.track || !parsed.chapter || !parsed.subchapter || !parsed.title) {
+      return null;
+    }
+
+    return parsed;
+  }
+
   function getPublishingChecklistEntryKey(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
     return [trackTitle, chapterTitle, subchapterTitle].join("::");
   }
@@ -2389,6 +2535,82 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return articleSourceQuestion;
   }
 
+  function loadArticleTopicDecision() {
+    try {
+      const raw = localStorage.getItem(ARTICLE_TOPIC_DECISION_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      articleTopicDecision = parsed && typeof parsed === "object" ? parsed : null;
+    } catch (error) {
+      console.error("讀取本題動態決題失敗：", error);
+      articleTopicDecision = null;
+    }
+  }
+
+  function saveArticleTopicDecision() {
+    try {
+      localStorage.setItem(ARTICLE_TOPIC_DECISION_KEY, JSON.stringify(articleTopicDecision));
+      return true;
+    } catch (error) {
+      console.error("儲存本題動態決題失敗：", error);
+      return false;
+    }
+  }
+
+  function clearArticleTopicDecision() {
+    articleTopicDecision = null;
+    try {
+      localStorage.removeItem(ARTICLE_TOPIC_DECISION_KEY);
+    } catch (error) {
+      console.error("清除本題動態決題失敗：", error);
+    }
+    renderArticleTopicDecision();
+  }
+
+  function renderArticleTopicDecision() {
+    const shell = document.getElementById("article-topic-shell");
+    const label = document.getElementById("article-topic-label");
+    const mode = document.getElementById("article-topic-mode");
+    const track = document.getElementById("article-topic-track");
+    const chapter = document.getElementById("article-topic-chapter");
+    const subchapter = document.getElementById("article-topic-subchapter");
+    const title = document.getElementById("article-topic-title");
+    const reason = document.getElementById("article-topic-reason");
+    const note = document.getElementById("article-topic-note");
+    if (
+      !(shell instanceof HTMLElement) ||
+      !(label instanceof HTMLElement) ||
+      !(mode instanceof HTMLElement) ||
+      !(track instanceof HTMLElement) ||
+      !(chapter instanceof HTMLElement) ||
+      !(subchapter instanceof HTMLElement) ||
+      !(title instanceof HTMLElement) ||
+      !(reason instanceof HTMLElement) ||
+      !(note instanceof HTMLElement)
+    ) {
+      return;
+    }
+
+    if (!articleTopicDecision) {
+      shell.hidden = true;
+      return;
+    }
+
+    const modeState = getCurrentTopicModeState(articleTopicDecision.mode);
+    const candidateCount = getCurrentTopicCandidates(articleTopicDecision.mode).length;
+    shell.hidden = false;
+    label.textContent = articleTopicDecision.summary || "已完成本題動態決題";
+    mode.textContent = articleTopicDecision.modeLabel || modeState?.label || articleTopicDecision.mode || "尚未決題";
+    track.textContent = articleTopicDecision.track || "尚未決題";
+    chapter.textContent = articleTopicDecision.chapter || "尚未決題";
+    subchapter.textContent = articleTopicDecision.subchapter || "尚未決題";
+    title.textContent = articleTopicDecision.title || "尚未決題";
+    reason.textContent = articleTopicDecision.reason || articleTopicDecision.questionLink || "已完成動態決題。";
+    note.textContent =
+      articleTopicDecision.bookLink ||
+      `這一步會先依真實社團問題理解痛點，再從 ${candidateCount || "目前"} 個出版候選裡挑最適合落進書稿的題目。`;
+  }
+
   function loadArticleAiResult() {
     try {
       const raw = localStorage.getItem(ARTICLE_AI_RESULT_KEY);
@@ -2549,6 +2771,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function buildArticleAiTimeoutMessage(mode) {
+    if (mode === "topic") {
+      return "本題動態決題逾時，請再試一次。";
+    }
     if (mode === "metadata") {
       return "主書系、章節與標題補齊逾時，已保留目前判題結果。";
     }
@@ -2614,10 +2839,25 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     });
   }
 
+  function buildArticleTopicDecisionContext(decision = articleTopicDecision) {
+    if (!decision) return "（尚未產生本題動態決題，請先依真實問題與固定骨架保守判斷。）";
+    return [
+      `決題模式：${decision.modeLabel || decision.mode || currentTopicMode}`,
+      `主書系：${decision.track}`,
+      `章節：${decision.chapter}`,
+      `子章節：${decision.subchapter}`,
+      `建議標題：${decision.title}`,
+      `決題理由：${decision.reason || decision.summary || "已先完成動態決題。"}`,
+      `問題連結：${decision.questionLink || "請沿用原始問題核心痛點"}`,
+      `書稿連結：${decision.bookLink || "請維持在這個書稿骨架內落位"}`,
+    ].join("\n");
+  }
+
   function buildArticlePrompt(problemText = "", mode = "full", currentContent = "") {
     const questionBlock = problemText.trim() || "（請在此貼上社團的發問內容）";
     const isShortQuestion = questionBlock.length <= 90;
     const currentContentBlock = currentContent.trim() || "（目前尚無 AI 初判內容）";
+    const topicDecisionBlock = buildArticleTopicDecisionContext();
     const tracksText = formatTrackStructureText();
     const intakeFieldText = articleIntakeFields.join(" / ");
     const siteCategoryText = siteCategoryOptions.join(" / ");
@@ -2664,8 +2904,17 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         "【目前 AI 初判內容】",
         currentContentBlock,
         "",
+        "【本題動態決題】",
+        topicDecisionBlock,
+        "",
         "【固定主書系】",
         tracksText,
+        "",
+      "【本題動態決題】",
+      topicDecisionBlock,
+      "",
+        "【既有文章清單】",
+        buildArticleCatalogText(),
         "",
         "【既有文章清單】",
         buildArticleCatalogText(),
@@ -2711,6 +2960,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         "【固定主書系】",
         tracksText,
         "",
+        "【本題動態決題】",
+        topicDecisionBlock,
+        "",
         "【既有文章清單】",
         buildArticleCatalogText(),
         "",
@@ -2720,10 +2972,20 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         "【相似題處理規則】",
         overlapRuleText,
         "",
+      "優先判斷規則：",
+      "- 先沿用【本題動態決題】提供的主書系、章節、子章節與標題方向。",
+      "- 只有在原始問題與該落位明顯衝突時，才可微調到同書系更合理的位置。",
+      "- 若你微調了落位，必須在【重複判斷】或【文章入庫卡】裡讓理由可被看懂。",
+      "",
         contextInstruction,
         "",
         `【文章入庫卡必填欄位】${intakeFieldText}`,
         "",
+      "優先判斷規則：",
+      "- 先沿用【本題動態決題】提供的主書系、章節、子章節與標題方向。",
+      "- 只有在原始問題與該落位明顯衝突時，才可微調到同書系更合理的位置。",
+      "- 若你微調了落位，必須在【情境補全假設】或【重複判斷】中讓理由可被看懂。",
+      "",
         "請只輸出以下 8 段，禁止多寫其他段落：",
         "0. 【判題結論】",
         "1. 【文章標題】",
@@ -3598,6 +3860,83 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     };
   }
 
+  async function requestArticleTopicDecision(mode = currentTopicMode) {
+    const question = persistArticleSourceQuestion();
+    if (!question) {
+      setFeedback("請先貼上真實社團問題。", "is-warning");
+      setArticleAiFeedback("請先貼上真實社團問題。", "is-warning");
+      return null;
+    }
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), getArticleAiTimeoutMs("topic"));
+      const response = await fetch("/api/social-ops/article-assist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        signal: controller.signal,
+        body: JSON.stringify({
+          mode: "topic",
+          prompt: buildArticleTopicPrompt(question, mode),
+        }),
+      });
+      window.clearTimeout(timeoutId);
+
+      const result = await response.json();
+      if (!response.ok) {
+        const errorMessage = result?.error === "GEMINI_API_KEY_MISSING"
+          ? "尚未設定 GEMINI_API_KEY，暫時無法做本題動態決題。"
+          : result?.error === "GEMINI_RATE_LIMITED"
+            ? `Gemini Flash 目前達到額度上限${Number.isFinite(result?.retryAfterSeconds) ? `，約 ${result.retryAfterSeconds} 秒後再試。` : "，請稍後再試。"}`
+            : "Gemini Flash 目前無法完成本題動態決題，請稍後再試。";
+        setFeedback(errorMessage, "is-warning");
+        setArticleAiFeedback(errorMessage, "is-warning");
+        return null;
+      }
+
+      return typeof result?.content === "string" ? result.content : "";
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        const timeoutMessage = buildArticleAiTimeoutMessage("topic");
+        setFeedback(timeoutMessage, "is-warning");
+        setArticleAiFeedback(timeoutMessage, "is-warning");
+        return null;
+      }
+      console.error("Gemini Flash 本題動態決題失敗：", error);
+      setFeedback("Gemini Flash 連線失敗，暫時無法完成本題動態決題。", "is-warning");
+      setArticleAiFeedback("Gemini Flash 連線失敗，暫時無法完成本題動態決題。", "is-warning");
+      return null;
+    }
+  }
+
+  async function ensureArticleTopicDecision(mode = currentTopicMode) {
+    const question = persistArticleSourceQuestion();
+    if (!question) return null;
+
+    if (articleTopicDecision?.question === question && articleTopicDecision?.mode === mode) {
+      renderArticleTopicDecision();
+      return articleTopicDecision;
+    }
+
+    setArticleAiFeedback("第 1 步進行中：正在依真實問題做本題動態決題...", "is-success");
+    const content = await requestArticleTopicDecision(mode);
+    if (!content) return null;
+
+    const parsed = parseArticleTopicDecision(content, mode, question);
+    if (!parsed) {
+      setArticleAiFeedback("本題動態決題格式不完整，先改用固定骨架繼續。", "is-warning");
+      return null;
+    }
+
+    articleTopicDecision = parsed;
+    saveArticleTopicDecision();
+    renderArticleTopicDecision();
+    setArticleAiFeedback("本題動態決題已完成，正在接續整理 AI 結果...", "is-success");
+    return articleTopicDecision;
+  }
+
   async function requestArticleAi(mode, currentContent = "") {
     const question = persistArticleSourceQuestion();
     if (!question) {
@@ -3688,6 +4027,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     setArticleAiFeedback(mode === "quick" ? "Gemini Flash 判題中..." : "Gemini Flash 長稿備援生成中...");
 
     try {
+      await ensureArticleTopicDecision(currentTopicMode);
       const content = await requestArticleAi(mode);
       if (!content) return false;
       articleAiResult = await enrichArticleMetadataIfNeeded(content, mode);
@@ -3716,9 +4056,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   async function runArticleAiFlow() {
     setArticleAiBusy(true);
-    setArticleAiFeedback("一鍵流程啟動中：先判題，再備好 Pro 生文提示詞...", "is-success");
+    setArticleAiFeedback("一鍵流程啟動中：先做本題動態決題，再判題並備好 Pro 生文提示詞...", "is-success");
 
     try {
+      await ensureArticleTopicDecision(currentTopicMode);
       const quickContent = await requestArticleAi("quick");
       if (!quickContent) return;
 
@@ -3849,6 +4190,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     };
   }
 
+  function readGeminiDraftFromFields() {
+    const { title, sourceUrl, content } = getGeminiFieldElements();
+    if (!(title instanceof HTMLInputElement) || !(sourceUrl instanceof HTMLInputElement) || !(content instanceof HTMLTextAreaElement)) {
+      return null;
+    }
+
+    return {
+      title: title.value.trim() || geminiCanvasMasterData.title,
+      sourceUrl: sourceUrl.value.trim() || geminiCanvasMasterData.sourceUrl,
+      content: content.value.trim(),
+    };
+  }
+
   function applyGeminiDraftToFields() {
     const { title, sourceUrl, content } = getGeminiFieldElements();
     if (!(title instanceof HTMLInputElement) || !(sourceUrl instanceof HTMLInputElement) || !(content instanceof HTMLTextAreaElement)) {
@@ -3861,18 +4215,20 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function persistGeminiDraftFromFields() {
-    const { title, sourceUrl, content } = getGeminiFieldElements();
-    if (!(title instanceof HTMLInputElement) || !(sourceUrl instanceof HTMLInputElement) || !(content instanceof HTMLTextAreaElement)) {
-      return null;
-    }
-
-    geminiDraft = {
-      title: title.value.trim() || geminiCanvasMasterData.title,
-      sourceUrl: sourceUrl.value.trim() || geminiCanvasMasterData.sourceUrl,
-      content: content.value.trim(),
-    };
+    const nextDraft = readGeminiDraftFromFields();
+    if (!nextDraft) return null;
+    geminiDraft = nextDraft;
     localStorage.setItem(GEMINI_DRAFT_KEY, JSON.stringify(geminiDraft));
     return geminiDraft;
+  }
+
+  function resetGeminiDraftContentForNewSource() {
+    const { content } = getGeminiFieldElements();
+    if (!(content instanceof HTMLTextAreaElement)) return;
+    content.value = "";
+    persistGeminiDraftFromFields();
+    setFeedback("已偵測到新的 Gemini 分享網址，先清空舊內容，請貼上新版本後再備份。", "is-warning");
+    setGeminiFeedback("已換成新網址；請同步貼上新的 Gemini Canvas 內容後再備份。", "is-warning");
   }
 
   function loadGeminiBackupState() {
@@ -4091,6 +4447,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       const nextMode = button.dataset.topicMode || "";
       if (!topicModeDataMap?.[nextMode]) return;
       currentTopicMode = nextMode;
+      clearArticleTopicDecision();
       saveTopicMode();
       renderTopicModePanels();
       renderPublishingChecklist();
@@ -4253,6 +4610,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   document.getElementById("clear-article-question")?.addEventListener("click", () => {
     articleSourceQuestion = "";
     localStorage.setItem(ARTICLE_SOURCE_QUESTION_KEY, "");
+    clearArticleTopicDecision();
     clearArticleProFinalizePrompt();
     applyArticleSourceQuestionToField();
     setFeedback("已清空真實社團問題。", "is-warning");
@@ -4338,6 +4696,22 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     ) {
       persistGeminiDraftFromFields();
     }
+  });
+
+  document.getElementById("gemini-source-url")?.addEventListener("change", (event) => {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    const nextUrl = event.target.value.trim();
+    const previousUrl = geminiDraft?.sourceUrl?.trim() || "";
+    const { content } = getGeminiFieldElements();
+    const currentContent = content instanceof HTMLTextAreaElement ? content.value.trim() : "";
+    const previousContent = geminiDraft?.content?.trim() || "";
+
+    if (nextUrl && previousUrl && nextUrl !== previousUrl && currentContent && currentContent === previousContent) {
+      resetGeminiDraftContentForNewSource();
+      return;
+    }
+
+    persistGeminiDraftFromFields();
   });
 
   document.getElementById("refresh-content-analytics")?.addEventListener("click", () => {
@@ -4446,7 +4820,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   });
 
   document.getElementById("article-source-question")?.addEventListener("input", () => {
-    persistArticleSourceQuestion();
+    const previousQuestion = articleSourceQuestion;
+    const nextQuestion = persistArticleSourceQuestion();
+    if (nextQuestion !== previousQuestion) {
+      clearArticleTopicDecision();
+    }
   });
 
   document.getElementById("article-pro-prompt-content")?.addEventListener("focus", (event) => {
@@ -4456,6 +4834,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   });
 
   loadArticleSourceQuestion();
+  loadArticleTopicDecision();
   loadArticleAiResult();
   loadArticleProFinalizePrompt();
   loadGeminiBackupState();
@@ -4464,6 +4843,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   loadState();
   normalizeWeeklyState();
   applyArticleSourceQuestionToField();
+  renderArticleTopicDecision();
   renderArticleAiResult();
   renderArticleProPrompt();
   applyGeminiDraftToFields();
@@ -5657,6 +6037,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     padding: 0.9rem 0.95rem;
     display: grid;
     gap: 0.35rem;
+  }
+
+  .bookshelf-confirm-card-wide {
+    grid-column: 1 / -1;
   }
 
   .bookshelf-confirm-card span,

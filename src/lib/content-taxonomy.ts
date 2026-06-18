@@ -1061,6 +1061,18 @@ export function getTrackRecommendedTopics(
     .filter((recommendation): recommendation is NextTopicRecommendation => Boolean(recommendation));
 }
 
+export function getNextRecommendedTopics(
+  posts: PublishingCatalogPost[] = [],
+  focusTrackTitle = publishingFocusTrackTitle,
+  mode: PublishingTopicMode = "publishing",
+  limit = 6,
+) {
+  const entries = buildBookshelfEntries(posts);
+  return buildRecommendationCandidates(entries, focusTrackTitle, mode)
+    .slice(0, Math.max(1, limit))
+    .map((candidate) => buildRecommendationFromCandidate(entries, candidate, focusTrackTitle, mode));
+}
+
 export function getNextRecommendedTopic(
   posts: PublishingCatalogPost[] = [],
   focusTrackTitle = publishingFocusTrackTitle,
