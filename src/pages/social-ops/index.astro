@@ -1302,7 +1302,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </div>
               <span>${actionTwoComplete ? "已完成" : "進行中"}</span>
             </div>
-            <p class="quest-main-copy">利用 LLM 完成官網發布（含圖），再同步分發至 Threads、IG 與小紅書（COPE 戰略）。</p>
+            <p class="quest-main-copy">利用 LLM 完成官網發布（含圖），再依序同步分發至 Facebook 粉專、IG、Threads 與小紅書（COPE 戰略）。</p>
             <div class="quest-checklist">
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionWebsite ? "is-checked" : ""}">
@@ -1312,11 +1312,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <a class="quest-link-btn" href="${BLOG_INDEX_URL}" target="_blank" rel="noreferrer">官網</a>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
-                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
-                  <span>已改寫並發佈 Threads</span>
+                <label class="quest-check ${run.actionFacebook ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionFacebook" ${run.actionFacebook ? "checked" : ""} />
+                  <span>已改寫並轉 po Facebook 粉專</span>
                 </label>
-                <a class="quest-link-btn" href="${THREADS_PROFILE_URL}" target="_blank" rel="noreferrer">Threads</a>
+                <a class="quest-link-btn" href="${FACEBOOK_PAGE_URL}" target="_blank" rel="noreferrer">Facebook</a>
               </div>
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionInstagram ? "is-checked" : ""}">
@@ -1326,11 +1326,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <a class="quest-link-btn" href="${INSTAGRAM_PROFILE_URL}" target="_blank" rel="noreferrer">Instagram</a>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionFacebook ? "is-checked" : ""}">
-                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionFacebook" ${run.actionFacebook ? "checked" : ""} />
-                  <span>已改寫並轉 po Facebook 粉專</span>
+                <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
+                  <span>已改寫並發佈 Threads</span>
                 </label>
-                <a class="quest-link-btn" href="${FACEBOOK_PAGE_URL}" target="_blank" rel="noreferrer">Facebook</a>
+                <a class="quest-link-btn" href="${THREADS_PROFILE_URL}" target="_blank" rel="noreferrer">Threads</a>
               </div>
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionXiaohongshu ? "is-checked" : ""}">
