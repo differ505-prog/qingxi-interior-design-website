@@ -25,6 +25,19 @@ export const DEFAULT_BLOG_COVER_IMAGE =
 
 export const staticBlogPosts: BlogCatalogPost[] = [
   {
+    title: "奠定老屋重生的基礎：拆除與泥作的進場順序與施作細節",
+    slug: "old-house-renovation-demolition-and-masonry-sequence",
+    date: "2026-06-22",
+    summary:
+      "整理老屋翻新基礎工程中拆除與泥作的正確進場邏輯，從防護、拆除、清運檢查到砌磚、打底與防水，幫助建立更穩定的施工順序觀念。",
+    siteCategory: "老屋翻新",
+    category: "老屋翻新",
+    track: "老屋翻新系",
+    chapter: "基礎工程",
+    tags: ["老屋翻新", "基礎工程", "拆除工程", "泥作工程", "防水", "施工順序"],
+    coverImage: "/images/blog/old-house-demolition-masonry-cover.png",
+  },
+  {
     title: "啟動老屋翻新之前：精準盤點屋況的 5 個核心判斷點",
     slug: "old-house-condition-assessment-guide",
     date: "2026-06-18",
