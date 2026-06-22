@@ -248,7 +248,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <div class="panel-heading">
               <div>
                 <p class="panel-tag">任務 6</p>
-                <h2>社群誘餌式回覆與微型分發</h2>
+                <h2>高意圖社群回覆與低成本分發</h2>
               </div>
             </div>
             <div id="quest-grid" class="quest-grid"></div>
@@ -775,14 +775,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   const SITE_ORIGIN = "https://qingxidesign.tw";
   const BLOG_INDEX_URL = `${SITE_ORIGIN}/blog`;
   const THREADS_PROFILE_URL = "https://www.threads.com/@qingxi.ds?hl=zh-tw";
-  const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/qingxi.ds/";
-  const FACEBOOK_PAGE_URL = "https://www.facebook.com/profile.php?id=61562661642204";
   const ARTICLE_AI_TIMEOUT_MS = 45000;
   const ARTICLE_AI_METADATA_TIMEOUT_MS = 18000;
   const CONTENT_ANALYTICS_URL = "/api/social-ops/analytics";
   const VENDOR_NOTES_API_URL = "/api/social-ops/vendor-notes";
   const socialReplyShortUrlCache = new Map();
   const sourceTemplate = JSON.parse(defaultSourcesJson);
+  const GOOGLE_BUSINESS_URL =
+    sourceTemplate.find((source) => source.id === "google-business")?.url || "https://www.google.com/";
+  const PORTAL_BOARD_URL = "#portal-grid";
   const articleLibrary = JSON.parse(blogPostsJson);
   const bookshelfTracks = JSON.parse(bookshelfTracksJson);
   const bookshelfSubchapterPools = JSON.parse(bookshelfSubchapterPoolsJson);
@@ -1076,19 +1077,20 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       id: `run-${slot}`,
       slot,
       actionOutreach: false,
+      actionOutreachFallback: false,
       actionImageGeneration: false,
       actionWebsite: false,
+      actionGoogleBusiness: false,
       actionThreads: false,
-      actionInstagram: false,
-      actionFacebook: false,
-      actionXiaohongshu: false,
+      actionLocalCommunity: false,
+      actionFacadeMaintenance: false,
       linkStash: {
         gemini: "",
         website: "",
+        googleBusiness: "",
         threads: "",
-        instagram: "",
-        facebook: "",
-        xiaohongshu: "",
+        localCommunity: "",
+        facadeMaintenance: "",
       },
       rewardClaimed: false,
       completedAt: "",
@@ -1135,20 +1137,35 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       ...templateRun,
       ...savedRun,
       actionOutreach: migratedOutreach,
+      actionOutreachFallback: Boolean(savedRun?.actionOutreachFallback),
       actionImageGeneration: migratedImageGeneration,
       actionWebsite: migratedWebsite,
+      actionGoogleBusiness: Boolean(savedRun?.actionGoogleBusiness),
       actionThreads: Boolean(savedRun?.actionThreads),
-      actionInstagram: Boolean(savedRun?.actionInstagram),
-      actionFacebook: Boolean(savedRun?.actionFacebook),
-      actionXiaohongshu: Boolean(savedRun?.actionXiaohongshu),
+      actionLocalCommunity: savedRun?.actionLocalCommunity !== undefined
+        ? Boolean(savedRun?.actionLocalCommunity)
+        : Boolean(savedRun?.actionFacebook),
+      actionFacadeMaintenance: savedRun?.actionFacadeMaintenance !== undefined
+        ? Boolean(savedRun?.actionFacadeMaintenance)
+        : Boolean(savedRun?.actionInstagram) || Boolean(savedRun?.actionXiaohongshu),
       linkStash: {
         ...templateRun.linkStash,
         gemini: typeof savedLinkStash?.gemini === "string" ? savedLinkStash.gemini : "",
         website: typeof savedLinkStash?.website === "string" ? savedLinkStash.website : "",
+        googleBusiness: typeof savedLinkStash?.googleBusiness === "string" ? savedLinkStash.googleBusiness : "",
         threads: typeof savedLinkStash?.threads === "string" ? savedLinkStash.threads : "",
-        instagram: typeof savedLinkStash?.instagram === "string" ? savedLinkStash.instagram : "",
-        facebook: typeof savedLinkStash?.facebook === "string" ? savedLinkStash.facebook : "",
-        xiaohongshu: typeof savedLinkStash?.xiaohongshu === "string" ? savedLinkStash.xiaohongshu : "",
+        localCommunity: typeof savedLinkStash?.localCommunity === "string"
+          ? savedLinkStash.localCommunity
+          : typeof savedLinkStash?.facebook === "string"
+            ? savedLinkStash.facebook
+            : "",
+        facadeMaintenance: typeof savedLinkStash?.facadeMaintenance === "string"
+          ? savedLinkStash.facadeMaintenance
+          : typeof savedLinkStash?.instagram === "string" && savedLinkStash.instagram
+            ? savedLinkStash.instagram
+            : typeof savedLinkStash?.xiaohongshu === "string"
+              ? savedLinkStash.xiaohongshu
+              : "",
       },
     };
   }
@@ -1190,7 +1207,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function isRunComplete(run) {
-    return run.actionOutreach && run.actionImageGeneration && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
+    return (run.actionOutreach || run.actionOutreachFallback)
+      && run.actionImageGeneration
+      && run.actionWebsite
+      && run.actionGoogleBusiness
+      && (run.actionThreads || run.actionLocalCommunity);
   }
 
   function buildCarryoverWeeklyRuns(previousRuns = []) {
@@ -1320,25 +1341,27 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
 
     const complete = isRunComplete(run);
-    const actionOneComplete = run.actionOutreach;
-    const actionTwoComplete = run.actionImageGeneration && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
+    const actionOneComplete = run.actionOutreach || run.actionOutreachFallback;
+    const actionTwoComplete = run.actionImageGeneration
+      && run.actionWebsite
+      && run.actionGoogleBusiness
+      && (run.actionThreads || run.actionLocalCommunity);
     const completedSteps = [
-      run.actionOutreach,
+      run.actionOutreach || run.actionOutreachFallback,
       run.actionImageGeneration,
       run.actionWebsite,
-      run.actionThreads,
-      run.actionInstagram,
-      run.actionFacebook,
-      run.actionXiaohongshu,
+      run.actionGoogleBusiness,
+      run.actionThreads || run.actionLocalCommunity,
+      run.actionFacadeMaintenance,
     ].filter(Boolean).length;
     const progressLabel = `(${activeRunIndex + 1}/${WEEKLY_TARGET})`;
     const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
     const geminiDraftUrl = normalizeLinkValue(run.linkStash?.gemini);
     const websiteDraftUrl = normalizeLinkValue(run.linkStash?.website);
+    const googleBusinessDraftUrl = normalizeLinkValue(run.linkStash?.googleBusiness);
     const threadsDraftUrl = normalizeLinkValue(run.linkStash?.threads);
-    const instagramDraftUrl = normalizeLinkValue(run.linkStash?.instagram);
-    const facebookDraftUrl = normalizeLinkValue(run.linkStash?.facebook);
-    const xiaohongshuDraftUrl = normalizeLinkValue(run.linkStash?.xiaohongshu);
+    const localCommunityDraftUrl = normalizeLinkValue(run.linkStash?.localCommunity);
+    const facadeMaintenanceDraftUrl = normalizeLinkValue(run.linkStash?.facadeMaintenance);
 
     shell.innerHTML = `
       <article class="quest-card ${complete ? "is-complete" : ""}">
@@ -1351,16 +1374,22 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <div class="quest-main-head">
               <div>
                 <p class="quest-main-index">主任務 1</p>
-                <strong>行動 1（釣魚）</strong>
+                <strong>行動 1（高意圖回覆）</strong>
               </div>
               <span>${actionOneComplete ? "已完成" : "進行中"}</span>
             </div>
-            <p class="quest-main-copy">在 FB 或 LINE 社團給予專業建議，附上官網文章或估價器連結。</p>
+            <p class="quest-main-copy">在在地 FB 或 LINE 社群先給完整可用的專業建議；只有真的適合時，才自然補上官網文章或估價器連結。若本週巡邏沒有合適發問，不必硬回，可直接由行動 2 補位。</p>
             <div class="quest-checklist">
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionOutreach ? "is-checked" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionOutreach" ${run.actionOutreach ? "checked" : ""} />
-                  <span>已在 FB 或 LINE 社團完成一次專業回覆並附上文章或估價器</span>
+                  <span>已在在地 FB 或 LINE 社群完成一次高意圖專業回覆，必要時才補上文章或估價器</span>
+                </label>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionOutreachFallback ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionOutreachFallback" ${run.actionOutreachFallback ? "checked" : ""} />
+                  <span>本週巡邏沒有適合發問，已不硬回，直接以行動 2 主動分發補位</span>
                 </label>
               </div>
             </div>
@@ -1369,11 +1398,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <div class="quest-main-head">
               <div>
                 <p class="quest-main-index">主任務 2</p>
-                <strong>行動 2（分發）</strong>
+                <strong>行動 2（低成本分發）</strong>
               </div>
               <span>${actionTwoComplete ? "已完成" : "進行中"}</span>
             </div>
-            <p class="quest-main-copy">利用 LLM 先完成生圖，再上稿官網文章，最後依序同步分發至 Facebook 粉專、IG、Threads 與小紅書（COPE 戰略）。</p>
+            <p class="quest-main-copy">先完成官網文章與必要圖檔，再同步到 Google 商家，最後擇一投放 Threads 或在地社群；FB 粉專、IG、小紅書只做低頻門面維護。</p>
             <div class="quest-checklist">
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionImageGeneration ? "is-checked" : ""}">
@@ -1390,30 +1419,30 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <a class="quest-link-btn" href="${BLOG_INDEX_URL}" target="_blank" rel="noreferrer">官網</a>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionFacebook ? "is-checked" : ""}">
-                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionFacebook" ${run.actionFacebook ? "checked" : ""} />
-                  <span>已改寫並轉 po Facebook 粉專</span>
+                <label class="quest-check ${run.actionGoogleBusiness ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionGoogleBusiness" ${run.actionGoogleBusiness ? "checked" : ""} />
+                  <span>已同步發布 Google 商家最新動態</span>
                 </label>
-                <a class="quest-link-btn" href="${FACEBOOK_PAGE_URL}" target="_blank" rel="noreferrer">Facebook</a>
-              </div>
-              <div class="quest-check-row">
-                <label class="quest-check ${run.actionInstagram ? "is-checked" : ""}">
-                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionInstagram" ${run.actionInstagram ? "checked" : ""} />
-                  <span>已改寫並發佈 Instagram</span>
-                </label>
-                <a class="quest-link-btn" href="${INSTAGRAM_PROFILE_URL}" target="_blank" rel="noreferrer">Instagram</a>
+                <a class="quest-link-btn" href="${GOOGLE_BUSINESS_URL}" target="_blank" rel="noreferrer">Google 商家</a>
               </div>
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
-                  <span>已改寫並發佈 Threads</span>
+                  <span>已改寫並發佈 Threads（測試場，與在地社群擇一即可）</span>
                 </label>
                 <a class="quest-link-btn" href="${THREADS_PROFILE_URL}" target="_blank" rel="noreferrer">Threads</a>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionXiaohongshu ? "is-checked" : ""}">
-                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionXiaohongshu" ${run.actionXiaohongshu ? "checked" : ""} />
-                  <span>已改寫並發佈小紅書</span>
+                <label class="quest-check ${run.actionLocalCommunity ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionLocalCommunity" ${run.actionLocalCommunity ? "checked" : ""} />
+                  <span>已將文章改寫後發佈到在地 FB / LINE 社群（與 Threads 擇一即可）</span>
+                </label>
+                <a class="quest-link-btn" href="${PORTAL_BOARD_URL}">來源入口</a>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionFacadeMaintenance ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionFacadeMaintenance" ${run.actionFacadeMaintenance ? "checked" : ""} />
+                  <span>本週如有需要，已補一則門面維護內容到 FB 粉專 / IG / 小紅書任一平台（選填）</span>
                 </label>
               </div>
             </div>
@@ -1442,6 +1471,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   </div>
                 </label>
                 <label class="quest-link-field">
+                  <span>Google 商家稿</span>
+                  <div class="quest-link-field-row">
+                    ${googleBusinessDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(googleBusinessDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="googleBusiness" value="${escapeHtml(run.linkStash?.googleBusiness || "")}" placeholder="貼 Google 商家貼文草稿或編輯頁網址" />
+                  </div>
+                </label>
+                <label class="quest-link-field">
                   <span>Threads 稿</span>
                   <div class="quest-link-field-row">
                     ${threadsDraftUrl
@@ -1451,30 +1489,21 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   </div>
                 </label>
                 <label class="quest-link-field">
-                  <span>Instagram 稿</span>
+                  <span>在地社群稿</span>
                   <div class="quest-link-field-row">
-                    ${instagramDraftUrl
-                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(instagramDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                    ${localCommunityDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(localCommunityDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="instagram" value="${escapeHtml(run.linkStash?.instagram || "")}" placeholder="貼 IG 文案或分享網址" />
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="localCommunity" value="${escapeHtml(run.linkStash?.localCommunity || "")}" placeholder="貼在地社群貼文或留言連結" />
                   </div>
                 </label>
                 <label class="quest-link-field">
-                  <span>Facebook 稿</span>
+                  <span>門面維護稿</span>
                   <div class="quest-link-field-row">
-                    ${facebookDraftUrl
-                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(facebookDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                    ${facadeMaintenanceDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(facadeMaintenanceDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="facebook" value="${escapeHtml(run.linkStash?.facebook || "")}" placeholder="貼 FB 粉專文案或分享網址" />
-                  </div>
-                </label>
-                <label class="quest-link-field">
-                  <span>小紅書稿</span>
-                  <div class="quest-link-field-row">
-                    ${xiaohongshuDraftUrl
-                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(xiaohongshuDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
-                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="xiaohongshu" value="${escapeHtml(run.linkStash?.xiaohongshu || "")}" placeholder="貼小紅書文案或分享網址" />
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="facadeMaintenance" value="${escapeHtml(run.linkStash?.facadeMaintenance || "")}" placeholder="貼 FB 粉專 / IG / 小紅書任一門面內容連結" />
                   </div>
                 </label>
               </div>
