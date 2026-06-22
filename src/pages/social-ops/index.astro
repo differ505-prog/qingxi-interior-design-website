@@ -4616,6 +4616,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const run = state.weekly.runs[index];
     if (!run || !key) return;
 
+    if (key === "actionOutreach" && target.checked) {
+      run.actionOutreachFallback = false;
+    }
+    if (key === "actionOutreachFallback" && target.checked) {
+      run.actionOutreach = false;
+    }
+    if (key === "actionThreads" && target.checked) {
+      run.actionLocalCommunity = false;
+    }
+    if (key === "actionLocalCommunity" && target.checked) {
+      run.actionThreads = false;
+    }
+
     run[key] = target.checked;
     maybeClaimRunReward(run);
     rerender();
