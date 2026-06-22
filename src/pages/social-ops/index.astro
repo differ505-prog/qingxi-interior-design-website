@@ -1118,42 +1118,46 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     };
   }
 
+  function hydrateRunState(savedRun = {}, templateRun) {
+    const migratedOutreach = savedRun?.actionOutreach !== undefined
+      ? Boolean(savedRun?.actionOutreach)
+      : Boolean(savedRun?.actionSearch) && Boolean(savedRun?.actionAdvice);
+    const migratedImageGeneration = savedRun?.actionImageGeneration !== undefined
+      ? Boolean(savedRun?.actionImageGeneration)
+      : Boolean(savedRun?.actionImage) || Boolean(savedRun?.actionVisual) || Boolean(savedRun?.actionIllustration);
+    const migratedWebsite = savedRun?.actionWebsite !== undefined
+      ? Boolean(savedRun?.actionWebsite)
+      : Boolean(savedRun?.actionArticle);
+    const savedLinkStash = savedRun?.linkStash && typeof savedRun.linkStash === "object"
+      ? savedRun.linkStash
+      : {};
+    return {
+      ...templateRun,
+      ...savedRun,
+      actionOutreach: migratedOutreach,
+      actionImageGeneration: migratedImageGeneration,
+      actionWebsite: migratedWebsite,
+      actionThreads: Boolean(savedRun?.actionThreads),
+      actionInstagram: Boolean(savedRun?.actionInstagram),
+      actionFacebook: Boolean(savedRun?.actionFacebook),
+      actionXiaohongshu: Boolean(savedRun?.actionXiaohongshu),
+      linkStash: {
+        ...templateRun.linkStash,
+        gemini: typeof savedLinkStash?.gemini === "string" ? savedLinkStash.gemini : "",
+        website: typeof savedLinkStash?.website === "string" ? savedLinkStash.website : "",
+        threads: typeof savedLinkStash?.threads === "string" ? savedLinkStash.threads : "",
+        instagram: typeof savedLinkStash?.instagram === "string" ? savedLinkStash.instagram : "",
+        facebook: typeof savedLinkStash?.facebook === "string" ? savedLinkStash.facebook : "",
+        xiaohongshu: typeof savedLinkStash?.xiaohongshu === "string" ? savedLinkStash.xiaohongshu : "",
+      },
+    };
+  }
+
   function syncRuns(savedRuns = []) {
     const templateRuns = createWeeklyRuns();
     return templateRuns.map((templateRun, index) => {
       const savedRun = savedRuns.find((run) => run?.id === templateRun.id) ?? savedRuns[index] ?? {};
-      const migratedOutreach = savedRun?.actionOutreach !== undefined
-        ? Boolean(savedRun?.actionOutreach)
-        : Boolean(savedRun?.actionSearch) && Boolean(savedRun?.actionAdvice);
-      const migratedImageGeneration = savedRun?.actionImageGeneration !== undefined
-        ? Boolean(savedRun?.actionImageGeneration)
-        : Boolean(savedRun?.actionImage) || Boolean(savedRun?.actionVisual) || Boolean(savedRun?.actionIllustration);
-      const migratedWebsite = savedRun?.actionWebsite !== undefined
-        ? Boolean(savedRun?.actionWebsite)
-        : Boolean(savedRun?.actionArticle);
-      const savedLinkStash = savedRun?.linkStash && typeof savedRun.linkStash === "object"
-        ? savedRun.linkStash
-        : {};
-      return {
-        ...templateRun,
-        ...savedRun,
-        actionOutreach: migratedOutreach,
-        actionImageGeneration: migratedImageGeneration,
-        actionWebsite: migratedWebsite,
-        actionThreads: Boolean(savedRun?.actionThreads),
-        actionInstagram: Boolean(savedRun?.actionInstagram),
-        actionFacebook: Boolean(savedRun?.actionFacebook),
-        actionXiaohongshu: Boolean(savedRun?.actionXiaohongshu),
-        linkStash: {
-          ...templateRun.linkStash,
-          gemini: typeof savedLinkStash?.gemini === "string" ? savedLinkStash.gemini : "",
-          website: typeof savedLinkStash?.website === "string" ? savedLinkStash.website : "",
-          threads: typeof savedLinkStash?.threads === "string" ? savedLinkStash.threads : "",
-          instagram: typeof savedLinkStash?.instagram === "string" ? savedLinkStash.instagram : "",
-          facebook: typeof savedLinkStash?.facebook === "string" ? savedLinkStash.facebook : "",
-          xiaohongshu: typeof savedLinkStash?.xiaohongshu === "string" ? savedLinkStash.xiaohongshu : "",
-        },
-      };
+      return hydrateRunState(savedRun, templateRun);
     });
   }
 
@@ -1189,18 +1193,40 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return run.actionOutreach && run.actionImageGeneration && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
   }
 
+  function buildCarryoverWeeklyRuns(previousRuns = []) {
+    const templateRuns = createWeeklyRuns();
+    const unfinishedRuns = previousRuns.filter((run) => !isRunComplete(run));
+    return templateRuns.map((templateRun, index) => {
+      const carryoverRun = unfinishedRuns[index];
+      if (!carryoverRun) return templateRun;
+      const hydratedRun = hydrateRunState(carryoverRun, templateRun);
+      return {
+        ...hydratedRun,
+        rewardClaimed: false,
+        completedAt: "",
+      };
+    });
+  }
+
   function normalizeWeeklyState() {
     const currentWeekKey = getWeekKey();
     if (state.weekly.weekKey === currentWeekKey) return;
 
     const completedRuns = state.weekly.runs.filter(isRunComplete).length;
+    const carryoverCount = state.weekly.runs.filter((run) => !isRunComplete(run)).length;
     state.stats.streak = completedRuns >= WEEKLY_TARGET ? state.stats.streak + 1 : 0;
     state.weekly = {
       weekKey: currentWeekKey,
       bonusClaimed: false,
-      runs: createWeeklyRuns(),
+      runs: buildCarryoverWeeklyRuns(state.weekly.runs),
     };
     saveState();
+    setFeedback(
+      carryoverCount > 0
+        ? `已進入新的一週，已保留 ${carryoverCount} 個未完成任務，已完成項目已刷新。`
+        : "已進入新的一週，本週任務已刷新。",
+      carryoverCount > 0 ? "is-warning" : "is-success",
+    );
   }
 
   function escapeHtml(value) {
