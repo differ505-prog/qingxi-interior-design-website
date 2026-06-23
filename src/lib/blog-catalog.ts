@@ -25,6 +25,19 @@ export const DEFAULT_BLOG_COVER_IMAGE =
 
 export const staticBlogPosts: BlogCatalogPost[] = [
   {
+    title: "智能居家系統建置指南：從平台生態到設備協定，回歸生活場景的決策心法",
+    slug: "smart-home-system-ecosystem-guide",
+    date: "2026-06-23",
+    summary:
+      "整理智能居家規劃中平台生態、設備協定與底層配電的決策重點，從跨平台整合到單一品牌深度生態，幫助回到真正的生活場景判斷。",
+    siteCategory: "智能家居",
+    category: "智能家居",
+    track: "水電照明系",
+    chapter: "智能控制",
+    tags: ["智能家居", "Apple Home", "Aqara", "Zigbee", "Thread", "智能控制"],
+    coverImage: "/images/blog/smart-home-system-ecosystem-guide-cover.png",
+  },
+  {
     title: "奠定老屋重生的基礎：拆除與泥作的進場順序與施作細節",
     slug: "old-house-renovation-demolition-and-masonry-sequence",
     date: "2026-06-22",
