@@ -244,6 +244,16 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
       <div class="ops-grid">
         <div class="ops-main">
+          <section id="daily-ops-board" class="ops-panel quest-board">
+            <div class="panel-heading">
+              <div>
+                <p class="panel-tag">日常任務</p>
+                <h2>主動獵殺</h2>
+              </div>
+            </div>
+            <div id="daily-quest-grid" class="quest-grid"></div>
+          </section>
+
           <section id="quest-board" class="ops-panel quest-board">
             <div class="panel-heading">
               <div>
@@ -1072,6 +1082,22 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return `${target.getFullYear()}-W${String(weekNo).padStart(2, "0")}`;
   }
 
+  function getDayKey(date = new Date()) {
+    const target = new Date(date);
+    target.setHours(0, 0, 0, 0);
+    return target.toISOString().split("T")[0];
+  }
+
+  function createDailyOps() {
+    return {
+      dayKey: getDayKey(),
+      actionMorningPatrol: false,
+      actionEveningPatrol: false,
+      actionOutboundHunt: false,
+      actionOutboundFallback: false,
+    };
+  }
+
   function createRun(slot) {
     return {
       id: `run-${slot}`,
@@ -1107,6 +1133,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   function createInitialState() {
     return {
+      daily: createDailyOps(),
       weekly: {
         weekKey: getWeekKey(),
         bonusClaimed: false,
@@ -1178,6 +1205,18 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     });
   }
 
+  function hydrateDailyState(savedDaily = {}, templateDaily = createDailyOps()) {
+    return {
+      ...templateDaily,
+      ...savedDaily,
+      dayKey: typeof savedDaily?.dayKey === "string" && savedDaily.dayKey ? savedDaily.dayKey : templateDaily.dayKey,
+      actionMorningPatrol: Boolean(savedDaily?.actionMorningPatrol),
+      actionEveningPatrol: Boolean(savedDaily?.actionEveningPatrol),
+      actionOutboundHunt: Boolean(savedDaily?.actionOutboundHunt),
+      actionOutboundFallback: Boolean(savedDaily?.actionOutboundFallback),
+    };
+  }
+
   let state = createInitialState();
 
   function saveState() {
@@ -1191,6 +1230,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       const parsed = JSON.parse(raw);
       const initialState = createInitialState();
       state = {
+        daily: hydrateDailyState(parsed.daily, initialState.daily),
         weekly: {
           ...initialState.weekly,
           ...(parsed.weekly || {}),
@@ -1212,6 +1252,12 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       && run.actionWebsite
       && run.actionGoogleBusiness
       && (run.actionThreads || run.actionLocalCommunity);
+  }
+
+  function isDailyOpsComplete(daily = state.daily) {
+    return daily.actionMorningPatrol
+      && daily.actionEveningPatrol
+      && (daily.actionOutboundHunt || daily.actionOutboundFallback);
   }
 
   function buildCarryoverWeeklyRuns(previousRuns = []) {
@@ -1248,6 +1294,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         : "已進入新的一週，本週任務已刷新。",
       carryoverCount > 0 ? "is-warning" : "is-success",
     );
+  }
+
+  function normalizeDailyState() {
+    const currentDayKey = getDayKey();
+    if (state.daily?.dayKey === currentDayKey) return;
+
+    state.daily = createDailyOps();
+    saveState();
+    setFeedback("已進入新的一天，主動獵殺任務已刷新。", "is-success");
   }
 
   function escapeHtml(value) {
@@ -1508,6 +1563,71 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 </label>
               </div>
             </div>
+          </section>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderDailyOps() {
+    const shell = document.getElementById("daily-quest-grid");
+    if (!shell) return;
+
+    const daily = state.daily;
+    const complete = isDailyOpsComplete(daily);
+    const completedSteps = [
+      daily.actionMorningPatrol,
+      daily.actionEveningPatrol,
+      daily.actionOutboundHunt || daily.actionOutboundFallback,
+    ].filter(Boolean).length;
+    const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
+    const huntComplete = daily.actionOutboundHunt || daily.actionOutboundFallback;
+
+    shell.innerHTML = `
+      <article class="quest-card ${complete ? "is-complete" : ""}">
+        <div class="quest-topline">
+          <span class="quest-slot">今日</span>
+          <span class="quest-keyword">${progressState}</span>
+        </div>
+        <div class="quest-main-list">
+          <section class="quest-main ${complete ? "is-complete" : ""}">
+            <div class="quest-main-head">
+              <div>
+                <p class="quest-main-index">日常巡邏</p>
+                <strong>主動獵殺（每日早晚巡邏 1 次）</strong>
+              </div>
+              <span>${complete ? "已完成" : "進行中"}</span>
+            </div>
+            <p class="quest-main-copy">鎖定明確尋找設計 / 統包的貼文，第一時間私訊，主打地緣極近與系統免費初步報價。若今日巡邏沒有合適目標，不必硬私訊，但早晚巡邏仍要完成。</p>
+            <div class="quest-checklist">
+              <div class="quest-check-row">
+                <label class="quest-check ${daily.actionMorningPatrol ? "is-checked" : ""}">
+                  <input type="checkbox" data-daily-check="actionMorningPatrol" ${daily.actionMorningPatrol ? "checked" : ""} />
+                  <span>今日早巡已完成</span>
+                </label>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${daily.actionEveningPatrol ? "is-checked" : ""}">
+                  <input type="checkbox" data-daily-check="actionEveningPatrol" ${daily.actionEveningPatrol ? "checked" : ""} />
+                  <span>今日晚巡已完成</span>
+                </label>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${daily.actionOutboundHunt ? "is-checked" : ""}">
+                  <input type="checkbox" data-daily-check="actionOutboundHunt" ${daily.actionOutboundHunt ? "checked" : ""} />
+                  <span>已鎖定高意圖貼文並第一時間私訊</span>
+                </label>
+                <a class="quest-link-btn" href="${PORTAL_BOARD_URL}">來源入口</a>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${daily.actionOutboundFallback ? "is-checked" : ""}">
+                  <input type="checkbox" data-daily-check="actionOutboundFallback" ${daily.actionOutboundFallback ? "checked" : ""} />
+                  <span>今日巡邏沒有合適目標，已不硬私訊</span>
+                </label>
+              </div>
+            </div>
+            <p class="quest-main-copy">${huntComplete ? "今日獵殺判定已完成，剩下看早晚巡邏是否都已勾選。" : "今日尚未完成獵殺判定，請在『已私訊』與『無合適目標』之間擇一。"}
+            </p>
           </section>
         </div>
       </article>
@@ -4610,7 +4730,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function rerender() {
+    normalizeWeeklyState();
+    normalizeDailyState();
     renderHero();
+    renderDailyOps();
     renderQuests();
     renderPortals();
     renderVendorNotes();
@@ -4637,6 +4760,21 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       const run = state.weekly.runs[index];
       if (!run || !linkKey || !run.linkStash) return;
       run.linkStash[linkKey] = target.value.trim();
+      rerender();
+      return;
+    }
+    if (target.dataset.dailyCheck) {
+      const key = target.dataset.dailyCheck;
+      if (!state.daily || !key) return;
+
+      if (key === "actionOutboundHunt" && target.checked) {
+        state.daily.actionOutboundFallback = false;
+      }
+      if (key === "actionOutboundFallback" && target.checked) {
+        state.daily.actionOutboundHunt = false;
+      }
+
+      state.daily[key] = target.checked;
       rerender();
       return;
     }
@@ -4680,13 +4818,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   });
 
   document.getElementById("reset-social-ops")?.addEventListener("click", () => {
+    state.daily = createDailyOps();
     state.weekly = {
       weekKey: getWeekKey(),
       bonusClaimed: false,
       runs: createWeeklyRuns(),
     };
     rerender();
-    setFeedback("本週任務已重設，XP 與連勝保留。", "is-warning");
+    setFeedback("本週任務與今日巡邏已重設，XP 與連勝保留。", "is-warning");
   });
 
   document.querySelectorAll("[data-topic-mode]").forEach((button) => {
@@ -5098,6 +5237,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   loadTopicMode();
   loadState();
   normalizeWeeklyState();
+  normalizeDailyState();
   applyArticleSourceQuestionToField();
   renderArticleTopicDecision();
   renderArticleAiResult();
