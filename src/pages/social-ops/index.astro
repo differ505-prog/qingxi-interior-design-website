@@ -172,6 +172,15 @@ const defaultTopicMode = publishingTopicModeOptions[0]?.value || "publishing";
 const defaultModeOption = publishingTopicModeOptions.find((modeOption) => modeOption.value === defaultTopicMode) || publishingTopicModeOptions[0];
 const defaultModeState = topicModeMap[defaultTopicMode];
 const publishingDashboard = topicModeMap[defaultTopicMode].publishingDashboard;
+const cannedReplies = [
+  {
+    id: "budget-range-estimator",
+    promptTitle: "裝修前期抓不到預算範圍怎麼辦？",
+    promptHint: "適合回覆：預算很亂、怕被亂報價、想先知道大概花費",
+    message:
+      "裝修前期最怕抓不到預算範圍。不管最後決定找誰施工，建議可以先用我們工作室開發的「線上自動估價系統」跑一次初步試算。先讓心裡有個客觀的數字底線，之後去跟師傅或設計師比價時會踏實很多，完全免費提供參考：https://www.qingxidesign.tw/tools",
+  },
+];
 
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
@@ -445,6 +454,33 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <button type="button" id="copy-social-reply-short" class="bookshelf-action">複製簡短版</button>
                     <button type="button" id="copy-social-reply-pro" class="bookshelf-action">複製專業版</button>
                     <button type="button" id="copy-social-reply-lead" class="bookshelf-action">複製導流版</button>
+                  </div>
+                </div>
+                <div class="bookshelf-canned-replies">
+                  <div class="bookshelf-preview-head">
+                    <p>常見罐頭回覆訊息</p>
+                    <span>不跑 AI 也可直接複製</span>
+                  </div>
+                  <div class="bookshelf-reply-grid bookshelf-canned-grid">
+                    {cannedReplies.map((reply) => (
+                      <article class="bookshelf-reply-card bookshelf-canned-card">
+                        <span>反推題目</span>
+                        <strong>{reply.promptTitle}</strong>
+                        <em>{reply.promptHint}</em>
+                        <p>{reply.message}</p>
+                        <div class="bookshelf-actions bookshelf-canned-actions">
+                          <button
+                            type="button"
+                            class="bookshelf-action"
+                            data-canned-reply-copy-button
+                            data-canned-reply-copy={reply.message}
+                            data-canned-reply-label={reply.promptTitle}
+                          >
+                            複製這則
+                          </button>
+                        </div>
+                      </article>
+                    ))}
                   </div>
                 </div>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
@@ -3140,6 +3176,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         button.disabled = isBusy;
       }
     });
+    document.querySelectorAll("[data-canned-reply-copy-button]").forEach((button) => {
+      if (button instanceof HTMLButtonElement) {
+        button.disabled = isBusy;
+      }
+    });
   }
 
   function buildArticleTopicDecisionContext(decision = articleTopicDecision) {
@@ -5015,6 +5056,25 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     await copyArticleSocialReply("lead", "已複製導流版社團回覆。");
   });
 
+  document.querySelectorAll("[data-canned-reply-copy-button]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!(button instanceof HTMLButtonElement)) return;
+      const text = button.dataset.cannedReplyCopy || "";
+      const label = button.dataset.cannedReplyLabel || "常見回覆";
+      if (!text.trim()) {
+        setArticleAiFeedback("目前沒有可複製的常見回覆。", "is-warning");
+        return;
+      }
+      const result = await copyText(text, `已複製「${label}」常見回覆。`);
+      const feedback = getCopyFeedbackState(
+        result,
+        `已複製「${label}」常見回覆。`,
+        "已開啟手動複製視窗，可直接複製常見回覆。",
+      );
+      setArticleAiFeedback(feedback.message, feedback.mode);
+    });
+  });
+
   document.getElementById("clear-article-question")?.addEventListener("click", () => {
     articleSourceQuestion = "";
     localStorage.setItem(ARTICLE_SOURCE_QUESTION_KEY, "");
@@ -6417,6 +6477,42 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   .bookshelf-reply-actions {
     margin-bottom: 0;
+  }
+
+  .bookshelf-canned-replies {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-canned-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .bookshelf-canned-card strong,
+  .bookshelf-canned-card em {
+    margin: 0;
+  }
+
+  .bookshelf-canned-card strong {
+    color: #f4f2ed;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+
+  .bookshelf-canned-card em {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.79rem;
+    line-height: 1.6;
+    font-style: normal;
+  }
+
+  .bookshelf-canned-actions {
+    margin-bottom: 0;
+    margin-top: 0.2rem;
   }
 
   .bookshelf-ai-content {
