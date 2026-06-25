@@ -99,6 +99,15 @@ function parseMetricValue(value: string | undefined) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function normalizePrivateKey(value: string) {
+  const trimmed = value.trim();
+  const unwrapped =
+    trimmed.startsWith('"') && trimmed.endsWith('"')
+      ? trimmed.slice(1, -1)
+      : trimmed;
+  return unwrapped.replace(/\\n/g, "\n").trim();
+}
+
 function isSocialSourceMedium(value: string) {
   const normalized = value.trim().toLowerCase();
   return SOCIAL_SOURCE_HINTS.some((hint) => normalized.includes(hint));
@@ -113,11 +122,11 @@ export const GET: APIRoute = async () => {
     import.meta.env.GA4_SERVICE_ACCOUNT_CLIENT_EMAIL?.trim() ||
     import.meta.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL?.trim() ||
     "";
-  const privateKey = (
+  const privateKey = normalizePrivateKey(
     import.meta.env.GA4_SERVICE_ACCOUNT_PRIVATE_KEY ||
-    import.meta.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ||
-    ""
-  ).replace(/\\n/g, "\n").trim();
+      import.meta.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ||
+      "",
+  );
 
   if (!propertyId || !clientEmail || !privateKey) {
     return new Response(
