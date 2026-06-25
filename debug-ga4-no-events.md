@@ -59,3 +59,6 @@ Additional note:
   - `gaDebug=1` now also sets `debug_mode: true` on `config`
   - `ga_debug_probe` now includes `send_to` and `event_callback`
   - Minimal fix updated: keep queue bootstrap before loader, but move the single `config` dispatch to `gtag.js` `onload`
+  - Latest iteration simplifies back toward the official `gtag.js` snippet:
+    - restore standard inline `gtag('config', ...)`
+    - remove network transport monkey-patching and keep only passive observation
