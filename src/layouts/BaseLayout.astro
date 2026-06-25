@@ -310,7 +310,7 @@ const MAINTENANCE_MODE =
         gtag('js', new Date());
         gtag('config', googleAnalyticsId, {
           'anonymize_ip': true,
-          'cookie_flags': 'SameSite=None;Secure'
+          'send_page_view': true
         });
         if (gaDebugEnabled) {
           mergeGaDebugState({ probeQueued: true });
@@ -367,7 +367,7 @@ const MAINTENANCE_MODE =
         async
         src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
         is:inline
-        onload={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"loaded",measurementId:"${googleAnalyticsId}",href:location.href};`}
+        onload={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"loaded",measurementId:"${googleAnalyticsId}",href:location.href};if(typeof window.gtag==="function"){window.gtag("config","${googleAnalyticsId}",{anonymize_ip:true,send_page_view:true});}`}
         onerror={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"failed",measurementId:"${googleAnalyticsId}",href:location.href};`}
       ></script>
     </>
