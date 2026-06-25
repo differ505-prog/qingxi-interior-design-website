@@ -231,7 +231,60 @@ const MAINTENANCE_MODE =
         onerror={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"failed",measurementId:"${googleAnalyticsId}",href:location.href};`}
       ></script>
       <script define:vars={{ googleAnalyticsId }} is:inline>
+        const gaDebugEnabled = new URLSearchParams(location.search).get("gaDebug") === "1";
+        const mergeGaDebugState = (patch) => {
+          window.__gaDebugState = {
+            ...(window.__gaDebugState || {}),
+            ...patch,
+          };
+        };
+        const pushGaDebugList = (key, value, limit = 8) => {
+          const current = Array.isArray(window.__gaDebugState?.[key]) ? window.__gaDebugState[key] : [];
+          mergeGaDebugState({ [key]: [...current, value].slice(-limit) });
+        };
         window.dataLayer = window.dataLayer || [];
+        // #region debug-point D:network-and-datalayer-hooks
+        if (gaDebugEnabled) {
+          const originalDataLayerPush = window.dataLayer.push.bind(window.dataLayer);
+          window.dataLayer.push = function(...args) {
+            pushGaDebugList("recentPushes", JSON.stringify(args));
+            return originalDataLayerPush(...args);
+          };
+          if (typeof window.fetch === "function") {
+            const originalFetch = window.fetch.bind(window);
+            window.fetch = (...args) => {
+              const url = typeof args[0] === "string" ? args[0] : args[0]?.url;
+              if (url && /googletagmanager|google-analytics|analytics.google/i.test(url)) {
+                pushGaDebugList("networkHits", `fetch ${url}`);
+              }
+              return originalFetch(...args);
+            };
+          }
+          if (typeof navigator.sendBeacon === "function") {
+            const originalSendBeacon = navigator.sendBeacon.bind(navigator);
+            navigator.sendBeacon = (url, data) => {
+              if (url && /googletagmanager|google-analytics|analytics.google/i.test(url)) {
+                pushGaDebugList("networkHits", `beacon ${url}`);
+              }
+              return originalSendBeacon(url, data);
+            };
+          }
+          if (typeof XMLHttpRequest !== "undefined") {
+            const originalOpen = XMLHttpRequest.prototype.open;
+            const originalSend = XMLHttpRequest.prototype.send;
+            XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+              this.__gaDebugUrl = url;
+              return originalOpen.call(this, method, url, ...rest);
+            };
+            XMLHttpRequest.prototype.send = function(...args) {
+              if (this.__gaDebugUrl && /googletagmanager|google-analytics|analytics.google/i.test(this.__gaDebugUrl)) {
+                pushGaDebugList("networkHits", `xhr ${this.__gaDebugUrl}`);
+              }
+              return originalSend.apply(this, args);
+            };
+          }
+        }
+        // #endregion
         function gtag(){dataLayer.push(arguments);}
         window.gtag = gtag;
         // #region debug-point A:init-ga4
@@ -259,7 +312,7 @@ const MAINTENANCE_MODE =
               .map((entry) => entry.name),
           };
           window.__gaDebugState = state;
-          if (new URLSearchParams(location.search).get("gaDebug") !== "1") return;
+          if (!gaDebugEnabled) return;
           const existing = document.getElementById("ga-debug-panel");
           if (existing) existing.remove();
           const panel = document.createElement("pre");
@@ -272,6 +325,8 @@ const MAINTENANCE_MODE =
             `hasGtag: ${state.hasGtag ? "yes" : "no"}`,
             `dataLayerLength: ${state.dataLayerLength ?? "-"}`,
             `resourceHits: ${state.resourceHits?.length ? state.resourceHits.join(" | ") : "none"}`,
+            `recentPushes: ${state.recentPushes?.length ? state.recentPushes.join(" || ") : "none"}`,
+            `networkHits: ${state.networkHits?.length ? state.networkHits.join(" | ") : "none"}`,
           ].join("\n");
           panel.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:99999;max-width:min(92vw,520px);padding:12px 14px;border-radius:14px;background:rgba(24,24,24,.92);color:#f5f5f0;border:1px solid rgba(255,255,255,.16);box-shadow:0 16px 40px rgba(0,0,0,.28);font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word;";
           document.body.appendChild(panel);
