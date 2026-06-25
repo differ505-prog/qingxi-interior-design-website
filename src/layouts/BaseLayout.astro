@@ -223,16 +223,28 @@ const MAINTENANCE_MODE =
   <!-- Google Analytics 4 (僅在生產環境且已設定時載入) -->
   {import.meta.env.PROD && googleAnalyticsId && (
     <>
-      <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`} is:inline></script>
+      <script
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
+        is:inline
+        onload={`fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"B",location:"BaseLayout.astro:226",msg:"[DEBUG] gtag script loaded",data:{googleAnalyticsId:"${googleAnalyticsId}",href:location.href},ts:Date.now()})}).catch(()=>{})`}
+        onerror={`fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"B",location:"BaseLayout.astro:226",msg:"[DEBUG] gtag script failed",data:{googleAnalyticsId:"${googleAnalyticsId}",href:location.href},ts:Date.now()})}).catch(()=>{})`}
+      ></script>
       <script define:vars={{ googleAnalyticsId }} is:inline>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         window.gtag = gtag;
+        // #region debug-point A:init-ga4
+        fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"A",location:"BaseLayout.astro:228",msg:"[DEBUG] GA init script executed",data:{googleAnalyticsId,href:location.href,readyState:document.readyState},ts:Date.now()})}).catch(()=>{});
+        // #endregion
         gtag('js', new Date());
         gtag('config', googleAnalyticsId, {
           'anonymize_ip': true,
           'cookie_flags': 'SameSite=None;Secure'
         });
+        // #region debug-point C:gtag-state
+        setTimeout(()=>{fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"C",location:"BaseLayout.astro:236",msg:"[DEBUG] GA runtime state snapshot",data:{googleAnalyticsId,href:location.href,hasGtag:typeof window.gtag==="function",dataLayerLength:Array.isArray(window.dataLayer)?window.dataLayer.length:-1,resourceHits:performance.getEntriesByType("resource").filter((entry)=>/googletagmanager|google-analytics/i.test(entry.name)).map((entry)=>entry.name)},ts:Date.now()})}).catch(()=>{})},4000);
+        // #endregion
       </script>
     </>
   )}
