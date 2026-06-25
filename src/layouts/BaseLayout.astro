@@ -227,15 +227,21 @@ const MAINTENANCE_MODE =
         async
         src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
         is:inline
-        onload={`fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"B",location:"BaseLayout.astro:226",msg:"[DEBUG] gtag script loaded",data:{googleAnalyticsId:"${googleAnalyticsId}",href:location.href},ts:Date.now()})}).catch(()=>{})`}
-        onerror={`fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"B",location:"BaseLayout.astro:226",msg:"[DEBUG] gtag script failed",data:{googleAnalyticsId:"${googleAnalyticsId}",href:location.href},ts:Date.now()})}).catch(()=>{})`}
+        onload={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"loaded",measurementId:"${googleAnalyticsId}",href:location.href};`}
+        onerror={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"failed",measurementId:"${googleAnalyticsId}",href:location.href};`}
       ></script>
       <script define:vars={{ googleAnalyticsId }} is:inline>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         window.gtag = gtag;
         // #region debug-point A:init-ga4
-        fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"A",location:"BaseLayout.astro:228",msg:"[DEBUG] GA init script executed",data:{googleAnalyticsId,href:location.href,readyState:document.readyState},ts:Date.now()})}).catch(()=>{});
+        window.__gaDebugState = {
+          ...(window.__gaDebugState || {}),
+          initExecuted: true,
+          measurementId: googleAnalyticsId,
+          href: location.href,
+          readyState: document.readyState,
+        };
         // #endregion
         gtag('js', new Date());
         gtag('config', googleAnalyticsId, {
@@ -243,7 +249,33 @@ const MAINTENANCE_MODE =
           'cookie_flags': 'SameSite=None;Secure'
         });
         // #region debug-point C:gtag-state
-        setTimeout(()=>{fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"C",location:"BaseLayout.astro:236",msg:"[DEBUG] GA runtime state snapshot",data:{googleAnalyticsId,href:location.href,hasGtag:typeof window.gtag==="function",dataLayerLength:Array.isArray(window.dataLayer)?window.dataLayer.length:-1,resourceHits:performance.getEntriesByType("resource").filter((entry)=>/googletagmanager|google-analytics/i.test(entry.name)).map((entry)=>entry.name)},ts:Date.now()})}).catch(()=>{})},4000);
+        setTimeout(() => {
+          const state = {
+            ...(window.__gaDebugState || {}),
+            hasGtag: typeof window.gtag === "function",
+            dataLayerLength: Array.isArray(window.dataLayer) ? window.dataLayer.length : -1,
+            resourceHits: performance.getEntriesByType("resource")
+              .filter((entry) => /googletagmanager|google-analytics/i.test(entry.name))
+              .map((entry) => entry.name),
+          };
+          window.__gaDebugState = state;
+          if (new URLSearchParams(location.search).get("gaDebug") !== "1") return;
+          const existing = document.getElementById("ga-debug-panel");
+          if (existing) existing.remove();
+          const panel = document.createElement("pre");
+          panel.id = "ga-debug-panel";
+          panel.textContent = [
+            "GA Debug",
+            `measurementId: ${state.measurementId || "-"}`,
+            `scriptLoad: ${state.scriptLoad || "pending"}`,
+            `initExecuted: ${state.initExecuted ? "yes" : "no"}`,
+            `hasGtag: ${state.hasGtag ? "yes" : "no"}`,
+            `dataLayerLength: ${state.dataLayerLength ?? "-"}`,
+            `resourceHits: ${state.resourceHits?.length ? state.resourceHits.join(" | ") : "none"}`,
+          ].join("\n");
+          panel.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:99999;max-width:min(92vw,520px);padding:12px 14px;border-radius:14px;background:rgba(24,24,24,.92);color:#f5f5f0;border:1px solid rgba(255,255,255,.16);box-shadow:0 16px 40px rgba(0,0,0,.28);font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word;";
+          document.body.appendChild(panel);
+        }, 4000);
         // #endregion
       </script>
     </>
