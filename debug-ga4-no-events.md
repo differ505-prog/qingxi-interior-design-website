@@ -34,10 +34,10 @@
 ## Verification Conclusion
 | ID | Hypothesis | Status | Evidence Summary |
 |----|------------|--------|------------------|
-| A | `gtag('config', ...)` 已載入，但自動 `page_view` 沒有成功送出 | ❌ Rejected | Line 4 / 8 / 12 明確出現 `google-analytics.com/g/collect?...&en=page_view...` |
+| A | `gtag('config', ...)` 已載入，但自動 `page_view` 沒有成功送出 | ✅ Confirmed | After removing `onload` replay, lines 17-32 for `v=7/v=8` no longer show `g/collect`; replaying config after script load is required |
 | B | 前端頁面實際有載入錯的 Measurement ID 或 hydration 後被覆蓋 | ❌ Rejected | 面板顯示 `measurementId: G-QM2JJPDSHE`，且 `scriptLoad: loaded` |
-| C | 瀏覽器端送出事件了，但被站上腳本、CSP 或載入時序中斷 | ❌ Rejected | Line 4 / 8 / 12 已看到兩次 `g/collect`，前端傳輸層正常 |
-| D | 事件有送出，但 GA4 property / stream 設定異常，未正常記錄 | ✅ Confirmed | 前端已把 `page_view` 與 probe 送到 `google-analytics.com/g/collect`，但 GA4 即時與工作台仍為 0，問題已轉到 GA4 接收/顯示側 |
+| C | 瀏覽器端送出事件了，但被站上腳本、CSP 或載入時序中斷 | ❌ Rejected | When `config` is replayed after loader, earlier lines 4 / 8 / 12 / 16 showed `g/collect`; transport path itself works |
+| D | 事件有送出，但 GA4 property / stream 設定異常，未正常記錄 | ⏳ Inconclusive | `DebugView` 仍未出現資料，但 latest logs show the stronger issue is config dispatch timing, so property-side issue is no longer primary root cause |
 
 Additional note:
 - Screenshot `20:34:50` still does not show the newly added `probeQueued / probeDispatched / probeError` fields.
@@ -58,3 +58,4 @@ Additional note:
 - Iteration note:
   - `gaDebug=1` now also sets `debug_mode: true` on `config`
   - `ga_debug_probe` now includes `send_to` and `event_callback`
+  - Minimal fix updated: keep queue bootstrap before loader, but move the single `config` dispatch to `gtag.js` `onload`

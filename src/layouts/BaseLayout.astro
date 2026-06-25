@@ -316,6 +316,19 @@ const MAINTENANCE_MODE =
         // #endregion
         function gtag(){dataLayer.push(arguments);}
         window.gtag = gtag;
+        const sendGaConfig = () => {
+          window.gtag('config', googleAnalyticsId, {
+            'anonymize_ip': true,
+            'send_page_view': true,
+            ...(gaDebugEnabled ? { 'debug_mode': true } : {})
+          });
+          reportGaDebug("D", "config-after-loader", {
+            measurementId: googleAnalyticsId,
+            href: location.href,
+            debugMode: gaDebugEnabled,
+          });
+        };
+        window.__qingxiSendGaConfig = sendGaConfig;
         // #region debug-point A:init-ga4
         window.__gaDebugState = {
           ...(window.__gaDebugState || {}),
@@ -331,11 +344,6 @@ const MAINTENANCE_MODE =
         });
         // #endregion
         gtag('js', new Date());
-        gtag('config', googleAnalyticsId, {
-          'anonymize_ip': true,
-          'send_page_view': true,
-          ...(gaDebugEnabled ? { 'debug_mode': true } : {})
-        });
         if (gaDebugEnabled) {
           mergeGaDebugState({ probeQueued: true });
           setTimeout(() => {
@@ -417,7 +425,7 @@ const MAINTENANCE_MODE =
         async
         src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
         is:inline
-        onload={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"loaded",measurementId:"${googleAnalyticsId}",href:location.href};if(new URLSearchParams(location.search).get("gaDebug")==="1"){fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"B",location:"src/layouts/BaseLayout.astro",msg:"[DEBUG] gtag-script-loaded",data:{measurementId:"${googleAnalyticsId}",href:location.href},ts:Date.now()})}).catch(()=>{});}`}
+        onload={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"loaded",measurementId:"${googleAnalyticsId}",href:location.href};if(new URLSearchParams(location.search).get("gaDebug")==="1"){fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"B",location:"src/layouts/BaseLayout.astro",msg:"[DEBUG] gtag-script-loaded",data:{measurementId:"${googleAnalyticsId}",href:location.href},ts:Date.now()})}).catch(()=>{});}if(typeof window.__qingxiSendGaConfig==="function"){window.__qingxiSendGaConfig();}`}
         onerror={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"failed",measurementId:"${googleAnalyticsId}",href:location.href};if(new URLSearchParams(location.search).get("gaDebug")==="1"){fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"B",location:"src/layouts/BaseLayout.astro",msg:"[DEBUG] gtag-script-load-failed",data:{measurementId:"${googleAnalyticsId}",href:location.href},ts:Date.now()})}).catch(()=>{});}`}
       ></script>
     </>
