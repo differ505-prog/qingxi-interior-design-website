@@ -55,3 +55,6 @@ Additional note:
 - Next verification target:
   - Check GA4 `DebugView` for the `ga_debug_probe` event
   - Compare whether GA4 receives debug events but delays standard reports / home cards
+- Iteration note:
+  - `gaDebug=1` now also sets `debug_mode: true` on `config`
+  - `ga_debug_probe` now includes `send_to` and `event_callback`

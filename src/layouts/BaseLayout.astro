@@ -333,17 +333,25 @@ const MAINTENANCE_MODE =
         gtag('js', new Date());
         gtag('config', googleAnalyticsId, {
           'anonymize_ip': true,
-          'send_page_view': true
+          'send_page_view': true,
+          ...(gaDebugEnabled ? { 'debug_mode': true } : {})
         });
         if (gaDebugEnabled) {
           mergeGaDebugState({ probeQueued: true });
           setTimeout(() => {
             try {
               window.gtag("event", "ga_debug_probe", {
+                send_to: googleAnalyticsId,
                 debug_mode: true,
                 transport_type: "beacon",
                 page_location: location.href,
                 page_title: document.title,
+                event_callback: () => {
+                  reportGaDebug("D", "probe-event-callback", {
+                    measurementId: googleAnalyticsId,
+                    href: location.href,
+                  });
+                },
               });
               mergeGaDebugState({ probeDispatched: true });
               reportGaDebug("A", "probe-dispatched", {
