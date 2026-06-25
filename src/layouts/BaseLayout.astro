@@ -283,6 +283,24 @@ const MAINTENANCE_MODE =
               return originalSend.apply(this, args);
             };
           }
+          if (typeof Image !== "undefined") {
+            const imageSrcDescriptor = Object.getOwnPropertyDescriptor(Image.prototype, "src");
+            if (imageSrcDescriptor?.set && imageSrcDescriptor?.get) {
+              Object.defineProperty(Image.prototype, "src", {
+                configurable: true,
+                enumerable: imageSrcDescriptor.enumerable ?? true,
+                get() {
+                  return imageSrcDescriptor.get.call(this);
+                },
+                set(value) {
+                  if (value && /googletagmanager|google-analytics|analytics.google/i.test(value)) {
+                    pushGaDebugList("networkHits", `img ${value}`);
+                  }
+                  return imageSrcDescriptor.set.call(this, value);
+                },
+              });
+            }
+          }
         }
         // #endregion
         function gtag(){dataLayer.push(arguments);}
