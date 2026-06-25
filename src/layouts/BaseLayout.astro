@@ -223,13 +223,6 @@ const MAINTENANCE_MODE =
   <!-- Google Analytics 4 (僅在生產環境且已設定時載入) -->
   {import.meta.env.PROD && googleAnalyticsId && (
     <>
-      <script
-        async
-        src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
-        is:inline
-        onload={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"loaded",measurementId:"${googleAnalyticsId}",href:location.href};`}
-        onerror={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"failed",measurementId:"${googleAnalyticsId}",href:location.href};`}
-      ></script>
       <script define:vars={{ googleAnalyticsId }} is:inline>
         const gaDebugEnabled = new URLSearchParams(location.search).get("gaDebug") === "1";
         const mergeGaDebugState = (patch) => {
@@ -370,6 +363,13 @@ const MAINTENANCE_MODE =
         }, 4000);
         // #endregion
       </script>
+      <script
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
+        is:inline
+        onload={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"loaded",measurementId:"${googleAnalyticsId}",href:location.href};`}
+        onerror={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"failed",measurementId:"${googleAnalyticsId}",href:location.href};`}
+      ></script>
     </>
   )}
   <script is:inline>
