@@ -1,5 +1,4 @@
 import type { APIRoute } from "astro";
-import { readFileSync } from "node:fs";
 import { createSign } from "node:crypto";
 
 type GaMetricMap = Record<string, number>;
@@ -12,41 +11,6 @@ const SOCIAL_SOURCE_HINTS = [
   "xiaohongshu",
   "social",
 ];
-
-// #region debug-point A:report-helper
-function reportDebugEvent(
-  hypothesisId: string,
-  location: string,
-  msg: string,
-  data: Record<string, unknown> = {},
-) {
-  let debugServerUrl = "http://127.0.0.1:7777/event";
-  let sessionId = "ga4-realtime-zero";
-
-  try {
-    const envText = readFileSync(".dbg/ga4-realtime-zero.env", "utf8");
-    debugServerUrl =
-      envText.match(/^DEBUG_SERVER_URL=(.+)$/m)?.[1]?.trim() || debugServerUrl;
-    sessionId = envText.match(/^DEBUG_SESSION_ID=(.+)$/m)?.[1]?.trim() || sessionId;
-  } catch {}
-
-  fetch(debugServerUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      sessionId,
-      runId: "pre-fix",
-      hypothesisId,
-      location,
-      msg: `[DEBUG] ${msg}`,
-      data,
-      ts: Date.now(),
-    }),
-  }).catch(() => {});
-}
-// #endregion
 
 function base64UrlEncode(input: string | Buffer) {
   return Buffer.from(input)
@@ -135,12 +99,6 @@ async function runGaRealtimeReport(
   propertyId: string,
   body: Record<string, unknown>,
 ) {
-  // #region debug-point B:realtime-request
-  reportDebugEvent("B", "analytics.ts:runGaRealtimeReport:start", "Calling GA4 realtime report", {
-    propertyId,
-    body,
-  });
-  // #endregion
   const response = await fetch(
     `https://analyticsdata.googleapis.com/v1beta/properties/${encodeURIComponent(propertyId)}:runRealtimeReport`,
     {
@@ -154,19 +112,6 @@ async function runGaRealtimeReport(
   );
 
   const result = await response.json();
-  // #region debug-point A:realtime-response
-  reportDebugEvent("A", "analytics.ts:runGaRealtimeReport:result", "Received GA4 realtime response", {
-    ok: response.ok,
-    status: response.status,
-    rowCount: Array.isArray(result?.rows) ? result.rows.length : 0,
-    totalsCount: Array.isArray(result?.totals) ? result.totals.length : 0,
-    firstMetricValue:
-      result?.rows?.[0]?.metricValues?.[0]?.value ||
-      result?.totals?.[0]?.metricValues?.[0]?.value ||
-      null,
-    errorMessage: result?.error?.message || null,
-  });
-  // #endregion
   if (!response.ok) {
     throw new Error(
       `GA4_RUN_REALTIME_REPORT_FAILED:${result?.error?.message || response.status}`,
@@ -197,17 +142,6 @@ async function runGaReportWithStartDateRetry(
         startDate: retryStartDate,
       })),
     };
-
-    // #region debug-point B:report-retry
-    reportDebugEvent(
-      "B",
-      "analytics.ts:runGaReportWithStartDateRetry:retry",
-      "Retrying GA report with adjusted start date",
-      {
-        retryStartDate,
-      },
-    );
-    // #endregion
 
     return runGaReport(accessToken, propertyId, nextBody);
   }
@@ -421,14 +355,6 @@ export const GET: APIRoute = async () => {
     const realtimeActiveUsers = parseMetricValue(
       realtimeReport?.rows?.[0]?.metricValues?.[0]?.value,
     );
-    // #region debug-point D:realtime-parse
-    reportDebugEvent("D", "analytics.ts:GET:parsed-metrics", "Parsed GA4 analytics metrics", {
-      realtimeActiveUsers,
-      todaySessions,
-      totalSessions,
-      realtimeFirstValue: realtimeReport?.rows?.[0]?.metricValues?.[0]?.value || null,
-    });
-    // #endregion
     const socialSessions = topSources.reduce(
       (sum: number, item: { isSocial: boolean; sessions: number }) =>
         item.isSocial ? sum + item.sessions : sum,
@@ -462,18 +388,6 @@ export const GET: APIRoute = async () => {
       },
     );
   } catch (error) {
-    // #region debug-point B:api-catch
-    reportDebugEvent("B", "analytics.ts:GET:catch", "GA4 analytics endpoint failed", {
-      error:
-        error instanceof Error
-          ? {
-              name: error.name,
-              message: error.message,
-              stack: error.stack || null,
-            }
-          : { value: String(error) },
-    });
-    // #endregion
     console.error("讀取 GA4 成效報表失敗：", error);
     return new Response(
       JSON.stringify({
