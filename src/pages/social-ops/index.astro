@@ -700,6 +700,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   </div>
                   <div class="bookshelf-confirm-grid bookshelf-analytics-grid">
                     <article class="bookshelf-confirm-card">
+                      <span>即時活躍使用者</span>
+                      <strong id="content-analytics-realtime-users">-</strong>
+                    </article>
+                    <article class="bookshelf-confirm-card">
                       <span>今日人次</span>
                       <strong id="content-analytics-today-sessions">-</strong>
                     </article>
@@ -940,6 +944,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     rangeLabel: "近 7 天",
     updatedAt: "",
     metrics: {
+      realtimeActiveUsers: 0,
       todaySessions: 0,
       totalSessions: 0,
       blogViews: 0,
@@ -1781,6 +1786,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const topPostsNode = document.getElementById("content-analytics-top-posts");
     const topSourcesNode = document.getElementById("content-analytics-top-sources");
     const socialLandingsNode = document.getElementById("content-analytics-social-landings");
+    const realtimeUsersNode = document.getElementById("content-analytics-realtime-users");
     const todaySessionsNode = document.getElementById("content-analytics-today-sessions");
     const totalSessionsNode = document.getElementById("content-analytics-total-sessions");
     const blogViewsNode = document.getElementById("content-analytics-blog-views");
@@ -1796,6 +1802,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       !topPostsNode ||
       !topSourcesNode ||
       !socialLandingsNode ||
+      !realtimeUsersNode ||
       !todaySessionsNode ||
       !totalSessionsNode ||
       !blogViewsNode ||
@@ -1807,6 +1814,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       return;
     }
 
+    realtimeUsersNode.textContent = formatCount(contentAnalyticsState.metrics.realtimeActiveUsers);
     todaySessionsNode.textContent = formatCount(contentAnalyticsState.metrics.todaySessions);
     totalSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.totalSessions);
     blogViewsNode.textContent = formatCount(contentAnalyticsState.metrics.blogViews);
@@ -1818,7 +1826,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     if (contentAnalyticsState.status === "loading") {
       statusNode.textContent = "讀取中";
       updatedAtNode.textContent = "同步中";
-      noteNode.textContent = "正在向 GA4 讀取近 7 天內容、來源與轉換成效。";
+      noteNode.textContent = "正在向 GA4 讀取即時活躍使用者、近 7 天內容、來源與轉換成效。";
       topPostsNode.innerHTML = "<li>正在讀取內容成效...</li>";
       topSourcesNode.innerHTML = "<li>正在讀取來源資料...</li>";
       socialLandingsNode.innerHTML = "<li>正在讀取社群落地頁...</li>";
@@ -1828,7 +1836,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     if (contentAnalyticsState.status === "setup_required") {
       statusNode.textContent = "待接 GA4";
       updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
-      noteNode.textContent = contentAnalyticsState.note || "設定好 GA4 報表權限後，這裡會自動顯示內容、來源與落地頁成效。";
+      noteNode.textContent =
+        contentAnalyticsState.note ||
+        "設定好 GA4 權限後，這裡會自動顯示即時活躍使用者、內容、來源與落地頁成效。";
       topPostsNode.innerHTML = "<li>目前尚未接通 GA4 Data API。</li>";
       topSourcesNode.innerHTML = "<li>接通後可直接看到來源 / 媒介排行。</li>";
       socialLandingsNode.innerHTML = "<li>接通後可直接看到社群帶進站的頁面。</li>";
@@ -1857,7 +1867,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       : contentAnalyticsState.rangeLabel;
     noteNode.textContent =
       contentAnalyticsState.note ||
-      `今日人次與總人次顯示整站 sessions；${contentAnalyticsState.rangeLabel} 內則集中回看內容、來源與官網轉換事件。`;
+      `即時活躍使用者顯示近 30 分鐘 active users；今日人次與總人次顯示整站 sessions；${contentAnalyticsState.rangeLabel} 內則集中回看內容、來源與官網轉換事件。`;
 
     const topPosts = Array.isArray(contentAnalyticsState.topPosts)
       ? contentAnalyticsState.topPosts
@@ -2125,6 +2135,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         rangeLabel: typeof result?.rangeLabel === "string" ? result.rangeLabel : "近 7 天",
         updatedAt: typeof result?.updatedAt === "string" ? result.updatedAt : "",
         metrics: {
+          realtimeActiveUsers: Number(result?.metrics?.realtimeActiveUsers || 0),
           todaySessions: Number(result?.metrics?.todaySessions || 0),
           totalSessions: Number(result?.metrics?.totalSessions || 0),
           blogViews: Number(result?.metrics?.blogViews || 0),

@@ -94,6 +94,33 @@ async function runGaReport(
   return result;
 }
 
+async function runGaRealtimeReport(
+  accessToken: string,
+  propertyId: string,
+  body: Record<string, unknown>,
+) {
+  const response = await fetch(
+    `https://analyticsdata.googleapis.com/v1beta/properties/${encodeURIComponent(propertyId)}:runRealtimeReport`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    },
+  );
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      `GA4_RUN_REALTIME_REPORT_FAILED:${result?.error?.message || response.status}`,
+    );
+  }
+
+  return result;
+}
+
 function parseMetricValue(value: string | undefined) {
   const parsed = Number(value || "0");
   return Number.isFinite(parsed) ? parsed : 0;
@@ -165,6 +192,7 @@ export const GET: APIRoute = async () => {
     }));
 
     const [
+      realtimeReport,
       blogReport,
       eventReport,
       sourceReport,
@@ -172,6 +200,11 @@ export const GET: APIRoute = async () => {
       todaySessionsReport,
       totalSessionsReport,
     ] = await Promise.all([
+      runGaRealtimeReport(accessToken, propertyId, {
+        metrics: [{ name: "activeUsers" }],
+        minuteRanges: [{ startMinutesAgo: 29, endMinutesAgo: 0, name: "last30Minutes" }],
+        limit: 1,
+      }),
       runGaReport(accessToken, propertyId, {
         dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
         dimensions: [{ name: "pagePath" }],
@@ -282,6 +315,9 @@ export const GET: APIRoute = async () => {
     );
     const todaySessions = parseReportMetricValue(todaySessionsReport);
     const totalSessions = parseReportMetricValue(totalSessionsReport);
+    const realtimeActiveUsers = parseMetricValue(
+      realtimeReport?.rows?.[0]?.metricValues?.[0]?.value,
+    );
     const socialSessions = topSources.reduce(
       (sum: number, item: { isSocial: boolean; sessions: number }) =>
         item.isSocial ? sum + item.sessions : sum,
@@ -295,6 +331,7 @@ export const GET: APIRoute = async () => {
         rangeLabel: "近 7 天",
         updatedAt: new Date().toISOString(),
         metrics: {
+          realtimeActiveUsers,
           todaySessions,
           totalSessions,
           blogViews: totalBlogViews,
@@ -320,7 +357,7 @@ export const GET: APIRoute = async () => {
         status: "error",
         configured: true,
         rangeLabel: "近 7 天",
-        note: "GA4 報表讀取失敗，請檢查 Property ID 或 service account 權限。",
+        note: "GA4 報表或即時資料讀取失敗，請檢查 Property ID 或 service account 權限。",
       }),
       {
         status: 500,
