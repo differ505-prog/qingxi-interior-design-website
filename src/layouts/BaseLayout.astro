@@ -301,6 +301,22 @@ const MAINTENANCE_MODE =
           'anonymize_ip': true,
           'cookie_flags': 'SameSite=None;Secure'
         });
+        if (gaDebugEnabled) {
+          mergeGaDebugState({ probeQueued: true });
+          setTimeout(() => {
+            try {
+              window.gtag("event", "ga_debug_probe", {
+                debug_mode: true,
+                transport_type: "beacon",
+                page_location: location.href,
+                page_title: document.title,
+              });
+              mergeGaDebugState({ probeDispatched: true });
+            } catch (error) {
+              mergeGaDebugState({ probeDispatched: false, probeError: String(error) });
+            }
+          }, 1200);
+        }
         // #region debug-point C:gtag-state
         setTimeout(() => {
           const state = {
@@ -324,6 +340,9 @@ const MAINTENANCE_MODE =
             `initExecuted: ${state.initExecuted ? "yes" : "no"}`,
             `hasGtag: ${state.hasGtag ? "yes" : "no"}`,
             `dataLayerLength: ${state.dataLayerLength ?? "-"}`,
+            `probeQueued: ${state.probeQueued ? "yes" : "no"}`,
+            `probeDispatched: ${state.probeDispatched === false ? "no" : state.probeDispatched ? "yes" : "pending"}`,
+            `probeError: ${state.probeError || "none"}`,
             `resourceHits: ${state.resourceHits?.length ? state.resourceHits.join(" | ") : "none"}`,
             `recentPushes: ${state.recentPushes?.length ? state.recentPushes.join(" || ") : "none"}`,
             `networkHits: ${state.networkHits?.length ? state.networkHits.join(" | ") : "none"}`,
