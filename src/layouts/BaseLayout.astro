@@ -225,6 +225,24 @@ const MAINTENANCE_MODE =
     <>
       <script define:vars={{ googleAnalyticsId }} is:inline>
         const gaDebugEnabled = new URLSearchParams(location.search).get("gaDebug") === "1";
+        const gaDebugServerUrl = "http://127.0.0.1:7777/event";
+        const gaDebugSessionId = "ga4-no-events";
+        const reportGaDebug = (hypothesisId, msg, data = {}) => {
+          if (!gaDebugEnabled) return;
+          fetch(gaDebugServerUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              sessionId: gaDebugSessionId,
+              runId: "pre-fix",
+              hypothesisId,
+              location: "src/layouts/BaseLayout.astro",
+              msg: `[DEBUG] ${msg}`,
+              data,
+              ts: Date.now(),
+            }),
+          }).catch(() => {});
+        };
         const mergeGaDebugState = (patch) => {
           window.__gaDebugState = {
             ...(window.__gaDebugState || {}),
@@ -306,6 +324,11 @@ const MAINTENANCE_MODE =
           href: location.href,
           readyState: document.readyState,
         };
+        reportGaDebug("A", "init-ga4", {
+          measurementId: googleAnalyticsId,
+          href: location.href,
+          readyState: document.readyState,
+        });
         // #endregion
         gtag('js', new Date());
         gtag('config', googleAnalyticsId, {
@@ -323,8 +346,15 @@ const MAINTENANCE_MODE =
                 page_title: document.title,
               });
               mergeGaDebugState({ probeDispatched: true });
+              reportGaDebug("A", "probe-dispatched", {
+                measurementId: googleAnalyticsId,
+                href: location.href,
+              });
             } catch (error) {
               mergeGaDebugState({ probeDispatched: false, probeError: String(error) });
+              reportGaDebug("C", "probe-dispatch-error", {
+                error: String(error),
+              });
             }
           }, 1200);
         }
@@ -339,6 +369,18 @@ const MAINTENANCE_MODE =
               .map((entry) => entry.name),
           };
           window.__gaDebugState = state;
+          reportGaDebug("C", "runtime-state-snapshot", {
+            measurementId: state.measurementId || null,
+            scriptLoad: state.scriptLoad || "pending",
+            hasGtag: typeof window.gtag === "function",
+            dataLayerLength: state.dataLayerLength ?? -1,
+            probeQueued: !!state.probeQueued,
+            probeDispatched: state.probeDispatched ?? null,
+            probeError: state.probeError || null,
+            resourceHits: state.resourceHits || [],
+            recentPushes: state.recentPushes || [],
+            networkHits: state.networkHits || [],
+          });
           if (!gaDebugEnabled) return;
           const existing = document.getElementById("ga-debug-panel");
           if (existing) existing.remove();
@@ -367,8 +409,8 @@ const MAINTENANCE_MODE =
         async
         src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
         is:inline
-        onload={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"loaded",measurementId:"${googleAnalyticsId}",href:location.href};if(typeof window.gtag==="function"){window.gtag("config","${googleAnalyticsId}",{anonymize_ip:true,send_page_view:true});}`}
-        onerror={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"failed",measurementId:"${googleAnalyticsId}",href:location.href};`}
+        onload={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"loaded",measurementId:"${googleAnalyticsId}",href:location.href};if(new URLSearchParams(location.search).get("gaDebug")==="1"){fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"B",location:"src/layouts/BaseLayout.astro",msg:"[DEBUG] gtag-script-loaded",data:{measurementId:"${googleAnalyticsId}",href:location.href},ts:Date.now()})}).catch(()=>{});}if(typeof window.gtag==="function"){window.gtag("config","${googleAnalyticsId}",{anonymize_ip:true,send_page_view:true});}`}
+        onerror={`window.__gaDebugState={...(window.__gaDebugState||{}),scriptLoad:"failed",measurementId:"${googleAnalyticsId}",href:location.href};if(new URLSearchParams(location.search).get("gaDebug")==="1"){fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"ga4-no-events",runId:"pre-fix",hypothesisId:"B",location:"src/layouts/BaseLayout.astro",msg:"[DEBUG] gtag-script-load-failed",data:{measurementId:"${googleAnalyticsId}",href:location.href},ts:Date.now()})}).catch(()=>{});}`}
       ></script>
     </>
   )}
