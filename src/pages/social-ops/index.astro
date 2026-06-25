@@ -704,6 +704,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                       <strong id="content-analytics-blog-views">-</strong>
                     </article>
                     <article class="bookshelf-confirm-card">
+                      <span>近 7 天社群導流</span>
+                      <strong id="content-analytics-social-sessions">-</strong>
+                    </article>
+                    <article class="bookshelf-confirm-card">
                       <span>估價器啟動</span>
                       <strong id="content-analytics-estimate-generated">-</strong>
                     </article>
@@ -723,6 +727,24 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     </div>
                     <ol id="content-analytics-top-posts" class="bookshelf-analytics-list">
                       <li>正在讀取內容成效...</li>
+                    </ol>
+                  </div>
+                  <div class="bookshelf-analytics-top">
+                    <div class="bookshelf-preview-head">
+                      <p>近 7 天主要來源</p>
+                      <span>看來源 / 媒介</span>
+                    </div>
+                    <ol id="content-analytics-top-sources" class="bookshelf-analytics-list">
+                      <li>正在讀取來源資料...</li>
+                    </ol>
+                  </div>
+                  <div class="bookshelf-analytics-top">
+                    <div class="bookshelf-preview-head">
+                      <p>社群導流熱門落地頁</p>
+                      <span>看哪篇最能接住流量</span>
+                    </div>
+                    <ol id="content-analytics-social-landings" class="bookshelf-analytics-list">
+                      <li>正在讀取落地頁資料...</li>
                     </ol>
                   </div>
                   <p id="content-analytics-note" class="bookshelf-confirm-note">只回看文章瀏覽與官網轉換。</p>
@@ -911,12 +933,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     updatedAt: "",
     metrics: {
       blogViews: 0,
+      socialSessions: 0,
       estimateGenerated: 0,
       estimateCtaClick: 0,
       requirementSubmit: 0,
       requirementSuccess: 0,
     },
     topPosts: [],
+    topSources: [],
+    socialLandingPages: [],
     note: "",
   };
   let vendorNotesState = {
@@ -1420,7 +1445,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const level = getLevel();
     document.getElementById("weekly-progress-count").textContent = `${completedRuns} / ${WEEKLY_TARGET}`;
     document.getElementById("weekly-progress-note").textContent = remaining === 0
-      ? "本週已清空。"
+      ? "本週主線已達標，待下週刷新。"
       : `還差 ${remaining} 個任務`;
     document.getElementById("weekly-progress-bar").style.width = `${percent}%`;
     document.getElementById("xp-value").textContent = `${state.stats.xp} XP`;
@@ -1728,12 +1753,26 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return matched?.title || slug;
   }
 
+  function getReadableLandingLabel(pagePath = "") {
+    const normalizedPath = String(pagePath || "").split("?")[0].trim();
+    if (!normalizedPath || normalizedPath === "(not set)") return "未提供落地頁";
+    if (normalizedPath === "/") return "首頁";
+    if (normalizedPath === "/tools") return "線上估價系統";
+    if (normalizedPath === "/contact") return "免費格局健檢";
+    if (normalizedPath === "/requirement-form") return "完整需求表";
+    if (normalizedPath.startsWith("/blog/")) return getArticleTitleFromPagePath(normalizedPath);
+    return normalizedPath;
+  }
+
   function renderContentAnalytics() {
     const statusNode = document.getElementById("content-analytics-status");
     const updatedAtNode = document.getElementById("content-analytics-updated-at");
     const noteNode = document.getElementById("content-analytics-note");
     const topPostsNode = document.getElementById("content-analytics-top-posts");
+    const topSourcesNode = document.getElementById("content-analytics-top-sources");
+    const socialLandingsNode = document.getElementById("content-analytics-social-landings");
     const blogViewsNode = document.getElementById("content-analytics-blog-views");
+    const socialSessionsNode = document.getElementById("content-analytics-social-sessions");
     const estimateGeneratedNode = document.getElementById("content-analytics-estimate-generated");
     const estimateCtaNode = document.getElementById("content-analytics-estimate-cta");
     const requirementSuccessNode = document.getElementById("content-analytics-requirement-success");
@@ -1743,7 +1782,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       !updatedAtNode ||
       !noteNode ||
       !topPostsNode ||
+      !topSourcesNode ||
+      !socialLandingsNode ||
       !blogViewsNode ||
+      !socialSessionsNode ||
       !estimateGeneratedNode ||
       !estimateCtaNode ||
       !requirementSuccessNode
@@ -1752,6 +1794,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
 
     blogViewsNode.textContent = formatCount(contentAnalyticsState.metrics.blogViews);
+    socialSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.socialSessions);
     estimateGeneratedNode.textContent = formatCount(contentAnalyticsState.metrics.estimateGenerated);
     estimateCtaNode.textContent = formatCount(contentAnalyticsState.metrics.estimateCtaClick);
     requirementSuccessNode.textContent = formatCount(contentAnalyticsState.metrics.requirementSuccess);
@@ -1759,16 +1802,20 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     if (contentAnalyticsState.status === "loading") {
       statusNode.textContent = "讀取中";
       updatedAtNode.textContent = "同步中";
-      noteNode.textContent = "正在向 GA4 讀取近 7 天內容與轉換成效。";
+      noteNode.textContent = "正在向 GA4 讀取近 7 天內容、來源與轉換成效。";
       topPostsNode.innerHTML = "<li>正在讀取內容成效...</li>";
+      topSourcesNode.innerHTML = "<li>正在讀取來源資料...</li>";
+      socialLandingsNode.innerHTML = "<li>正在讀取社群落地頁...</li>";
       return;
     }
 
     if (contentAnalyticsState.status === "setup_required") {
       statusNode.textContent = "待接 GA4";
       updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
-      noteNode.textContent = contentAnalyticsState.note || "設定好 GA4 報表權限後，這裡會自動顯示內容成效。";
+      noteNode.textContent = contentAnalyticsState.note || "設定好 GA4 報表權限後，這裡會自動顯示內容、來源與落地頁成效。";
       topPostsNode.innerHTML = "<li>目前尚未接通 GA4 Data API。</li>";
+      topSourcesNode.innerHTML = "<li>接通後可直接看到來源 / 媒介排行。</li>";
+      socialLandingsNode.innerHTML = "<li>接通後可直接看到社群帶進站的頁面。</li>";
       return;
     }
 
@@ -1777,6 +1824,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
       noteNode.textContent = contentAnalyticsState.note || "GA4 報表暫時讀取失敗，請稍後再試。";
       topPostsNode.innerHTML = "<li>目前無法取得熱門文章排行。</li>";
+      topSourcesNode.innerHTML = "<li>目前無法取得來源排行。</li>";
+      socialLandingsNode.innerHTML = "<li>目前無法取得社群落地頁排行。</li>";
       return;
     }
 
@@ -1792,7 +1841,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       : contentAnalyticsState.rangeLabel;
     noteNode.textContent =
       contentAnalyticsState.note ||
-      `${contentAnalyticsState.rangeLabel} 內，文章瀏覽與官網轉換事件會集中顯示在這裡。`;
+      `${contentAnalyticsState.rangeLabel} 內，文章瀏覽、來源與官網轉換事件會集中顯示在這裡。`;
 
     const topPosts = Array.isArray(contentAnalyticsState.topPosts)
       ? contentAnalyticsState.topPosts
@@ -1807,6 +1856,34 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
           `)
           .join("")
       : "<li>近 7 天尚無文章瀏覽資料。</li>";
+
+    const topSources = Array.isArray(contentAnalyticsState.topSources)
+      ? contentAnalyticsState.topSources
+      : [];
+    topSourcesNode.innerHTML = topSources.length
+      ? topSources
+          .map((source) => `
+            <li>
+              <span>${escapeHtml(source.sourceMedium || "(direct) / (none)")}</span>
+              <strong>${formatCount(source.sessions)}</strong>
+            </li>
+          `)
+          .join("")
+      : "<li>近 7 天尚無來源資料。</li>";
+
+    const socialLandingPages = Array.isArray(contentAnalyticsState.socialLandingPages)
+      ? contentAnalyticsState.socialLandingPages
+      : [];
+    socialLandingsNode.innerHTML = socialLandingPages.length
+      ? socialLandingPages
+          .map((page) => `
+            <li>
+              <span>${escapeHtml(getReadableLandingLabel(page.pagePath))}</span>
+              <strong>${formatCount(page.sessions)}</strong>
+            </li>
+          `)
+          .join("")
+      : "<li>近 7 天尚無社群導流資料。</li>";
   }
 
   function renderVendorNotes() {
@@ -2033,12 +2110,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         updatedAt: typeof result?.updatedAt === "string" ? result.updatedAt : "",
         metrics: {
           blogViews: Number(result?.metrics?.blogViews || 0),
+          socialSessions: Number(result?.metrics?.socialSessions || 0),
           estimateGenerated: Number(result?.metrics?.estimateGenerated || 0),
           estimateCtaClick: Number(result?.metrics?.estimateCtaClick || 0),
           requirementSubmit: Number(result?.metrics?.requirementSubmit || 0),
           requirementSuccess: Number(result?.metrics?.requirementSuccess || 0),
         },
         topPosts: Array.isArray(result?.topPosts) ? result.topPosts : [],
+        topSources: Array.isArray(result?.topSources) ? result.topSources : [],
+        socialLandingPages: Array.isArray(result?.socialLandingPages) ? result.socialLandingPages : [],
         note: typeof result?.note === "string" ? result.note : "",
       };
     } catch (error) {
@@ -6670,7 +6750,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   .bookshelf-analytics-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 
   .bookshelf-analytics-top {

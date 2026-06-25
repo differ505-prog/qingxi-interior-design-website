@@ -2,6 +2,15 @@ import type { APIRoute } from "astro";
 import { createSign } from "node:crypto";
 
 type GaMetricMap = Record<string, number>;
+const SOCIAL_SOURCE_HINTS = [
+  "facebook",
+  "instagram",
+  "threads",
+  "line",
+  "xhs",
+  "xiaohongshu",
+  "social",
+];
 
 function base64UrlEncode(input: string | Buffer) {
   return Buffer.from(input)
@@ -90,6 +99,11 @@ function parseMetricValue(value: string | undefined) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function isSocialSourceMedium(value: string) {
+  const normalized = value.trim().toLowerCase();
+  return SOCIAL_SOURCE_HINTS.some((hint) => normalized.includes(hint));
+}
+
 export const GET: APIRoute = async () => {
   const propertyId =
     import.meta.env.GA4_PROPERTY_ID?.trim() ||
@@ -124,7 +138,17 @@ export const GET: APIRoute = async () => {
   try {
     const accessToken = await getGoogleAccessToken(clientEmail, privateKey);
 
-    const [blogReport, eventReport] = await Promise.all([
+    const socialSourceExpressions = SOCIAL_SOURCE_HINTS.map((value) => ({
+      filter: {
+        fieldName: "sessionSourceMedium",
+        stringFilter: {
+          matchType: "CONTAINS",
+          value,
+        },
+      },
+    }));
+
+    const [blogReport, eventReport, sourceReport, socialLandingReport] = await Promise.all([
       runGaReport(accessToken, propertyId, {
         dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
         dimensions: [{ name: "pagePath" }],
@@ -160,6 +184,25 @@ export const GET: APIRoute = async () => {
           },
         },
       }),
+      runGaReport(accessToken, propertyId, {
+        dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+        dimensions: [{ name: "sessionSourceMedium" }],
+        metrics: [{ name: "sessions" }],
+        orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+        limit: 25,
+      }),
+      runGaReport(accessToken, propertyId, {
+        dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+        dimensions: [{ name: "landingPagePlusQueryString" }, { name: "sessionSourceMedium" }],
+        metrics: [{ name: "sessions" }],
+        dimensionFilter: {
+          orGroup: {
+            expressions: socialSourceExpressions,
+          },
+        },
+        orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+        limit: 25,
+      }),
     ]);
 
     const eventMetrics = (eventReport?.rows || []).reduce(
@@ -176,8 +219,38 @@ export const GET: APIRoute = async () => {
       views: parseMetricValue(row?.metricValues?.[0]?.value),
     }));
 
+    const topSources = (sourceReport?.rows || []).map((row: any) => {
+      const sourceMedium = String(row?.dimensionValues?.[0]?.value || "");
+      return {
+        sourceMedium,
+        sessions: parseMetricValue(row?.metricValues?.[0]?.value),
+        isSocial: isSocialSourceMedium(sourceMedium),
+      };
+    });
+
+    const socialLandingTotals = new Map<string, number>();
+    for (const row of socialLandingReport?.rows || []) {
+      const landingPage = String(row?.dimensionValues?.[0]?.value || "").trim();
+      const sessions = parseMetricValue(row?.metricValues?.[0]?.value);
+      if (!landingPage || landingPage === "(not set)") continue;
+      socialLandingTotals.set(landingPage, (socialLandingTotals.get(landingPage) || 0) + sessions);
+    }
+
+    const socialLandingPages = Array.from(socialLandingTotals.entries())
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, 5)
+      .map(([pagePath, sessions]) => ({
+        pagePath,
+        sessions,
+      }));
+
     const totalBlogViews = parseMetricValue(
       blogReport?.totals?.[0]?.metricValues?.[0]?.value,
+    );
+    const socialSessions = topSources.reduce(
+      (sum: number, item: { isSocial: boolean; sessions: number }) =>
+        item.isSocial ? sum + item.sessions : sum,
+      0,
     );
 
     return new Response(
@@ -188,12 +261,15 @@ export const GET: APIRoute = async () => {
         updatedAt: new Date().toISOString(),
         metrics: {
           blogViews: totalBlogViews,
+          socialSessions,
           estimateGenerated: eventMetrics.renovation_estimate_generated || 0,
           estimateCtaClick: eventMetrics.renovation_estimate_cta_click || 0,
           requirementSubmit: eventMetrics.requirement_form_submit || 0,
           requirementSuccess: eventMetrics.requirement_form_success || 0,
         },
         topPosts,
+        topSources: topSources.slice(0, 8),
+        socialLandingPages,
       }),
       {
         status: 200,

@@ -33,6 +33,40 @@
 PUBLIC_GA_MEASUREMENT_ID=G-ABC1234567
 ```
 
+### 1-1. 若要讓工作台直接顯示 GA4 報表，還需要這 3 個 server 端參數
+
+- `GA4_PROPERTY_ID`
+  - 格式範例：`123456789`
+  - 不是 `G-XXXX`，而是 GA4 Property 的數字 ID
+- `GA4_SERVICE_ACCOUNT_CLIENT_EMAIL`
+  - 格式範例：`ga4-reader@your-project.iam.gserviceaccount.com`
+- `GA4_SERVICE_ACCOUNT_PRIVATE_KEY`
+  - 直接貼 service account JSON 裡的 `private_key`
+  - 若放在單行環境變數，可保留 `\n`
+
+放置位置：
+
+```env
+GA4_PROPERTY_ID=123456789
+GA4_SERVICE_ACCOUNT_CLIENT_EMAIL=ga4-reader@your-project.iam.gserviceaccount.com
+GA4_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+### 1-2. GA4 Data API 與權限設定
+
+- 到 Google Cloud 建立一個 `Service Account`
+- 啟用 `Google Analytics Data API`
+- 把該 service account 的 Email 加到 GA4 這個 Property 的存取權限中
+- 權限至少給 `Viewer` 即可讀報表
+
+完成後，設計師工作台會直接顯示：
+
+- 近 7 天文章瀏覽
+- 近 7 天社群導流
+- 主要來源 / 媒介
+- 社群導流熱門落地頁
+- 估價器與正式留單轉換
+
 ### 2. Formspree Form ID
 
 - 格式範例：`xblyzabc`
@@ -63,6 +97,13 @@ PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID=xblyzabc
 
 - 看 `Session source / medium`
 - 判斷流量來自 Google、Instagram、Facebook、LINE 或其他活動連結
+
+### 1-1. 工作台新增可直接看的 2 個欄位
+
+- `近 7 天主要來源`
+  - 用來快速看最近流量是不是開始從 `facebook / referral`、`instagram / referral`、`line / social` 進站
+- `社群導流熱門落地頁`
+  - 用來看你貼出去的網址，實際是哪些頁面最能接住社群流量
 
 ### 2. 估價器使用量
 
@@ -105,7 +146,10 @@ https://qingxidesign.tw/tools?utm_source=instagram&utm_medium=social&utm_campaig
 
 ## 下一步
 
-等取得以下兩個資料後，就可以完成正式啟用：
+等取得以下資料後，就可以完成正式啟用：
 
 - `PUBLIC_GA_MEASUREMENT_ID`
+- `GA4_PROPERTY_ID`
+- `GA4_SERVICE_ACCOUNT_CLIENT_EMAIL`
+- `GA4_SERVICE_ACCOUNT_PRIVATE_KEY`
 - `PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID`
