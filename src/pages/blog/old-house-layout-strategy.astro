@@ -1,0 +1,144 @@
+---
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogPost } from "../../lib/blog-catalog";
+
+const articleMeta = getStaticBlogPost("old-house-layout-strategy");
+const articleTitle = articleMeta.title;
+const articleDescription = articleMeta.summary;
+const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
+const articleImage = articleMeta.coverImage;
+const articleDetailImage = "/images/blog/old-house-layout-strategy-detail.png";
+const articleSequenceImage = "/images/blog/old-house-layout-strategy-sequence.png";
+const articleStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: articleTitle,
+    description: articleDescription,
+    image: [articleImage],
+    datePublished: articlePublishedTime,
+    dateModified: articlePublishedTime,
+    articleSection: articleMeta.track,
+    keywords: articleMeta.tags.join(", "),
+    author: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    mainEntityOfPage: "https://qingxidesign.tw/blog/old-house-layout-strategy",
+  },
+];
+---
+<EditorialArticleLayout
+  title={articleTitle}
+  description={articleDescription}
+  ogImage={articleImage}
+  publishedTime={articlePublishedTime}
+  modifiedTime={articlePublishedTime}
+  structuredData={articleStructuredData}
+  track={articleMeta.track}
+  chapter={articleMeta.chapter}
+  siteCategory={articleMeta.siteCategory}
+  tags={articleMeta.tags}
+>
+      <p class="article-lead">
+        面對高齡老屋，許多人第一時間的期待往往是打掉重練。但格局調整從來不是一場單純的拆除工程，而是一次重新梳理生活秩序的過程。真正讓老屋住起來順，靠的不是把牆盡可能打開，而是先看懂什麼不能動、光風怎麼走，以及人要如何在空間裡自然地生活。
+      </p>
+
+      <p>
+        老屋常伴隨狹長格局、單面採光、動線畸零，或隔間過度切割等歷史遺留問題。若只憑想像改格局，往往會把原本的缺點換一種方式重演；但若回到結構、採光與動線的底層邏輯，零碎、擁擠的平面，就有機會被重新整理成更安定的生活場景。
+      </p>
+
+      <blockquote>
+        格局真正的順，不只是視覺變大，而是安全、光線、空氣與生活節奏都能彼此配合。
+      </blockquote>
+
+      <h2>第一層：順應結構，先看懂什麼不能動</h2>
+
+      <p>
+        格局重整的第一步，不是決定客廳要放多大，而是先看懂這棟建築的隱形邊界。承重牆、剪力牆、主要樑柱與管道間，是維持建築安全的根本。規劃初期若沒有先把這些結構元素標示清楚，後面所有的開放式想像，都可能只是建立在錯誤前提上。
+      </p>
+
+      <p>
+        這也是為什麼有些老屋在紙面上看起來好像很容易重整，實際進場後卻發現關鍵牆體不能動，大樑也無法消失。與其把這些元素視為障礙，不如把它們轉化成空間秩序的一部分。結構柱可以成為收納端景的起點，大樑可以轉成場域分界，管道間也可以成為機能配置的依據。
+      </p>
+
+      <ul>
+        <li><strong>承重牆與剪力牆：</strong>決定哪些區域可以討論、哪些區域只能順勢而為。</li>
+        <li><strong>樑柱位置：</strong>影響櫃體、過道與天花板的比例安排。</li>
+        <li><strong>管道間與濕區：</strong>牽動廚房、衛浴與排水的可調整幅度。</li>
+      </ul>
+
+      <p>
+        所謂順，首先是安全與合理。唯有在結構安全的框架內思考，格局調整才能走得長遠，也才不會讓後續工程陷入反覆修改。
+      </p>
+
+      <figure class="article-figure">
+        <img src={articleDetailImage} alt="老屋格局重整時先標示結構邊界與採光方向的手繪示意" />
+        <figcaption>
+          格局調整不是先想像理想平面，而是先標出不可移動的結構邊界，再在限制內找出最穩定的空間解法。
+        </figcaption>
+      </figure>
+
+      <h2>第二層：追光與引風，讓空間重新呼吸</h2>
+
+      <p>
+        當結構邊界確立後，下一個關鍵就是光與風的路徑。多數老屋真正的痛點，往往不只是坪數小，而是空間中段採光不良、通風不佳，久而久之讓整個家的感受變得沉悶、壓迫、潮濕。
+      </p>
+
+      <p>
+        在格局重整時，最好的採光面應盡量留給停留時間最長的公共空間，例如客廳、餐廳、書房。若原本有過度切碎的隔間，就要重新思考哪些牆是真的必要，哪些只是讓光線在中途被截斷。透光不透影的材質、降低量體高度的櫃體、半開放的分界做法，通常比單純把空間全部打通更細膩，也更適合長期居住。
+      </p>
+
+      <p>
+        風的邏輯也一樣。當窗戶位置被重新理解，並且在格局上留出對流路徑，空氣流動會讓空間本身的體感完全不同。光線能深進腹地，空氣能穿過停滯區域，家就會從沉悶轉為通透。
+      </p>
+
+      <ul>
+        <li><strong>公共區優先留給採光面：</strong>把最好的自然光交給最常被使用的空間。</li>
+        <li><strong>減少不必要的實牆：</strong>避免讓中段腹地成為暗區。</li>
+        <li><strong>保留空氣對流路徑：</strong>讓開口位置彼此呼應，而不是各自孤立。</li>
+      </ul>
+
+      <h2>第三層：梳理動線，讓空間真正服務於人</h2>
+
+      <p>
+        解決了結構與採光之後，最後才是動線。動線不只是走道，而是生活行為的串聯方式。老屋常見的長走廊、反覆繞行與尷尬過道，往往是坪效被浪費的主因。真正好的格局重整，不是把每個房間獨立得更清楚，而是讓空間之間的關係變得更自然。
+      </p>
+
+      <p>
+        例如把廚房、餐廳與客廳重新整合成開放或半開放公領域，除了能放大空間感，也能讓家人互動變得更順。反過來說，在公私領域交界處，則需要適度的緩衝與過渡。轉折、材質變化、一段端景或櫃體，都可以幫助居住者從公共節奏慢慢轉換進私密空間。
+      </p>
+
+      <p>
+        順暢的動線，核心不是看起來多大，而是日常每一步都不需要跟空間對抗。當收納、走道、轉身、停留、進出都能被更細緻地安排，空間才真的開始服務生活，而不是讓人去遷就格局。
+      </p>
+
+      <div class="article-gallery">
+        <figure class="article-figure">
+          <img src={articleSequenceImage} alt="老屋格局重整中公私領域節奏與動線梳理的手繪示意" />
+          <figcaption>
+            格局重整的成熟度，常常表現在那些看似細微的轉折與節奏安排，讓走動、停留與收納彼此不再互相干擾。
+          </figcaption>
+        </figure>
+        <figure class="article-figure">
+          <img src={articleImage} alt="老屋翻新格局重整封面主圖手繪示意" />
+          <figcaption>
+            當結構、光風與動線被重新梳理後，老屋的格局不只是被打開，而是重新長出一種更安定的生活秩序。
+          </figcaption>
+        </figure>
+      </div>
+
+      <h2>結語：格局，是生活質地的總和</h2>
+
+      <p>
+        老屋翻新的格局調整沒有唯一標準答案，只有最適合當下與未來生活型態的最適解。若只把它當成拆牆與重排房間，結果往往很快又會被日常生活打回原形；但若能先穩固結構、梳理光與風，再細膩安排動線節奏，空間就會開始回到它真正該有的秩序。
+      </p>
+
+      <p>
+        那些曾經零碎、擁擠、陰暗的格局，未必需要誇張改造，才會變得更好。很多時候，真正決定居住感受的，是有沒有用正確的邏輯重新理解這個家。當格局被調整得夠順，生活自然就會安定下來。
+      </p>
+</EditorialArticleLayout>

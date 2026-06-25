@@ -25,6 +25,19 @@ export const DEFAULT_BLOG_COVER_IMAGE =
 
 export const staticBlogPosts: BlogCatalogPost[] = [
   {
+    title: "老屋翻新格局怎麼調才順？從結構、採光到動線的空間重整邏輯",
+    slug: "old-house-layout-strategy",
+    date: "2026-06-25",
+    summary:
+      "整理老屋翻新格局重整時最關鍵的三個判斷維度，從結構邊界、採光通風到生活動線，幫助在工程前期建立更安穩的空間重整邏輯。",
+    siteCategory: "格局動線",
+    category: "格局動線",
+    track: "老屋翻新系",
+    chapter: "空間重整",
+    tags: ["老屋翻新", "格局動線", "空間重整", "採光通風", "生活動線", "結構判讀"],
+    coverImage: "/images/blog/old-house-layout-strategy-cover.png",
+  },
+  {
     title: "智能居家系統建置指南：從平台生態到設備協定，回歸生活場景的決策心法",
     slug: "smart-home-system-ecosystem-guide",
     date: "2026-06-23",
