@@ -23,21 +23,21 @@
   - `A`: inline GA init script executed with resolved `googleAnalyticsId`
   - `B`: external `gtag.js` load success / failure
   - `C`: runtime snapshot of `window.gtag`, `window.dataLayer`, and resource requests after 4s
-- User screenshot evidence on blog page:
-  - `measurementId: G-QM2JJPDSHE`
-  - `scriptLoad: loaded`
-  - `initExecuted: yes`
-  - `hasGtag: yes`
-  - `dataLayerLength: 4`
-  - `resourceHits` currently only shows `https://www.googletagmanager.com/gtag/js?...`
+- Runtime evidence from `.dbg/trae-debug-log-ga4-no-events.ndjson`:
+  - Line 1 / 5 / 9: `init-ga4` executed with `measurementId=G-QM2JJPDSHE`
+  - Line 2 / 6 / 10: `gtag-script-loaded`
+  - Line 3 / 7 / 11: `probe-dispatched`
+  - Line 4 / 8 / 12: `runtime-state-snapshot`
+  - `resourceHits` includes `https://www.google-analytics.com/g/collect?...&en=page_view...`
+  - `resourceHits` also includes a second `https://www.google-analytics.com/g/collect?...` request from the probe run
 
 ## Verification Conclusion
 | ID | Hypothesis | Status | Evidence Summary |
 |----|------------|--------|------------------|
-| A | `gtag('config', ...)` 已載入，但自動 `page_view` 沒有成功送出 | ✅ Confirmed | `config` 與 `ga_debug_probe` 都已進 `dataLayer`，但目前仍無任何 `collect` 網路跡象 |
+| A | `gtag('config', ...)` 已載入，但自動 `page_view` 沒有成功送出 | ❌ Rejected | Line 4 / 8 / 12 明確出現 `google-analytics.com/g/collect?...&en=page_view...` |
 | B | 前端頁面實際有載入錯的 Measurement ID 或 hydration 後被覆蓋 | ❌ Rejected | 面板顯示 `measurementId: G-QM2JJPDSHE`，且 `scriptLoad: loaded` |
-| C | 瀏覽器端送出事件了，但被站上腳本、CSP 或載入時序中斷 | ✅ Confirmed | `gtag.js` 載入成功、`gtm.dom`/`gtm.load` 已出現，代表 gtag runtime 活著；但 `networkHits: none`，事件停在客戶端轉發前 |
-| D | 事件有送出，但 GA4 property / stream 設定異常，未正常記錄 | ❌ Rejected | 目前根本尚未觀察到瀏覽器送出任何 `collect` 類網路請求，因此還不是 property 端問題 |
+| C | 瀏覽器端送出事件了，但被站上腳本、CSP 或載入時序中斷 | ❌ Rejected | Line 4 / 8 / 12 已看到兩次 `g/collect`，前端傳輸層正常 |
+| D | 事件有送出，但 GA4 property / stream 設定異常，未正常記錄 | ✅ Confirmed | 前端已把 `page_view` 與 probe 送到 `google-analytics.com/g/collect`，但 GA4 即時與工作台仍為 0，問題已轉到 GA4 接收/顯示側 |
 
 Additional note:
 - Screenshot `20:34:50` still does not show the newly added `probeQueued / probeDispatched / probeError` fields.
@@ -51,6 +51,7 @@ Additional note:
 
 ## Fix Candidate
 - Keep instrumentation.
-- Minimal fix applied in `src/layouts/BaseLayout.astro`:
-  - Initialize `window.dataLayer` and `window.gtag` before loading external `gtag.js`
-  - This removes the async race where `gtag.js` may initialize before the queue shim exists
+- No additional business-logic fix yet.
+- Next verification target:
+  - Check GA4 `DebugView` for the `ga_debug_probe` event
+  - Compare whether GA4 receives debug events but delays standard reports / home cards
