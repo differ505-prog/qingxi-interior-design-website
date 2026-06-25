@@ -99,6 +99,13 @@ function parseMetricValue(value: string | undefined) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function parseReportMetricValue(report: any) {
+  return parseMetricValue(
+    report?.totals?.[0]?.metricValues?.[0]?.value ||
+      report?.rows?.[0]?.metricValues?.[0]?.value,
+  );
+}
+
 function normalizePrivateKey(value: string) {
   const trimmed = value.trim();
   const unwrapped =
@@ -157,7 +164,14 @@ export const GET: APIRoute = async () => {
       },
     }));
 
-    const [blogReport, eventReport, sourceReport, socialLandingReport] = await Promise.all([
+    const [
+      blogReport,
+      eventReport,
+      sourceReport,
+      socialLandingReport,
+      todaySessionsReport,
+      totalSessionsReport,
+    ] = await Promise.all([
       runGaReport(accessToken, propertyId, {
         dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
         dimensions: [{ name: "pagePath" }],
@@ -212,6 +226,16 @@ export const GET: APIRoute = async () => {
         orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
         limit: 25,
       }),
+      runGaReport(accessToken, propertyId, {
+        dateRanges: [{ startDate: "today", endDate: "today" }],
+        metrics: [{ name: "sessions" }],
+        metricAggregations: ["TOTAL"],
+      }),
+      runGaReport(accessToken, propertyId, {
+        dateRanges: [{ startDate: "2005-01-01", endDate: "today" }],
+        metrics: [{ name: "sessions" }],
+        metricAggregations: ["TOTAL"],
+      }),
     ]);
 
     const eventMetrics = (eventReport?.rows || []).reduce(
@@ -256,6 +280,8 @@ export const GET: APIRoute = async () => {
     const totalBlogViews = parseMetricValue(
       blogReport?.totals?.[0]?.metricValues?.[0]?.value,
     );
+    const todaySessions = parseReportMetricValue(todaySessionsReport);
+    const totalSessions = parseReportMetricValue(totalSessionsReport);
     const socialSessions = topSources.reduce(
       (sum: number, item: { isSocial: boolean; sessions: number }) =>
         item.isSocial ? sum + item.sessions : sum,
@@ -269,6 +295,8 @@ export const GET: APIRoute = async () => {
         rangeLabel: "近 7 天",
         updatedAt: new Date().toISOString(),
         metrics: {
+          todaySessions,
+          totalSessions,
           blogViews: totalBlogViews,
           socialSessions,
           estimateGenerated: eventMetrics.renovation_estimate_generated || 0,

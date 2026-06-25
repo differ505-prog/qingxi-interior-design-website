@@ -700,6 +700,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   </div>
                   <div class="bookshelf-confirm-grid bookshelf-analytics-grid">
                     <article class="bookshelf-confirm-card">
+                      <span>今日人次</span>
+                      <strong id="content-analytics-today-sessions">-</strong>
+                    </article>
+                    <article class="bookshelf-confirm-card">
+                      <span>總人次</span>
+                      <strong id="content-analytics-total-sessions">-</strong>
+                    </article>
+                    <article class="bookshelf-confirm-card">
                       <span>近 7 天文章瀏覽</span>
                       <strong id="content-analytics-blog-views">-</strong>
                     </article>
@@ -932,6 +940,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     rangeLabel: "近 7 天",
     updatedAt: "",
     metrics: {
+      todaySessions: 0,
+      totalSessions: 0,
       blogViews: 0,
       socialSessions: 0,
       estimateGenerated: 0,
@@ -1771,6 +1781,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const topPostsNode = document.getElementById("content-analytics-top-posts");
     const topSourcesNode = document.getElementById("content-analytics-top-sources");
     const socialLandingsNode = document.getElementById("content-analytics-social-landings");
+    const todaySessionsNode = document.getElementById("content-analytics-today-sessions");
+    const totalSessionsNode = document.getElementById("content-analytics-total-sessions");
     const blogViewsNode = document.getElementById("content-analytics-blog-views");
     const socialSessionsNode = document.getElementById("content-analytics-social-sessions");
     const estimateGeneratedNode = document.getElementById("content-analytics-estimate-generated");
@@ -1784,6 +1796,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       !topPostsNode ||
       !topSourcesNode ||
       !socialLandingsNode ||
+      !todaySessionsNode ||
+      !totalSessionsNode ||
       !blogViewsNode ||
       !socialSessionsNode ||
       !estimateGeneratedNode ||
@@ -1793,6 +1807,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       return;
     }
 
+    todaySessionsNode.textContent = formatCount(contentAnalyticsState.metrics.todaySessions);
+    totalSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.totalSessions);
     blogViewsNode.textContent = formatCount(contentAnalyticsState.metrics.blogViews);
     socialSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.socialSessions);
     estimateGeneratedNode.textContent = formatCount(contentAnalyticsState.metrics.estimateGenerated);
@@ -1841,7 +1857,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       : contentAnalyticsState.rangeLabel;
     noteNode.textContent =
       contentAnalyticsState.note ||
-      `${contentAnalyticsState.rangeLabel} 內，文章瀏覽、來源與官網轉換事件會集中顯示在這裡。`;
+      `今日人次與總人次顯示整站 sessions；${contentAnalyticsState.rangeLabel} 內則集中回看內容、來源與官網轉換事件。`;
 
     const topPosts = Array.isArray(contentAnalyticsState.topPosts)
       ? contentAnalyticsState.topPosts
@@ -2109,6 +2125,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         rangeLabel: typeof result?.rangeLabel === "string" ? result.rangeLabel : "近 7 天",
         updatedAt: typeof result?.updatedAt === "string" ? result.updatedAt : "",
         metrics: {
+          todaySessions: Number(result?.metrics?.todaySessions || 0),
+          totalSessions: Number(result?.metrics?.totalSessions || 0),
           blogViews: Number(result?.metrics?.blogViews || 0),
           socialSessions: Number(result?.metrics?.socialSessions || 0),
           estimateGenerated: Number(result?.metrics?.estimateGenerated || 0),
