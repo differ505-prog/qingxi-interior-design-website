@@ -337,33 +337,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </details>
               <p class="bookshelf-prompt-note">主路徑只用一鍵備好 Pro 生文包；備援按鈕只在例外情況再打開。</p>
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
-              <div class="bookshelf-canned-replies bookshelf-canned-replies-priority">
-                <div class="bookshelf-preview-head">
-                  <p>常見罐頭回覆訊息</p>
-                  <span>方便直接複製貼上回覆貼文</span>
-                </div>
-                <div class="bookshelf-reply-grid bookshelf-canned-grid">
-                  {cannedReplies.map((reply) => (
-                    <article class="bookshelf-reply-card bookshelf-canned-card bookshelf-canned-card-priority">
-                      <span>反推題目</span>
-                      <strong>{reply.promptTitle}</strong>
-                      <em>{reply.promptHint}</em>
-                      <p>{reply.message}</p>
-                      <div class="bookshelf-actions bookshelf-canned-actions">
-                        <button
-                          type="button"
-                          class="bookshelf-action bookshelp-action-primary"
-                          data-canned-reply-copy-button
-                          data-canned-reply-copy={reply.message}
-                          data-canned-reply-label={reply.promptTitle}
-                        >
-                          複製這則
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
               <div id="article-topic-shell" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
                   <p>本題動態決題</p>
@@ -674,6 +647,39 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     </div>
                   </section>
                 </div>
+
+        <aside class="ops-side">
+          <section class="ops-panel bookshelf-canned-replies bookshelf-canned-replies-priority ops-canned-sidebar">
+            <div class="panel-heading panel-heading-compact">
+              <div>
+                <p class="panel-tag">快速工具</p>
+                <h2>常見罐頭回覆</h2>
+              </div>
+              <p>方便直接複製貼上回覆貼文</p>
+            </div>
+            <div class="bookshelf-reply-grid bookshelf-canned-grid">
+              {cannedReplies.map((reply) => (
+                <article class="bookshelf-reply-card bookshelf-canned-card bookshelf-canned-card-priority">
+                  <span>反推題目</span>
+                  <strong>{reply.promptTitle}</strong>
+                  <em>{reply.promptHint}</em>
+                  <p>{reply.message}</p>
+                  <div class="bookshelf-actions bookshelf-canned-actions">
+                    <button
+                      type="button"
+                      class="bookshelf-action bookshelp-action-primary"
+                      data-canned-reply-copy-button
+                      data-canned-reply-copy={reply.message}
+                      data-canned-reply-label={reply.promptTitle}
+                    >
+                      複製這則
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        </aside>
               </div>
             </details>
 
@@ -5645,8 +5651,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   .ops-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.72fr);
     align-items: start;
+  }
+
+  .ops-side {
+    display: grid;
+    gap: 1.25rem;
+    align-self: start;
+  }
+
+  .ops-canned-sidebar {
+    position: sticky;
+    top: 1rem;
   }
 
   .ops-panel {
@@ -6490,7 +6507,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   .bookshelf-canned-replies-priority {
     margin-bottom: 0.2rem;
     border: 1px solid rgba(170, 187, 255, 0.22);
-    border-radius: 20px;
     background:
       linear-gradient(180deg, rgba(30, 40, 64, 0.36), rgba(20, 20, 24, 0.78)),
       rgba(255, 255, 255, 0.02);
@@ -6513,6 +6529,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   .bookshelf-canned-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel-heading-compact {
+    margin-bottom: 0.35rem;
   }
 
   .bookshelf-canned-card strong,
@@ -8174,6 +8194,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   @media (max-width: 1120px) {
     .ops-hero,
+    .ops-grid,
     .portal-card-grid,
     .bookshelf-shelf-grid,
     .bookshelf-outline-grid,
@@ -8185,6 +8206,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
     .quest-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ops-canned-sidebar {
+      position: static;
     }
 
     .quest-link-stash-grid {
@@ -8230,7 +8255,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
 
     .hero-actions,
-    .panel-heading {
+    .panel-heading,
+    .panel-heading-compact {
       flex-direction: column;
       align-items: stretch;
     }
