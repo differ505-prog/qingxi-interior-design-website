@@ -330,7 +330,7 @@ const workflow = [
     margin: 0 0 0.8rem;
     color: var(--tiffany-dark);
     font-size: 0.8rem;
-    letter-spacing: 0.18em;
+    letter-spacing: var(--type-overline-spacing);
     font-weight: 600;
   }
 
@@ -343,11 +343,11 @@ const workflow = [
   .positioning-card h2,
   .cta-shell h2 {
     margin: 0;
-    font-family: 'Noto Serif TC', serif;
+    font-family: var(--font-serif);
     color: var(--gray-darkest);
-    font-weight: 500;
-    line-height: 1.35;
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    line-height: 1.24;
+    letter-spacing: var(--type-title-tracking);
   }
 
   .hero-copy h1 {
@@ -360,7 +360,8 @@ const workflow = [
   .workflow-card p,
   .cta-shell p {
     color: var(--gray-medium);
-    line-height: 1.9;
+    line-height: 1.82;
+    letter-spacing: var(--type-body-tracking);
   }
 
   .hero-intro {
@@ -385,7 +386,8 @@ const workflow = [
     padding: 0.9rem 1.35rem;
     border-radius: 999px;
     text-decoration: none;
-    letter-spacing: 0.08em;
+    font-weight: 500;
+    letter-spacing: var(--type-cta-tracking);
     transition:
       transform 0.25s ease,
       background-color 0.25s ease,
@@ -442,7 +444,8 @@ const workflow = [
   .capability-label,
   .workflow-step {
     display: inline-flex;
-    letter-spacing: 0.18em;
+    font-weight: 600;
+    letter-spacing: var(--type-overline-spacing);
     font-size: 0.78rem;
   }
 
@@ -588,7 +591,8 @@ const workflow = [
   .visual-tag {
     display: inline-flex;
     font-size: 0.75rem;
-    letter-spacing: 0.18em;
+    font-weight: 600;
+    letter-spacing: var(--type-overline-spacing);
     text-transform: uppercase;
     color: var(--tiffany-dark);
   }
@@ -606,8 +610,8 @@ const workflow = [
     display: block;
     margin-top: 0.85rem;
     font-size: 1.05rem;
-    letter-spacing: 0.14em;
-    font-weight: 500;
+    letter-spacing: 0.04em;
+    font-weight: 600;
     position: relative;
     z-index: 1;
     text-shadow: 0 6px 22px rgba(0, 0, 0, 0.24);
@@ -625,16 +629,19 @@ const workflow = [
 
   .visual-copy h3 {
     margin: 0.55rem 0 0;
+    font-family: var(--font-serif);
     font-size: 1.18rem;
     color: var(--gray-darkest);
-    line-height: 1.5;
-    letter-spacing: 0.03em;
+    line-height: 1.42;
+    letter-spacing: 0.02em;
+    font-weight: 600;
   }
 
   .visual-copy p {
     margin: 0.75rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.8;
+    line-height: 1.74;
+    letter-spacing: var(--type-body-tracking);
   }
 
   .visual-copy small {
