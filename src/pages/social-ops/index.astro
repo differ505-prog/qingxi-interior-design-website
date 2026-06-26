@@ -173,6 +173,7 @@ const defaultTopicMode = publishingTopicModeOptions[0]?.value || "publishing";
 const defaultModeOption = publishingTopicModeOptions.find((modeOption) => modeOption.value === defaultTopicMode) || publishingTopicModeOptions[0];
 const defaultModeState = topicModeMap[defaultTopicMode];
 const publishingDashboard = topicModeMap[defaultTopicMode].publishingDashboard;
+const vendorIntakeShortUrl = "https://qingxidesign.tw/crew-intake";
 const cannedReplies = [
   {
     id: "budget-range-estimator",
@@ -208,7 +209,6 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
 const topicModeOptionsJson = JSON.stringify(publishingTopicModeOptions);
 const topicModeMapJson = JSON.stringify(topicModeMap);
-const vendorIntakeShortUrl = "https://qingxidesign.tw/crew-intake";
 ---
 
 <BaseLayout
