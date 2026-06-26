@@ -92,25 +92,27 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   .policies-eyebrow {
     margin: 0 0 0.9rem;
     font-size: 0.8rem;
-    letter-spacing: 0.22em;
+    font-weight: 600;
+    letter-spacing: var(--type-overline-spacing);
     color: var(--tiffany-dark);
     text-transform: uppercase;
   }
 
   .policies-hero h1 {
     margin: 0;
-    font-family: "Noto Serif TC", serif;
+    font-family: var(--font-serif);
     font-size: clamp(2.2rem, 4vw, 4rem);
     line-height: 1.25;
-    font-weight: 500;
-    letter-spacing: 0.05em;
+    font-weight: 600;
+    letter-spacing: var(--type-title-tracking);
     color: var(--gray-darkest);
   }
 
   .policies-intro {
     margin: 1.2rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.9;
+    line-height: 1.82;
+    letter-spacing: var(--type-body-tracking);
     font-size: 1rem;
   }
 
@@ -130,17 +132,19 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
   .policy-card h2 {
     margin: 0;
-    font-family: "Noto Serif TC", serif;
+    font-family: var(--font-serif);
     font-size: 1.35rem;
-    line-height: 1.45;
-    font-weight: 500;
+    line-height: 1.34;
+    font-weight: 600;
+    letter-spacing: var(--type-title-tracking);
     color: var(--gray-darkest);
   }
 
   .policy-card p {
     margin: 0.8rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.85;
+    line-height: 1.8;
+    letter-spacing: var(--type-body-tracking);
   }
 
   .policy-card a {

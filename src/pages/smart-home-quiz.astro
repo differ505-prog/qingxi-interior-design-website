@@ -463,7 +463,8 @@ const quizStepsJson = JSON.stringify(quizSteps);
   .quiz-step {
     margin: 0 0 0.8rem;
     font-size: 0.8rem;
-    letter-spacing: 0.24em;
+    font-weight: 600;
+    letter-spacing: var(--type-overline-spacing);
     color: var(--tiffany-dark);
     text-transform: uppercase;
   }
@@ -473,11 +474,11 @@ const quizStepsJson = JSON.stringify(quizSteps);
   .quiz-header h2,
   .result-header h2 {
     margin: 0;
-    font-family: "Noto Serif TC", serif;
+    font-family: var(--font-serif);
     color: var(--gray-darkest);
-    font-weight: 500;
-    line-height: 1.35;
-    letter-spacing: 0.04em;
+    font-weight: 600;
+    line-height: 1.24;
+    letter-spacing: var(--type-title-tracking);
   }
 
   .hero-copy h1 {
@@ -490,7 +491,8 @@ const quizStepsJson = JSON.stringify(quizSteps);
   .result-cta-card p,
   .hero-panel li {
     color: var(--gray-medium);
-    line-height: 1.9;
+    line-height: 1.82;
+    letter-spacing: var(--type-body-tracking);
   }
 
   .hero-description {
@@ -626,9 +628,12 @@ const quizStepsJson = JSON.stringify(quizSteps);
 
   .quiz-question-header h3 {
     margin: 0;
+    font-family: var(--font-serif);
     font-size: 1.18rem;
-    line-height: 1.6;
+    line-height: 1.42;
     color: var(--gray-darkest);
+    font-weight: 600;
+    letter-spacing: var(--type-title-tracking);
   }
 
   .quiz-options {

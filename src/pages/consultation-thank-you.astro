@@ -57,25 +57,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin: 0 0 0.9rem;
     color: var(--tiffany-dark);
     font-size: 0.8rem;
-    letter-spacing: 0.24em;
+    font-weight: 600;
+    letter-spacing: var(--type-overline-spacing);
     text-transform: uppercase;
   }
 
   .thank-you-shell h1 {
     margin: 0;
-    font-family: "Noto Serif TC", serif;
+    font-family: var(--font-serif);
     font-size: clamp(2rem, 4vw, 3.4rem);
-    font-weight: 500;
+    font-weight: 600;
     color: var(--gray-darkest);
-    line-height: 1.35;
-    letter-spacing: 0.04em;
+    line-height: 1.24;
+    letter-spacing: var(--type-title-tracking);
   }
 
   .thank-you-description {
     max-width: 42rem;
     margin: 1.1rem auto 0;
     color: var(--gray-medium);
-    line-height: 1.9;
+    line-height: 1.82;
+    letter-spacing: var(--type-body-tracking);
   }
 
   .thank-you-cards {
@@ -95,14 +97,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .thank-you-card h2 {
     margin: 0;
+    font-family: var(--font-serif);
     font-size: 1.05rem;
     color: var(--gray-darkest);
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: var(--type-title-tracking);
   }
 
   .thank-you-card p {
     margin: 0.65rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.75;
+    line-height: 1.72;
+    letter-spacing: var(--type-body-tracking);
   }
 
   .thank-you-actions {
@@ -120,6 +127,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     border-radius: 999px;
     text-decoration: none;
     font-weight: 500;
+    letter-spacing: var(--type-cta-tracking);
     text-align: center;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
     font-size: 1rem;
