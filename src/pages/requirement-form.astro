@@ -971,9 +971,11 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     margin-bottom: 1.6rem;
     padding: 1rem 1.1rem;
     border-radius: 18px;
-    background: rgba(255, 248, 235, 0.94);
-    border: 1px solid rgba(219, 170, 89, 0.24);
-    color: #7b5a1f;
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.14), transparent 34%),
+      linear-gradient(135deg, rgba(245, 249, 249, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.18);
+    color: var(--gray-dark);
     line-height: 1.75;
   }
 
