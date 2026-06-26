@@ -253,6 +253,34 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               }
             </select>
           </div>
+
+          <div class="form-group">
+            <label for="bathroom-count">衛浴數量</label>
+            <select id="bathroom-count">
+              <option value="1">1 間衛浴</option>
+              <option value="2" selected>2 間衛浴</option>
+              <option value="3plus">3 間以上衛浴</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="utility-scope">水電更新程度</label>
+            <select id="utility-scope">
+              <option value="none">不重拉，以局部整理為主</option>
+              <option value="partial" selected>局部調整 / 局部換新</option>
+              <option value="full">全室重拉水電</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="storage-kitchen-scope">系統櫃 / 廚具更新</label>
+            <select id="storage-kitchen-scope">
+              <option value="none" selected>不含系統櫃 / 廚具更新</option>
+              <option value="storage">含系統櫃配置</option>
+              <option value="kitchen">含廚具更新</option>
+              <option value="both">系統櫃與廚具都含</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-section">
@@ -282,6 +310,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <p class="result-subtitle" id="result-subtitle">
             先看目前可討論的預算帶。
           </p>
+          <div class="logic-summary-card">
+            <span class="logic-summary-label">估算邏輯摘要</span>
+            <p class="logic-summary-copy" id="logic-summary">
+              坪數 x 等級單價 x 條件係數（項目類型、屋況、住宅型態、使用目的、時程與高影響因子）
+            </p>
+          </div>
 
           <div class="result-card">
             <div class="result-row">
@@ -371,7 +405,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 class="btn btn-secondary"
                 data-estimator-cta="contact"
               >
-                先做免費格局健檢
+                先帶著結果諮詢
               </a>
               <p class="estimator-handoff-note">若你只想先抓範圍，也可以先保留結果。</p>
             </div>
@@ -788,6 +822,30 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     margin: -0.4rem 0 1.25rem;
     color: var(--gray-medium);
     line-height: 1.8;
+  }
+
+  .logic-summary-card {
+    margin-bottom: 1.1rem;
+    padding: 0.95rem 1.05rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.18);
+  }
+
+  .logic-summary-label {
+    display: inline-flex;
+    margin-bottom: 0.35rem;
+    color: var(--tiffany-dark);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .logic-summary-copy {
+    margin: 0;
+    color: var(--gray-dark);
+    font-size: 0.94rem;
+    line-height: 1.75;
   }
 
   .result-card {
@@ -1452,6 +1510,15 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const timeline = document.getElementById(
     "timeline",
   ) as HTMLSelectElement;
+  const bathroomCount = document.getElementById(
+    "bathroom-count",
+  ) as HTMLSelectElement;
+  const utilityScope = document.getElementById(
+    "utility-scope",
+  ) as HTMLSelectElement;
+  const storageKitchenScope = document.getElementById(
+    "storage-kitchen-scope",
+  ) as HTMLSelectElement;
   const selectedItems = Array.from(
     document.querySelectorAll('.checkbox-item input[type="checkbox"]'),
   ) as HTMLInputElement[];
@@ -1462,6 +1529,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const perPingRange = document.getElementById("per-ping-range");
   const scopeSummary = document.getElementById("scope-summary");
   const resultSubtitle = document.getElementById("result-subtitle");
+  const logicSummary = document.getElementById("logic-summary");
   const breakdownList = document.getElementById("breakdown-list");
   const adviceList = document.getElementById("advice-list");
   const nextStepIntro = document.getElementById("next-step-intro");
@@ -1557,8 +1625,45 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     urgent: { label: "三個月內，希望盡快進場", multiplier: 1.08, reserve: 1.15 },
   };
 
+  const bathroomCountMeta = {
+    1: { label: "1 間衛浴", multiplier: 1 },
+    2: { label: "2 間衛浴", multiplier: 1.06 },
+    "3plus": { label: "3 間以上衛浴", multiplier: 1.12 },
+  };
+
+  const utilityScopeMeta = {
+    none: { label: "不重拉水電", multiplier: 1, reserve: 1 },
+    partial: { label: "局部調整 / 局部換新", multiplier: 1.08, reserve: 1.04 },
+    full: { label: "全室重拉水電", multiplier: 1.16, reserve: 1.12 },
+  };
+
+  const storageKitchenScopeMeta = {
+    none: { label: "不含系統櫃 / 廚具更新" },
+    storage: { label: "含系統櫃配置" },
+    kitchen: { label: "含廚具更新" },
+    both: { label: "系統櫃與廚具都含" },
+  };
+
   function formatRange(min, max) {
     return `${min}萬 - ${max}萬`;
+  }
+
+  function getStorageKitchenMultiplier(scopeValue, selectedConfigs) {
+    const hasKitchen = selectedConfigs.some((item) => item.value === "kitchen");
+    const hasFurniture = selectedConfigs.some((item) => item.value === "furniture");
+
+    switch (scopeValue) {
+      case "storage":
+        return hasFurniture ? 1.06 : 1.03;
+      case "kitchen":
+        return hasKitchen ? 1.07 : 1.03;
+      case "both":
+        if (hasKitchen && hasFurniture) return 1.12;
+        if (hasKitchen || hasFurniture) return 1.08;
+        return 1.04;
+      default:
+        return 1;
+    }
   }
 
   function saveEstimateSnapshot(snapshot) {
@@ -1614,6 +1719,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const timelineInfo =
       timelineMeta[timeline.value as keyof typeof timelineMeta] ||
       timelineMeta.planned;
+    const bathroomInfo =
+      bathroomCountMeta[bathroomCount.value as keyof typeof bathroomCountMeta] ||
+      bathroomCountMeta[2];
+    const utilityInfo =
+      utilityScopeMeta[utilityScope.value as keyof typeof utilityScopeMeta] ||
+      utilityScopeMeta.partial;
+    const storageKitchenInfo =
+      storageKitchenScopeMeta[
+        storageKitchenScope.value as keyof typeof storageKitchenScopeMeta
+      ] || storageKitchenScopeMeta.none;
     const totalWeight = renovationItems.reduce(
       (sum, item) => sum + item.weight,
       0,
@@ -1630,6 +1745,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             projectMeta.minScopeFactor,
             0.45 + 0.55 * selectedScopeRatio,
           );
+    const bathroomMultiplier = selectedConfigs.some((item) => item.value === "bathroom")
+      ? bathroomInfo.multiplier
+      : 1;
+    const storageKitchenMultiplier =
+      projectType.value === "design-only"
+        ? 1
+        : getStorageKitchenMultiplier(storageKitchenScope.value, selectedConfigs);
 
     const minConstruction =
       projectType.value === "design-only"
@@ -1642,6 +1764,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               residenceMeta.multiplier *
               usePurposeInfo.multiplier *
               timelineInfo.multiplier *
+              bathroomMultiplier *
+              utilityInfo.multiplier *
+              storageKitchenMultiplier *
               scopeFactor,
           );
     const maxConstruction =
@@ -1655,6 +1780,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               residenceMeta.multiplier *
               usePurposeInfo.multiplier *
               timelineInfo.multiplier *
+              bathroomMultiplier *
+              utilityInfo.multiplier *
+              storageKitchenMultiplier *
               scopeFactor,
           );
 
@@ -1671,7 +1799,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         : Math.round(
             minConstruction *
               (conditionMeta.multiplier > 1 ? 0.1 : 0.06) *
-              timelineInfo.reserve,
+              timelineInfo.reserve *
+              utilityInfo.reserve *
+              (bathroomMultiplier > 1 ? 1.03 : 1),
           );
     const maxReserve =
       projectType.value === "design-only"
@@ -1679,7 +1809,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         : Math.round(
             maxConstruction *
               (conditionMeta.multiplier > 1 ? 0.14 : 0.08) *
-              timelineInfo.reserve,
+              timelineInfo.reserve *
+              utilityInfo.reserve *
+              (bathroomMultiplier > 1 ? 1.05 : 1),
           );
 
     const minTotal = minConstruction + minDesign;
@@ -1713,6 +1845,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       residenceType: residenceType.value,
       usePurpose: usePurpose.value,
       timeline: timeline.value,
+      bathroomCount: bathroomCount.value,
+      utilityScope: utilityScope.value,
+      storageKitchenScope: storageKitchenScope.value,
       selectedItems: selectedConfigs.map((item) => item.value),
     });
 
@@ -1724,6 +1859,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       perPingRange &&
       scopeSummary &&
       resultSubtitle &&
+      logicSummary &&
       nextStepIntro &&
       reportContext
     ) {
@@ -1733,6 +1869,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       reserveBudget.textContent = formatRange(minReserve, maxReserve);
       perPingRange.textContent = `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`;
       scopeSummary.textContent = `${projectMeta.label} / ${selectedConfigs.length} 項工種 / ${residenceMeta.label}`;
+      logicSummary.textContent =
+        projectType.value === "design-only"
+          ? `坪數 x 設計費單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label].join(" / ")}）`
+          : `坪數 x 等級單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label, selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}）`;
       resultSubtitle.textContent =
         projectType.value === "design-only"
           ? "目前以設計規劃費為主，工程費用需依圖面、工法與發包範圍另行確認。"
@@ -1769,7 +1909,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           "再補需求、照片與時程，青曦就能更快判斷你的案件方向。";
         estimatorHandoffPointTitle.textContent = "這一步最有效率";
         estimatorHandoffPointDescription.textContent =
-          "如果你已經有大致預算方向，可直接填完整需求表；若還卡在格局判斷，也可先做免費格局健檢。";
+          "如果你已經有大致預算方向，就直接往下整理需求。";
       }
     }
 
@@ -1780,8 +1920,21 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       adviceItems.push("屋況相對單純，較適合先把預算重點放在機能、材質與收納整合。");
     }
 
+    if (utilityScope.value === "full") {
+      adviceItems.push("這次估算已把全室重拉水電算進去，若現場原始管線老舊，實際費用通常會更接近區間上緣。");
+    } else if (utilityScope.value === "partial") {
+      adviceItems.push("目前以局部水電調整估算，若後續確認要全室重拉，總價通常會再上修。");
+    }
+
     if (projectType.value === "full" && selectedScopeRatio < projectMeta.minScopeFactor) {
       adviceItems.push("你目前選的是全屋裝修，因此估算已自動納入基礎工程底盤，不會因少勾幾項就過度低估。");
+    }
+
+    if (
+      selectedConfigs.some((item) => item.value === "bathroom") &&
+      bathroomCount.value !== "1"
+    ) {
+      adviceItems.push(`這次已把 ${bathroomInfo.label} 的條件納入，衛浴數量越多，泥作、防水、設備與收邊費用通常越明顯。`);
     }
 
     if (usePurpose.value === "rental") {
@@ -1836,6 +1989,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       `估價摘要：${formatRange(minTotal, maxTotal)}`,
       `每坪抓法：每坪約 ${minPerPing}萬 - ${maxPerPing}萬`,
       `專案條件：${[projectMeta.label, qualityLevel.options[qualityLevel.selectedIndex]?.textContent, conditionMeta.label, residenceMeta.label].filter(Boolean).join(" / ")}`,
+      `高影響因子：${[selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}`,
       `使用目的 / 時程：${[usePurposeInfo.label, timelineInfo.label].filter(Boolean).join(" / ")}`,
       `工項：${selectedConfigs.length ? selectedConfigs.map((item) => item.label).join("、") : "尚未勾選"}`,
     ].join(" ｜ ");
@@ -1872,6 +2026,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       usePurposeLabel: usePurposeInfo.label,
       timeline: timeline.value,
       timelineLabel: timelineInfo.label,
+      bathroomCount: bathroomCount.value,
+      bathroomCountLabel: bathroomInfo.label,
+      utilityScope: utilityScope.value,
+      utilityScopeLabel: utilityInfo.label,
+      storageKitchenScope: storageKitchenScope.value,
+      storageKitchenScopeLabel: storageKitchenInfo.label,
       selectedItems: selectedConfigs.map((item) => item.label),
       totalRange: formatRange(minTotal, maxTotal),
       designRange: formatRange(minDesign, maxDesign),
@@ -1895,6 +2055,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         residence_type: residenceType.value,
         use_purpose: usePurpose.value,
         timeline: timeline.value,
+        bathroom_count: bathroomCount.value,
+        utility_scope: utilityScope.value,
+        storage_kitchen_scope: storageKitchenScope.value,
         selected_item_count: selectedConfigs.length,
         estimated_total_min: minTotal,
         estimated_total_max: maxTotal,
@@ -1956,7 +2119,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     houseCondition &&
     residenceType &&
     usePurpose &&
-    timeline
+    timeline &&
+    bathroomCount &&
+    utilityScope &&
+    storageKitchenScope
   ) {
     areaInput.addEventListener("input", calculate);
     projectType.addEventListener("change", calculate);
@@ -1965,6 +2131,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     residenceType.addEventListener("change", calculate);
     usePurpose.addEventListener("change", calculate);
     timeline.addEventListener("change", calculate);
+    bathroomCount.addEventListener("change", calculate);
+    utilityScope.addEventListener("change", calculate);
+    storageKitchenScope.addEventListener("change", calculate);
     selectedItems.forEach((checkbox) => {
       checkbox.addEventListener("change", calculate);
     });
