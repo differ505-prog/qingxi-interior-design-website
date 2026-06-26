@@ -166,12 +166,12 @@ const {
     font-size: 1.85rem;
     font-weight: 500;
     color: #332e29;
-    margin-top: 4rem;
-    margin-bottom: 1.4rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(164, 171, 160, 0.28);
-    letter-spacing: 0.025em;
-    line-height: 1.55;
+    margin-top: 4.2rem;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(164, 171, 160, 0.22);
+    letter-spacing: 0.02em;
+    line-height: 1.5;
   }
 
   .article-content :global(h3) {
@@ -179,10 +179,10 @@ const {
     font-size: 1.34rem;
     font-weight: 500;
     color: #49423c;
-    margin-top: 2.3rem;
-    margin-bottom: 0.9rem;
+    margin-top: 2.15rem;
+    margin-bottom: 0.8rem;
     letter-spacing: 0.015em;
-    line-height: 1.7;
+    line-height: 1.65;
   }
 
   .article-content :global(p) {
@@ -214,18 +214,20 @@ const {
   }
 
   .article-content :global(blockquote) {
-    margin: 2.75rem 0;
-    padding: 1.35rem 1.6rem;
-    border-top: 1px solid rgba(164, 171, 160, 0.24);
-    border-bottom: 1px solid rgba(164, 171, 160, 0.24);
+    margin: 2.5rem 0 2.65rem;
+    padding: 1.15rem 1.35rem 1.15rem 1.5rem;
+    border-top: 0;
+    border-bottom: 0;
+    border-left: 2px solid rgba(150, 160, 150, 0.46);
+    border-radius: 0 14px 14px 0;
     background: linear-gradient(
-      180deg,
-      rgba(244, 240, 234, 0.72),
-      rgba(244, 240, 234, 0.3)
+      135deg,
+      rgba(244, 240, 234, 0.62),
+      rgba(244, 240, 234, 0.2)
     );
     color: #5b544d;
-    font-size: 1.04rem;
-    line-height: 1.95;
+    font-size: 1.02rem;
+    line-height: 1.9;
   }
 
   .article-content :global(a) {
@@ -242,7 +244,7 @@ const {
     box-shadow: 0 18px 42px rgba(58, 52, 46, 0.1);
     background: #f7f4ee;
     border: 1px solid var(--art-accent-line);
-    margin: 2.8rem 0 0;
+    margin: 2.45rem 0 0;
   }
 
   .article-content :global(.image-caption) {
@@ -256,7 +258,7 @@ const {
   }
 
   .article-content :global(.article-figure) {
-    margin: 2.8rem 0;
+    margin: 2.45rem 0 2.7rem;
   }
 
   .article-content :global(.article-figure img) {
@@ -265,9 +267,9 @@ const {
 
   .article-content :global(.article-figure figcaption) {
     max-width: 32rem;
-    margin: 0.95rem auto 0;
+    margin: 0.82rem auto 0;
     font-size: 0.9rem;
-    line-height: 1.8;
+    line-height: 1.75;
     color: #8a837b;
     text-align: center;
     letter-spacing: 0.015em;
@@ -277,7 +279,7 @@ const {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.45rem;
-    margin: 3rem 0 0.75rem;
+    margin: 2.7rem 0 0.55rem;
   }
 
   .back-link {
@@ -323,14 +325,23 @@ const {
 
     .article-content :global(h2) {
       font-size: 1.5rem;
+      margin-top: 3.35rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
     }
 
     .article-content :global(.article-gallery) {
       grid-template-columns: 1fr;
+      margin-top: 2.2rem;
     }
 
     .article-cover {
       margin-bottom: 2.45rem;
+    }
+
+    .article-content :global(blockquote) {
+      margin: 2.15rem 0 2.3rem;
+      padding: 1rem 1.05rem 1rem 1.2rem;
     }
   }
 </style>
