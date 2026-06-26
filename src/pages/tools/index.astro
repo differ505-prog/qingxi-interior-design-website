@@ -37,6 +37,30 @@ const timelineOptions = [
   { value: "urgent", label: "三個月內，希望盡快進場" },
 ];
 
+const bathroomCountOptions = [
+  { value: "one", label: "1 間衛浴" },
+  { value: "two", label: "2 間衛浴" },
+  { value: "three-plus", label: "3 間以上" },
+];
+
+const kitchenLevelOptions = [
+  { value: "cosmetic", label: "局部更新，盡量保留格局" },
+  { value: "full", label: "整套翻新，不大改管線" },
+  { value: "relocate", label: "含管線 / 泥作與設備移位" },
+];
+
+const floorMethodOptions = [
+  { value: "overlay", label: "直鋪或表層更新" },
+  { value: "replace", label: "拆舊換新，含基礎處理" },
+  { value: "rebuild", label: "含整平或基底重做" },
+];
+
+const furnitureScaleOptions = [
+  { value: "partial", label: "局部收納補強" },
+  { value: "wall", label: "單面牆或單一主櫃體" },
+  { value: "multi-zone", label: "多區櫃體整合" },
+];
+
 const renovationItems = [
   {
     value: "ceiling",
@@ -274,6 +298,65 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 </label>
               ))
             }
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>細部條件</h2>
+          <p class="form-section-note">只補最影響第一層估價判讀的 4 個分支；若未勾對應工項，欄位會自動停用。</p>
+
+          <div class="detail-grid">
+            <div class="form-group detail-group" data-detail-for="bathroom">
+              <label for="bathroom-count">衛浴數量</label>
+              <select id="bathroom-count">
+                {
+                  bathroomCountOptions.map(({ value, label }) => (
+                    <option value={value} selected={value === "one"}>
+                      {label}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div class="form-group detail-group" data-detail-for="kitchen">
+              <label for="kitchen-level">廚房翻新程度</label>
+              <select id="kitchen-level">
+                {
+                  kitchenLevelOptions.map(({ value, label }) => (
+                    <option value={value} selected={value === "full"}>
+                      {label}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div class="form-group detail-group" data-detail-for="floor">
+              <label for="floor-method">地板做法</label>
+              <select id="floor-method">
+                {
+                  floorMethodOptions.map(({ value, label }) => (
+                    <option value={value} selected={value === "replace"}>
+                      {label}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div class="form-group detail-group" data-detail-for="furniture">
+              <label for="furniture-scale">櫃體規模</label>
+              <select id="furniture-scale">
+                {
+                  furnitureScaleOptions.map(({ value, label }) => (
+                    <option value={value} selected={value === "wall"}>
+                      {label}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
           </div>
         </div>
 
@@ -684,6 +767,32 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     margin-bottom: 0.55rem;
     font-weight: 500;
     color: var(--gray-dark);
+  }
+
+  .form-section-note {
+    margin: -0.45rem 0 1rem;
+    color: var(--gray-medium);
+    line-height: 1.7;
+    font-size: 0.92rem;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.1rem;
+  }
+
+  .detail-group {
+    margin-bottom: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .detail-group.is-disabled {
+    opacity: 0.48;
+  }
+
+  .detail-group.is-disabled label {
+    color: var(--gray-light);
   }
 
   .input-with-unit {
@@ -1418,6 +1527,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       grid-template-columns: 1fr;
     }
 
+    .detail-grid {
+      grid-template-columns: 1fr;
+    }
+
     .result-highlights {
       grid-template-columns: 1fr;
     }
@@ -1482,6 +1595,21 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const selectedItems = Array.from(
     document.querySelectorAll('.checkbox-item input[type="checkbox"]'),
   ) as HTMLInputElement[];
+  const bathroomCount = document.getElementById(
+    "bathroom-count",
+  ) as HTMLSelectElement | null;
+  const kitchenLevel = document.getElementById(
+    "kitchen-level",
+  ) as HTMLSelectElement | null;
+  const floorMethod = document.getElementById(
+    "floor-method",
+  ) as HTMLSelectElement | null;
+  const furnitureScale = document.getElementById(
+    "furniture-scale",
+  ) as HTMLSelectElement | null;
+  const detailGroups = Array.from(
+    document.querySelectorAll(".detail-group[data-detail-for]"),
+  ) as HTMLElement[];
   const totalPrice = document.getElementById("total-price");
   const designFee = document.getElementById("design-fee");
   const constructionFee = document.getElementById("construction-fee");
@@ -1590,6 +1718,30 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     urgent: { label: "三個月內，希望盡快進場", multiplier: 1.08, reserve: 1.15 },
   };
 
+  const bathroomCountMeta = {
+    one: { label: "1 間衛浴", multiplier: 1 },
+    two: { label: "2 間衛浴", multiplier: 1.45 },
+    "three-plus": { label: "3 間以上", multiplier: 1.85 },
+  };
+
+  const kitchenLevelMeta = {
+    cosmetic: { label: "局部更新，盡量保留格局", multiplier: 0.82 },
+    full: { label: "整套翻新，不大改管線", multiplier: 1 },
+    relocate: { label: "含管線 / 泥作與設備移位", multiplier: 1.22 },
+  };
+
+  const floorMethodMeta = {
+    overlay: { label: "直鋪或表層更新", multiplier: 0.82 },
+    replace: { label: "拆舊換新，含基礎處理", multiplier: 1 },
+    rebuild: { label: "含整平或基底重做", multiplier: 1.18 },
+  };
+
+  const furnitureScaleMeta = {
+    partial: { label: "局部收納補強", multiplier: 0.78 },
+    wall: { label: "單面牆或單一主櫃體", multiplier: 1 },
+    "multi-zone": { label: "多區櫃體整合", multiplier: 1.28 },
+  };
+
   function formatRange(min, max) {
     return `${min}萬 - ${max}萬`;
   }
@@ -1619,7 +1771,46 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   let lastTrackedSignature = "";
 
+  function hasSelectedItem(value) {
+    return selectedItems.some((item) => item.value === value && item.checked);
+  }
+
+  function syncDetailControls() {
+    detailGroups.forEach((group) => {
+      const target = group.dataset.detailFor || "";
+      const select = group.querySelector("select");
+      const enabled = hasSelectedItem(target);
+
+      if (select) {
+        select.disabled = !enabled;
+      }
+
+      group.classList.toggle("is-disabled", !enabled);
+    });
+  }
+
+  function getItemDetailMeta(itemValue) {
+    if (itemValue === "bathroom") {
+      return bathroomCountMeta[bathroomCount?.value as keyof typeof bathroomCountMeta] || bathroomCountMeta.one;
+    }
+
+    if (itemValue === "kitchen") {
+      return kitchenLevelMeta[kitchenLevel?.value as keyof typeof kitchenLevelMeta] || kitchenLevelMeta.full;
+    }
+
+    if (itemValue === "floor") {
+      return floorMethodMeta[floorMethod?.value as keyof typeof floorMethodMeta] || floorMethodMeta.replace;
+    }
+
+    if (itemValue === "furniture") {
+      return furnitureScaleMeta[furnitureScale?.value as keyof typeof furnitureScaleMeta] || furnitureScaleMeta.wall;
+    }
+
+    return { label: "", multiplier: 1 };
+  }
+
   function calculate() {
+    syncDetailControls();
     const area = Math.min(200, Math.max(1, parseFloat(areaInput.value) || 30));
     const pricePerPing =
       estimatorConfig.qualityLevels?.[qualityLevel.value] ||
@@ -1657,6 +1848,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     );
     const selectedScopeRatio = selectedWeight / totalWeight || 0;
     const baselineNoticeRatio = projectMeta.baselineNoticeRatio ?? 0;
+    const selectedDetailConfigs = selectedConfigs.map((item) => ({
+      ...item,
+      detail: getItemDetailMeta(item.value),
+    }));
+    const weightedDetailMultiplier = selectedWeight
+      ? selectedDetailConfigs.reduce(
+          (sum, item) => sum + item.weight * item.detail.multiplier,
+          0,
+        ) / selectedWeight
+      : 1;
     const scopeFactor =
       projectType.value === "design-only"
         ? 0
@@ -1665,6 +1866,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             projectMeta.baseScopeFactor +
               projectMeta.variableScopeFactor * selectedScopeRatio,
           );
+    const detailFactor = projectType.value === "design-only" ? 1 : weightedDetailMultiplier;
 
     const minConstruction =
       projectType.value === "design-only"
@@ -1677,7 +1879,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               residenceMeta.multiplier *
               usePurposeInfo.multiplier *
               timelineInfo.multiplier *
-              scopeFactor,
+              scopeFactor *
+              detailFactor,
           );
     const maxConstruction =
       projectType.value === "design-only"
@@ -1690,7 +1893,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               residenceMeta.multiplier *
               usePurposeInfo.multiplier *
               timelineInfo.multiplier *
-              scopeFactor,
+              scopeFactor *
+              detailFactor,
           );
 
     const minDesign = Math.round(
@@ -1731,11 +1935,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               max: maxDesign,
             },
           ]
-        : selectedConfigs.map((item) => {
-            const share = item.weight / (selectedWeight || 1);
+        : selectedDetailConfigs.map((item) => {
+            const totalEffectiveWeight = selectedDetailConfigs.reduce(
+              (sum, config) => sum + config.weight * config.detail.multiplier,
+              0,
+            ) || 1;
+            const share = item.weight * item.detail.multiplier / totalEffectiveWeight;
             return {
               label: item.label,
-              description: item.description,
+              description: item.detail.label
+                ? `${item.description}｜目前條件：${item.detail.label}`
+                : item.description,
               min: Math.round(minConstruction * share),
               max: Math.round(maxConstruction * share),
             };
@@ -1749,6 +1959,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       usePurpose: usePurpose.value,
       timeline: timeline.value,
       selectedItems: selectedConfigs.map((item) => item.value),
+      bathroomCount: bathroomCount?.value || "",
+      kitchenLevel: kitchenLevel?.value || "",
+      floorMethod: floorMethod?.value || "",
+      furnitureScale: furnitureScale?.value || "",
     });
 
     if (
@@ -1831,10 +2045,25 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       adviceItems.push("時程仍有彈性，可先把需求表填完整，讓設計討論更聚焦也更容易抓準預算。");
     }
 
+    if (hasSelectedItem("bathroom") && bathroomCount?.value === "two") {
+      adviceItems.push("兩間衛浴一起翻新時，防水、泥作與設備安裝通常會明顯拉高整體預算。");
+    } else if (hasSelectedItem("bathroom") && bathroomCount?.value === "three-plus") {
+      adviceItems.push("三間以上衛浴通常已接近整屋基礎工程量體，建議同步檢查排水、防水與設備等級。");
+    }
+
+    if (hasSelectedItem("kitchen") && kitchenLevel?.value === "relocate") {
+      adviceItems.push("廚房若涉及設備移位或重拉管線，預算差異通常不只在廚具本體，也會反映在泥作與水電。");
+    }
+
+    if (hasSelectedItem("floor") && floorMethod?.value === "rebuild") {
+      adviceItems.push("地板若含整平或基底重做，通常要把拆除、乾燥與交界收口一併算進工期與預備金。");
+    }
+
+    const detailAdviceItems = adviceItems.slice(4);
     const compactAdviceItems =
       projectType.value === "design-only"
         ? adviceItems.slice(0, 2)
-        : [adviceItems[0], adviceItems[2] || adviceItems[1]].filter(Boolean);
+        : [adviceItems[0], detailAdviceItems[0] || adviceItems[2] || adviceItems[1]].filter(Boolean);
 
     if (adviceList) {
       adviceList.innerHTML = compactAdviceItems.map((item) => `<li>${item}</li>`).join("");
@@ -1873,6 +2102,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       `專案條件：${[projectMeta.label, qualityLevel.options[qualityLevel.selectedIndex]?.textContent, conditionMeta.label, residenceMeta.label].filter(Boolean).join(" / ")}`,
       `使用目的 / 時程：${[usePurposeInfo.label, timelineInfo.label].filter(Boolean).join(" / ")}`,
       `工項：${selectedConfigs.length ? selectedConfigs.map((item) => item.label).join("、") : "尚未勾選"}`,
+      `細部條件：${[
+        hasSelectedItem("bathroom") ? `衛浴 ${getItemDetailMeta("bathroom").label}` : "",
+        hasSelectedItem("kitchen") ? `廚房 ${getItemDetailMeta("kitchen").label}` : "",
+        hasSelectedItem("floor") ? `地板 ${getItemDetailMeta("floor").label}` : "",
+        hasSelectedItem("furniture") ? `櫃體 ${getItemDetailMeta("furniture").label}` : "",
+      ].filter(Boolean).join(" / ") || "未額外套用"}`,
     ].join(" ｜ ");
 
     if (estimatorSummaryInput) {
@@ -1908,6 +2143,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       timeline: timeline.value,
       timelineLabel: timelineInfo.label,
       selectedItems: selectedConfigs.map((item) => item.label),
+      detailSelections: [
+        hasSelectedItem("bathroom") ? `衛浴：${getItemDetailMeta("bathroom").label}` : "",
+        hasSelectedItem("kitchen") ? `廚房：${getItemDetailMeta("kitchen").label}` : "",
+        hasSelectedItem("floor") ? `地板：${getItemDetailMeta("floor").label}` : "",
+        hasSelectedItem("furniture") ? `櫃體：${getItemDetailMeta("furniture").label}` : "",
+      ].filter(Boolean),
       totalRange: formatRange(minTotal, maxTotal),
       designRange: formatRange(minDesign, maxDesign),
       constructionRange: formatRange(minConstruction, maxConstruction),
@@ -1931,6 +2172,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         use_purpose: usePurpose.value,
         timeline: timeline.value,
         selected_item_count: selectedConfigs.length,
+        detail_factor: Number(detailFactor.toFixed(3)),
         estimated_total_min: minTotal,
         estimated_total_max: maxTotal,
       });
@@ -1963,9 +2205,14 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         return;
       }
 
-      breakdownList.innerHTML = selectedConfigs
+      const totalEffectiveWeight = selectedDetailConfigs.reduce(
+        (sum, item) => sum + item.weight * item.detail.multiplier,
+        0,
+      ) || 1;
+
+      breakdownList.innerHTML = selectedDetailConfigs
         .map((item) => {
-          const share = item.weight / selectedWeight;
+          const share = item.weight * item.detail.multiplier / totalEffectiveWeight;
           const minItem = Math.round(minConstruction * share);
           const maxItem = Math.round(maxConstruction * share);
 
@@ -1973,7 +2220,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             <div class="breakdown-item">
               <div class="breakdown-copy">
                 <strong>${item.label}</strong>
-                <span>${item.description}</span>
+                <span>${item.detail.label ? `${item.description}｜目前條件：${item.detail.label}` : item.description}</span>
               </div>
               <span class="breakdown-value">${formatRange(minItem, maxItem)}</span>
             </div>
@@ -2000,6 +2247,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     residenceType.addEventListener("change", calculate);
     usePurpose.addEventListener("change", calculate);
     timeline.addEventListener("change", calculate);
+    bathroomCount?.addEventListener("change", calculate);
+    kitchenLevel?.addEventListener("change", calculate);
+    floorMethod?.addEventListener("change", calculate);
+    furnitureScale?.addEventListener("change", calculate);
     selectedItems.forEach((checkbox) => {
       checkbox.addEventListener("change", calculate);
     });
