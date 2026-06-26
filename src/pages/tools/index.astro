@@ -273,12 +273,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           </div>
 
           <div class="form-group">
-            <label for="storage-kitchen-scope">系統櫃 / 廚具更新</label>
+            <label for="storage-kitchen-scope">系統櫃 / 廚具納入程度</label>
             <select id="storage-kitchen-scope">
-              <option value="none" selected>不含系統櫃 / 廚具更新</option>
-              <option value="storage">含系統櫃配置</option>
-              <option value="kitchen">含廚具更新</option>
-              <option value="both">系統櫃與廚具都含</option>
+              <option value="none" selected>先不另外放大這兩項預算</option>
+              <option value="storage">已知會做系統櫃</option>
+              <option value="kitchen">已知會更新廚具</option>
+              <option value="both">系統櫃與廚具都會做</option>
             </select>
           </div>
         </div>
@@ -319,7 +319,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
           <div class="result-card">
             <div class="result-row">
-              <span class="result-label">預估總價</span>
+              <span class="result-label">建議準備總預算</span>
+              <span class="result-value" id="recommended-total">190萬 - 318萬</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">基礎估價</span>
               <span class="result-value" id="total-price">180萬 - 300萬</span>
             </div>
             <div class="result-row">
@@ -1522,6 +1526,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const selectedItems = Array.from(
     document.querySelectorAll('.checkbox-item input[type="checkbox"]'),
   ) as HTMLInputElement[];
+  const recommendedTotal = document.getElementById("recommended-total");
   const totalPrice = document.getElementById("total-price");
   const designFee = document.getElementById("design-fee");
   const constructionFee = document.getElementById("construction-fee");
@@ -1641,10 +1646,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   };
 
   const storageKitchenScopeMeta = {
-    none: { label: "不含系統櫃 / 廚具更新" },
-    storage: { label: "含系統櫃配置" },
-    kitchen: { label: "含廚具更新" },
-    both: { label: "系統櫃與廚具都含" },
+    none: { label: "先不另外放大系統櫃 / 廚具預算" },
+    storage: { label: "已知會做系統櫃" },
+    kitchen: { label: "已知會更新廚具" },
+    both: { label: "系統櫃與廚具都會做" },
   };
 
   function formatRange(min, max) {
@@ -1820,6 +1825,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
     const minTotal = minConstruction + minDesign;
     const maxTotal = maxConstruction + maxDesign;
+    const minRecommendedTotal = minTotal + minReserve;
+    const maxRecommendedTotal = maxTotal + maxReserve;
     const minPerPing = (minTotal / area).toFixed(1);
     const maxPerPing = (maxTotal / area).toFixed(1);
     const breakdownItems =
@@ -1856,6 +1863,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     });
 
     if (
+      recommendedTotal &&
       totalPrice &&
       designFee &&
       constructionFee &&
@@ -1868,6 +1876,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       reportContext
     ) {
       if (!hasValidScope) {
+        recommendedTotal.textContent = "--";
         totalPrice.textContent = "--";
         designFee.textContent = "--";
         constructionFee.textContent = "--";
@@ -1879,6 +1888,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         nextStepIntro.textContent = "先勾選實際要做的項目，再看預算帶。";
         reportContext.textContent = "先確定至少一項實際裝修項目，後續的拆解報告與需求表判讀才會更準。";
       } else {
+        recommendedTotal.textContent = formatRange(minRecommendedTotal, maxRecommendedTotal);
         totalPrice.textContent = formatRange(minTotal, maxTotal);
         designFee.textContent = formatRange(minDesign, maxDesign);
         constructionFee.textContent = formatRange(minConstruction, maxConstruction);
