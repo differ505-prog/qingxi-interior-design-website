@@ -1085,6 +1085,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       location: "",
       impression: "",
       memo: "",
+      sourceType: "internal_added",
       isPinned: false,
       createdAt: "",
       updatedAt: "",
@@ -1265,6 +1266,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return vendorIntakeStatusOptions.find((option) => option.value === value)?.label || "待審核";
   }
 
+  function getVendorSourceTypeLabel(value = "") {
+    if (value === "vendor_submitted") return "工班自填";
+    if (value === "internal_added") return "內部建檔";
+    return "未分類來源";
+  }
+
+  function getVendorContractLabel(value = "") {
+    if (value === "yes") return "可接受簽約";
+    if (value === "no") return "暫不接受簽約";
+    if (value === "discuss") return "簽約可再討論";
+    return "";
+  }
+
   function setVendorIntakeFeedback(message, mode = "") {
     const shell = document.getElementById("vendor-intake-feedback");
     if (!(shell instanceof HTMLElement)) return;
@@ -1345,9 +1359,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         item.contactMethod,
         item.contactValue,
         item.invoiceStatus,
+        item.acceptsContract,
         item.pricingMode,
         item.note,
         item.internalNote,
+        item.sourceType,
       ]
         .join("\n")
         .toLowerCase()
@@ -1459,6 +1475,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
           item.serviceArea ? `<span>${escapeHtml(item.serviceArea)}</span>` : "",
           item.contactMethod && item.contactValue ? `<span>${escapeHtml(item.contactMethod)}：${escapeHtml(item.contactValue)}</span>` : "",
           item.invoiceStatus ? `<span>${escapeHtml(item.invoiceStatus)}</span>` : "",
+          item.acceptsContract ? `<span>${escapeHtml(getVendorContractLabel(item.acceptsContract))}</span>` : "",
           item.pricingMode ? `<span>${escapeHtml(item.pricingMode)}</span>` : "",
           item.createdAt ? `<span>提交 ${escapeHtml(formatVendorNoteTimestamp(item.createdAt))}</span>` : "",
         ].filter(Boolean).join("");
@@ -1468,6 +1485,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <div class="vendor-note-card-head">
               <div class="vendor-note-card-main">
                 <div class="vendor-note-badges">
+                  <span class="vendor-note-badge">${escapeHtml(getVendorSourceTypeLabel(item.sourceType))}</span>
                   <span class="vendor-note-badge">${escapeHtml(item.trade || "未分類")}</span>
                   <span class="vendor-note-badge">${escapeHtml(getVendorIntakeStatusLabel(item.status))}</span>
                   ${item.attachmentKind ? `<span class="vendor-note-badge">${escapeHtml(item.attachmentKind)}</span>` : ""}
@@ -2455,6 +2473,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <div class="vendor-note-card-head">
                       <div class="vendor-note-card-main">
                         <div class="vendor-note-badges">
+                          <span class="vendor-note-badge">${escapeHtml(getVendorSourceTypeLabel(note.sourceType))}</span>
                           ${note.priceLevel ? `<span class="vendor-note-badge">${escapeHtml(note.priceLevel)}價位</span>` : ""}
                           ${note.craftLevel ? `<span class="vendor-note-badge">${escapeHtml(note.craftLevel)}</span>` : ""}
                           ${note.isPinned ? '<span class="vendor-note-badge vendor-note-badge-star">優先</span>' : ""}

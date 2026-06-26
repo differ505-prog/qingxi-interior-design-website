@@ -14,6 +14,7 @@ type VendorNoteRecord = {
   location: string;
   impression: string;
   memo: string;
+  sourceType: string;
   isPinned: boolean;
   createdAt: string;
   updatedAt: string;
@@ -60,6 +61,7 @@ function normalizeVendorNote(input: Record<string, unknown>): VendorNoteRecord {
     location: normalizeText(input.location),
     impression: normalizeText(input.impression),
     memo: normalizeText(input.memo),
+    sourceType: normalizeText(input.sourceType) || "internal_added",
     isPinned: normalizeBoolean(input.isPinned),
     createdAt: normalizeText(input.createdAt) || now,
     updatedAt: normalizeText(input.updatedAt) || now,

@@ -23,8 +23,10 @@ export type VendorIntakeRecord = {
   contactMethod: string;
   contactValue: string;
   invoiceStatus: string;
+  acceptsContract: string;
   pricingMode: string;
   note: string;
+  sourceType: string;
   sourceLabel: string;
   sourceDetail: string;
   utmSource: string;
@@ -84,8 +86,10 @@ export function normalizeVendorIntake(
     contactMethod: normalizeText(input.contactMethod),
     contactValue: normalizeText(input.contactValue),
     invoiceStatus: normalizeText(input.invoiceStatus),
+    acceptsContract: normalizeText(input.acceptsContract),
     pricingMode: normalizeText(input.pricingMode),
     note: normalizeText(input.note),
+    sourceType: normalizeText(input.sourceType) || "vendor_submitted",
     sourceLabel: normalizeText(input.sourceLabel),
     sourceDetail: normalizeText(input.sourceDetail),
     utmSource: normalizeText(input.utmSource),
