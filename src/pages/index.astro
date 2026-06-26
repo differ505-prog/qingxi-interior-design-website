@@ -113,20 +113,24 @@ const homeStructuredData = [
   <section class="stats-section">
     <div class="stats-container">
       <div class="stat-item" data-animate="scale">
-        <div class="stat-number">100%</div>
-        <div class="stat-label">客製化設計</div>
+        <div class="stat-kicker">設計</div>
+        <div class="stat-number">客製化設計</div>
+        <div class="stat-label">依空間、預算與使用習慣調整</div>
       </div>
       <div class="stat-item" data-animate="scale">
-        <div class="stat-number">1年</div>
-        <div class="stat-label">工程保固</div>
+        <div class="stat-kicker">保固</div>
+        <div class="stat-number">1 年工程保固</div>
+        <div class="stat-label">完工後仍有清楚的售後承接</div>
       </div>
       <div class="stat-item" data-animate="scale">
-        <div class="stat-number">免費</div>
-        <div class="stat-label">初步諮詢</div>
+        <div class="stat-kicker">諮詢</div>
+        <div class="stat-number">初步諮詢免費</div>
+        <div class="stat-label">先把方向、預算與條件對清楚</div>
       </div>
       <div class="stat-item" data-animate="scale">
-        <div class="stat-number">透明</div>
-        <div class="stat-label">報價流程</div>
+        <div class="stat-kicker">報價</div>
+        <div class="stat-number">報價流程透明</div>
+        <div class="stat-label">每一步怎麼估、怎麼走都說清楚</div>
       </div>
     </div>
   </section>
@@ -909,11 +913,11 @@ const homeStructuredData = [
     }
 
     .stat-item {
-      text-align: center;
-      padding: 1.75rem 1.25rem;
+      text-align: left;
+      padding: 1.5rem 1.35rem;
       border-radius: 22px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(10px);
       opacity: 0;
       transform: scale(0.8);
@@ -925,18 +929,27 @@ const homeStructuredData = [
       transform: scale(1);
     }
 
+    .stat-kicker {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      color: rgba(255, 255, 255, 0.58);
+      margin-bottom: 0.8rem;
+    }
+
     .stat-number {
-      font-size: 3rem;
-      font-weight: 700;
-      color: var(--gray-darkest);
-      margin-bottom: 0.5rem;
-      font-family: "Noto Sans", sans-serif;
+      font-size: 1.45rem;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 0.7rem;
+      font-family: "Noto Serif TC", serif;
+      line-height: 1.45;
+      letter-spacing: 0.04em;
     }
 
     .stat-label {
-      font-size: 1rem;
-      color: var(--gray-light);
-      letter-spacing: 0.05em;
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.75;
     }
 
     /* Testimonial Section Styles */
@@ -1416,12 +1429,12 @@ const homeStructuredData = [
       }
 
       .stat-item {
-        padding: 1.35rem 1rem;
+        padding: 1.35rem 1.05rem;
         border-radius: 18px;
       }
 
       .stat-number {
-        font-size: 2.5rem;
+        font-size: 1.2rem;
       }
 
       .faq-question {
