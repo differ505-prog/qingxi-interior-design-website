@@ -1740,6 +1740,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       (sum, item) => sum + item.weight,
       0,
     );
+    const hasSelectedItems = selectedConfigs.length > 0;
+    const hasValidScope =
+      projectType.value === "design-only" ? true : hasSelectedItems;
     const selectedScopeRatio = selectedWeight / totalWeight || 0;
     const scopeFactor =
       projectType.value === "design-only"
@@ -1864,31 +1867,44 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       nextStepIntro &&
       reportContext
     ) {
-      totalPrice.textContent = formatRange(minTotal, maxTotal);
-      designFee.textContent = formatRange(minDesign, maxDesign);
-      constructionFee.textContent = formatRange(minConstruction, maxConstruction);
-      reserveBudget.textContent = formatRange(minReserve, maxReserve);
-      perPingRange.textContent = `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`;
-      scopeSummary.textContent = `${projectMeta.label} / ${selectedConfigs.length} 項工種 / ${residenceMeta.label}`;
-      logicSummary.textContent =
-        projectType.value === "design-only"
-          ? `坪數 x 設計費單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label].join(" / ")}）`
-          : `坪數 x 等級單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label, selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}）`;
-      resultSubtitle.textContent =
-        projectType.value === "design-only"
-          ? "目前以設計規劃費為主，工程費用需依圖面、工法與發包範圍另行確認。"
-          : projectType.value === "full" &&
-              selectedScopeRatio < 0.7
-            ? "全屋裝修仍保留基礎工程底盤，但工項勾選越多，估算會越接近完整裝修規模。"
-          : "依目前輸入條件，先整理出適合討論的預算帶、主要工項與建議預備金。";
-      nextStepIntro.textContent =
-        projectType.value === "design-only"
-          ? "你現在更接近設計規劃前期。"
-          : "你現在已經有可討論的預算帶。";
-      reportContext.textContent =
-        projectType.value === "design-only"
-          ? `目前較適合先整理 ${projectMeta.label} 的需求重點與設計深度，再進一步確認交付方向。`
-          : `目前這組 ${projectMeta.label} / ${residenceMeta.label} 條件，可先用拆解報告判讀 ${formatRange(minTotal, maxTotal)} 的主要預算落點。`;
+      if (!hasValidScope) {
+        totalPrice.textContent = "--";
+        designFee.textContent = "--";
+        constructionFee.textContent = "--";
+        reserveBudget.textContent = "--";
+        perPingRange.textContent = "--";
+        scopeSummary.textContent = `${projectMeta.label} / 尚未勾選工項 / ${residenceMeta.label}`;
+        logicSummary.textContent = "請至少勾選 1 項裝修項目，估價結果才有參考意義。";
+        resultSubtitle.textContent = "目前未勾選任何裝修項目，因此不顯示正式預算帶，避免誤導。";
+        nextStepIntro.textContent = "先勾選實際要做的項目，再看預算帶。";
+        reportContext.textContent = "先確定至少一項實際裝修項目，後續的拆解報告與需求表判讀才會更準。";
+      } else {
+        totalPrice.textContent = formatRange(minTotal, maxTotal);
+        designFee.textContent = formatRange(minDesign, maxDesign);
+        constructionFee.textContent = formatRange(minConstruction, maxConstruction);
+        reserveBudget.textContent = formatRange(minReserve, maxReserve);
+        perPingRange.textContent = `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`;
+        scopeSummary.textContent = `${projectMeta.label} / ${selectedConfigs.length} 項工種 / ${residenceMeta.label}`;
+        logicSummary.textContent =
+          projectType.value === "design-only"
+            ? `坪數 x 設計費單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label].join(" / ")}）`
+            : `坪數 x 等級單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label, selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}）`;
+        resultSubtitle.textContent =
+          projectType.value === "design-only"
+            ? "目前以設計規劃費為主，工程費用需依圖面、工法與發包範圍另行確認。"
+            : projectType.value === "full" &&
+                selectedScopeRatio < 0.7
+              ? "全屋裝修仍保留基礎工程底盤，但工項勾選越多，估算會越接近完整裝修規模。"
+              : "依目前輸入條件，先整理出適合討論的預算帶、主要工項與建議預備金。";
+        nextStepIntro.textContent =
+          projectType.value === "design-only"
+            ? "你現在更接近設計規劃前期。"
+            : "你現在已經有可討論的預算帶。";
+        reportContext.textContent =
+          projectType.value === "design-only"
+            ? `目前較適合先整理 ${projectMeta.label} 的需求重點與設計深度，再進一步確認交付方向。`
+            : `目前這組 ${projectMeta.label} / ${residenceMeta.label} 條件，可先用拆解報告判讀 ${formatRange(minTotal, maxTotal)} 的主要預算落點。`;
+      }
     }
 
     if (
@@ -1915,45 +1931,52 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     }
 
     const adviceItems = [];
-    if (conditionMeta.multiplier >= 1.18) {
-      adviceItems.push("屋況偏複雜，建議預留較高比例的拆除、基礎工程與預備金。");
+    if (!hasValidScope) {
+      adviceItems.push("目前沒有勾選任何裝修項目，因此系統不提供正式預算，避免把基礎底盤誤認成實際報價。");
+      adviceItems.push("先勾選至少 1 項實際要做的工程，例如衛浴、廚房、地板或系統家具，估價結果才有參考價值。");
     } else {
-      adviceItems.push("屋況相對單純，較適合先把預算重點放在機能、材質與收納整合。");
-    }
+      if (conditionMeta.multiplier >= 1.18) {
+        adviceItems.push("屋況偏複雜，建議預留較高比例的拆除、基礎工程與預備金。");
+      } else {
+        adviceItems.push("屋況相對單純，較適合先把預算重點放在機能、材質與收納整合。");
+      }
 
-    if (utilityScope.value === "full") {
-      adviceItems.push("這次估算已把全室重拉水電算進去，若現場原始管線老舊，實際費用通常會更接近區間上緣。");
-    } else if (utilityScope.value === "partial") {
-      adviceItems.push("目前以局部水電調整估算，若後續確認要全室重拉，總價通常會再上修。");
-    }
+      if (utilityScope.value === "full") {
+        adviceItems.push("這次估算已把全室重拉水電算進去，若現場原始管線老舊，實際費用通常會更接近區間上緣。");
+      } else if (utilityScope.value === "partial") {
+        adviceItems.push("目前以局部水電調整估算，若後續確認要全室重拉，總價通常會再上修。");
+      }
 
-    if (projectType.value === "full" && selectedScopeRatio < 0.7) {
-      adviceItems.push("你目前選的是全屋裝修，因此估算仍保留基礎工程底盤；但每次增減工項，總價都會同步調整，不會再完全卡住。");
-    }
+      if (projectType.value === "full" && selectedScopeRatio < 0.7) {
+        adviceItems.push("你目前選的是全屋裝修，因此估算仍保留基礎工程底盤；但每次增減工項，總價都會同步調整，不會再完全卡住。");
+      }
 
-    if (
-      selectedConfigs.some((item) => item.value === "bathroom") &&
-      bathroomCount.value !== "1"
-    ) {
-      adviceItems.push(`這次已把 ${bathroomInfo.label} 的條件納入，衛浴數量越多，泥作、防水、設備與收邊費用通常越明顯。`);
-    }
+      if (
+        selectedConfigs.some((item) => item.value === "bathroom") &&
+        bathroomCount.value !== "1"
+      ) {
+        adviceItems.push(`這次已把 ${bathroomInfo.label} 的條件納入，衛浴數量越多，泥作、防水、設備與收邊費用通常越明顯。`);
+      }
 
-    if (usePurpose.value === "rental") {
-      adviceItems.push("若以出租或轉售為主，建議優先聚焦耐用、易維護與高感知更新項目。");
-    } else {
-      adviceItems.push("若以自住為主，可優先盤點真正影響日常使用的動線、收納與生活情境。");
-    }
+      if (usePurpose.value === "rental") {
+        adviceItems.push("若以出租或轉售為主，建議優先聚焦耐用、易維護與高感知更新項目。");
+      } else {
+        adviceItems.push("若以自住為主，可優先盤點真正影響日常使用的動線、收納與生活情境。");
+      }
 
-    if (timeline.value === "urgent") {
-      adviceItems.push("預計時程較趕，建議盡快整理現場照片、尺寸與交屋時間，避免後續排程壓縮。");
-    } else {
-      adviceItems.push("時程仍有彈性，可先把需求表填完整，讓設計討論更聚焦也更容易抓準預算。");
+      if (timeline.value === "urgent") {
+        adviceItems.push("預計時程較趕，建議盡快整理現場照片、尺寸與交屋時間，避免後續排程壓縮。");
+      } else {
+        adviceItems.push("時程仍有彈性，可先把需求表填完整，讓設計討論更聚焦也更容易抓準預算。");
+      }
     }
 
     const compactAdviceItems =
-      projectType.value === "design-only"
-        ? adviceItems.slice(0, 2)
-        : [adviceItems[0], adviceItems[2] || adviceItems[1]].filter(Boolean);
+      !hasValidScope
+        ? adviceItems
+        : projectType.value === "design-only"
+          ? adviceItems.slice(0, 2)
+          : [adviceItems[0], adviceItems[2] || adviceItems[1]].filter(Boolean);
 
     if (adviceList) {
       adviceList.innerHTML = compactAdviceItems.map((item) => `<li>${item}</li>`).join("");
@@ -1961,7 +1984,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
     if (nextStepPoints) {
       const stepItem =
-        projectType.value === "design-only"
+        !hasValidScope
+          ? {
+              title: "先勾選至少 1 項裝修項目",
+              description: "先把這次實際要做的工程圈出來，系統才會顯示有參考價值的預算帶。",
+            }
+          : projectType.value === "design-only"
           ? {
               title: "先整理需求與參考圖",
               description: "把需求、風格與空間痛點帶進需求表，第一次設計討論會更容易對焦。",
@@ -1987,8 +2015,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     }
 
     const estimatorSummaryText = [
-      `估價摘要：${formatRange(minTotal, maxTotal)}`,
-      `每坪抓法：每坪約 ${minPerPing}萬 - ${maxPerPing}萬`,
+      `估價摘要：${hasValidScope ? formatRange(minTotal, maxTotal) : "尚未形成有效估價"}`,
+      `每坪抓法：${hasValidScope ? `每坪約 ${minPerPing}萬 - ${maxPerPing}萬` : "--"}`,
       `專案條件：${[projectMeta.label, qualityLevel.options[qualityLevel.selectedIndex]?.textContent, conditionMeta.label, residenceMeta.label].filter(Boolean).join(" / ")}`,
       `高影響因子：${[selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}`,
       `使用目的 / 時程：${[usePurposeInfo.label, timelineInfo.label].filter(Boolean).join(" / ")}`,
@@ -2002,6 +2030,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const defaultLeadFocus =
       projectType.value === "design-only"
         ? `我想先索取這次設計規劃的拆解方向，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想了解設計深度與下一步建議。`
+        : !hasValidScope
+          ? "我目前還在整理實際裝修範圍，想先確認應該勾選哪些項目，才能得到更有參考價值的估價結果。"
         : `我想索取這次估價的費用拆解報告，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想先了解主要預算落點與是否適合安排後續諮詢。`;
 
     if (
@@ -2033,12 +2063,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       utilityScopeLabel: utilityInfo.label,
       storageKitchenScope: storageKitchenScope.value,
       storageKitchenScopeLabel: storageKitchenInfo.label,
+      hasValidScope,
       selectedItems: selectedConfigs.map((item) => item.label),
-      totalRange: formatRange(minTotal, maxTotal),
-      designRange: formatRange(minDesign, maxDesign),
-      constructionRange: formatRange(minConstruction, maxConstruction),
-      reserveRange: formatRange(minReserve, maxReserve),
-      perPingRange: `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`,
+      totalRange: hasValidScope ? formatRange(minTotal, maxTotal) : "--",
+      designRange: hasValidScope ? formatRange(minDesign, maxDesign) : "--",
+      constructionRange: hasValidScope ? formatRange(minConstruction, maxConstruction) : "--",
+      reserveRange: hasValidScope ? formatRange(minReserve, maxReserve) : "--",
+      perPingRange: hasValidScope ? `每坪約 ${minPerPing}萬 - ${maxPerPing}萬` : "--",
       reportIntent:
         projectType.value === "design-only"
           ? "design-planning-report"
@@ -2047,7 +2078,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       updatedAt: new Date().toISOString(),
     });
 
-    if (trackingSignature !== lastTrackedSignature) {
+    if (hasValidScope && trackingSignature !== lastTrackedSignature) {
       lastTrackedSignature = trackingSignature;
       window.trackLeadEvent?.("renovation_estimate_generated", {
         project_type: projectType.value,
