@@ -114,9 +114,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       <div class="calculator-header">
         <p class="eyebrow">RENOVATION ESTIMATOR</p>
         <h1>裝修估價器</h1>
-        <p class="subtitle">先抓出預算帶，判斷下一步。</p>
+        <p class="subtitle">先用設計觀點整理預算帶，再判斷這個家要往哪一種生活感走。</p>
         <div class="calculator-lead-note">
-          <span>快速試算預算帶</span>
+          <span>前期預算判讀</span>
+          <span>生活感與工項一起看</span>
           <span>結果可直接帶入需求表</span>
         </div>
         <div class="hero-actions">
@@ -128,40 +129,70 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       <div class="landing-grid">
         <section class="landing-card">
           <div class="landing-card-header">
-            <h2>這個工具適合誰</h2>
-            <p>如果你還在前期判斷，先試算就夠了。</p>
+            <h2>這個工具比較像什麼</h2>
+            <p>它不是快速喊價，而是先把空間尺度、工項比例與生活預算感整理出來。</p>
           </div>
           <div class="landing-points">
             <div class="landing-point">
-              <strong>準備交屋或剛交屋</strong>
-              <span>想先知道預算帶是否合理，再安排後續設計與工程。</span>
+              <strong>先看比例，再談風格</strong>
+              <span>先知道哪些條件正在拉高預算，後續才更容易判斷收納、材質與機能如何取捨。</span>
             </div>
             <div class="landing-point">
-              <strong>老屋翻新或局部整理</strong>
-              <span>還沒準備好完整需求，也能先抓大概規模與主要成本。</span>
+              <strong>先判斷尺度，再進完整需求</strong>
+              <span>還沒整理好所有細節也沒關係，這一層先幫你抓到可以對話的區間。</span>
             </div>
           </div>
         </section>
 
         <section class="landing-card landing-card-accent">
           <div class="landing-card-header">
-            <h2>你會拿到什麼</h2>
-            <p>不是正式報價，但足夠幫你判斷下一步。</p>
+            <h2>青曦想保留的感覺</h2>
+            <p>即使是估價器，也希望它先傳達空間設計該有的安靜、比例與質地。</p>
           </div>
           <div class="landing-points">
             <div class="landing-point">
-              <strong>預算帶與主要落點</strong>
-              <span>先知道總價區間、每坪抓法與主要工項。</span>
+              <strong>極簡不是少做，而是少浪費</strong>
+              <span>預算先放在真正影響生活感的工程與材質，而不是只堆滿表面裝飾。</span>
             </div>
             <div class="landing-point">
-              <strong>可直接帶入需求表</strong>
-              <span>試算結果會一起帶進需求表。</span>
+              <strong>質感來自秩序與克制</strong>
+              <span>從工項、預備金到下一步，都希望維持清楚而不擁擠的節奏。</span>
             </div>
           </div>
         </section>
       </div>
 
+      <section class="editorial-band" aria-label="青曦估價觀點">
+        <div class="editorial-band-copy">
+          <p class="editorial-band-eyebrow">QINGXI ESTIMATE NOTES</p>
+          <h2>我們希望這份初估，不只是看數字，而是先讓你看見空間感的比例。</h2>
+          <p>
+            真正有質感的室內設計，往往不是把所有東西都加進去，而是知道哪些要留下、哪些該收斂，
+            以及哪些地方值得為未來的生活多預留一點。
+          </p>
+        </div>
+        <div class="editorial-band-points">
+          <div class="editorial-band-point">
+            <strong>先對齊生活畫面</strong>
+            <span>估價之前，先確認這個家是要安靜、耐住、好整理，還是偏向展示與收納並重。</span>
+          </div>
+          <div class="editorial-band-point">
+            <strong>先抓正確比例</strong>
+            <span>拆除、水電、防水、櫃體、材質，先把比例抓對，後面的選擇才不容易失衡。</span>
+          </div>
+          <div class="editorial-band-point">
+            <strong>再進完整需求</strong>
+            <span>當你已經有預算帶與方向，第二層需求表就能更有效率地往下談。</span>
+          </div>
+        </div>
+      </section>
+
       <div class="calculator-form" id="estimator-form">
+        <div class="form-intro">
+          <p class="form-intro-eyebrow">STEP 01</p>
+          <h2>先把這次裝修的尺度與生活條件整理清楚。</h2>
+          <p>這一頁先回答與預算最有關的條件，讓青曦用更接近設計討論的方式幫你抓到合理區間。</p>
+        </div>
         <div class="form-section">
           <h2>基本資訊</h2>
 
@@ -321,6 +352,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         </div>
 
         <div class="result-section">
+          <p class="result-eyebrow">ESTIMATE OVERVIEW</p>
           <h2>預估結果</h2>
           <p class="result-subtitle" id="result-subtitle">
             先看目前可討論的預算帶。
@@ -414,7 +446,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="estimator-handoff-card">
             <div class="estimator-handoff-copy">
               <p class="estimator-handoff-eyebrow">BEST NEXT STEP</p>
-              <h3 id="estimator-handoff-title">下一步：帶著估算填需求表</h3>
+              <h3 id="estimator-handoff-title">下一步：把這份初估延伸成完整空間需求</h3>
               <p id="estimator-handoff-description" class="estimator-handoff-description">
                 再補需求、照片與時程，青曦就能更快判斷方向。
               </p>
@@ -451,7 +483,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="report-offer-card">
             <div class="report-offer-copy">
               <p class="report-offer-eyebrow">ESTIMATE FOLLOW-UP</p>
-              <h3>想更看懂這次試算，可直接索取拆解報告。</h3>
+              <h3>如果你想看得更深一點，也可以直接索取這次的拆解判讀。</h3>
               <p class="report-offer-description">
                 青曦會依這次條件整理初步拆解方向，幫你更快看懂預算落點。
               </p>
@@ -695,7 +727,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.15rem;
   }
 
   .landing-card {
@@ -715,14 +747,15 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .landing-card-header h2 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.35rem;
+    font-size: 1.42rem;
     color: var(--gray-darkest);
+    letter-spacing: 0.05em;
   }
 
   .landing-card-header p {
-    margin: 0.65rem 0 0;
+    margin: 0.72rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.8;
+    line-height: 1.88;
   }
 
   .landing-points {
@@ -745,12 +778,87 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .landing-point strong {
     color: var(--gray-darkest);
+    letter-spacing: 0.02em;
   }
 
   .landing-point span {
     margin-top: 0.35rem;
     color: var(--gray-medium);
+    line-height: 1.78;
+    font-size: 0.92rem;
+  }
+
+  .editorial-band {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+    gap: 1.2rem;
+    margin: 0 0 1.45rem;
+    padding: 1.55rem 1.6rem;
+    border-radius: 30px;
+    background:
+      radial-gradient(circle at top left, rgba(160, 217, 217, 0.12), transparent 32%),
+      linear-gradient(180deg, rgba(250, 251, 250, 0.95) 0%, rgba(255, 255, 255, 0.82) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.12);
+    box-shadow:
+      0 20px 36px rgba(47, 47, 47, 0.035),
+      inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  }
+
+  .editorial-band-eyebrow,
+  .form-intro-eyebrow,
+  .result-eyebrow {
+    margin: 0 0 0.85rem;
+    color: var(--tiffany-dark);
+    font-size: 0.74rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  .editorial-band-copy h2,
+  .form-intro h2 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: clamp(1.45rem, 2.3vw, 2rem);
     line-height: 1.7;
+    color: var(--gray-darkest);
+    letter-spacing: 0.05em;
+  }
+
+  .editorial-band-copy p:last-child,
+  .form-intro p:last-child {
+    margin: 0.85rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.95;
+    font-size: 0.96rem;
+  }
+
+  .editorial-band-points {
+    display: grid;
+    gap: 0.8rem;
+    align-content: start;
+  }
+
+  .editorial-band-point {
+    padding: 1rem 1.05rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(129, 199, 212, 0.1);
+  }
+
+  .editorial-band-point strong,
+  .editorial-band-point span {
+    display: block;
+  }
+
+  .editorial-band-point strong {
+    color: var(--gray-darkest);
+    letter-spacing: 0.03em;
+  }
+
+  .editorial-band-point span {
+    margin-top: 0.36rem;
+    color: var(--gray-medium);
+    line-height: 1.78;
     font-size: 0.92rem;
   }
 
@@ -761,6 +869,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 248, 0.95) 100%);
     border: 1px solid rgba(129, 199, 212, 0.1);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .form-intro {
+    margin-bottom: 1.55rem;
+    padding: 0 0 1.5rem;
+    border-bottom: 1px solid rgba(129, 199, 212, 0.12);
   }
 
   .form-section:last-child {
@@ -900,13 +1014,14 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .result-section h2 {
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.05rem;
   }
 
   .result-subtitle {
-    margin: -0.4rem 0 1.25rem;
+    margin: -0.2rem 0 1.35rem;
     color: var(--gray-medium);
-    line-height: 1.8;
+    line-height: 1.9;
+    max-width: 36rem;
   }
 
   .logic-summary-card {
@@ -1126,8 +1241,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .estimator-handoff-copy h3 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.5rem;
-    line-height: 1.55;
+    font-size: 1.56rem;
+    line-height: 1.65;
     color: var(--gray-darkest);
     letter-spacing: 0.04em;
   }
@@ -1200,8 +1315,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .report-offer-copy h3 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.45rem;
-    line-height: 1.55;
+    font-size: 1.5rem;
+    line-height: 1.65;
     color: var(--gray-darkest);
     letter-spacing: 0.04em;
   }
@@ -1485,8 +1600,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .faq-header h2 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.5rem;
+    font-size: 1.56rem;
     color: var(--gray-darkest);
+    letter-spacing: 0.05em;
   }
 
   .faq-header p {
@@ -1556,6 +1672,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     .landing-grid {
       grid-template-columns: 1fr;
       flex-direction: column;
+    }
+
+    .editorial-band {
+      grid-template-columns: 1fr;
+      padding: 1.3rem;
+      border-radius: 24px;
     }
 
     .form-section,
@@ -2217,19 +2339,19 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       estimatorHandoffPointDescription
     ) {
       if (projectType.value === "design-only") {
-        estimatorHandoffTitle.textContent = "把設計方向整理成完整需求表？";
+        estimatorHandoffTitle.textContent = "下一步：把這次空間方向整理成可討論的設計需求";
         estimatorHandoffDescription.textContent =
-          "把需求、空間痛點與參考風格整理清楚，第一次討論會更有效率。";
-        estimatorHandoffPointTitle.textContent = "這一步最有效率";
+          "把需求、空間痛點與參考風格補進需求表，第一次討論就能更快對齊生活畫面與設計深度。";
+        estimatorHandoffPointTitle.textContent = "先把方向說清楚";
         estimatorHandoffPointDescription.textContent =
-          "把需求、參考圖與理想交付內容先講清楚就可以。";
+          "你只需要先整理想像中的生活感、參考圖與期待交付，青曦就能順著這份初步方向往下接。";
       } else {
-        estimatorHandoffTitle.textContent = "下一步：帶著估算填需求表";
+        estimatorHandoffTitle.textContent = "下一步：把這份初估延伸成完整空間需求";
         estimatorHandoffDescription.textContent =
-          "再補需求、照片與時程，青曦就能更快判斷你的案件方向。";
-        estimatorHandoffPointTitle.textContent = "這一步最有效率";
+          "再補需求、照片與時程，青曦就能更快把預算帶、空間條件與後續方向一起判讀。";
+        estimatorHandoffPointTitle.textContent = "先把條件接續下去";
         estimatorHandoffPointDescription.textContent =
-          "如果你已經有大致預算方向，就直接往下整理需求。";
+          "如果你已經抓到大致預算方向，現在最有效率的做法就是直接把需求與現場資訊補完整。";
       }
     }
 
@@ -2332,10 +2454,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
     const defaultLeadFocus =
       projectType.value === "design-only"
-        ? `我想先索取這次設計規劃的拆解方向，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想了解設計深度與下一步建議。`
+        ? `我想先索取這次設計規劃的初步判讀，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想進一步了解空間方向、設計深度與下一步建議。`
         : !hasValidScope
-          ? "我目前還在整理實際裝修範圍，想先確認應該勾選哪些項目，才能得到更有參考價值的估價結果。"
-        : `我想索取這次估價的費用拆解報告，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想先了解主要預算落點與是否適合安排後續諮詢。`;
+          ? "我目前還在整理實際裝修範圍，想先確認哪些工項與條件最該先釐清，才能得到更有參考價值的前期估價。"
+        : `我想索取這次估價的費用拆解判讀，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想先了解主要預算落點、影響比例與是否適合安排後續諮詢。`;
 
     if (
       estimatorLeadFocus &&
