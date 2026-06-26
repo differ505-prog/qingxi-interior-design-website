@@ -172,6 +172,15 @@ const defaultTopicMode = publishingTopicModeOptions[0]?.value || "publishing";
 const defaultModeOption = publishingTopicModeOptions.find((modeOption) => modeOption.value === defaultTopicMode) || publishingTopicModeOptions[0];
 const defaultModeState = topicModeMap[defaultTopicMode];
 const publishingDashboard = topicModeMap[defaultTopicMode].publishingDashboard;
+const cannedReplies = [
+  {
+    id: "budget-range-estimator",
+    promptTitle: "裝修前期抓不到預算範圍怎麼辦？",
+    promptHint: "適合回覆：預算很亂、怕被亂報價、想先知道大概花費",
+    message:
+      "裝修前期最怕抓不到預算範圍。不管最後決定找誰施工，建議可以先用我們工作室開發的「線上自動估價系統」跑一次初步試算。先讓心裡有個客觀的數字底線，之後去跟師傅或設計師比價時會踏實很多，完全免費提供參考：https://www.qingxidesign.tw/tools",
+  },
+];
 
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
@@ -185,7 +194,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
 <BaseLayout
   title="設計師工作面板 - 青曦空間設計"
-  description="青曦內部使用的設計師工作面板，主畫面只留本週任務、本次決題與工種名錄。"
+  description="青曦內部使用的設計師工作面板，只留必要任務、進度與來源入口。"
   noindex={true}
 >
   <section class="social-ops-page">
@@ -195,7 +204,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
           <p class="ops-eyebrow">青曦內部面板</p>
           <h1>設計師工作面板</h1>
           <p class="ops-description">
-            主畫面只留本週任務、本次決題與工種名錄；來源、成效與備份全部後退到低頻層。
+            只留本週任務、生文主線與工種名錄。
           </p>
           <div class="hero-actions">
             <a href="#quest-board" class="btn btn-primary">開始本週任務</a>
@@ -204,80 +213,102 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         </div>
 
         <div class="hero-command-panel">
-          <article class="metric-card metric-card-primary">
-            <span>本週主線</span>
-            <strong id="weekly-progress-count">3 / 3</strong>
-            <small id="weekly-progress-note">已完成 0 / 3</small>
-            <div class="progress-track">
-              <div id="weekly-progress-bar" class="progress-bar"></div>
-            </div>
-          </article>
-          <details class="metric-fold">
-            <summary>
-              <span>累積節奏</span>
-              <small id="rank-title">起稿中</small>
-            </summary>
-            <div class="metric-fold-grid">
-              <article class="metric-card">
-                <span>目前級別</span>
-                <strong id="level-value">第 1 級</strong>
-              </article>
-              <article class="metric-card">
-                <span>總進度</span>
-                <strong id="xp-value">0 XP</strong>
-              </article>
-              <article class="metric-card">
-                <span>連續達標</span>
-                <strong id="streak-value">0</strong>
-              </article>
-              <article class="metric-card">
-                <span>完成累積</span>
-                <strong id="lifetime-runs-value">0</strong>
-              </article>
-            </div>
-          </details>
+          <div class="command-badge">
+            <span>本週狀態</span>
+            <strong id="rank-title">起稿中</strong>
+            <small id="level-value">第 1 級</small>
+          </div>
+          <div class="command-metrics">
+            <article class="metric-card metric-card-primary">
+              <span>本週主線</span>
+              <strong id="weekly-progress-count">0 / 3</strong>
+              <small id="weekly-progress-note">還差 3 個任務</small>
+              <div class="progress-track">
+                <div id="weekly-progress-bar" class="progress-bar"></div>
+              </div>
+            </article>
+            <details class="metric-fold">
+              <summary>
+                <span>累積節奏</span>
+                <small>低頻時再看</small>
+              </summary>
+              <div class="metric-fold-grid">
+                <article class="metric-card">
+                  <span>總進度</span>
+                  <strong id="xp-value">0 XP</strong>
+                </article>
+                <article class="metric-card">
+                  <span>連續達標</span>
+                  <strong id="streak-value">0</strong>
+                </article>
+                <article class="metric-card">
+                  <span>完成累積</span>
+                  <strong id="lifetime-runs-value">0</strong>
+                </article>
+              </div>
+            </details>
+          </div>
         </div>
       </header>
 
       <div class="ops-grid">
         <div class="ops-main">
-          <section id="quest-board" class="ops-panel quest-board">
-            <div class="panel-heading">
-              <div>
-                <p class="panel-tag">本週任務</p>
-                <h2>社群回覆與內容分發</h2>
-              </div>
-              <p>先完成回覆，再完成官網與社群分發。</p>
+          <div class="ops-task-layout">
+            <div class="ops-task-main">
+              <section id="daily-ops-board" class="ops-panel quest-board">
+                <div class="panel-heading">
+                  <div>
+                    <p class="panel-tag">日常任務</p>
+                    <h2>主動獵殺</h2>
+                  </div>
+                </div>
+                <div id="daily-quest-grid" class="quest-grid"></div>
+              </section>
+
+              <section id="quest-board" class="ops-panel quest-board">
+                <div class="panel-heading">
+                  <div>
+                    <p class="panel-tag">任務 6</p>
+                    <h2>高意圖社群回覆與低成本分發</h2>
+                  </div>
+                </div>
+                <div id="quest-grid" class="quest-grid"></div>
+              </section>
             </div>
-            <div class="quest-board-layout">
-              <div id="quest-grid" class="quest-grid"></div>
-              <aside id="article-social-replies" class="bookshelf-reply-shell quest-reply-shell" hidden>
-                <div class="bookshelf-preview-head">
-                  <p>社團回覆稿</p>
-                  <span>導流版會自動帶官網連結</span>
+
+            <aside class="ops-side ops-task-side">
+              <section class="ops-panel bookshelf-canned-replies bookshelf-canned-replies-priority ops-canned-sidebar">
+                <div class="panel-heading panel-heading-compact">
+                  <div>
+                    <p class="panel-tag">快速工具</p>
+                    <h2>常見罐頭回覆</h2>
+                  </div>
+                  <p>方便直接複製貼上回覆貼文</p>
                 </div>
-                <div class="bookshelf-reply-grid quest-reply-grid">
-                  <article class="bookshelf-reply-card">
-                    <span>簡短版</span>
-                    <p id="article-social-reply-short">尚未生成</p>
-                  </article>
-                  <article class="bookshelf-reply-card">
-                    <span>專業版</span>
-                    <p id="article-social-reply-pro">尚未生成</p>
-                  </article>
-                  <article class="bookshelf-reply-card">
-                    <span>導流版</span>
-                    <p id="article-social-reply-lead">尚未生成</p>
-                  </article>
+                <div class="bookshelf-reply-grid bookshelf-canned-grid">
+                  {cannedReplies.map((reply) => (
+                    <article class="bookshelf-reply-card bookshelf-canned-card bookshelf-canned-card-priority">
+                      <span>適用題目</span>
+                      <strong>{reply.promptTitle}</strong>
+                      <em>{reply.promptHint}</em>
+                      <p>{reply.message}</p>
+                      <div class="bookshelf-actions bookshelf-canned-actions">
+                        <button
+                          type="button"
+                          class="bookshelf-action bookshelp-action-primary"
+                          data-canned-reply-copy-button
+                          data-canned-reply-copy={reply.message}
+                          data-canned-reply-label={reply.promptTitle}
+                        >
+                          複製這則
+                        </button>
+                      </div>
+                    </article>
+                  ))}
                 </div>
-                <div class="bookshelf-actions bookshelf-reply-actions">
-                  <button type="button" id="copy-social-reply-short" class="bookshelf-action">複製簡短版</button>
-                  <button type="button" id="copy-social-reply-pro" class="bookshelf-action">複製專業版</button>
-                  <button type="button" id="copy-social-reply-lead" class="bookshelf-action">複製導流版</button>
-                </div>
-              </aside>
-            </div>
-          </section>
+              </section>
+            </aside>
+          </div>
 
           <details id="portal-grid" class="ops-panel ops-fold portal-board">
             <summary class="ops-fold-summary">
@@ -312,10 +343,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
           <section id="bookshelf-board" class="ops-panel bookshelf-board">
             <div class="panel-heading">
               <div>
-                <p class="panel-tag">本次決題</p>
-                <h2>決題與生文主線</h2>
+                <p class="panel-tag">內容書架</p>
+                <h2>內容書架</h2>
               </div>
-              <p>同一件事只看一次：先決題，再備好 Pro 生文包，其餘原始結果往下收。</p>
+              <p>主線只留判題、生文與名錄。</p>
             </div>
 
             <div class="bookshelf-prompt-tool">
@@ -345,17 +376,13 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <div id="article-topic-shell" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
-                  <p>本次決題結果</p>
+                  <p>本題動態決題</p>
                   <span id="article-topic-label">尚未決題</span>
                 </div>
                 <div class="bookshelf-confirm-grid">
                   <article class="bookshelf-confirm-card">
                     <span>決題模式</span>
                     <strong id="article-topic-mode">尚未決題</strong>
-                  </article>
-                  <article class="bookshelf-confirm-card">
-                    <span>網站分類</span>
-                    <strong id="article-topic-category">尚未判定</strong>
                   </article>
                   <article class="bookshelf-confirm-card">
                     <span>主書系</span>
@@ -377,22 +404,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <span>決題理由</span>
                     <strong id="article-topic-reason">先貼上真實社團問題，再由 Flash 在出版候選裡選最適合的切角。</strong>
                   </article>
-                  <article class="bookshelf-confirm-card">
-                    <span>下一步</span>
-                    <strong id="article-topic-next-action">先貼問題再判題</strong>
-                  </article>
-                  <article class="bookshelf-confirm-card">
-                    <span>相似舊文</span>
-                    <strong id="article-topic-similar">尚未比對</strong>
-                  </article>
-                  <article class="bookshelf-confirm-card">
-                    <span>回覆視角</span>
-                    <strong id="article-topic-angle">先貼問題再判題</strong>
-                  </article>
-                </div>
-                <div class="bookshelf-actions bookshelf-confirm-actions">
-                  <button type="button" id="copy-article-category" class="bookshelf-action">複製正式分類</button>
-                  <button type="button" id="copy-article-confirm-payload" class="bookshelf-action">複製分類落地資訊</button>
                 </div>
                 <p id="article-topic-note" class="bookshelf-confirm-note">這一步會先依真實社團問題理解痛點，再從系統候選缺口內挑最適合落進書稿的題目。</p>
               </div>
@@ -424,7 +435,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </div>
               <details id="article-ai-result-shell" class="bookshelf-ai-result">
                 <summary>
-                  <span>社團回覆與 AI 原文</span>
+                  <span>AI 結果</span>
                   <small id="article-ai-result-label">尚未生成</small>
                 </summary>
                 <div id="article-ai-decision" class="bookshelf-ai-decision" hidden>
@@ -444,9 +455,75 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <span>回覆視角</span>
                     <strong id="article-ai-decision-angle">先貼問題再判題</strong>
                   </article>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>主書系</span>
+                    <strong id="article-ai-decision-track">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>章節名稱</span>
+                    <strong id="article-ai-decision-chapter">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-ai-decision-card">
+                    <span>文章標題</span>
+                    <strong id="article-ai-decision-article-title">尚未判定</strong>
+                  </article>
+                </div>
+                <div id="article-social-replies" class="bookshelf-reply-shell" hidden>
+                  <div class="bookshelf-preview-head">
+                    <p>社團回覆稿</p>
+                    <span>導流版會自動帶官網連結</span>
+                  </div>
+                  <div class="bookshelf-reply-grid">
+                    <article class="bookshelf-reply-card">
+                      <span>簡短版</span>
+                      <p id="article-social-reply-short">尚未生成</p>
+                    </article>
+                    <article class="bookshelf-reply-card">
+                      <span>專業版</span>
+                      <p id="article-social-reply-pro">尚未生成</p>
+                    </article>
+                    <article class="bookshelf-reply-card">
+                      <span>導流版</span>
+                      <p id="article-social-reply-lead">尚未生成</p>
+                    </article>
+                  </div>
+                  <div class="bookshelf-actions bookshelf-reply-actions">
+                    <button type="button" id="copy-social-reply-short" class="bookshelf-action">複製簡短版</button>
+                    <button type="button" id="copy-social-reply-pro" class="bookshelf-action">複製專業版</button>
+                    <button type="button" id="copy-social-reply-lead" class="bookshelf-action">複製導流版</button>
+                  </div>
                 </div>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
               </details>
+              <div id="article-category-confirm" class="bookshelf-confirm" hidden>
+                <div class="bookshelf-preview-head">
+                  <p>這題會寫成什麼</p>
+                  <span>可直接拿去定稿</span>
+                </div>
+                <div class="bookshelf-confirm-grid">
+                  <article class="bookshelf-confirm-card">
+                    <span>網站分類</span>
+                    <strong id="article-confirm-category">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>主書系</span>
+                    <strong id="article-confirm-track">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>章節定位</span>
+                    <strong id="article-confirm-chapter">尚未判定</strong>
+                  </article>
+                  <article class="bookshelf-confirm-card">
+                    <span>文章標題</span>
+                    <strong id="article-confirm-title">尚未判定</strong>
+                  </article>
+                </div>
+                <div class="bookshelf-actions bookshelf-confirm-actions">
+                  <button type="button" id="copy-article-category" class="bookshelf-action">複製正式分類</button>
+                  <button type="button" id="copy-article-confirm-payload" class="bookshelf-action">複製分類落地資訊</button>
+                </div>
+                <p class="bookshelf-confirm-note">這裡先做 AI 建議分類確認；確認後再手動貼回知識分享資料源，避免誤寫正式文章。</p>
+              </div>
             </div>
 
             <div class="bookshelf-summary">
@@ -470,8 +547,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
             <section class="bookshelf-topic-modes">
               <div class="bookshelf-preview-head">
-                <p>出版補位策略</p>
-                <span>主畫面只留這次推薦主題與當前最缺的一章</span>
+                <p>決題模式</p>
+                <span>先決定出版補位策略，再看長線推薦主題</span>
               </div>
               <div class="bookshelf-topic-mode-switch" role="tablist" aria-label="決題模式">
                 {publishingTopicModeOptions.map((modeOption) => (
@@ -498,9 +575,121 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </template>
             ))}
 
+            <details id="vendor-notes-board" class="bookshelf-fold" open>
+              <summary>
+                <span>優質廠商筆記</span>
+                <small><span id="vendor-note-count">0</span> 筆</small>
+              </summary>
+              <div class="bookshelf-preview bookshelf-fold-body">
+                <div class="vendor-board-layout">
+                  <section class="vendor-panel">
+                    <div class="bookshelf-preview-head">
+                      <p>快速新增</p>
+                      <span id="vendor-note-form-mode">新增模式</span>
+                    </div>
+                    <p class="vendor-form-note">先記名稱、工種、價位、工的粗細與主連結，其餘低頻資訊再補。</p>
+                    <div class="vendor-form-grid">
+                      <label class="gemini-field">
+                        <span>廠商名稱</span>
+                        <input id="vendor-note-name" type="text" placeholder="例如：某某木作工作室" />
+                      </label>
+                      <label class="gemini-field">
+                        <span>工種</span>
+                        <select id="vendor-note-trade">
+                          <option value="">選擇工種</option>
+                          {vendorTradeOptions.map((trade) => (
+                            <option value={trade}>{trade}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label class="gemini-field">
+                        <span>價位分級</span>
+                        <select id="vendor-note-price-level">
+                          <option value="">選擇價位</option>
+                          {vendorPriceLevelOptions.map((level) => (
+                            <option value={level}>{level}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label class="gemini-field">
+                        <span>工的粗細</span>
+                        <select id="vendor-note-craft-level">
+                          <option value="">選擇細緻度</option>
+                          {vendorCraftLevelOptions.map((level) => (
+                            <option value={level}>{level}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label class="gemini-field gemini-field-full">
+                        <span>主要連結</span>
+                        <input id="vendor-note-primary-url" type="url" placeholder="貼官網、作品集或主要頁面" />
+                      </label>
+                      <label class="gemini-field gemini-field-full">
+                        <span>一句印象</span>
+                        <input id="vendor-note-impression" type="text" placeholder="第一眼想記下來的優點" />
+                      </label>
+                    </div>
+                    <details id="vendor-note-extra-fields" class="vendor-form-fold">
+                      <summary>
+                        <span>補充欄位</span>
+                        <small>地區、第二連結與備註</small>
+                      </summary>
+                      <div class="vendor-form-grid vendor-form-grid-extra">
+                        <label class="gemini-field">
+                          <span>地區 / 來源</span>
+                          <input id="vendor-note-location" type="text" placeholder="例如：台北 / IG 逛到" />
+                        </label>
+                        <label class="gemini-field">
+                          <span>第二連結</span>
+                          <input id="vendor-note-secondary-url" type="url" placeholder="IG、Behance 或其他補充連結" />
+                        </label>
+                        <label class="gemini-field gemini-field-full">
+                          <span>備註</span>
+                          <textarea id="vendor-note-memo" rows="5" placeholder="補充風格、質感、合作印象或未來適合案型"></textarea>
+                        </label>
+                      </div>
+                    </details>
+                    <div class="bookshelf-actions vendor-form-actions">
+                      <button type="button" id="save-vendor-note" class="bookshelf-action bookshelp-action-primary">儲存筆記</button>
+                      <button type="button" id="clear-vendor-note-form" class="bookshelf-action">清空</button>
+                    </div>
+                    <p id="vendor-note-feedback" class="vendor-note-feedback" aria-live="polite"></p>
+                  </section>
+
+                  <section class="vendor-panel">
+                    <div class="vendor-list-head">
+                      <div class="bookshelf-preview-head">
+                        <p>工種名錄</p>
+                        <span id="vendor-note-summary">先按工種看</span>
+                      </div>
+                      <div id="vendor-trade-filter" class="vendor-trade-filter"></div>
+                      <div class="vendor-list-tools">
+                        <label class="gemini-field vendor-sort-field">
+                          <span>排序</span>
+                          <select id="vendor-note-sort">
+                            <option value="default">預設</option>
+                            <option value="pinned">優先名單</option>
+                            <option value="recent">最近更新</option>
+                            <option value="price-desc">價位高低</option>
+                          </select>
+                        </label>
+                        <label class="gemini-field vendor-search-field">
+                          <span>搜尋</span>
+                          <input id="vendor-note-search" type="search" placeholder="搜尋名稱、地區、印象或備註" />
+                        </label>
+                      </div>
+                    </div>
+                    <div id="vendor-note-list" class="vendor-note-list">
+                      <div class="vendor-note-empty">尚未建立優質廠商筆記。</div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </details>
+
             <details class="bookshelf-fold">
               <summary>
-                <span>低頻工具</span>
+                <span>回看與成效</span>
                 <small>低頻時再展開</small>
               </summary>
               <div class="bookshelf-fold-stack">
@@ -511,8 +700,24 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   </div>
                   <div class="bookshelf-confirm-grid bookshelf-analytics-grid">
                     <article class="bookshelf-confirm-card">
+                      <span>即時活躍使用者</span>
+                      <strong id="content-analytics-realtime-users">-</strong>
+                    </article>
+                    <article class="bookshelf-confirm-card">
+                      <span>今日人次</span>
+                      <strong id="content-analytics-today-sessions">-</strong>
+                    </article>
+                    <article class="bookshelf-confirm-card">
+                      <span>總人次</span>
+                      <strong id="content-analytics-total-sessions">-</strong>
+                    </article>
+                    <article class="bookshelf-confirm-card">
                       <span>近 7 天文章瀏覽</span>
                       <strong id="content-analytics-blog-views">-</strong>
+                    </article>
+                    <article class="bookshelf-confirm-card">
+                      <span>近 7 天社群導流</span>
+                      <strong id="content-analytics-social-sessions">-</strong>
                     </article>
                     <article class="bookshelf-confirm-card">
                       <span>估價器啟動</span>
@@ -521,10 +726,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <article class="bookshelf-confirm-card">
                       <span>估價 CTA 點擊</span>
                       <strong id="content-analytics-estimate-cta">-</strong>
-                    </article>
-                    <article class="bookshelf-confirm-card">
-                      <span>官方 LINE 點擊</span>
-                      <strong id="content-analytics-official-line">-</strong>
                     </article>
                     <article class="bookshelf-confirm-card">
                       <span>正式留單成功</span>
@@ -540,7 +741,25 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                       <li>正在讀取內容成效...</li>
                     </ol>
                   </div>
-                  <p id="content-analytics-note" class="bookshelf-confirm-note">只回看文章瀏覽、官網轉換與官方 LINE 點擊。</p>
+                  <div class="bookshelf-analytics-top">
+                    <div class="bookshelf-preview-head">
+                      <p>近 7 天主要來源</p>
+                      <span>看來源 / 媒介</span>
+                    </div>
+                    <ol id="content-analytics-top-sources" class="bookshelf-analytics-list">
+                      <li>正在讀取來源資料...</li>
+                    </ol>
+                  </div>
+                  <div class="bookshelf-analytics-top">
+                    <div class="bookshelf-preview-head">
+                      <p>社群導流熱門落地頁</p>
+                      <span>看哪篇最能接住流量</span>
+                    </div>
+                    <ol id="content-analytics-social-landings" class="bookshelf-analytics-list">
+                      <li>正在讀取落地頁資料...</li>
+                    </ol>
+                  </div>
+                  <p id="content-analytics-note" class="bookshelf-confirm-note">只回看文章瀏覽與官網轉換。</p>
                   <div class="bookshelf-actions bookshelf-confirm-actions">
                     <button type="button" id="refresh-content-analytics" class="bookshelf-action">重新整理成效</button>
                     <a href="https://analytics.google.com/" class="bookshelf-action" target="_blank" rel="noreferrer">前往 GA4</a>
@@ -569,119 +788,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </div>
             </details>
 
-          </section>
-
-          <section id="vendor-notes-board" class="ops-panel vendor-board">
-            <div class="panel-heading">
-              <div>
-                <p class="panel-tag">工種名錄</p>
-                <h2>優質廠商筆記</h2>
-              </div>
-              <p><span id="vendor-note-count">0</span> 筆，主畫面只留名錄本體；補充欄位與細節再往下展開。</p>
-            </div>
-            <div class="vendor-board-layout">
-              <section class="vendor-panel">
-                <div class="bookshelf-preview-head">
-                  <p>快速新增</p>
-                  <span id="vendor-note-form-mode">新增模式</span>
-                </div>
-                <p class="vendor-form-note">先記名稱、工種、價位、工的粗細與主連結，其餘低頻資訊再補。</p>
-                <div class="vendor-form-grid">
-                  <label class="gemini-field">
-                    <span>廠商名稱</span>
-                    <input id="vendor-note-name" type="text" placeholder="例如：某某木作工作室" />
-                  </label>
-                  <label class="gemini-field">
-                    <span>工種</span>
-                    <select id="vendor-note-trade">
-                      <option value="">選擇工種</option>
-                      {vendorTradeOptions.map((trade) => (
-                        <option value={trade}>{trade}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label class="gemini-field">
-                    <span>價位分級</span>
-                    <select id="vendor-note-price-level">
-                      <option value="">選擇價位</option>
-                      {vendorPriceLevelOptions.map((level) => (
-                        <option value={level}>{level}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label class="gemini-field">
-                    <span>工的粗細</span>
-                    <select id="vendor-note-craft-level">
-                      <option value="">選擇細緻度</option>
-                      {vendorCraftLevelOptions.map((level) => (
-                        <option value={level}>{level}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label class="gemini-field gemini-field-full">
-                    <span>主要連結</span>
-                    <input id="vendor-note-primary-url" type="url" placeholder="貼官網、作品集或主要頁面" />
-                  </label>
-                  <label class="gemini-field gemini-field-full">
-                    <span>一句印象</span>
-                    <input id="vendor-note-impression" type="text" placeholder="第一眼想記下來的優點" />
-                  </label>
-                </div>
-                <details id="vendor-note-extra-fields" class="vendor-form-fold">
-                  <summary>
-                    <span>補充欄位</span>
-                    <small>地區、第二連結與備註</small>
-                  </summary>
-                  <div class="vendor-form-grid vendor-form-grid-extra">
-                    <label class="gemini-field">
-                      <span>地區 / 來源</span>
-                      <input id="vendor-note-location" type="text" placeholder="例如：台北 / IG 逛到" />
-                    </label>
-                    <label class="gemini-field">
-                      <span>第二連結</span>
-                      <input id="vendor-note-secondary-url" type="url" placeholder="IG、Behance 或其他補充連結" />
-                    </label>
-                    <label class="gemini-field gemini-field-full">
-                      <span>備註</span>
-                      <textarea id="vendor-note-memo" rows="5" placeholder="補充風格、質感、合作印象或未來適合案型"></textarea>
-                    </label>
-                  </div>
-                </details>
-                <div class="bookshelf-actions vendor-form-actions">
-                  <button type="button" id="save-vendor-note" class="bookshelf-action bookshelp-action-primary">儲存筆記</button>
-                  <button type="button" id="clear-vendor-note-form" class="bookshelf-action">清空</button>
-                </div>
-                <p id="vendor-note-feedback" class="vendor-note-feedback" aria-live="polite"></p>
-              </section>
-
-              <section class="vendor-panel">
-                <div class="vendor-list-head">
-                  <div class="bookshelf-preview-head">
-                    <p>工種名錄</p>
-                    <span id="vendor-note-summary">先按工種看</span>
-                  </div>
-                  <div class="vendor-list-tools">
-                    <label class="gemini-field vendor-sort-field">
-                      <span>排序</span>
-                      <select id="vendor-note-sort">
-                        <option value="default">預設</option>
-                        <option value="pinned">優先名單</option>
-                        <option value="recent">最近更新</option>
-                        <option value="price-desc">價位高低</option>
-                      </select>
-                    </label>
-                    <label class="gemini-field vendor-search-field">
-                      <span>搜尋</span>
-                      <input id="vendor-note-search" type="search" placeholder="搜尋名稱、地區、印象或備註" />
-                    </label>
-                  </div>
-                  <div id="vendor-trade-filter" class="vendor-trade-filter"></div>
-                </div>
-                <div id="vendor-note-list" class="vendor-note-list">
-                  <div class="vendor-note-empty">尚未建立優質廠商筆記。</div>
-                </div>
-              </section>
-            </div>
           </section>
 
           <details id="gemini-backup-board" class="ops-panel ops-fold gemini-board">
@@ -759,14 +865,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   const SITE_ORIGIN = "https://qingxidesign.tw";
   const BLOG_INDEX_URL = `${SITE_ORIGIN}/blog`;
   const THREADS_PROFILE_URL = "https://www.threads.com/@qingxi.ds?hl=zh-tw";
-  const INSTAGRAM_PROFILE_URL = "https://www.instagram.com/qingxi.ds/";
-  const FACEBOOK_PAGE_URL = "https://www.facebook.com/profile.php?id=61562661642204";
   const ARTICLE_AI_TIMEOUT_MS = 45000;
   const ARTICLE_AI_METADATA_TIMEOUT_MS = 18000;
   const CONTENT_ANALYTICS_URL = "/api/social-ops/analytics";
   const VENDOR_NOTES_API_URL = "/api/social-ops/vendor-notes";
   const socialReplyShortUrlCache = new Map();
   const sourceTemplate = JSON.parse(defaultSourcesJson);
+  const GOOGLE_BUSINESS_URL =
+    sourceTemplate.find((source) => source.id === "google-business")?.url || "https://www.google.com/";
+  const PORTAL_BOARD_URL = "#portal-grid";
   const articleLibrary = JSON.parse(blogPostsJson);
   const bookshelfTracks = JSON.parse(bookshelfTracksJson);
   const bookshelfSubchapterPools = JSON.parse(bookshelfSubchapterPoolsJson);
@@ -837,15 +944,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     rangeLabel: "近 7 天",
     updatedAt: "",
     metrics: {
+      realtimeActiveUsers: 0,
+      todaySessions: 0,
+      totalSessions: 0,
       blogViews: 0,
+      socialSessions: 0,
       estimateGenerated: 0,
       estimateCtaClick: 0,
-      officialLineClick: 0,
       requirementSubmit: 0,
       requirementSuccess: 0,
     },
-    latestOfficialLineClickAt: "",
     topPosts: [],
+    topSources: [],
+    socialLandingPages: [],
     note: "",
   };
   let vendorNotesState = {
@@ -1057,24 +1168,41 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return `${target.getFullYear()}-W${String(weekNo).padStart(2, "0")}`;
   }
 
+  function getDayKey(date = new Date()) {
+    const target = new Date(date);
+    target.setHours(0, 0, 0, 0);
+    return target.toISOString().split("T")[0];
+  }
+
+  function createDailyOps() {
+    return {
+      dayKey: getDayKey(),
+      actionMorningPatrol: false,
+      actionEveningPatrol: false,
+      actionOutboundHunt: false,
+      actionOutboundFallback: false,
+    };
+  }
+
   function createRun(slot) {
     return {
       id: `run-${slot}`,
       slot,
       actionOutreach: false,
+      actionOutreachFallback: false,
       actionImageGeneration: false,
       actionWebsite: false,
+      actionGoogleBusiness: false,
       actionThreads: false,
-      actionInstagram: false,
-      actionFacebook: false,
-      actionXiaohongshu: false,
+      actionLocalCommunity: false,
+      actionFacadeMaintenance: false,
       linkStash: {
         gemini: "",
         website: "",
+        googleBusiness: "",
         threads: "",
-        instagram: "",
-        facebook: "",
-        xiaohongshu: "",
+        localCommunity: "",
+        facadeMaintenance: "",
       },
       rewardClaimed: false,
       completedAt: "",
@@ -1091,6 +1219,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   function createInitialState() {
     return {
+      daily: createDailyOps(),
       weekly: {
         weekKey: getWeekKey(),
         bonusClaimed: false,
@@ -1104,43 +1233,74 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     };
   }
 
+  function hydrateRunState(savedRun = {}, templateRun) {
+    const migratedOutreach = savedRun?.actionOutreach !== undefined
+      ? Boolean(savedRun?.actionOutreach)
+      : Boolean(savedRun?.actionSearch) && Boolean(savedRun?.actionAdvice);
+    const migratedImageGeneration = savedRun?.actionImageGeneration !== undefined
+      ? Boolean(savedRun?.actionImageGeneration)
+      : Boolean(savedRun?.actionImage) || Boolean(savedRun?.actionVisual) || Boolean(savedRun?.actionIllustration);
+    const migratedWebsite = savedRun?.actionWebsite !== undefined
+      ? Boolean(savedRun?.actionWebsite)
+      : Boolean(savedRun?.actionArticle);
+    const savedLinkStash = savedRun?.linkStash && typeof savedRun.linkStash === "object"
+      ? savedRun.linkStash
+      : {};
+    return {
+      ...templateRun,
+      ...savedRun,
+      actionOutreach: migratedOutreach,
+      actionOutreachFallback: Boolean(savedRun?.actionOutreachFallback),
+      actionImageGeneration: migratedImageGeneration,
+      actionWebsite: migratedWebsite,
+      actionGoogleBusiness: Boolean(savedRun?.actionGoogleBusiness),
+      actionThreads: Boolean(savedRun?.actionThreads),
+      actionLocalCommunity: savedRun?.actionLocalCommunity !== undefined
+        ? Boolean(savedRun?.actionLocalCommunity)
+        : Boolean(savedRun?.actionFacebook),
+      actionFacadeMaintenance: savedRun?.actionFacadeMaintenance !== undefined
+        ? Boolean(savedRun?.actionFacadeMaintenance)
+        : Boolean(savedRun?.actionInstagram) || Boolean(savedRun?.actionXiaohongshu),
+      linkStash: {
+        ...templateRun.linkStash,
+        gemini: typeof savedLinkStash?.gemini === "string" ? savedLinkStash.gemini : "",
+        website: typeof savedLinkStash?.website === "string" ? savedLinkStash.website : "",
+        googleBusiness: typeof savedLinkStash?.googleBusiness === "string" ? savedLinkStash.googleBusiness : "",
+        threads: typeof savedLinkStash?.threads === "string" ? savedLinkStash.threads : "",
+        localCommunity: typeof savedLinkStash?.localCommunity === "string"
+          ? savedLinkStash.localCommunity
+          : typeof savedLinkStash?.facebook === "string"
+            ? savedLinkStash.facebook
+            : "",
+        facadeMaintenance: typeof savedLinkStash?.facadeMaintenance === "string"
+          ? savedLinkStash.facadeMaintenance
+          : typeof savedLinkStash?.instagram === "string" && savedLinkStash.instagram
+            ? savedLinkStash.instagram
+            : typeof savedLinkStash?.xiaohongshu === "string"
+              ? savedLinkStash.xiaohongshu
+              : "",
+      },
+    };
+  }
+
   function syncRuns(savedRuns = []) {
     const templateRuns = createWeeklyRuns();
     return templateRuns.map((templateRun, index) => {
       const savedRun = savedRuns.find((run) => run?.id === templateRun.id) ?? savedRuns[index] ?? {};
-      const migratedOutreach = savedRun?.actionOutreach !== undefined
-        ? Boolean(savedRun?.actionOutreach)
-        : Boolean(savedRun?.actionSearch) && Boolean(savedRun?.actionAdvice);
-      const migratedImageGeneration = savedRun?.actionImageGeneration !== undefined
-        ? Boolean(savedRun?.actionImageGeneration)
-        : Boolean(savedRun?.actionImage) || Boolean(savedRun?.actionVisual) || Boolean(savedRun?.actionIllustration);
-      const migratedWebsite = savedRun?.actionWebsite !== undefined
-        ? Boolean(savedRun?.actionWebsite)
-        : Boolean(savedRun?.actionArticle);
-      const savedLinkStash = savedRun?.linkStash && typeof savedRun.linkStash === "object"
-        ? savedRun.linkStash
-        : {};
-      return {
-        ...templateRun,
-        ...savedRun,
-        actionOutreach: migratedOutreach,
-        actionImageGeneration: migratedImageGeneration,
-        actionWebsite: migratedWebsite,
-        actionThreads: Boolean(savedRun?.actionThreads),
-        actionInstagram: Boolean(savedRun?.actionInstagram),
-        actionFacebook: Boolean(savedRun?.actionFacebook),
-        actionXiaohongshu: Boolean(savedRun?.actionXiaohongshu),
-        linkStash: {
-          ...templateRun.linkStash,
-          gemini: typeof savedLinkStash?.gemini === "string" ? savedLinkStash.gemini : "",
-          website: typeof savedLinkStash?.website === "string" ? savedLinkStash.website : "",
-          threads: typeof savedLinkStash?.threads === "string" ? savedLinkStash.threads : "",
-          instagram: typeof savedLinkStash?.instagram === "string" ? savedLinkStash.instagram : "",
-          facebook: typeof savedLinkStash?.facebook === "string" ? savedLinkStash.facebook : "",
-          xiaohongshu: typeof savedLinkStash?.xiaohongshu === "string" ? savedLinkStash.xiaohongshu : "",
-        },
-      };
+      return hydrateRunState(savedRun, templateRun);
     });
+  }
+
+  function hydrateDailyState(savedDaily = {}, templateDaily = createDailyOps()) {
+    return {
+      ...templateDaily,
+      ...savedDaily,
+      dayKey: typeof savedDaily?.dayKey === "string" && savedDaily.dayKey ? savedDaily.dayKey : templateDaily.dayKey,
+      actionMorningPatrol: Boolean(savedDaily?.actionMorningPatrol),
+      actionEveningPatrol: Boolean(savedDaily?.actionEveningPatrol),
+      actionOutboundHunt: Boolean(savedDaily?.actionOutboundHunt),
+      actionOutboundFallback: Boolean(savedDaily?.actionOutboundFallback),
+    };
   }
 
   let state = createInitialState();
@@ -1156,6 +1316,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       const parsed = JSON.parse(raw);
       const initialState = createInitialState();
       state = {
+        daily: hydrateDailyState(parsed.daily, initialState.daily),
         weekly: {
           ...initialState.weekly,
           ...(parsed.weekly || {}),
@@ -1172,7 +1333,32 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function isRunComplete(run) {
-    return run.actionOutreach && run.actionImageGeneration && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
+    return (run.actionOutreach || run.actionOutreachFallback)
+      && run.actionImageGeneration
+      && run.actionWebsite
+      && run.actionGoogleBusiness
+      && (run.actionThreads || run.actionLocalCommunity);
+  }
+
+  function isDailyOpsComplete(daily = state.daily) {
+    return daily.actionMorningPatrol
+      && daily.actionEveningPatrol
+      && (daily.actionOutboundHunt || daily.actionOutboundFallback);
+  }
+
+  function buildCarryoverWeeklyRuns(previousRuns = []) {
+    const templateRuns = createWeeklyRuns();
+    const unfinishedRuns = previousRuns.filter((run) => !isRunComplete(run));
+    return templateRuns.map((templateRun, index) => {
+      const carryoverRun = unfinishedRuns[index];
+      if (!carryoverRun) return templateRun;
+      const hydratedRun = hydrateRunState(carryoverRun, templateRun);
+      return {
+        ...hydratedRun,
+        rewardClaimed: false,
+        completedAt: "",
+      };
+    });
   }
 
   function normalizeWeeklyState() {
@@ -1180,13 +1366,29 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     if (state.weekly.weekKey === currentWeekKey) return;
 
     const completedRuns = state.weekly.runs.filter(isRunComplete).length;
+    const carryoverCount = state.weekly.runs.filter((run) => !isRunComplete(run)).length;
     state.stats.streak = completedRuns >= WEEKLY_TARGET ? state.stats.streak + 1 : 0;
     state.weekly = {
       weekKey: currentWeekKey,
       bonusClaimed: false,
-      runs: createWeeklyRuns(),
+      runs: buildCarryoverWeeklyRuns(state.weekly.runs),
     };
     saveState();
+    setFeedback(
+      carryoverCount > 0
+        ? `已進入新的一週，已保留 ${carryoverCount} 個未完成任務，已完成項目已刷新。`
+        : "已進入新的一週，本週任務已刷新。",
+      carryoverCount > 0 ? "is-warning" : "is-success",
+    );
+  }
+
+  function normalizeDailyState() {
+    const currentDayKey = getDayKey();
+    if (state.daily?.dayKey === currentDayKey) return;
+
+    state.daily = createDailyOps();
+    saveState();
+    setFeedback("已進入新的一天，主動獵殺任務已刷新。", "is-success");
   }
 
   function escapeHtml(value) {
@@ -1256,10 +1458,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const remaining = Math.max(WEEKLY_TARGET - completedRuns, 0);
     const percent = Math.round((completedRuns / WEEKLY_TARGET) * 100);
     const level = getLevel();
-    document.getElementById("weekly-progress-count").textContent = `${WEEKLY_TARGET} / ${WEEKLY_TARGET}`;
+    document.getElementById("weekly-progress-count").textContent = `${completedRuns} / ${WEEKLY_TARGET}`;
     document.getElementById("weekly-progress-note").textContent = remaining === 0
-      ? `已完成 ${completedRuns} / ${WEEKLY_TARGET}`
-      : `已完成 ${completedRuns} / ${WEEKLY_TARGET}，還差 ${remaining} 個任務`;
+      ? "本週主線已達標，待下週刷新。"
+      : `還差 ${remaining} 個任務`;
     document.getElementById("weekly-progress-bar").style.width = `${percent}%`;
     document.getElementById("xp-value").textContent = `${state.stats.xp} XP`;
     document.getElementById("streak-value").textContent = `${state.stats.streak} 週`;
@@ -1280,25 +1482,27 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
 
     const complete = isRunComplete(run);
-    const actionOneComplete = run.actionOutreach;
-    const actionTwoComplete = run.actionImageGeneration && run.actionWebsite && run.actionThreads && run.actionInstagram && run.actionFacebook && run.actionXiaohongshu;
+    const actionOneComplete = run.actionOutreach || run.actionOutreachFallback;
+    const actionTwoComplete = run.actionImageGeneration
+      && run.actionWebsite
+      && run.actionGoogleBusiness
+      && (run.actionThreads || run.actionLocalCommunity);
     const completedSteps = [
-      run.actionOutreach,
+      run.actionOutreach || run.actionOutreachFallback,
       run.actionImageGeneration,
       run.actionWebsite,
-      run.actionThreads,
-      run.actionInstagram,
-      run.actionFacebook,
-      run.actionXiaohongshu,
+      run.actionGoogleBusiness,
+      run.actionThreads || run.actionLocalCommunity,
+      run.actionFacadeMaintenance,
     ].filter(Boolean).length;
     const progressLabel = `(${activeRunIndex + 1}/${WEEKLY_TARGET})`;
     const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
     const geminiDraftUrl = normalizeLinkValue(run.linkStash?.gemini);
     const websiteDraftUrl = normalizeLinkValue(run.linkStash?.website);
+    const googleBusinessDraftUrl = normalizeLinkValue(run.linkStash?.googleBusiness);
     const threadsDraftUrl = normalizeLinkValue(run.linkStash?.threads);
-    const instagramDraftUrl = normalizeLinkValue(run.linkStash?.instagram);
-    const facebookDraftUrl = normalizeLinkValue(run.linkStash?.facebook);
-    const xiaohongshuDraftUrl = normalizeLinkValue(run.linkStash?.xiaohongshu);
+    const localCommunityDraftUrl = normalizeLinkValue(run.linkStash?.localCommunity);
+    const facadeMaintenanceDraftUrl = normalizeLinkValue(run.linkStash?.facadeMaintenance);
 
     shell.innerHTML = `
       <article class="quest-card ${complete ? "is-complete" : ""}">
@@ -1311,16 +1515,22 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <div class="quest-main-head">
               <div>
                 <p class="quest-main-index">主任務 1</p>
-                <strong>行動 1（釣魚）</strong>
+                <strong>行動 1（高意圖回覆）</strong>
               </div>
               <span>${actionOneComplete ? "已完成" : "進行中"}</span>
             </div>
-            <p class="quest-main-copy">先在 FB 或 LINE 社團完成一次專業回覆，並附上官網文章或估價器連結。</p>
+            <p class="quest-main-copy">在在地 FB 或 LINE 社群先給完整可用的專業建議；只有真的適合時，才自然補上官網文章或估價器連結。若本週巡邏沒有合適發問，不必硬回，可直接由行動 2 補位。</p>
             <div class="quest-checklist">
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionOutreach ? "is-checked" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionOutreach" ${run.actionOutreach ? "checked" : ""} />
-                  <span>已在 FB 或 LINE 社團完成一次專業回覆並附上文章或估價器</span>
+                  <span>已在在地 FB 或 LINE 社群完成一次高意圖專業回覆，必要時才補上文章或估價器</span>
+                </label>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionOutreachFallback ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionOutreachFallback" ${run.actionOutreachFallback ? "checked" : ""} />
+                  <span>本週巡邏沒有適合發問，已不硬回，直接以行動 2 主動分發補位</span>
                 </label>
               </div>
             </div>
@@ -1329,11 +1539,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <div class="quest-main-head">
               <div>
                 <p class="quest-main-index">主任務 2</p>
-                <strong>行動 2（分發）</strong>
+                <strong>行動 2（低成本分發）</strong>
               </div>
               <span>${actionTwoComplete ? "已完成" : "進行中"}</span>
             </div>
-            <p class="quest-main-copy">完成生圖、官網上稿，再把同一題改寫分發到各社群平台。</p>
+            <p class="quest-main-copy">先完成官網文章與必要圖檔，再同步到 Google 商家，最後擇一投放 Threads 或在地社群；FB 粉專、IG、小紅書只做低頻門面維護。</p>
             <div class="quest-checklist">
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionImageGeneration ? "is-checked" : ""}">
@@ -1350,30 +1560,30 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <a class="quest-link-btn" href="${BLOG_INDEX_URL}" target="_blank" rel="noreferrer">官網</a>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionFacebook ? "is-checked" : ""}">
-                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionFacebook" ${run.actionFacebook ? "checked" : ""} />
-                  <span>已改寫並轉 po Facebook 粉專</span>
+                <label class="quest-check ${run.actionGoogleBusiness ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionGoogleBusiness" ${run.actionGoogleBusiness ? "checked" : ""} />
+                  <span>已同步發布 Google 商家最新動態</span>
                 </label>
-                <a class="quest-link-btn" href="${FACEBOOK_PAGE_URL}" target="_blank" rel="noreferrer">Facebook</a>
-              </div>
-              <div class="quest-check-row">
-                <label class="quest-check ${run.actionInstagram ? "is-checked" : ""}">
-                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionInstagram" ${run.actionInstagram ? "checked" : ""} />
-                  <span>已改寫並發佈 Instagram</span>
-                </label>
-                <a class="quest-link-btn" href="${INSTAGRAM_PROFILE_URL}" target="_blank" rel="noreferrer">Instagram</a>
+                <a class="quest-link-btn" href="${GOOGLE_BUSINESS_URL}" target="_blank" rel="noreferrer">Google 商家</a>
               </div>
               <div class="quest-check-row">
                 <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
-                  <span>已改寫並發佈 Threads</span>
+                  <span>已改寫並發佈 Threads（測試場，與在地社群擇一即可）</span>
                 </label>
                 <a class="quest-link-btn" href="${THREADS_PROFILE_URL}" target="_blank" rel="noreferrer">Threads</a>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionXiaohongshu ? "is-checked" : ""}">
-                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionXiaohongshu" ${run.actionXiaohongshu ? "checked" : ""} />
-                  <span>已改寫並發佈小紅書</span>
+                <label class="quest-check ${run.actionLocalCommunity ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionLocalCommunity" ${run.actionLocalCommunity ? "checked" : ""} />
+                  <span>已將文章改寫後發佈到在地 FB / LINE 社群（與 Threads 擇一即可）</span>
+                </label>
+                <a class="quest-link-btn" href="${PORTAL_BOARD_URL}">來源入口</a>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${run.actionFacadeMaintenance ? "is-checked" : ""}">
+                  <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionFacadeMaintenance" ${run.actionFacadeMaintenance ? "checked" : ""} />
+                  <span>本週如有需要，已補一則門面維護內容到 FB 粉專 / IG / 小紅書任一平台（選填）</span>
                 </label>
               </div>
             </div>
@@ -1402,6 +1612,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   </div>
                 </label>
                 <label class="quest-link-field">
+                  <span>Google 商家稿</span>
+                  <div class="quest-link-field-row">
+                    ${googleBusinessDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(googleBusinessDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="googleBusiness" value="${escapeHtml(run.linkStash?.googleBusiness || "")}" placeholder="貼 Google 商家貼文草稿或編輯頁網址" />
+                  </div>
+                </label>
+                <label class="quest-link-field">
                   <span>Threads 稿</span>
                   <div class="quest-link-field-row">
                     ${threadsDraftUrl
@@ -1411,34 +1630,90 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   </div>
                 </label>
                 <label class="quest-link-field">
-                  <span>Instagram 稿</span>
+                  <span>在地社群稿</span>
                   <div class="quest-link-field-row">
-                    ${instagramDraftUrl
-                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(instagramDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                    ${localCommunityDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(localCommunityDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="instagram" value="${escapeHtml(run.linkStash?.instagram || "")}" placeholder="貼 IG 文案或分享網址" />
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="localCommunity" value="${escapeHtml(run.linkStash?.localCommunity || "")}" placeholder="貼在地社群貼文或留言連結" />
                   </div>
                 </label>
                 <label class="quest-link-field">
-                  <span>Facebook 稿</span>
+                  <span>門面維護稿</span>
                   <div class="quest-link-field-row">
-                    ${facebookDraftUrl
-                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(facebookDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
+                    ${facadeMaintenanceDraftUrl
+                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(facadeMaintenanceDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
                       : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="facebook" value="${escapeHtml(run.linkStash?.facebook || "")}" placeholder="貼 FB 粉專文案或分享網址" />
-                  </div>
-                </label>
-                <label class="quest-link-field">
-                  <span>小紅書稿</span>
-                  <div class="quest-link-field-row">
-                    ${xiaohongshuDraftUrl
-                      ? `<a class="quest-link-btn quest-link-btn-soft" href="${escapeHtml(xiaohongshuDraftUrl)}" target="_blank" rel="noreferrer">開啟</a>`
-                      : `<button type="button" class="quest-link-btn quest-link-btn-soft is-disabled" disabled>開啟</button>`}
-                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="xiaohongshu" value="${escapeHtml(run.linkStash?.xiaohongshu || "")}" placeholder="貼小紅書文案或分享網址" />
+                    <input type="url" data-run-index="${activeRunIndex}" data-run-link-key="facadeMaintenance" value="${escapeHtml(run.linkStash?.facadeMaintenance || "")}" placeholder="貼 FB 粉專 / IG / 小紅書任一門面內容連結" />
                   </div>
                 </label>
               </div>
             </div>
+          </section>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderDailyOps() {
+    const shell = document.getElementById("daily-quest-grid");
+    if (!shell) return;
+
+    const daily = state.daily;
+    const complete = isDailyOpsComplete(daily);
+    const completedSteps = [
+      daily.actionMorningPatrol,
+      daily.actionEveningPatrol,
+      daily.actionOutboundHunt || daily.actionOutboundFallback,
+    ].filter(Boolean).length;
+    const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
+    const huntComplete = daily.actionOutboundHunt || daily.actionOutboundFallback;
+
+    shell.innerHTML = `
+      <article class="quest-card ${complete ? "is-complete" : ""}">
+        <div class="quest-topline">
+          <span class="quest-slot">今日</span>
+          <span class="quest-keyword">${progressState}</span>
+        </div>
+        <div class="quest-main-list">
+          <section class="quest-main ${complete ? "is-complete" : ""}">
+            <div class="quest-main-head">
+              <div>
+                <p class="quest-main-index">日常巡邏</p>
+                <strong>主動獵殺（每日早晚巡邏 1 次）</strong>
+              </div>
+              <span>${complete ? "已完成" : "進行中"}</span>
+            </div>
+            <p class="quest-main-copy">鎖定明確尋找設計 / 統包的貼文，第一時間私訊，主打地緣極近與系統免費初步報價。若今日巡邏沒有合適目標，不必硬私訊，但早晚巡邏仍要完成。</p>
+            <div class="quest-checklist">
+              <div class="quest-check-row">
+                <label class="quest-check ${daily.actionMorningPatrol ? "is-checked" : ""}">
+                  <input type="checkbox" data-daily-check="actionMorningPatrol" ${daily.actionMorningPatrol ? "checked" : ""} />
+                  <span>今日早巡已完成</span>
+                </label>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${daily.actionEveningPatrol ? "is-checked" : ""}">
+                  <input type="checkbox" data-daily-check="actionEveningPatrol" ${daily.actionEveningPatrol ? "checked" : ""} />
+                  <span>今日晚巡已完成</span>
+                </label>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${daily.actionOutboundHunt ? "is-checked" : ""}">
+                  <input type="checkbox" data-daily-check="actionOutboundHunt" ${daily.actionOutboundHunt ? "checked" : ""} />
+                  <span>已鎖定高意圖貼文並第一時間私訊</span>
+                </label>
+                <a class="quest-link-btn" href="${PORTAL_BOARD_URL}">來源入口</a>
+              </div>
+              <div class="quest-check-row">
+                <label class="quest-check ${daily.actionOutboundFallback ? "is-checked" : ""}">
+                  <input type="checkbox" data-daily-check="actionOutboundFallback" ${daily.actionOutboundFallback ? "checked" : ""} />
+                  <span>今日巡邏沒有合適目標，已不硬私訊</span>
+                </label>
+              </div>
+            </div>
+            <p class="quest-main-copy">${huntComplete ? "今日獵殺判定已完成，剩下看早晚巡邏是否都已勾選。" : "今日尚未完成獵殺判定，請在『已私訊』與『無合適目標』之間擇一。"}
+            </p>
           </section>
         </div>
       </article>
@@ -1493,15 +1768,31 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return matched?.title || slug;
   }
 
+  function getReadableLandingLabel(pagePath = "") {
+    const normalizedPath = String(pagePath || "").split("?")[0].trim();
+    if (!normalizedPath || normalizedPath === "(not set)") return "未提供落地頁";
+    if (normalizedPath === "/") return "首頁";
+    if (normalizedPath === "/tools") return "線上估價系統";
+    if (normalizedPath === "/contact") return "免費格局健檢";
+    if (normalizedPath === "/requirement-form") return "完整需求表";
+    if (normalizedPath.startsWith("/blog/")) return getArticleTitleFromPagePath(normalizedPath);
+    return normalizedPath;
+  }
+
   function renderContentAnalytics() {
     const statusNode = document.getElementById("content-analytics-status");
     const updatedAtNode = document.getElementById("content-analytics-updated-at");
     const noteNode = document.getElementById("content-analytics-note");
     const topPostsNode = document.getElementById("content-analytics-top-posts");
+    const topSourcesNode = document.getElementById("content-analytics-top-sources");
+    const socialLandingsNode = document.getElementById("content-analytics-social-landings");
+    const realtimeUsersNode = document.getElementById("content-analytics-realtime-users");
+    const todaySessionsNode = document.getElementById("content-analytics-today-sessions");
+    const totalSessionsNode = document.getElementById("content-analytics-total-sessions");
     const blogViewsNode = document.getElementById("content-analytics-blog-views");
+    const socialSessionsNode = document.getElementById("content-analytics-social-sessions");
     const estimateGeneratedNode = document.getElementById("content-analytics-estimate-generated");
     const estimateCtaNode = document.getElementById("content-analytics-estimate-cta");
-    const officialLineNode = document.getElementById("content-analytics-official-line");
     const requirementSuccessNode = document.getElementById("content-analytics-requirement-success");
 
     if (
@@ -1509,34 +1800,48 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       !updatedAtNode ||
       !noteNode ||
       !topPostsNode ||
+      !topSourcesNode ||
+      !socialLandingsNode ||
+      !realtimeUsersNode ||
+      !todaySessionsNode ||
+      !totalSessionsNode ||
       !blogViewsNode ||
+      !socialSessionsNode ||
       !estimateGeneratedNode ||
       !estimateCtaNode ||
-      !officialLineNode ||
       !requirementSuccessNode
     ) {
       return;
     }
 
+    realtimeUsersNode.textContent = formatCount(contentAnalyticsState.metrics.realtimeActiveUsers);
+    todaySessionsNode.textContent = formatCount(contentAnalyticsState.metrics.todaySessions);
+    totalSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.totalSessions);
     blogViewsNode.textContent = formatCount(contentAnalyticsState.metrics.blogViews);
+    socialSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.socialSessions);
     estimateGeneratedNode.textContent = formatCount(contentAnalyticsState.metrics.estimateGenerated);
     estimateCtaNode.textContent = formatCount(contentAnalyticsState.metrics.estimateCtaClick);
-    officialLineNode.textContent = formatCount(contentAnalyticsState.metrics.officialLineClick);
     requirementSuccessNode.textContent = formatCount(contentAnalyticsState.metrics.requirementSuccess);
 
     if (contentAnalyticsState.status === "loading") {
       statusNode.textContent = "讀取中";
       updatedAtNode.textContent = "同步中";
-      noteNode.textContent = "正在向 GA4 讀取近 7 天內容與轉換成效。";
+      noteNode.textContent = "正在向 GA4 讀取即時活躍使用者、近 7 天內容、來源與轉換成效。";
       topPostsNode.innerHTML = "<li>正在讀取內容成效...</li>";
+      topSourcesNode.innerHTML = "<li>正在讀取來源資料...</li>";
+      socialLandingsNode.innerHTML = "<li>正在讀取社群落地頁...</li>";
       return;
     }
 
     if (contentAnalyticsState.status === "setup_required") {
       statusNode.textContent = "待接 GA4";
       updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
-      noteNode.textContent = contentAnalyticsState.note || "設定好 GA4 報表權限後，這裡會自動顯示內容成效。";
+      noteNode.textContent =
+        contentAnalyticsState.note ||
+        "設定好 GA4 權限後，這裡會自動顯示即時活躍使用者、內容、來源與落地頁成效。";
       topPostsNode.innerHTML = "<li>目前尚未接通 GA4 Data API。</li>";
+      topSourcesNode.innerHTML = "<li>接通後可直接看到來源 / 媒介排行。</li>";
+      socialLandingsNode.innerHTML = "<li>接通後可直接看到社群帶進站的頁面。</li>";
       return;
     }
 
@@ -1545,6 +1850,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
       noteNode.textContent = contentAnalyticsState.note || "GA4 報表暫時讀取失敗，請稍後再試。";
       topPostsNode.innerHTML = "<li>目前無法取得熱門文章排行。</li>";
+      topSourcesNode.innerHTML = "<li>目前無法取得來源排行。</li>";
+      socialLandingsNode.innerHTML = "<li>目前無法取得社群落地頁排行。</li>";
       return;
     }
 
@@ -1558,18 +1865,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
           minute: "2-digit",
         })}`
       : contentAnalyticsState.rangeLabel;
-    const latestLineClickLabel = contentAnalyticsState.latestOfficialLineClickAt
-      ? `最近一次官方 LINE 點擊：${new Date(contentAnalyticsState.latestOfficialLineClickAt).toLocaleString("zh-TW", {
-          hour12: false,
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}`
-      : "最近 7 天尚未記錄到官方 LINE 點擊。";
     noteNode.textContent =
       contentAnalyticsState.note ||
-      `${contentAnalyticsState.rangeLabel} 內，文章瀏覽、官網轉換與官方 LINE 點擊會集中顯示在這裡。${latestLineClickLabel}`;
+      `即時活躍使用者顯示近 30 分鐘 active users；今日人次與總人次顯示整站 sessions；${contentAnalyticsState.rangeLabel} 內則集中回看內容、來源與官網轉換事件。`;
 
     const topPosts = Array.isArray(contentAnalyticsState.topPosts)
       ? contentAnalyticsState.topPosts
@@ -1584,6 +1882,34 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
           `)
           .join("")
       : "<li>近 7 天尚無文章瀏覽資料。</li>";
+
+    const topSources = Array.isArray(contentAnalyticsState.topSources)
+      ? contentAnalyticsState.topSources
+      : [];
+    topSourcesNode.innerHTML = topSources.length
+      ? topSources
+          .map((source) => `
+            <li>
+              <span>${escapeHtml(source.sourceMedium || "(direct) / (none)")}</span>
+              <strong>${formatCount(source.sessions)}</strong>
+            </li>
+          `)
+          .join("")
+      : "<li>近 7 天尚無來源資料。</li>";
+
+    const socialLandingPages = Array.isArray(contentAnalyticsState.socialLandingPages)
+      ? contentAnalyticsState.socialLandingPages
+      : [];
+    socialLandingsNode.innerHTML = socialLandingPages.length
+      ? socialLandingPages
+          .map((page) => `
+            <li>
+              <span>${escapeHtml(getReadableLandingLabel(page.pagePath))}</span>
+              <strong>${formatCount(page.sessions)}</strong>
+            </li>
+          `)
+          .join("")
+      : "<li>近 7 天尚無社群導流資料。</li>";
   }
 
   function renderVendorNotes() {
@@ -1809,16 +2135,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         rangeLabel: typeof result?.rangeLabel === "string" ? result.rangeLabel : "近 7 天",
         updatedAt: typeof result?.updatedAt === "string" ? result.updatedAt : "",
         metrics: {
+          realtimeActiveUsers: Number(result?.metrics?.realtimeActiveUsers || 0),
+          todaySessions: Number(result?.metrics?.todaySessions || 0),
+          totalSessions: Number(result?.metrics?.totalSessions || 0),
           blogViews: Number(result?.metrics?.blogViews || 0),
+          socialSessions: Number(result?.metrics?.socialSessions || 0),
           estimateGenerated: Number(result?.metrics?.estimateGenerated || 0),
           estimateCtaClick: Number(result?.metrics?.estimateCtaClick || 0),
-          officialLineClick: Number(result?.metrics?.officialLineClick || 0),
           requirementSubmit: Number(result?.metrics?.requirementSubmit || 0),
           requirementSuccess: Number(result?.metrics?.requirementSuccess || 0),
         },
-        latestOfficialLineClickAt:
-          typeof result?.latestOfficialLineClickAt === "string" ? result.latestOfficialLineClickAt : "",
         topPosts: Array.isArray(result?.topPosts) ? result.topPosts : [],
+        topSources: Array.isArray(result?.topSources) ? result.topSources : [],
+        socialLandingPages: Array.isArray(result?.socialLandingPages) ? result.socialLandingPages : [],
         note: typeof result?.note === "string" ? result.note : "",
       };
     } catch (error) {
@@ -2241,7 +2570,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
       "這篇文章不是一次性流量稿，而是未來可持續收錄、整併、出版的內容資產；寫作時請同時滿足網站發布與出書收錄兩個目的。",
-      "請把正式文章主體輸出成可直接放進 Gemini 內建 Canvas 的單一完整文件稿，方便後續在 Canvas 內繼續編修。",
+      "請把整份輸出都寫成可直接放進 Gemini 內建 Canvas 的單一完整 Markdown 文件，方便後續在同一份 Canvas 內繼續編修。",
       "",
       "【真實社團問題】",
       questionBlock,
@@ -2249,16 +2578,25 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "【Gemini Flash 結構化判題結果】",
       aiDraftBlock,
       "",
+      "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下所有段落都必須寫在同一份 Markdown 文件內。",
+      "除這份文件本體外，不要在前後額外補操作說明、註解或對話式補充。",
       "請固定依序輸出：",
       "A. 文章策略確認",
       "B. 正式發布標題",
       "C. 正式發布摘要",
-      "D. Gemini Canvas 文件稿（Markdown 單一完整文件）",
+      "D. 同一份 Gemini Canvas 文件內的正式文章正文",
       "E. 最終發布欄位確認",
       "F. 出書收錄備註",
-      "G. 給 IDE 的提示詞優化建議",
+      "G. Google 商家最新動態版",
+      "H. 給 IDE 的提示詞優化建議",
       "",
-      buildIdePromptOptimizationSection("G. 給 IDE 的提示詞優化建議"),
+      "G. Google 商家最新動態版",
+      "- 請固定分成『更新標題』、『最新動態內文』、『CTA 收尾句』三段。",
+      "- 字數請嚴格控制在 100-150 字內，以符合 Google 商家最新動態的最佳顯示體驗。",
+      "- 內容必須視為官網文章的摘要分支，不可另寫成新的社群長文。",
+      "- 若需附連結，請不要把完整裸網址寫進文案句子裡。",
+      "",
+      buildIdePromptOptimizationSection("H. 給 IDE 的提示詞優化建議"),
     ].join("\n");
   }
 
@@ -2292,7 +2630,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "- 正向提示詞禁止出現任何會把模型導向寫實攝影的語彙，例如：photorealistic、photography、photo、8k、cinematic lighting、architectural photography、architectural digest style、render、3d render。",
       "- 若你寫出上述寫實攝影語彙，代表這組提示詞不合格，必須改寫成手繪插畫導向。",
       "- 每組都要包含：用途 / 檔名建議 / 正向提示詞 / 負面提示詞。",
-      "- 檔名建議請直接給可存檔用的中文檔名，格式自然、好辨識，並保留副檔名 `.png`。",
+      "- 檔名建議請直接給可存檔用的中文檔名，僅可使用中文、阿拉伯數字、半形連接號(-)、底線(_)與副檔名；勿使用空格、全形符號或其他特殊字元，並保留副檔名 `.png`。",
       "- 檔名建議格式固定：文章主題 + 圖片用途；例如：`客廳局部改造預算-封面主圖.png`、`客廳局部改造預算-內文輔圖.png`、`客廳局部改造預算-延伸情境圖.png`。",
       "- 正向提示詞請直接寫成可貼進 Copilot 的完整句子，並在句中明確寫出 colored pencil sketch 或 marker rendering 之類的手繪指向，以及 muted Morandi palette 或 low-saturation palette 之類的低飽和配色指向。",
       "- 負面提示詞請固定排除：photorealistic、photography、photo、realistic render、3d render、text、letters、numbers、logo、watermark、infographic、UI screen、harsh flash、neon colors、high saturation、glossy showroom style、messy background、distorted perspective、low resolution、blur。",
@@ -2304,10 +2642,22 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   function buildSocialPlatformToneGuardSection(sectionTitle = "社群平台品牌護欄") {
     return [
       `${sectionTitle}`,
-      "- 社群平台版（FB／IG／Threads／小紅書）雖可依平台節奏微調長短、分段與口語感，但品牌主調不可改變。",
-      "- 所有社群文案都必須維持：高級、極簡、安定、耐看、不油膩，不可滑向內容農場、罐頭小編、過度煽情、廉價共鳴或硬廣告腔。",
+      "- 社群平台版與 Google 商家版雖可依渠道節奏微調長短、分段與口語感，但品牌主調不可改變。",
+      "- 所有渠道文案都必須維持：高級、極簡、安定、耐看、不油膩，不可滑向內容農場、罐頭小編、過度煽情、廉價共鳴或硬廣告腔。",
       "- 可以提高可讀性與互動感，但不可因平台特性退化成浮誇、討好、刻意聳動、廉價反問句或情緒操弄式文案。",
       "- 若平台常見語氣與品牌主調衝突，優先守住品牌質感，而不是迎合平台慣性。",
+    ].join("\n");
+  }
+
+  function buildDistributionSafetyGuardSection(sectionTitle = "渠道反限流護欄") {
+    return [
+      `${sectionTitle}`,
+      "- 除 Google 商家最新動態外，其餘平台文案預設不要直接輸出裸網址；若需要導流，請改寫成自然提及『官網文章』『整理過一篇』『留言補連結』等低壓說法。",
+      "- FB 粉專若需要放官網文章，優先建議使用貼文預覽卡、留言補連結，或由發文者手動貼上，不要把完整外部網址硬寫進主文案。",
+      "- 在地 FB / LINE 社群回覆預設先完整回答問題，不主動附外部連結；只有在真的高度相關、且語境自然時，才可補一句參考文章或工具。",
+      "- IG、Threads、小紅書版預設不可在文案中主動輸出外部網址，也不要用過重的離站導流句型。",
+      "- CTA 必須低壓、自然，避免每篇都出現過度一致的模板式導流尾句，以免被判定為低品質分發內容。",
+      "- Hashtag 與標籤關鍵詞應精簡且相關，不要堆疊過量熱門詞或農場式關鍵字。",
     ].join("\n");
   }
 
@@ -2315,8 +2665,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return [
       `${sectionTitle}`,
       "- 請把『圖片資產規劃』與『貼文文字內容』分開輸出，不可混寫成同一句。",
+      "- FB、IG、小紅書原則上應共用同一組素材池，再依平台改寫包裝；不要替不同平台各自虛構一套新圖片。",
       "- 若實際可用圖片不足，不可假設每一頁都有獨立新圖片；應優先規劃為『少量既有圖片 + 多張純文字卡』的輪播或圖文結構。",
       "- 只可使用以下畫面類型：封面圖、既有插圖、延伸情境圖、文章連結預覽、純文字卡；不可虛構不存在的新圖片。",
+      "- FB 可直接使用同一素材池中的主圖、連結預覽或少量配圖；IG 與小紅書則優先從同一素材池轉成文字卡輪播或筆記型圖文，不要重做另一套視覺世界觀。",
       "- 若需要逐頁規劃，請先標示每頁畫面類型，再另外輸出該頁應放的標題或文字卡文案。",
       "- 若平台不適合輪播，請直接改成單圖、連結預覽或純文字貼文，不要硬湊多頁圖片。",
     ].join("\n");
@@ -2326,10 +2678,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return [
       `${sectionTitle}`,
       "- 各平台若需要標題、首句、封面字卡或首張圖文字，請直接寫在該平台區塊內，不要另外抽出共用段落。",
-      "- FB 粉專版：請固定分成『素材搭配建議』、『貼文內文』、『導流收尾句』三段。",
-      "- IG 版：請固定分成『輪播結構』、『圖片使用規劃』、『每頁文字卡文案』、『貼文內文』、『Hashtags』五段。",
+      "- Google 商家版：請固定分成『更新標題』、『最新動態內文』、『CTA 收尾句』三段；內容必須由官網文章母稿萃取與縮寫，不可直接複製 FB，也不可另寫成新的社群長文。",
+      "- FB 粉專版：請固定分成『素材搭配建議』、『貼文內文』、『導流收尾句』三段；包裝可最接近官網文章延伸版。",
+      "- IG 版：請固定分成『輪播結構』、『圖片使用規劃』、『每頁文字卡文案』、『貼文內文』、『Hashtags』五段；優先沿用與小紅書相同的素材池規劃，再微調成較精簡的 IG 口吻。",
       "- Threads 版：請固定分成『主貼文』與『可選延伸回覆』兩段；除非上方已有明確圖片資產，否則不要主動規劃多圖。",
-      "- 小紅書版：請固定分成『圖文結構』、『圖片使用規劃』、『每頁封面或文字卡文案』、『正文』、『標籤關鍵詞』五段。",
+      "- 小紅書版：請固定分成『圖文結構』、『圖片使用規劃』、『每頁封面或文字卡文案』、『正文』、『標籤關鍵詞』五段；優先沿用與 IG 相同的素材池規劃，再微調成較有筆記感的表達。",
     ].join("\n");
   }
 
@@ -2366,7 +2719,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
       "這篇文章不是一次性流量稿，而是未來要整理成書的內容資產；請一開始就用『可發布、可收錄、可長期保存』的標準寫作。",
-      "請把正式文章主體輸出成可直接放進 Gemini 內建 Canvas 的單一完整文件稿，方便後續在 Canvas 內繼續編修。",
+      "請把整份輸出都寫成可直接放進 Gemini 內建 Canvas 的單一完整 Markdown 文件，方便後續在同一份 Canvas 內繼續編修。",
       "",
       "【真實社團問題】",
       questionBlock,
@@ -2393,30 +2746,42 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "6. 文氣要穩定、乾淨、有設計感，不要推銷腔。",
       "7. 若 Flash 的分類或標題不夠精準，你可以微調，但不要偏離原始問題，而且調整後仍要留在同一套書稿脈絡內。",
       "",
+      "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下所有段落都必須寫在同一份 Markdown 文件內。",
+      "除這份文件本體外，不要在前後額外補操作說明、註解或對話式補充。",
       "請固定依序輸出：",
       "A. 文章策略確認",
       "B. 重複風險覆核",
       "C. 正式發布標題（1 個最推薦 + 2 個備選）",
       "D. 正式發布摘要（120-160 字）",
-      "E. Gemini Canvas 文件稿（Markdown 單一完整文件）",
+      "E. 同一份 Gemini Canvas 文件內的正式文章正文",
       "F. 最終發布欄位確認（網站分類 / 主書系 / 章節定位 / 文章標題 / 摘要 / 建議 slug）",
       "G. 出書收錄備註",
-      "H. FB 粉專版",
-      "I. IG 版",
-      "J. Threads 版",
-      "K. 小紅書版",
-      "L. Copilot 生圖提示詞（封面主圖 / 內文輔圖 / 延伸情境圖，各含正向提示詞與負面提示詞，必須為色鉛筆或麥克筆手繪、莫蘭迪或低飽和配色，禁止寫實攝影語彙）",
-      "M. 最後人工檢查清單",
+      "H. Google 商家最新動態版",
+      "I. FB 粉專版",
+      "J. IG 版",
+      "K. Threads 版",
+      "L. 小紅書版",
+      "M. Copilot 生圖提示詞（封面主圖 / 內文輔圖 / 延伸情境圖，各含正向提示詞與負面提示詞，必須為色鉛筆或麥克筆手繪、莫蘭迪或低飽和配色，禁止寫實攝影語彙）",
+      "N. 最後人工檢查清單",
       "",
       buildSocialPlatformToneGuardSection("社群平台版統一護欄"),
+      "",
+      buildDistributionSafetyGuardSection("渠道反限流護欄"),
       "",
       buildSocialAssetPlanningGuardSection("社群素材規劃統一護欄"),
       "",
       buildSocialPlatformOutputFormatSection("社群平台固定輸出格式"),
       "",
-      buildCopilotImagePromptSection("L. Copilot 生圖提示詞補充限制"),
+      "H. 【Google 商家最新動態版】",
+      "- 請輸出適合 Google 商家最新動態的版本。",
+      "- 請固定分成『更新標題』、『最新動態內文』、『CTA 收尾句』三段。",
+      "- 字數請嚴格控制在 100-150 字內，以符合 Google 商家最新動態的最佳顯示體驗。",
+      "- 這一版必須視為官網文章的摘要分支，請從官網文章母稿萃取，不可直接複製 FB 版，也不可另寫成新的社群長文。",
+      "- 若需附連結，請不要把完整裸網址寫進文案句子裡。",
       "",
-      buildIdePromptOptimizationSection("N. 給 IDE 的提示詞優化建議"),
+      buildCopilotImagePromptSection("M. Copilot 生圖提示詞補充限制"),
+      "",
+      buildIdePromptOptimizationSection("O. 給 IDE 的提示詞優化建議"),
     ].join("\n");
   }
 
@@ -2433,7 +2798,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "你現在不是只在寫一篇官網文章，而是在替一套未來可集結成書的內容系統，完成其中一個可長期保存的章節單元。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場、業配腔或短影音口語稿。",
       "請把『這篇文未來一定會被納入書稿』視為硬性前提，而不是可有可無的附帶備註。",
-      "請把正式文章主體輸出成可直接放進 Gemini 內建 Canvas 的單一完整文件稿，方便後續在 Canvas 內繼續編修，而不是零碎片段。",
+      "請把整份輸出都寫成可直接放進 Gemini 內建 Canvas 的單一完整 Markdown 文件，方便後續在同一份 Canvas 內繼續編修，而不是零碎片段。",
       "",
       "你的任務不是覆寫一篇低階初稿，而是直接站在高階模型的角度完成正式內文。",
       "請把 Flash 提供的判題、分類、標題與入庫資訊當成文章骨架，再把真正的文章品質、邏輯、文氣、內部連貫與 SEO 完整拉高。",
@@ -2469,6 +2834,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "7. 若牽涉預算、費用、單價或報價，請只寫保守區間、情境差異與影響因子，不可寫成保證價、固定單價、精準總價或像正式估價單的口吻，避免讓讀者把文章當成日後對價依據。",
       "8. 若 Flash 給的主書系、章節或標題不夠精準，你可以微調，但調整後仍需維持在同一套書稿脈絡內。",
       "",
+      "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下 A 到 P 全部都必須寫在同一份 Markdown 文件內。",
+      "除這份文件本體外，不要在前後額外補操作說明、註解、摘要前言或對話式補充。",
+      "A 到 Q 每一段都是必填，不可自行省略、合併、跳號或只挑部分輸出；若缺少任何一段，代表整份回覆不合格，請先補齊再結束。",
+      "尤其 J. 【Google 商家最新動態版】是必填段落，不可因為你判斷篇幅不足、平台不重要、內容重複或任何其他理由省略。",
       "請你輸出以下內容，並嚴格依照順序：",
       "",
       "A. 【文章策略確認】",
@@ -2489,10 +2858,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "D. 【正式發布摘要】",
       "- 請輸出 120-160 字摘要，可直接作為知識分享摘要或 meta description 草稿。",
       "",
-      "E. 【Gemini Canvas 文件稿（Markdown 單一完整文件）】",
-      "- 請直接輸出一篇真正可發佈、且可直接放進 Gemini 內建 Canvas 的完整文件稿，不要再假裝是草稿。",
-      "- 這一段請只輸出文件本體，不要在文件前後再補額外說明、註解或操作提醒。",
-      "- 請用適合 Canvas 續修的 Markdown 結構整理內容，讓標題、小標、列表與段落層次清楚完整。",
+      "E. 【同一份 Gemini Canvas 文件內的正式文章正文】",
+      "- E 段是這份單一 Canvas 文件裡的正文主體，不代表只有 E 段要放進 Canvas。",
+      "- 請直接輸出一篇真正可發佈的正式文章正文，不要再假裝是草稿。",
+      "- 整份回覆都必須維持適合 Canvas 續修的 Markdown 結構，讓標題、小標、列表與段落層次清楚完整。",
       "- 保留高資訊密度，但文氣要穩定、乾淨、有設計感，且要有可收進書稿的成熟度。",
       "- 文章內文必須真正根據原始問題展開，而不是只重述 Flash 判題結果。",
       "- 若題目原始資訊不足，請合理補全背景與情境，讓文章仍能成立為完整章節。",
@@ -2510,11 +2879,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "- 若你有微調主書系或章節定位，請在這裡順手說明原因。",
       "",
       "H. 【跨平台轉貼策略】",
-      "- 請先判斷這篇正式文章轉貼到 FB 粉專、IG、Threads、小紅書時，哪些內容可以共用基底，哪些一定要分開改寫。",
+      "- 請先判斷這篇正式文章轉貼到 Google 商家、FB 粉專、IG、Threads、小紅書時，哪些內容可以共用基底，哪些一定要分開改寫。",
       "- 請用 3-6 點簡潔說明，不要空話。",
-      "- 需明確指出：哪些平台可共用同一個核心文案，哪些平台只適合獨立版本。",
+      "- 需明確指出：Google 商家版是官網文章的摘要分支，不是 FB 版的複製稿，也不是另一套獨立社群策略。",
+      "- 需明確指出：FB 與 Threads 可共用同一個核心文案母稿；IG 與小紅書可共用同一組素材池，但文案包裝仍需分開改寫。",
+      "- 請優先採用『同題、同素材池、分平台包裝』，不要建議每個平台各做一套完全不同的新素材。",
       "",
       buildSocialPlatformToneGuardSection("H0. 【社群平台品牌護欄】"),
+      "",
+      buildDistributionSafetyGuardSection("H0-1. 【渠道反限流護欄】"),
       "",
       buildSocialAssetPlanningGuardSection("H1. 【社群素材規劃護欄】"),
       "",
@@ -2522,53 +2895,74 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "",
       "I. 【共用基底文案】",
       "- 請先輸出 1 版可作為跨平台共用核心的基底文案。",
-      "- 這版要適合拿去微調成 FB 粉專與 Threads 版本，也能作為其他平台縮寫母稿。",
+      "- 這版要適合拿去微調成 Google 商家、FB 粉專與 Threads 版本，並作為 IG 與小紅書提煉重點時的文字母稿。",
       "- 長度控制在 140-220 字。",
       "- 語氣：專業、穩定、像品牌主理人，不要像廣告貼文。",
       "",
-      "J. 【FB 粉專版】",
+      "J. 【Google 商家最新動態版】",
+      "- 這一段是必填，不可省略；即使你認為與其他平台內容相近，也必須獨立輸出完整版本。",
+      "- 請輸出適合 Google 商家最新動態的版本。",
+      "- 這一版必須視為官網文章的摘要分支，請從官網文章母稿萃取，不可直接複製 FB 版，也不可另寫成新的社群長文。",
+      "- 字數請嚴格控制在 100-150 字內，以符合 Google 商家最新動態的最佳顯示體驗。",
+      "- 內容應聚焦在一個核心判斷點或一個明確提醒，不要鋪陳太多背景。",
+      "- 可自然帶入汐止、南港、內湖等在地語境，但只有在確實有幫助時才使用，不要為了在地而硬塞地名。",
+      "- CTA 請以『閱讀官網文章』、『加入 LINE 諮詢』或『了解免費格局健檢』這類低壓導流為主，不要像強推銷。",
+      "- 若需附連結，請不要把完整裸網址寫進文案句子裡，保留給實際發布時手動掛在 Google 商家欄位即可。",
+      "- 請固定分成『更新標題』、『最新動態內文』、『CTA 收尾句』三段。",
+      "- 若你完成 J 段後，請再繼續輸出 K、L、M、N、O、P、Q，不可在 J 段後提早結束。",
+      "",
+      "K. 【FB 粉專版】",
       "- 請輸出適合 FB 粉專的完整貼文。",
       "- 可比共用基底再完整一些，適合搭配官網文章連結。",
       "- 長度控制在 180-320 字，分成 2-4 小段。",
       "- 結尾可自然帶一句導回官網文章，但不要像硬廣告。",
+      "- 主文案預設不可直接輸出裸網址；若需要導流，請優先寫成『留言補連結』、『文末附官網文章』或『搭配文章預覽卡』這類低風險表述。",
       "- 請固定分成『素材搭配建議』、『貼文內文』、『導流收尾句』三段。",
+      "- FB 版可直接沿用共用素材池中的主圖、文章連結預覽或少量配圖，不必另做一套專屬圖片邏輯。",
       "- 素材搭配建議只能使用：文章連結預覽、封面圖、既有插圖、延伸情境圖、純文字卡；不可自行虛構新圖。",
       "",
-      "K. 【IG 版】",
+      "L. 【IG 版】",
       "- 請輸出適合 IG 貼文的版本。",
       "- 第一行要有吸引力，適合搭配空間照片或插圖閱讀。",
       "- 文字要更濃縮、更有畫面感，避免過長說理。",
       "- 長度控制在 120-220 字。",
       "- 請固定分成『輪播結構』、『圖片使用規劃』、『每頁文字卡文案』、『貼文內文』、『Hashtags』五段。",
+      "- IG 不要直接照搬 FB 的『圖片 + 完整貼文』模式；應沿用共用素材池改寫成較精簡的圖卡或輪播版本。",
       "- 若實際可用圖片不足，不可假設每一頁都有新圖片；請優先規劃成少量既有圖片搭配純文字卡。",
       "- 『輪播結構』必須先標示每頁畫面類型，只能使用：封面圖、既有插圖、延伸情境圖、純文字卡。",
       "- 『圖片使用規劃』與『每頁文字卡文案』必須分開輸出，不可把圖片描述與字卡文案混成同一句。",
+      "- IG 的素材規劃應盡量與小紅書共用同一組頁面結構，再只調整語氣、字數與 hashtag。",
+      "- IG caption 不可直接附外部網址，也不要寫成強導流文案。",
       "- 最後請補 5-8 個適合的 hashtag，不要過度農場感。",
       "",
-      "L. 【Threads 版】",
+      "M. 【Threads 版】",
       "- 請輸出適合 Threads 的版本。",
       "- 語氣可以比 FB 更口語、更像主理人在分享觀察，但仍要保留品牌質感。",
       "- 長度控制在 80-160 字。",
       "- 適合引發互動或共鳴，但不要刻意爭議、不要廉價反問句。",
       "- 請固定分成『主貼文』與『可選延伸回覆』兩段。",
+      "- Threads 文案不可直接附外部網址；若需要導流，只能自然提及『我有整理成官網文章』，不要硬帶離站感。",
       "- 除非上方已有明確圖片資產需求，否則不要主動規劃多圖或輪播。",
       "",
-      "M. 【小紅書版】",
+      "N. 【小紅書版】",
       "- 請輸出適合小紅書的完整版本。",
       "- 語氣要更生活化、帶經驗整理感，像在分享一次真實裝修判斷，不要太像台式官網文。",
       "- 可適度加小標或分行，但不要浮誇，不要濫用 emoji。",
       "- 長度控制在 220-420 字。",
       "- 請固定分成『圖文結構』、『圖片使用規劃』、『每頁封面或文字卡文案』、『正文』、『標籤關鍵詞』五段。",
+      "- 小紅書不要直接照搬 FB 的『圖片 + 完整貼文』模式；應優先沿用與 IG 相同的素材池，再改寫成較有筆記感、可收藏的版本。",
       "- 若圖不夠，請直接用少量既有圖片搭配文字卡，不可假設每頁都有新圖。",
+      "- 小紅書可參考 IG 的頁面結構，但正文與每頁文字卡要更有重點整理感，不可只是把 IG caption 拉長。",
+      "- 小紅書正文不可直接附外部網址，也不要寫成要讀者跳出平台的硬導流文案。",
       "- 請補 5-8 個適合的小紅書標籤關鍵詞。",
       "",
-      buildCopilotImagePromptSection("N. 【Copilot 生圖提示詞】"),
+      buildCopilotImagePromptSection("O. 【Copilot 生圖提示詞】"),
       "",
-      "O. 【最後人工檢查清單】",
+      "P. 【最後人工檢查清單】",
       "- 請列出 3-5 條發布前應人工確認的地方。",
       "- 例如：是否與既有文章重複、是否需要補真實案例、是否需要調整分類、是否適合收進既定書稿章節等。",
       "",
-      buildIdePromptOptimizationSection("P. 【給 IDE 的提示詞優化建議】"),
+      buildIdePromptOptimizationSection("Q. 【給 IDE 的提示詞優化建議】"),
     ].join("\n");
   }
 
@@ -2635,29 +3029,21 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const shell = document.getElementById("article-topic-shell");
     const label = document.getElementById("article-topic-label");
     const mode = document.getElementById("article-topic-mode");
-    const category = document.getElementById("article-topic-category");
     const track = document.getElementById("article-topic-track");
     const chapter = document.getElementById("article-topic-chapter");
     const subchapter = document.getElementById("article-topic-subchapter");
     const title = document.getElementById("article-topic-title");
     const reason = document.getElementById("article-topic-reason");
-    const nextAction = document.getElementById("article-topic-next-action");
-    const similar = document.getElementById("article-topic-similar");
-    const angle = document.getElementById("article-topic-angle");
     const note = document.getElementById("article-topic-note");
     if (
       !(shell instanceof HTMLElement) ||
       !(label instanceof HTMLElement) ||
       !(mode instanceof HTMLElement) ||
-      !(category instanceof HTMLElement) ||
       !(track instanceof HTMLElement) ||
       !(chapter instanceof HTMLElement) ||
       !(subchapter instanceof HTMLElement) ||
       !(title instanceof HTMLElement) ||
       !(reason instanceof HTMLElement) ||
-      !(nextAction instanceof HTMLElement) ||
-      !(similar instanceof HTMLElement) ||
-      !(angle instanceof HTMLElement) ||
       !(note instanceof HTMLElement)
     ) {
       return;
@@ -2673,15 +3059,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     shell.hidden = false;
     label.textContent = articleTopicDecision.summary || "已完成本題動態決題";
     mode.textContent = articleTopicDecision.modeLabel || modeState?.label || articleTopicDecision.mode || "尚未決題";
-    category.textContent = "尚未判定";
     track.textContent = articleTopicDecision.track || "尚未決題";
     chapter.textContent = articleTopicDecision.chapter || "尚未決題";
     subchapter.textContent = articleTopicDecision.subchapter || "尚未決題";
     title.textContent = articleTopicDecision.title || "尚未決題";
     reason.textContent = articleTopicDecision.reason || articleTopicDecision.questionLink || "已完成動態決題。";
-    nextAction.textContent = "先完成 AI 判題與正式分類";
-    similar.textContent = "尚未比對";
-    angle.textContent = "先貼問題再判題";
     note.textContent =
       articleTopicDecision.bookLink ||
       `這一步會先依真實社團問題理解痛點，再從 ${candidateCount || "目前"} 個出版候選裡挑最適合落進書稿的題目。`;
@@ -2865,9 +3247,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const decisionAction = document.getElementById("article-ai-decision-action");
     const decisionSimilar = document.getElementById("article-ai-decision-similar");
     const decisionAngle = document.getElementById("article-ai-decision-angle");
-    const topicNextAction = document.getElementById("article-topic-next-action");
-    const topicSimilar = document.getElementById("article-topic-similar");
-    const topicAngle = document.getElementById("article-topic-angle");
+    const decisionTrack = document.getElementById("article-ai-decision-track");
+    const decisionChapter = document.getElementById("article-ai-decision-chapter");
+    const decisionArticleTitle = document.getElementById("article-ai-decision-article-title");
     if (
       !(shell instanceof HTMLDetailsElement) ||
       !(label instanceof HTMLElement) ||
@@ -2876,13 +3258,17 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       !(decisionTitle instanceof HTMLElement) ||
       !(decisionAction instanceof HTMLElement) ||
       !(decisionSimilar instanceof HTMLElement) ||
-      !(decisionAngle instanceof HTMLElement)
+      !(decisionAngle instanceof HTMLElement) ||
+      !(decisionTrack instanceof HTMLElement) ||
+      !(decisionChapter instanceof HTMLElement) ||
+      !(decisionArticleTitle instanceof HTMLElement)
     ) {
       return;
     }
 
     const hasResult = Boolean(articleAiResult.trim());
     const decision = getArticleAiDecision(articleAiResult);
+    const confirmData = getArticleConfirmData(articleAiResult);
     renderArticleConfirm(articleAiResult);
     renderArticleSocialReplies(articleAiResult);
     label.textContent = hasResult
@@ -2895,9 +3281,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     decisionAction.textContent = decision.action;
     decisionSimilar.textContent = decision.similar;
     decisionAngle.textContent = decision.angle;
-    if (topicNextAction instanceof HTMLElement) topicNextAction.textContent = decision.action;
-    if (topicSimilar instanceof HTMLElement) topicSimilar.textContent = decision.similar;
-    if (topicAngle instanceof HTMLElement) topicAngle.textContent = decision.angle;
+    decisionTrack.textContent = confirmData.track;
+    decisionChapter.textContent = confirmData.chapter;
+    decisionArticleTitle.textContent = confirmData.title;
     content.textContent = articleAiResult;
     shell.open = hasResult;
   }
@@ -2905,6 +3291,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   function setArticleAiBusy(isBusy) {
     ["run-article-ai-flow", "run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload", "copy-social-reply-short", "copy-social-reply-pro", "copy-social-reply-lead"].forEach((id) => {
       const button = document.getElementById(id);
+      if (button instanceof HTMLButtonElement) {
+        button.disabled = isBusy;
+      }
+    });
+    document.querySelectorAll("[data-canned-reply-copy-button]").forEach((button) => {
       if (button instanceof HTMLButtonElement) {
         button.disabled = isBusy;
       }
@@ -3165,7 +3556,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "導流版：",
       "- 簡短版：控制在 45-70 字，適合快速回覆，不帶連結感。",
       "- 專業版：控制在 70-110 字，保留更多判斷依據，但不要像文章。",
-      "- 導流版：控制在 70-110 字，語氣要像真人順手補充，不要像在導購或貼模板；可用『我之前有整理過』『貼這篇給你參考』這類自然句型，最後再接 [預留網址空間]。",
+      "- 導流版：控制在 70-110 字，語氣要像真人順手補充，不要像在導購或貼模板；可用『我之前有整理過』『如果你需要我再補文章給你參考』這類自然句型，預設不要直接附裸網址。",
+      "- 若情境真的需要補連結，請另外用『可選補連結版』標示，並把網址位置保留成 [預留網址空間]，不要把它混進預設導流版。",
       "- 三版都必須客觀、同理、像真人，不可出現『歡迎私訊』『找我們設計』『完整分析』『歡迎參考』這類推銷或 AI 模板味太重的字眼。",
       "",
       "8. 【官網完整痛點文章（Markdown 格式，約 600-800 字）】",
@@ -3187,7 +3579,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "- 構圖要求：橫式 16:9，適合網站文章首圖或段落插圖。",
       "- 提示詞內容要緊扣本文主題，把空間、材料、光線、情境描述清楚，避免只寫抽象形容詞。",
       "- 若主題偏知識或工法，也要把它轉成可視覺化的空間場景或物件組合，不要生成資訊圖表。",
-      "- 檔名建議請直接輸出可存檔的中文檔名，保留 `.png` 副檔名，讓使用者可以直接存檔。",
+      "- 檔名建議請直接輸出可存檔的中文檔名，僅可使用中文、阿拉伯數字、半形連接號(-)、底線(_)與副檔名；勿使用空格、全形符號或其他特殊字元，並保留 `.png` 副檔名，讓使用者可以直接存檔。",
       "- 正向提示詞請直接寫成可貼進 Copilot 的完整句子，並明確寫出 colored pencil sketch 或 marker rendering，以及 muted Morandi palette 或 low-saturation palette。",
       "- 正向提示詞禁止出現 photorealistic、photography、photo、8k、cinematic lighting、architectural photography、architectural digest style、render、3d render 這類寫實攝影語彙。",
       "- 負面提示詞請固定排除：文字、字母、數字、標誌、logo、浮水印、資訊圖表、介面截圖、人物五官特寫、過度寫實攝影感、photorealistic、photography、photo、realistic render、3d render、高飽和螢光色、雜亂背景、扭曲透視、低解析度、模糊。",
@@ -3766,11 +4158,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function renderArticleConfirm(content) {
-    const shell = document.getElementById("article-topic-shell");
-    const category = document.getElementById("article-topic-category");
-    const track = document.getElementById("article-topic-track");
-    const chapter = document.getElementById("article-topic-chapter");
-    const title = document.getElementById("article-topic-title");
+    const shell = document.getElementById("article-category-confirm");
+    const category = document.getElementById("article-confirm-category");
+    const track = document.getElementById("article-confirm-track");
+    const chapter = document.getElementById("article-confirm-chapter");
+    const title = document.getElementById("article-confirm-title");
     if (
       !(shell instanceof HTMLElement) ||
       !(category instanceof HTMLElement) ||
@@ -3782,12 +4174,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
 
     const hasResult = Boolean(content.trim());
-    if (!hasResult) {
-      shell.hidden = !articleTopicDecision;
-      return;
-    }
     const data = getArticleConfirmData(content);
-    shell.hidden = false;
+    shell.hidden = !hasResult;
     category.textContent = data.category;
     track.textContent = data.track;
     chapter.textContent = data.chapter;
@@ -4523,7 +4911,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function rerender() {
+    normalizeWeeklyState();
+    normalizeDailyState();
     renderHero();
+    renderDailyOps();
     renderQuests();
     renderPortals();
     renderVendorNotes();
@@ -4553,12 +4944,40 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       rerender();
       return;
     }
+    if (target.dataset.dailyCheck) {
+      const key = target.dataset.dailyCheck;
+      if (!state.daily || !key) return;
+
+      if (key === "actionOutboundHunt" && target.checked) {
+        state.daily.actionOutboundFallback = false;
+      }
+      if (key === "actionOutboundFallback" && target.checked) {
+        state.daily.actionOutboundHunt = false;
+      }
+
+      state.daily[key] = target.checked;
+      rerender();
+      return;
+    }
     if (!target.dataset.runCheck) return;
 
     const index = Number(target.dataset.runIndex);
     const key = target.dataset.runCheck;
     const run = state.weekly.runs[index];
     if (!run || !key) return;
+
+    if (key === "actionOutreach" && target.checked) {
+      run.actionOutreachFallback = false;
+    }
+    if (key === "actionOutreachFallback" && target.checked) {
+      run.actionOutreach = false;
+    }
+    if (key === "actionThreads" && target.checked) {
+      run.actionLocalCommunity = false;
+    }
+    if (key === "actionLocalCommunity" && target.checked) {
+      run.actionThreads = false;
+    }
 
     run[key] = target.checked;
     maybeClaimRunReward(run);
@@ -4580,13 +4999,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   });
 
   document.getElementById("reset-social-ops")?.addEventListener("click", () => {
+    state.daily = createDailyOps();
     state.weekly = {
       weekKey: getWeekKey(),
       bonusClaimed: false,
       runs: createWeeklyRuns(),
     };
     rerender();
-    setFeedback("本週任務已重設，XP 與連勝保留。", "is-warning");
+    setFeedback("本週任務與今日巡邏已重設，XP 與連勝保留。", "is-warning");
   });
 
   document.querySelectorAll("[data-topic-mode]").forEach((button) => {
@@ -4753,6 +5173,25 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   document.getElementById("copy-social-reply-lead")?.addEventListener("click", async () => {
     await copyArticleSocialReply("lead", "已複製導流版社團回覆。");
+  });
+
+  document.querySelectorAll("[data-canned-reply-copy-button]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!(button instanceof HTMLButtonElement)) return;
+      const text = button.dataset.cannedReplyCopy || "";
+      const label = button.dataset.cannedReplyLabel || "常見回覆";
+      if (!text.trim()) {
+        setArticleAiFeedback("目前沒有可複製的常見回覆。", "is-warning");
+        return;
+      }
+      const result = await copyText(text, `已複製「${label}」常見回覆。`);
+      const feedback = getCopyFeedbackState(
+        result,
+        `已複製「${label}」常見回覆。`,
+        "已開啟手動複製視窗，可直接複製常見回覆。",
+      );
+      setArticleAiFeedback(feedback.message, feedback.mode);
+    });
   });
 
   document.getElementById("clear-article-question")?.addEventListener("click", () => {
@@ -4998,6 +5437,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   loadTopicMode();
   loadState();
   normalizeWeeklyState();
+  normalizeDailyState();
   applyArticleSourceQuestionToField();
   renderArticleTopicDecision();
   renderArticleAiResult();
@@ -5014,7 +5454,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
 <style is:global>
   .social-ops-page {
-    padding: 5rem 1.25rem 6rem;
+    padding: 4.5rem 1.4rem 6rem;
     background:
       radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 24%),
       radial-gradient(circle at right top, rgba(196, 196, 188, 0.05), transparent 28%),
@@ -5023,11 +5463,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-  }
-
-  .social-ops-shell {
-    max-width: 1220px;
-    margin: 0 auto;
   }
 
   .social-ops-page a,
@@ -5041,10 +5476,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   .social-ops-shell {
-    max-width: 1240px;
+    max-width: 1360px;
     margin: 0 auto;
     display: grid;
-    gap: 1.2rem;
+    gap: 1.35rem;
   }
 
   .ops-hero,
@@ -5062,8 +5497,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   .ops-hero {
     padding: clamp(1.35rem, 2.7vw, 2.1rem);
     display: grid;
-    gap: 1.2rem;
-    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.88fr);
+    gap: 1.35rem;
+    grid-template-columns: minmax(0, 1.34fr) minmax(330px, 0.8fr);
   }
 
   .ops-eyebrow,
@@ -5326,10 +5761,39 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   .ops-grid {
     grid-template-columns: 1fr;
     align-items: start;
+    gap: 1.35rem;
+  }
+
+  .ops-side {
+    display: grid;
+    gap: 1.25rem;
+    align-self: start;
+  }
+
+  .ops-canned-sidebar {
+    position: sticky;
+    top: 1rem;
+  }
+
+  .ops-task-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2.08fr) minmax(250px, 300px);
+    gap: 1.35rem;
+    align-items: start;
+  }
+
+  .ops-task-main {
+    display: grid;
+    gap: 1.35rem;
+  }
+
+  .ops-task-side {
+    align-self: start;
+    max-width: 300px;
   }
 
   .ops-panel {
-    padding: 1.2rem;
+    padding: 1.28rem;
   }
 
   .ops-fold {
@@ -5373,7 +5837,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     justify-content: space-between;
     gap: 1rem;
     align-items: start;
-    margin-bottom: 0.95rem;
+    margin-bottom: 1rem;
   }
 
   .panel-heading h2 {
@@ -5387,20 +5851,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   .panel-heading p {
     margin: 0;
-    max-width: 280px;
+    max-width: 320px;
     line-height: 1.7;
     font-size: 0.92rem;
   }
 
   .quest-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .quest-board-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.75fr) minmax(300px, 0.95fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    align-items: start;
   }
 
   .portal-card-grid {
@@ -6165,19 +6623,84 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     margin-bottom: 0;
   }
 
-  .quest-reply-shell {
-    position: sticky;
-    top: 1rem;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-bottom: 0;
-    background:
-      radial-gradient(circle at top right, rgba(255, 255, 255, 0.04), transparent 34%),
-      linear-gradient(180deg, rgba(33, 33, 33, 0.92), rgba(24, 24, 24, 0.96));
+  .bookshelf-canned-replies {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.018);
   }
 
-  .quest-reply-grid {
-    grid-template-columns: 1fr;
+  .bookshelf-canned-replies-priority {
+    margin-bottom: 0.2rem;
+    border: 1px solid rgba(163, 186, 208, 0.32);
+    background:
+      radial-gradient(circle at top left, rgba(181, 205, 223, 0.16), transparent 36%),
+      linear-gradient(180deg, rgba(54, 69, 86, 0.88), rgba(25, 29, 36, 0.94)),
+      rgba(255, 255, 255, 0.02);
+    box-shadow:
+      inset 0 1px 0 rgba(232, 240, 245, 0.08),
+      0 16px 42px rgba(11, 15, 24, 0.26);
+  }
+
+  .bookshelf-canned-replies-priority .bookshelf-preview-head p::before {
+    content: "快速回覆";
+    display: inline-flex;
+    align-items: center;
+    margin-right: 0.55rem;
+    padding: 0.16rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(191, 214, 227, 0.14);
+    color: rgba(231, 240, 245, 0.96);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .bookshelf-canned-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel-heading-compact {
+    margin-bottom: 0.35rem;
+  }
+
+  .bookshelf-canned-card strong,
+  .bookshelf-canned-card em {
+    margin: 0;
+  }
+
+  .bookshelf-canned-card strong {
+    color: #f4f2ed;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+
+  .bookshelf-canned-card em {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.79rem;
+    line-height: 1.6;
+    font-style: normal;
+  }
+
+  .bookshelf-canned-actions {
+    margin-bottom: 0;
+    margin-top: 0.2rem;
+  }
+
+  .bookshelf-canned-card-priority {
+    border-color: rgba(177, 200, 215, 0.22);
+    background:
+      linear-gradient(180deg, rgba(72, 87, 102, 0.52), rgba(28, 31, 38, 0.88));
+  }
+
+  .bookshelf-canned-card-priority strong {
+    color: #f2f5f6;
+  }
+
+  .bookshelf-canned-card-priority p {
+    color: rgba(242, 242, 238, 0.92);
   }
 
   .bookshelf-ai-content {
@@ -6256,7 +6779,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   .bookshelf-analytics-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 
   .bookshelf-analytics-top {
@@ -7434,7 +7957,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   .quest-card,
   .portal-card {
-    padding: 1rem;
+    padding: 1.08rem;
   }
 
   .quest-card {
@@ -7481,10 +8004,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   .quest-checklist {
     display: grid;
-    gap: 0.62rem;
-    margin-top: 0.82rem;
+    gap: 0.68rem;
+    margin-top: 0.9rem;
     margin-left: 1.2rem;
-    padding: 0.34rem 0 0.14rem 0.96rem;
+    padding: 0.42rem 0 0.18rem 0.98rem;
     position: relative;
     border-left: 1px solid rgba(255, 255, 255, 0.08);
     background: linear-gradient(180deg, rgba(11, 11, 11, 0.18), rgba(11, 11, 11, 0.02));
@@ -7493,14 +8016,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   .quest-main-list {
     display: grid;
-    gap: 0.82rem;
-    margin-top: 0.82rem;
+    gap: 0.92rem;
+    margin-top: 0.9rem;
   }
 
   .quest-main {
     display: grid;
-    gap: 0.7rem;
-    padding: 0.86rem 0.88rem;
+    gap: 0.74rem;
+    padding: 0.92rem 0.94rem;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     background: linear-gradient(180deg, rgba(36, 36, 36, 0.46), rgba(18, 18, 18, 0.34));
@@ -7565,9 +8088,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   .quest-link-stash {
     display: grid;
-    gap: 0.8rem;
-    margin-top: 0.3rem;
-    padding: 0.95rem 1rem 1rem;
+    gap: 0.86rem;
+    margin-top: 0.36rem;
+    padding: 1rem 1.02rem 1.02rem;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     background: linear-gradient(180deg, rgba(17, 17, 17, 0.42), rgba(9, 9, 9, 0.24));
@@ -7605,7 +8128,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   .quest-link-stash-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
-    gap: 0.72rem;
+    gap: 0.82rem;
   }
 
   .quest-link-field {
@@ -7823,11 +8346,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .quest-board-layout {
+    .ops-task-layout {
       grid-template-columns: 1fr;
     }
 
-    .quest-reply-shell {
+    .ops-canned-sidebar {
       position: static;
     }
 
@@ -7874,7 +8397,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
 
     .hero-actions,
-    .panel-heading {
+    .panel-heading,
+    .panel-heading-compact {
       flex-direction: column;
       align-items: stretch;
     }
