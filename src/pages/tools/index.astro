@@ -42,37 +42,37 @@ const renovationItems = [
     value: "ceiling",
     label: "天花板工程",
     description: "含平頂、包樑與基礎造型整理",
-    weight: 0.14,
+    weight: 0.11,
   },
   {
     value: "floor",
     label: "地板工程",
     description: "木地板、磁磚與基礎地坪更新",
-    weight: 0.16,
+    weight: 0.14,
   },
   {
     value: "wall",
     label: "牆面工程",
     description: "油漆、批土與牆面基礎修整",
-    weight: 0.14,
+    weight: 0.11,
   },
   {
     value: "kitchen",
     label: "廚房翻新",
     description: "廚具、檯面、設備與相關整修",
-    weight: 0.22,
+    weight: 0.24,
   },
   {
     value: "bathroom",
     label: "衛浴翻新",
     description: "防水、泥作、設備與配件更新",
-    weight: 0.2,
+    weight: 0.23,
   },
   {
     value: "furniture",
     label: "系統家具",
     description: "收納櫃體、立面與機能整合",
-    weight: 0.18,
+    weight: 0.17,
   },
 ];
 
@@ -1543,19 +1543,25 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       label: "全屋裝修",
       constructionMultiplier: estimatorConfig.projectTypeMultipliers?.full ?? 1,
       designMultiplier: 1,
-      minScopeFactor: 0.52,
+      baseScopeFactor: 0.34,
+      variableScopeFactor: 0.66,
+      baselineNoticeRatio: 0.52,
     },
     partial: {
       label: "局部裝修",
       constructionMultiplier: estimatorConfig.projectTypeMultipliers?.partial ?? 0.6,
       designMultiplier: 0.65,
-      minScopeFactor: 0.38,
+      baseScopeFactor: 0.2,
+      variableScopeFactor: 0.8,
+      baselineNoticeRatio: 0.38,
     },
     "design-only": {
       label: "純設計",
       constructionMultiplier: 0,
       designMultiplier: 1,
-      minScopeFactor: 0,
+      baseScopeFactor: 0,
+      variableScopeFactor: 0,
+      baselineNoticeRatio: 0,
     },
   };
 
@@ -1650,12 +1656,15 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       0,
     );
     const selectedScopeRatio = selectedWeight / totalWeight || 0;
+    const baselineNoticeRatio = projectMeta.baselineNoticeRatio ?? 0;
     const scopeFactor =
       projectType.value === "design-only"
         ? 0
-        : projectType.value === "full"
-          ? Math.max(projectMeta.minScopeFactor, 0.3 + 0.7 * selectedScopeRatio)
-          : Math.max(projectMeta.minScopeFactor, 0.45 + 0.55 * selectedScopeRatio);
+        : Math.min(
+            1,
+            projectMeta.baseScopeFactor +
+              projectMeta.variableScopeFactor * selectedScopeRatio,
+          );
 
     const minConstruction =
       projectType.value === "design-only"
@@ -1763,7 +1772,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         projectType.value === "design-only"
           ? "目前以設計規劃費為主，工程費用需另估。"
           : projectType.value === "full" &&
-              selectedScopeRatio < projectMeta.minScopeFactor
+              selectedScopeRatio < baselineNoticeRatio
             ? "全屋裝修仍含基礎工程與共通工項，因此不會直接降成局部裝修。"
           : "先整理出可討論的預算帶、主要工項與預備金。";
       nextStepIntro.textContent =
@@ -1806,7 +1815,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       adviceItems.push("屋況相對單純，較適合先把預算重點放在機能、材質與收納整合。");
     }
 
-    if (projectType.value === "full" && selectedScopeRatio < projectMeta.minScopeFactor) {
+    if (projectType.value === "full" && selectedScopeRatio < baselineNoticeRatio) {
       adviceItems.push("你目前選的是全屋裝修，因此即使少勾幾項，估算仍會保留拆除、基礎工程與現場整合的基本成本。");
     }
 
