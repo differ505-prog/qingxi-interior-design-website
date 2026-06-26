@@ -311,36 +311,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             </aside>
           </div>
 
-          <details id="portal-grid" class="ops-panel ops-fold portal-board">
-            <summary class="ops-fold-summary">
-              <div>
-                <p class="panel-tag">來源入口</p>
-                <h2>來源入口</h2>
-              </div>
-              <small>低頻時再展開</small>
-            </summary>
-            <div class="ops-fold-body">
-              <div class="portal-section">
-                <div class="portal-section-heading">
-                  <p>Facebook 社團</p>
-                </div>
-                <div id="facebook-card-grid" class="portal-card-grid"></div>
-              </div>
-              <div class="portal-section">
-                <div class="portal-section-heading">
-                  <p>LINE 社群</p>
-                </div>
-                <div id="line-card-grid" class="portal-card-grid"></div>
-              </div>
-              <div class="portal-section">
-                <div class="portal-section-heading">
-                  <p>Google 商家</p>
-                </div>
-                <div id="google-card-grid" class="portal-card-grid"></div>
-              </div>
-            </div>
-          </details>
-
           <section id="bookshelf-board" class="ops-panel bookshelf-board">
             <div class="panel-heading">
               <div>
@@ -843,6 +813,36 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </div>
             </div>
           </details>
+
+          <details id="portal-grid" class="ops-panel ops-fold portal-board">
+            <summary class="ops-fold-summary">
+              <div>
+                <p class="panel-tag">來源入口</p>
+                <h2>來源入口</h2>
+              </div>
+              <small>低頻時再展開</small>
+            </summary>
+            <div class="ops-fold-body">
+              <div class="portal-section">
+                <div class="portal-section-heading">
+                  <p>Facebook 社團</p>
+                </div>
+                <div id="facebook-card-grid" class="portal-card-grid"></div>
+              </div>
+              <div class="portal-section">
+                <div class="portal-section-heading">
+                  <p>LINE 社群</p>
+                </div>
+                <div id="line-card-grid" class="portal-card-grid"></div>
+              </div>
+              <div class="portal-section">
+                <div class="portal-section-heading">
+                  <p>Google 商家</p>
+                </div>
+                <div id="google-card-grid" class="portal-card-grid"></div>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -861,8 +861,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   const TOPIC_MODE_KEY = "qingxi-topic-mode-v1";
   const GEMINI_RECENT_LIMIT = 10;
   const WEEKLY_TARGET = 3;
+  const DAILY_OPS_XP = 15;
   const RUN_XP = 100;
   const WEEKLY_BONUS_XP = 50;
+  const STREAK_BONUS_XP = 25;
   const SITE_ORIGIN = "https://qingxidesign.tw";
   const BLOG_INDEX_URL = `${SITE_ORIGIN}/blog`;
   const THREADS_PROFILE_URL = "https://www.threads.com/@qingxi.ds?hl=zh-tw";
@@ -1182,6 +1184,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       actionEveningPatrol: false,
       actionOutboundHunt: false,
       actionOutboundFallback: false,
+      rewardClaimed: false,
+      completedAt: "",
     };
   }
 
@@ -1301,6 +1305,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       actionEveningPatrol: Boolean(savedDaily?.actionEveningPatrol),
       actionOutboundHunt: Boolean(savedDaily?.actionOutboundHunt),
       actionOutboundFallback: Boolean(savedDaily?.actionOutboundFallback),
+      rewardClaimed: Boolean(savedDaily?.rewardClaimed),
+      completedAt: typeof savedDaily?.completedAt === "string" ? savedDaily.completedAt : "",
     };
   }
 
@@ -1368,7 +1374,12 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
     const completedRuns = state.weekly.runs.filter(isRunComplete).length;
     const carryoverCount = state.weekly.runs.filter((run) => !isRunComplete(run)).length;
-    state.stats.streak = completedRuns >= WEEKLY_TARGET ? state.stats.streak + 1 : 0;
+    const previousStreak = state.stats.streak;
+    const nextStreak = completedRuns >= WEEKLY_TARGET ? previousStreak + 1 : 0;
+    state.stats.streak = nextStreak;
+    if (nextStreak >= 2) {
+      state.stats.xp += STREAK_BONUS_XP;
+    }
     state.weekly = {
       weekKey: currentWeekKey,
       bonusClaimed: false,
@@ -1376,10 +1387,12 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     };
     saveState();
     setFeedback(
-      carryoverCount > 0
-        ? `已進入新的一週，已保留 ${carryoverCount} 個未完成任務，已完成項目已刷新。`
-        : "已進入新的一週，本週任務已刷新。",
-      carryoverCount > 0 ? "is-warning" : "is-success",
+      nextStreak >= 2
+        ? `已進入新的一週，連續達標 ${nextStreak} 週，額外 +${STREAK_BONUS_XP} XP。${carryoverCount > 0 ? `已保留 ${carryoverCount} 個未完成任務。` : "本週任務已刷新。"}`
+        : carryoverCount > 0
+          ? `已進入新的一週，已保留 ${carryoverCount} 個未完成任務，已完成項目已刷新。`
+          : "已進入新的一週，本週任務已刷新。",
+      nextStreak >= 2 ? "is-success" : carryoverCount > 0 ? "is-warning" : "is-success",
     );
   }
 
@@ -1450,8 +1463,18 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     if (completedRuns >= WEEKLY_TARGET && !state.weekly.bonusClaimed) {
       state.weekly.bonusClaimed = true;
       state.stats.xp += WEEKLY_BONUS_XP;
-      setFeedback("本週三個任務已全清，已領取 +50 XP 額外獎勵。", "is-success");
+      setFeedback(`本輪週任務完成，+${RUN_XP} XP；本週三個任務已全清，額外 +${WEEKLY_BONUS_XP} XP。`, "is-success");
+      return;
     }
+    setFeedback(`本輪週任務完成，+${RUN_XP} XP。`, "is-success");
+  }
+
+  function maybeClaimDailyReward(daily = state.daily) {
+    if (!isDailyOpsComplete(daily) || daily.rewardClaimed) return;
+    daily.rewardClaimed = true;
+    daily.completedAt = new Date().toISOString();
+    state.stats.xp += DAILY_OPS_XP;
+    setFeedback(`今日主動獵殺完成，+${DAILY_OPS_XP} XP。`, "is-success");
   }
 
   function renderHero() {
@@ -4919,6 +4942,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   function rerender() {
     normalizeWeeklyState();
     normalizeDailyState();
+    maybeClaimDailyReward();
     renderHero();
     renderDailyOps();
     renderQuests();
@@ -4962,6 +4986,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       }
 
       state.daily[key] = target.checked;
+      maybeClaimDailyReward(state.daily);
       rerender();
       return;
     }
