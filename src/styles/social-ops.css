@@ -310,8 +310,8 @@
   }
 
   .progress-bar-xp {
-    background: linear-gradient(90deg, rgba(129, 199, 212, 0.96), rgba(201, 226, 231, 0.9));
-    box-shadow: 0 0 18px rgba(129, 199, 212, 0.24);
+    background: linear-gradient(90deg, rgba(108, 120, 118, 0.96), rgba(201, 226, 231, 0.9));
+    box-shadow: 0 0 18px rgba(108, 120, 118, 0.24);
   }
 
   .ops-grid {
@@ -2620,8 +2620,8 @@
     align-items: center;
     padding: 0.28rem 0.6rem;
     border-radius: 999px;
-    border: 1px solid rgba(129, 199, 212, 0.22);
-    background: rgba(129, 199, 212, 0.12);
+    border: 1px solid rgba(108, 120, 118, 0.22);
+    background: rgba(108, 120, 118, 0.12);
     color: rgba(225, 242, 245, 0.92);
     font-size: 0.72rem;
     letter-spacing: 0.03em;
