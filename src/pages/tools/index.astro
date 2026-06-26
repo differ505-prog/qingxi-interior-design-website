@@ -229,6 +229,18 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           </div>
 
           <div class="form-group">
+            <label for="market-benchmark">市場行情基準</label>
+            <p class="field-helper">
+              這一層會把估價帶對齊你想參考的市場區域，讓前期預算更貼近實際行情。
+            </p>
+            <select id="market-benchmark">
+              <option value="taipei-metro" selected>北北基住宅市場</option>
+              <option value="urban-taiwan">全台都會住宅中位帶</option>
+              <option value="central-south">中南部都會住宅帶</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label for="use-purpose">使用目的</label>
             <select id="use-purpose">
               {
@@ -323,6 +335,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             <span class="logic-summary-label">本次拉高預算的條件</span>
             <p class="logic-summary-copy" id="cost-driver-summary">
               目前先依你填入的條件整理主要影響因子。
+            </p>
+          </div>
+          <div class="logic-summary-card logic-summary-card-soft">
+            <span class="logic-summary-label">市場校準基準</span>
+            <p class="logic-summary-copy" id="market-benchmark-summary">
+              目前先以全台住宅裝修常見行情帶做前期校準。
             </p>
           </div>
           <div class="logic-summary-card logic-summary-card-accent">
@@ -1540,6 +1558,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const residenceType = document.getElementById(
     "residence-type",
   ) as HTMLSelectElement;
+  const marketBenchmark = document.getElementById(
+    "market-benchmark",
+  ) as HTMLSelectElement;
   const usePurpose = document.getElementById(
     "use-purpose",
   ) as HTMLSelectElement;
@@ -1571,6 +1592,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const resultSubtitle = document.getElementById("result-subtitle");
   const logicSummary = document.getElementById("logic-summary");
   const costDriverSummary = document.getElementById("cost-driver-summary");
+  const marketBenchmarkSummary = document.getElementById("market-benchmark-summary");
   const changeSummary = document.getElementById("change-summary");
   const breakdownNote = document.getElementById("breakdown-note");
   const breakdownList = document.getElementById("breakdown-list");
@@ -1657,6 +1679,30 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     tower: { label: "電梯大樓", multiplier: 1 },
     walkup: { label: "公寓 / 華廈", multiplier: 1.06 },
     townhouse: { label: "透天 / 樓中樓", multiplier: 1.12 },
+  };
+
+  const marketBenchmarkMeta = {
+    "taipei-metro": {
+      label: "北北基住宅市場",
+      constructionMultiplier: 1.06,
+      designMultiplier: 1.08,
+      summary:
+        "目前以北北基住宅裝修前期行情帶校準，會比全台都會中位帶略高一些，較貼近雙北住宅常見報價節奏。",
+    },
+    "urban-taiwan": {
+      label: "全台都會住宅中位帶",
+      constructionMultiplier: 1,
+      designMultiplier: 1,
+      summary:
+        "目前以全台都會住宅常見中位行情帶校準，適合先抓較通用的前期估價範圍。",
+    },
+    "central-south": {
+      label: "中南部都會住宅帶",
+      constructionMultiplier: 0.94,
+      designMultiplier: 0.95,
+      summary:
+        "目前以中南部都會住宅帶校準，會比雙北市場帶更收斂一些，適合先抓在地較常見的前期預算。",
+    },
   };
 
   const usePurposeMeta = {
@@ -1756,6 +1802,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     qualityLabel,
     conditionMeta,
     residenceMeta,
+    marketInfo,
     timelineInfo,
     utilityInfo,
     bathroomInfo,
@@ -1784,6 +1831,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     }
     if (residenceMeta.multiplier > 1) {
       drivers.push(`${residenceMeta.label} 的施工條件較複雜`);
+    }
+    if (marketInfo.constructionMultiplier > 1) {
+      drivers.push(`${marketInfo.label} 本身的市場帶較高`);
     }
     if (timelineInfo.multiplier > 1) {
       drivers.push(`${timelineInfo.label} 會提高時程壓力`);
@@ -1848,6 +1898,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const residenceMeta =
       residenceTypeMeta[residenceType.value as keyof typeof residenceTypeMeta] ||
       residenceTypeMeta.tower;
+    const marketInfo =
+      marketBenchmarkMeta[marketBenchmark.value as keyof typeof marketBenchmarkMeta] ||
+      marketBenchmarkMeta["taipei-metro"];
     const usePurposeInfo =
       usePurposeMeta[usePurpose.value as keyof typeof usePurposeMeta] ||
       usePurposeMeta.self;
@@ -1899,6 +1952,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         : Math.round(
             area *
               pricePerPing.min *
+              marketInfo.constructionMultiplier *
               projectMeta.constructionMultiplier *
               conditionMeta.multiplier *
               residenceMeta.multiplier *
@@ -1915,6 +1969,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         : Math.round(
             area *
               pricePerPing.max *
+              marketInfo.constructionMultiplier *
               projectMeta.constructionMultiplier *
               conditionMeta.multiplier *
               residenceMeta.multiplier *
@@ -1927,10 +1982,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           );
 
     const minDesign = Math.round(
-      area * designFeePerPing.min * projectMeta.designMultiplier,
+      area * designFeePerPing.min * projectMeta.designMultiplier * marketInfo.designMultiplier,
     );
     const maxDesign = Math.round(
-      area * designFeePerPing.max * projectMeta.designMultiplier,
+      area * designFeePerPing.max * projectMeta.designMultiplier * marketInfo.designMultiplier,
     );
 
     const minReserve =
@@ -1966,6 +2021,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       qualityLabel,
       conditionMeta,
       residenceMeta,
+      marketInfo,
       timelineInfo,
       utilityInfo,
       bathroomInfo,
@@ -2005,6 +2061,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       qualityLevel: qualityLevel.value,
       houseCondition: houseCondition.value,
       residenceType: residenceType.value,
+      marketBenchmark: marketBenchmark.value,
       usePurpose: usePurpose.value,
       timeline: timeline.value,
       bathroomCount: bathroomCount.value,
@@ -2024,6 +2081,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       resultSubtitle &&
       logicSummary &&
       costDriverSummary &&
+      marketBenchmarkSummary &&
       changeSummary &&
       nextStepIntro &&
       reportContext &&
@@ -2039,6 +2097,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         scopeSummary.textContent = `${projectMeta.label} / 尚未勾選工項 / ${residenceMeta.label}`;
         logicSummary.textContent = "請至少勾選 1 項裝修項目，估價結果才有參考意義。";
         costDriverSummary.textContent = "尚未形成有效估價條件，因此暫不整理高價因子。";
+        marketBenchmarkSummary.textContent = `${marketInfo.label}：${marketInfo.summary}`;
         changeSummary.textContent = "先勾選至少 1 項裝修項目，系統才會開始解釋預算如何變動。";
         resultSubtitle.textContent = "目前未勾選任何裝修項目，因此不顯示正式預算帶，避免誤導。";
         nextStepIntro.textContent = "先勾選實際要做的項目，再看預算帶。";
@@ -2054,11 +2113,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         scopeSummary.textContent = `${projectMeta.label} / ${selectedConfigs.length} 項工種 / ${residenceMeta.label}`;
         logicSummary.textContent =
           projectType.value === "design-only"
-            ? `坪數 x 設計費單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label].join(" / ")}）`
-            : `坪數 x 等級單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label, selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}）`;
+            ? `坪數 x 設計費單價 x 條件係數（${[projectMeta.label, marketInfo.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label].join(" / ")}）`
+            : `坪數 x 等級單價 x 條件係數（${[projectMeta.label, marketInfo.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label, selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}）`;
         costDriverSummary.textContent = costDrivers.length
           ? `目前主要拉高預算的條件：${costDrivers.join("、")}。`
           : "目前條件相對單純，估價主要由坪數、等級單價與基本工項組成。";
+        marketBenchmarkSummary.textContent = `${marketInfo.label}：${marketInfo.summary}`;
         changeSummary.textContent = dynamicChangeSummary;
         resultSubtitle.textContent =
           projectType.value === "design-only"
@@ -2192,7 +2252,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const estimatorSummaryText = [
       `估價摘要：${hasValidScope ? formatRange(minTotal, maxTotal) : "尚未形成有效估價"}`,
       `每坪抓法：${hasValidScope ? `每坪約 ${minPerPing}萬 - ${maxPerPing}萬` : "--"}`,
-      `專案條件：${[projectMeta.label, qualityLevel.options[qualityLevel.selectedIndex]?.textContent, conditionMeta.label, residenceMeta.label].filter(Boolean).join(" / ")}`,
+      `專案條件：${[projectMeta.label, qualityLevel.options[qualityLevel.selectedIndex]?.textContent, conditionMeta.label, residenceMeta.label, marketInfo.label].filter(Boolean).join(" / ")}`,
       `高影響因子：${[selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}`,
       `使用目的 / 時程：${[usePurposeInfo.label, timelineInfo.label].filter(Boolean).join(" / ")}`,
       `工項：${selectedConfigs.length ? selectedConfigs.map((item) => item.label).join("、") : "尚未勾選"}`,
@@ -2228,6 +2288,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       houseConditionLabel: conditionMeta.label,
       residenceType: residenceType.value,
       residenceTypeLabel: residenceMeta.label,
+      marketBenchmark: marketBenchmark.value,
+      marketBenchmarkLabel: marketInfo.label,
+      marketBenchmarkSummary: marketInfo.summary,
       usePurpose: usePurpose.value,
       usePurposeLabel: usePurposeInfo.label,
       timeline: timeline.value,
@@ -2269,6 +2332,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         quality_level: qualityLevel.value,
         house_condition: houseCondition.value,
         residence_type: residenceType.value,
+        market_benchmark: marketBenchmark.value,
         use_purpose: usePurpose.value,
         timeline: timeline.value,
         bathroom_count: bathroomCount.value,
@@ -2358,6 +2422,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     });
     residenceType.addEventListener("change", () => {
       lastChangeReason = "住宅型態";
+      calculate();
+    });
+    marketBenchmark.addEventListener("change", () => {
+      lastChangeReason = "市場行情基準";
       calculate();
     });
     usePurpose.addEventListener("change", () => {
