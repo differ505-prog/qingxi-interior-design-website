@@ -272,8 +272,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             </select>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" id="storage-kitchen-group" hidden>
             <label for="storage-kitchen-scope">系統櫃 / 廚具納入程度</label>
+            <p class="field-helper">
+              只有在你勾選 `系統家具` 或 `廚房翻新` 時，才需要補這個強度條件。
+            </p>
             <select id="storage-kitchen-scope">
               <option value="none" selected>先不另外放大這兩項預算</option>
               <option value="storage">已知會做系統櫃</option>
@@ -316,6 +319,18 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               坪數 x 等級單價 x 條件係數（項目類型、屋況、住宅型態、使用目的、時程與高影響因子）
             </p>
           </div>
+          <div class="logic-summary-card logic-summary-card-soft">
+            <span class="logic-summary-label">本次拉高預算的條件</span>
+            <p class="logic-summary-copy" id="cost-driver-summary">
+              目前先依你填入的條件整理主要影響因子。
+            </p>
+          </div>
+          <div class="logic-summary-card logic-summary-card-accent">
+            <span class="logic-summary-label">即時變動提示</span>
+            <p class="logic-summary-copy" id="change-summary">
+              調整條件後，系統會告訴你是哪個因素正在影響這次估價。
+            </p>
+          </div>
 
           <div class="result-card">
             <div class="result-row">
@@ -356,7 +371,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="breakdown-card">
             <div class="breakdown-header">
               <h3>工程拆解</h3>
-                <p>先看目前工項比例。</p>
+                <p id="breakdown-note">目前為前期比例拆解，先用勾選工項與權重估出落點；實際報價仍會再看尺寸、材質、點位與現場條件。</p>
             </div>
             <div class="breakdown-list" id="breakdown-list"></div>
           </div>
@@ -715,6 +730,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     color: var(--gray-dark);
   }
 
+  .field-helper {
+    margin: -0.2rem 0 0.6rem;
+    color: var(--gray-medium);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
   .input-with-unit {
     display: flex;
     align-items: center;
@@ -834,6 +856,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.88);
     border: 1px solid rgba(129, 199, 212, 0.18);
+  }
+
+  .logic-summary-card-soft {
+    background: rgba(248, 249, 248, 0.96);
+  }
+
+  .logic-summary-card-accent {
+    background:
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 38%),
+      rgba(255, 255, 255, 0.92);
   }
 
   .logic-summary-label {
@@ -1520,6 +1552,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const utilityScope = document.getElementById(
     "utility-scope",
   ) as HTMLSelectElement;
+  const storageKitchenGroup = document.getElementById(
+    "storage-kitchen-group",
+  ) as HTMLDivElement | null;
   const storageKitchenScope = document.getElementById(
     "storage-kitchen-scope",
   ) as HTMLSelectElement;
@@ -1535,6 +1570,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const scopeSummary = document.getElementById("scope-summary");
   const resultSubtitle = document.getElementById("result-subtitle");
   const logicSummary = document.getElementById("logic-summary");
+  const costDriverSummary = document.getElementById("cost-driver-summary");
+  const changeSummary = document.getElementById("change-summary");
+  const breakdownNote = document.getElementById("breakdown-note");
   const breakdownList = document.getElementById("breakdown-list");
   const adviceList = document.getElementById("advice-list");
   const nextStepIntro = document.getElementById("next-step-intro");
@@ -1698,6 +1736,95 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   let lastTrackedSignature = "";
+  let lastChangeReason = "";
+  let previousEstimateState = null;
+
+  function toggleStorageKitchenField(selectedConfigs) {
+    const shouldShow = selectedConfigs.some(
+      (item) => item.value === "kitchen" || item.value === "furniture",
+    );
+    if (storageKitchenGroup) {
+      storageKitchenGroup.hidden = !shouldShow;
+    }
+    if (!shouldShow && storageKitchenScope.value !== "none") {
+      storageKitchenScope.value = "none";
+    }
+    return shouldShow;
+  }
+
+  function buildCostDrivers({
+    qualityLabel,
+    conditionMeta,
+    residenceMeta,
+    timelineInfo,
+    utilityInfo,
+    bathroomInfo,
+    storageKitchenInfo,
+    selectedConfigs,
+    bathroomMultiplier,
+    storageKitchenMultiplier,
+    projectMeta,
+  }) {
+    const drivers = [];
+
+    if (qualityLevel.value === "premium" || qualityLevel.value === "luxury") {
+      drivers.push(`${qualityLabel} 單價帶較高`);
+    }
+    if (conditionMeta.multiplier > 1) {
+      drivers.push(`${conditionMeta.label} 需要較多基礎工程`);
+    }
+    if (utilityInfo.multiplier > 1) {
+      drivers.push(`${utilityInfo.label} 會拉高水電與預備金`);
+    }
+    if (bathroomMultiplier > 1 && selectedConfigs.some((item) => item.value === "bathroom")) {
+      drivers.push(`${bathroomInfo.label} 會增加衛浴相關工程`);
+    }
+    if (storageKitchenMultiplier > 1 && storageKitchenInfo.label) {
+      drivers.push(`${storageKitchenInfo.label} 會放大櫃體或廚具預算`);
+    }
+    if (residenceMeta.multiplier > 1) {
+      drivers.push(`${residenceMeta.label} 的施工條件較複雜`);
+    }
+    if (timelineInfo.multiplier > 1) {
+      drivers.push(`${timelineInfo.label} 會提高時程壓力`);
+    }
+    if (projectMeta.label === "全屋裝修") {
+      drivers.push("全屋裝修本身包含較完整的基礎底盤");
+    }
+
+    return drivers.slice(0, 4);
+  }
+
+  function buildChangeSummary({
+    hasValidScope,
+    minRecommendedTotal,
+    costDrivers,
+  }) {
+    if (!hasValidScope) {
+      return "請先勾選至少 1 項裝修項目，系統才會建立有效估價。";
+    }
+
+    if (!previousEstimateState) {
+      return costDrivers.length
+        ? `目前主要由 ${costDrivers.slice(0, 2).join("、")} 影響這次估價。`
+        : "目前條件已套入，接著可再微調工項與高影響因子。";
+    }
+
+    const delta = minRecommendedTotal - previousEstimateState.minRecommendedTotal;
+    const absDelta = Math.abs(delta);
+
+    if (!absDelta) {
+      return lastChangeReason
+        ? `你剛調整了「${lastChangeReason}」，但目前仍落在同一個預算帶。`
+        : "目前條件變動不大，整體預算帶維持不變。";
+    }
+
+    const direction = delta > 0 ? "上升" : "下降";
+    const reasonPrefix = lastChangeReason ? `你剛調整了「${lastChangeReason}」，` : "";
+    const topDriver = costDrivers[0] ? `主因多半是 ${costDrivers[0]}。` : "";
+
+    return `${reasonPrefix}這次建議準備總預算約${direction} ${absDelta} 萬起。${topDriver}`;
+  }
 
   function calculate() {
     const area = Math.min(200, Math.max(1, parseFloat(areaInput.value) || 30));
@@ -1733,9 +1860,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const utilityInfo =
       utilityScopeMeta[utilityScope.value as keyof typeof utilityScopeMeta] ||
       utilityScopeMeta.partial;
+    const shouldShowStorageKitchen = toggleStorageKitchenField(selectedConfigs);
     const storageKitchenInfo =
       storageKitchenScopeMeta[
-        storageKitchenScope.value as keyof typeof storageKitchenScopeMeta
+        (shouldShowStorageKitchen ? storageKitchenScope.value : "none") as keyof typeof storageKitchenScopeMeta
       ] || storageKitchenScopeMeta.none;
     const totalWeight = renovationItems.reduce(
       (sum, item) => sum + item.weight,
@@ -1760,7 +1888,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const storageKitchenMultiplier =
       projectType.value === "design-only"
         ? 1
-        : getStorageKitchenMultiplier(storageKitchenScope.value, selectedConfigs);
+        : getStorageKitchenMultiplier(
+            shouldShowStorageKitchen ? storageKitchenScope.value : "none",
+            selectedConfigs,
+          );
 
     const minConstruction =
       projectType.value === "design-only"
@@ -1829,6 +1960,26 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const maxRecommendedTotal = maxTotal + maxReserve;
     const minPerPing = (minTotal / area).toFixed(1);
     const maxPerPing = (maxTotal / area).toFixed(1);
+    const qualityLabel =
+      qualityLevel.options[qualityLevel.selectedIndex]?.textContent || "";
+    const costDrivers = buildCostDrivers({
+      qualityLabel,
+      conditionMeta,
+      residenceMeta,
+      timelineInfo,
+      utilityInfo,
+      bathroomInfo,
+      storageKitchenInfo,
+      selectedConfigs,
+      bathroomMultiplier,
+      storageKitchenMultiplier,
+      projectMeta,
+    });
+    const dynamicChangeSummary = buildChangeSummary({
+      hasValidScope,
+      minRecommendedTotal,
+      costDrivers,
+    });
     const breakdownItems =
       projectType.value === "design-only"
         ? [
@@ -1872,8 +2023,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       scopeSummary &&
       resultSubtitle &&
       logicSummary &&
+      costDriverSummary &&
+      changeSummary &&
       nextStepIntro &&
-      reportContext
+      reportContext &&
+      breakdownNote
     ) {
       if (!hasValidScope) {
         recommendedTotal.textContent = "--";
@@ -1884,9 +2038,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         perPingRange.textContent = "--";
         scopeSummary.textContent = `${projectMeta.label} / 尚未勾選工項 / ${residenceMeta.label}`;
         logicSummary.textContent = "請至少勾選 1 項裝修項目，估價結果才有參考意義。";
+        costDriverSummary.textContent = "尚未形成有效估價條件，因此暫不整理高價因子。";
+        changeSummary.textContent = "先勾選至少 1 項裝修項目，系統才會開始解釋預算如何變動。";
         resultSubtitle.textContent = "目前未勾選任何裝修項目，因此不顯示正式預算帶，避免誤導。";
         nextStepIntro.textContent = "先勾選實際要做的項目，再看預算帶。";
         reportContext.textContent = "先確定至少一項實際裝修項目，後續的拆解報告與需求表判讀才會更準。";
+        breakdownNote.textContent = "目前尚未形成有效工項範圍，因此先不提供工程比例拆解。";
       } else {
         recommendedTotal.textContent = formatRange(minRecommendedTotal, maxRecommendedTotal);
         totalPrice.textContent = formatRange(minTotal, maxTotal);
@@ -1899,6 +2056,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           projectType.value === "design-only"
             ? `坪數 x 設計費單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label].join(" / ")}）`
             : `坪數 x 等級單價 x 條件係數（${[projectMeta.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label, selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}）`;
+        costDriverSummary.textContent = costDrivers.length
+          ? `目前主要拉高預算的條件：${costDrivers.join("、")}。`
+          : "目前條件相對單純，估價主要由坪數、等級單價與基本工項組成。";
+        changeSummary.textContent = dynamicChangeSummary;
         resultSubtitle.textContent =
           projectType.value === "design-only"
             ? "目前以設計規劃費為主，工程費用需依圖面、工法與發包範圍另行確認。"
@@ -1914,6 +2075,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           projectType.value === "design-only"
             ? `目前較適合先整理 ${projectMeta.label} 的需求重點與設計深度，再進一步確認交付方向。`
             : `目前這組 ${projectMeta.label} / ${residenceMeta.label} 條件，可先用拆解報告判讀 ${formatRange(minTotal, maxTotal)} 的主要預算落點。`;
+        breakdownNote.textContent =
+          projectType.value === "design-only"
+            ? "目前為設計規劃費試算，尚未進入工程比例拆解。"
+            : "目前為前期比例拆解，先依勾選工項與權重估出落點；實際報價仍會再看尺寸、材質、點位與現場條件。";
       }
     }
 
@@ -2071,7 +2236,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       bathroomCountLabel: bathroomInfo.label,
       utilityScope: utilityScope.value,
       utilityScopeLabel: utilityInfo.label,
-      storageKitchenScope: storageKitchenScope.value,
+      storageKitchenScope: shouldShowStorageKitchen ? storageKitchenScope.value : "none",
       storageKitchenScopeLabel: storageKitchenInfo.label,
       hasValidScope,
       selectedItems: selectedConfigs.map((item) => item.label),
@@ -2079,7 +2244,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       designRange: hasValidScope ? formatRange(minDesign, maxDesign) : "--",
       constructionRange: hasValidScope ? formatRange(minConstruction, maxConstruction) : "--",
       reserveRange: hasValidScope ? formatRange(minReserve, maxReserve) : "--",
+      recommendedTotalRange: hasValidScope ? formatRange(minRecommendedTotal, maxRecommendedTotal) : "--",
       perPingRange: hasValidScope ? `每坪約 ${minPerPing}萬 - ${maxPerPing}萬` : "--",
+      costDrivers,
       reportIntent:
         projectType.value === "design-only"
           ? "design-planning-report"
@@ -2087,6 +2254,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       breakdownItems,
       updatedAt: new Date().toISOString(),
     });
+
+    previousEstimateState = {
+      minRecommendedTotal,
+      maxRecommendedTotal,
+      hasValidScope,
+    };
+    lastChangeReason = "";
 
     if (hasValidScope && trackingSignature !== lastTrackedSignature) {
       lastTrackedSignature = trackingSignature;
@@ -2166,18 +2340,52 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     utilityScope &&
     storageKitchenScope
   ) {
-    areaInput.addEventListener("input", calculate);
-    projectType.addEventListener("change", calculate);
-    qualityLevel.addEventListener("change", calculate);
-    houseCondition.addEventListener("change", calculate);
-    residenceType.addEventListener("change", calculate);
-    usePurpose.addEventListener("change", calculate);
-    timeline.addEventListener("change", calculate);
-    bathroomCount.addEventListener("change", calculate);
-    utilityScope.addEventListener("change", calculate);
-    storageKitchenScope.addEventListener("change", calculate);
+    areaInput.addEventListener("input", () => {
+      lastChangeReason = "室內坪數";
+      calculate();
+    });
+    projectType.addEventListener("change", () => {
+      lastChangeReason = "項目類型";
+      calculate();
+    });
+    qualityLevel.addEventListener("change", () => {
+      lastChangeReason = "裝修等級";
+      calculate();
+    });
+    houseCondition.addEventListener("change", () => {
+      lastChangeReason = "屋況條件";
+      calculate();
+    });
+    residenceType.addEventListener("change", () => {
+      lastChangeReason = "住宅型態";
+      calculate();
+    });
+    usePurpose.addEventListener("change", () => {
+      lastChangeReason = "使用目的";
+      calculate();
+    });
+    timeline.addEventListener("change", () => {
+      lastChangeReason = "開始時程";
+      calculate();
+    });
+    bathroomCount.addEventListener("change", () => {
+      lastChangeReason = "衛浴數量";
+      calculate();
+    });
+    utilityScope.addEventListener("change", () => {
+      lastChangeReason = "水電更新程度";
+      calculate();
+    });
+    storageKitchenScope.addEventListener("change", () => {
+      lastChangeReason = "系統櫃 / 廚具納入程度";
+      calculate();
+    });
     selectedItems.forEach((checkbox) => {
-      checkbox.addEventListener("change", calculate);
+      checkbox.addEventListener("change", () => {
+        const label = checkbox.closest(".checkbox-item")?.querySelector("strong")?.textContent || "裝修項目";
+        lastChangeReason = checkbox.checked ? `新增 ${label}` : `取消 ${label}`;
+        calculate();
+      });
     });
     requirementFormLinks.forEach((link) => {
       link.addEventListener("click", calculate);
