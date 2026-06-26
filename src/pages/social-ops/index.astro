@@ -1065,6 +1065,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     { value: "contacted", label: "已聯繫" },
     { value: "pricing-review", label: "報價待比" },
     { value: "approved", label: "可合作" },
+    { value: "promoted", label: "已轉成筆記" },
     { value: "hold", label: "暫不合作" },
   ];
 
@@ -1088,6 +1089,76 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       isPinned: false,
       createdAt: "",
       updatedAt: "",
+    };
+  }
+
+  function getVendorIntakeNoteId(itemId = "") {
+    return itemId ? `vendor-intake-${itemId}` : "";
+  }
+
+  function mapPricingDisclosureToPriceLevel(value = "") {
+    if (value === "direct") return "中";
+    if (value === "sanitized") return "中";
+    if (value === "later") return "中低";
+    return "";
+  }
+
+  function mapCraftApproachToCraftLevel(value = "") {
+    if (value === "偏效率施工") return "粗工";
+    if (value === "標準住宅施工") return "標準";
+    if (value === "偏細緻收邊") return "細緻";
+    if (value === "依案型調整") return "細緻";
+    return "";
+  }
+
+  function buildVendorIntakeAttachmentUrl(itemId = "") {
+    return itemId ? `${SITE_ORIGIN}${VENDOR_INTAKE_FILE_URL}?id=${encodeURIComponent(itemId)}` : "";
+  }
+
+  function buildVendorIntakePromotedImpression(item = {}) {
+    const emphasis = [item.projectFocus, item.craftApproach].filter(Boolean).join(" / ");
+    if (emphasis) return emphasis;
+    if (item.trade) return `${item.trade} 可先列入待評估合作名單`;
+    return "可先列入待評估合作名單";
+  }
+
+  function buildVendorIntakePromotedMemo(item = {}) {
+    const lines = [];
+    if (item.note) lines.push(`工班自填說明：${item.note}`);
+    if (item.internalNote) lines.push(`內部備註：${item.internalNote}`);
+    const summaryParts = [
+      item.projectFocus ? `擅長案型：${item.projectFocus}` : "",
+      item.craftApproach ? `工法細緻度：${item.craftApproach}` : "",
+      item.pricingMode ? `報價方式：${getVendorPricingModeLabel(item.pricingMode)}` : "",
+      item.pricingDisclosure ? `資料提供：${getVendorPricingDisclosureLabel(item.pricingDisclosure)}` : "",
+      item.acceptsContract ? `簽約：${getVendorContractLabel(item.acceptsContract)}` : "",
+      item.invoiceStatus ? `發票：${getVendorInvoiceLabel(item.invoiceStatus)}` : "",
+    ].filter(Boolean);
+    if (summaryParts.length) lines.push(summaryParts.join("｜"));
+    return lines.join("\n");
+  }
+
+  function buildVendorNoteFromIntake(item = {}) {
+    const noteId = getVendorIntakeNoteId(item.id);
+    const existingNote = (vendorNotesState.items || []).find((entry) => entry.id === noteId);
+    const now = new Date().toISOString();
+    return {
+      ...createVendorNoteTemplate(),
+      ...existingNote,
+      id: noteId || createVendorNoteId(),
+      name: item.teamName ? `${item.name || "未命名工班"} / ${item.teamName}` : (item.name || "未命名工班"),
+      trade: item.trade || existingNote?.trade || "",
+      priceLevel: existingNote?.priceLevel || mapPricingDisclosureToPriceLevel(item.pricingDisclosure),
+      craftLevel: existingNote?.craftLevel || mapCraftApproachToCraftLevel(item.craftApproach),
+      primaryUrl: buildVendorIntakeAttachmentUrl(item.id),
+      secondaryUrl: existingNote?.secondaryUrl || "",
+      location: item.serviceArea || existingNote?.location || "",
+      impression: existingNote?.impression || buildVendorIntakePromotedImpression(item),
+      memo: buildVendorIntakePromotedMemo(item),
+      sourceType: "vendor_submitted",
+      isPinned: Boolean(existingNote?.isPinned),
+      createdAt: existingNote?.createdAt || now,
+      updatedAt: now,
     };
   }
 
@@ -1495,6 +1566,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     listNode.innerHTML = filteredItems
       .map((item) => {
         const attachmentHref = item.id ? `${VENDOR_INTAKE_FILE_URL}?id=${encodeURIComponent(item.id)}` : "";
+        const promotedNoteId = getVendorIntakeNoteId(item.id);
+        const hasPromotedNote = (vendorNotesState.items || []).some((entry) => entry.id === promotedNoteId);
         const sourceParts = [item.sourceLabel, item.utmSource, item.utmMedium].filter(Boolean);
         const metaItems = [
           item.serviceArea ? `<span>${escapeHtml(item.serviceArea)}</span>` : "",
@@ -1516,6 +1589,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   ${item.projectFocus ? `<span class="vendor-note-badge">${escapeHtml(item.projectFocus)}</span>` : ""}
                   ${item.craftApproach ? `<span class="vendor-note-badge">${escapeHtml(item.craftApproach)}</span>` : ""}
                   <span class="vendor-note-badge">${escapeHtml(getVendorIntakeStatusLabel(item.status))}</span>
+                  ${hasPromotedNote ? '<span class="vendor-note-badge vendor-note-badge-star">已建優質筆記</span>' : ""}
                   ${item.attachmentKind ? `<span class="vendor-note-badge">${escapeHtml(item.attachmentKind)}</span>` : ""}
                 </div>
                 <strong>${escapeHtml(item.name || "未命名工班")}${item.teamName ? ` / ${escapeHtml(item.teamName)}` : ""}</strong>
@@ -1545,6 +1619,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             </div>
             <div class="vendor-note-card-actions">
               <button type="button" class="vendor-note-mini-btn" data-vendor-intake-save="${escapeHtml(item.id)}">儲存狀態</button>
+              <button type="button" class="vendor-note-mini-btn" data-vendor-intake-promote="${escapeHtml(item.id)}">${hasPromotedNote ? "更新優質筆記" : "轉成優質筆記"}</button>
             </div>
           </article>
         `;
@@ -5853,10 +5928,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   });
 
   document.getElementById("vendor-intake-list")?.addEventListener("click", async (event) => {
-    const target = event.target instanceof HTMLElement ? event.target.closest("[data-vendor-intake-save]") : null;
+    const target = event.target instanceof HTMLElement ? event.target.closest("[data-vendor-intake-save], [data-vendor-intake-promote]") : null;
     if (!(target instanceof HTMLButtonElement)) return;
 
-    const itemId = target.dataset.vendorIntakeSave || "";
+    const itemId = target.dataset.vendorIntakeSave || target.dataset.vendorIntakePromote || "";
     const currentItem = (vendorIntakeState.items || []).find((entry) => entry.id === itemId);
     if (!itemId || !currentItem) return;
 
@@ -5867,6 +5942,23 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
     target.disabled = true;
     try {
+      if (target.dataset.vendorIntakePromote) {
+        const notePayload = buildVendorNoteFromIntake({
+          ...currentItem,
+          status: nextStatus || currentItem.status,
+          internalNote: nextNote,
+        });
+        await saveVendorNote(notePayload);
+        await saveVendorIntake({
+          ...currentItem,
+          status: "promoted",
+          internalNote: nextNote,
+        });
+        setVendorIntakeFeedback("已轉成優質廠商筆記，之後再按會更新同一筆筆記。", "is-success");
+        setVendorNoteFeedback("已同步建立優質廠商筆記。", "is-success");
+        return;
+      }
+
       await saveVendorIntake({
         ...currentItem,
         status: nextStatus || "new",
