@@ -2,15 +2,6 @@ import type { APIRoute } from "astro";
 import { createSign } from "node:crypto";
 
 type GaMetricMap = Record<string, number>;
-const SOCIAL_SOURCE_HINTS = [
-  "facebook",
-  "instagram",
-  "threads",
-  "line",
-  "xhs",
-  "xiaohongshu",
-  "social",
-];
 
 function base64UrlEncode(input: string | Buffer) {
   return Buffer.from(input)
@@ -94,94 +85,19 @@ async function runGaReport(
   return result;
 }
 
-async function runGaRealtimeReport(
-  accessToken: string,
-  propertyId: string,
-  body: Record<string, unknown>,
-) {
-  const response = await fetch(
-    `https://analyticsdata.googleapis.com/v1beta/properties/${encodeURIComponent(propertyId)}:runRealtimeReport`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    },
-  );
-
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      `GA4_RUN_REALTIME_REPORT_FAILED:${result?.error?.message || response.status}`,
-    );
-  }
-
-  return result;
-}
-
-async function runGaReportWithStartDateRetry(
-  accessToken: string,
-  propertyId: string,
-  body: Record<string, unknown>,
-) {
-  try {
-    return await runGaReport(accessToken, propertyId, body);
-  } catch (error) {
-    const retryStartDate = getRetryableGaStartDate(error);
-    const dateRanges = Array.isArray(body?.dateRanges) ? body.dateRanges : [];
-    if (!retryStartDate || dateRanges.length !== 1) {
-      throw error;
-    }
-
-    const nextBody = {
-      ...body,
-      dateRanges: dateRanges.map((range: any) => ({
-        ...range,
-        startDate: retryStartDate,
-      })),
-    };
-
-    return runGaReport(accessToken, propertyId, nextBody);
-  }
-}
-
 function parseMetricValue(value: string | undefined) {
   const parsed = Number(value || "0");
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function parseReportMetricValue(report: any) {
-  return parseMetricValue(
-    report?.totals?.[0]?.metricValues?.[0]?.value ||
-      report?.rows?.[0]?.metricValues?.[0]?.value,
-  );
-}
-
-function getRetryableGaStartDate(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error || "");
-  const matched = message.match(/must be greater than (\d{4}-\d{2}-\d{2})/);
-  if (!matched?.[1]) return "";
-
-  const parsed = new Date(`${matched[1]}T00:00:00Z`);
-  if (Number.isNaN(parsed.getTime())) return "";
-  parsed.setUTCDate(parsed.getUTCDate() + 1);
-  return parsed.toISOString().slice(0, 10);
-}
-
-function normalizePrivateKey(value: string) {
-  const trimmed = value.trim();
-  const unwrapped =
-    trimmed.startsWith('"') && trimmed.endsWith('"')
-      ? trimmed.slice(1, -1)
-      : trimmed;
-  return unwrapped.replace(/\\n/g, "\n").trim();
-}
-
-function isSocialSourceMedium(value: string) {
-  const normalized = value.trim().toLowerCase();
-  return SOCIAL_SOURCE_HINTS.some((hint) => normalized.includes(hint));
+function parseDateHourMinute(value: string | undefined) {
+  if (!value || !/^\d{12}$/.test(value)) return "";
+  const year = value.slice(0, 4);
+  const month = value.slice(4, 6);
+  const day = value.slice(6, 8);
+  const hour = value.slice(8, 10);
+  const minute = value.slice(10, 12);
+  return `${year}-${month}-${day}T${hour}:${minute}:00+08:00`;
 }
 
 export const GET: APIRoute = async () => {
@@ -193,11 +109,11 @@ export const GET: APIRoute = async () => {
     import.meta.env.GA4_SERVICE_ACCOUNT_CLIENT_EMAIL?.trim() ||
     import.meta.env.GOOGLE_SERVICE_ACCOUNT_CLIENT_EMAIL?.trim() ||
     "";
-  const privateKey = normalizePrivateKey(
+  const privateKey = (
     import.meta.env.GA4_SERVICE_ACCOUNT_PRIVATE_KEY ||
-      import.meta.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ||
-      "",
-  );
+    import.meta.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY ||
+    ""
+  ).replace(/\\n/g, "\n").trim();
 
   if (!propertyId || !clientEmail || !privateKey) {
     return new Response(
@@ -218,30 +134,7 @@ export const GET: APIRoute = async () => {
   try {
     const accessToken = await getGoogleAccessToken(clientEmail, privateKey);
 
-    const socialSourceExpressions = SOCIAL_SOURCE_HINTS.map((value) => ({
-      filter: {
-        fieldName: "sessionSourceMedium",
-        stringFilter: {
-          matchType: "CONTAINS",
-          value,
-        },
-      },
-    }));
-
-    const [
-      realtimeReport,
-      blogReport,
-      eventReport,
-      sourceReport,
-      socialLandingReport,
-      todaySessionsReport,
-      totalSessionsReport,
-    ] = await Promise.all([
-      runGaRealtimeReport(accessToken, propertyId, {
-        metrics: [{ name: "activeUsers" }],
-        minuteRanges: [{ startMinutesAgo: 29, endMinutesAgo: 0, name: "last30Minutes" }],
-        limit: 1,
-      }),
+    const [blogReport, eventReport, officialLineReport] = await Promise.all([
       runGaReport(accessToken, propertyId, {
         dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
         dimensions: [{ name: "pagePath" }],
@@ -272,6 +165,7 @@ export const GET: APIRoute = async () => {
                 "renovation_estimate_cta_click",
                 "requirement_form_submit",
                 "requirement_form_success",
+                "official_line_click",
               ],
             },
           },
@@ -279,32 +173,19 @@ export const GET: APIRoute = async () => {
       }),
       runGaReport(accessToken, propertyId, {
         dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
-        dimensions: [{ name: "sessionSourceMedium" }],
-        metrics: [{ name: "sessions" }],
-        orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
-        limit: 25,
-      }),
-      runGaReport(accessToken, propertyId, {
-        dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
-        dimensions: [{ name: "landingPagePlusQueryString" }, { name: "sessionSourceMedium" }],
-        metrics: [{ name: "sessions" }],
+        dimensions: [{ name: "dateHourMinute" }],
+        metrics: [{ name: "eventCount" }],
         dimensionFilter: {
-          orGroup: {
-            expressions: socialSourceExpressions,
+          filter: {
+            fieldName: "eventName",
+            stringFilter: {
+              matchType: "EXACT",
+              value: "official_line_click",
+            },
           },
         },
-        orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
-        limit: 25,
-      }),
-      runGaReport(accessToken, propertyId, {
-        dateRanges: [{ startDate: "today", endDate: "today" }],
-        metrics: [{ name: "sessions" }],
-        metricAggregations: ["TOTAL"],
-      }),
-      runGaReportWithStartDateRetry(accessToken, propertyId, {
-        dateRanges: [{ startDate: "2005-01-01", endDate: "today" }],
-        metrics: [{ name: "sessions" }],
-        metricAggregations: ["TOTAL"],
+        orderBys: [{ dimension: { dimensionName: "dateHourMinute", orderType: "ALPHANUMERIC" }, desc: true }],
+        limit: 1,
       }),
     ]);
 
@@ -322,43 +203,11 @@ export const GET: APIRoute = async () => {
       views: parseMetricValue(row?.metricValues?.[0]?.value),
     }));
 
-    const topSources = (sourceReport?.rows || []).map((row: any) => {
-      const sourceMedium = String(row?.dimensionValues?.[0]?.value || "");
-      return {
-        sourceMedium,
-        sessions: parseMetricValue(row?.metricValues?.[0]?.value),
-        isSocial: isSocialSourceMedium(sourceMedium),
-      };
-    });
-
-    const socialLandingTotals = new Map<string, number>();
-    for (const row of socialLandingReport?.rows || []) {
-      const landingPage = String(row?.dimensionValues?.[0]?.value || "").trim();
-      const sessions = parseMetricValue(row?.metricValues?.[0]?.value);
-      if (!landingPage || landingPage === "(not set)") continue;
-      socialLandingTotals.set(landingPage, (socialLandingTotals.get(landingPage) || 0) + sessions);
-    }
-
-    const socialLandingPages = Array.from(socialLandingTotals.entries())
-      .sort((left, right) => right[1] - left[1])
-      .slice(0, 5)
-      .map(([pagePath, sessions]) => ({
-        pagePath,
-        sessions,
-      }));
-
     const totalBlogViews = parseMetricValue(
       blogReport?.totals?.[0]?.metricValues?.[0]?.value,
     );
-    const todaySessions = parseReportMetricValue(todaySessionsReport);
-    const totalSessions = parseReportMetricValue(totalSessionsReport);
-    const realtimeActiveUsers = parseMetricValue(
-      realtimeReport?.rows?.[0]?.metricValues?.[0]?.value,
-    );
-    const socialSessions = topSources.reduce(
-      (sum: number, item: { isSocial: boolean; sessions: number }) =>
-        item.isSocial ? sum + item.sessions : sum,
-      0,
+    const latestOfficialLineClickAt = parseDateHourMinute(
+      officialLineReport?.rows?.[0]?.dimensionValues?.[0]?.value,
     );
 
     return new Response(
@@ -368,19 +217,15 @@ export const GET: APIRoute = async () => {
         rangeLabel: "近 7 天",
         updatedAt: new Date().toISOString(),
         metrics: {
-          realtimeActiveUsers,
-          todaySessions,
-          totalSessions,
           blogViews: totalBlogViews,
-          socialSessions,
           estimateGenerated: eventMetrics.renovation_estimate_generated || 0,
           estimateCtaClick: eventMetrics.renovation_estimate_cta_click || 0,
+          officialLineClick: eventMetrics.official_line_click || 0,
           requirementSubmit: eventMetrics.requirement_form_submit || 0,
           requirementSuccess: eventMetrics.requirement_form_success || 0,
         },
+        latestOfficialLineClickAt,
         topPosts,
-        topSources: topSources.slice(0, 8),
-        socialLandingPages,
       }),
       {
         status: 200,
@@ -394,7 +239,7 @@ export const GET: APIRoute = async () => {
         status: "error",
         configured: true,
         rangeLabel: "近 7 天",
-        note: "GA4 報表或即時資料讀取失敗，請檢查 Property ID 或 service account 權限。",
+        note: "GA4 報表讀取失敗，請檢查 Property ID 或 service account 權限。",
       }),
       {
         status: 500,

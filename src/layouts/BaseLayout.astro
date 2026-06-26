@@ -223,6 +223,7 @@ const MAINTENANCE_MODE =
   <!-- Google Analytics 4 (僅在生產環境且已設定時載入) -->
   {import.meta.env.PROD && googleAnalyticsId && (
     <>
+      <script async src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`} is:inline></script>
       <script define:vars={{ googleAnalyticsId }} is:inline>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
@@ -230,14 +231,9 @@ const MAINTENANCE_MODE =
         gtag('js', new Date());
         gtag('config', googleAnalyticsId, {
           'anonymize_ip': true,
-          'send_page_view': true
+          'cookie_flags': 'SameSite=None;Secure'
         });
       </script>
-      <script
-        async
-        src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
-        is:inline
-      ></script>
     </>
   )}
   <script is:inline>
@@ -247,6 +243,43 @@ const MAINTENANCE_MODE =
         window.gtag('event', name, params);
       }
     };
+
+    const OFFICIAL_LINE_URLS = [
+      'https://lin.ee/U1HCeW4',
+      'https://line.me/R/ti/p/@example'
+    ];
+
+    function normalizeTrackingUrl(value) {
+      try {
+        return new URL(value, window.location.origin).toString();
+      } catch (_error) {
+        return '';
+      }
+    }
+
+    function extractLinkLabel(anchor) {
+      if (!(anchor instanceof HTMLAnchorElement)) return '';
+      const text = (anchor.dataset.lineLabel || anchor.getAttribute('aria-label') || anchor.textContent || '').trim();
+      if (text) return text.slice(0, 80);
+      return anchor.pathname || anchor.href;
+    }
+
+    document.addEventListener('click', function(event) {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest('a[href]');
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+
+      const href = normalizeTrackingUrl(anchor.href);
+      if (!href || !OFFICIAL_LINE_URLS.includes(href)) return;
+
+      window.trackLeadEvent?.('official_line_click', {
+        page_path: window.location.pathname,
+        page_location: window.location.href,
+        destination_url: href,
+        link_label: extractLinkLabel(anchor)
+      });
+    });
   </script>
   
   <style>
