@@ -311,6 +311,10 @@ const MAINTENANCE_MODE =
         --art-card-muted: rgba(241, 235, 229, 0.95);
         --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
         --font-serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+        --type-overline-spacing: 0.18em;
+        --type-title-tracking: 0.022em;
+        --type-body-tracking: 0.008em;
+        --type-cta-tracking: 0.06em;
 
         /* 中性深浅层次 */
         --tiffany-primary: var(--art-accent-solid);
@@ -527,7 +531,7 @@ const MAINTENANCE_MODE =
         text-decoration: none;
         font-size: 0.92rem;
         font-weight: 500;
-        letter-spacing: 0.06em;
+        letter-spacing: var(--type-cta-tracking);
         transition:
           transform 0.25s ease,
           box-shadow 0.25s ease,
@@ -725,7 +729,7 @@ const MAINTENANCE_MODE =
         font-size: 1.5rem;
         font-weight: 600;
         line-height: 1.4;
-        letter-spacing: 0.05em;
+        letter-spacing: var(--type-title-tracking);
       }
 
       .footer-brand p,
@@ -734,6 +738,7 @@ const MAINTENANCE_MODE =
         margin: 0;
         color: rgba(255, 255, 255, 0.72);
         line-height: 1.8;
+        letter-spacing: var(--type-body-tracking);
         text-decoration: none;
       }
 
@@ -748,12 +753,14 @@ const MAINTENANCE_MODE =
         color: rgba(255, 255, 255, 0.88);
         background: rgba(255, 255, 255, 0.04);
         font-size: 0.88rem;
+        font-weight: 500;
+        letter-spacing: var(--type-cta-tracking);
       }
 
       .footer-column h3 {
         margin: 0 0 1rem;
         font-size: 0.82rem;
-        letter-spacing: 0.18em;
+        letter-spacing: var(--type-overline-spacing);
         color: rgba(255, 255, 255, 0.56);
         text-transform: uppercase;
         font-weight: 600;
@@ -791,6 +798,7 @@ const MAINTENANCE_MODE =
         color: rgba(255, 255, 255, 0.56);
         text-decoration: none;
         font-size: 0.92rem;
+        letter-spacing: var(--type-body-tracking);
       }
 
       @media (max-width: 900px) {
