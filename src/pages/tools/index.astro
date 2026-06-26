@@ -43,6 +43,12 @@ const bathroomCountOptions = [
   { value: "three-plus", label: "3 間以上" },
 ];
 
+const bathroomScopeOptions = [
+  { value: "fixtures", label: "以設備更新為主" },
+  { value: "standard", label: "標準整間翻新" },
+  { value: "relocate", label: "含格局 / 管線移位" },
+];
+
 const kitchenLevelOptions = [
   { value: "cosmetic", label: "局部更新，盡量保留格局" },
   { value: "full", label: "整套翻新，不大改管線" },
@@ -59,6 +65,12 @@ const furnitureScaleOptions = [
   { value: "partial", label: "局部收納補強" },
   { value: "wall", label: "單面牆或單一主櫃體" },
   { value: "multi-zone", label: "多區櫃體整合" },
+];
+
+const surfaceCoverageOptions = [
+  { value: "local", label: "局部單區" },
+  { value: "main-zone", label: "主要公區 / 主空間" },
+  { value: "whole-home", label: "接近全室" },
 ];
 
 const renovationItems = [
@@ -303,7 +315,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
         <div class="form-section">
           <h2>細部條件</h2>
-          <p class="form-section-note">只補最影響第一層估價判讀的 4 個分支；若未勾對應工項，欄位會自動停用。</p>
+          <p class="form-section-note">只補最影響第一層估價判讀的 6 個分支；若未勾對應工項，欄位會自動停用。</p>
 
           <div class="detail-grid">
             <div class="form-group detail-group" data-detail-for="bathroom">
@@ -312,6 +324,19 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 {
                   bathroomCountOptions.map(({ value, label }) => (
                     <option value={value} selected={value === "one"}>
+                      {label}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div class="form-group detail-group" data-detail-for="bathroom">
+              <label for="bathroom-scope">衛浴翻新範圍</label>
+              <select id="bathroom-scope">
+                {
+                  bathroomScopeOptions.map(({ value, label }) => (
+                    <option value={value} selected={value === "standard"}>
                       {label}
                     </option>
                   ))
@@ -351,6 +376,19 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 {
                   furnitureScaleOptions.map(({ value, label }) => (
                     <option value={value} selected={value === "wall"}>
+                      {label}
+                    </option>
+                  ))
+                }
+              </select>
+            </div>
+
+            <div class="form-group detail-group" data-detail-targets="ceiling,floor,wall">
+              <label for="surface-coverage">表面工程範圍</label>
+              <select id="surface-coverage">
+                {
+                  surfaceCoverageOptions.map(({ value, label }) => (
+                    <option value={value} selected={value === "main-zone"}>
                       {label}
                     </option>
                   ))
@@ -1598,6 +1636,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const bathroomCount = document.getElementById(
     "bathroom-count",
   ) as HTMLSelectElement | null;
+  const bathroomScope = document.getElementById(
+    "bathroom-scope",
+  ) as HTMLSelectElement | null;
   const kitchenLevel = document.getElementById(
     "kitchen-level",
   ) as HTMLSelectElement | null;
@@ -1606,6 +1647,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   ) as HTMLSelectElement | null;
   const furnitureScale = document.getElementById(
     "furniture-scale",
+  ) as HTMLSelectElement | null;
+  const surfaceCoverage = document.getElementById(
+    "surface-coverage",
   ) as HTMLSelectElement | null;
   const detailGroups = Array.from(
     document.querySelectorAll(".detail-group[data-detail-for]"),
@@ -1724,6 +1768,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     "three-plus": { label: "3 間以上", multiplier: 1.85 },
   };
 
+  const bathroomScopeMeta = {
+    fixtures: { label: "以設備更新為主", multiplier: 0.72 },
+    standard: { label: "標準整間翻新", multiplier: 1 },
+    relocate: { label: "含格局 / 管線移位", multiplier: 1.24 },
+  };
+
   const kitchenLevelMeta = {
     cosmetic: { label: "局部更新，盡量保留格局", multiplier: 0.82 },
     full: { label: "整套翻新，不大改管線", multiplier: 1 },
@@ -1740,6 +1790,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     partial: { label: "局部收納補強", multiplier: 0.78 },
     wall: { label: "單面牆或單一主櫃體", multiplier: 1 },
     "multi-zone": { label: "多區櫃體整合", multiplier: 1.28 },
+  };
+
+  const surfaceCoverageMeta = {
+    local: { label: "局部單區", multiplier: 0.82 },
+    "main-zone": { label: "主要公區 / 主空間", multiplier: 1 },
+    "whole-home": { label: "接近全室", multiplier: 1.24 },
   };
 
   function formatRange(min, max) {
@@ -1775,11 +1831,21 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     return selectedItems.some((item) => item.value === value && item.checked);
   }
 
+  function hasSelectedAnyItem(values = []) {
+    return values.some((value) => hasSelectedItem(value));
+  }
+
   function syncDetailControls() {
     detailGroups.forEach((group) => {
-      const target = group.dataset.detailFor || "";
       const select = group.querySelector("select");
-      const enabled = hasSelectedItem(target);
+      const singleTarget = group.dataset.detailFor || "";
+      const multiTargets = (group.dataset.detailTargets || "")
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean);
+      const enabled = singleTarget
+        ? hasSelectedItem(singleTarget)
+        : hasSelectedAnyItem(multiTargets);
 
       if (select) {
         select.disabled = !enabled;
@@ -1791,7 +1857,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   function getItemDetailMeta(itemValue) {
     if (itemValue === "bathroom") {
-      return bathroomCountMeta[bathroomCount?.value as keyof typeof bathroomCountMeta] || bathroomCountMeta.one;
+      const countMeta =
+        bathroomCountMeta[bathroomCount?.value as keyof typeof bathroomCountMeta] ||
+        bathroomCountMeta.one;
+      const scopeMeta =
+        bathroomScopeMeta[bathroomScope?.value as keyof typeof bathroomScopeMeta] ||
+        bathroomScopeMeta.standard;
+
+      return {
+        label: `${countMeta.label} / ${scopeMeta.label}`,
+        multiplier: countMeta.multiplier * scopeMeta.multiplier,
+      };
     }
 
     if (itemValue === "kitchen") {
@@ -1799,7 +1875,22 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     }
 
     if (itemValue === "floor") {
-      return floorMethodMeta[floorMethod?.value as keyof typeof floorMethodMeta] || floorMethodMeta.replace;
+      const floorMeta =
+        floorMethodMeta[floorMethod?.value as keyof typeof floorMethodMeta] ||
+        floorMethodMeta.replace;
+      const coverageMeta =
+        surfaceCoverageMeta[surfaceCoverage?.value as keyof typeof surfaceCoverageMeta] ||
+        surfaceCoverageMeta["main-zone"];
+
+      return {
+        label: `${floorMeta.label} / ${coverageMeta.label}`,
+        multiplier: floorMeta.multiplier * coverageMeta.multiplier,
+      };
+    }
+
+    if (itemValue === "ceiling" || itemValue === "wall") {
+      return surfaceCoverageMeta[surfaceCoverage?.value as keyof typeof surfaceCoverageMeta] ||
+        surfaceCoverageMeta["main-zone"];
     }
 
     if (itemValue === "furniture") {
@@ -1960,9 +2051,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       timeline: timeline.value,
       selectedItems: selectedConfigs.map((item) => item.value),
       bathroomCount: bathroomCount?.value || "",
+      bathroomScope: bathroomScope?.value || "",
       kitchenLevel: kitchenLevel?.value || "",
       floorMethod: floorMethod?.value || "",
       furnitureScale: furnitureScale?.value || "",
+      surfaceCoverage: surfaceCoverage?.value || "",
     });
 
     if (
@@ -2051,12 +2144,20 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       adviceItems.push("三間以上衛浴通常已接近整屋基礎工程量體，建議同步檢查排水、防水與設備等級。");
     }
 
+    if (hasSelectedItem("bathroom") && bathroomScope?.value === "relocate") {
+      adviceItems.push("衛浴若含格局或管線移位，費用通常不只增加設備，還會拉高泥作、防水與排水調整成本。");
+    }
+
     if (hasSelectedItem("kitchen") && kitchenLevel?.value === "relocate") {
       adviceItems.push("廚房若涉及設備移位或重拉管線，預算差異通常不只在廚具本體，也會反映在泥作與水電。");
     }
 
     if (hasSelectedItem("floor") && floorMethod?.value === "rebuild") {
       adviceItems.push("地板若含整平或基底重做，通常要把拆除、乾燥與交界收口一併算進工期與預備金。");
+    }
+
+    if (hasSelectedAnyItem(["ceiling", "floor", "wall"]) && surfaceCoverage?.value === "whole-home") {
+      adviceItems.push("表面工程若接近全室，雖然單項不一定最貴，但總面積累積後，常會把整體預算往上一級推。");
     }
 
     const detailAdviceItems = adviceItems.slice(4);
@@ -2106,6 +2207,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         hasSelectedItem("bathroom") ? `衛浴 ${getItemDetailMeta("bathroom").label}` : "",
         hasSelectedItem("kitchen") ? `廚房 ${getItemDetailMeta("kitchen").label}` : "",
         hasSelectedItem("floor") ? `地板 ${getItemDetailMeta("floor").label}` : "",
+        hasSelectedAnyItem(["ceiling", "wall"]) ? `表面工程 ${surfaceCoverageMeta[surfaceCoverage?.value as keyof typeof surfaceCoverageMeta]?.label || surfaceCoverageMeta["main-zone"].label}` : "",
         hasSelectedItem("furniture") ? `櫃體 ${getItemDetailMeta("furniture").label}` : "",
       ].filter(Boolean).join(" / ") || "未額外套用"}`,
     ].join(" ｜ ");
@@ -2147,6 +2249,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         hasSelectedItem("bathroom") ? `衛浴：${getItemDetailMeta("bathroom").label}` : "",
         hasSelectedItem("kitchen") ? `廚房：${getItemDetailMeta("kitchen").label}` : "",
         hasSelectedItem("floor") ? `地板：${getItemDetailMeta("floor").label}` : "",
+        hasSelectedAnyItem(["ceiling", "wall"]) ? `表面工程：${surfaceCoverageMeta[surfaceCoverage?.value as keyof typeof surfaceCoverageMeta]?.label || surfaceCoverageMeta["main-zone"].label}` : "",
         hasSelectedItem("furniture") ? `櫃體：${getItemDetailMeta("furniture").label}` : "",
       ].filter(Boolean),
       totalRange: formatRange(minTotal, maxTotal),
@@ -2248,9 +2351,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     usePurpose.addEventListener("change", calculate);
     timeline.addEventListener("change", calculate);
     bathroomCount?.addEventListener("change", calculate);
+    bathroomScope?.addEventListener("change", calculate);
     kitchenLevel?.addEventListener("change", calculate);
     floorMethod?.addEventListener("change", calculate);
     furnitureScale?.addEventListener("change", calculate);
+    surfaceCoverage?.addEventListener("change", calculate);
     selectedItems.forEach((checkbox) => {
       checkbox.addEventListener("change", calculate);
     });
