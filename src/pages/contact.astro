@@ -623,7 +623,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   }
 
   .quick-form-submit {
-    border: 1px solid var(--gray-darkest);
+    border: 1px solid rgba(95, 111, 105, 0.24);
     background: linear-gradient(135deg, var(--gray-darkest) 0%, var(--tiffany-dark) 100%);
     color: var(--white);
     cursor: pointer;
@@ -631,19 +631,22 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   }
 
   .quick-form-submit:hover {
+    background: linear-gradient(135deg, rgba(40, 40, 40, 1) 0%, rgba(102, 124, 118, 1) 100%);
     transform: translateY(-2px);
     box-shadow: 0 18px 28px rgba(47, 47, 47, 0.18);
   }
 
   .quick-form-secondary {
-    border: 1px solid rgba(129, 199, 212, 0.22);
-    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(95, 111, 105, 0.22);
+    background: rgba(255, 255, 255, 0.96);
     color: var(--gray-darkest);
+    box-shadow: 0 12px 22px rgba(47, 47, 47, 0.06);
   }
 
   .quick-form-secondary:hover {
     transform: translateY(-2px);
-    background: rgba(245, 250, 250, 1);
+    background: rgba(242, 247, 247, 1);
+    border-color: rgba(102, 124, 118, 0.28);
     box-shadow: 0 14px 24px rgba(129, 199, 212, 0.12);
   }
 
