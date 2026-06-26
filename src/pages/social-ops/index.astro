@@ -176,10 +176,27 @@ const publishingDashboard = topicModeMap[defaultTopicMode].publishingDashboard;
 const cannedReplies = [
   {
     id: "budget-range-estimator",
+    category: "業主導流",
     promptTitle: "裝修前期抓不到預算範圍怎麼辦？",
     promptHint: "適合回覆：預算很亂、怕被亂報價、想先知道大概花費",
     message:
       "裝修前期最怕抓不到預算範圍。不管最後決定找誰施工，建議可以先用我們工作室開發的「線上自動估價系統」跑一次初步試算。先讓心裡有個客觀的數字底線，之後去跟師傅或設計師比價時會踏實很多，完全免費提供參考：https://www.qingxidesign.tw/tools",
+  },
+  {
+    id: "vendor-intake-short",
+    category: "工班招募",
+    promptTitle: "工班自薦短版",
+    promptHint: "適合回覆：先快速留連結，不想留言太長",
+    message:
+      `若您有穩定承接相關工種，歡迎填這個合作工班資料登錄頁，留下聯絡方式、工種、服務區域與擅長案型；若方便，也可附單價表、報價單或去識別樣本。資料僅供青曦內部評估，不對外公開：${vendorIntakeShortUrl}`,
+  },
+  {
+    id: "vendor-intake-full",
+    category: "工班招募",
+    promptTitle: "工班自薦完整版",
+    promptHint: "適合回覆：對方主動自薦、想一次講清楚規則",
+    message:
+      `若您有穩定承接相關工種，歡迎填這個合作工班資料登錄頁，留下必要聯絡方式與服務資料。表單會請您簡單填寫工種、服務區域、較擅長商空 / 武場或住宅裝潢，以及工法傾向；若方便，也可附上常用單價表、報價單範例，或去識別後的報價樣本。資料僅供青曦內部評估與建立合作名單，不會對外公開；若案件方向適合，我們會再主動聯繫：${vendorIntakeShortUrl}`,
   },
 ];
 
@@ -191,6 +208,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
 const topicModeOptionsJson = JSON.stringify(publishingTopicModeOptions);
 const topicModeMapJson = JSON.stringify(topicModeMap);
+const vendorIntakeShortUrl = "https://qingxidesign.tw/crew-intake";
 ---
 
 <BaseLayout
@@ -293,7 +311,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <div class="bookshelf-reply-grid bookshelf-canned-grid">
                   {cannedReplies.map((reply) => (
                     <article class="bookshelf-reply-card bookshelf-canned-card bookshelf-canned-card-priority">
-                      <span>適用題目</span>
+                      <span>{reply.category}</span>
                       <strong>{reply.promptTitle}</strong>
                       <em>{reply.promptHint}</em>
                       <p>{reply.message}</p>
@@ -1380,12 +1398,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function buildVendorIntakeShareUrl() {
-    const url = new URL(VENDOR_INTAKE_PUBLIC_URL);
-    url.searchParams.set("source", "social-comment");
-    url.searchParams.set("utm_source", "social");
-    url.searchParams.set("utm_medium", "comment-reply");
-    url.searchParams.set("utm_campaign", "crew-intake");
-    return url.toString();
+    return vendorIntakeShortUrl;
   }
 
   function buildVendorIntakeCannedReply(shareUrl) {

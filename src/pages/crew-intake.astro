@@ -54,8 +54,8 @@ const vendorTradeOptions = [
       <div class="crew-intake-card">
         <div class="crew-intake-card-head">
           <p class="crew-intake-section-label">STEP 01</p>
-          <h2>先留下必要資料即可</h2>
-          <p>若案件適合，青曦會再往下確認合作方式；這一步只先收能快速判斷合作方向的關鍵資料。</p>
+          <h2>先完成核心必填資料，再補附件即可</h2>
+          <p>這份表單分成核心必填區、補充資料區與附件區；青曦會先看最影響合作判斷的項目。</p>
         </div>
 
         <form id="crew-intake-form" class="crew-intake-form" enctype="multipart/form-data">
@@ -69,141 +69,178 @@ const vendorTradeOptions = [
           <input type="hidden" name="landing_page" id="crew-landing-page" />
           <input type="hidden" name="referrer" id="crew-referrer" />
 
-          <div class="crew-intake-grid">
-            <label class="crew-intake-field">
-              <span>姓名</span>
-              <input type="text" name="name" placeholder="請填主要聯絡人姓名" required />
-            </label>
+          <section class="crew-intake-form-section crew-intake-form-section-emphasis">
+            <div class="crew-intake-form-section-head">
+              <div>
+                <p class="crew-intake-form-section-tag">核心必填區</p>
+                <h3>這幾題會直接影響青曦是否能快速判斷合作方向</h3>
+              </div>
+              <p>請優先完成工種、區域、聯絡方式、擅長案型、工法傾向與報價資料提供方式。</p>
+            </div>
 
-            <label class="crew-intake-field">
-              <span>團隊 / 公司名稱</span>
-              <input type="text" name="team_name" placeholder="可填工作室或公司名稱" />
-            </label>
+            <div class="crew-intake-grid">
+              <label class="crew-intake-field crew-intake-field-key">
+                <span class="crew-intake-field-title"><strong>姓名</strong><em>必填</em></span>
+                <input type="text" name="name" placeholder="請填主要聯絡人姓名" required />
+              </label>
 
-            <label class="crew-intake-field">
-              <span>工種</span>
-              <select name="trade" id="crew-trade" required>
-                <option value="">請選擇工種</option>
-                {vendorTradeOptions.map((trade) => (
-                  <option value={trade}>{trade}</option>
-                ))}
-              </select>
-            </label>
+              <label class="crew-intake-field">
+                <span class="crew-intake-field-title"><strong>團隊 / 公司名稱</strong><small>選填</small></span>
+                <input type="text" name="team_name" placeholder="可填工作室或公司名稱" />
+              </label>
 
-            <label class="crew-intake-field">
-              <span>服務區域</span>
-              <input type="text" name="service_area" placeholder="例如：台北 / 新北 / 基隆" required />
-            </label>
+              <label class="crew-intake-field crew-intake-field-key">
+                <span class="crew-intake-field-title"><strong>工種</strong><em>必填</em></span>
+                <select name="trade" id="crew-trade" required>
+                  <option value="">請選擇工種</option>
+                  {vendorTradeOptions.map((trade) => (
+                    <option value={trade}>{trade}</option>
+                  ))}
+                </select>
+              </label>
 
-            <label class="crew-intake-field">
-              <span>聯絡方式類型</span>
-              <select name="contact_method" required>
-                <option value="">請選擇</option>
-                <option value="phone">手機</option>
-                <option value="line">LINE</option>
-                <option value="email">Email</option>
-              </select>
-            </label>
+              <label class="crew-intake-field crew-intake-field-key">
+                <span class="crew-intake-field-title"><strong>服務區域</strong><em>必填</em></span>
+                <input type="text" name="service_area" placeholder="例如：台北 / 新北 / 基隆" required />
+              </label>
 
-            <label class="crew-intake-field">
-              <span>聯絡方式</span>
-              <input type="text" name="contact_value" placeholder="請填主要聯絡方式" required />
-            </label>
+              <label class="crew-intake-field crew-intake-field-key">
+                <span class="crew-intake-field-title"><strong>聯絡方式類型</strong><em>必填</em></span>
+                <select name="contact_method" required>
+                  <option value="">請選擇</option>
+                  <option value="phone">手機</option>
+                  <option value="line">LINE</option>
+                  <option value="email">Email</option>
+                </select>
+              </label>
 
-            <label class="crew-intake-field">
-              <span>擅長案型</span>
-              <select name="project_focus" required>
-                <option value="">請選擇</option>
-                <option value="商空 / 武場為主">商空 / 武場為主</option>
-                <option value="住宅裝潢為主">住宅裝潢為主</option>
-                <option value="兩者都有">兩者都有</option>
-                <option value="其他特殊案型">其他特殊案型</option>
-              </select>
-            </label>
+              <label class="crew-intake-field crew-intake-field-key">
+                <span class="crew-intake-field-title"><strong>聯絡方式</strong><em>必填</em></span>
+                <input type="text" name="contact_value" placeholder="請填主要聯絡方式" required />
+              </label>
 
-            <label class="crew-intake-field">
-              <span>工法細緻度</span>
-              <select name="craft_approach" required>
-                <option value="">請選擇</option>
-                <option value="偏效率施工">偏效率施工</option>
-                <option value="標準住宅施工">標準住宅施工</option>
-                <option value="偏細緻收邊">偏細緻收邊</option>
-                <option value="依案型調整">依案型調整</option>
-              </select>
-            </label>
+              <label class="crew-intake-field crew-intake-field-key">
+                <span class="crew-intake-field-title"><strong>擅長案型</strong><em>必填</em></span>
+                <select name="project_focus" required>
+                  <option value="">請選擇</option>
+                  <option value="商空 / 武場為主">商空 / 武場為主</option>
+                  <option value="住宅裝潢為主">住宅裝潢為主</option>
+                  <option value="兩者都有">兩者都有</option>
+                  <option value="其他特殊案型">其他特殊案型</option>
+                </select>
+                <small>例如較常承接商空、武場、住宅裝潢，或兩者皆有。</small>
+              </label>
 
-            <label class="crew-intake-field">
-              <span>是否可開發票</span>
-              <select name="invoice_status">
-                <option value="">先不填也可以</option>
-                <option value="yes">可開發票</option>
-                <option value="no">不可開發票</option>
-                <option value="discuss">可再討論</option>
-              </select>
-            </label>
+              <label class="crew-intake-field crew-intake-field-key">
+                <span class="crew-intake-field-title"><strong>工法細緻度</strong><em>必填</em></span>
+                <select name="craft_approach" required>
+                  <option value="">請選擇</option>
+                  <option value="偏效率施工">偏效率施工</option>
+                  <option value="標準住宅施工">標準住宅施工</option>
+                  <option value="偏細緻收邊">偏細緻收邊</option>
+                  <option value="依案型調整">依案型調整</option>
+                </select>
+                <small>若你會依案型調整施工節奏與收邊方式，可直接選最後一項。</small>
+              </label>
 
-            <label class="crew-intake-field">
-              <span>目前報價方式</span>
-              <select name="pricing_mode">
-                <option value="">先不填也可以</option>
-                <option value="unit-price">常用單價表</option>
-                <option value="quote-sheet">常用報價單</option>
-                <option value="both">兩者都有</option>
-                <option value="custom">依案件另報</option>
-              </select>
-            </label>
+              <label class="crew-intake-field crew-intake-field-key">
+                <span class="crew-intake-field-title"><strong>報價資料提供方式</strong><em>必填</em></span>
+                <select name="pricing_disclosure" id="crew-pricing-disclosure" required>
+                  <option value="">請選擇</option>
+                  <option value="direct">可直接提供單價表 / 報價單</option>
+                  <option value="sanitized">可提供去識別版本</option>
+                  <option value="later">接洽後再提供</option>
+                  <option value="not-now">目前暫不提供</option>
+                </select>
+                <small>即使目前不方便附檔，也建議先選擇現在可配合的方式。</small>
+              </label>
+            </div>
+          </section>
 
-            <label class="crew-intake-field">
-              <span>報價資料提供方式</span>
-              <select name="pricing_disclosure" id="crew-pricing-disclosure" required>
-                <option value="">請選擇</option>
-                <option value="direct">可直接提供單價表 / 報價單</option>
-                <option value="sanitized">可提供去識別版本</option>
-                <option value="later">接洽後再提供</option>
-                <option value="not-now">目前暫不提供</option>
-              </select>
-            </label>
+          <section class="crew-intake-form-section">
+            <div class="crew-intake-form-section-head">
+              <div>
+                <p class="crew-intake-form-section-tag">補充資料區</p>
+                <h3>這些欄位會幫青曦更快判斷合作條件，但可稍後再補</h3>
+              </div>
+              <p>若願意先提供，後續在整理合作名單時會更有效率。</p>
+            </div>
 
-            <label class="crew-intake-field">
-              <span>是否可接受簽約</span>
-              <select name="accepts_contract">
-                <option value="">先不填也可以</option>
-                <option value="yes">可接受簽約</option>
-                <option value="no">暫不接受簽約</option>
-                <option value="discuss">可再討論</option>
-              </select>
-            </label>
+            <div class="crew-intake-grid">
+              <label class="crew-intake-field">
+                <span class="crew-intake-field-title"><strong>是否可開發票</strong><small>選填</small></span>
+                <select name="invoice_status">
+                  <option value="">先不填也可以</option>
+                  <option value="yes">可開發票</option>
+                  <option value="no">不可開發票</option>
+                  <option value="discuss">可再討論</option>
+                </select>
+              </label>
 
-            <label class="crew-intake-field">
-              <span>附件類型</span>
-              <select name="attachment_kind" id="crew-attachment-kind">
-                <option value="">若未附檔可先略過</option>
-                <option value="pricing-sheet">收費標準</option>
-                <option value="quote-sheet">報價單</option>
-                <option value="both-mixed">綜合資料</option>
-              </select>
-            </label>
+              <label class="crew-intake-field">
+                <span class="crew-intake-field-title"><strong>目前報價方式</strong><small>選填</small></span>
+                <select name="pricing_mode">
+                  <option value="">先不填也可以</option>
+                  <option value="unit-price">常用單價表</option>
+                  <option value="quote-sheet">常用報價單</option>
+                  <option value="both">兩者都有</option>
+                  <option value="custom">依案件另報</option>
+                </select>
+              </label>
 
-            <label class="crew-intake-field crew-intake-field-full">
-              <span>上傳單價表、報價單或去識別報價樣本</span>
-              <input
-                type="file"
-                id="crew-pricing-file"
-                name="pricing_file"
-                accept=".pdf,.jpg,.jpeg,.png,.webp,.xls,.xlsx,application/pdf,image/jpeg,image/png,image/webp,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              />
-              <small id="crew-pricing-file-hint">若方便，可直接上傳單價表、既有報價單，或去識別後的報價樣本其一即可；資料僅供青曦內部評估，不會對外公開。</small>
-            </label>
+              <label class="crew-intake-field">
+                <span class="crew-intake-field-title"><strong>是否可接受簽約</strong><small>選填</small></span>
+                <select name="accepts_contract">
+                  <option value="">先不填也可以</option>
+                  <option value="yes">可接受簽約</option>
+                  <option value="no">暫不接受簽約</option>
+                  <option value="discuss">可再討論</option>
+                </select>
+              </label>
 
-            <label class="crew-intake-field crew-intake-field-full">
-              <span>補充說明</span>
-              <textarea
-                name="note"
-                rows="4"
-                placeholder="可補充擅長案型、合作方式、常接案型，或其他想先說明的內容"
-              ></textarea>
-            </label>
-          </div>
+              <label class="crew-intake-field crew-intake-field-full">
+                <span class="crew-intake-field-title"><strong>補充說明</strong><small>選填</small></span>
+                <textarea
+                  name="note"
+                  rows="4"
+                  placeholder="可補充擅長案型、合作方式、常接案型，或其他想先說明的內容"
+                ></textarea>
+              </label>
+            </div>
+          </section>
+
+          <section class="crew-intake-form-section">
+            <div class="crew-intake-form-section-head">
+              <div>
+                <p class="crew-intake-form-section-tag">附件區</p>
+                <h3>若方便，請附單價表、報價單或去識別樣本</h3>
+              </div>
+              <p>若你選了可直接提供或可提供去識別版本，附件會列為必附；若目前不方便，也可先送出基本資料。</p>
+            </div>
+
+            <div class="crew-intake-grid">
+              <label class="crew-intake-field">
+                <span class="crew-intake-field-title"><strong>附件類型</strong><small>條件必填</small></span>
+                <select name="attachment_kind" id="crew-attachment-kind">
+                  <option value="">若未附檔可先略過</option>
+                  <option value="pricing-sheet">收費標準</option>
+                  <option value="quote-sheet">報價單</option>
+                  <option value="both-mixed">綜合資料</option>
+                </select>
+              </label>
+
+              <div class="crew-intake-field crew-intake-field-full crew-intake-field-key">
+                <span class="crew-intake-field-title"><strong>上傳單價表、報價單或去識別報價樣本</strong><small>條件必填</small></span>
+                <input
+                  type="file"
+                  id="crew-pricing-file"
+                  name="pricing_file"
+                  accept=".pdf,.jpg,.jpeg,.png,.webp,.xls,.xlsx,application/pdf,image/jpeg,image/png,image/webp,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                />
+                <small id="crew-pricing-file-hint">若方便，可直接上傳單價表、既有報價單，或去識別後的報價樣本其一即可；資料僅供青曦內部評估，不會對外公開。</small>
+              </div>
+            </div>
+          </section>
 
           <div class="crew-intake-actions">
             <button type="submit" id="crew-intake-submit">送出資料</button>
@@ -338,6 +375,59 @@ const vendorTradeOptions = [
     margin-bottom: 1.4rem;
   }
 
+  .crew-intake-form-section {
+    display: grid;
+    gap: 1rem;
+    padding: 1.1rem 1.15rem 1.2rem;
+    border-radius: 24px;
+    border: 1px solid rgba(124, 131, 122, 0.12);
+    background: rgba(255, 252, 248, 0.76);
+  }
+
+  .crew-intake-form-section + .crew-intake-form-section {
+    margin-top: 0.95rem;
+  }
+
+  .crew-intake-form-section-emphasis {
+    border-color: rgba(105, 115, 108, 0.2);
+    background:
+      radial-gradient(circle at top right, rgba(164, 171, 160, 0.12), transparent 38%),
+      linear-gradient(180deg, rgba(255, 254, 251, 0.96) 0%, rgba(247, 242, 237, 0.94) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  .crew-intake-form-section-head {
+    display: grid;
+    gap: 0.45rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(124, 131, 122, 0.12);
+  }
+
+  .crew-intake-form-section-head h3,
+  .crew-intake-form-section-head p {
+    margin: 0;
+  }
+
+  .crew-intake-form-section-head h3 {
+    color: #332e29;
+    font-size: 1.02rem;
+    line-height: 1.65;
+    font-weight: 600;
+  }
+
+  .crew-intake-form-section-head p {
+    color: #766f68;
+    line-height: 1.75;
+  }
+
+  .crew-intake-form-section-tag {
+    margin: 0 0 0.3rem;
+    color: #69736c;
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
   .crew-intake-form,
   .crew-intake-grid,
   .crew-intake-field {
@@ -349,9 +439,53 @@ const vendorTradeOptions = [
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .crew-intake-field span {
+  .crew-intake-field-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
     color: #332e29;
     font-size: 0.94rem;
+  }
+
+  .crew-intake-field-title strong,
+  .crew-intake-field-title em,
+  .crew-intake-field-title small {
+    margin: 0;
+    font-style: normal;
+  }
+
+  .crew-intake-field-title strong {
+    font-weight: 600;
+  }
+
+  .crew-intake-field-title em,
+  .crew-intake-field-title small {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    letter-spacing: 0.02em;
+  }
+
+  .crew-intake-field-title em {
+    background: rgba(74, 89, 78, 0.1);
+    border: 1px solid rgba(74, 89, 78, 0.12);
+    color: #475347;
+  }
+
+  .crew-intake-field-title small {
+    background: rgba(124, 131, 122, 0.08);
+    border: 1px solid rgba(124, 131, 122, 0.1);
+    color: #746d66;
+  }
+
+  .crew-intake-field-key {
+    padding: 0.15rem;
+    border-radius: 22px;
+    background: rgba(247, 243, 238, 0.62);
   }
 
   .crew-intake-field input,
