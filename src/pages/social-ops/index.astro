@@ -756,7 +756,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </div>
             </details>
 
-            <details class="bookshelf-fold">
+            <details id="content-analytics-details" class="bookshelf-fold">
               <summary>
                 <span>回看與成效</span>
                 <small>低頻時再展開</small>
@@ -2373,68 +2373,50 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const estimateCtaNode = document.getElementById("content-analytics-estimate-cta");
     const requirementSuccessNode = document.getElementById("content-analytics-requirement-success");
 
-    if (
-      !statusNode ||
-      !updatedAtNode ||
-      !noteNode ||
-      !topPostsNode ||
-      !topSourcesNode ||
-      !socialLandingsNode ||
-      !realtimeUsersNode ||
-      !todaySessionsNode ||
-      !totalSessionsNode ||
-      !blogViewsNode ||
-      !socialSessionsNode ||
-      !estimateGeneratedNode ||
-      !estimateCtaNode ||
-      !requirementSuccessNode
-    ) {
-      return;
-    }
-
-    realtimeUsersNode.textContent = formatCount(contentAnalyticsState.metrics.realtimeActiveUsers);
-    todaySessionsNode.textContent = formatCount(contentAnalyticsState.metrics.todaySessions);
-    totalSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.totalSessions);
-    blogViewsNode.textContent = formatCount(contentAnalyticsState.metrics.blogViews);
-    socialSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.socialSessions);
-    estimateGeneratedNode.textContent = formatCount(contentAnalyticsState.metrics.estimateGenerated);
-    estimateCtaNode.textContent = formatCount(contentAnalyticsState.metrics.estimateCtaClick);
-    requirementSuccessNode.textContent = formatCount(contentAnalyticsState.metrics.requirementSuccess);
+    // 即使找不到一些元素，也继续处理能找到的元素
+    if (realtimeUsersNode) realtimeUsersNode.textContent = formatCount(contentAnalyticsState.metrics.realtimeActiveUsers);
+    if (todaySessionsNode) todaySessionsNode.textContent = formatCount(contentAnalyticsState.metrics.todaySessions);
+    if (totalSessionsNode) totalSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.totalSessions);
+    if (blogViewsNode) blogViewsNode.textContent = formatCount(contentAnalyticsState.metrics.blogViews);
+    if (socialSessionsNode) socialSessionsNode.textContent = formatCount(contentAnalyticsState.metrics.socialSessions);
+    if (estimateGeneratedNode) estimateGeneratedNode.textContent = formatCount(contentAnalyticsState.metrics.estimateGenerated);
+    if (estimateCtaNode) estimateCtaNode.textContent = formatCount(contentAnalyticsState.metrics.estimateCtaClick);
+    if (requirementSuccessNode) requirementSuccessNode.textContent = formatCount(contentAnalyticsState.metrics.requirementSuccess);
 
     if (contentAnalyticsState.status === "loading") {
-      statusNode.textContent = "讀取中";
-      updatedAtNode.textContent = "同步中";
-      noteNode.textContent = "正在向 GA4 讀取即時活躍使用者、近 7 天內容、來源與轉換成效。";
-      topPostsNode.innerHTML = "<li>正在讀取內容成效...</li>";
-      topSourcesNode.innerHTML = "<li>正在讀取來源資料...</li>";
-      socialLandingsNode.innerHTML = "<li>正在讀取社群落地頁...</li>";
+      if (statusNode) statusNode.textContent = "讀取中";
+      if (updatedAtNode) updatedAtNode.textContent = "同步中";
+      if (noteNode) noteNode.textContent = "正在向 GA4 讀取即時活躍使用者、近 7 天內容、來源與轉換成效。";
+      if (topPostsNode) topPostsNode.innerHTML = "<li>正在讀取內容成效...</li>";
+      if (topSourcesNode) topSourcesNode.innerHTML = "<li>正在讀取來源資料...</li>";
+      if (socialLandingsNode) socialLandingsNode.innerHTML = "<li>正在讀取社群落地頁...</li>";
       return;
     }
 
     if (contentAnalyticsState.status === "setup_required") {
-      statusNode.textContent = "待接 GA4";
-      updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
-      noteNode.textContent =
+      if (statusNode) statusNode.textContent = "待接 GA4";
+      if (updatedAtNode) updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
+      if (noteNode) noteNode.textContent =
         contentAnalyticsState.note ||
         "設定好 GA4 權限後，這裡會自動顯示即時活躍使用者、內容、來源與落地頁成效。";
-      topPostsNode.innerHTML = "<li>目前尚未接通 GA4 Data API。</li>";
-      topSourcesNode.innerHTML = "<li>接通後可直接看到來源 / 媒介排行。</li>";
-      socialLandingsNode.innerHTML = "<li>接通後可直接看到社群帶進站的頁面。</li>";
+      if (topPostsNode) topPostsNode.innerHTML = "<li>目前尚未接通 GA4 Data API。</li>";
+      if (topSourcesNode) topSourcesNode.innerHTML = "<li>接通後可直接看到來源 / 媒介排行。</li>";
+      if (socialLandingsNode) socialLandingsNode.innerHTML = "<li>接通後可直接看到社群帶進站的頁面。</li>";
       return;
     }
 
     if (contentAnalyticsState.status === "error") {
-      statusNode.textContent = "讀取失敗";
-      updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
-      noteNode.textContent = contentAnalyticsState.note || "GA4 報表暫時讀取失敗，請稍後再試。";
-      topPostsNode.innerHTML = "<li>目前無法取得熱門文章排行。</li>";
-      topSourcesNode.innerHTML = "<li>目前無法取得來源排行。</li>";
-      socialLandingsNode.innerHTML = "<li>目前無法取得社群落地頁排行。</li>";
+      if (statusNode) statusNode.textContent = "讀取失敗";
+      if (updatedAtNode) updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
+      if (noteNode) noteNode.textContent = contentAnalyticsState.note || "GA4 報表暫時讀取失敗，請稍後再試。";
+      if (topPostsNode) topPostsNode.innerHTML = "<li>目前無法取得熱門文章排行。</li>";
+      if (topSourcesNode) topSourcesNode.innerHTML = "<li>目前無法取得來源排行。</li>";
+      if (socialLandingsNode) socialLandingsNode.innerHTML = "<li>目前無法取得社群落地頁排行。</li>";
       return;
     }
 
-    statusNode.textContent = contentAnalyticsState.configured ? "已同步" : "未設定";
-    updatedAtNode.textContent = contentAnalyticsState.updatedAt
+    if (statusNode) statusNode.textContent = contentAnalyticsState.configured ? "已同步" : "未設定";
+    if (updatedAtNode) updatedAtNode.textContent = contentAnalyticsState.updatedAt
       ? `更新於 ${new Date(contentAnalyticsState.updatedAt).toLocaleString("zh-TW", {
           hour12: false,
           month: "2-digit",
@@ -2443,14 +2425,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
           minute: "2-digit",
         })}`
       : contentAnalyticsState.rangeLabel;
-    noteNode.textContent =
+    if (noteNode) noteNode.textContent =
       contentAnalyticsState.note ||
       `即時活躍使用者顯示近 30 分鐘 active users；今日人次與總人次顯示整站 sessions；${contentAnalyticsState.rangeLabel} 內則集中回看內容、來源與官網轉換事件。`;
 
     const topPosts = Array.isArray(contentAnalyticsState.topPosts)
       ? contentAnalyticsState.topPosts
       : [];
-    topPostsNode.innerHTML = topPosts.length
+    if (topPostsNode) topPostsNode.innerHTML = topPosts.length
       ? topPosts
           .map((post) => `
             <li>
@@ -2464,7 +2446,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const topSources = Array.isArray(contentAnalyticsState.topSources)
       ? contentAnalyticsState.topSources
       : [];
-    topSourcesNode.innerHTML = topSources.length
+    if (topSourcesNode) topSourcesNode.innerHTML = topSources.length
       ? topSources
           .map((source) => `
             <li>
@@ -2478,7 +2460,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const socialLandingPages = Array.isArray(contentAnalyticsState.socialLandingPages)
       ? contentAnalyticsState.socialLandingPages
       : [];
-    socialLandingsNode.innerHTML = socialLandingPages.length
+    if (socialLandingsNode) socialLandingsNode.innerHTML = socialLandingPages.length
       ? socialLandingPages
           .map((page) => `
             <li>
@@ -6119,6 +6101,21 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   applyGeminiDraftToFields();
   renderTopicModePanels();
   renderPublishingChecklist();
+  // 监听「回看與成效」details 标签的展开事件
+  const analyticsDetails = document.getElementById('content-analytics-details');
+  if (analyticsDetails) {
+    analyticsDetails.addEventListener('toggle', () => {
+      if (analyticsDetails.open) {
+        // 展开时重新渲染 UI
+        renderContentAnalytics();
+        // 如果还没有成功加载过，或者之前加载失败了，都重新尝试加载
+        if (contentAnalyticsState.status === 'idle' || contentAnalyticsState.status === 'error' || contentAnalyticsState.status === 'loading') {
+          loadContentAnalytics();
+        }
+      }
+    });
+  }
+
   rerender();
   hydrateVendorIntakeTools();
   renderVendorIntakes();
