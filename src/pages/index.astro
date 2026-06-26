@@ -52,13 +52,13 @@ const homeStructuredData = [
         <p class="brand-strip-label">品牌概念</p>
         <h2>設計與工程，一起想清楚</h2>
         <p class="brand-strip-intro">
-          先把需求、預算與順序講清楚，再把空間做好。
+          先對齊需求與預算，再把空間做好。
         </p>
         <div class="brand-smart-home">
           <p class="brand-smart-home-label">智能家居</p>
           <h3>先把科技放對位置</h3>
           <p>
-            青曦可一起規劃 Home Assistant、NAS 與跨品牌整合。
+            Home Assistant、NAS 與跨品牌整合可一起規劃。
           </p>
           <div class="brand-smart-home-actions">
             <a href="/smart-home" class="brand-smart-home-link">查看智能家居專區</a>
@@ -71,7 +71,7 @@ const homeStructuredData = [
           <p class="brand-credential-label">專業資格</p>
           <p class="brand-credential-title">具室內裝修工程管理乙級證照</p>
           <p class="brand-credential-description">
-            也重視現場與落地。
+            設計與落地一起看。
           </p>
         </div>
       </div>
@@ -137,7 +137,7 @@ const homeStructuredData = [
       <div class="section-header">
         <h6 class="section-subtitle">服務內容</h6>
         <h2 class="section-title">服務項目</h2>
-        <p class="service-intro">以住宅為主，也處理商空與智能整合。</p>
+        <p class="service-intro">住宅、商空、智能整合。</p>
       </div>
 
       <ul class="service-grid">
@@ -271,7 +271,7 @@ const homeStructuredData = [
         <h6 class="section-subtitle">智能家居</h6>
         <h2 class="section-title">把智能、空間與使用感一起規劃</h2>
         <p class="smart-case-intro">
-          不只規劃動線，也把 Home Assistant、NAS、弱電與整合一起想清楚。
+          智能、弱電與空間一次規劃。
         </p>
       </div>
 
@@ -280,7 +280,7 @@ const homeStructuredData = [
           <p class="smart-case-label">整合定位</p>
           <h3>從裝修前期就把控制、備份與家庭網路一起規劃好</h3>
           <p class="smart-case-description">
-            不是先買設備再硬湊，而是先把空間、弱電與控制邏輯整理好。
+            先定控制邏輯與弱電配置，再選設備。
           </p>
           <div class="smart-case-tags">
             <span>系統設定整合</span>
@@ -342,7 +342,7 @@ const homeStructuredData = [
       <div class="workflow-header">
         <h6 class="section-subtitle">合作流程</h6>
         <h2 class="section-title">怎麼開始</h2>
-        <p class="workflow-mobile-note">先看主要節點就夠了，細節在諮詢後再對。</p>
+        <p class="workflow-mobile-note">8 個節點，一眼看完。</p>
       </div>
 
       <ul class="workflow-list">
@@ -506,9 +506,9 @@ const homeStructuredData = [
     <div class="consult-shell">
       <div class="consult-copy">
         <p class="section-subtitle consult-subtitle">下一步</p>
-        <h2 class="consult-title">如果你準備開始，先把需求講清楚。</h2>
+        <h2 class="consult-title">準備開始，就直接留下需求。</h2>
         <p class="consult-description">
-          整理需求、預算與時程，下一步就會快很多。
+          需求、預算、時程一次整理。
         </p>
       </div>
       <div class="consult-actions">
@@ -525,7 +525,7 @@ const homeStructuredData = [
       <div class="section-header">
         <h6 class="section-subtitle">FAQ</h6>
         <h2 class="section-title">常見問題</h2>
-        <p class="faq-intro">先看 3 個問題，就知道要不要直接聊。</p>
+        <p class="faq-intro">先看 3 個常見問題。</p>
       </div>
 
       <div class="faq-list">
@@ -709,11 +709,11 @@ const homeStructuredData = [
     .brand-smart-home-link-secondary {
       background: rgba(255, 255, 255, 0.9);
       color: var(--gray-darkest);
-      border: 1px solid var(--art-accent-line);
+      border: 1px solid rgba(129, 199, 212, 0.18);
     }
 
     .brand-smart-home-link-secondary:hover {
-      background: rgba(245, 241, 236, 1);
+      background: rgba(245, 250, 250, 1);
     }
 
     .brand-credential {
@@ -815,7 +815,7 @@ const homeStructuredData = [
 
     .about-tagline {
       font-size: 1.3rem;
-      color: var(--art-accent-text);
+      color: var(--tiffany-dark);
       margin: 0.5rem 0 1rem;
       font-weight: 500;
       letter-spacing: 0.08em;
@@ -844,8 +844,8 @@ const homeStructuredData = [
       text-align: center;
       padding: 2.5rem 2rem;
       background:
-        radial-gradient(circle at top left, rgba(138, 128, 116, 0.14), transparent 32%),
-        linear-gradient(135deg, rgba(44, 39, 35, 1) 0%, rgba(32, 28, 25, 1) 100%);
+        radial-gradient(circle at top left, rgba(160, 217, 217, 0.16), transparent 30%),
+        linear-gradient(135deg, #2f2f2f 0%, #1f1f1f 100%);
       border-radius: 26px;
       color: var(--white);
       position: relative;
@@ -854,7 +854,7 @@ const homeStructuredData = [
 
     .quote-mark {
       font-size: 4rem;
-      color: rgba(236, 231, 224, 0.82);
+      color: var(--tiffany-primary);
       line-height: 1;
       display: block;
       font-family: 'Noto Serif TC', serif;
@@ -869,7 +869,7 @@ const homeStructuredData = [
     }
 
     .quote-dash {
-      color: rgba(236, 231, 224, 0.72);
+      color: var(--tiffany-primary);
       display: block;
       margin: 0.5rem 0;
     }
@@ -917,7 +917,7 @@ const homeStructuredData = [
     .stat-number {
       font-size: 3rem;
       font-weight: 700;
-      color: rgba(236, 231, 224, 0.9);
+      color: var(--tiffany-primary);
       margin-bottom: 0.5rem;
       font-family: "Noto Sans", sans-serif;
     }
@@ -1033,8 +1033,8 @@ const homeStructuredData = [
 
     .testimonial-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 28px rgba(58, 52, 46, 0.1);
-      border-color: var(--art-accent-line-strong);
+      box-shadow: 0 8px 25px rgba(129, 199, 212, 0.15);
+      border-color: var(--tiffany-light);
     }
 
     .promise-icon {
@@ -1044,14 +1044,14 @@ const homeStructuredData = [
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(244, 240, 234, 0.9);
+      background: var(--tiffany-pale);
       border-radius: 50%;
-      color: var(--art-accent-text);
+      color: var(--tiffany-primary);
       transition: all 0.3s ease;
     }
 
     .testimonial-card:hover .promise-icon {
-      background: var(--art-accent-solid);
+      background: var(--tiffany-primary);
       color: var(--white);
       transform: scale(1.1) rotate(5deg);
     }
@@ -1105,7 +1105,7 @@ const homeStructuredData = [
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 250, 250, 1) 100%);
       border-radius: 20px;
       overflow: hidden;
-      border: 1px solid var(--art-accent-line);
+      border: 1px solid rgba(129, 199, 212, 0.14);
       box-shadow: 0 12px 26px rgba(47, 47, 47, 0.05);
       transition: all 0.3s ease;
       opacity: 0;
@@ -1128,11 +1128,11 @@ const homeStructuredData = [
     }
 
     .faq-item:hover {
-      border-color: var(--art-accent-line-strong);
+      border-color: var(--tiffany-light);
     }
 
     .faq-item.active {
-      border-color: var(--art-accent-solid);
+      border-color: var(--tiffany-primary);
     }
 
     .faq-question {
@@ -1152,7 +1152,7 @@ const homeStructuredData = [
     }
 
     .faq-question:hover {
-      color: var(--art-accent-text);
+      color: var(--tiffany-primary);
     }
 
     .faq-icon {
@@ -1165,7 +1165,7 @@ const homeStructuredData = [
 
     .faq-item.active .faq-icon {
       transform: rotate(180deg);
-      color: var(--art-accent-text);
+      color: var(--tiffany-primary);
     }
 
     .faq-answer {
@@ -1220,7 +1220,7 @@ const homeStructuredData = [
     .faq-link-secondary {
       background: rgba(255, 255, 255, 0.96);
       color: var(--gray-darkest);
-      border: 1px solid var(--art-accent-line);
+      border: 1px solid rgba(129, 199, 212, 0.18);
     }
 
     /* Responsive Styles */
@@ -1518,7 +1518,7 @@ const homeStructuredData = [
     .service-card {
       display: block;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 250, 250, 1) 100%);
-      border: 1px solid var(--art-accent-line);
+      border: 1px solid rgba(129, 199, 212, 0.14);
       border-radius: 24px;
       overflow: hidden;
       text-decoration: none;
@@ -1618,7 +1618,7 @@ const homeStructuredData = [
     }
 
     .service-card:hover .service-icon svg {
-      color: var(--art-accent-text);
+      color: var(--tiffany-primary);
     }
 
     @media (max-width: 1200px) {
@@ -1674,8 +1674,8 @@ const homeStructuredData = [
     .smart-case-section {
       padding: 5rem 2rem;
       background:
-        radial-gradient(circle at top right, var(--art-accent-glow), transparent 22%),
-        linear-gradient(180deg, rgba(250, 247, 242, 1) 0%, rgba(241, 236, 230, 1) 100%);
+        radial-gradient(circle at top right, rgba(160, 217, 217, 0.12), transparent 22%),
+        linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 248, 248, 1) 100%);
     }
 
     .smart-case-container {
@@ -1711,8 +1711,8 @@ const homeStructuredData = [
     .smart-case-summary {
       padding: 1.8rem;
       background:
-        radial-gradient(circle at top right, rgba(138, 128, 116, 0.14), transparent 32%),
-        linear-gradient(135deg, rgba(44, 39, 35, 1) 0%, rgba(32, 28, 25, 1) 100%);
+        radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 30%),
+        linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(47, 47, 47, 1) 100%);
       color: var(--white);
     }
 
@@ -1785,8 +1785,8 @@ const homeStructuredData = [
 
     .smart-case-link:hover {
       transform: translateY(-2px);
-      background: rgba(236, 231, 224, 0.22);
-      border-color: rgba(236, 231, 224, 0.42);
+      background: rgba(129, 199, 212, 0.22);
+      border-color: rgba(129, 199, 212, 0.42);
     }
 
     .smart-case-link-secondary {
@@ -1796,8 +1796,8 @@ const homeStructuredData = [
     }
 
     .smart-case-link-secondary:hover {
-      background: rgba(245, 241, 236, 1);
-      border-color: var(--art-accent-line-strong);
+      background: rgba(245, 250, 250, 1);
+      border-color: rgba(129, 199, 212, 0.3);
     }
 
     .smart-case-grid {
@@ -1868,7 +1868,7 @@ const homeStructuredData = [
       top: 10px;
       bottom: 10px;
       width: 1px;
-      background: linear-gradient(180deg, rgba(124, 131, 122, 0.36) 0%, rgba(124, 131, 122, 0.05) 100%);
+      background: linear-gradient(180deg, rgba(129, 199, 212, 0.42) 0%, rgba(129, 199, 212, 0.05) 100%);
     }
 
     .workflow-item {
@@ -1899,8 +1899,8 @@ const homeStructuredData = [
       height: 80px;
       background: linear-gradient(
         135deg,
-        rgba(124, 131, 122, 1) 0%,
-        rgba(88, 96, 89, 1) 100%
+        var(--tiffany-primary) 0%,
+        var(--tiffany-dark) 100%
       );
       color: var(--white);
       border-radius: 50%;
@@ -1910,13 +1910,13 @@ const homeStructuredData = [
       font-size: 1.75rem;
       font-weight: 600;
       font-family: "Noto Sans", sans-serif;
-      box-shadow: 0 4px 15px rgba(58, 52, 46, 0.2);
+      box-shadow: 0 4px 15px rgba(129, 199, 212, 0.3);
       transition: all 0.3s ease;
     }
 
     .workflow-item:hover .workflow-number {
       transform: scale(1.1) rotate(5deg);
-      box-shadow: 0 6px 20px rgba(58, 52, 46, 0.28);
+      box-shadow: 0 6px 20px rgba(129, 199, 212, 0.5);
       background: linear-gradient(
         135deg,
         var(--gray-dark) 0%,
@@ -1929,7 +1929,7 @@ const homeStructuredData = [
       padding: 1.4rem 1.5rem;
       border-radius: 22px;
       background: rgba(255, 255, 255, 0.82);
-      border: 1px solid var(--art-accent-line);
+      border: 1px solid rgba(129, 199, 212, 0.12);
       box-shadow: 0 16px 30px rgba(47, 47, 47, 0.05);
     }
 
@@ -2001,9 +2001,9 @@ const homeStructuredData = [
     }
 
     .consult-button-primary {
-      background: linear-gradient(135deg, rgba(248, 243, 236, 0.96) 0%, rgba(235, 228, 219, 0.96) 100%);
+      background: var(--tiffany-primary);
       color: var(--gray-darkest);
-      border: 1px solid rgba(255, 248, 240, 0.56);
+      border: 1px solid var(--tiffany-primary);
     }
 
     .consult-button-secondary {

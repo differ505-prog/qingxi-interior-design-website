@@ -21,11 +21,11 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
         <p class="hero-eyebrow">DESIGN BRIEF</p>
         <h1>先把需求講清楚。</h1>
         <p class="hero-description">
-          先留下聯絡方式、屋況、預算與時程，青曦就能先判斷方向。
+          留下聯絡方式、屋況、預算與時程，青曦就能接手判斷。
         </p>
         <div class="hero-highlights">
-          <span>先填核心資訊</span>
-          <span>其餘細節後補</span>
+          <span>核心資訊優先</span>
+          <span>細節可後補</span>
         </div>
       </div>
 
@@ -51,11 +51,11 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
       <div class="form-header">
         <p class="form-eyebrow">CONSULTATION FORM</p>
         <h1>設計需求表</h1>
-          <p class="form-subtitle">先填核心欄位就能送出。</p>
+        <p class="form-subtitle">先填核心欄位。</p>
         <div class="form-assurance">
-            <p class="form-assurance-title">先把關鍵交給青曦就好</p>
+          <p class="form-assurance-title">先把關鍵交給青曦</p>
           <p class="form-assurance-description">
-            不用一次講完，細節後補就可以。
+            其餘細節可後補。
           </p>
         </div>
         
@@ -99,7 +99,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
             <p class="estimator-brief-eyebrow">ESTIMATOR SUMMARY</p>
             <h2>已帶入本次裝修估算</h2>
             <p class="estimator-brief-description">
-              若這份試算接近你的方向，送出時會一起帶入。
+              送出時會一起帶入。
             </p>
           </div>
           <div class="estimator-brief-grid">
@@ -142,8 +142,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
         <!-- 基本資料 -->
         <section class="form-section">
           <h2 class="section-title">第一步｜快速聯絡資訊</h2>
-          <p class="field-hint">先留下姓名與一種聯絡方式即可。</p>
-          
+
           <div class="form-group">
             <label for="name">姓名 <span class="required">*</span></label>
             <input type="text" id="name" name="name" required data-progress="true">
@@ -156,12 +155,12 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
           <div class="form-group">
             <label for="line-id">Line ID</label>
-            <input type="text" id="line-id" name="line-id" data-progress="true" placeholder="如果你比較習慣用 LINE 溝通，可留這裡">
+            <input type="text" id="line-id" name="line-id" data-progress="true" placeholder="常用 LINE ID">
           </div>
 
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" data-progress="true" placeholder="如果方便，也可留 Email">
+            <input type="email" id="email" name="email" data-progress="true" placeholder="常用 Email">
           </div>
 
           <div class="form-group">
@@ -173,7 +172,6 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
               <option value="email">Email</option>
               <option value="either">都可以</option>
             </select>
-            <p class="field-hint">電話、LINE ID、Email 任一種可聯絡到你即可。</p>
           </div>
 
           <div class="form-group">
@@ -191,8 +189,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
         <!-- 房屋資料 -->
         <section class="form-section">
           <h2 class="section-title">第二步｜案件基本條件</h2>
-          <p class="field-hint">這一段只抓判斷案型最需要的資訊。</p>
-          
+
           <div class="form-group">
             <label for="address">裝修地址 <span class="required">*</span></label>
             <input type="text" id="address" name="address" required data-progress="true" placeholder="可先填到行政區或社區名稱，例如汐止、板橋、新店央北等">
@@ -288,16 +285,14 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
         <!-- 空間配置需求 -->
         <section class="form-section">
           <h2 class="section-title">第三步｜空間與方向</h2>
-          <p class="field-hint">這些資訊會幫助青曦先判斷配置方向。</p>
-          
+
           <div class="form-group">
             <label for="expected-completion">希望什麼時候完工</label>
             <input type="date" id="expected-completion" name="expected-completion" data-progress="true">
           </div>
 
           <div class="form-group">
-            <label>請勾選需要的空間配置</label>
-            <p class="field-hint">先勾需要的空間；只有可能不只一間的空間才會再問數量。</p>
+            <label>請勾選需要的空間配置（可多選）</label>
             <div class="checkbox-grid">
               <label class="checkbox-label">
                 <input type="checkbox" name="spaces" value="living-room" class="space-checkbox" data-progress="true">
@@ -366,7 +361,6 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
         <section class="form-section">
           <h2 class="section-title">第四步｜智慧家庭需求</h2>
-          <p class="field-hint">如果還不確定，只要勾「想了解」即可。</p>
 
           <div class="form-group">
             <label>是否需要智慧家庭整合規劃</label>
@@ -482,7 +476,6 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
         <section class="form-section">
           <h2 class="section-title">進階補充（選填）</h2>
-          <p class="field-hint">以下都不是必填；現在有想法再補即可。</p>
 
           <div class="form-group">
             <label for="residents">居住人數</label>
@@ -499,7 +492,6 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
           <div class="form-group">
             <label>家庭成員組成</label>
-            <p class="field-hint">這部分會幫助青曦更快理解你家裡的使用需求與房間安排。</p>
             <div class="checkbox-group">
               <label class="checkbox-label">
                 <input type="checkbox" name="household-structure" value="single">
@@ -570,7 +562,6 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
           <div id="pet-details" class="conditional-section" style="display: none;">
             <div class="form-group">
               <label>寵物組成</label>
-              <p class="field-hint">寵物條件會直接影響材質選擇、收納配置、清潔區與活動動線。</p>
               <div class="checkbox-group">
                 <label class="checkbox-label">
                   <input type="checkbox" name="pet-type" value="dog">
@@ -2042,7 +2033,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
       }
 
       spaceQuantityContainer.innerHTML = `
-        <p class="field-hint">以下是你剛勾選且可能不只一間的空間，先抓大概數量即可。</p>
+        <p class="field-hint">以下空間請補大概數量。</p>
         ${quantityHtml}
       `;
       spaceQuantityContainer.style.display = 'block';

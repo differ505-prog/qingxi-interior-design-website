@@ -24,7 +24,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
           <p class="contact-eyebrow">NEXT STEP</p>
           <h1>先把需求留下，後面就快很多。</h1>
           <p class="contact-description">
-            不論是新成屋、預售屋客變，或既有住宅整理，都可以先從這裡留下核心資訊。
+            住宅、客變、翻修，都可以先從這裡開始。
           </p>
 
           <div class="contact-highlights">
@@ -37,7 +37,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
           <p class="contact-credential-title">室內裝修工程管理乙級證照</p>
           <p class="contact-credential-meta">技術士證編號：126-0024871</p>
           <p class="contact-credential-description">
-            諮詢時也會一起對工程與時程。
+            工程與時程也會一起看。
           </p>
         </div>
         </div>
@@ -75,7 +75,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
           </div>
           <p class="card-label">即時聯繫</p>
           <h2>加入官方 LINE</h2>
-          <p class="card-description">適合想先快速確認方向的人。</p>
+          <p class="card-description">適合先快速聊方向。</p>
           <span class="card-link">立即開始聊</span>
         </a>
       </div>
@@ -83,16 +83,16 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       <section class="quick-form-panel">
         <div class="quick-form-copy">
           <p class="quick-form-eyebrow">QUICK CONSULTATION</p>
-          <h2 id="quick-form-title">還沒整理完整也沒關係，先留核心資訊就可以。</h2>
+          <h2 id="quick-form-title">先留聯絡資訊與需求重點。</h2>
           <p class="quick-form-description" id="quick-form-description">
-            這是第一階段精簡表單，適合先確認方向。
+            約 1 分鐘，先確認方向。
           </p>
           <div class="quick-form-highlights">
             <span>約 1 分鐘完成</span>
             <span>先確認方向</span>
           </div>
           <p class="quick-form-direct-note">
-            若你已經整理差不多，也可以直接填完整需求表。
+            需求已整理好，可直接填完整需求表。
           </p>
         </div>
 
@@ -223,8 +223,8 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   .contact-page {
     padding: 5rem 1.5rem 4.5rem;
     background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 24%),
-      linear-gradient(180deg, rgba(251, 248, 243, 1) 0%, rgba(240, 235, 229, 1) 100%);
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.12), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 247, 246, 1) 100%);
   }
 
   .contact-shell {
@@ -257,7 +257,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     margin: 0 0 0.9rem;
     font-size: 0.8rem;
     letter-spacing: 0.22em;
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
     text-transform: uppercase;
   }
 
@@ -279,11 +279,11 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   .contact-highlights span {
     padding: 0.7rem 1rem;
     border-radius: 999px;
-    background: rgba(255, 252, 248, 0.82);
-    border: 1px solid var(--art-accent-line);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(129, 199, 212, 0.18);
     color: var(--gray-dark);
     letter-spacing: 0.04em;
-    box-shadow: 0 10px 22px rgba(58, 52, 46, 0.05);
+    box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
   }
 
   .contact-credential {
@@ -291,15 +291,15 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     padding: 1.3rem 1.4rem;
     border-radius: 24px;
     background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 34%),
-      linear-gradient(135deg, rgba(255, 253, 249, 0.98) 0%, rgba(245, 241, 236, 1) 100%);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 18px 40px rgba(58, 52, 46, 0.06);
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.14), transparent 34%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 249, 249, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.2);
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.05);
   }
 
   .contact-credential-label {
     margin: 0;
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
     font-size: 0.76rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -316,7 +316,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
   .contact-credential-meta {
     margin: 0.45rem 0 0;
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
     font-size: 0.95rem;
     letter-spacing: 0.04em;
   }
@@ -331,10 +331,10 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     padding: 1.75rem;
     border-radius: 28px;
     background:
-      radial-gradient(circle at top right, rgba(138, 128, 116, 0.14), transparent 34%),
-      linear-gradient(135deg, rgba(44, 39, 35, 1) 0%, rgba(32, 28, 25, 1) 100%);
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 32%),
+      linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(47, 47, 47, 1) 100%);
     color: var(--white);
-    box-shadow: 0 26px 60px rgba(32, 28, 25, 0.22);
+    box-shadow: 0 26px 60px rgba(17, 17, 17, 0.16);
   }
 
   .contact-aside .aside-label {
@@ -364,9 +364,9 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     border-radius: 30px;
     text-decoration: none;
     color: inherit;
-    background: rgba(255, 252, 248, 0.9);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 22px 45px rgba(58, 52, 46, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 22px 45px rgba(47, 47, 47, 0.06);
     transition:
       transform 0.3s ease,
       box-shadow 0.3s ease,
@@ -379,19 +379,19 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     position: absolute;
     inset: auto 2rem 0;
     height: 1px;
-    background: linear-gradient(90deg, rgba(124, 131, 122, 0.4), transparent);
+    background: linear-gradient(90deg, rgba(129, 199, 212, 0.5), transparent);
   }
 
   .contact-card:hover {
     transform: translateY(-6px);
-    border-color: var(--art-accent-line-strong);
-    box-shadow: 0 28px 60px rgba(58, 52, 46, 0.12);
+    border-color: rgba(129, 199, 212, 0.36);
+    box-shadow: 0 28px 60px rgba(129, 199, 212, 0.14);
   }
 
   .contact-card-primary {
     background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 32%),
-      linear-gradient(135deg, rgba(255, 253, 249, 0.98) 0%, rgba(244, 240, 234, 1) 100%);
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 30%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 249, 249, 1) 100%);
   }
 
   .card-icon {
@@ -401,7 +401,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: rgba(244, 240, 234, 0.84);
+    background: rgba(129, 199, 212, 0.12);
     transition: transform 0.3s ease, color 0.3s ease, background-color 0.3s ease;
   }
 
@@ -415,12 +415,12 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   }
 
   .form-color {
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
   }
 
   .contact-card:hover .card-icon {
     transform: scale(1.08);
-    background: rgba(236, 231, 224, 0.9);
+    background: rgba(129, 199, 212, 0.2);
   }
 
   .contact-card h2 {
@@ -444,7 +444,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     align-items: center;
     gap: 0.45rem;
     margin-top: auto;
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
     letter-spacing: 0.08em;
   }
 
@@ -462,10 +462,10 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     padding: 2rem;
     border-radius: 32px;
     background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 32%),
-      linear-gradient(135deg, rgba(255, 253, 249, 0.98) 0%, rgba(244, 240, 234, 1) 100%);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 24px 60px rgba(58, 52, 46, 0.08);
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 32%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 248, 248, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 24px 60px rgba(47, 47, 47, 0.06);
     display: grid;
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
     gap: 1.5rem;
@@ -499,11 +499,11 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   .quick-form-highlights span {
     padding: 0.7rem 0.95rem;
     border-radius: 999px;
-    background: rgba(255, 252, 248, 0.84);
-    border: 1px solid var(--art-accent-line);
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(129, 199, 212, 0.18);
     color: var(--gray-dark);
     letter-spacing: 0.04em;
-    box-shadow: 0 10px 22px rgba(58, 52, 46, 0.05);
+    box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
   }
 
   .quick-form-direct-note {
@@ -515,8 +515,8 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   .quick-form-shell {
     padding: 1.5rem;
     border-radius: 28px;
-    background: rgba(255, 252, 248, 0.9);
-    border: 1px solid var(--art-accent-line);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.14);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
   }
 
@@ -562,8 +562,8 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     width: 100%;
     padding: 0.95rem 1rem;
     border-radius: 18px;
-    border: 1px solid var(--art-accent-line-strong);
-    background: rgba(255, 253, 250, 0.98);
+    border: 1px solid rgba(129, 199, 212, 0.22);
+    background: rgba(255, 255, 255, 0.98);
     color: var(--gray-darkest);
     font: inherit;
     line-height: 1.6;
@@ -582,9 +582,9 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   .quick-form-field select:focus,
   .quick-form-field textarea:focus {
     outline: none;
-    border-color: var(--art-accent-line-strong);
-    box-shadow: 0 0 0 4px var(--art-accent-focus);
-    background: rgba(255, 253, 250, 1);
+    border-color: rgba(129, 199, 212, 0.48);
+    box-shadow: 0 0 0 4px rgba(129, 199, 212, 0.12);
+    background: rgba(252, 255, 255, 1);
   }
 
   .quick-form-field textarea {
@@ -622,7 +622,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
   .quick-form-submit {
     border: 1px solid var(--gray-darkest);
-    background: linear-gradient(135deg, rgba(44, 39, 35, 1) 0%, rgba(97, 89, 80, 1) 100%);
+    background: linear-gradient(135deg, var(--gray-darkest) 0%, var(--tiffany-dark) 100%);
     color: var(--white);
     cursor: pointer;
     font-weight: 500;
@@ -634,15 +634,15 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   }
 
   .quick-form-secondary {
-    border: 1px solid var(--art-accent-line);
-    background: rgba(255, 252, 248, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.22);
+    background: rgba(255, 255, 255, 0.9);
     color: var(--gray-darkest);
   }
 
   .quick-form-secondary:hover {
     transform: translateY(-2px);
-    background: rgba(245, 241, 236, 1);
-    box-shadow: 0 14px 24px rgba(58, 52, 46, 0.1);
+    background: rgba(245, 250, 250, 1);
+    box-shadow: 0 14px 24px rgba(129, 199, 212, 0.12);
   }
 
   .quick-form-secondary.is-disabled,
@@ -650,7 +650,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     pointer-events: none;
     color: rgba(108, 108, 108, 0.82);
     background: rgba(247, 249, 249, 0.92);
-    border-color: var(--art-accent-line);
+    border-color: rgba(129, 199, 212, 0.14);
     box-shadow: none;
   }
 
@@ -658,9 +658,9 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     margin-top: 2.25rem;
     padding: 1.6rem 1.75rem;
     border-radius: 26px;
-    background: rgba(255, 252, 248, 0.84);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 18px 40px rgba(58, 52, 46, 0.06);
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.04);
     display: flex;
     justify-content: space-between;
     gap: 1.5rem;
@@ -690,7 +690,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     align-items: center;
     justify-content: center;
     background: var(--white);
-    border: 1px solid var(--art-accent-line);
+    border: 1px solid rgba(129, 199, 212, 0.18);
     border-radius: 50%;
     color: var(--gray-medium);
     transition:
@@ -699,15 +699,15 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       background-color 0.25s ease,
       border-color 0.25s ease,
       box-shadow 0.25s ease;
-    box-shadow: 0 10px 22px rgba(58, 52, 46, 0.05);
+    box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
   }
 
   .social-icon-small:hover {
-    background: var(--art-accent-solid);
-    border-color: var(--art-accent-solid);
+    background: var(--tiffany-primary);
+    border-color: var(--tiffany-primary);
     color: var(--white);
     transform: translateY(-3px);
-    box-shadow: 0 14px 24px rgba(58, 52, 46, 0.16);
+    box-shadow: 0 14px 24px rgba(129, 199, 212, 0.24);
   }
 
   @media (max-width: 900px) {
@@ -842,10 +842,10 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       if (quickEstimatorSummary) quickEstimatorSummary.value = summaryText;
 
       if (intent === "report") {
-        if (quickFormTitle) quickFormTitle.textContent = "想索取費用拆解報告，先留下這次估價的聯絡資訊就可以。";
+        if (quickFormTitle) quickFormTitle.textContent = "想索取拆解報告，先留聯絡資訊。";
         if (quickFormDescription) {
           quickFormDescription.textContent =
-            "青曦會依你這次試算條件，整理更好判讀的初步拆解方向，方便你理解預算落點與下一步建議。";
+            "青曦會接著整理這次試算的拆解方向。";
         }
         if (quickConsultationFocus && !quickConsultationFocus.value) {
           quickConsultationFocus.value =
@@ -854,10 +854,10 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       }
 
       if (intent === "studio-visit") {
-        if (quickFormTitle) quickFormTitle.textContent = "如果你想直接來汐止工作室體驗，先留下聯絡資訊就可以。";
+        if (quickFormTitle) quickFormTitle.textContent = "想來汐止工作室體驗，先留聯絡資訊。";
         if (quickFormDescription) {
           quickFormDescription.textContent =
-            "青曦會依你這次估價方向安排後續聯繫，方便你到現場看材質、施工細節，並直接體驗智能家居。";
+            "青曦會安排後續聯繫與現場體驗。";
         }
         if (quickConsultationFocus && !quickConsultationFocus.value) {
           quickConsultationFocus.value =
@@ -893,10 +893,10 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       if (quickSmartHomeSummary) quickSmartHomeSummary.value = summaryText;
 
       if (intent === "smart-home-quiz") {
-        if (quickFormTitle) quickFormTitle.textContent = "想帶著智能家居快篩結果深入聊，先留下聯絡資訊就可以。";
+        if (quickFormTitle) quickFormTitle.textContent = "想帶著快篩結果深入聊，先留聯絡資訊。";
         if (quickFormDescription) {
           quickFormDescription.textContent =
-            "青曦會依你這次快篩結果，整理適合的智能家居方向、弱電預留與下一步建議。";
+            "青曦會接著整理適合的智能家居方向。";
         }
         if (quickConsultationFocus && !quickConsultationFocus.value) {
           quickConsultationFocus.value =
@@ -905,10 +905,10 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       }
 
       if (intent === "smart-home-studio-visit") {
-        if (quickFormTitle) quickFormTitle.textContent = "如果你想直接來工作室體驗智能家居，先留下聯絡資訊就可以。";
+        if (quickFormTitle) quickFormTitle.textContent = "想來工作室體驗智能家居，先留聯絡資訊。";
         if (quickFormDescription) {
           quickFormDescription.textContent =
-            "青曦會依你這次快篩結果安排後續聯繫，方便你到汐止工作室體驗情境操作，並看真實材質與施工細節。";
+            "青曦會安排後續聯繫與現場體驗。";
         }
         if (quickConsultationFocus && !quickConsultationFocus.value) {
           quickConsultationFocus.value =

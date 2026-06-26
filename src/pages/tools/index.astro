@@ -114,10 +114,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       <div class="calculator-header">
         <p class="eyebrow">RENOVATION ESTIMATOR</p>
         <h1>裝修估價器</h1>
-        <p class="subtitle">先用設計觀點整理預算帶，再判斷這個家要往哪一種生活感走。</p>
+        <p class="subtitle">先抓出預算帶，判斷下一步。</p>
         <div class="calculator-lead-note">
-          <span>前期預算判讀</span>
-          <span>生活感與工項一起看</span>
+          <span>快速試算預算帶</span>
           <span>結果可直接帶入需求表</span>
         </div>
         <div class="hero-actions">
@@ -129,70 +128,40 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       <div class="landing-grid">
         <section class="landing-card">
           <div class="landing-card-header">
-            <h2>這個工具比較像什麼</h2>
-            <p>它不是快速喊價，而是先把空間尺度、工項比例與生活預算感整理出來。</p>
+            <h2>適合現在先判斷</h2>
+            <p>前期先試算就夠了。</p>
           </div>
           <div class="landing-points">
             <div class="landing-point">
-              <strong>先看比例，再談風格</strong>
-              <span>先知道哪些條件正在拉高預算，後續才更容易判斷收納、材質與機能如何取捨。</span>
+              <strong>準備交屋或剛交屋</strong>
+              <span>先抓預算帶，再安排設計與工程。</span>
             </div>
             <div class="landing-point">
-              <strong>先判斷尺度，再進完整需求</strong>
-              <span>還沒整理好所有細節也沒關係，這一層先幫你抓到可以對話的區間。</span>
+              <strong>老屋翻新或局部整理</strong>
+              <span>還沒整理完整需求，也能先抓規模與成本。</span>
             </div>
           </div>
         </section>
 
         <section class="landing-card landing-card-accent">
           <div class="landing-card-header">
-            <h2>青曦想保留的感覺</h2>
-            <p>即使是估價器，也希望它先幫你看懂預算該放在哪些真正影響生活感的地方。</p>
+            <h2>你會先看到什麼</h2>
+            <p>先抓預算帶與下一步。</p>
           </div>
           <div class="landing-points">
             <div class="landing-point">
-              <strong>極簡不是少做，而是少浪費</strong>
-              <span>預算先放在真正影響生活感的工程與材質，而不是只堆滿表面裝飾。</span>
+              <strong>預算帶與主要落點</strong>
+              <span>先看總價區間、每坪抓法與主要工項。</span>
             </div>
             <div class="landing-point">
-              <strong>質感來自秩序與克制</strong>
-              <span>從工項、預備金到下一步，都希望維持清楚而不擁擠的節奏。</span>
+              <strong>可直接帶入需求表</strong>
+              <span>試算結果會一起帶進需求表。</span>
             </div>
           </div>
         </section>
       </div>
 
-      <section class="editorial-band" aria-label="青曦估價觀點">
-        <div class="editorial-band-copy">
-          <p class="editorial-band-eyebrow">QINGXI ESTIMATE NOTES</p>
-          <h2>我們希望這份初估，不只是看數字，而是先讓你看見空間感的比例。</h2>
-          <p>
-            真正有質感的室內設計，往往不是把所有東西都加進去，而是知道哪些要留下、哪些該收斂，
-            以及哪些地方值得為未來的生活多預留一點。
-          </p>
-        </div>
-        <div class="editorial-band-points">
-          <div class="editorial-band-point">
-            <strong>先對齊生活畫面</strong>
-            <span>估價之前，先確認這個家是要安靜、耐住、好整理，還是偏向展示與收納並重。</span>
-          </div>
-          <div class="editorial-band-point">
-            <strong>先抓正確比例</strong>
-            <span>拆除、水電、防水、櫃體、材質，先把比例抓對，後面的選擇才不容易失衡。</span>
-          </div>
-          <div class="editorial-band-point">
-            <strong>再進完整需求</strong>
-            <span>當你已經有預算帶與方向，第二層需求表就能更有效率地往下談。</span>
-          </div>
-        </div>
-      </section>
-
       <div class="calculator-form" id="estimator-form">
-        <div class="form-intro">
-          <p class="form-intro-eyebrow">STEP 01</p>
-          <h2>先把這次裝修的尺度與生活條件整理清楚。</h2>
-          <p>這一頁先回答與預算最有關的條件，讓青曦用更接近設計討論的方式幫你抓到合理區間。</p>
-        </div>
         <div class="form-section">
           <h2>基本資訊</h2>
 
@@ -260,18 +229,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           </div>
 
           <div class="form-group">
-            <label for="market-benchmark">市場行情基準</label>
-            <p class="field-helper">
-              這一層會把估價帶對齊你想參考的市場區域，讓前期預算更貼近實際行情。
-            </p>
-            <select id="market-benchmark">
-              <option value="taipei-metro" selected>北北基住宅市場</option>
-              <option value="urban-taiwan">全台都會住宅中位帶</option>
-              <option value="central-south">中南部都會住宅帶</option>
-            </select>
-          </div>
-
-          <div class="form-group">
             <label for="use-purpose">使用目的</label>
             <select id="use-purpose">
               {
@@ -294,37 +251,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                   </option>
                 ))
               }
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="bathroom-count">衛浴數量</label>
-            <select id="bathroom-count">
-              <option value="1">1 間衛浴</option>
-              <option value="2" selected>2 間衛浴</option>
-              <option value="3plus">3 間以上衛浴</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="utility-scope">水電更新程度</label>
-            <select id="utility-scope">
-              <option value="none">不重拉，以局部整理為主</option>
-              <option value="partial" selected>局部調整 / 局部換新</option>
-              <option value="full">全室重拉水電</option>
-            </select>
-          </div>
-
-          <div class="form-group" id="storage-kitchen-group" hidden>
-            <label for="storage-kitchen-scope">系統櫃 / 廚具納入程度</label>
-            <p class="field-helper">
-              只有在你勾選 `系統家具` 或 `廚房翻新` 時，才需要補這個強度條件。
-            </p>
-            <select id="storage-kitchen-scope">
-              <option value="none" selected>先不另外放大這兩項預算</option>
-              <option value="storage">已知會做系統櫃</option>
-              <option value="kitchen">已知會更新廚具</option>
-              <option value="both">系統櫃與廚具都會做</option>
             </select>
           </div>
         </div>
@@ -352,43 +278,14 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         </div>
 
         <div class="result-section">
-          <p class="result-eyebrow">ESTIMATE OVERVIEW</p>
           <h2>預估結果</h2>
           <p class="result-subtitle" id="result-subtitle">
-            先看目前可討論的預算帶。
+            先看這次的預算帶。
           </p>
-          <div class="logic-summary-card">
-            <span class="logic-summary-label">估算邏輯摘要</span>
-            <p class="logic-summary-copy" id="logic-summary">
-              坪數 x 等級單價 x 條件係數（項目類型、屋況、住宅型態、使用目的、時程與高影響因子）
-            </p>
-          </div>
-          <div class="logic-summary-card logic-summary-card-soft">
-            <span class="logic-summary-label">本次拉高預算的條件</span>
-            <p class="logic-summary-copy" id="cost-driver-summary">
-              目前先依你填入的條件整理主要影響因子。
-            </p>
-          </div>
-          <div class="logic-summary-card logic-summary-card-soft">
-            <span class="logic-summary-label">市場校準基準</span>
-            <p class="logic-summary-copy" id="market-benchmark-summary">
-              目前先以全台住宅裝修常見行情帶做前期校準。
-            </p>
-          </div>
-          <div class="logic-summary-card logic-summary-card-accent">
-            <span class="logic-summary-label">即時變動提示</span>
-            <p class="logic-summary-copy" id="change-summary">
-              調整條件後，系統會告訴你是哪個因素正在影響這次估價。
-            </p>
-          </div>
 
           <div class="result-card">
             <div class="result-row">
-              <span class="result-label">建議準備總預算</span>
-              <span class="result-value" id="recommended-total">190萬 - 318萬</span>
-            </div>
-            <div class="result-row">
-              <span class="result-label">基礎估價</span>
+              <span class="result-label">預估總價</span>
               <span class="result-value" id="total-price">180萬 - 300萬</span>
             </div>
             <div class="result-row">
@@ -421,7 +318,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="breakdown-card">
             <div class="breakdown-header">
               <h3>工程拆解</h3>
-                <p id="breakdown-note">目前先依你勾選的工項整理各項費用的大致比例；實際報價仍會再看尺寸、材質、點位與現場條件。</p>
+                <p>目前工項比例。</p>
             </div>
             <div class="breakdown-list" id="breakdown-list"></div>
           </div>
@@ -430,14 +327,14 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             <div class="advice-card">
               <div class="advice-header">
                 <h3>估算判讀</h3>
-                <p>只留目前最值得先注意的 2 個重點。</p>
+                <p>先看 2 個重點。</p>
               </div>
               <ul class="advice-list" id="advice-list"></ul>
             </div>
             <div class="advice-card advice-card-accent">
               <div class="advice-header">
                 <h3>建議下一步</h3>
-                <p id="next-step-intro">先看最適合的下一步就好。</p>
+                <p id="next-step-intro">直接看下一步。</p>
               </div>
               <div class="next-step-points" id="next-step-points"></div>
             </div>
@@ -446,9 +343,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="estimator-handoff-card">
             <div class="estimator-handoff-copy">
               <p class="estimator-handoff-eyebrow">BEST NEXT STEP</p>
-              <h3 id="estimator-handoff-title">下一步：把這份初估延伸成完整空間需求</h3>
+              <h3 id="estimator-handoff-title">下一步：帶著估算填需求表</h3>
               <p id="estimator-handoff-description" class="estimator-handoff-description">
-                再補需求、照片與時程，青曦就能更快判斷方向。
+                再補需求、照片與時程，青曦就能接著判斷。
               </p>
               <div class="estimator-handoff-points">
                 <div class="estimator-handoff-point">
@@ -457,7 +354,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 </div>
                 <div class="estimator-handoff-point">
                   <strong id="estimator-handoff-point-title">這一步最有效率</strong>
-                  <span id="estimator-handoff-point-description">如果你已經有大致預算方向，就直接往下整理需求。</span>
+                  <span id="estimator-handoff-point-description">有預算方向後，直接整理需求。</span>
                 </div>
               </div>
             </div>
@@ -476,24 +373,24 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               >
                 先帶著結果諮詢
               </a>
-              <p class="estimator-handoff-note">若你只想先抓範圍，也可以先保留結果。</p>
+              <p class="estimator-handoff-note">只想先抓範圍，也可先保留結果。</p>
             </div>
           </div>
 
           <div class="report-offer-card">
             <div class="report-offer-copy">
               <p class="report-offer-eyebrow">ESTIMATE FOLLOW-UP</p>
-              <h3>如果你想看得更深一點，也可以直接索取這次的預算分析。</h3>
+              <h3>想更看懂這次試算，可直接索取拆解報告。</h3>
               <p class="report-offer-description">
-                青曦會依這次條件整理初步建議，幫你更快看懂主要花費方向。
+                青曦會接著整理這次試算的拆解方向。
               </p>
               <div class="report-offer-points">
                 <div class="report-offer-point">
-                  <strong>這份分析會帶到的重點</strong>
-                  <span>預算區間、主要工項與初步建議。</span>
+                  <strong>這份報告會帶到的重點</strong>
+                  <span>預算帶、主要工項與初步判讀。</span>
                 </div>
                 <div class="report-offer-point">
-                  <strong>適合目前這個階段</strong>
+                  <strong>適合目前這種前期階段</strong>
                   <span id="report-context">特別適合正在抓新成屋或住宅裝修預算方向的人。</span>
                 </div>
               </div>
@@ -501,13 +398,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
             <div class="report-offer-actions">
               <div class="report-form-intro">
-                <strong>想直接拿這次的預算分析</strong>
-                <p>留下姓名與 Line / Email，青曦會依這次試算內容接續整理。</p>
+                <strong>想直接拿這次的拆解方向</strong>
+                <p>留下姓名與 Line / Email，青曦會接著整理。</p>
               </div>
               {
                 !estimatorLeadEnabled && (
                   <div class="report-form-notice" role="status">
-                    <p>若你想先和青曦聊聊這次空間方向，歡迎先透過下方按鈕前往聯絡頁或加入官方 LINE。</p>
+                    <p>表單收件尚未完成設定，目前請先透過下方按鈕前往聯絡頁或加入官方 LINE。</p>
                   </div>
                 )
               }
@@ -552,7 +449,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                       id="estimator-lead-focus"
                       name="consultation_focus"
                       rows="3"
-                      placeholder="例如想先知道主要預算會落在哪些項目，或目前是否適合安排後續討論"
+                      placeholder="例如想先知道預算主要會花在哪裡，或是否適合安排到工作室聊聊"
                       required
                     ></textarea>
                   </label>
@@ -563,7 +460,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                   class="btn btn-primary report-lead-submit"
                   disabled={!estimatorLeadEnabled}
                 >
-                  送出並索取初步預算分析
+                  送出並索取費用拆解報告
                 </button>
               </form>
               <a
@@ -612,162 +509,112 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
 <style>
   .calculator-container {
-    --art-accent-solid: #6c756f;
-    --art-accent-text: #69736c;
-    --art-accent-line: rgba(124, 131, 122, 0.14);
-    --art-accent-line-strong: rgba(124, 131, 122, 0.28);
-    --art-accent-glow: rgba(164, 171, 160, 0.14);
-    --art-accent-glow-soft: rgba(164, 171, 160, 0.08);
-    --art-accent-focus: rgba(124, 131, 122, 0.12);
-    --art-paper: rgba(250, 247, 242, 1);
-    --art-paper-deep: rgba(238, 234, 228, 1);
-    --art-card: rgba(255, 253, 249, 0.9);
-    --art-card-soft: rgba(249, 246, 241, 0.88);
-    --art-card-muted: rgba(244, 240, 234, 0.92);
-    padding: 5.5rem 1.5rem 5.75rem;
+    padding: 4.75rem 1.5rem 5rem;
     background:
-      radial-gradient(circle at top center, var(--art-accent-glow), transparent 24%),
-      radial-gradient(circle at bottom right, var(--art-accent-glow-soft), transparent 26%),
-      linear-gradient(180deg, rgba(252, 249, 245, 1) 0%, rgba(239, 235, 229, 1) 100%);
+      radial-gradient(circle at top left, rgba(160, 217, 217, 0.1), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(244, 245, 244, 1) 100%);
   }
 
   .calculator-wrapper {
-    max-width: 980px;
+    max-width: 960px;
     margin: 0 auto;
   }
 
   .calculator-header {
-    position: relative;
-    max-width: 760px;
-    margin: 0 auto 3rem;
-    padding: 3.2rem 2.4rem 2.7rem;
     text-align: center;
-    border-radius: 34px;
-    background:
-      linear-gradient(180deg, rgba(255, 254, 251, 0.92) 0%, rgba(247, 243, 238, 0.8) 100%);
-    border: 1px solid var(--art-accent-line);
-    box-shadow:
-      0 26px 50px rgba(58, 52, 46, 0.065),
-      inset 0 1px 0 rgba(255, 255, 255, 0.72);
-    overflow: hidden;
-  }
-
-  .calculator-header::before {
-    content: "";
-    position: absolute;
-    top: 24px;
-    left: 50%;
-    width: 92px;
-    height: 1px;
-    transform: translateX(-50%);
-    background: linear-gradient(90deg, rgba(124, 131, 122, 0), rgba(124, 131, 122, 0.45), rgba(124, 131, 122, 0));
-  }
-
-  .calculator-header::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 30%);
-    pointer-events: none;
+    margin-bottom: 2.4rem;
   }
 
   .calculator-lead-note {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 0.7rem;
-    margin-top: 1.5rem;
+    gap: 0.8rem;
+    margin-top: 1.25rem;
   }
 
   .calculator-lead-note span {
-    padding: 0.55rem 0.9rem;
+    padding: 0.65rem 0.95rem;
     border-radius: 999px;
-    background: rgba(255, 252, 248, 0.78);
-    border: 1px solid var(--art-accent-line);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.16);
     color: var(--gray-dark);
-    box-shadow: 0 10px 22px rgba(58, 52, 46, 0.04);
-    font-size: 0.86rem;
-    letter-spacing: 0.04em;
+    box-shadow: 0 10px 20px rgba(47, 47, 47, 0.04);
+    font-size: 0.92rem;
   }
 
   .hero-actions {
     display: flex;
     justify-content: center;
-    gap: 0.9rem;
-    margin-top: 1.7rem;
+    gap: 1rem;
+    margin-top: 1.5rem;
   }
 
   .eyebrow {
-    margin: 0 0 1rem;
-    color: var(--art-accent-text);
-    font-size: 0.75rem;
-    letter-spacing: 0.34em;
+    margin: 0 0 0.9rem;
+    color: var(--tiffany-dark);
+    font-size: 0.8rem;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
   }
 
   .calculator-header h1 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: clamp(2.6rem, 4.8vw, 4.45rem);
+    font-size: clamp(2.3rem, 4vw, 4rem);
     font-weight: 500;
     color: var(--gray-darkest);
-    letter-spacing: 0.08em;
-    line-height: 1.18;
+    letter-spacing: 0.05em;
   }
 
   .subtitle {
-    max-width: 34rem;
-    margin: 1.2rem auto 0;
+    max-width: 40rem;
+    margin: 1rem auto 0;
     color: var(--gray-medium);
-    font-size: 1.02rem;
-    line-height: 1.95;
+    font-size: 1rem;
+    line-height: 1.9;
   }
 
   .calculator-form {
-    background:
-      linear-gradient(180deg, rgba(255, 253, 249, 0.94) 0%, rgba(246, 242, 237, 0.94) 100%);
-    border-radius: 36px;
-    padding: 2.45rem;
-    box-shadow:
-      0 36px 72px rgba(58, 52, 46, 0.075),
-      inset 0 1px 0 rgba(255, 255, 255, 0.75);
-    border: 1px solid var(--art-accent-line);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 32px;
+    padding: 2.1rem;
+    box-shadow: 0 28px 60px rgba(47, 47, 47, 0.06);
+    border: 1px solid rgba(129, 199, 212, 0.16);
   }
 
   .landing-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    margin-bottom: 1.15rem;
+    margin-bottom: 1.5rem;
   }
 
   .landing-card {
-    padding: 1.65rem;
-    border-radius: 28px;
-    background: var(--art-card);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 18px 40px rgba(58, 52, 46, 0.05);
+    padding: 1.5rem;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 20px 36px rgba(47, 47, 47, 0.05);
   }
 
   .landing-card-accent {
     background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 36%),
-      linear-gradient(135deg, rgba(246, 242, 236, 1) 0%, rgba(255, 253, 249, 0.98) 100%);
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 35%),
+      linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
   }
 
   .landing-card-header h2 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.42rem;
+    font-size: 1.35rem;
     color: var(--gray-darkest);
-    letter-spacing: 0.05em;
   }
 
   .landing-card-header p {
-    margin: 0.72rem 0 0;
+    margin: 0.65rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.88;
+    line-height: 1.8;
   }
 
   .landing-points {
@@ -779,8 +626,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .landing-point {
     padding: 1rem 1.05rem;
     border-radius: 18px;
-    background: rgba(255, 252, 248, 0.84);
-    border: 1px solid var(--art-accent-line);
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(129, 199, 212, 0.12);
   }
 
   .landing-point strong,
@@ -790,103 +637,21 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .landing-point strong {
     color: var(--gray-darkest);
-    letter-spacing: 0.02em;
   }
 
   .landing-point span {
     margin-top: 0.35rem;
     color: var(--gray-medium);
-    line-height: 1.78;
-    font-size: 0.92rem;
-  }
-
-  .editorial-band {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
-    gap: 1.2rem;
-    margin: 0 0 1.45rem;
-    padding: 1.55rem 1.6rem;
-    border-radius: 30px;
-    background:
-      radial-gradient(circle at top left, var(--art-accent-glow), transparent 34%),
-      linear-gradient(180deg, rgba(247, 243, 238, 0.96) 0%, rgba(255, 253, 249, 0.84) 100%);
-    border: 1px solid var(--art-accent-line);
-    box-shadow:
-      0 20px 36px rgba(58, 52, 46, 0.045),
-      inset 0 1px 0 rgba(255, 255, 255, 0.78);
-  }
-
-  .editorial-band-eyebrow,
-  .form-intro-eyebrow,
-  .result-eyebrow {
-    margin: 0 0 0.85rem;
-    color: var(--art-accent-text);
-    font-size: 0.74rem;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-  }
-
-  .editorial-band-copy h2,
-  .form-intro h2 {
-    margin: 0;
-    font-family: "Noto Serif TC", serif;
-    font-size: clamp(1.45rem, 2.3vw, 2rem);
     line-height: 1.7;
-    color: var(--gray-darkest);
-    letter-spacing: 0.05em;
-  }
-
-  .editorial-band-copy p:last-child,
-  .form-intro p:last-child {
-    margin: 0.85rem 0 0;
-    color: var(--gray-medium);
-    line-height: 1.95;
-    font-size: 0.96rem;
-  }
-
-  .editorial-band-points {
-    display: grid;
-    gap: 0.8rem;
-    align-content: start;
-  }
-
-  .editorial-band-point {
-    padding: 1rem 1.05rem;
-    border-radius: 22px;
-    background: var(--art-card-soft);
-    border: 1px solid var(--art-accent-line);
-  }
-
-  .editorial-band-point strong,
-  .editorial-band-point span {
-    display: block;
-  }
-
-  .editorial-band-point strong {
-    color: var(--gray-darkest);
-    letter-spacing: 0.03em;
-  }
-
-  .editorial-band-point span {
-    margin-top: 0.36rem;
-    color: var(--gray-medium);
-    line-height: 1.78;
     font-size: 0.92rem;
   }
 
   .form-section {
     margin-bottom: 1.5rem;
-    padding: 1.75rem;
-    border-radius: 28px;
-    background: linear-gradient(180deg, rgba(255, 254, 250, 0.96) 0%, rgba(245, 241, 236, 0.96) 100%);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  }
-
-  .form-intro {
-    margin-bottom: 1.55rem;
-    padding: 0 0 1.5rem;
-    border-bottom: 1px solid var(--art-accent-line);
+    padding: 1.6rem;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 249, 248, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.12);
   }
 
   .form-section:last-child {
@@ -896,9 +661,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .form-section h2 {
     margin: 0 0 1.25rem;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.5rem;
+    font-size: 1.45rem;
     color: var(--gray-darkest);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
   }
 
   .form-group {
@@ -910,13 +675,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     margin-bottom: 0.55rem;
     font-weight: 500;
     color: var(--gray-dark);
-  }
-
-  .field-helper {
-    margin: -0.2rem 0 0.6rem;
-    color: var(--gray-medium);
-    font-size: 0.88rem;
-    line-height: 1.7;
   }
 
   .input-with-unit {
@@ -938,20 +696,20 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   input[type="number"],
   select {
     width: 100%;
-    padding: 1rem 1.05rem;
-    border: 1px solid var(--art-accent-line);
-    border-radius: 18px;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(129, 199, 212, 0.18);
+    border-radius: 16px;
     font-size: 1rem;
     color: var(--gray-darkest);
     transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
-    background: rgba(255, 253, 250, 0.9);
+    background: rgba(255, 255, 255, 0.92);
   }
 
   input[type="number"]:focus,
   select:focus {
     outline: none;
-    border-color: var(--art-accent-line-strong);
-    box-shadow: 0 0 0 4px var(--art-accent-focus);
+    border-color: rgba(129, 199, 212, 0.46);
+    box-shadow: 0 0 0 4px rgba(129, 199, 212, 0.12);
     transform: translateY(-1px);
   }
 
@@ -966,18 +724,18 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     align-items: center;
     gap: 0.75rem;
     min-height: 58px;
-    padding: 1rem 1.05rem;
-    border: 1px solid var(--art-accent-line);
-    border-radius: 20px;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    border-radius: 18px;
     cursor: pointer;
     transition: transform 0.25s ease, border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
-    background: rgba(255, 252, 248, 0.78);
+    background: rgba(255, 255, 255, 0.82);
   }
 
   .checkbox-item:hover {
-    background: var(--art-card-muted);
-    border-color: var(--art-accent-line-strong);
-    box-shadow: 0 14px 26px rgba(58, 52, 46, 0.05);
+    background: rgba(245, 250, 250, 1);
+    border-color: rgba(129, 199, 212, 0.34);
+    box-shadow: 0 12px 22px rgba(47, 47, 47, 0.04);
     transform: translateY(-1px);
   }
 
@@ -985,11 +743,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: var(--art-accent-solid);
+    accent-color: var(--tiffany-primary);
   }
 
   .checkbox-item input[type="checkbox"]:checked + span {
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
   }
 
   .checkbox-copy {
@@ -1009,85 +767,43 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .checkbox-item input[type="checkbox"]:checked + .checkbox-copy strong {
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
   }
 
   .result-section {
     margin-top: 1.5rem;
-    padding: 2.35rem;
-    border-radius: 32px;
+    padding: 2rem;
+    border-radius: 28px;
     background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 30%),
-      linear-gradient(135deg, rgba(248, 244, 239, 1) 0%, rgba(255, 253, 250, 0.98) 100%);
-    border: 1px solid var(--art-accent-line);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      0 24px 48px rgba(58, 52, 46, 0.05);
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.14), transparent 28%),
+      linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.16);
   }
 
   .result-section h2 {
-    margin-bottom: 1.05rem;
+    margin-bottom: 1.2rem;
   }
 
   .result-subtitle {
-    margin: -0.2rem 0 1.35rem;
+    margin: -0.4rem 0 1.25rem;
     color: var(--gray-medium);
-    line-height: 1.9;
-    max-width: 36rem;
-  }
-
-  .logic-summary-card {
-    margin-bottom: 1.1rem;
-    padding: 1rem 1.1rem;
-    border-radius: 20px;
-    background: rgba(255, 252, 248, 0.76);
-    border: 1px solid var(--art-accent-line);
-    backdrop-filter: blur(6px);
-  }
-
-  .logic-summary-card-soft {
-    background: rgba(245, 241, 236, 0.9);
-  }
-
-  .logic-summary-card-accent {
-    background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 38%),
-      rgba(255, 252, 248, 0.86);
-  }
-
-  .logic-summary-label {
-    display: inline-flex;
-    margin-bottom: 0.42rem;
-    color: var(--art-accent-text);
-    font-size: 0.76rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-  }
-
-  .logic-summary-copy {
-    margin: 0;
-    color: var(--gray-dark);
-    font-size: 0.93rem;
-    line-height: 1.82;
+    line-height: 1.8;
   }
 
   .result-card {
-    background: rgba(255, 252, 248, 0.82);
-    padding: 1.65rem;
-    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.92);
+    padding: 1.5rem;
+    border-radius: 22px;
     margin-bottom: 1.5rem;
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 16px 30px rgba(58, 52, 46, 0.04);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
   }
 
   .result-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    padding: 1.05rem 0;
-    border-bottom: 1px solid rgba(47, 47, 47, 0.06);
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(47, 47, 47, 0.08);
   }
 
   .result-row:last-child {
@@ -1097,20 +813,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .result-label {
     font-size: 1rem;
     color: var(--gray-medium);
-    letter-spacing: 0.02em;
   }
 
   .result-value {
-    font-size: 1.18rem;
+    font-size: 1.2rem;
     font-weight: 600;
-    color: var(--art-accent-text);
-    text-align: right;
+    color: var(--tiffany-dark);
   }
 
   .result-row:first-child .result-value {
-    font-size: 1.62rem;
+    font-size: 1.5rem;
     color: var(--gray-darkest);
-    letter-spacing: 0.02em;
   }
 
   .result-highlights {
@@ -1121,10 +834,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .highlight-pill {
-    padding: 1rem 1.15rem;
-    border-radius: 20px;
-    background: rgba(255, 252, 248, 0.8);
-    border: 1px solid var(--art-accent-line);
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.16);
   }
 
   .highlight-pill span,
@@ -1145,11 +858,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .breakdown-card {
     margin-bottom: 1.5rem;
-    padding: 1.45rem;
-    border-radius: 24px;
-    background: rgba(255, 252, 248, 0.8);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 16px 28px rgba(58, 52, 46, 0.04);
+    padding: 1.4rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
   }
 
   .breakdown-header h3 {
@@ -1202,7 +915,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .breakdown-value {
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
     font-weight: 600;
     white-space: nowrap;
   }
@@ -1219,13 +932,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
     gap: 1rem;
-    padding: 1.45rem;
-    border-radius: 28px;
+    padding: 1.35rem;
+    border-radius: 24px;
     background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 36%),
-      linear-gradient(135deg, rgba(246, 242, 236, 1) 0%, rgba(255, 253, 249, 1) 100%);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 18px 34px rgba(58, 52, 46, 0.045);
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.16), transparent 34%),
+      linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
   }
 
   .estimator-handoff-card {
@@ -1233,18 +946,18 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
     gap: 1rem;
-    padding: 1.5rem;
-    border-radius: 28px;
+    padding: 1.35rem;
+    border-radius: 24px;
     background:
-      radial-gradient(circle at top left, var(--art-accent-glow), transparent 36%),
-      linear-gradient(135deg, rgba(244, 240, 234, 1) 0%, rgba(255, 253, 249, 1) 100%);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 18px 34px rgba(58, 52, 46, 0.05);
+      radial-gradient(circle at top left, rgba(160, 217, 217, 0.18), transparent 34%),
+      linear-gradient(135deg, rgba(243, 248, 248, 1) 0%, rgba(255, 255, 255, 1) 100%);
+    border: 1px solid rgba(129, 199, 212, 0.22);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.05);
   }
 
   .estimator-handoff-eyebrow {
     margin: 0 0 0.75rem;
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
     font-size: 0.78rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -1253,8 +966,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .estimator-handoff-copy h3 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.56rem;
-    line-height: 1.65;
+    font-size: 1.5rem;
+    line-height: 1.55;
     color: var(--gray-darkest);
     letter-spacing: 0.04em;
   }
@@ -1273,9 +986,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .estimator-handoff-point {
     padding: 0.95rem 1rem;
-    border-radius: 20px;
-    background: rgba(255, 252, 248, 0.8);
-    border: 1px solid var(--art-accent-line);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.14);
   }
 
   .estimator-handoff-point strong,
@@ -1300,9 +1013,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     justify-content: center;
     gap: 0.9rem;
     padding: 1rem;
-    border-radius: 22px;
-    background: rgba(255, 252, 248, 0.82);
-    border: 1px solid var(--art-accent-line);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.14);
   }
 
   .estimator-handoff-actions .btn {
@@ -1318,7 +1031,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .report-offer-eyebrow {
     margin: 0 0 0.75rem;
-    color: var(--art-accent-text);
+    color: var(--tiffany-dark);
     font-size: 0.78rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -1327,8 +1040,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .report-offer-copy h3 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.5rem;
-    line-height: 1.65;
+    font-size: 1.45rem;
+    line-height: 1.55;
     color: var(--gray-darkest);
     letter-spacing: 0.04em;
   }
@@ -1347,9 +1060,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .report-offer-point {
     padding: 0.95rem 1rem;
-    border-radius: 20px;
-    background: rgba(255, 252, 248, 0.8);
-    border: 1px solid var(--art-accent-line);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(129, 199, 212, 0.14);
   }
 
   .report-offer-point strong,
@@ -1374,9 +1087,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     justify-content: center;
     gap: 0.9rem;
     padding: 1rem;
-    border-radius: 22px;
-    background: rgba(255, 252, 248, 0.84);
-    border: 1px solid var(--art-accent-line);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.14);
   }
 
   .report-offer-actions .btn {
@@ -1403,8 +1116,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .report-form-notice {
     padding: 0.9rem 1rem;
     border-radius: 16px;
-    background: rgba(245, 238, 229, 0.95);
-    border: 1px solid rgba(164, 144, 115, 0.18);
+    background: rgba(255, 246, 236, 0.95);
+    border: 1px solid rgba(209, 165, 97, 0.2);
     color: var(--gray-dark);
   }
 
@@ -1440,11 +1153,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .report-lead-field textarea {
     width: 100%;
     padding: 0.9rem 0.95rem;
-    border: 1px solid var(--art-accent-line);
+    border: 1px solid rgba(129, 199, 212, 0.18);
     border-radius: 14px;
     font-size: 0.98rem;
     color: var(--gray-darkest);
-    background: rgba(255, 253, 250, 0.96);
+    background: rgba(255, 255, 255, 0.96);
     transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
     resize: vertical;
   }
@@ -1452,8 +1165,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .report-lead-field input:focus,
   .report-lead-field textarea:focus {
     outline: none;
-    border-color: var(--art-accent-line-strong);
-    box-shadow: 0 0 0 4px var(--art-accent-focus);
+    border-color: rgba(129, 199, 212, 0.46);
+    box-shadow: 0 0 0 4px rgba(129, 199, 212, 0.12);
     transform: translateY(-1px);
   }
 
@@ -1480,17 +1193,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .advice-card {
-    padding: 1.45rem;
-    border-radius: 24px;
-    background: rgba(255, 252, 248, 0.82);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 16px 30px rgba(58, 52, 46, 0.04);
+    padding: 1.4rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
   }
 
   .advice-card-accent {
     background:
-      radial-gradient(circle at top right, var(--art-accent-glow), transparent 36%),
-      linear-gradient(135deg, rgba(245, 241, 236, 1) 0%, rgba(255, 253, 249, 1) 100%);
+      radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 35%),
+      linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
   }
 
   .advice-header h3 {
@@ -1525,10 +1238,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .next-step-item {
-    padding: 0.95rem 1rem;
-    border-radius: 18px;
-    background: rgba(255, 252, 248, 0.8);
-    border: 1px solid var(--art-accent-line);
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(129, 199, 212, 0.14);
   }
 
   .next-step-item strong,
@@ -1548,11 +1261,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .disclaimer {
-    background: rgba(255, 252, 248, 0.8);
+    background: rgba(255, 255, 255, 0.92);
     padding: 1rem 1.1rem;
-    border-radius: 20px;
+    border-radius: 18px;
     margin-bottom: 1.5rem;
-    border: 1px solid var(--art-accent-line);
+    border: 1px solid rgba(129, 199, 212, 0.16);
   }
 
   .disclaimer p {
@@ -1564,57 +1277,53 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .btn {
     flex: 1;
-    padding: 1rem 1.55rem;
+    padding: 0.95rem 1.5rem;
     border-radius: 999px;
     text-decoration: none;
     font-weight: 500;
     text-align: center;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
-    font-size: 0.98rem;
-    letter-spacing: 0.04em;
+    font-size: 1rem;
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, rgba(44, 39, 35, 1) 0%, rgba(97, 89, 80, 1) 100%);
+    background: linear-gradient(135deg, var(--gray-darkest) 0%, var(--tiffany-dark) 100%);
     color: var(--white);
-    border: 1px solid rgba(44, 39, 35, 0.96);
-    box-shadow: 0 14px 24px rgba(58, 52, 46, 0.16);
+    border: 1px solid var(--gray-darkest);
   }
 
   .btn-primary:hover {
-    border-color: rgba(44, 39, 35, 1);
+    border-color: var(--gray-darkest);
     transform: translateY(-2px);
-    box-shadow: 0 20px 32px rgba(58, 52, 46, 0.2);
+    box-shadow: 0 18px 28px rgba(47, 47, 47, 0.18);
   }
 
   .btn-secondary {
-    background: rgba(255, 252, 248, 0.76);
+    background: rgba(255, 255, 255, 0.92);
     color: var(--gray-darkest);
-    border: 1px solid var(--art-accent-line);
-    backdrop-filter: blur(6px);
+    border: 1px solid rgba(129, 199, 212, 0.22);
   }
 
   .btn-secondary:hover {
-    background: rgba(245, 241, 236, 0.96);
+    background: rgba(245, 250, 250, 1);
     transform: translateY(-2px);
-    box-shadow: 0 14px 28px rgba(124, 131, 122, 0.09);
+    box-shadow: 0 14px 24px rgba(129, 199, 212, 0.12);
   }
 
   .faq-panel {
     margin-top: 1.5rem;
-    padding: 1.9rem;
-    border-radius: 30px;
-    background: rgba(255, 252, 248, 0.84);
-    border: 1px solid var(--art-accent-line);
-    box-shadow: 0 18px 32px rgba(58, 52, 46, 0.045);
+    padding: 1.8rem;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(129, 199, 212, 0.16);
+    box-shadow: 0 20px 36px rgba(47, 47, 47, 0.05);
   }
 
   .faq-header h2 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.56rem;
+    font-size: 1.5rem;
     color: var(--gray-darkest);
-    letter-spacing: 0.05em;
   }
 
   .faq-header p {
@@ -1630,10 +1339,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .faq-item {
-    padding: 1.05rem 1.15rem;
-    border-radius: 20px;
-    background: rgba(247, 243, 238, 0.84);
-    border: 1px solid var(--art-accent-line);
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(247, 250, 250, 0.9);
+    border: 1px solid rgba(129, 199, 212, 0.12);
   }
 
   .faq-item summary {
@@ -1641,22 +1350,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     color: var(--gray-darkest);
     font-weight: 600;
     list-style: none;
-    letter-spacing: 0.02em;
   }
 
   .faq-item summary::-webkit-details-marker {
     display: none;
-  }
-
-  .faq-item summary::after {
-    content: "+";
-    float: right;
-    color: var(--art-accent-text);
-    font-size: 1rem;
-  }
-
-  .faq-item[open] summary::after {
-    content: "−";
   }
 
   .faq-item p {
@@ -1667,29 +1364,18 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   @media (max-width: 768px) {
     .calculator-container {
-      padding: 4.3rem 1.25rem 4.2rem;
+      padding: 4rem 1.25rem 4rem;
     }
 
     .calculator-form {
-      padding: 1.35rem;
+      padding: 1.3rem;
       border-radius: 24px;
-    }
-
-    .calculator-header {
-      padding: 2.5rem 1.3rem 2.15rem;
-      border-radius: 26px;
     }
 
     .hero-actions,
     .landing-grid {
       grid-template-columns: 1fr;
       flex-direction: column;
-    }
-
-    .editorial-band {
-      grid-template-columns: 1fr;
-      padding: 1.3rem;
-      border-radius: 24px;
     }
 
     .form-section,
@@ -1760,31 +1446,15 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const residenceType = document.getElementById(
     "residence-type",
   ) as HTMLSelectElement;
-  const marketBenchmark = document.getElementById(
-    "market-benchmark",
-  ) as HTMLSelectElement;
   const usePurpose = document.getElementById(
     "use-purpose",
   ) as HTMLSelectElement;
   const timeline = document.getElementById(
     "timeline",
   ) as HTMLSelectElement;
-  const bathroomCount = document.getElementById(
-    "bathroom-count",
-  ) as HTMLSelectElement;
-  const utilityScope = document.getElementById(
-    "utility-scope",
-  ) as HTMLSelectElement;
-  const storageKitchenGroup = document.getElementById(
-    "storage-kitchen-group",
-  ) as HTMLDivElement | null;
-  const storageKitchenScope = document.getElementById(
-    "storage-kitchen-scope",
-  ) as HTMLSelectElement;
   const selectedItems = Array.from(
     document.querySelectorAll('.checkbox-item input[type="checkbox"]'),
   ) as HTMLInputElement[];
-  const recommendedTotal = document.getElementById("recommended-total");
   const totalPrice = document.getElementById("total-price");
   const designFee = document.getElementById("design-fee");
   const constructionFee = document.getElementById("construction-fee");
@@ -1792,11 +1462,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const perPingRange = document.getElementById("per-ping-range");
   const scopeSummary = document.getElementById("scope-summary");
   const resultSubtitle = document.getElementById("result-subtitle");
-  const logicSummary = document.getElementById("logic-summary");
-  const costDriverSummary = document.getElementById("cost-driver-summary");
-  const marketBenchmarkSummary = document.getElementById("market-benchmark-summary");
-  const changeSummary = document.getElementById("change-summary");
-  const breakdownNote = document.getElementById("breakdown-note");
   const breakdownList = document.getElementById("breakdown-list");
   const adviceList = document.getElementById("advice-list");
   const nextStepIntro = document.getElementById("next-step-intro");
@@ -1851,22 +1516,19 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       label: "全屋裝修",
       constructionMultiplier: estimatorConfig.projectTypeMultipliers?.full ?? 1,
       designMultiplier: 1,
-      baseScopeFactor: 0.62,
-      variableScopeFactor: 0.38,
+      minScopeFactor: 0.78,
     },
     partial: {
       label: "局部裝修",
       constructionMultiplier: estimatorConfig.projectTypeMultipliers?.partial ?? 0.6,
       designMultiplier: 0.65,
-      baseScopeFactor: 0.18,
-      variableScopeFactor: 0.82,
+      minScopeFactor: 0.38,
     },
     "design-only": {
       label: "純設計",
       constructionMultiplier: 0,
       designMultiplier: 1,
-      baseScopeFactor: 0,
-      variableScopeFactor: 0,
+      minScopeFactor: 0,
     },
   };
 
@@ -1883,30 +1545,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     townhouse: { label: "透天 / 樓中樓", multiplier: 1.12 },
   };
 
-  const marketBenchmarkMeta = {
-    "taipei-metro": {
-      label: "北北基住宅市場",
-      constructionMultiplier: 1.06,
-      designMultiplier: 1.08,
-      summary:
-        "目前以北北基住宅裝修前期行情帶校準，會比全台都會中位帶略高一些，較貼近雙北住宅常見報價節奏。",
-    },
-    "urban-taiwan": {
-      label: "全台都會住宅中位帶",
-      constructionMultiplier: 1,
-      designMultiplier: 1,
-      summary:
-        "目前以全台都會住宅常見中位行情帶校準，適合先抓較通用的前期估價範圍。",
-    },
-    "central-south": {
-      label: "中南部都會住宅帶",
-      constructionMultiplier: 0.94,
-      designMultiplier: 0.95,
-      summary:
-        "目前以中南部都會住宅帶校準，會比雙北市場帶更收斂一些，適合先抓在地較常見的前期預算。",
-    },
-  };
-
   const usePurposeMeta = {
     self: { label: "自住", multiplier: 1.02 },
     family: { label: "家庭長住", multiplier: 1.05 },
@@ -1919,45 +1557,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     urgent: { label: "三個月內，希望盡快進場", multiplier: 1.08, reserve: 1.15 },
   };
 
-  const bathroomCountMeta = {
-    1: { label: "1 間衛浴", multiplier: 1 },
-    2: { label: "2 間衛浴", multiplier: 1.06 },
-    "3plus": { label: "3 間以上衛浴", multiplier: 1.12 },
-  };
-
-  const utilityScopeMeta = {
-    none: { label: "不重拉水電", multiplier: 1, reserve: 1 },
-    partial: { label: "局部調整 / 局部換新", multiplier: 1.08, reserve: 1.04 },
-    full: { label: "全室重拉水電", multiplier: 1.16, reserve: 1.12 },
-  };
-
-  const storageKitchenScopeMeta = {
-    none: { label: "先不另外放大系統櫃 / 廚具預算" },
-    storage: { label: "已知會做系統櫃" },
-    kitchen: { label: "已知會更新廚具" },
-    both: { label: "系統櫃與廚具都會做" },
-  };
-
   function formatRange(min, max) {
     return `${min}萬 - ${max}萬`;
-  }
-
-  function getStorageKitchenMultiplier(scopeValue, selectedConfigs) {
-    const hasKitchen = selectedConfigs.some((item) => item.value === "kitchen");
-    const hasFurniture = selectedConfigs.some((item) => item.value === "furniture");
-
-    switch (scopeValue) {
-      case "storage":
-        return hasFurniture ? 1.06 : 1.03;
-      case "kitchen":
-        return hasKitchen ? 1.07 : 1.03;
-      case "both":
-        if (hasKitchen && hasFurniture) return 1.12;
-        if (hasKitchen || hasFurniture) return 1.08;
-        return 1.04;
-      default:
-        return 1;
-    }
   }
 
   function saveEstimateSnapshot(snapshot) {
@@ -1984,99 +1585,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   let lastTrackedSignature = "";
-  let lastChangeReason = "";
-  let previousEstimateState = null;
-
-  function toggleStorageKitchenField(selectedConfigs) {
-    const shouldShow = selectedConfigs.some(
-      (item) => item.value === "kitchen" || item.value === "furniture",
-    );
-    if (storageKitchenGroup) {
-      storageKitchenGroup.hidden = !shouldShow;
-    }
-    if (!shouldShow && storageKitchenScope.value !== "none") {
-      storageKitchenScope.value = "none";
-    }
-    return shouldShow;
-  }
-
-  function buildCostDrivers({
-    qualityLabel,
-    conditionMeta,
-    residenceMeta,
-    marketInfo,
-    timelineInfo,
-    utilityInfo,
-    bathroomInfo,
-    storageKitchenInfo,
-    selectedConfigs,
-    bathroomMultiplier,
-    storageKitchenMultiplier,
-    projectMeta,
-  }) {
-    const drivers = [];
-
-    if (qualityLevel.value === "premium" || qualityLevel.value === "luxury") {
-      drivers.push(`${qualityLabel} 單價帶較高`);
-    }
-    if (conditionMeta.multiplier > 1) {
-      drivers.push(`${conditionMeta.label} 需要較多基礎工程`);
-    }
-    if (utilityInfo.multiplier > 1) {
-      drivers.push(`${utilityInfo.label} 會拉高水電與預備金`);
-    }
-    if (bathroomMultiplier > 1 && selectedConfigs.some((item) => item.value === "bathroom")) {
-      drivers.push(`${bathroomInfo.label} 會增加衛浴相關工程`);
-    }
-    if (storageKitchenMultiplier > 1 && storageKitchenInfo.label) {
-      drivers.push(`${storageKitchenInfo.label} 會放大櫃體或廚具預算`);
-    }
-    if (residenceMeta.multiplier > 1) {
-      drivers.push(`${residenceMeta.label} 的施工條件較複雜`);
-    }
-    if (marketInfo.constructionMultiplier > 1) {
-      drivers.push(`${marketInfo.label} 本身的市場帶較高`);
-    }
-    if (timelineInfo.multiplier > 1) {
-      drivers.push(`${timelineInfo.label} 會提高時程壓力`);
-    }
-    if (projectMeta.label === "全屋裝修") {
-      drivers.push("全屋裝修通常會包含較完整的基礎工程需求");
-    }
-
-    return drivers.slice(0, 4);
-  }
-
-  function buildChangeSummary({
-    hasValidScope,
-    minRecommendedTotal,
-    costDrivers,
-  }) {
-    if (!hasValidScope) {
-      return "請先勾選至少 1 項裝修項目，系統才會建立有效估價。";
-    }
-
-    if (!previousEstimateState) {
-      return costDrivers.length
-        ? `目前主要由 ${costDrivers.slice(0, 2).join("、")} 影響這次估價。`
-        : "目前條件已套入，接著可再微調工項與高影響因子。";
-    }
-
-    const delta = minRecommendedTotal - previousEstimateState.minRecommendedTotal;
-    const absDelta = Math.abs(delta);
-
-    if (!absDelta) {
-      return lastChangeReason
-        ? `你剛調整了「${lastChangeReason}」，但目前仍落在同一個預算帶。`
-        : "目前條件變動不大，整體預算帶維持不變。";
-    }
-
-    const direction = delta > 0 ? "上升" : "下降";
-    const reasonPrefix = lastChangeReason ? `你剛調整了「${lastChangeReason}」，` : "";
-    const topDriver = costDrivers[0] ? `主因多半是 ${costDrivers[0]}。` : "";
-
-    return `${reasonPrefix}這次建議準備總預算約${direction} ${absDelta} 萬起。${topDriver}`;
-  }
 
   function calculate() {
     const area = Math.min(200, Math.max(1, parseFloat(areaInput.value) || 30));
@@ -2100,26 +1608,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const residenceMeta =
       residenceTypeMeta[residenceType.value as keyof typeof residenceTypeMeta] ||
       residenceTypeMeta.tower;
-    const marketInfo =
-      marketBenchmarkMeta[marketBenchmark.value as keyof typeof marketBenchmarkMeta] ||
-      marketBenchmarkMeta["taipei-metro"];
     const usePurposeInfo =
       usePurposeMeta[usePurpose.value as keyof typeof usePurposeMeta] ||
       usePurposeMeta.self;
     const timelineInfo =
       timelineMeta[timeline.value as keyof typeof timelineMeta] ||
       timelineMeta.planned;
-    const bathroomInfo =
-      bathroomCountMeta[bathroomCount.value as keyof typeof bathroomCountMeta] ||
-      bathroomCountMeta[2];
-    const utilityInfo =
-      utilityScopeMeta[utilityScope.value as keyof typeof utilityScopeMeta] ||
-      utilityScopeMeta.partial;
-    const shouldShowStorageKitchen = toggleStorageKitchenField(selectedConfigs);
-    const storageKitchenInfo =
-      storageKitchenScopeMeta[
-        (shouldShowStorageKitchen ? storageKitchenScope.value : "none") as keyof typeof storageKitchenScopeMeta
-      ] || storageKitchenScopeMeta.none;
     const totalWeight = renovationItems.reduce(
       (sum, item) => sum + item.weight,
       0,
@@ -2128,24 +1622,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       (sum, item) => sum + item.weight,
       0,
     );
-    const hasSelectedItems = selectedConfigs.length > 0;
-    const hasValidScope =
-      projectType.value === "design-only" ? true : hasSelectedItems;
     const selectedScopeRatio = selectedWeight / totalWeight || 0;
     const scopeFactor =
       projectType.value === "design-only"
         ? 0
-        : projectMeta.baseScopeFactor +
-          projectMeta.variableScopeFactor * selectedScopeRatio;
-    const bathroomMultiplier = selectedConfigs.some((item) => item.value === "bathroom")
-      ? bathroomInfo.multiplier
-      : 1;
-    const storageKitchenMultiplier =
-      projectType.value === "design-only"
-        ? 1
-        : getStorageKitchenMultiplier(
-            shouldShowStorageKitchen ? storageKitchenScope.value : "none",
-            selectedConfigs,
+        : Math.max(
+            projectMeta.minScopeFactor,
+            0.45 + 0.55 * selectedScopeRatio,
           );
 
     const minConstruction =
@@ -2154,15 +1637,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         : Math.round(
             area *
               pricePerPing.min *
-              marketInfo.constructionMultiplier *
               projectMeta.constructionMultiplier *
               conditionMeta.multiplier *
               residenceMeta.multiplier *
               usePurposeInfo.multiplier *
               timelineInfo.multiplier *
-              bathroomMultiplier *
-              utilityInfo.multiplier *
-              storageKitchenMultiplier *
               scopeFactor,
           );
     const maxConstruction =
@@ -2171,23 +1650,19 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         : Math.round(
             area *
               pricePerPing.max *
-              marketInfo.constructionMultiplier *
               projectMeta.constructionMultiplier *
               conditionMeta.multiplier *
               residenceMeta.multiplier *
               usePurposeInfo.multiplier *
               timelineInfo.multiplier *
-              bathroomMultiplier *
-              utilityInfo.multiplier *
-              storageKitchenMultiplier *
               scopeFactor,
           );
 
     const minDesign = Math.round(
-      area * designFeePerPing.min * projectMeta.designMultiplier * marketInfo.designMultiplier,
+      area * designFeePerPing.min * projectMeta.designMultiplier,
     );
     const maxDesign = Math.round(
-      area * designFeePerPing.max * projectMeta.designMultiplier * marketInfo.designMultiplier,
+      area * designFeePerPing.max * projectMeta.designMultiplier,
     );
 
     const minReserve =
@@ -2196,9 +1671,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         : Math.round(
             minConstruction *
               (conditionMeta.multiplier > 1 ? 0.1 : 0.06) *
-              timelineInfo.reserve *
-              utilityInfo.reserve *
-              (bathroomMultiplier > 1 ? 1.03 : 1),
+              timelineInfo.reserve,
           );
     const maxReserve =
       projectType.value === "design-only"
@@ -2206,38 +1679,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         : Math.round(
             maxConstruction *
               (conditionMeta.multiplier > 1 ? 0.14 : 0.08) *
-              timelineInfo.reserve *
-              utilityInfo.reserve *
-              (bathroomMultiplier > 1 ? 1.05 : 1),
+              timelineInfo.reserve,
           );
 
     const minTotal = minConstruction + minDesign;
     const maxTotal = maxConstruction + maxDesign;
-    const minRecommendedTotal = minTotal + minReserve;
-    const maxRecommendedTotal = maxTotal + maxReserve;
     const minPerPing = (minTotal / area).toFixed(1);
     const maxPerPing = (maxTotal / area).toFixed(1);
-    const qualityLabel =
-      qualityLevel.options[qualityLevel.selectedIndex]?.textContent || "";
-    const costDrivers = buildCostDrivers({
-      qualityLabel,
-      conditionMeta,
-      residenceMeta,
-      marketInfo,
-      timelineInfo,
-      utilityInfo,
-      bathroomInfo,
-      storageKitchenInfo,
-      selectedConfigs,
-      bathroomMultiplier,
-      storageKitchenMultiplier,
-      projectMeta,
-    });
-    const dynamicChangeSummary = buildChangeSummary({
-      hasValidScope,
-      minRecommendedTotal,
-      costDrivers,
-    });
     const breakdownItems =
       projectType.value === "design-only"
         ? [
@@ -2263,17 +1711,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       qualityLevel: qualityLevel.value,
       houseCondition: houseCondition.value,
       residenceType: residenceType.value,
-      marketBenchmark: marketBenchmark.value,
       usePurpose: usePurpose.value,
       timeline: timeline.value,
-      bathroomCount: bathroomCount.value,
-      utilityScope: utilityScope.value,
-      storageKitchenScope: storageKitchenScope.value,
       selectedItems: selectedConfigs.map((item) => item.value),
     });
 
     if (
-      recommendedTotal &&
       totalPrice &&
       designFee &&
       constructionFee &&
@@ -2281,67 +1724,30 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       perPingRange &&
       scopeSummary &&
       resultSubtitle &&
-      logicSummary &&
-      costDriverSummary &&
-      marketBenchmarkSummary &&
-      changeSummary &&
       nextStepIntro &&
-      reportContext &&
-      breakdownNote
+      reportContext
     ) {
-      if (!hasValidScope) {
-        recommendedTotal.textContent = "--";
-        totalPrice.textContent = "--";
-        designFee.textContent = "--";
-        constructionFee.textContent = "--";
-        reserveBudget.textContent = "--";
-        perPingRange.textContent = "--";
-        scopeSummary.textContent = `${projectMeta.label} / 尚未勾選工項 / ${residenceMeta.label}`;
-        logicSummary.textContent = "請至少勾選 1 項裝修項目，估價結果才有參考意義。";
-        costDriverSummary.textContent = "尚未形成有效估價條件，因此暫不整理高價因子。";
-        marketBenchmarkSummary.textContent = `${marketInfo.label}：${marketInfo.summary}`;
-        changeSummary.textContent = "先勾選至少 1 項裝修項目，系統才會開始解釋預算如何變動。";
-        resultSubtitle.textContent = "目前未勾選任何裝修項目，因此不顯示正式預算帶，避免誤導。";
-        nextStepIntro.textContent = "先勾選實際要做的項目，再看預算帶。";
-        reportContext.textContent = "先確定至少一項實際裝修項目，後續的預算分析與下一步建議才會更準。";
-        breakdownNote.textContent = "目前尚未形成有效工項範圍，因此先不顯示各項費用比例。";
-      } else {
-        recommendedTotal.textContent = formatRange(minRecommendedTotal, maxRecommendedTotal);
-        totalPrice.textContent = formatRange(minTotal, maxTotal);
-        designFee.textContent = formatRange(minDesign, maxDesign);
-        constructionFee.textContent = formatRange(minConstruction, maxConstruction);
-        reserveBudget.textContent = formatRange(minReserve, maxReserve);
-        perPingRange.textContent = `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`;
-        scopeSummary.textContent = `${projectMeta.label} / ${selectedConfigs.length} 項工種 / ${residenceMeta.label}`;
-        logicSummary.textContent =
-          projectType.value === "design-only"
-            ? `坪數 x 設計費單價 x 條件係數（${[projectMeta.label, marketInfo.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label].join(" / ")}）`
-            : `坪數 x 等級單價 x 條件係數（${[projectMeta.label, marketInfo.label, conditionMeta.label, residenceMeta.label, usePurposeInfo.label, timelineInfo.label, selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}）`;
-        costDriverSummary.textContent = costDrivers.length
-          ? `目前主要拉高預算的條件：${costDrivers.join("、")}。`
-          : "目前條件相對單純，估價主要由坪數、等級單價與基本工項組成。";
-        marketBenchmarkSummary.textContent = `${marketInfo.label}：${marketInfo.summary}`;
-        changeSummary.textContent = dynamicChangeSummary;
-        resultSubtitle.textContent =
-          projectType.value === "design-only"
-            ? "目前以設計規劃費為主，工程費用需依圖面、工法與發包範圍另行確認。"
-            : projectType.value === "full" &&
-                selectedScopeRatio < 0.7
-              ? "全屋裝修通常會包含基本工程需求；你勾選的項目越完整，估價區間也會越貼近實際情況。"
-              : "依目前輸入條件，先整理出適合討論的預算帶、主要工項與建議預備金。";
-        nextStepIntro.textContent =
-          projectType.value === "design-only"
-            ? "你現在更接近設計規劃前期。"
-            : "你現在已經有可討論的預算帶。";
-        reportContext.textContent =
-          projectType.value === "design-only"
-            ? `目前較適合先整理 ${projectMeta.label} 的需求重點與設計深度，再進一步確認交付方向。`
-            : `目前這組 ${projectMeta.label} / ${residenceMeta.label} 條件，可先用這份預算分析理解 ${formatRange(minTotal, maxTotal)} 的主要花費方向。`;
-        breakdownNote.textContent =
-          projectType.value === "design-only"
-            ? "目前為設計規劃費試算，尚未進入工程比例拆解。"
-            : "目前先依你勾選的工項整理各項費用的大致比例；實際報價仍會再看尺寸、材質、點位與現場條件。";
-      }
+      totalPrice.textContent = formatRange(minTotal, maxTotal);
+      designFee.textContent = formatRange(minDesign, maxDesign);
+      constructionFee.textContent = formatRange(minConstruction, maxConstruction);
+      reserveBudget.textContent = formatRange(minReserve, maxReserve);
+      perPingRange.textContent = `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`;
+      scopeSummary.textContent = `${projectMeta.label} / ${selectedConfigs.length} 項工種 / ${residenceMeta.label}`;
+      resultSubtitle.textContent =
+        projectType.value === "design-only"
+          ? "目前以設計規劃費為主，工程費用需另估。"
+          : projectType.value === "full" &&
+              selectedScopeRatio < projectMeta.minScopeFactor
+            ? "全屋裝修已含基礎工程底盤估算。"
+          : "先整理出可討論的預算帶、主要工項與預備金。";
+      nextStepIntro.textContent =
+        projectType.value === "design-only"
+          ? "先整理設計需求。"
+          : "你已經有可討論的預算帶。";
+      reportContext.textContent =
+        projectType.value === "design-only"
+          ? `目前較適合先整理 ${projectMeta.label} 的需求重點與交付方向。`
+          : `這組 ${projectMeta.label} / ${residenceMeta.label} 條件，可先用拆解報告判讀 ${formatRange(minTotal, maxTotal)} 的預算落點。`;
     }
 
     if (
@@ -2351,69 +1757,49 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       estimatorHandoffPointDescription
     ) {
       if (projectType.value === "design-only") {
-        estimatorHandoffTitle.textContent = "下一步：把這次空間方向整理成可討論的設計需求";
+        estimatorHandoffTitle.textContent = "把設計方向整理成完整需求表？";
         estimatorHandoffDescription.textContent =
-          "把需求、空間痛點與參考風格補進需求表，第一次討論就能更快對齊生活畫面與設計深度。";
-        estimatorHandoffPointTitle.textContent = "先把方向說清楚";
+          "把需求、空間痛點與參考風格整理清楚。";
+        estimatorHandoffPointTitle.textContent = "這一步最有效率";
         estimatorHandoffPointDescription.textContent =
-          "你只需要先整理想像中的生活感、參考圖與期待交付，青曦就能順著這份初步方向往下接。";
+          "把需求、參考圖與交付內容先講清楚。";
       } else {
-        estimatorHandoffTitle.textContent = "下一步：把這份初估延伸成完整空間需求";
+        estimatorHandoffTitle.textContent = "下一步：帶著估算填需求表";
         estimatorHandoffDescription.textContent =
-          "再補需求、照片與時程，青曦就能更快把預算帶、空間條件與後續方向一起整理清楚。";
-        estimatorHandoffPointTitle.textContent = "先把條件接續下去";
+          "再補需求、照片與時程，青曦就能接著判斷。";
+        estimatorHandoffPointTitle.textContent = "這一步最有效率";
         estimatorHandoffPointDescription.textContent =
-          "如果你已經抓到大致預算方向，現在最有效率的做法就是直接把需求與現場資訊補完整。";
+          "有預算方向後，直接整理需求。";
       }
     }
 
     const adviceItems = [];
-    if (!hasValidScope) {
-      adviceItems.push("目前沒有勾選任何裝修項目，因此暫時無法形成有參考價值的預算區間。");
-      adviceItems.push("先勾選至少 1 項實際要做的工程，例如衛浴、廚房、地板或系統家具，估價結果才有參考價值。");
+    if (conditionMeta.multiplier >= 1.18) {
+      adviceItems.push("屋況偏複雜，建議預留較高比例的拆除、基礎工程與預備金。");
     } else {
-      if (conditionMeta.multiplier >= 1.18) {
-        adviceItems.push("屋況偏複雜，建議預留較高比例的拆除、基礎工程與預備金。");
-      } else {
-        adviceItems.push("屋況相對單純，較適合先把預算重點放在機能、材質與收納整合。");
-      }
+      adviceItems.push("屋況相對單純，較適合先把預算重點放在機能、材質與收納整合。");
+    }
 
-      if (utilityScope.value === "full") {
-        adviceItems.push("這次估算已把全室重拉水電算進去，若現場原始管線老舊，實際費用通常會更接近區間上緣。");
-      } else if (utilityScope.value === "partial") {
-        adviceItems.push("目前以局部水電調整估算，若後續確認要全室重拉，總價通常會再上修。");
-      }
+    if (projectType.value === "full" && selectedScopeRatio < projectMeta.minScopeFactor) {
+      adviceItems.push("你目前選的是全屋裝修，因此估算已自動納入基礎工程底盤，不會因少勾幾項就過度低估。");
+    }
 
-      if (projectType.value === "full" && selectedScopeRatio < 0.7) {
-        adviceItems.push("你目前選的是全屋裝修，全屋案件通常還會包含基本工程需求；每次增減工項，估價也都會同步更新。");
-      }
+    if (usePurpose.value === "rental") {
+      adviceItems.push("若以出租或轉售為主，建議優先聚焦耐用、易維護與高感知更新項目。");
+    } else {
+      adviceItems.push("若以自住為主，可優先盤點真正影響日常使用的動線、收納與生活情境。");
+    }
 
-      if (
-        selectedConfigs.some((item) => item.value === "bathroom") &&
-        bathroomCount.value !== "1"
-      ) {
-        adviceItems.push(`這次已把 ${bathroomInfo.label} 的條件納入，衛浴數量越多，泥作、防水、設備與收邊費用通常越明顯。`);
-      }
-
-      if (usePurpose.value === "rental") {
-        adviceItems.push("若以出租或轉售為主，建議優先聚焦耐用、易維護與高感知更新項目。");
-      } else {
-        adviceItems.push("若以自住為主，可優先盤點真正影響日常使用的動線、收納與生活情境。");
-      }
-
-      if (timeline.value === "urgent") {
-        adviceItems.push("預計時程較趕，建議盡快整理現場照片、尺寸與交屋時間，避免後續排程壓縮。");
-      } else {
-        adviceItems.push("時程仍有彈性，可先把需求表填完整，讓設計討論更聚焦也更容易抓準預算。");
-      }
+    if (timeline.value === "urgent") {
+      adviceItems.push("預計時程較趕，建議盡快整理現場照片、尺寸與交屋時間，避免後續排程壓縮。");
+    } else {
+      adviceItems.push("時程仍有彈性，可先把需求表填完整，讓設計討論更聚焦也更容易抓準預算。");
     }
 
     const compactAdviceItems =
-      !hasValidScope
-        ? adviceItems
-        : projectType.value === "design-only"
-          ? adviceItems.slice(0, 2)
-          : [adviceItems[0], adviceItems[2] || adviceItems[1]].filter(Boolean);
+      projectType.value === "design-only"
+        ? adviceItems.slice(0, 2)
+        : [adviceItems[0], adviceItems[2] || adviceItems[1]].filter(Boolean);
 
     if (adviceList) {
       adviceList.innerHTML = compactAdviceItems.map((item) => `<li>${item}</li>`).join("");
@@ -2421,12 +1807,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
     if (nextStepPoints) {
       const stepItem =
-        !hasValidScope
-          ? {
-              title: "先勾選至少 1 項裝修項目",
-              description: "先把這次實際要做的工程圈出來，系統才會顯示有參考價值的預算帶。",
-            }
-          : projectType.value === "design-only"
+        projectType.value === "design-only"
           ? {
               title: "先整理需求與參考圖",
               description: "把需求、風格與空間痛點帶進需求表，第一次設計討論會更容易對焦。",
@@ -2452,10 +1833,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     }
 
     const estimatorSummaryText = [
-      `估價摘要：${hasValidScope ? formatRange(minTotal, maxTotal) : "尚未形成有效估價"}`,
-      `每坪抓法：${hasValidScope ? `每坪約 ${minPerPing}萬 - ${maxPerPing}萬` : "--"}`,
-      `專案條件：${[projectMeta.label, qualityLevel.options[qualityLevel.selectedIndex]?.textContent, conditionMeta.label, residenceMeta.label, marketInfo.label].filter(Boolean).join(" / ")}`,
-      `高影響因子：${[selectedConfigs.some((item) => item.value === "bathroom") ? bathroomInfo.label : null, utilityInfo.label, storageKitchenInfo.label].filter(Boolean).join(" / ")}`,
+      `估價摘要：${formatRange(minTotal, maxTotal)}`,
+      `每坪抓法：每坪約 ${minPerPing}萬 - ${maxPerPing}萬`,
+      `專案條件：${[projectMeta.label, qualityLevel.options[qualityLevel.selectedIndex]?.textContent, conditionMeta.label, residenceMeta.label].filter(Boolean).join(" / ")}`,
       `使用目的 / 時程：${[usePurposeInfo.label, timelineInfo.label].filter(Boolean).join(" / ")}`,
       `工項：${selectedConfigs.length ? selectedConfigs.map((item) => item.label).join("、") : "尚未勾選"}`,
     ].join(" ｜ ");
@@ -2466,10 +1846,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
     const defaultLeadFocus =
       projectType.value === "design-only"
-        ? `我想先索取這次設計規劃的初步建議，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想進一步了解空間方向、設計深度與下一步建議。`
-        : !hasValidScope
-          ? "我目前還在整理實際裝修範圍，想先確認哪些工項與條件最該先釐清，才能得到更有參考價值的前期估價。"
-        : `我想索取這次估價的初步預算分析，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想先了解主要花費方向與是否適合安排後續諮詢。`;
+        ? `我想先索取這次設計規劃的拆解方向，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想了解設計深度與下一步建議。`
+        : `我想索取這次估價的費用拆解報告，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想先了解主要預算落點與是否適合安排後續諮詢。`;
 
     if (
       estimatorLeadFocus &&
@@ -2490,28 +1868,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       houseConditionLabel: conditionMeta.label,
       residenceType: residenceType.value,
       residenceTypeLabel: residenceMeta.label,
-      marketBenchmark: marketBenchmark.value,
-      marketBenchmarkLabel: marketInfo.label,
-      marketBenchmarkSummary: marketInfo.summary,
       usePurpose: usePurpose.value,
       usePurposeLabel: usePurposeInfo.label,
       timeline: timeline.value,
       timelineLabel: timelineInfo.label,
-      bathroomCount: bathroomCount.value,
-      bathroomCountLabel: bathroomInfo.label,
-      utilityScope: utilityScope.value,
-      utilityScopeLabel: utilityInfo.label,
-      storageKitchenScope: shouldShowStorageKitchen ? storageKitchenScope.value : "none",
-      storageKitchenScopeLabel: storageKitchenInfo.label,
-      hasValidScope,
       selectedItems: selectedConfigs.map((item) => item.label),
-      totalRange: hasValidScope ? formatRange(minTotal, maxTotal) : "--",
-      designRange: hasValidScope ? formatRange(minDesign, maxDesign) : "--",
-      constructionRange: hasValidScope ? formatRange(minConstruction, maxConstruction) : "--",
-      reserveRange: hasValidScope ? formatRange(minReserve, maxReserve) : "--",
-      recommendedTotalRange: hasValidScope ? formatRange(minRecommendedTotal, maxRecommendedTotal) : "--",
-      perPingRange: hasValidScope ? `每坪約 ${minPerPing}萬 - ${maxPerPing}萬` : "--",
-      costDrivers,
+      totalRange: formatRange(minTotal, maxTotal),
+      designRange: formatRange(minDesign, maxDesign),
+      constructionRange: formatRange(minConstruction, maxConstruction),
+      reserveRange: formatRange(minReserve, maxReserve),
+      perPingRange: `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`,
       reportIntent:
         projectType.value === "design-only"
           ? "design-planning-report"
@@ -2520,26 +1886,15 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       updatedAt: new Date().toISOString(),
     });
 
-    previousEstimateState = {
-      minRecommendedTotal,
-      maxRecommendedTotal,
-      hasValidScope,
-    };
-    lastChangeReason = "";
-
-    if (hasValidScope && trackingSignature !== lastTrackedSignature) {
+    if (trackingSignature !== lastTrackedSignature) {
       lastTrackedSignature = trackingSignature;
       window.trackLeadEvent?.("renovation_estimate_generated", {
         project_type: projectType.value,
         quality_level: qualityLevel.value,
         house_condition: houseCondition.value,
         residence_type: residenceType.value,
-        market_benchmark: marketBenchmark.value,
         use_purpose: usePurpose.value,
         timeline: timeline.value,
-        bathroom_count: bathroomCount.value,
-        utility_scope: utilityScope.value,
-        storage_kitchen_scope: storageKitchenScope.value,
         selected_item_count: selectedConfigs.length,
         estimated_total_min: minTotal,
         estimated_total_max: maxTotal,
@@ -2601,61 +1956,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     houseCondition &&
     residenceType &&
     usePurpose &&
-    timeline &&
-    bathroomCount &&
-    utilityScope &&
-    storageKitchenScope
+    timeline
   ) {
-    areaInput.addEventListener("input", () => {
-      lastChangeReason = "室內坪數";
-      calculate();
-    });
-    projectType.addEventListener("change", () => {
-      lastChangeReason = "項目類型";
-      calculate();
-    });
-    qualityLevel.addEventListener("change", () => {
-      lastChangeReason = "裝修等級";
-      calculate();
-    });
-    houseCondition.addEventListener("change", () => {
-      lastChangeReason = "屋況條件";
-      calculate();
-    });
-    residenceType.addEventListener("change", () => {
-      lastChangeReason = "住宅型態";
-      calculate();
-    });
-    marketBenchmark.addEventListener("change", () => {
-      lastChangeReason = "市場行情基準";
-      calculate();
-    });
-    usePurpose.addEventListener("change", () => {
-      lastChangeReason = "使用目的";
-      calculate();
-    });
-    timeline.addEventListener("change", () => {
-      lastChangeReason = "開始時程";
-      calculate();
-    });
-    bathroomCount.addEventListener("change", () => {
-      lastChangeReason = "衛浴數量";
-      calculate();
-    });
-    utilityScope.addEventListener("change", () => {
-      lastChangeReason = "水電更新程度";
-      calculate();
-    });
-    storageKitchenScope.addEventListener("change", () => {
-      lastChangeReason = "系統櫃 / 廚具納入程度";
-      calculate();
-    });
+    areaInput.addEventListener("input", calculate);
+    projectType.addEventListener("change", calculate);
+    qualityLevel.addEventListener("change", calculate);
+    houseCondition.addEventListener("change", calculate);
+    residenceType.addEventListener("change", calculate);
+    usePurpose.addEventListener("change", calculate);
+    timeline.addEventListener("change", calculate);
     selectedItems.forEach((checkbox) => {
-      checkbox.addEventListener("change", () => {
-        const label = checkbox.closest(".checkbox-item")?.querySelector("strong")?.textContent || "裝修項目";
-        lastChangeReason = checkbox.checked ? `新增 ${label}` : `取消 ${label}`;
-        calculate();
-      });
+      checkbox.addEventListener("change", calculate);
     });
     requirementFormLinks.forEach((link) => {
       link.addEventListener("click", calculate);
