@@ -1,0 +1,492 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const vendorTradeOptions = [
+  "木作",
+  "系統櫃",
+  "泥作",
+  "水電",
+  "油漆",
+  "燈光",
+  "窗簾",
+  "地板",
+  "鐵件",
+  "玻璃",
+  "軟裝",
+  "清潔",
+  "其他",
+];
+---
+
+<BaseLayout
+  title="合作工班資料登錄 - 青曦空間設計"
+  description="青曦空間設計合作工班資料登錄頁，留下必要聯絡資訊並上傳常用收費標準或報價單。"
+  noindex={true}
+>
+  <section class="crew-intake-page">
+    <div class="crew-intake-shell">
+      <div class="crew-intake-hero">
+        <div class="crew-intake-copy">
+          <p class="crew-intake-eyebrow">QINGXI CREW INTAKE</p>
+          <h1>合作工班資料登錄</h1>
+          <p class="crew-intake-description">
+            若你有穩定承接相關工種，歡迎先留下必要資料，並上傳常用收費標準或報價單。
+            後續若案件方向適合，青曦會再主動聯繫。
+          </p>
+          <div class="crew-intake-points">
+            <span>只填必要欄位</span>
+            <span>至少上傳一份報價資料</span>
+            <span>資料僅供青曦內部篩選</span>
+          </div>
+        </div>
+
+        <aside class="crew-intake-aside">
+          <p class="crew-intake-aside-label">你會需要準備</p>
+          <ul>
+            <li>可聯絡的主要窗口</li>
+            <li>服務工種與區域</li>
+            <li>常用收費標準或報價單</li>
+          </ul>
+        </aside>
+      </div>
+
+      <div class="crew-intake-card">
+        <div class="crew-intake-card-head">
+          <p class="crew-intake-section-label">STEP 01</p>
+          <h2>先留下必要資料即可</h2>
+          <p>若案件適合，青曦會再往下確認合作方式，不需在這一步把所有細節都填滿。</p>
+        </div>
+
+        <form id="crew-intake-form" class="crew-intake-form" enctype="multipart/form-data">
+          <input type="hidden" name="source_label" id="crew-source-label" />
+          <input type="hidden" name="source_detail" id="crew-source-detail" />
+          <input type="hidden" name="utm_source" id="crew-utm-source" />
+          <input type="hidden" name="utm_medium" id="crew-utm-medium" />
+          <input type="hidden" name="utm_campaign" id="crew-utm-campaign" />
+          <input type="hidden" name="utm_term" id="crew-utm-term" />
+          <input type="hidden" name="utm_content" id="crew-utm-content" />
+          <input type="hidden" name="landing_page" id="crew-landing-page" />
+          <input type="hidden" name="referrer" id="crew-referrer" />
+
+          <div class="crew-intake-grid">
+            <label class="crew-intake-field">
+              <span>姓名</span>
+              <input type="text" name="name" placeholder="請填主要聯絡人姓名" required />
+            </label>
+
+            <label class="crew-intake-field">
+              <span>團隊 / 公司名稱</span>
+              <input type="text" name="team_name" placeholder="可填工作室或公司名稱" />
+            </label>
+
+            <label class="crew-intake-field">
+              <span>工種</span>
+              <select name="trade" id="crew-trade" required>
+                <option value="">請選擇工種</option>
+                {vendorTradeOptions.map((trade) => (
+                  <option value={trade}>{trade}</option>
+                ))}
+              </select>
+            </label>
+
+            <label class="crew-intake-field">
+              <span>服務區域</span>
+              <input type="text" name="service_area" placeholder="例如：台北 / 新北 / 基隆" required />
+            </label>
+
+            <label class="crew-intake-field">
+              <span>聯絡方式類型</span>
+              <select name="contact_method" required>
+                <option value="">請選擇</option>
+                <option value="phone">手機</option>
+                <option value="line">LINE</option>
+                <option value="email">Email</option>
+              </select>
+            </label>
+
+            <label class="crew-intake-field">
+              <span>聯絡方式</span>
+              <input type="text" name="contact_value" placeholder="請填主要聯絡方式" required />
+            </label>
+
+            <label class="crew-intake-field">
+              <span>是否可開發票</span>
+              <select name="invoice_status">
+                <option value="">先不填也可以</option>
+                <option value="yes">可開發票</option>
+                <option value="no">不可開發票</option>
+                <option value="discuss">可再討論</option>
+              </select>
+            </label>
+
+            <label class="crew-intake-field">
+              <span>目前報價方式</span>
+              <select name="pricing_mode">
+                <option value="">先不填也可以</option>
+                <option value="unit-price">常用單價表</option>
+                <option value="quote-sheet">常用報價單</option>
+                <option value="both">兩者都有</option>
+                <option value="custom">依案件另報</option>
+              </select>
+            </label>
+
+            <label class="crew-intake-field">
+              <span>附件類型</span>
+              <select name="attachment_kind" required>
+                <option value="">請選擇</option>
+                <option value="pricing-sheet">收費標準</option>
+                <option value="quote-sheet">報價單</option>
+                <option value="both-mixed">綜合資料</option>
+              </select>
+            </label>
+
+            <label class="crew-intake-field crew-intake-field-full">
+              <span>上傳收費標準或報價單</span>
+              <input
+                type="file"
+                name="pricing_file"
+                accept=".pdf,.jpg,.jpeg,.png,.webp,.xls,.xlsx,application/pdf,image/jpeg,image/png,image/webp,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                required
+              />
+              <small>支援 PDF、JPG、PNG、WEBP、XLS、XLSX，請控制在 10MB 以內。</small>
+            </label>
+
+            <label class="crew-intake-field crew-intake-field-full">
+              <span>補充說明</span>
+              <textarea
+                name="note"
+                rows="4"
+                placeholder="可補充擅長案型、合作方式或其他想先說明的內容"
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="crew-intake-actions">
+            <button type="submit" id="crew-intake-submit">送出資料</button>
+            <p id="crew-intake-feedback" class="crew-intake-feedback" aria-live="polite">
+              送出後資料只供青曦內部篩選，不會公開顯示。
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .crew-intake-page {
+    padding: 5rem 1.5rem 5.5rem;
+    background:
+      radial-gradient(circle at top, rgba(164, 171, 160, 0.12), transparent 26%),
+      linear-gradient(180deg, rgba(250, 247, 242, 1) 0%, rgba(239, 234, 228, 1) 100%);
+  }
+
+  .crew-intake-shell {
+    width: min(100%, 1120px);
+    margin: 0 auto;
+    display: grid;
+    gap: 1.6rem;
+  }
+
+  .crew-intake-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(280px, 340px);
+    gap: 1.4rem;
+    align-items: stretch;
+  }
+
+  .crew-intake-copy,
+  .crew-intake-aside,
+  .crew-intake-card {
+    border-radius: 30px;
+    border: 1px solid rgba(124, 131, 122, 0.14);
+    background: rgba(255, 253, 249, 0.9);
+    box-shadow: 0 22px 48px rgba(58, 52, 46, 0.07);
+  }
+
+  .crew-intake-copy {
+    padding: 2.4rem;
+    background:
+      radial-gradient(circle at top right, rgba(164, 171, 160, 0.12), transparent 34%),
+      linear-gradient(180deg, rgba(255, 254, 251, 0.94) 0%, rgba(246, 242, 237, 0.94) 100%);
+  }
+
+  .crew-intake-eyebrow,
+  .crew-intake-section-label,
+  .crew-intake-aside-label {
+    margin: 0 0 0.85rem;
+    color: #69736c;
+    font-size: 0.74rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+  }
+
+  .crew-intake-copy h1,
+  .crew-intake-card-head h2 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: #332e29;
+  }
+
+  .crew-intake-copy h1 {
+    font-size: clamp(2.2rem, 4vw, 4rem);
+    line-height: 1.24;
+  }
+
+  .crew-intake-description,
+  .crew-intake-card-head p,
+  .crew-intake-aside li,
+  .crew-intake-feedback,
+  .crew-intake-field small {
+    color: #6a645d;
+    line-height: 1.8;
+  }
+
+  .crew-intake-description {
+    margin: 1.2rem 0 0;
+    max-width: 42rem;
+  }
+
+  .crew-intake-points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.6rem;
+  }
+
+  .crew-intake-points span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(255, 252, 248, 0.78);
+    border: 1px solid rgba(124, 131, 122, 0.14);
+    color: #4a4a4a;
+    font-size: 0.88rem;
+  }
+
+  .crew-intake-aside {
+    padding: 1.8rem;
+    display: grid;
+    gap: 0.75rem;
+    background:
+      radial-gradient(circle at top right, rgba(164, 171, 160, 0.12), transparent 34%),
+      linear-gradient(180deg, rgba(247, 243, 238, 1) 0%, rgba(255, 253, 249, 0.96) 100%);
+  }
+
+  .crew-intake-aside ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .crew-intake-card {
+    padding: 2rem;
+  }
+
+  .crew-intake-card-head {
+    display: grid;
+    gap: 0.55rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .crew-intake-form,
+  .crew-intake-grid,
+  .crew-intake-field {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .crew-intake-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .crew-intake-field span {
+    color: #332e29;
+    font-size: 0.94rem;
+  }
+
+  .crew-intake-field input,
+  .crew-intake-field select,
+  .crew-intake-field textarea {
+    width: 100%;
+    border-radius: 18px;
+    border: 1px solid rgba(124, 131, 122, 0.18);
+    background: rgba(255, 253, 250, 0.96);
+    padding: 0.95rem 1rem;
+    color: #332e29;
+    font: inherit;
+    line-height: 1.6;
+    box-sizing: border-box;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .crew-intake-field input:focus,
+  .crew-intake-field select:focus,
+  .crew-intake-field textarea:focus {
+    outline: none;
+    border-color: rgba(124, 131, 122, 0.3);
+    box-shadow: 0 0 0 4px rgba(124, 131, 122, 0.12);
+  }
+
+  .crew-intake-field textarea {
+    resize: vertical;
+    min-height: 130px;
+  }
+
+  .crew-intake-field-full {
+    grid-column: 1 / -1;
+  }
+
+  .crew-intake-actions {
+    display: grid;
+    gap: 0.8rem;
+    margin-top: 0.35rem;
+  }
+
+  .crew-intake-actions button {
+    width: fit-content;
+    min-height: 50px;
+    padding: 0.9rem 1.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(44, 39, 35, 0.96);
+    background: linear-gradient(135deg, rgba(44, 39, 35, 1) 0%, rgba(97, 89, 80, 1) 100%);
+    color: #ffffff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 14px 24px rgba(58, 52, 46, 0.16);
+  }
+
+  .crew-intake-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 28px rgba(58, 52, 46, 0.2);
+  }
+
+  .crew-intake-actions button:disabled {
+    opacity: 0.72;
+    cursor: wait;
+  }
+
+  .crew-intake-feedback {
+    margin: 0;
+    min-height: 1.5rem;
+    font-size: 0.92rem;
+  }
+
+  .crew-intake-feedback.is-success {
+    color: #4d5b51;
+  }
+
+  .crew-intake-feedback.is-warning {
+    color: #8a5b44;
+  }
+
+  @media (max-width: 900px) {
+    .crew-intake-hero,
+    .crew-intake-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .crew-intake-copy,
+    .crew-intake-aside,
+    .crew-intake-card {
+      padding: 1.5rem;
+    }
+
+    .crew-intake-actions button {
+      width: 100%;
+    }
+  }
+</style>
+
+<script is:inline>
+  const crewIntakeForm = document.getElementById("crew-intake-form");
+  const feedbackNode = document.getElementById("crew-intake-feedback");
+  const submitButton = document.getElementById("crew-intake-submit");
+  const tradeField = document.getElementById("crew-trade");
+
+  function setCrewFeedback(message, mode = "") {
+    if (!(feedbackNode instanceof HTMLElement)) return;
+    feedbackNode.className = `crew-intake-feedback ${mode}`.trim();
+    feedbackNode.textContent = message;
+  }
+
+  if (crewIntakeForm instanceof HTMLFormElement) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const sourceLabel = document.getElementById("crew-source-label");
+    const sourceDetail = document.getElementById("crew-source-detail");
+    const utmSource = document.getElementById("crew-utm-source");
+    const utmMedium = document.getElementById("crew-utm-medium");
+    const utmCampaign = document.getElementById("crew-utm-campaign");
+    const utmTerm = document.getElementById("crew-utm-term");
+    const utmContent = document.getElementById("crew-utm-content");
+    const landingPage = document.getElementById("crew-landing-page");
+    const referrer = document.getElementById("crew-referrer");
+
+    if (sourceLabel instanceof HTMLInputElement) {
+      sourceLabel.value = searchParams.get("source") || "social-comment";
+    }
+    if (sourceDetail instanceof HTMLInputElement) {
+      sourceDetail.value = searchParams.get("source_detail") || "";
+    }
+    if (utmSource instanceof HTMLInputElement) utmSource.value = searchParams.get("utm_source") || "";
+    if (utmMedium instanceof HTMLInputElement) utmMedium.value = searchParams.get("utm_medium") || "";
+    if (utmCampaign instanceof HTMLInputElement) utmCampaign.value = searchParams.get("utm_campaign") || "";
+    if (utmTerm instanceof HTMLInputElement) utmTerm.value = searchParams.get("utm_term") || "";
+    if (utmContent instanceof HTMLInputElement) utmContent.value = searchParams.get("utm_content") || "";
+    if (landingPage instanceof HTMLInputElement) landingPage.value = window.location.href;
+    if (referrer instanceof HTMLInputElement) referrer.value = document.referrer || "";
+
+    const tradeParam = searchParams.get("trade") || "";
+    if (tradeField instanceof HTMLSelectElement && tradeParam) {
+      const matchingOption = Array.from(tradeField.options).find(
+        (option) => option.value === tradeParam,
+      );
+      if (matchingOption) {
+        tradeField.value = tradeParam;
+      }
+    }
+
+    crewIntakeForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!(submitButton instanceof HTMLButtonElement)) return;
+
+      submitButton.disabled = true;
+      setCrewFeedback("資料送出中，請稍候。");
+
+      try {
+        const response = await fetch("/api/vendor-intake", {
+          method: "POST",
+          body: new FormData(crewIntakeForm),
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || result?.status !== "ok") {
+          throw new Error(result?.note || "資料送出失敗，請稍後再試。");
+        }
+
+        crewIntakeForm.reset();
+        if (tradeField instanceof HTMLSelectElement && tradeParam) {
+          tradeField.value = tradeParam;
+        }
+        setCrewFeedback(
+          result?.note || "資料已送出，若案件適合，青曦會再主動聯繫。",
+          "is-success",
+        );
+      } catch (error) {
+        setCrewFeedback(
+          error instanceof Error ? error.message : "資料送出失敗，請稍後再試。",
+          "is-warning",
+        );
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+  }
+</script>

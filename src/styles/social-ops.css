@@ -1387,10 +1387,59 @@
     gap: 0.85rem;
   }
 
+.vendor-intake-stack {
+  display: grid;
+  gap: 1rem;
+}
+
   .vendor-board-layout {
     grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.08fr);
     align-items: start;
   }
+
+.vendor-intake-guide-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vendor-intake-link-row,
+.vendor-intake-actions,
+.vendor-intake-metrics,
+.vendor-intake-admin-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.vendor-intake-link-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.vendor-intake-actions {
+  grid-template-columns: repeat(2, minmax(0, max-content));
+}
+
+.vendor-intake-metrics {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.vendor-intake-metric-card {
+  min-height: 100%;
+}
+
+.vendor-intake-card {
+  gap: 1rem;
+}
+
+.vendor-intake-admin-grid {
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+}
+
+.vendor-intake-source {
+  margin: 0;
+  color: rgba(224, 221, 214, 0.5);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
 
   .vendor-panel {
     display: grid;
@@ -2921,6 +2970,9 @@
     .bookshelf-outline-grid,
     .bookshelf-guide-grid,
     .bookshelf-track-grid,
+  .vendor-intake-guide-grid,
+  .vendor-intake-metrics,
+  .vendor-intake-admin-grid,
     .vendor-board-layout {
       grid-template-columns: 1fr;
     }
@@ -3020,9 +3072,14 @@
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
     .gemini-editor-grid,
+  .vendor-intake-actions,
     .vendor-form-grid {
       grid-template-columns: 1fr;
     }
+
+  .vendor-intake-link-row {
+    grid-template-columns: 1fr;
+  }
 
     .bookshelf-fold-stack {
       padding-inline: 0.9rem;

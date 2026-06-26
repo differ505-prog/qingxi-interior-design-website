@@ -550,6 +550,82 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </template>
             ))}
 
+            <details id="vendor-intake-board" class="bookshelf-fold" open>
+              <summary>
+                <span>工班登錄池</span>
+                <small><span id="vendor-intake-count">0</span> 筆</small>
+              </summary>
+              <div class="bookshelf-preview bookshelf-fold-body">
+                <div class="vendor-intake-stack">
+                  <section class="vendor-panel">
+                    <div class="bookshelf-preview-head">
+                      <p>招募入口</p>
+                      <span id="vendor-intake-status">先分享連結，再回看提交名單</span>
+                    </div>
+                    <div class="bookshelf-guide-grid vendor-intake-guide-grid">
+                      <article class="bookshelf-guide-card">
+                        <span>專用網址</span>
+                        <strong>給工班填必要資料與上傳報價單</strong>
+                        <p>此頁只負責收必要欄位，提交後資料不會公開，只在工作台內部可見。</p>
+                      </article>
+                      <article class="bookshelf-guide-card">
+                        <span>推薦流程</span>
+                        <strong>社群留言導去填表，不在留言區來回蒐集</strong>
+                        <p>先把聯絡方式、工種、區域與收費資料收齊，後續再人工判斷是否適合合作。</p>
+                      </article>
+                    </div>
+                    <label class="gemini-field gemini-field-full">
+                      <span>工班登錄網址</span>
+                      <div class="vendor-intake-link-row">
+                        <input id="vendor-intake-share-url" type="text" readonly />
+                        <button type="button" id="copy-vendor-intake-url" class="bookshelf-action bookshelp-action-primary">複製網址</button>
+                      </div>
+                    </label>
+                    <label class="gemini-field gemini-field-full">
+                      <span>社群通用留言</span>
+                      <textarea id="vendor-intake-canned-reply" rows="6" readonly></textarea>
+                    </label>
+                    <div class="bookshelf-actions vendor-intake-actions">
+                      <button type="button" id="copy-vendor-intake-reply" class="bookshelf-action bookshelp-action-primary">複製留言</button>
+                      <a id="open-vendor-intake-page" class="bookshelf-action" href="/crew-intake" target="_blank" rel="noreferrer">開啟登錄頁</a>
+                    </div>
+                    <p id="vendor-intake-feedback" class="vendor-note-feedback" aria-live="polite"></p>
+                  </section>
+
+                  <section class="vendor-panel">
+                    <div class="vendor-list-head">
+                      <div class="bookshelf-preview-head">
+                        <p>內部名單池</p>
+                        <span id="vendor-intake-summary">先看最新提交</span>
+                      </div>
+                      <div class="vendor-intake-metrics" id="vendor-intake-metrics"></div>
+                      <div class="vendor-list-tools">
+                        <label class="gemini-field vendor-sort-field">
+                          <span>工種</span>
+                          <select id="vendor-intake-trade-filter">
+                            <option value="">全部工種</option>
+                          </select>
+                        </label>
+                        <label class="gemini-field vendor-sort-field">
+                          <span>狀態</span>
+                          <select id="vendor-intake-status-filter">
+                            <option value="">全部狀態</option>
+                          </select>
+                        </label>
+                        <label class="gemini-field vendor-search-field">
+                          <span>搜尋</span>
+                          <input id="vendor-intake-search" type="search" placeholder="搜尋姓名、區域、聯絡方式或備註" />
+                        </label>
+                      </div>
+                    </div>
+                    <div id="vendor-intake-list" class="vendor-note-list">
+                      <div class="vendor-note-empty">尚未收到工班登錄資料。</div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </details>
+
             <details id="vendor-notes-board" class="bookshelf-fold" open>
               <summary>
                 <span>優質廠商筆記</span>
@@ -876,6 +952,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   const ARTICLE_AI_METADATA_TIMEOUT_MS = 18000;
   const CONTENT_ANALYTICS_URL = "/api/social-ops/analytics";
   const VENDOR_NOTES_API_URL = "/api/social-ops/vendor-notes";
+  const VENDOR_INTAKE_API_URL = "/api/social-ops/vendor-intake";
+  const VENDOR_INTAKE_PUBLIC_URL = `${SITE_ORIGIN}/crew-intake`;
+  const VENDOR_INTAKE_SUBMIT_URL = "/api/vendor-intake";
+  const VENDOR_INTAKE_FILE_URL = "/api/social-ops/vendor-intake-file";
   const socialReplyShortUrlCache = new Map();
   const sourceTemplate = JSON.parse(defaultSourcesJson);
   const GOOGLE_BUSINESS_URL =
@@ -945,6 +1025,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   let vendorNoteSearch = "";
   let vendorNoteTradeFilter = "";
   let vendorNoteSort = "default";
+  let vendorIntakeSearch = "";
+  let vendorIntakeTradeFilter = "";
+  let vendorIntakeStatusFilter = "";
   let contentAnalyticsState = {
     status: "idle",
     configured: false,
@@ -972,6 +1055,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     items: [],
     note: "",
   };
+  let vendorIntakeState = {
+    status: "idle",
+    configured: false,
+    items: [],
+    note: "",
+  };
+  const vendorIntakeStatusOptions = [
+    { value: "new", label: "待審核" },
+    { value: "contacted", label: "已聯繫" },
+    { value: "pricing-review", label: "報價待比" },
+    { value: "approved", label: "可合作" },
+    { value: "hold", label: "暫不合作" },
+  ];
 
   function createVendorNoteId() {
     return `vendor-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -1163,6 +1259,305 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       month: "2-digit",
       day: "2-digit",
     });
+  }
+
+  function getVendorIntakeStatusLabel(value = "") {
+    return vendorIntakeStatusOptions.find((option) => option.value === value)?.label || "待審核";
+  }
+
+  function setVendorIntakeFeedback(message, mode = "") {
+    const shell = document.getElementById("vendor-intake-feedback");
+    if (!(shell instanceof HTMLElement)) return;
+    shell.className = `vendor-note-feedback ${mode}`.trim();
+    shell.textContent = message;
+  }
+
+  function buildVendorIntakeShareUrl() {
+    const url = new URL(VENDOR_INTAKE_PUBLIC_URL);
+    url.searchParams.set("source", "social-comment");
+    url.searchParams.set("utm_source", "social");
+    url.searchParams.set("utm_medium", "comment-reply");
+    url.searchParams.set("utm_campaign", "crew-intake");
+    return url.toString();
+  }
+
+  function buildVendorIntakeCannedReply(shareUrl) {
+    return [
+      "若您有穩定承接相關工種，歡迎填這個合作工班資料登錄頁，留下必要聯絡方式，並上傳常用收費標準或報價單即可。",
+      "若案件方向適合，我們會再主動聯繫。",
+      shareUrl,
+    ].join("\n");
+  }
+
+  function hydrateVendorIntakeTools() {
+    const shareUrlNode = document.getElementById("vendor-intake-share-url");
+    const replyNode = document.getElementById("vendor-intake-canned-reply");
+    const openNode = document.getElementById("open-vendor-intake-page");
+    const shareUrl = buildVendorIntakeShareUrl();
+    const cannedReply = buildVendorIntakeCannedReply(shareUrl);
+
+    if (shareUrlNode instanceof HTMLInputElement) {
+      shareUrlNode.value = shareUrl;
+    }
+    if (replyNode instanceof HTMLTextAreaElement) {
+      replyNode.value = cannedReply;
+    }
+    if (openNode instanceof HTMLAnchorElement) {
+      openNode.href = shareUrl;
+    }
+  }
+
+  function formatFileSize(value = 0) {
+    const size = Number(value || 0);
+    if (!Number.isFinite(size) || size <= 0) return "";
+    if (size >= 1024 * 1024) {
+      return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    }
+    return `${Math.max(1, Math.round(size / 1024))} KB`;
+  }
+
+  function getVendorIntakeTradeOptions() {
+    const trades = new Set((vendorIntakeState.items || []).map((item) => item.trade).filter(Boolean));
+    return [
+      { value: "", label: "全部工種" },
+      ...vendorTradeOptions.filter((trade) => trades.has(trade)).map((trade) => ({ value: trade, label: trade })),
+      ...[...trades]
+        .filter((trade) => !vendorTradeOptions.includes(trade))
+        .sort((left, right) => left.localeCompare(right, "zh-Hant"))
+        .map((trade) => ({ value: trade, label: trade })),
+    ];
+  }
+
+  function getFilteredVendorIntakes() {
+    const query = vendorIntakeSearch.trim().toLowerCase();
+    const baseItems = [...(vendorIntakeState.items || [])]
+      .filter((item) => !vendorIntakeTradeFilter || item.trade === vendorIntakeTradeFilter)
+      .filter((item) => !vendorIntakeStatusFilter || item.status === vendorIntakeStatusFilter)
+      .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime());
+
+    if (!query) return baseItems;
+    return baseItems.filter((item) =>
+      [
+        item.name,
+        item.teamName,
+        item.trade,
+        item.serviceArea,
+        item.contactMethod,
+        item.contactValue,
+        item.invoiceStatus,
+        item.pricingMode,
+        item.note,
+        item.internalNote,
+      ]
+        .join("\n")
+        .toLowerCase()
+        .includes(query),
+    );
+  }
+
+  function renderVendorIntakes() {
+    const countNode = document.getElementById("vendor-intake-count");
+    const statusNode = document.getElementById("vendor-intake-status");
+    const summaryNode = document.getElementById("vendor-intake-summary");
+    const metricsNode = document.getElementById("vendor-intake-metrics");
+    const listNode = document.getElementById("vendor-intake-list");
+    const tradeFilterNode = document.getElementById("vendor-intake-trade-filter");
+    const statusFilterNode = document.getElementById("vendor-intake-status-filter");
+    const searchNode = document.getElementById("vendor-intake-search");
+
+    if (
+      !(countNode instanceof HTMLElement) ||
+      !(statusNode instanceof HTMLElement) ||
+      !(summaryNode instanceof HTMLElement) ||
+      !(metricsNode instanceof HTMLElement) ||
+      !(listNode instanceof HTMLElement) ||
+      !(tradeFilterNode instanceof HTMLSelectElement) ||
+      !(statusFilterNode instanceof HTMLSelectElement) ||
+      !(searchNode instanceof HTMLInputElement)
+    ) {
+      return;
+    }
+
+    const totalCount = vendorIntakeState.items.length || 0;
+    countNode.textContent = String(totalCount);
+    if (searchNode.value !== vendorIntakeSearch) {
+      searchNode.value = vendorIntakeSearch;
+    }
+
+    const tradeOptions = getVendorIntakeTradeOptions();
+    tradeFilterNode.innerHTML = tradeOptions
+      .map((option) => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`)
+      .join("");
+    tradeFilterNode.value = vendorIntakeTradeFilter;
+
+    statusFilterNode.innerHTML = [
+      '<option value="">全部狀態</option>',
+      ...vendorIntakeStatusOptions.map((option) => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`),
+    ].join("");
+    statusFilterNode.value = vendorIntakeStatusFilter;
+
+    if (vendorIntakeState.status === "loading") {
+      statusNode.textContent = "讀取中";
+      summaryNode.textContent = "正在同步工班登錄資料";
+      metricsNode.innerHTML = "";
+      listNode.innerHTML = '<div class="vendor-note-empty">正在讀取工班登錄池...</div>';
+      return;
+    }
+
+    if (vendorIntakeState.status === "setup_required") {
+      statusNode.textContent = "待接共享儲存";
+      summaryNode.textContent = "先接 Blob 才能跨裝置同步";
+      metricsNode.innerHTML = "";
+      listNode.innerHTML = `<div class="vendor-note-empty">${escapeHtml(vendorIntakeState.note || "尚未接通共享儲存。")}</div>`;
+      return;
+    }
+
+    if (vendorIntakeState.status === "error") {
+      statusNode.textContent = "讀取失敗";
+      summaryNode.textContent = "稍後再重整一次";
+      metricsNode.innerHTML = "";
+      listNode.innerHTML = `<div class="vendor-note-empty">${escapeHtml(vendorIntakeState.note || "工班登錄池暫時讀取失敗。")}</div>`;
+      return;
+    }
+
+    const filteredItems = getFilteredVendorIntakes();
+    const metrics = vendorIntakeStatusOptions.map((option) => ({
+      ...option,
+      count: (vendorIntakeState.items || []).filter((item) => item.status === option.value).length,
+    }));
+    metricsNode.innerHTML = metrics
+      .map((metric) => `
+        <article class="bookshelf-track-card vendor-intake-metric-card">
+          <div class="bookshelf-track-top"><p>${escapeHtml(metric.label)}</p></div>
+          <strong>${escapeHtml(String(metric.count))}</strong>
+          <small>${metric.value === "new" ? "最新待看名單" : "目前此狀態筆數"}</small>
+        </article>
+      `)
+      .join("");
+
+    statusNode.textContent = totalCount ? "已同步" : "尚無資料";
+    summaryNode.textContent = vendorIntakeSearch
+      ? `顯示 ${filteredItems.length} 筆符合搜尋的工班資料`
+      : vendorIntakeTradeFilter || vendorIntakeStatusFilter
+        ? `篩選後 ${filteredItems.length} 筆`
+        : totalCount
+          ? `最新 ${Math.min(filteredItems.length, 5)} 筆可直接優先看`
+          : "尚未收到工班登錄資料";
+
+    if (!filteredItems.length) {
+      listNode.innerHTML = vendorIntakeSearch || vendorIntakeTradeFilter || vendorIntakeStatusFilter
+        ? '<div class="vendor-note-empty">目前沒有符合條件的工班資料。</div>'
+        : '<div class="vendor-note-empty">尚未收到工班登錄資料。</div>';
+      return;
+    }
+
+    listNode.innerHTML = filteredItems
+      .map((item) => {
+        const attachmentHref = item.id ? `${VENDOR_INTAKE_FILE_URL}?id=${encodeURIComponent(item.id)}` : "";
+        const sourceParts = [item.sourceLabel, item.utmSource, item.utmMedium].filter(Boolean);
+        const metaItems = [
+          item.serviceArea ? `<span>${escapeHtml(item.serviceArea)}</span>` : "",
+          item.contactMethod && item.contactValue ? `<span>${escapeHtml(item.contactMethod)}：${escapeHtml(item.contactValue)}</span>` : "",
+          item.invoiceStatus ? `<span>${escapeHtml(item.invoiceStatus)}</span>` : "",
+          item.pricingMode ? `<span>${escapeHtml(item.pricingMode)}</span>` : "",
+          item.createdAt ? `<span>提交 ${escapeHtml(formatVendorNoteTimestamp(item.createdAt))}</span>` : "",
+        ].filter(Boolean).join("");
+
+        return `
+          <article class="vendor-note-card vendor-intake-card">
+            <div class="vendor-note-card-head">
+              <div class="vendor-note-card-main">
+                <div class="vendor-note-badges">
+                  <span class="vendor-note-badge">${escapeHtml(item.trade || "未分類")}</span>
+                  <span class="vendor-note-badge">${escapeHtml(getVendorIntakeStatusLabel(item.status))}</span>
+                  ${item.attachmentKind ? `<span class="vendor-note-badge">${escapeHtml(item.attachmentKind)}</span>` : ""}
+                </div>
+                <strong>${escapeHtml(item.name || "未命名工班")}${item.teamName ? ` / ${escapeHtml(item.teamName)}` : ""}</strong>
+                <p>${escapeHtml(item.note || "尚未補充說明，先看附件與聯絡方式。")}</p>
+                <div class="vendor-note-meta">${metaItems || "<span>尚未補齊聯絡資訊</span>"}</div>
+                ${sourceParts.length ? `<p class="vendor-intake-source">來源：${escapeHtml(sourceParts.join(" / "))}</p>` : ""}
+              </div>
+              <div class="vendor-note-card-actions">
+                ${attachmentHref
+                  ? `<a class="vendor-note-action-link" href="${escapeHtml(attachmentHref)}" target="_blank" rel="noreferrer">看附件${item.attachmentName ? ` (${escapeHtml(formatFileSize(item.attachmentSize)) || escapeHtml(item.attachmentName)})` : ""}</a>`
+                  : '<span class="vendor-note-action-link is-disabled">無附件</span>'}
+              </div>
+            </div>
+            <div class="vendor-intake-admin-grid">
+              <label class="gemini-field">
+                <span>合作狀態</span>
+                <select data-vendor-intake-status="${escapeHtml(item.id)}">
+                  ${vendorIntakeStatusOptions
+                    .map((option) => `<option value="${escapeHtml(option.value)}" ${option.value === item.status ? "selected" : ""}>${escapeHtml(option.label)}</option>`)
+                    .join("")}
+                </select>
+              </label>
+              <label class="gemini-field gemini-field-full">
+                <span>內部備註</span>
+                <textarea data-vendor-intake-note="${escapeHtml(item.id)}" rows="3" placeholder="例如：報價帶合理、可先加 LINE、等下次案型再找">${escapeHtml(item.internalNote || "")}</textarea>
+              </label>
+            </div>
+            <div class="vendor-note-card-actions">
+              <button type="button" class="vendor-note-mini-btn" data-vendor-intake-save="${escapeHtml(item.id)}">儲存狀態</button>
+            </div>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function updateVendorIntakeState(result, fallbackItems = []) {
+    vendorIntakeState = {
+      status: typeof result?.status === "string" ? result.status : "error",
+      configured: Boolean(result?.configured),
+      items: Array.isArray(result?.items) ? result.items : fallbackItems,
+      note: typeof result?.note === "string" ? result.note : "",
+    };
+  }
+
+  async function loadVendorIntakes() {
+    vendorIntakeState = {
+      ...vendorIntakeState,
+      status: "loading",
+    };
+    renderVendorIntakes();
+
+    try {
+      const response = await fetch(VENDOR_INTAKE_API_URL, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      const result = await response.json();
+      updateVendorIntakeState(result, []);
+    } catch (error) {
+      console.error("讀取工班登錄池失敗：", error);
+      vendorIntakeState = {
+        ...vendorIntakeState,
+        status: "error",
+        configured: false,
+        note: "工班登錄池暫時讀取失敗，請稍後再試。",
+      };
+    }
+
+    renderVendorIntakes();
+  }
+
+  async function saveVendorIntake(item) {
+    const response = await fetch(VENDOR_INTAKE_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ item }),
+    });
+    const result = await response.json();
+    updateVendorIntakeState(result, vendorIntakeState.items || []);
+    renderVendorIntakes();
+    if (!response.ok || result?.status !== "ok") {
+      throw new Error(result?.note || `SAVE_VENDOR_INTAKE_FAILED:${response.status}`);
+    }
   }
 
   function getWeekKey(date = new Date()) {
@@ -5368,6 +5763,77 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     loadContentAnalytics();
   });
 
+  document.getElementById("copy-vendor-intake-url")?.addEventListener("click", async () => {
+    const shareUrlNode = document.getElementById("vendor-intake-share-url");
+    const shareUrl = shareUrlNode instanceof HTMLInputElement ? shareUrlNode.value.trim() : buildVendorIntakeShareUrl();
+    const result = await copyText(shareUrl, "已複製工班登錄網址。");
+    const feedback = getCopyFeedbackState(
+      result,
+      "已複製工班登錄網址。",
+      "已開啟手動複製視窗，可直接複製工班登錄網址。",
+    );
+    setVendorIntakeFeedback(feedback.message, feedback.mode);
+  });
+
+  document.getElementById("copy-vendor-intake-reply")?.addEventListener("click", async () => {
+    const replyNode = document.getElementById("vendor-intake-canned-reply");
+    const text = replyNode instanceof HTMLTextAreaElement ? replyNode.value.trim() : buildVendorIntakeCannedReply(buildVendorIntakeShareUrl());
+    const result = await copyText(text, "已複製工班招募留言。");
+    const feedback = getCopyFeedbackState(
+      result,
+      "已複製工班招募留言。",
+      "已開啟手動複製視窗，可直接複製工班招募留言。",
+    );
+    setVendorIntakeFeedback(feedback.message, feedback.mode);
+  });
+
+  document.getElementById("vendor-intake-search")?.addEventListener("input", (event) => {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    vendorIntakeSearch = event.target.value.trim();
+    renderVendorIntakes();
+  });
+
+  document.getElementById("vendor-intake-trade-filter")?.addEventListener("change", (event) => {
+    if (!(event.target instanceof HTMLSelectElement)) return;
+    vendorIntakeTradeFilter = event.target.value || "";
+    renderVendorIntakes();
+  });
+
+  document.getElementById("vendor-intake-status-filter")?.addEventListener("change", (event) => {
+    if (!(event.target instanceof HTMLSelectElement)) return;
+    vendorIntakeStatusFilter = event.target.value || "";
+    renderVendorIntakes();
+  });
+
+  document.getElementById("vendor-intake-list")?.addEventListener("click", async (event) => {
+    const target = event.target instanceof HTMLElement ? event.target.closest("[data-vendor-intake-save]") : null;
+    if (!(target instanceof HTMLButtonElement)) return;
+
+    const itemId = target.dataset.vendorIntakeSave || "";
+    const currentItem = (vendorIntakeState.items || []).find((entry) => entry.id === itemId);
+    if (!itemId || !currentItem) return;
+
+    const statusField = document.querySelector(`[data-vendor-intake-status="${itemId}"]`);
+    const noteField = document.querySelector(`[data-vendor-intake-note="${itemId}"]`);
+    const nextStatus = statusField instanceof HTMLSelectElement ? statusField.value.trim() : currentItem.status;
+    const nextNote = noteField instanceof HTMLTextAreaElement ? noteField.value.trim() : currentItem.internalNote;
+
+    target.disabled = true;
+    try {
+      await saveVendorIntake({
+        ...currentItem,
+        status: nextStatus || "new",
+        internalNote: nextNote,
+      });
+      setVendorIntakeFeedback("已更新這筆工班資料狀態。", "is-success");
+    } catch (error) {
+      console.error("更新工班登錄資料失敗：", error);
+      setVendorIntakeFeedback(error instanceof Error ? error.message : "工班資料更新失敗，請稍後再試。", "is-warning");
+    } finally {
+      target.disabled = false;
+    }
+  });
+
   document.getElementById("vendor-note-search")?.addEventListener("input", (event) => {
     if (!(event.target instanceof HTMLInputElement)) return;
     vendorNoteSearch = event.target.value.trim();
@@ -5501,6 +5967,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   renderTopicModePanels();
   renderPublishingChecklist();
   rerender();
+  hydrateVendorIntakeTools();
+  renderVendorIntakes();
+  loadVendorIntakes();
   renderContentAnalytics();
   loadContentAnalytics();
   resetVendorNoteForm();
