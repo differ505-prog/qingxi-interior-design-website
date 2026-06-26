@@ -421,7 +421,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="breakdown-card">
             <div class="breakdown-header">
               <h3>工程拆解</h3>
-                <p id="breakdown-note">目前為前期比例拆解，先用勾選工項與權重估出落點；實際報價仍會再看尺寸、材質、點位與現場條件。</p>
+                <p id="breakdown-note">目前先依你勾選的工項整理各項費用的大致比例；實際報價仍會再看尺寸、材質、點位與現場條件。</p>
             </div>
             <div class="breakdown-list" id="breakdown-list"></div>
           </div>
@@ -483,17 +483,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="report-offer-card">
             <div class="report-offer-copy">
               <p class="report-offer-eyebrow">ESTIMATE FOLLOW-UP</p>
-              <h3>如果你想看得更深一點，也可以直接索取這次的拆解判讀。</h3>
+              <h3>如果你想看得更深一點，也可以直接索取這次的預算分析。</h3>
               <p class="report-offer-description">
-                青曦會依這次條件整理初步拆解方向，幫你更快看懂預算落點。
+                青曦會依這次條件整理初步建議，幫你更快看懂主要花費方向。
               </p>
               <div class="report-offer-points">
                 <div class="report-offer-point">
-                  <strong>這份報告會帶到的重點</strong>
-                  <span>預算帶、主要工項與初步判讀。</span>
+                  <strong>這份分析會帶到的重點</strong>
+                  <span>預算區間、主要工項與初步建議。</span>
                 </div>
                 <div class="report-offer-point">
-                  <strong>適合目前這種前期階段</strong>
+                  <strong>適合目前這個階段</strong>
                   <span id="report-context">特別適合正在抓新成屋或住宅裝修預算方向的人。</span>
                 </div>
               </div>
@@ -501,13 +501,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
             <div class="report-offer-actions">
               <div class="report-form-intro">
-                <strong>想直接拿這次的拆解方向</strong>
+                <strong>想直接拿這次的預算分析</strong>
                 <p>留下姓名與 Line / Email，青曦會依這次試算內容接續整理。</p>
               </div>
               {
                 !estimatorLeadEnabled && (
                   <div class="report-form-notice" role="status">
-                    <p>表單收件尚未完成設定，目前請先透過下方按鈕前往聯絡頁或加入官方 LINE。</p>
+                    <p>若你想先和青曦聊聊這次空間方向，歡迎先透過下方按鈕前往聯絡頁或加入官方 LINE。</p>
                   </div>
                 )
               }
@@ -552,7 +552,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                       id="estimator-lead-focus"
                       name="consultation_focus"
                       rows="3"
-                      placeholder="例如想先知道預算主要會花在哪裡，或是否適合安排到工作室聊聊"
+                      placeholder="例如想先知道主要預算會落在哪些項目，或目前是否適合安排後續討論"
                       required
                     ></textarea>
                   </label>
@@ -563,7 +563,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                   class="btn btn-primary report-lead-submit"
                   disabled={!estimatorLeadEnabled}
                 >
-                  送出並索取費用拆解報告
+                  送出並索取初步預算分析
                 </button>
               </form>
               <a
@@ -2029,7 +2029,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       drivers.push(`${timelineInfo.label} 會提高時程壓力`);
     }
     if (projectMeta.label === "全屋裝修") {
-      drivers.push("全屋裝修本身包含較完整的基礎底盤");
+      drivers.push("全屋裝修通常會包含較完整的基礎工程需求");
     }
 
     return drivers.slice(0, 4);
@@ -2291,8 +2291,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         changeSummary.textContent = "先勾選至少 1 項裝修項目，系統才會開始解釋預算如何變動。";
         resultSubtitle.textContent = "目前未勾選任何裝修項目，因此不顯示正式預算帶，避免誤導。";
         nextStepIntro.textContent = "先勾選實際要做的項目，再看預算帶。";
-        reportContext.textContent = "先確定至少一項實際裝修項目，後續的拆解報告與需求表判讀才會更準。";
-        breakdownNote.textContent = "目前尚未形成有效工項範圍，因此先不提供工程比例拆解。";
+        reportContext.textContent = "先確定至少一項實際裝修項目，後續的預算分析與下一步建議才會更準。";
+        breakdownNote.textContent = "目前尚未形成有效工項範圍，因此先不顯示各項費用比例。";
       } else {
         recommendedTotal.textContent = formatRange(minRecommendedTotal, maxRecommendedTotal);
         totalPrice.textContent = formatRange(minTotal, maxTotal);
@@ -2315,7 +2315,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             ? "目前以設計規劃費為主，工程費用需依圖面、工法與發包範圍另行確認。"
             : projectType.value === "full" &&
                 selectedScopeRatio < 0.7
-              ? "全屋裝修仍保留基礎工程底盤，但工項勾選越多，估算會越接近完整裝修規模。"
+              ? "全屋裝修通常會包含基本工程需求；你勾選的項目越完整，估價區間也會越貼近實際情況。"
               : "依目前輸入條件，先整理出適合討論的預算帶、主要工項與建議預備金。";
         nextStepIntro.textContent =
           projectType.value === "design-only"
@@ -2324,11 +2324,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         reportContext.textContent =
           projectType.value === "design-only"
             ? `目前較適合先整理 ${projectMeta.label} 的需求重點與設計深度，再進一步確認交付方向。`
-            : `目前這組 ${projectMeta.label} / ${residenceMeta.label} 條件，可先用拆解報告判讀 ${formatRange(minTotal, maxTotal)} 的主要預算落點。`;
+            : `目前這組 ${projectMeta.label} / ${residenceMeta.label} 條件，可先用這份預算分析理解 ${formatRange(minTotal, maxTotal)} 的主要花費方向。`;
         breakdownNote.textContent =
           projectType.value === "design-only"
             ? "目前為設計規劃費試算，尚未進入工程比例拆解。"
-            : "目前為前期比例拆解，先依勾選工項與權重估出落點；實際報價仍會再看尺寸、材質、點位與現場條件。";
+            : "目前先依你勾選的工項整理各項費用的大致比例；實際報價仍會再看尺寸、材質、點位與現場條件。";
       }
     }
 
@@ -2348,7 +2348,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       } else {
         estimatorHandoffTitle.textContent = "下一步：把這份初估延伸成完整空間需求";
         estimatorHandoffDescription.textContent =
-          "再補需求、照片與時程，青曦就能更快把預算帶、空間條件與後續方向一起判讀。";
+          "再補需求、照片與時程，青曦就能更快把預算帶、空間條件與後續方向一起整理清楚。";
         estimatorHandoffPointTitle.textContent = "先把條件接續下去";
         estimatorHandoffPointDescription.textContent =
           "如果你已經抓到大致預算方向，現在最有效率的做法就是直接把需求與現場資訊補完整。";
@@ -2357,7 +2357,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
     const adviceItems = [];
     if (!hasValidScope) {
-      adviceItems.push("目前沒有勾選任何裝修項目，因此系統不提供正式預算，避免把基礎底盤誤認成實際報價。");
+      adviceItems.push("目前沒有勾選任何裝修項目，因此暫時無法形成有參考價值的預算區間。");
       adviceItems.push("先勾選至少 1 項實際要做的工程，例如衛浴、廚房、地板或系統家具，估價結果才有參考價值。");
     } else {
       if (conditionMeta.multiplier >= 1.18) {
@@ -2373,7 +2373,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       }
 
       if (projectType.value === "full" && selectedScopeRatio < 0.7) {
-        adviceItems.push("你目前選的是全屋裝修，因此估算仍保留基礎工程底盤；但每次增減工項，總價都會同步調整，不會再完全卡住。");
+        adviceItems.push("你目前選的是全屋裝修，全屋案件通常還會包含基本工程需求；每次增減工項，估價也都會同步更新。");
       }
 
       if (
@@ -2454,10 +2454,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
     const defaultLeadFocus =
       projectType.value === "design-only"
-        ? `我想先索取這次設計規劃的初步判讀，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想進一步了解空間方向、設計深度與下一步建議。`
+        ? `我想先索取這次設計規劃的初步建議，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想進一步了解空間方向、設計深度與下一步建議。`
         : !hasValidScope
           ? "我目前還在整理實際裝修範圍，想先確認哪些工項與條件最該先釐清，才能得到更有參考價值的前期估價。"
-        : `我想索取這次估價的費用拆解判讀，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想先了解主要預算落點、影響比例與是否適合安排後續諮詢。`;
+        : `我想索取這次估價的初步預算分析，目前估價結果約為 ${formatRange(minTotal, maxTotal)}，想先了解主要花費方向與是否適合安排後續諮詢。`;
 
     if (
       estimatorLeadFocus &&
