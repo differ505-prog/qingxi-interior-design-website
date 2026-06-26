@@ -1020,6 +1020,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .estimator-handoff-actions .btn {
     width: 100%;
+    max-width: 100%;
+    flex: 0 0 auto;
   }
 
   .estimator-handoff-note {
@@ -1094,6 +1096,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .report-offer-actions .btn {
     width: 100%;
+    max-width: 100%;
+    flex: 0 0 auto;
   }
 
   .report-form-intro strong,
@@ -1279,11 +1283,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .btn {
     flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.95rem 1.5rem;
     border-radius: 999px;
+    box-sizing: border-box;
     text-decoration: none;
     font-weight: 500;
     text-align: center;
+    line-height: 1.4;
+    white-space: normal;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
     font-size: 1rem;
   }
