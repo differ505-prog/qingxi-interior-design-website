@@ -954,7 +954,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   const VENDOR_NOTES_API_URL = "/api/social-ops/vendor-notes";
   const VENDOR_INTAKE_API_URL = "/api/social-ops/vendor-intake";
   const VENDOR_INTAKE_PUBLIC_URL = `${SITE_ORIGIN}/crew-intake`;
-  const VENDOR_INTAKE_SUBMIT_URL = "/api/vendor-intake";
   const VENDOR_INTAKE_FILE_URL = "/api/social-ops/vendor-intake-file";
   const socialReplyShortUrlCache = new Map();
   const sourceTemplate = JSON.parse(defaultSourcesJson);
@@ -1279,6 +1278,29 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return "";
   }
 
+  function getVendorInvoiceLabel(value = "") {
+    if (value === "yes") return "可開發票";
+    if (value === "no") return "不可開發票";
+    if (value === "discuss") return "發票可再討論";
+    return "";
+  }
+
+  function getVendorPricingModeLabel(value = "") {
+    if (value === "unit-price") return "常用單價表";
+    if (value === "quote-sheet") return "常用報價單";
+    if (value === "both") return "兩者都有";
+    if (value === "custom") return "依案件另報";
+    return value || "";
+  }
+
+  function getVendorPricingDisclosureLabel(value = "") {
+    if (value === "direct") return "可直接提供報價資料";
+    if (value === "sanitized") return "可提供去識別版本";
+    if (value === "later") return "接洽後再提供";
+    if (value === "not-now") return "目前暫不提供";
+    return value || "";
+  }
+
   function setVendorIntakeFeedback(message, mode = "") {
     const shell = document.getElementById("vendor-intake-feedback");
     if (!(shell instanceof HTMLElement)) return;
@@ -1297,7 +1319,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   function buildVendorIntakeCannedReply(shareUrl) {
     return [
-      "若您有穩定承接相關工種，歡迎填這個合作工班資料登錄頁，留下必要聯絡方式，並上傳常用收費標準或報價單即可。",
+      "若您有穩定承接相關工種，歡迎填這個合作工班資料登錄頁，留下必要聯絡方式；若方便，也可附上常用單價表、報價單範例，或去識別後的報價樣本。",
       "若案件方向適合，我們會再主動聯繫。",
       shareUrl,
     ].join("\n");
@@ -1358,9 +1380,12 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         item.serviceArea,
         item.contactMethod,
         item.contactValue,
+        item.projectFocus,
+        item.craftApproach,
         item.invoiceStatus,
         item.acceptsContract,
         item.pricingMode,
+        item.pricingDisclosure,
         item.note,
         item.internalNote,
         item.sourceType,
@@ -1474,9 +1499,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         const metaItems = [
           item.serviceArea ? `<span>${escapeHtml(item.serviceArea)}</span>` : "",
           item.contactMethod && item.contactValue ? `<span>${escapeHtml(item.contactMethod)}：${escapeHtml(item.contactValue)}</span>` : "",
-          item.invoiceStatus ? `<span>${escapeHtml(item.invoiceStatus)}</span>` : "",
+          item.invoiceStatus ? `<span>${escapeHtml(getVendorInvoiceLabel(item.invoiceStatus))}</span>` : "",
           item.acceptsContract ? `<span>${escapeHtml(getVendorContractLabel(item.acceptsContract))}</span>` : "",
-          item.pricingMode ? `<span>${escapeHtml(item.pricingMode)}</span>` : "",
+          item.pricingMode ? `<span>${escapeHtml(getVendorPricingModeLabel(item.pricingMode))}</span>` : "",
+          item.pricingDisclosure ? `<span>${escapeHtml(getVendorPricingDisclosureLabel(item.pricingDisclosure))}</span>` : "",
           item.createdAt ? `<span>提交 ${escapeHtml(formatVendorNoteTimestamp(item.createdAt))}</span>` : "",
         ].filter(Boolean).join("");
 
@@ -1487,6 +1513,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <div class="vendor-note-badges">
                   <span class="vendor-note-badge">${escapeHtml(getVendorSourceTypeLabel(item.sourceType))}</span>
                   <span class="vendor-note-badge">${escapeHtml(item.trade || "未分類")}</span>
+                  ${item.projectFocus ? `<span class="vendor-note-badge">${escapeHtml(item.projectFocus)}</span>` : ""}
+                  ${item.craftApproach ? `<span class="vendor-note-badge">${escapeHtml(item.craftApproach)}</span>` : ""}
                   <span class="vendor-note-badge">${escapeHtml(getVendorIntakeStatusLabel(item.status))}</span>
                   ${item.attachmentKind ? `<span class="vendor-note-badge">${escapeHtml(item.attachmentKind)}</span>` : ""}
                 </div>

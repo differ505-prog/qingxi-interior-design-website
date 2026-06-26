@@ -36,32 +36,38 @@ export const POST: APIRoute = async ({ request }) => {
     const contactMethod = String(formData.get("contact_method") || "").trim();
     const contactValue = String(formData.get("contact_value") || "").trim();
     const serviceArea = String(formData.get("service_area") || "").trim();
-    const file = formData.get("pricing_file");
+    const projectFocus = String(formData.get("project_focus") || "").trim();
+    const craftApproach = String(formData.get("craft_approach") || "").trim();
+    const pricingDisclosure = String(formData.get("pricing_disclosure") || "").trim();
+    const rawFile = formData.get("pricing_file");
+    const file = rawFile instanceof File && rawFile.size > 0 ? rawFile : null;
 
-    if (!name || !trade || !contactMethod || !contactValue || !serviceArea) {
+    if (!name || !trade || !contactMethod || !contactValue || !serviceArea || !projectFocus || !craftApproach || !pricingDisclosure) {
       return jsonResponse(
         {
           status: "error",
           configured: true,
-          note: "請至少填寫姓名、工種、服務區域與聯絡方式。",
+          note: "請填寫姓名、工種、服務區域、擅長案型、工法細緻度與報價資料提供方式。",
         },
         400,
       );
     }
 
-    if (!(file instanceof File)) {
+    const requiresAttachment = pricingDisclosure === "direct" || pricingDisclosure === "sanitized";
+
+    if (requiresAttachment && !file) {
       return jsonResponse(
         {
           status: "error",
           configured: true,
-          note: "請上傳收費標準或報價單。",
+          note: "若選擇可直接提供或可提供去識別版本，請一併上傳報價資料。",
         },
         400,
       );
     }
 
     const fileError = validateVendorIntakeFile(file);
-    if (fileError) {
+    if (file && fileError) {
       return jsonResponse(
         {
           status: "error",
@@ -81,9 +87,12 @@ export const POST: APIRoute = async ({ request }) => {
         serviceArea,
         contactMethod,
         contactValue,
+        projectFocus,
+        craftApproach,
         invoiceStatus: String(formData.get("invoice_status") || "").trim(),
         acceptsContract: String(formData.get("accepts_contract") || "").trim(),
         pricingMode: String(formData.get("pricing_mode") || "").trim(),
+        pricingDisclosure,
         note: String(formData.get("note") || "").trim(),
         attachmentKind: String(formData.get("attachment_kind") || "").trim(),
         sourceType: "vendor_submitted",

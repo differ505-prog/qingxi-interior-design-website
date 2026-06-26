@@ -22,9 +22,12 @@ export type VendorIntakeRecord = {
   serviceArea: string;
   contactMethod: string;
   contactValue: string;
+  projectFocus: string;
+  craftApproach: string;
   invoiceStatus: string;
   acceptsContract: string;
   pricingMode: string;
+  pricingDisclosure: string;
   note: string;
   sourceType: string;
   sourceLabel: string;
@@ -85,9 +88,12 @@ export function normalizeVendorIntake(
     serviceArea: normalizeText(input.serviceArea),
     contactMethod: normalizeText(input.contactMethod),
     contactValue: normalizeText(input.contactValue),
+    projectFocus: normalizeText(input.projectFocus),
+    craftApproach: normalizeText(input.craftApproach),
     invoiceStatus: normalizeText(input.invoiceStatus),
     acceptsContract: normalizeText(input.acceptsContract),
     pricingMode: normalizeText(input.pricingMode),
+    pricingDisclosure: normalizeText(input.pricingDisclosure),
     note: normalizeText(input.note),
     sourceType: normalizeText(input.sourceType) || "vendor_submitted",
     sourceLabel: normalizeText(input.sourceLabel),
@@ -147,7 +153,7 @@ export async function writeVendorIntakes(token: string, items: VendorIntakeRecor
   });
 }
 
-export function validateVendorIntakeFile(file: File) {
+export function validateVendorIntakeFile(file: File | null) {
   if (!file || file.size <= 0) {
     return "請上傳收費標準或報價單。";
   }
@@ -183,17 +189,17 @@ export async function uploadVendorIntakeAttachment(
 export async function addVendorIntake(
   token: string,
   input: Record<string, unknown>,
-  file: File,
+  file: File | null,
 ) {
   const id = crypto.randomUUID();
-  const attachmentPath = await uploadVendorIntakeAttachment(token, id, file);
+  const attachmentPath = file ? await uploadVendorIntakeAttachment(token, id, file) : "";
   const nextItem = normalizeVendorIntake({
     ...input,
     id,
     attachmentPath,
-    attachmentName: file.name,
-    attachmentType: file.type,
-    attachmentSize: file.size,
+    attachmentName: file?.name || "",
+    attachmentType: file?.type || "",
+    attachmentSize: file?.size || 0,
     status: "new",
     internalNote: "",
     createdAt: new Date().toISOString(),

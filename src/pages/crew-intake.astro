@@ -30,12 +30,12 @@ const vendorTradeOptions = [
           <p class="crew-intake-eyebrow">QINGXI CREW INTAKE</p>
           <h1>合作工班資料登錄</h1>
           <p class="crew-intake-description">
-            若你有穩定承接相關工種，歡迎先留下必要資料，並上傳常用收費標準或報價單。
-            後續若案件方向適合，青曦會再主動聯繫。
+            若你有穩定承接相關工種，歡迎先留下必要資料。
+            若方便，也可直接附上常用單價表、報價單範例或去識別後的報價樣本，後續若案件方向適合，青曦會再主動聯繫。
           </p>
           <div class="crew-intake-points">
             <span>只填必要欄位</span>
-            <span>至少上傳一份報價資料</span>
+            <span>可附去識別報價樣本</span>
             <span>資料僅供青曦內部篩選</span>
           </div>
         </div>
@@ -44,8 +44,9 @@ const vendorTradeOptions = [
           <p class="crew-intake-aside-label">你會需要準備</p>
           <ul>
             <li>可聯絡的主要窗口</li>
+            <li>擅長案型與工法傾向</li>
             <li>服務工種與區域</li>
-            <li>常用收費標準或報價單</li>
+            <li>常用單價表、報價單或去識別樣本</li>
           </ul>
         </aside>
       </div>
@@ -54,7 +55,7 @@ const vendorTradeOptions = [
         <div class="crew-intake-card-head">
           <p class="crew-intake-section-label">STEP 01</p>
           <h2>先留下必要資料即可</h2>
-          <p>若案件適合，青曦會再往下確認合作方式，不需在這一步把所有細節都填滿。</p>
+          <p>若案件適合，青曦會再往下確認合作方式；這一步只先收能快速判斷合作方向的關鍵資料。</p>
         </div>
 
         <form id="crew-intake-form" class="crew-intake-form" enctype="multipart/form-data">
@@ -110,6 +111,28 @@ const vendorTradeOptions = [
             </label>
 
             <label class="crew-intake-field">
+              <span>擅長案型</span>
+              <select name="project_focus" required>
+                <option value="">請選擇</option>
+                <option value="商空 / 武場為主">商空 / 武場為主</option>
+                <option value="住宅裝潢為主">住宅裝潢為主</option>
+                <option value="兩者都有">兩者都有</option>
+                <option value="其他特殊案型">其他特殊案型</option>
+              </select>
+            </label>
+
+            <label class="crew-intake-field">
+              <span>工法細緻度</span>
+              <select name="craft_approach" required>
+                <option value="">請選擇</option>
+                <option value="偏效率施工">偏效率施工</option>
+                <option value="標準住宅施工">標準住宅施工</option>
+                <option value="偏細緻收邊">偏細緻收邊</option>
+                <option value="依案型調整">依案型調整</option>
+              </select>
+            </label>
+
+            <label class="crew-intake-field">
               <span>是否可開發票</span>
               <select name="invoice_status">
                 <option value="">先不填也可以</option>
@@ -131,6 +154,17 @@ const vendorTradeOptions = [
             </label>
 
             <label class="crew-intake-field">
+              <span>報價資料提供方式</span>
+              <select name="pricing_disclosure" id="crew-pricing-disclosure" required>
+                <option value="">請選擇</option>
+                <option value="direct">可直接提供單價表 / 報價單</option>
+                <option value="sanitized">可提供去識別版本</option>
+                <option value="later">接洽後再提供</option>
+                <option value="not-now">目前暫不提供</option>
+              </select>
+            </label>
+
+            <label class="crew-intake-field">
               <span>是否可接受簽約</span>
               <select name="accepts_contract">
                 <option value="">先不填也可以</option>
@@ -142,8 +176,8 @@ const vendorTradeOptions = [
 
             <label class="crew-intake-field">
               <span>附件類型</span>
-              <select name="attachment_kind" required>
-                <option value="">請選擇</option>
+              <select name="attachment_kind" id="crew-attachment-kind">
+                <option value="">若未附檔可先略過</option>
                 <option value="pricing-sheet">收費標準</option>
                 <option value="quote-sheet">報價單</option>
                 <option value="both-mixed">綜合資料</option>
@@ -151,14 +185,14 @@ const vendorTradeOptions = [
             </label>
 
             <label class="crew-intake-field crew-intake-field-full">
-              <span>上傳收費標準或報價單</span>
+              <span>上傳單價表、報價單或去識別報價樣本</span>
               <input
                 type="file"
+                id="crew-pricing-file"
                 name="pricing_file"
                 accept=".pdf,.jpg,.jpeg,.png,.webp,.xls,.xlsx,application/pdf,image/jpeg,image/png,image/webp,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                required
               />
-              <small>支援 PDF、JPG、PNG、WEBP、XLS、XLSX，請控制在 10MB 以內。</small>
+              <small id="crew-pricing-file-hint">若方便，可直接上傳單價表、既有報價單，或去識別後的報價樣本其一即可；資料僅供青曦內部評估，不會對外公開。</small>
             </label>
 
             <label class="crew-intake-field crew-intake-field-full">
@@ -166,7 +200,7 @@ const vendorTradeOptions = [
               <textarea
                 name="note"
                 rows="4"
-                placeholder="可補充擅長案型、合作方式或其他想先說明的內容"
+                placeholder="可補充擅長案型、合作方式、常接案型，或其他想先說明的內容"
               ></textarea>
             </label>
           </div>
@@ -420,11 +454,32 @@ const vendorTradeOptions = [
   const feedbackNode = document.getElementById("crew-intake-feedback");
   const submitButton = document.getElementById("crew-intake-submit");
   const tradeField = document.getElementById("crew-trade");
+  const pricingDisclosureField = document.getElementById("crew-pricing-disclosure");
+  const pricingFileField = document.getElementById("crew-pricing-file");
+  const attachmentKindField = document.getElementById("crew-attachment-kind");
+  const pricingFileHint = document.getElementById("crew-pricing-file-hint");
 
   function setCrewFeedback(message, mode = "") {
     if (!(feedbackNode instanceof HTMLElement)) return;
     feedbackNode.className = `crew-intake-feedback ${mode}`.trim();
     feedbackNode.textContent = message;
+  }
+
+  function syncPricingDisclosureRequirement() {
+    const disclosure = pricingDisclosureField instanceof HTMLSelectElement ? pricingDisclosureField.value : "";
+    const requiresAttachment = disclosure === "direct" || disclosure === "sanitized";
+
+    if (pricingFileField instanceof HTMLInputElement) {
+      pricingFileField.required = requiresAttachment;
+    }
+    if (attachmentKindField instanceof HTMLSelectElement) {
+      attachmentKindField.required = requiresAttachment;
+    }
+    if (pricingFileHint instanceof HTMLElement) {
+      pricingFileHint.textContent = requiresAttachment
+        ? "你選擇了可提供報價資料，請一併上傳單價表、既有報價單，或去識別後的報價樣本其一即可；資料僅供青曦內部評估，不會對外公開。"
+        : "若目前不方便附檔，也可先留下資料；若願意提供，建議上傳單價表、既有報價單，或去識別後的報價樣本其一即可。";
+    }
   }
 
   if (crewIntakeForm instanceof HTMLFormElement) {
@@ -462,6 +517,9 @@ const vendorTradeOptions = [
         tradeField.value = tradeParam;
       }
     }
+
+    syncPricingDisclosureRequirement();
+    pricingDisclosureField?.addEventListener("change", syncPricingDisclosureRequirement);
 
     crewIntakeForm.addEventListener("submit", async (event) => {
       event.preventDefault();
