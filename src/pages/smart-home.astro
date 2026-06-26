@@ -395,26 +395,37 @@ const workflow = [
 
   .primary-link,
   .cta-link {
-    background: var(--gray-darkest);
+    background: linear-gradient(135deg, var(--gray-darkest) 0%, var(--tiffany-dark) 100%);
     color: var(--white);
-    border: 1px solid var(--gray-darkest);
+    border: 1px solid rgba(159, 203, 200, 0.24);
   }
 
   .secondary-link {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.96);
     color: var(--gray-darkest);
-    border: 1px solid rgba(47, 47, 47, 0.14);
+    border: 1px solid rgba(95, 111, 105, 0.22);
+    box-shadow: 0 12px 22px rgba(47, 47, 47, 0.06);
   }
 
   .hero-actions .secondary-link:last-child {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(129, 199, 212, 0.18);
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(95, 111, 105, 0.22);
   }
 
   .primary-link:hover,
   .secondary-link:hover,
   .cta-link:hover {
     transform: translateY(-2px);
+  }
+
+  .primary-link:hover,
+  .cta-link:hover {
+    background: linear-gradient(135deg, rgba(40, 40, 40, 1) 0%, rgba(102, 124, 118, 1) 100%);
+  }
+
+  .secondary-link:hover {
+    background: rgba(242, 247, 247, 1);
+    border-color: rgba(102, 124, 118, 0.28);
   }
 
   .hero-panel {
