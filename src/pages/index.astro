@@ -709,11 +709,11 @@ const homeStructuredData = [
     .brand-smart-home-link-secondary {
       background: rgba(255, 255, 255, 0.9);
       color: var(--gray-darkest);
-      border: 1px solid rgba(129, 199, 212, 0.18);
+      border: 1px solid var(--art-accent-line);
     }
 
     .brand-smart-home-link-secondary:hover {
-      background: rgba(245, 250, 250, 1);
+      background: rgba(245, 241, 236, 1);
     }
 
     .brand-credential {
@@ -815,7 +815,7 @@ const homeStructuredData = [
 
     .about-tagline {
       font-size: 1.3rem;
-      color: var(--tiffany-dark);
+      color: var(--art-accent-text);
       margin: 0.5rem 0 1rem;
       font-weight: 500;
       letter-spacing: 0.08em;
@@ -844,8 +844,8 @@ const homeStructuredData = [
       text-align: center;
       padding: 2.5rem 2rem;
       background:
-        radial-gradient(circle at top left, rgba(160, 217, 217, 0.16), transparent 30%),
-        linear-gradient(135deg, #2f2f2f 0%, #1f1f1f 100%);
+        radial-gradient(circle at top left, rgba(138, 128, 116, 0.14), transparent 32%),
+        linear-gradient(135deg, rgba(44, 39, 35, 1) 0%, rgba(32, 28, 25, 1) 100%);
       border-radius: 26px;
       color: var(--white);
       position: relative;
@@ -854,7 +854,7 @@ const homeStructuredData = [
 
     .quote-mark {
       font-size: 4rem;
-      color: var(--tiffany-primary);
+      color: rgba(236, 231, 224, 0.82);
       line-height: 1;
       display: block;
       font-family: 'Noto Serif TC', serif;
@@ -869,7 +869,7 @@ const homeStructuredData = [
     }
 
     .quote-dash {
-      color: var(--tiffany-primary);
+      color: rgba(236, 231, 224, 0.72);
       display: block;
       margin: 0.5rem 0;
     }
@@ -917,7 +917,7 @@ const homeStructuredData = [
     .stat-number {
       font-size: 3rem;
       font-weight: 700;
-      color: var(--tiffany-primary);
+      color: rgba(236, 231, 224, 0.9);
       margin-bottom: 0.5rem;
       font-family: "Noto Sans", sans-serif;
     }
@@ -1033,8 +1033,8 @@ const homeStructuredData = [
 
     .testimonial-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(129, 199, 212, 0.15);
-      border-color: var(--tiffany-light);
+      box-shadow: 0 10px 28px rgba(58, 52, 46, 0.1);
+      border-color: var(--art-accent-line-strong);
     }
 
     .promise-icon {
@@ -1044,14 +1044,14 @@ const homeStructuredData = [
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--tiffany-pale);
+      background: rgba(244, 240, 234, 0.9);
       border-radius: 50%;
-      color: var(--tiffany-primary);
+      color: var(--art-accent-text);
       transition: all 0.3s ease;
     }
 
     .testimonial-card:hover .promise-icon {
-      background: var(--tiffany-primary);
+      background: var(--art-accent-solid);
       color: var(--white);
       transform: scale(1.1) rotate(5deg);
     }
@@ -1105,7 +1105,7 @@ const homeStructuredData = [
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 250, 250, 1) 100%);
       border-radius: 20px;
       overflow: hidden;
-      border: 1px solid rgba(129, 199, 212, 0.14);
+      border: 1px solid var(--art-accent-line);
       box-shadow: 0 12px 26px rgba(47, 47, 47, 0.05);
       transition: all 0.3s ease;
       opacity: 0;
@@ -1128,11 +1128,11 @@ const homeStructuredData = [
     }
 
     .faq-item:hover {
-      border-color: var(--tiffany-light);
+      border-color: var(--art-accent-line-strong);
     }
 
     .faq-item.active {
-      border-color: var(--tiffany-primary);
+      border-color: var(--art-accent-solid);
     }
 
     .faq-question {
@@ -1152,7 +1152,7 @@ const homeStructuredData = [
     }
 
     .faq-question:hover {
-      color: var(--tiffany-primary);
+      color: var(--art-accent-text);
     }
 
     .faq-icon {
@@ -1165,7 +1165,7 @@ const homeStructuredData = [
 
     .faq-item.active .faq-icon {
       transform: rotate(180deg);
-      color: var(--tiffany-primary);
+      color: var(--art-accent-text);
     }
 
     .faq-answer {
@@ -1220,7 +1220,7 @@ const homeStructuredData = [
     .faq-link-secondary {
       background: rgba(255, 255, 255, 0.96);
       color: var(--gray-darkest);
-      border: 1px solid rgba(129, 199, 212, 0.18);
+      border: 1px solid var(--art-accent-line);
     }
 
     /* Responsive Styles */
@@ -1518,7 +1518,7 @@ const homeStructuredData = [
     .service-card {
       display: block;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 250, 250, 1) 100%);
-      border: 1px solid rgba(129, 199, 212, 0.14);
+      border: 1px solid var(--art-accent-line);
       border-radius: 24px;
       overflow: hidden;
       text-decoration: none;
@@ -1618,7 +1618,7 @@ const homeStructuredData = [
     }
 
     .service-card:hover .service-icon svg {
-      color: var(--tiffany-primary);
+      color: var(--art-accent-text);
     }
 
     @media (max-width: 1200px) {
@@ -1674,8 +1674,8 @@ const homeStructuredData = [
     .smart-case-section {
       padding: 5rem 2rem;
       background:
-        radial-gradient(circle at top right, rgba(160, 217, 217, 0.12), transparent 22%),
-        linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 248, 248, 1) 100%);
+        radial-gradient(circle at top right, var(--art-accent-glow), transparent 22%),
+        linear-gradient(180deg, rgba(250, 247, 242, 1) 0%, rgba(241, 236, 230, 1) 100%);
     }
 
     .smart-case-container {
@@ -1711,8 +1711,8 @@ const homeStructuredData = [
     .smart-case-summary {
       padding: 1.8rem;
       background:
-        radial-gradient(circle at top right, rgba(160, 217, 217, 0.18), transparent 30%),
-        linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(47, 47, 47, 1) 100%);
+        radial-gradient(circle at top right, rgba(138, 128, 116, 0.14), transparent 32%),
+        linear-gradient(135deg, rgba(44, 39, 35, 1) 0%, rgba(32, 28, 25, 1) 100%);
       color: var(--white);
     }
 
@@ -1785,8 +1785,8 @@ const homeStructuredData = [
 
     .smart-case-link:hover {
       transform: translateY(-2px);
-      background: rgba(129, 199, 212, 0.22);
-      border-color: rgba(129, 199, 212, 0.42);
+      background: rgba(236, 231, 224, 0.22);
+      border-color: rgba(236, 231, 224, 0.42);
     }
 
     .smart-case-link-secondary {
@@ -1796,8 +1796,8 @@ const homeStructuredData = [
     }
 
     .smart-case-link-secondary:hover {
-      background: rgba(245, 250, 250, 1);
-      border-color: rgba(129, 199, 212, 0.3);
+      background: rgba(245, 241, 236, 1);
+      border-color: var(--art-accent-line-strong);
     }
 
     .smart-case-grid {
@@ -1868,7 +1868,7 @@ const homeStructuredData = [
       top: 10px;
       bottom: 10px;
       width: 1px;
-      background: linear-gradient(180deg, rgba(129, 199, 212, 0.42) 0%, rgba(129, 199, 212, 0.05) 100%);
+      background: linear-gradient(180deg, rgba(124, 131, 122, 0.36) 0%, rgba(124, 131, 122, 0.05) 100%);
     }
 
     .workflow-item {
@@ -1899,8 +1899,8 @@ const homeStructuredData = [
       height: 80px;
       background: linear-gradient(
         135deg,
-        var(--tiffany-primary) 0%,
-        var(--tiffany-dark) 100%
+        rgba(124, 131, 122, 1) 0%,
+        rgba(88, 96, 89, 1) 100%
       );
       color: var(--white);
       border-radius: 50%;
@@ -1910,13 +1910,13 @@ const homeStructuredData = [
       font-size: 1.75rem;
       font-weight: 600;
       font-family: "Noto Sans", sans-serif;
-      box-shadow: 0 4px 15px rgba(129, 199, 212, 0.3);
+      box-shadow: 0 4px 15px rgba(58, 52, 46, 0.2);
       transition: all 0.3s ease;
     }
 
     .workflow-item:hover .workflow-number {
       transform: scale(1.1) rotate(5deg);
-      box-shadow: 0 6px 20px rgba(129, 199, 212, 0.5);
+      box-shadow: 0 6px 20px rgba(58, 52, 46, 0.28);
       background: linear-gradient(
         135deg,
         var(--gray-dark) 0%,
@@ -1929,7 +1929,7 @@ const homeStructuredData = [
       padding: 1.4rem 1.5rem;
       border-radius: 22px;
       background: rgba(255, 255, 255, 0.82);
-      border: 1px solid rgba(129, 199, 212, 0.12);
+      border: 1px solid var(--art-accent-line);
       box-shadow: 0 16px 30px rgba(47, 47, 47, 0.05);
     }
 
@@ -2001,9 +2001,9 @@ const homeStructuredData = [
     }
 
     .consult-button-primary {
-      background: var(--tiffany-primary);
+      background: linear-gradient(135deg, rgba(248, 243, 236, 0.96) 0%, rgba(235, 228, 219, 0.96) 100%);
       color: var(--gray-darkest);
-      border: 1px solid var(--tiffany-primary);
+      border: 1px solid rgba(255, 248, 240, 0.56);
     }
 
     .consult-button-secondary {

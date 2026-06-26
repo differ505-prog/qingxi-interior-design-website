@@ -5,10 +5,10 @@ const { title, coverImage, summary, slug } = Astro.props;
 <style>
   .card {
     display: block;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 248, 248, 1) 100%);
+    background: linear-gradient(180deg, rgba(255, 253, 249, 0.98) 0%, rgba(245, 241, 236, 1) 100%);
     border-radius: 24px;
-    box-shadow: 0 18px 45px rgba(47, 47, 47, 0.08);
-    border: 1px solid rgba(129, 199, 212, 0.14);
+    box-shadow: 0 18px 45px rgba(58, 52, 46, 0.08);
+    border: 1px solid var(--art-accent-line);
     overflow: hidden;
     transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
     text-decoration: none;
@@ -17,8 +17,8 @@ const { title, coverImage, summary, slug } = Astro.props;
   
   .card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 24px 50px rgba(129, 199, 212, 0.18);
-    border-color: var(--tiffany-light);
+    box-shadow: 0 24px 50px rgba(58, 52, 46, 0.12);
+    border-color: var(--art-accent-line-strong);
   }
 
   .card-media {
@@ -80,7 +80,7 @@ const { title, coverImage, summary, slug } = Astro.props;
     align-items: center;
     gap: 0.55rem;
     margin-top: 1.25rem;
-    color: var(--tiffany-dark);
+    color: var(--art-accent-text);
     font-size: 0.9rem;
     letter-spacing: 0.08em;
   }
