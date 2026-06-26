@@ -206,8 +206,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         <div class="hero-command-panel">
           <article class="metric-card metric-card-primary">
             <span>本週主線</span>
-            <strong id="weekly-progress-count">0 / 3</strong>
-            <small id="weekly-progress-note">還差 3 個任務</small>
+            <strong id="weekly-progress-count">3 / 3</strong>
+            <small id="weekly-progress-note">已完成 0 / 3</small>
             <div class="progress-track">
               <div id="weekly-progress-bar" class="progress-bar"></div>
             </div>
@@ -249,7 +249,34 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </div>
               <p>先完成回覆，再完成官網與社群分發。</p>
             </div>
-            <div id="quest-grid" class="quest-grid"></div>
+            <div class="quest-board-layout">
+              <div id="quest-grid" class="quest-grid"></div>
+              <aside id="article-social-replies" class="bookshelf-reply-shell quest-reply-shell" hidden>
+                <div class="bookshelf-preview-head">
+                  <p>社團回覆稿</p>
+                  <span>導流版會自動帶官網連結</span>
+                </div>
+                <div class="bookshelf-reply-grid quest-reply-grid">
+                  <article class="bookshelf-reply-card">
+                    <span>簡短版</span>
+                    <p id="article-social-reply-short">尚未生成</p>
+                  </article>
+                  <article class="bookshelf-reply-card">
+                    <span>專業版</span>
+                    <p id="article-social-reply-pro">尚未生成</p>
+                  </article>
+                  <article class="bookshelf-reply-card">
+                    <span>導流版</span>
+                    <p id="article-social-reply-lead">尚未生成</p>
+                  </article>
+                </div>
+                <div class="bookshelf-actions bookshelf-reply-actions">
+                  <button type="button" id="copy-social-reply-short" class="bookshelf-action">複製簡短版</button>
+                  <button type="button" id="copy-social-reply-pro" class="bookshelf-action">複製專業版</button>
+                  <button type="button" id="copy-social-reply-lead" class="bookshelf-action">複製導流版</button>
+                </div>
+              </aside>
+            </div>
           </section>
 
           <details id="portal-grid" class="ops-panel ops-fold portal-board">
@@ -417,31 +444,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <span>回覆視角</span>
                     <strong id="article-ai-decision-angle">先貼問題再判題</strong>
                   </article>
-                </div>
-                <div id="article-social-replies" class="bookshelf-reply-shell" hidden>
-                  <div class="bookshelf-preview-head">
-                    <p>社團回覆稿</p>
-                    <span>導流版會自動帶官網連結</span>
-                  </div>
-                  <div class="bookshelf-reply-grid">
-                    <article class="bookshelf-reply-card">
-                      <span>簡短版</span>
-                      <p id="article-social-reply-short">尚未生成</p>
-                    </article>
-                    <article class="bookshelf-reply-card">
-                      <span>專業版</span>
-                      <p id="article-social-reply-pro">尚未生成</p>
-                    </article>
-                    <article class="bookshelf-reply-card">
-                      <span>導流版</span>
-                      <p id="article-social-reply-lead">尚未生成</p>
-                    </article>
-                  </div>
-                  <div class="bookshelf-actions bookshelf-reply-actions">
-                    <button type="button" id="copy-social-reply-short" class="bookshelf-action">複製簡短版</button>
-                    <button type="button" id="copy-social-reply-pro" class="bookshelf-action">複製專業版</button>
-                    <button type="button" id="copy-social-reply-lead" class="bookshelf-action">複製導流版</button>
-                  </div>
                 </div>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
               </details>
@@ -1254,10 +1256,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const remaining = Math.max(WEEKLY_TARGET - completedRuns, 0);
     const percent = Math.round((completedRuns / WEEKLY_TARGET) * 100);
     const level = getLevel();
-    document.getElementById("weekly-progress-count").textContent = `${completedRuns} / ${WEEKLY_TARGET}`;
+    document.getElementById("weekly-progress-count").textContent = `${WEEKLY_TARGET} / ${WEEKLY_TARGET}`;
     document.getElementById("weekly-progress-note").textContent = remaining === 0
-      ? "本週已清空。"
-      : `還差 ${remaining} 個任務`;
+      ? `已完成 ${completedRuns} / ${WEEKLY_TARGET}`
+      : `已完成 ${completedRuns} / ${WEEKLY_TARGET}，還差 ${remaining} 個任務`;
     document.getElementById("weekly-progress-bar").style.width = `${percent}%`;
     document.getElementById("xp-value").textContent = `${state.stats.xp} XP`;
     document.getElementById("streak-value").textContent = `${state.stats.streak} 週`;
@@ -5394,6 +5396,13 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .quest-board-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.75fr) minmax(300px, 0.95fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
   .portal-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -6154,6 +6163,21 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   .bookshelf-reply-actions {
     margin-bottom: 0;
+  }
+
+  .quest-reply-shell {
+    position: sticky;
+    top: 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 0;
+    background:
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.04), transparent 34%),
+      linear-gradient(180deg, rgba(33, 33, 33, 0.92), rgba(24, 24, 24, 0.96));
+  }
+
+  .quest-reply-grid {
+    grid-template-columns: 1fr;
   }
 
   .bookshelf-ai-content {
@@ -7797,6 +7821,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
     .quest-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .quest-board-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .quest-reply-shell {
+      position: static;
     }
 
     .quest-link-stash-grid {
