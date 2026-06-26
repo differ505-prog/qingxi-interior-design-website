@@ -237,6 +237,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <article class="metric-card">
                   <span>總進度</span>
                   <strong id="xp-value">0 XP</strong>
+                  <small id="xp-progress-note">本級 0 / 200 XP</small>
+                  <div class="progress-track progress-track-xp">
+                    <div id="xp-progress-bar" class="progress-bar progress-bar-xp"></div>
+                  </div>
                 </article>
                 <article class="metric-card">
                   <span>連續達標</span>
@@ -1448,6 +1452,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return Math.floor(state.stats.xp / 200) + 1;
   }
 
+  function getCurrentLevelXp() {
+    return state.stats.xp % 200;
+  }
+
+  function getNextLevelXpRequirement() {
+    return 200;
+  }
+
   function getRankTitle(level) {
     return rankTitles[Math.min(level - 1, rankTitles.length - 1)];
   }
@@ -1482,12 +1494,17 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const remaining = Math.max(WEEKLY_TARGET - completedRuns, 0);
     const percent = Math.round((completedRuns / WEEKLY_TARGET) * 100);
     const level = getLevel();
+    const currentLevelXp = getCurrentLevelXp();
+    const nextLevelXpRequirement = getNextLevelXpRequirement();
+    const xpPercent = Math.round((currentLevelXp / nextLevelXpRequirement) * 100);
     document.getElementById("weekly-progress-count").textContent = `${completedRuns} / ${WEEKLY_TARGET}`;
     document.getElementById("weekly-progress-note").textContent = remaining === 0
       ? "本週主線已達標，待下週刷新。"
       : `還差 ${remaining} 個任務`;
     document.getElementById("weekly-progress-bar").style.width = `${percent}%`;
     document.getElementById("xp-value").textContent = `${state.stats.xp} XP`;
+    document.getElementById("xp-progress-note").textContent = `本級 ${currentLevelXp} / ${nextLevelXpRequirement} XP`;
+    document.getElementById("xp-progress-bar").style.width = `${xpPercent}%`;
     document.getElementById("streak-value").textContent = `${state.stats.streak} 週`;
     document.getElementById("lifetime-runs-value").textContent = `${state.stats.lifetimeRuns} 次`;
     document.getElementById("level-value").textContent = `第 ${level} 級`;
@@ -1532,7 +1549,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       <article class="quest-card ${complete ? "is-complete" : ""}">
         <div class="quest-topline">
           <span class="quest-slot">${progressLabel}</span>
-          <span class="quest-keyword">${progressState}</span>
+          <div class="quest-topline-meta">
+            <span class="quest-reward-badge">完成 +${RUN_XP} XP</span>
+            ${!state.weekly.bonusClaimed ? `<span class="quest-reward-badge quest-reward-badge-soft">3 / 3 再 +${WEEKLY_BONUS_XP} XP</span>` : ""}
+            <span class="quest-keyword">${progressState}</span>
+          </div>
         </div>
         <div class="quest-main-list">
           <section class="quest-main ${actionOneComplete ? "is-complete" : ""}">
@@ -1697,7 +1718,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       <article class="quest-card ${complete ? "is-complete" : ""}">
         <div class="quest-topline">
           <span class="quest-slot">今日</span>
-          <span class="quest-keyword">${progressState}</span>
+          <div class="quest-topline-meta">
+            <span class="quest-reward-badge">完成 +${DAILY_OPS_XP} XP</span>
+            <span class="quest-keyword">${progressState}</span>
+          </div>
         </div>
         <div class="quest-main-list">
           <section class="quest-main ${complete ? "is-complete" : ""}">

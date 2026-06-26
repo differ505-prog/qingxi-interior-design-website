@@ -303,6 +303,17 @@
     transition: width 0.35s ease;
   }
 
+  .progress-track-xp {
+    margin-top: 0.55rem;
+    height: 7px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .progress-bar-xp {
+    background: linear-gradient(90deg, rgba(129, 199, 212, 0.96), rgba(201, 226, 231, 0.9));
+    box-shadow: 0 0 18px rgba(129, 199, 212, 0.24);
+  }
+
   .ops-grid {
     grid-template-columns: 1fr;
     align-items: start;
@@ -2537,6 +2548,14 @@
     align-items: center;
   }
 
+  .quest-topline-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
   .quest-keyword {
     display: inline-flex;
     padding: 0.3rem 0.62rem;
@@ -2545,6 +2564,25 @@
     color: rgba(236, 234, 227, 0.68);
     font-size: 0.79rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .quest-reward-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(129, 199, 212, 0.22);
+    background: rgba(129, 199, 212, 0.12);
+    color: rgba(225, 242, 245, 0.92);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .quest-reward-badge-soft {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(234, 230, 222, 0.78);
   }
 
   .quest-checklist {
@@ -2950,6 +2988,15 @@
 
     .command-metrics {
       grid-template-columns: 1fr;
+    }
+
+    .quest-topline {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .quest-topline-meta {
+      justify-content: flex-start;
     }
 
     .metric-fold-grid {
