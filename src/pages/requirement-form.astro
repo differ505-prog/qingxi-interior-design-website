@@ -832,8 +832,6 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 </BaseLayout>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
-
   * {
     box-sizing: border-box;
   }
@@ -859,7 +857,9 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .form-eyebrow {
     margin: 0 0 0.9rem;
     color: var(--tiffany-dark);
+    font-family: var(--font-sans);
     font-size: 0.8rem;
+    font-weight: 600;
     letter-spacing: 0.24em;
     text-transform: uppercase;
   }
@@ -867,22 +867,23 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .hero-copy h1,
   .form-header h1 {
     margin: 0;
-    font-family: "Noto Serif TC", serif;
-    font-weight: 500;
+    font-family: var(--font-serif);
+    font-weight: 600;
     color: var(--gray-darkest);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
   }
 
   .hero-copy h1 {
     font-size: clamp(2.3rem, 4vw, 4.1rem);
-    line-height: 1.3;
+    line-height: 1.22;
   }
 
   .hero-description {
     margin: 1.25rem 0 0;
     max-width: 42rem;
     color: var(--gray-medium);
-    line-height: 1.95;
+    font-family: var(--font-sans);
+    line-height: 1.9;
     font-size: 1.04rem;
   }
 
@@ -900,6 +901,10 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     border: 1px solid rgba(115, 103, 94, 0.18);
     color: var(--gray-dark);
     box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
   }
 
   .hero-panel {
@@ -921,6 +926,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     padding-left: 1.2rem;
     display: grid;
     gap: 0.9rem;
+    font-family: var(--font-sans);
     line-height: 1.85;
     color: rgba(255, 255, 255, 0.84);
   }
@@ -934,7 +940,9 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .panel-credential-label {
     margin: 0;
     color: rgba(255, 255, 255, 0.56);
+    font-family: var(--font-sans);
     font-size: 0.74rem;
+    font-weight: 600;
     letter-spacing: 0.22em;
     text-transform: uppercase;
   }
@@ -942,14 +950,16 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .panel-credential-title {
     margin: 0.6rem 0 0;
     color: var(--white);
+    font-family: var(--font-serif);
     font-size: 1rem;
     line-height: 1.7;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
   }
 
   .panel-credential-meta {
     margin: 0.4rem 0 0;
     color: rgba(255, 255, 255, 0.72);
+    font-family: var(--font-sans);
     font-size: 0.9rem;
     letter-spacing: 0.04em;
   }
@@ -959,7 +969,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     background:
       radial-gradient(circle at top left, rgba(159, 147, 136, 0.04), transparent 24%),
       linear-gradient(180deg, rgba(245, 240, 234, 1) 0%, rgba(243, 244, 243, 1) 100%);
-    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    font-family: var(--font-sans);
   }
 
   .form-wrapper {
@@ -976,6 +986,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
       linear-gradient(135deg, rgba(245, 240, 234, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
     border: 1px solid rgba(115, 103, 94, 0.18);
     color: var(--gray-dark);
+    font-family: var(--font-sans);
     line-height: 1.75;
   }
 
@@ -997,22 +1008,26 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .estimator-brief-eyebrow {
     margin: 0 0 0.85rem;
     color: var(--tiffany-dark);
+    font-family: var(--font-sans);
     font-size: 0.78rem;
+    font-weight: 600;
     letter-spacing: 0.22em;
     text-transform: uppercase;
   }
 
   .estimator-brief-header h2 {
     margin: 0;
-    font-family: "Noto Serif TC", serif;
+    font-family: var(--font-serif);
     font-size: 1.5rem;
+    font-weight: 600;
     color: var(--gray-darkest);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
   }
 
   .estimator-brief-description {
     margin: 0.8rem 0 0;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     line-height: 1.8;
   }
 
@@ -1037,13 +1052,17 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
   .estimator-brief-item span {
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     font-size: 0.88rem;
+    letter-spacing: 0.02em;
   }
 
   .estimator-brief-item strong {
     margin-top: 0.35rem;
     color: var(--gray-darkest);
+    font-family: var(--font-serif);
     line-height: 1.65;
+    font-weight: 600;
   }
 
   .form-header {
@@ -1053,13 +1072,14 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
 
   .form-header h1 {
     font-size: clamp(2rem, 3vw, 3rem);
-    line-height: 1.35;
+    line-height: 1.28;
   }
 
   .form-subtitle {
     margin: 1rem auto 0;
     max-width: 40rem;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     line-height: 1.9;
     font-size: 1rem;
   }
@@ -1079,7 +1099,8 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .form-assurance-title {
     margin: 0;
     color: var(--gray-darkest);
-    font-size: 1rem;
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
     font-weight: 600;
     letter-spacing: 0.03em;
   }
@@ -1087,6 +1108,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .form-assurance-description {
     margin: 0.55rem 0 0;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     line-height: 1.8;
     font-size: 0.95rem;
   }
@@ -1121,6 +1143,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     margin-top: 0.65rem;
     display: flex;
     justify-content: space-between;
+    font-family: var(--font-sans);
     font-size: 0.88rem;
     color: var(--gray-medium);
   }
@@ -1166,10 +1189,10 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .section-title,
   .space-detail-title {
     margin: 0 0 1.35rem;
-    font-family: "Noto Serif TC", serif;
-    font-weight: 500;
+    font-family: var(--font-serif);
+    font-weight: 600;
     color: var(--gray-darkest);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
   }
 
   .section-title {
@@ -1183,6 +1206,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .space-detail-subtitle {
     margin: -0.75rem 0 1rem;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     font-size: 0.9rem;
     line-height: 1.7;
   }
@@ -1205,9 +1229,10 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     display: block;
     margin-bottom: 0.55rem;
     color: var(--gray-dark);
+    font-family: var(--font-sans);
     font-size: 0.92rem;
-    font-weight: 500;
-    letter-spacing: 0.02em;
+    font-weight: 600;
+    letter-spacing: 0.015em;
   }
 
   .required {
@@ -1218,6 +1243,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .field-hint {
     margin: 0.45rem 0 0.9rem;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     font-size: 0.92rem;
     line-height: 1.75;
   }
@@ -1264,6 +1290,12 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     padding-right: 2.5rem;
   }
 
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(88, 88, 88, 0.64);
+    font-family: var(--font-sans);
+  }
+
   input[type="radio"],
   input[type="checkbox"] {
     accent-color: var(--tiffany-primary);
@@ -1294,6 +1326,14 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
       border-color 0.25s ease,
       background-color 0.25s ease,
       box-shadow 0.25s ease;
+  }
+
+  .radio-label span,
+  .checkbox-label span {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.55;
   }
 
   .radio-label:hover,
@@ -1341,13 +1381,15 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     display: block;
     margin-bottom: 0.55rem;
     color: var(--gray-dark);
+    font-family: var(--font-sans);
     font-size: 0.92rem;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .space-quantity-hint {
     margin: 0.45rem 0 0;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     font-size: 0.86rem;
     line-height: 1.7;
   }
@@ -1366,6 +1408,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
   .form-notice p {
     margin: 0;
     color: var(--gray-dark);
+    font-family: var(--font-sans);
     line-height: 1.85;
   }
 
@@ -1379,7 +1422,8 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     background: #06c755;
     color: var(--white);
     text-decoration: none;
-    font-weight: 500;
+    font-family: var(--font-sans);
+    font-weight: 600;
     letter-spacing: 0.04em;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
   }
@@ -1401,9 +1445,10 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     border-radius: 999px;
     background: linear-gradient(135deg, var(--gray-darkest) 0%, var(--tiffany-dark) 100%);
     color: var(--white);
-    font-size: 1rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    font-family: var(--font-sans);
+    font-size: 0.98rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     cursor: pointer;
     transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
   }

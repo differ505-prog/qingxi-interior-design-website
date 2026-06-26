@@ -815,9 +815,12 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .sign-eyebrow,
   .document-brand {
     margin: 0 0 0.5rem;
+    font-family: var(--font-sans);
     letter-spacing: 0.18em;
     font-size: 0.78rem;
+    font-weight: 600;
     color: #8d6f5c;
+    text-transform: uppercase;
   }
 
   .sign-description,
@@ -828,6 +831,28 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .payment-stage-card p {
     margin: 0;
     color: rgba(64, 44, 30, 0.76);
+    font-family: var(--font-sans);
+  }
+
+  .sign-toolbar h1,
+  .document-header h2,
+  .section-heading h3,
+  .signature-side-card h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  .sign-toolbar h1 {
+    margin: 0;
+    font-size: clamp(2.05rem, 4vw, 3.3rem);
+    line-height: 1.18;
+  }
+
+  .document-header h2 {
+    margin: 0.7rem 0 0;
+    font-size: clamp(1.75rem, 3vw, 2.7rem);
+    line-height: 1.24;
   }
 
   .sign-actions {
@@ -862,6 +887,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .document-summary {
     margin: 0.6rem 0 0;
     color: rgba(64, 44, 30, 0.76);
+    font-family: var(--font-sans);
+    line-height: 1.8;
   }
 
   .document-meta,
@@ -879,6 +906,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     padding: 0.8rem 1rem;
     border-radius: 16px;
     background: rgba(249, 246, 240, 0.9);
+    font-family: var(--font-sans);
   }
 
   .payment-stage-card,
@@ -923,6 +951,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   .spec-copy-item span {
     color: rgba(64, 44, 30, 0.62);
+    font-family: var(--font-sans);
     font-size: 0.92rem;
   }
 
@@ -978,6 +1007,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   }
 
   .signing-status strong {
+    font-family: var(--font-serif);
     color: #5f4230;
   }
 
@@ -985,6 +1015,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     margin: 0;
     padding-left: 1.1rem;
     color: rgba(94, 46, 35, 0.88);
+    font-family: var(--font-sans);
   }
 
   .signing-status.is-pending {
@@ -1006,7 +1037,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     border: 1px solid rgba(93, 67, 44, 0.18);
     border-radius: 14px;
     padding: 0.85rem 1rem;
-    font: inherit;
+    font-family: var(--font-sans);
+    font-size: 0.96rem;
+    line-height: 1.6;
     background: rgba(255, 255, 255, 0.98);
   }
 
@@ -1026,6 +1059,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     gap: 0.75rem;
     align-items: start;
     color: rgba(64, 44, 30, 0.88);
+    font-family: var(--font-sans);
+    line-height: 1.8;
   }
 
   .checkbox-item input {
@@ -1058,6 +1093,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   .submit-message {
     color: #6d513c;
+    font-family: var(--font-sans);
     font-size: 0.95rem;
   }
 
@@ -1081,6 +1117,38 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .btn-sm {
     padding: 0.55rem 0.95rem;
     font-size: 0.92rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.82rem 1.2rem;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    background: var(--tiffany-primary);
+    color: var(--gray-darkest);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--gray-darkest);
+    border-color: rgba(93, 67, 44, 0.18);
   }
 
   @media (max-width: 860px) {

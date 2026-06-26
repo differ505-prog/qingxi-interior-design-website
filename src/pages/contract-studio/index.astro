@@ -1128,9 +1128,12 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
   .studio-eyebrow {
     margin: 0 0 0.5rem;
+    font-family: var(--font-sans);
     letter-spacing: 0.18em;
     font-size: 0.78rem;
+    font-weight: 600;
     color: #8d6f5c;
+    text-transform: uppercase;
   }
 
   .studio-hero h1,
@@ -1138,6 +1141,14 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
   .contract-section-card h3,
   .checklist-shell h3 {
     margin: 0;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: 0.025em;
+  }
+
+  .studio-hero h1 {
+    font-size: clamp(2.15rem, 4vw, 3.45rem);
+    line-height: 1.18;
   }
 
   .studio-description,
@@ -1147,6 +1158,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
   .support-list {
     margin: 0;
     color: rgba(64, 44, 30, 0.76);
+    font-family: var(--font-sans);
   }
 
   .studio-actions {
@@ -1166,6 +1178,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
   .share-link-status strong,
   .share-link-feedback {
+    font-family: var(--font-sans);
     font-size: 0.98rem;
   }
 
@@ -1173,6 +1186,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
   .share-link-feedback {
     margin: 0;
     color: rgba(64, 44, 30, 0.8);
+    font-family: var(--font-sans);
   }
 
   .share-link-status.is-ready {
@@ -1230,7 +1244,10 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
   }
 
   .field span {
-    font-size: 0.95rem;
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.015em;
     color: rgba(64, 44, 30, 0.9);
   }
 
@@ -1240,7 +1257,9 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
     border: 1px solid rgba(93, 67, 44, 0.18);
     border-radius: 14px;
     padding: 0.85rem 1rem;
-    font: inherit;
+    font-family: var(--font-sans);
+    font-size: 0.96rem;
+    line-height: 1.6;
     background: rgba(255, 255, 255, 0.98);
   }
 
@@ -1273,6 +1292,8 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
     padding: 0.85rem 1rem;
     color: rgba(64, 44, 30, 0.68);
     background: rgba(243, 236, 228, 0.72);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
   }
 
   .input-with-prefix input,
@@ -1314,11 +1335,13 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
   .material-spec-header p {
     margin: 0.35rem 0 0;
     color: rgba(64, 44, 30, 0.72);
+    font-family: var(--font-sans);
   }
 
   .stage-amount {
     grid-column: 1 / -1;
     justify-self: end;
+    font-family: var(--font-serif);
     font-weight: 700;
     color: #6d513c;
   }
@@ -1326,6 +1349,11 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
   .checklist-shell ul,
   .support-list {
     padding-left: 1.1rem;
+  }
+
+  .support-list li,
+  .checklist-shell li {
+    line-height: 1.8;
   }
 
   .summary-content {
@@ -1341,6 +1369,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
   .llm-review-card p {
     margin: 0;
     color: rgba(64, 44, 30, 0.76);
+    font-family: var(--font-sans);
   }
 
   .llm-review-output {
@@ -1349,7 +1378,9 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
     border-radius: 16px;
     padding: 0.9rem 1rem;
     background: rgba(250, 247, 242, 0.78);
-    font: inherit;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    line-height: 1.7;
     resize: vertical;
     min-height: 280px;
   }
@@ -1358,7 +1389,9 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    font-size: 0.98rem;
+    font-family: var(--font-sans);
+    font-size: 0.96rem;
+    line-height: 1.6;
   }
 
   .is-good {
@@ -1367,6 +1400,42 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
 
   .is-warning {
     color: #b45309;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.82rem 1.2rem;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    background: var(--tiffany-primary);
+    color: var(--gray-darkest);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--gray-darkest);
+    border-color: rgba(93, 67, 44, 0.18);
+  }
+
+  .btn-muted {
+    color: rgba(64, 44, 30, 0.62);
   }
 
   @media (max-width: 960px) {

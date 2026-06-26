@@ -318,21 +318,28 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .preview-eyebrow {
     margin: 0 0 0.8rem;
     color: var(--tiffany-dark);
+    font-family: var(--font-sans);
     font-size: 0.8rem;
+    font-weight: 600;
     letter-spacing: 0.24em;
+    text-transform: uppercase;
   }
 
   .preview-toolbar h1 {
     margin: 0;
     color: var(--gray-darkest);
-    font-family: "Noto Serif TC", serif;
+    font-family: var(--font-serif);
     font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    line-height: 1.18;
   }
 
   .preview-description,
   .document-intro {
     margin: 0.8rem 0 0;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     line-height: 1.85;
   }
 
@@ -367,16 +374,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .document-brand {
     margin: 0;
     color: var(--tiffany-dark);
+    font-family: var(--font-sans);
     letter-spacing: 0.18em;
     font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
   }
 
   .document-header h2 {
     margin: 0.7rem 0 0;
     color: var(--gray-darkest);
-    font-family: "Noto Serif TC", serif;
+    font-family: var(--font-serif);
     font-size: clamp(1.8rem, 3vw, 2.8rem);
-    line-height: 1.3;
+    font-weight: 600;
+    line-height: 1.24;
+    letter-spacing: 0.025em;
   }
 
   .document-meta {
@@ -394,11 +406,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   .meta-item span {
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     font-size: 0.86rem;
+    letter-spacing: 0.02em;
   }
 
   .meta-item strong {
     color: var(--gray-darkest);
+    font-family: var(--font-sans);
     line-height: 1.7;
   }
 
@@ -409,12 +424,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .section-heading h3 {
     margin: 0;
     color: var(--gray-darkest);
-    font-size: 1.25rem;
+    font-family: var(--font-serif);
+    font-size: 1.28rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
 
   .section-heading p {
     margin: 0.45rem 0 0;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     line-height: 1.75;
   }
 
@@ -440,6 +459,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   .preview-assumption-card span {
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     font-size: 0.86rem;
   }
 
@@ -447,11 +467,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     display: block;
     margin-top: 0.35rem;
     color: var(--gray-darkest);
+    font-family: var(--font-serif);
+    font-weight: 600;
   }
 
   .preview-assumption-card p {
     margin: 0.5rem 0 0;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     line-height: 1.75;
   }
 
@@ -473,6 +496,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .quote-group-header h4 {
     margin: 0;
     color: var(--gray-darkest);
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
 
   .quote-item-list {
@@ -496,18 +522,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .quote-item-main h5 {
     margin: 0;
     color: var(--gray-darkest);
-    font-size: 1rem;
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    font-weight: 600;
   }
 
   .quote-item-main p {
     margin: 0.45rem 0 0;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     line-height: 1.75;
   }
 
   .quote-item-meta {
     margin-top: 0.65rem;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     font-size: 0.92rem;
   }
 
@@ -522,6 +552,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     margin: 1rem 0 0;
     padding-left: 1.2rem;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     line-height: 1.8;
   }
 
@@ -536,12 +567,15 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   .invoice-notice-card h4 {
     margin: 0;
     color: var(--gray-darkest);
-    font-size: 1rem;
+    font-family: var(--font-serif);
+    font-size: 1.02rem;
+    font-weight: 600;
   }
 
   .invoice-notice-card p {
     margin: 0.8rem 0 0;
     color: var(--gray-medium);
+    font-family: var(--font-sans);
     line-height: 1.85;
   }
 
@@ -556,6 +590,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   .summary-row {
     color: var(--gray-dark);
+    font-family: var(--font-sans);
   }
 
   .grand-total {
@@ -575,7 +610,10 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     text-decoration: none;
     border: 1px solid transparent;
     cursor: pointer;
-    font: inherit;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
   }
 
   .btn-primary {
