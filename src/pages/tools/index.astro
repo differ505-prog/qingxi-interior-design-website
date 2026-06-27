@@ -625,127 +625,141 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           </div>
 
           <div class="feedback-card" id="feedback-form">
-            <div class="feedback-card-copy">
-              <p class="feedback-eyebrow">BUG FEEDBACK</p>
-              <h3>覺得結果怪怪的？直接回報給青曦。</h3>
-              <p class="feedback-description">
-                送出時會自動附上你這次的估價摘要、工程拆解與頁面資訊，方便直接檢查是公式、互動還是顯示問題。
-              </p>
-              <div class="feedback-points">
-                <div class="feedback-point">
-                  <strong>不用自己整理條件</strong>
-                  <span>目前坪數、等級、工項與拆解結果都會一起附上。</span>
-                </div>
-                <div class="feedback-point">
-                  <strong>可留聯絡方式追蹤</strong>
-                  <span>若你願意，青曦可再回頭確認是行情、公式還是前端 bug。</span>
-                </div>
+            <div class="feedback-card-header">
+              <div class="feedback-card-copy">
+                <p class="feedback-eyebrow">BUG FEEDBACK</p>
+                <h3>覺得結果怪怪的，再展開回報就好。</h3>
+                <p class="feedback-description">
+                  送出時會自動附上這次估價摘要與拆解結果，青曦比較好直接檢查問題。
+                </p>
               </div>
+              <button
+                type="button"
+                id="feedback-toggle"
+                class="btn btn-secondary feedback-toggle"
+                aria-expanded="false"
+                aria-controls="feedback-panel"
+              >
+                展開問題回報
+              </button>
             </div>
 
-            <div class="feedback-card-form">
-              <div
-                id="feedback-status-success"
-                class="feedback-status feedback-status-success is-hidden"
-                role="status"
-              >
-                <p>問題回報已送出，青曦會連同這次試算摘要一起檢查。</p>
-              </div>
-              <div
-                id="feedback-status-error"
-                class="feedback-status feedback-status-error is-hidden"
-                role="status"
-              >
-                <p>這次回報沒有成功送出，請稍後再試，或直接改用 LINE 告知。</p>
-              </div>
-              {
-                !estimatorFeedbackEnabled && (
-                  <div class="feedback-status" role="status">
-                    <p>問題回報收件尚未完成設定，目前可先透過下方聯絡方式或官方 LINE 告知青曦。</p>
+            <div class="feedback-card-panel is-hidden" id="feedback-panel">
+              <div class="feedback-card-form">
+                <div
+                  id="feedback-status-success"
+                  class="feedback-status feedback-status-success is-hidden"
+                  role="status"
+                >
+                  <p>問題回報已送出，青曦會連同這次試算摘要一起檢查。</p>
+                </div>
+                <div
+                  id="feedback-status-error"
+                  class="feedback-status feedback-status-error is-hidden"
+                  role="status"
+                >
+                  <p>這次回報沒有成功送出，請稍後再試，或直接改用 LINE 告知。</p>
+                </div>
+                {
+                  !estimatorFeedbackEnabled && (
+                    <div class="feedback-status" role="status">
+                      <p>問題回報收件尚未完成設定，目前可先透過下方聯絡方式或官方 LINE 告知青曦。</p>
+                    </div>
+                  )
+                }
+                <form
+                  id="estimator-feedback-form"
+                  action="/api/forms/estimator-feedback"
+                  method="POST"
+                  class="feedback-form"
+                  data-form-enabled={String(estimatorFeedbackEnabled)}
+                >
+                  <input type="hidden" name="page_path" value="/tools" />
+                  <input type="hidden" name="form_type" value="estimator_bug_feedback" />
+                  <input type="hidden" name="form_stage" value="stage_1_estimator_feedback" />
+                  <input type="hidden" name="estimator_summary" id="feedback-estimator-summary" />
+                  <input type="hidden" name="estimator_breakdown" id="feedback-estimator-breakdown" />
+                  <input type="hidden" name="estimator_snapshot" id="feedback-estimator-snapshot" />
+                  <input type="hidden" name="landing_page" id="feedback-landing-page" />
+                  <input type="hidden" name="page_referrer" id="feedback-page-referrer" />
+                  <input
+                    type="text"
+                    name="_gotcha"
+                    class="feedback-honeypot"
+                    tabindex="-1"
+                    autocomplete="off"
+                  />
+
+                  <div class="feedback-form-grid">
+                    <label class="feedback-field">
+                      <span>問題類型</span>
+                      <select name="issue_type" required>
+                        <option value="">請選擇</option>
+                        <option value="pricing">估價數字不合理</option>
+                        <option value="breakdown">工程拆解怪怪的</option>
+                        <option value="interaction">勾選或互動有問題</option>
+                        <option value="display">畫面顯示異常</option>
+                        <option value="other">其他</option>
+                      </select>
+                    </label>
+                    <label class="feedback-field">
+                      <span>聯絡方式（可選）</span>
+                      <input
+                        type="text"
+                        name="contact_method"
+                        placeholder="Email、LINE ID 或電話"
+                      />
+                    </label>
+                    <label class="feedback-field feedback-field-full">
+                      <span>你覺得哪裡怪？</span>
+                      <textarea
+                        id="feedback-message"
+                        name="issue_description"
+                        rows="4"
+                        placeholder="例如 30 坪、全勾時牆面工程反而下降，或切換精緻型後櫃體價格才正常"
+                        required
+                      ></textarea>
+                    </label>
                   </div>
-                )
-              }
-              <form
-                id="estimator-feedback-form"
-                action="/api/forms/estimator-feedback"
-                method="POST"
-                class="feedback-form"
-                data-form-enabled={String(estimatorFeedbackEnabled)}
-              >
-                <input type="hidden" name="page_path" value="/tools" />
-                <input type="hidden" name="form_type" value="estimator_bug_feedback" />
-                <input type="hidden" name="form_stage" value="stage_1_estimator_feedback" />
-                <input type="hidden" name="estimator_summary" id="feedback-estimator-summary" />
-                <input type="hidden" name="estimator_breakdown" id="feedback-estimator-breakdown" />
-                <input type="hidden" name="estimator_snapshot" id="feedback-estimator-snapshot" />
-                <input type="hidden" name="landing_page" id="feedback-landing-page" />
-                <input type="hidden" name="page_referrer" id="feedback-page-referrer" />
-                <input
-                  type="text"
-                  name="_gotcha"
-                  class="feedback-honeypot"
-                  tabindex="-1"
-                  autocomplete="off"
-                />
 
-                <div class="feedback-form-grid">
-                  <label class="feedback-field">
-                    <span>問題類型</span>
-                    <select name="issue_type" required>
-                      <option value="">請選擇</option>
-                      <option value="pricing">估價數字不合理</option>
-                      <option value="breakdown">工程拆解怪怪的</option>
-                      <option value="interaction">勾選或互動有問題</option>
-                      <option value="display">畫面顯示異常</option>
-                      <option value="other">其他</option>
-                    </select>
-                  </label>
-                  <label class="feedback-field">
-                    <span>聯絡方式（可選）</span>
-                    <input
-                      type="text"
-                      name="contact_method"
-                      placeholder="Email、LINE ID 或電話"
-                    />
-                  </label>
-                  <label class="feedback-field feedback-field-full">
-                    <span>你覺得哪裡怪？</span>
-                    <textarea
-                      id="feedback-message"
-                      name="issue_description"
-                      rows="4"
-                      placeholder="例如 30 坪、全勾時牆面工程反而下降，或切換精緻型後櫃體價格才正常"
-                      required
-                    ></textarea>
-                  </label>
-                </div>
-
-                <div class="feedback-actions">
-                  <button
-                    type="submit"
-                    class="btn btn-secondary feedback-submit"
-                    disabled={!estimatorFeedbackEnabled}
-                  >
-                    送出問題回報
-                  </button>
-                  <p class="feedback-note">
-                    這份回報會自動附上本次估價摘要與拆解結果，方便直接重現。
-                  </p>
-                </div>
-              </form>
+                  <div class="feedback-actions">
+                    <button
+                      type="submit"
+                      class="btn btn-secondary feedback-submit"
+                      disabled={!estimatorFeedbackEnabled}
+                    >
+                      送出問題回報
+                    </button>
+                    <p class="feedback-note">
+                      這份回報會自動附上本次估價摘要與拆解結果，方便直接重現。
+                    </p>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
 
         </div>
       </div>
 
-      <section class="faq-panel">
+      <section class="faq-panel" id="faq-panel">
         <div class="faq-header">
-          <h2>常見問題</h2>
-          <p>先看 3 個最常被問的問題。</p>
+          <div>
+            <h2>常見問題</h2>
+            <p>真的想看再展開，先把頁面留給試算結果。</p>
+          </div>
+          <button
+            type="button"
+            id="faq-toggle"
+            class="btn btn-secondary faq-toggle"
+            aria-expanded="false"
+            aria-controls="faq-list"
+          >
+            展開常見問題
+          </button>
         </div>
-        <div class="faq-list">
-          <details class="faq-item" open>
+        <div class="faq-list is-hidden" id="faq-list">
+          <details class="faq-item">
             <summary>這個結果可以當成正式報價嗎？</summary>
             <p>不行。這份結果比較像前期預算判讀，用來幫你理解規模、工項與討論方向；正式費用仍需依現場丈量、圖面與選材確認。</p>
           </details>
@@ -1501,8 +1515,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .feedback-card {
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
-    gap: 1.4rem;
+    gap: 1rem;
     margin-top: 1.3rem;
     padding: 1.55rem;
     border-radius: 24px;
@@ -1511,6 +1524,25 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       rgba(255, 255, 255, 0.92);
     border: 1px solid rgba(115, 103, 94, 0.16);
     box-shadow: 0 20px 36px rgba(47, 47, 47, 0.05);
+  }
+
+  .feedback-card-header,
+  .faq-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .feedback-toggle,
+  .faq-toggle {
+    flex: 0 0 auto;
+    align-self: center;
+  }
+
+  .feedback-card-panel.is-hidden,
+  .faq-list.is-hidden {
+    display: none;
   }
 
   .feedback-eyebrow {
@@ -1909,15 +1941,20 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       grid-template-columns: 1fr;
     }
 
-    .estimator-handoff-card,
-    .report-offer-card,
-    .feedback-card {
-      grid-template-columns: 1fr;
-    }
-
     .report-lead-grid,
     .feedback-form-grid {
       grid-template-columns: 1fr;
+    }
+
+    .feedback-card-header,
+    .faq-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .feedback-toggle,
+    .faq-toggle {
+      width: 100%;
     }
 
     .breakdown-item {
@@ -2073,12 +2110,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   ) as HTMLInputElement | null;
   const feedbackStatusSuccess = document.getElementById("feedback-status-success");
   const feedbackStatusError = document.getElementById("feedback-status-error");
+  const feedbackToggle = document.getElementById("feedback-toggle") as HTMLButtonElement | null;
+  const feedbackPanel = document.getElementById("feedback-panel");
   const feedbackLandingPage = document.getElementById(
     "feedback-landing-page",
   ) as HTMLInputElement | null;
   const feedbackPageReferrer = document.getElementById(
     "feedback-page-referrer",
   ) as HTMLInputElement | null;
+  const faqToggle = document.getElementById("faq-toggle") as HTMLButtonElement | null;
+  const faqList = document.getElementById("faq-list");
   const estimatorCtaLinks = Array.from(
     document.querySelectorAll("[data-estimator-cta]"),
   );
@@ -2294,6 +2335,35 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     const feedbackParam = new URLSearchParams(window.location.search).get("feedback");
     feedbackStatusSuccess?.classList.toggle("is-hidden", feedbackParam !== "success");
     feedbackStatusError?.classList.toggle("is-hidden", feedbackParam !== "error");
+    if (feedbackParam === "success" || feedbackParam === "error") {
+      setExpandableSection(feedbackPanel, feedbackToggle, true, "展開問題回報", "收起問題回報");
+    }
+  }
+
+  function setExpandableSection(
+    panel,
+    button,
+    isExpanded,
+    expandLabel,
+    collapseLabel,
+  ) {
+    if (!panel || !button) return;
+    panel.classList.toggle("is-hidden", !isExpanded);
+    button.setAttribute("aria-expanded", String(isExpanded));
+    button.textContent = isExpanded ? collapseLabel : expandLabel;
+  }
+
+  function syncExpandableSectionsFromUrl() {
+    syncFeedbackStatusFromUrl();
+
+    const shouldOpenFaq =
+      window.location.hash === "#faq-panel" ||
+      window.location.hash === "#faq-list" ||
+      new URLSearchParams(window.location.search).get("faq") === "open";
+
+    if (shouldOpenFaq) {
+      setExpandableSection(faqList, faqToggle, true, "展開常見問題", "收起常見問題");
+    }
   }
 
   function calculate() {
@@ -2831,8 +2901,30 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       });
     });
 
+    feedbackToggle?.addEventListener("click", () => {
+      const isExpanded = feedbackToggle.getAttribute("aria-expanded") === "true";
+      setExpandableSection(
+        feedbackPanel,
+        feedbackToggle,
+        !isExpanded,
+        "展開問題回報",
+        "收起問題回報",
+      );
+    });
+
+    faqToggle?.addEventListener("click", () => {
+      const isExpanded = faqToggle.getAttribute("aria-expanded") === "true";
+      setExpandableSection(
+        faqList,
+        faqToggle,
+        !isExpanded,
+        "展開常見問題",
+        "收起常見問題",
+      );
+    });
+
     fillEstimatorLeadAttribution();
-    syncFeedbackStatusFromUrl();
+    syncExpandableSectionsFromUrl();
 
     estimatorLeadForm?.addEventListener("submit", () => {
       calculate();
