@@ -1,6 +1,13 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
+type RiskMeta = {
+  riskLevel: "low" | "medium" | "high";
+  riskLabel: string;
+  riskNote: string;
+  bufferDays: number;
+};
+
 const ganttWeeks = Array.from({ length: 28 }, (_, index) => index + 1);
 const toneLegend = [
   {
@@ -48,7 +55,25 @@ const scopeLegend = [
   },
 ];
 
-const processStages = [
+const riskLegend = [
+  {
+    key: "low",
+    label: "低變動",
+    note: "通常依既定節奏推進，受外部變因影響較小。",
+  },
+  {
+    key: "medium",
+    label: "中變動",
+    note: "常受確認速度、現場條件或協作銜接影響。",
+  },
+  {
+    key: "high",
+    label: "高變動",
+    note: "最常受缺工、材料交期、隱藏問題或返修影響。",
+  },
+];
+
+const rawProcessStages = [
   {
     id: "consult",
     stage: "01",
@@ -451,9 +476,168 @@ const processStages = [
   },
 ];
 
+const stageRiskConfig: Record<string, RiskMeta> = {
+  consult: {
+    riskLevel: "low",
+    riskLabel: "低變動",
+    riskNote: "主要受雙方排程與回覆速度影響。",
+    bufferDays: 0,
+  },
+  survey: {
+    riskLevel: "low",
+    riskLabel: "低變動",
+    riskNote: "通常只要現場可進入就能完成。",
+    bufferDays: 0,
+  },
+  "layout-proposal": {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "若平面方向反覆調整，會拉長前期節奏。",
+    bufferDays: 3,
+  },
+  "design-contract": {
+    riskLevel: "low",
+    riskLabel: "低變動",
+    riskNote: "主要取決於合作確認速度。",
+    bufferDays: 0,
+  },
+  "detailed-design": {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "材質、櫃體與設備整合越多，往往越需要反覆確認。",
+    bufferDays: 4,
+  },
+  "quote-contract": {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "報價增減與付款條件協調常讓時間拉長。",
+    bufferDays: 3,
+  },
+  "procurement-prep": {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "主材到貨與工班排程常在這裡開始出現落差。",
+    bufferDays: 4,
+  },
+  protection: {
+    riskLevel: "low",
+    riskLabel: "低變動",
+    riskNote: "通常為開工既定流程。",
+    bufferDays: 0,
+  },
+  demolition: {
+    riskLevel: "high",
+    riskLabel: "高變動",
+    riskNote: "拆除後最容易發現漏水、結構或管線隱藏問題。",
+    bufferDays: 7,
+  },
+  "plumbing-electric": {
+    riskLevel: "high",
+    riskLabel: "高變動",
+    riskNote: "常因點位調整、現場條件與協作卡位延後。",
+    bufferDays: 6,
+  },
+  "masonry-base": {
+    riskLevel: "high",
+    riskLabel: "高變動",
+    riskNote: "濕作與修補類工序最常受基底與養護時間影響。",
+    bufferDays: 7,
+  },
+  waterproofing: {
+    riskLevel: "high",
+    riskLabel: "高變動",
+    riskNote: "需保留試水與修正時間，不能壓太滿。",
+    bufferDays: 5,
+  },
+  "windows-metal": {
+    riskLevel: "high",
+    riskLabel: "高變動",
+    riskNote: "外部條件、訂製尺寸與金屬加工交期波動較大。",
+    bufferDays: 5,
+  },
+  carpentry: {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "常與空調、弱電和現場誤差互相牽動。",
+    bufferDays: 4,
+  },
+  "hvac-lowvoltage": {
+    riskLevel: "high",
+    riskLabel: "高變動",
+    riskNote: "設備整合與多工班交錯最容易延長工期。",
+    bufferDays: 6,
+  },
+  tiling: {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "對基底、排版與材料到貨都較敏感。",
+    bufferDays: 4,
+  },
+  paint: {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "常受前面木作修補與現場保護品質影響。",
+    bufferDays: 3,
+  },
+  "cabinet-factory": {
+    riskLevel: "high",
+    riskLabel: "高變動",
+    riskNote: "系統櫃與門片製作最常受工廠排程與五金交期影響。",
+    bufferDays: 7,
+  },
+  flooring: {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "會受濕作完成度與交叉施工影響。",
+    bufferDays: 3,
+  },
+  "cabinet-install": {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "若現場誤差或完成面有問題，安裝會被連動延後。",
+    bufferDays: 4,
+  },
+  "equipment-install": {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "型號更換、到貨延誤或設備測試都會影響節點。",
+    bufferDays: 4,
+  },
+  finishing: {
+    riskLevel: "high",
+    riskLabel: "高變動",
+    riskNote: "最後修口與補漆最常被前面累積問題壓縮。",
+    bufferDays: 5,
+  },
+  cleaning: {
+    riskLevel: "low",
+    riskLabel: "低變動",
+    riskNote: "主要受前一階段是否真正收尾完成影響。",
+    bufferDays: 1,
+  },
+  inspection: {
+    riskLevel: "high",
+    riskLabel: "高變動",
+    riskNote: "驗收後若有缺失修正，通常會直接往後推。",
+    bufferDays: 5,
+  },
+  handoff: {
+    riskLevel: "medium",
+    riskLabel: "中變動",
+    riskNote: "點交通常受複驗結果與屋主時間影響。",
+    bufferDays: 3,
+  },
+};
+
+const processStages = rawProcessStages.map((item) => ({
+  ...item,
+  ...stageRiskConfig[item.id],
+}));
+
 const requiredCount = processStages.filter((item) => item.scopeType === "required").length;
 const optionalCount = processStages.filter((item) => item.scopeType === "optional").length;
 const totalWeeks = Math.max(...processStages.map((item) => item.start + item.span - 1));
+const highRiskCount = processStages.filter((item) => item.riskLevel === "high").length;
 
 const stageHighlights = [
   {
@@ -493,7 +677,7 @@ const processStructuredData = [
 
 <BaseLayout
   title="裝修全流程 - 青曦空間設計"
-  description="用甘特圖看懂青曦空間設計從初談、提案、簽約設計到拆除施工與完工交屋的完整流程，並可輸入日期自動換算各節點時間。"
+  description="用甘特圖看懂青曦空間設計從初談、提案、簽約設計到拆除施工與完工交屋的完整流程，並提供基準版與保守版日期推算。"
   ogImage="/images/portfolio/xizhi-1.jpg"
   pageType="service"
   structuredData={processStructuredData}
@@ -526,7 +710,7 @@ const processStructuredData = [
       <section class="schedule-tools" aria-label="日期換算工具">
         <article class="schedule-card schedule-card-primary">
           <p class="schedule-eyebrow">日期換算</p>
-          <h2>輸入起算日期，自動推算各節點時間</h2>
+          <h2>輸入起算日期，切換基準版或保守版</h2>
           <div class="schedule-form">
             <label class="schedule-field">
               <span>起算日期</span>
@@ -537,13 +721,20 @@ const processStructuredData = [
               <button type="button" id="schedule-clear" class="schedule-action">清除</button>
             </div>
           </div>
+          <div class="schedule-mode-switch" role="tablist" aria-label="排程模式">
+            <button type="button" class="schedule-mode-button is-active" data-schedule-mode="baseline">基準版</button>
+            <button type="button" class="schedule-mode-button" data-schedule-mode="conservative">保守版</button>
+          </div>
           <p id="schedule-summary" class="schedule-summary" aria-live="polite">
-            輸入日期後，這裡會顯示整套流程的大致完成時間。
+            選好日期後，這裡會顯示整體節奏與預留彈性。
+          </p>
+          <p class="schedule-helper">
+            保守版會對中高變動工項自動加入緩衝，較適合拿來抓搬家、家具進場與租約銜接。
           </p>
         </article>
 
         <article class="schedule-card schedule-card-secondary">
-          <p class="schedule-eyebrow">快速判讀</p>
+          <p class="schedule-eyebrow">期待管理</p>
           <div class="schedule-metrics">
             <div class="schedule-metric">
               <strong>{processStages.length}</strong>
@@ -561,9 +752,13 @@ const processStructuredData = [
               <strong>{totalWeeks}</strong>
               <span>基準週數</span>
             </div>
+            <div class="schedule-metric">
+              <strong>{highRiskCount}</strong>
+              <span>高變動工項</span>
+            </div>
           </div>
           <p class="schedule-description">
-            真實案場若遇到老屋問題、訂製交期較長或中途改動需求，交屋時間通常會再往後拉。
+            以下日期是排程推算，不是交屋承諾。若遇到缺工、材料交期、現場突發狀況、社區施工限制或中途變更，實際進度仍可能延後，建議至少預留 10%-20% 彈性。
           </p>
         </article>
       </section>
@@ -574,7 +769,7 @@ const processStructuredData = [
             <p class="gantt-label">甘特圖</p>
             <h2 id="gantt-title">以 28 週為基準的全流程節奏</h2>
           </div>
-          <p class="gantt-note">顏色代表工項類型，標籤代表必做或視案況，日期欄位會依你輸入的起算日自動換算。</p>
+          <p class="gantt-note">切到保守版後，日期會對中高變動工項自動加上緩衝。</p>
         </div>
 
         <div class="gantt-legend-grid">
@@ -606,6 +801,20 @@ const processStructuredData = [
               ))}
             </div>
           </div>
+
+          <div class="legend-group">
+            <p>變動程度</p>
+            <div class="legend-items legend-items-compact">
+              {riskLegend.map((item) => (
+                <div class="legend-item">
+                  <span class={`risk-pill risk-pill-${item.key}`}>{item.label}</span>
+                  <div>
+                    <small>{item.note}</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div class="gantt-board">
@@ -625,6 +834,8 @@ const processStructuredData = [
                 data-stage-title={item.title}
                 data-start-week={item.start}
                 data-span-weeks={item.span}
+                data-buffer-days={item.bufferDays}
+                data-risk-level={item.riskLevel}
               >
                 <div class="gantt-stage">
                   <span class={`gantt-stage-number gantt-stage-number-${item.tone}`}>{item.stage}</span>
@@ -637,10 +848,11 @@ const processStructuredData = [
                     <p class="gantt-stage-summary">{item.summary}</p>
                     <div class="gantt-stage-meta">
                       <span class={`tone-pill tone-pill-${item.tone}`}>{item.toneLabel}</span>
+                      <span class={`risk-pill risk-pill-${item.riskLevel}`}>{item.riskLabel}</span>
                       <span class="gantt-stage-duration">{item.durationLabel}</span>
                     </div>
                     <p class="gantt-date-range gantt-date-range-empty" data-stage-date={item.id}>
-                      輸入起算日期後，自動換算這個節點的大約日期區間。
+                      選好日期後，這裡會顯示這個節點的大約區間。
                     </p>
                   </div>
                 </div>
@@ -666,6 +878,10 @@ const processStructuredData = [
                     </ul>
                   </div>
                   <div class="gantt-detail-block">
+                    <p>變動提醒</p>
+                    <p class="gantt-risk-note">{item.riskNote}</p>
+                  </div>
+                  <div class="gantt-detail-block">
                     <p>常見產出</p>
                     <ul>
                       {item.outputs.map((output) => <li>{output}</li>)}
@@ -680,8 +896,8 @@ const processStructuredData = [
 
       <section class="process-notes" aria-label="補充說明">
         <article class="notes-card notes-card-dark">
-          <p class="notes-label">你會看到的真實差異</p>
-          <h2>哪些因素最常讓時程變動？</h2>
+          <p class="notes-label">排程現實</p>
+          <h2>哪些情況最常把時程往後推？</h2>
           <ul class="notes-list">
             <li>老屋若拆除後才發現漏水、結構修補、電箱更新或管線重拉，後面所有工項都可能往後延。</li>
             <li>系統櫃、特殊門片、玻璃、石材或進口五金若製作週期較長，安裝與收尾階段會一起被拉長。</li>
@@ -690,10 +906,10 @@ const processStructuredData = [
         </article>
 
         <article class="notes-card">
-          <p class="notes-label">補充</p>
-          <h2>視案況追加的工項，最常影響整體節奏</h2>
+          <p class="notes-label">建議</p>
+          <h2>如果有搬家或租約壓力，請直接看保守版</h2>
           <p>
-            像泥作變更、鋁窗更新、空調弱電、系統櫃比例較高或特殊材料交期較長時，整體工期通常會一起被拉長。
+            若你手上有搬家、家具進場、租約到期或入厝日安排，不建議把基準版最後一天當成唯一決策點。
           </p>
           <div class="notes-actions">
             <a href="/portfolio" class="process-button process-button-secondary">先看作品</a>
@@ -917,6 +1133,44 @@ const processStructuredData = [
     letter-spacing: 0.008em;
   }
 
+  .schedule-helper {
+    margin: 0.65rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    letter-spacing: 0.008em;
+  }
+
+  .schedule-mode-switch {
+    display: inline-flex;
+    gap: 0.65rem;
+    margin-top: 1rem;
+    padding: 0.35rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+  }
+
+  .schedule-mode-button {
+    min-height: 42px;
+    padding: 0.7rem 1rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--gray-medium);
+    font: inherit;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .schedule-mode-button.is-active {
+    background: linear-gradient(135deg, var(--gray-darkest) 0%, #6a5f57 100%);
+    color: var(--white);
+    box-shadow: 0 12px 20px rgba(20, 20, 20, 0.12);
+  }
+
   .schedule-metrics {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -979,7 +1233,7 @@ const processStructuredData = [
 
   .gantt-legend-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
     margin-bottom: 1.2rem;
     padding: 0 0.35rem;
@@ -1065,7 +1319,8 @@ const processStructuredData = [
   }
 
   .legend-badge,
-  .tone-pill {
+  .tone-pill,
+  .risk-pill {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1075,6 +1330,21 @@ const processStructuredData = [
     font-weight: 600;
     letter-spacing: 0.06em;
     white-space: nowrap;
+  }
+
+  .risk-pill-low {
+    background: rgba(72, 107, 76, 0.12);
+    color: #406443;
+  }
+
+  .risk-pill-medium {
+    background: rgba(185, 140, 88, 0.14);
+    color: #9b6f3d;
+  }
+
+  .risk-pill-high {
+    background: rgba(155, 78, 69, 0.14);
+    color: #8d4b42;
   }
 
   .legend-badge-required {
@@ -1374,6 +1644,13 @@ const processStructuredData = [
     margin-top: 0.35rem;
   }
 
+  .gantt-risk-note {
+    margin: 0.7rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    letter-spacing: 0.008em;
+  }
+
   .notes-card {
     padding: 1.7rem;
   }
@@ -1443,12 +1720,20 @@ const processStructuredData = [
     }
 
     .process-button,
-    .schedule-action {
+    .schedule-action,
+    .schedule-mode-button {
       width: 100%;
     }
 
     .schedule-form {
       grid-template-columns: 1fr;
+    }
+
+    .schedule-mode-switch {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
+      border-radius: 20px;
     }
 
     .gantt-section {
@@ -1476,8 +1761,10 @@ const processStructuredData = [
     const summaryNode = document.getElementById("schedule-summary");
     const processPage = document.querySelector(".process-page");
     const stageRows = Array.from(document.querySelectorAll("[data-stage-id]"));
+    const modeButtons = Array.from(document.querySelectorAll("[data-schedule-mode]"));
     const totalWeeks = Number(processPage?.getAttribute("data-total-weeks") || 0);
     const defaultSummary = summaryNode?.textContent || "";
+    let scheduleMode = "baseline";
 
     function toInputDateValue(date) {
       const year = date.getFullYear();
@@ -1507,13 +1794,21 @@ const processStructuredData = [
       }).format(date);
     }
 
+    function setScheduleMode(nextMode) {
+      scheduleMode = nextMode;
+      modeButtons.forEach((button) => {
+        const isActive = button.getAttribute("data-schedule-mode") === nextMode;
+        button.classList.toggle("is-active", isActive);
+      });
+    }
+
     function updateSchedule() {
       const baseDate = parseLocalDate(startDateInput instanceof HTMLInputElement ? startDateInput.value : "");
       const dateNodes = Array.from(document.querySelectorAll("[data-stage-date]"));
 
       if (!baseDate) {
         dateNodes.forEach((node) => {
-          node.textContent = "輸入起算日期後，自動換算這個節點的大約日期區間。";
+          node.textContent = "選好日期後，這裡會顯示這個節點的大約區間。";
           node.classList.add("gantt-date-range-empty");
         });
         if (summaryNode) {
@@ -1522,24 +1817,48 @@ const processStructuredData = [
         return;
       }
 
+      let conservativeOffsetDays = 0;
+
       stageRows.forEach((row) => {
         const stageId = row.getAttribute("data-stage-id");
         const startWeek = Number(row.getAttribute("data-start-week") || 0);
         const spanWeeks = Number(row.getAttribute("data-span-weeks") || 0);
+        const bufferDays = Number(row.getAttribute("data-buffer-days") || 0);
+        const riskLevel = row.getAttribute("data-risk-level") || "low";
         const title = row.getAttribute("data-stage-title") || "此節點";
         const targetNode = document.querySelector(`[data-stage-date="${stageId}"]`);
         if (!targetNode || !startWeek || !spanWeeks) return;
 
-        const stageStart = addDays(baseDate, (startWeek - 1) * 7);
-        const stageEnd = addDays(baseDate, (startWeek + spanWeeks - 1) * 7 - 1);
-        targetNode.textContent = `${title}約落在 ${formatDate(stageStart)} 至 ${formatDate(stageEnd)}`;
+        const baselineStart = addDays(baseDate, (startWeek - 1) * 7);
+        const baselineEnd = addDays(baseDate, (startWeek + spanWeeks - 1) * 7 - 1);
+        const conservativeStart = addDays(baselineStart, conservativeOffsetDays);
+        const conservativeEnd = addDays(baselineEnd, conservativeOffsetDays + bufferDays);
+
+        if (scheduleMode === "conservative") {
+          const bufferText =
+            riskLevel === "high" || riskLevel === "medium" ? `，已含約 ${bufferDays} 天緩衝` : "";
+          targetNode.textContent =
+            `${title}保守抓約 ${formatDate(conservativeStart)} 至 ${formatDate(conservativeEnd)}${bufferText}`;
+        } else {
+          targetNode.textContent =
+            `${title}基準抓約 ${formatDate(baselineStart)} 至 ${formatDate(baselineEnd)}`;
+        }
         targetNode.classList.remove("gantt-date-range-empty");
+
+        conservativeOffsetDays += bufferDays;
       });
 
       if (summaryNode && totalWeeks) {
-        const estimatedEnd = addDays(baseDate, totalWeeks * 7 - 1);
-        summaryNode.textContent =
-          `若以 ${formatDate(baseDate)} 作為起算日，依這份基準甘特圖估算，整體流程大約會在 ${formatDate(estimatedEnd)} 前後收斂到交屋。`;
+        const baselineEnd = addDays(baseDate, totalWeeks * 7 - 1);
+        const conservativeEnd = addDays(baselineEnd, conservativeOffsetDays);
+
+        if (scheduleMode === "conservative") {
+          summaryNode.textContent =
+            `若以 ${formatDate(baseDate)} 起算，保守版大約會落在 ${formatDate(conservativeEnd)} 前後交屋，較適合用來安排搬家、家具進場與租約銜接。`;
+        } else {
+          summaryNode.textContent =
+            `若以 ${formatDate(baseDate)} 起算，基準版大約會在 ${formatDate(baselineEnd)} 前後收斂到交屋；若要抓更安全的時間，建議再看保守版。`;
+        }
       }
     }
 
@@ -1562,6 +1881,16 @@ const processStructuredData = [
       startDateInput.addEventListener("change", updateSchedule);
     }
 
+    modeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextMode = button.getAttribute("data-schedule-mode");
+        if (!nextMode) return;
+        setScheduleMode(nextMode);
+        updateSchedule();
+      });
+    });
+
+    setScheduleMode(scheduleMode);
     updateSchedule();
   });
 </script>
