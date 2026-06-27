@@ -11,6 +11,13 @@ const estimatorLeadAction = requirementFormId
 const estimatorLeadEnabled = Boolean(estimatorLeadAction);
 const siteOrigin = (Astro.site || new URL("https://qingxidesign.tw")).toString();
 const estimatorLeadSuccessURL = new URL("/consultation-thank-you", siteOrigin).toString();
+const estimatorFeedbackFormId =
+  import.meta.env.FORMSPREE_ESTIMATOR_FEEDBACK_FORM_ID?.trim() ||
+  import.meta.env.PUBLIC_FORMSPREE_ESTIMATOR_FEEDBACK_FORM_ID?.trim() ||
+  import.meta.env.FORMSPREE_REQUIREMENT_FORM_ID?.trim() ||
+  import.meta.env.PUBLIC_FORMSPREE_REQUIREMENT_FORM_ID?.trim() ||
+  "";
+const estimatorFeedbackEnabled = Boolean(estimatorFeedbackFormId);
 
 const houseConditionOptions = [
   { value: "new", label: "新成屋 / 屋況佳" },
@@ -615,6 +622,118 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
           <div class="disclaimer">
             <p>{estimatorConfig.disclaimer}</p>
+          </div>
+
+          <div class="feedback-card" id="feedback-form">
+            <div class="feedback-card-copy">
+              <p class="feedback-eyebrow">BUG FEEDBACK</p>
+              <h3>覺得結果怪怪的？直接回報給青曦。</h3>
+              <p class="feedback-description">
+                送出時會自動附上你這次的估價摘要、工程拆解與頁面資訊，方便直接檢查是公式、互動還是顯示問題。
+              </p>
+              <div class="feedback-points">
+                <div class="feedback-point">
+                  <strong>不用自己整理條件</strong>
+                  <span>目前坪數、等級、工項與拆解結果都會一起附上。</span>
+                </div>
+                <div class="feedback-point">
+                  <strong>可留聯絡方式追蹤</strong>
+                  <span>若你願意，青曦可再回頭確認是行情、公式還是前端 bug。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="feedback-card-form">
+              <div
+                id="feedback-status-success"
+                class="feedback-status feedback-status-success is-hidden"
+                role="status"
+              >
+                <p>問題回報已送出，青曦會連同這次試算摘要一起檢查。</p>
+              </div>
+              <div
+                id="feedback-status-error"
+                class="feedback-status feedback-status-error is-hidden"
+                role="status"
+              >
+                <p>這次回報沒有成功送出，請稍後再試，或直接改用 LINE 告知。</p>
+              </div>
+              {
+                !estimatorFeedbackEnabled && (
+                  <div class="feedback-status" role="status">
+                    <p>問題回報收件尚未完成設定，目前可先透過下方聯絡方式或官方 LINE 告知青曦。</p>
+                  </div>
+                )
+              }
+              <form
+                id="estimator-feedback-form"
+                action="/api/forms/estimator-feedback"
+                method="POST"
+                class="feedback-form"
+                data-form-enabled={String(estimatorFeedbackEnabled)}
+              >
+                <input type="hidden" name="page_path" value="/tools" />
+                <input type="hidden" name="form_type" value="estimator_bug_feedback" />
+                <input type="hidden" name="form_stage" value="stage_1_estimator_feedback" />
+                <input type="hidden" name="estimator_summary" id="feedback-estimator-summary" />
+                <input type="hidden" name="estimator_breakdown" id="feedback-estimator-breakdown" />
+                <input type="hidden" name="estimator_snapshot" id="feedback-estimator-snapshot" />
+                <input type="hidden" name="landing_page" id="feedback-landing-page" />
+                <input type="hidden" name="page_referrer" id="feedback-page-referrer" />
+                <input
+                  type="text"
+                  name="_gotcha"
+                  class="feedback-honeypot"
+                  tabindex="-1"
+                  autocomplete="off"
+                />
+
+                <div class="feedback-form-grid">
+                  <label class="feedback-field">
+                    <span>問題類型</span>
+                    <select name="issue_type" required>
+                      <option value="">請選擇</option>
+                      <option value="pricing">估價數字不合理</option>
+                      <option value="breakdown">工程拆解怪怪的</option>
+                      <option value="interaction">勾選或互動有問題</option>
+                      <option value="display">畫面顯示異常</option>
+                      <option value="other">其他</option>
+                    </select>
+                  </label>
+                  <label class="feedback-field">
+                    <span>聯絡方式（可選）</span>
+                    <input
+                      type="text"
+                      name="contact_method"
+                      placeholder="Email、LINE ID 或電話"
+                    />
+                  </label>
+                  <label class="feedback-field feedback-field-full">
+                    <span>你覺得哪裡怪？</span>
+                    <textarea
+                      id="feedback-message"
+                      name="issue_description"
+                      rows="4"
+                      placeholder="例如 30 坪、全勾時牆面工程反而下降，或切換精緻型後櫃體價格才正常"
+                      required
+                    ></textarea>
+                  </label>
+                </div>
+
+                <div class="feedback-actions">
+                  <button
+                    type="submit"
+                    class="btn btn-secondary feedback-submit"
+                    disabled={!estimatorFeedbackEnabled}
+                  >
+                    送出問題回報
+                  </button>
+                  <p class="feedback-note">
+                    這份回報會自動附上本次估價摘要與拆解結果，方便直接重現。
+                  </p>
+                </div>
+              </form>
+            </div>
           </div>
 
         </div>
@@ -1380,6 +1499,196 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     font-size: 0.93rem;
   }
 
+  .feedback-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+    gap: 1.4rem;
+    margin-top: 1.3rem;
+    padding: 1.55rem;
+    border-radius: 24px;
+    background:
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.05), transparent 38%),
+      rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(115, 103, 94, 0.16);
+    box-shadow: 0 20px 36px rgba(47, 47, 47, 0.05);
+  }
+
+  .feedback-eyebrow {
+    margin: 0 0 0.8rem;
+    color: var(--tiffany-dark);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .feedback-card-copy h3 {
+    margin: 0;
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.45rem;
+    line-height: 1.55;
+    color: var(--gray-darkest);
+    letter-spacing: 0.04em;
+  }
+
+  .feedback-description {
+    margin: 0.8rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+  }
+
+  .feedback-points {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 1.1rem;
+  }
+
+  .feedback-point {
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    background: rgba(247, 250, 250, 0.88);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+  }
+
+  .feedback-point strong,
+  .feedback-point span {
+    display: block;
+  }
+
+  .feedback-point strong {
+    color: var(--gray-darkest);
+  }
+
+  .feedback-point span {
+    margin-top: 0.35rem;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.92rem;
+  }
+
+  .feedback-card-form {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .feedback-status {
+    padding: 0.95rem 1rem;
+    border-radius: 16px;
+    background: rgba(247, 250, 250, 0.9);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+    color: var(--gray-medium);
+  }
+
+  .feedback-status p {
+    margin: 0;
+    line-height: 1.72;
+    font-size: 0.92rem;
+  }
+
+  .feedback-status.is-hidden {
+    display: none;
+  }
+
+  .feedback-status-success {
+    background: rgba(232, 243, 240, 0.95);
+    border-color: rgba(76, 125, 110, 0.22);
+    color: #35584d;
+  }
+
+  .feedback-status-error {
+    background: rgba(255, 244, 241, 0.95);
+    border-color: rgba(191, 106, 83, 0.2);
+    color: #8b4c3b;
+  }
+
+  .feedback-form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .feedback-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .feedback-field {
+    display: grid;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .feedback-field span {
+    color: var(--gray-dark);
+    font-size: 0.92rem;
+    font-weight: 500;
+  }
+
+  .feedback-field input,
+  .feedback-field select,
+  .feedback-field textarea {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0.9rem 0.95rem;
+    border: 1px solid rgba(115, 103, 94, 0.18);
+    border-radius: 14px;
+    font-size: 0.98rem;
+    color: var(--gray-darkest);
+    background: rgba(255, 255, 255, 0.96);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  }
+
+  .feedback-field textarea {
+    resize: vertical;
+    min-height: 116px;
+  }
+
+  .feedback-field input:focus,
+  .feedback-field select:focus,
+  .feedback-field textarea:focus {
+    outline: none;
+    border-color: rgba(115, 103, 94, 0.46);
+    box-shadow: 0 0 0 4px rgba(115, 103, 94, 0.12);
+    transform: translateY(-1px);
+  }
+
+  .feedback-field-full {
+    grid-column: 1 / -1;
+  }
+
+  .feedback-actions {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .feedback-submit {
+    justify-self: start;
+  }
+
+  .feedback-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .feedback-note {
+    margin: 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    font-size: 0.9rem;
+  }
+
+  .feedback-honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .advice-card {
     padding: 1.4rem;
     border-radius: 22px;
@@ -1601,11 +1910,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     }
 
     .estimator-handoff-card,
-    .report-offer-card {
+    .report-offer-card,
+    .feedback-card {
       grid-template-columns: 1fr;
     }
 
-    .report-lead-grid {
+    .report-lead-grid,
+    .feedback-form-grid {
       grid-template-columns: 1fr;
     }
 
@@ -1748,6 +2059,26 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const estimatorPageReferrer = document.getElementById(
     "estimator-page-referrer",
   ) as HTMLInputElement | null;
+  const estimatorFeedbackForm = document.getElementById(
+    "estimator-feedback-form",
+  ) as HTMLFormElement | null;
+  const feedbackEstimatorSummary = document.getElementById(
+    "feedback-estimator-summary",
+  ) as HTMLInputElement | null;
+  const feedbackEstimatorBreakdown = document.getElementById(
+    "feedback-estimator-breakdown",
+  ) as HTMLInputElement | null;
+  const feedbackEstimatorSnapshot = document.getElementById(
+    "feedback-estimator-snapshot",
+  ) as HTMLInputElement | null;
+  const feedbackStatusSuccess = document.getElementById("feedback-status-success");
+  const feedbackStatusError = document.getElementById("feedback-status-error");
+  const feedbackLandingPage = document.getElementById(
+    "feedback-landing-page",
+  ) as HTMLInputElement | null;
+  const feedbackPageReferrer = document.getElementById(
+    "feedback-page-referrer",
+  ) as HTMLInputElement | null;
   const estimatorCtaLinks = Array.from(
     document.querySelectorAll("[data-estimator-cta]"),
   );
@@ -1865,6 +2196,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     if (estimatorUtmContent) estimatorUtmContent.value = searchParams.get("utm_content") || "";
     if (estimatorLandingPage) estimatorLandingPage.value = window.location.href;
     if (estimatorPageReferrer) estimatorPageReferrer.value = document.referrer || "";
+    if (feedbackLandingPage) feedbackLandingPage.value = window.location.href;
+    if (feedbackPageReferrer) feedbackPageReferrer.value = document.referrer || "";
   }
 
   let lastTrackedSignature = "";
@@ -1948,6 +2281,19 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       qualityLevelMeta[qualityLevel?.value as keyof typeof qualityLevelMeta] ||
       qualityLevelMeta.standard;
     qualityLevelNote.textContent = meta.helper;
+  }
+
+  function buildBreakdownSummary(breakdownItems = []) {
+    if (!breakdownItems.length) return "";
+    return breakdownItems
+      .map((item) => `${item.label}：${formatRange(item.min, item.max)}｜${item.description}`)
+      .join("\n");
+  }
+
+  function syncFeedbackStatusFromUrl() {
+    const feedbackParam = new URLSearchParams(window.location.search).get("feedback");
+    feedbackStatusSuccess?.classList.toggle("is-hidden", feedbackParam !== "success");
+    feedbackStatusError?.classList.toggle("is-hidden", feedbackParam !== "error");
   }
 
   function calculate() {
@@ -2304,6 +2650,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     if (estimatorSummaryInput) {
       estimatorSummaryInput.value = estimatorSummaryText;
     }
+    if (feedbackEstimatorSummary) {
+      feedbackEstimatorSummary.value = estimatorSummaryText;
+    }
+    if (feedbackEstimatorBreakdown) {
+      feedbackEstimatorBreakdown.value = buildBreakdownSummary(breakdownItems);
+    }
 
     const defaultLeadFocus =
       projectType.value === "design-only"
@@ -2353,6 +2705,34 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       breakdownItems,
       updatedAt: new Date().toISOString(),
     });
+
+    if (feedbackEstimatorSnapshot) {
+      feedbackEstimatorSnapshot.value = JSON.stringify(
+        {
+          area,
+          projectType: projectMeta.label,
+          qualityLevel:
+            qualityLevel.options[qualityLevel.selectedIndex]?.textContent || "",
+          houseCondition: conditionMeta.label,
+          residenceType: residenceMeta.label,
+          usePurpose: usePurposeInfo.label,
+          timeline: timelineInfo.label,
+          items: selectedConfigs.map((item) => ({
+            label: item.label,
+            detail: item.detail.label || "",
+          })),
+          totalRange: formatRange(minTotal, maxTotal),
+          designRange: formatRange(minDesign, maxDesign),
+          constructionRange: formatRange(minConstruction, maxConstruction),
+          reserveRange: formatRange(minReserve, maxReserve),
+          perPingRange: `每坪約 ${minPerPing}萬 - ${maxPerPing}萬`,
+          breakdownItems,
+          capturedAt: new Date().toISOString(),
+        },
+        null,
+        2,
+      );
+    }
 
     if (trackingSignature !== lastTrackedSignature) {
       lastTrackedSignature = trackingSignature;
@@ -2452,11 +2832,20 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     });
 
     fillEstimatorLeadAttribution();
+    syncFeedbackStatusFromUrl();
 
     estimatorLeadForm?.addEventListener("submit", () => {
       calculate();
       window.trackLeadEvent?.("estimator_inline_lead_submit", {
         lead_intent: estimatorLeadIntent?.value || "budget-breakdown-report",
+      });
+    });
+
+    estimatorFeedbackForm?.addEventListener("submit", () => {
+      calculate();
+      window.trackLeadEvent?.("estimator_feedback_submit", {
+        project_type: projectType.value,
+        quality_level: qualityLevel.value,
       });
     });
 
