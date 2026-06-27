@@ -651,6 +651,10 @@ const processStages = rawProcessStages.map((item) => ({
 
 const totalWeeks = Math.max(...processStages.map((item) => item.start + item.span - 1));
 const highRiskCount = processStages.filter((item) => item.riskLevel === "high").length;
+const keyFlexStageIds = ["demolition", "plumbing-electric", "cabinet-factory", "inspection"];
+const keyFlexStages = keyFlexStageIds
+  .map((id) => processStages.find((item) => item.id === id))
+  .filter(Boolean);
 
 const stageHighlights = [
   {
@@ -784,6 +788,36 @@ const processStructuredData = [
           </ul>
           <p class="schedule-description">
             以下日期是排程推算，不是交屋承諾。若遇到缺工、材料交期、現場突發狀況、社區施工限制或中途變更，實際進度仍可能延後，建議至少預留 10%-20% 彈性。
+          </p>
+        </article>
+      </section>
+
+      <section class="process-brief" aria-label="重點摘要">
+        <article class="brief-card brief-card-primary">
+          <p class="notes-label">交付視窗</p>
+          <h2>先看兩種時間視角，再決定你要抓得多保守。</h2>
+          <div class="brief-window-grid">
+            <div class="brief-window-item">
+              <span>日常節奏</span>
+              <strong id="brief-baseline-window">選好日期後，這裡會先出現較日常的交付視窗。</strong>
+              <small>先用來理解整體推進感</small>
+            </div>
+            <div class="brief-window-item">
+              <span>安心安排</span>
+              <strong id="brief-conservative-window">若你有搬家或租約安排，這裡會提供更保守的交付抓法。</strong>
+              <small>更適合拿來安排實際決策</small>
+            </div>
+          </div>
+        </article>
+
+        <article class="brief-card">
+          <p class="notes-label">最需留白</p>
+          <h2>真正該保留彈性的，通常不是全部工項，而是幾個關鍵轉折。</h2>
+          <div class="brief-tag-list">
+            {keyFlexStages.map((item) => <span class="brief-tag">{item.title}</span>)}
+          </div>
+          <p>
+            這幾段最常牽動後面的節奏，所以比起把每一天算得很準，更重要的是替這些轉折預留空間。
           </p>
         </article>
       </section>
@@ -1053,6 +1087,7 @@ const processStructuredData = [
 
   .process-highlights,
   .schedule-tools,
+  .process-brief,
   .process-notes {
     margin-top: 2rem;
     display: grid;
@@ -1061,11 +1096,13 @@ const processStructuredData = [
   }
 
   .schedule-tools,
+  .process-brief,
   .process-notes {
     grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
   }
 
   .highlight-card,
+  .brief-card,
   .notes-card,
   .schedule-card {
     border-radius: 26px;
@@ -1074,6 +1111,7 @@ const processStructuredData = [
   }
 
   .highlight-card,
+  .brief-card,
   .notes-card,
   .schedule-card-secondary {
     padding: 1.5rem;
@@ -1267,6 +1305,88 @@ const processStructuredData = [
 
   .schedule-reading-list li + li {
     margin-top: 0.4rem;
+  }
+
+  .brief-card h2 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.45rem, 2.6vw, 1.9rem);
+    line-height: 1.4;
+    color: var(--gray-darkest);
+    font-weight: 600;
+  }
+
+  .brief-card-primary {
+    background:
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 30%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 241, 236, 1) 100%);
+  }
+
+  .brief-window-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  .brief-window-item {
+    padding: 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+  }
+
+  .brief-window-item span,
+  .brief-window-item small {
+    display: block;
+  }
+
+  .brief-window-item span {
+    color: var(--gray-medium);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+  }
+
+  .brief-window-item strong {
+    display: block;
+    margin-top: 0.55rem;
+    color: var(--gray-darkest);
+    font-size: 1rem;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+  }
+
+  .brief-window-item small {
+    margin-top: 0.55rem;
+    color: var(--gray-medium);
+    line-height: 1.7;
+  }
+
+  .brief-tag-list {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .brief-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(115, 103, 94, 0.14);
+    color: var(--gray-darkest);
+    font-size: 0.84rem;
+    letter-spacing: 0.02em;
+  }
+
+  .brief-card > p:last-of-type {
+    margin: 1rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.82;
+    letter-spacing: 0.008em;
   }
 
   .gantt-section {
@@ -1756,6 +1876,7 @@ const processStructuredData = [
   @media (max-width: 1180px) {
     .process-highlights,
     .schedule-tools,
+    .process-brief,
     .process-notes,
     .gantt-legend-grid {
       grid-template-columns: 1fr;
@@ -1816,7 +1937,8 @@ const processStructuredData = [
     }
 
     .legend-items,
-    .schedule-metrics {
+    .schedule-metrics,
+    .brief-window-grid {
       grid-template-columns: 1fr;
     }
   }
@@ -1829,6 +1951,8 @@ const processStructuredData = [
     const clearButton = document.getElementById("schedule-clear");
     const summaryNode = document.getElementById("schedule-summary");
     const modeCopy = document.getElementById("schedule-mode-copy");
+    const baselineWindowNode = document.getElementById("brief-baseline-window");
+    const conservativeWindowNode = document.getElementById("brief-conservative-window");
     const processPage = document.querySelector(".process-page");
     const stageRows = Array.from(document.querySelectorAll("[data-stage-id]"));
     const modeButtons = Array.from(document.querySelectorAll("[data-schedule-mode]"));
@@ -1864,6 +1988,31 @@ const processStructuredData = [
       }).format(date);
     }
 
+    function getPhaseLabel(date) {
+      const day = date.getDate();
+      if (day <= 10) return "上旬";
+      if (day <= 20) return "中旬";
+      return "下旬";
+    }
+
+    function formatNaturalWindow(startDate, endDate) {
+      const startYear = startDate.getFullYear();
+      const endYear = endDate.getFullYear();
+      const startMonth = startDate.getMonth() + 1;
+      const endMonth = endDate.getMonth() + 1;
+      const startPhase = getPhaseLabel(startDate);
+      const endPhase = getPhaseLabel(endDate);
+
+      if (startYear === endYear && startMonth === endMonth) {
+        if (startPhase === endPhase) {
+          return `${startYear} 年 ${startMonth} 月${startPhase}`;
+        }
+        return `${startYear} 年 ${startMonth} 月${startPhase}至${endPhase}`;
+      }
+
+      return `${startYear} 年 ${startMonth} 月${startPhase}至 ${endYear} 年 ${endMonth} 月${endPhase}`;
+    }
+
     function setScheduleMode(nextMode) {
       scheduleMode = nextMode;
       modeButtons.forEach((button) => {
@@ -1895,6 +2044,12 @@ const processStructuredData = [
         if (summaryNode) {
           summaryNode.textContent = defaultSummary;
         }
+        if (baselineWindowNode) {
+          baselineWindowNode.textContent = "選好日期後，這裡會先出現較日常的交付視窗。";
+        }
+        if (conservativeWindowNode) {
+          conservativeWindowNode.textContent = "若你有搬家或租約安排，這裡會提供更保守的交付抓法。";
+        }
         return;
       }
 
@@ -1919,10 +2074,10 @@ const processStructuredData = [
           const bufferText =
             riskLevel === "high" || riskLevel === "medium" ? `，已含約 ${bufferDays} 天緩衝` : "";
           targetNode.textContent =
-            `${title}在安心安排裡，約會落在 ${formatDate(conservativeStart)} 至 ${formatDate(conservativeEnd)}${bufferText}`;
+            `${title}在安心安排裡，通常會落在 ${formatNaturalWindow(conservativeStart, conservativeEnd)}左右${bufferText}`;
         } else {
           targetNode.textContent =
-            `${title}在日常節奏裡，約會落在 ${formatDate(baselineStart)} 至 ${formatDate(baselineEnd)}`;
+            `${title}在日常節奏裡，通常會落在 ${formatNaturalWindow(baselineStart, baselineEnd)}左右`;
         }
         targetNode.classList.remove("gantt-date-range-empty");
 
@@ -1933,12 +2088,22 @@ const processStructuredData = [
         const baselineEnd = addDays(baseDate, totalWeeks * 7 - 1);
         const conservativeEnd = addDays(baselineEnd, conservativeOffsetDays);
 
+        if (baselineWindowNode) {
+          baselineWindowNode.textContent =
+            `${formatNaturalWindow(baseDate, baselineEnd)}交付機率最高`;
+        }
+
+        if (conservativeWindowNode) {
+          conservativeWindowNode.textContent =
+            `${formatNaturalWindow(baseDate, conservativeEnd)}會更從容`;
+        }
+
         if (scheduleMode === "conservative") {
           summaryNode.textContent =
-            `若以 ${formatDate(baseDate)} 起算，依安心安排來看，整體大約會在 ${formatDate(conservativeEnd)} 前後收斂到交屋，較適合拿來安排搬家、家具進場與租約銜接。`;
+            `若從 ${formatDate(baseDate)} 開始往後看，安心安排會把中高變動工項的緩衝一起算進去，整體交付多半會落在 ${formatNaturalWindow(baseDate, conservativeEnd)}。`;
         } else {
           summaryNode.textContent =
-            `若以 ${formatDate(baseDate)} 起算，依日常節奏來看，整體大約會在 ${formatDate(baselineEnd)} 前後收斂到交屋；若要預留更充足彈性，建議再看安心安排。`;
+            `若從 ${formatDate(baseDate)} 開始往後看，依日常節奏推進，整體交付通常會落在 ${formatNaturalWindow(baseDate, baselineEnd)}；若你手上已有固定時程，建議再多看安心安排。`;
         }
       }
     }
