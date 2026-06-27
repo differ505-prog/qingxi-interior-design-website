@@ -59,14 +59,12 @@ const scheduleViews = [
   {
     key: "baseline",
     label: "日常節奏",
-    description: "適合先看整體流程怎麼推進，抓大方向與主要重疊工序。",
-    note: "第一次看這頁，建議先從這個視角開始。",
+    description: "先看整體流程怎麼推進。",
   },
   {
     key: "conservative",
     label: "安心安排",
-    description: "把中高變動工項的緩衝一起算進去，較適合安排搬家與交屋前後的實際決策。",
-    note: "若有搬家、租約或家具進場壓力，建議優先看這個視角。",
+    description: "把中高變動工項的緩衝一起算進去。",
   },
 ];
 
@@ -656,24 +654,6 @@ const keyFlexStages = keyFlexStageIds
   .map((id) => processStages.find((item) => item.id === id))
   .filter((item): item is (typeof processStages)[number] => Boolean(item));
 
-const stageHighlights = [
-  {
-    label: "全流程",
-    title: "從提案、簽約、設計到交屋都放進同一張圖",
-    body: "現在不是只看施工期，而是把前期提案與後段工程整合成一套完整時程。",
-  },
-  {
-    label: "判讀方式",
-    title: "顏色看工項類型，標籤看必做或視案況",
-    body: "不需要長篇說明，也能快速分辨哪些是固定節點、哪些會依案況增減。",
-  },
-  {
-    label: "日期推算",
-    title: "輸入起算日後，節點就能直接換算成大概日期",
-    body: "很適合屋主先抓搬家、家具進場、設備到貨與請假驗收的大致時點。",
-  },
-];
-
 const processStructuredData = [
   {
     "@context": "https://schema.org",
@@ -705,24 +685,13 @@ const processStructuredData = [
         <p class="process-eyebrow">Renovation Roadmap</p>
         <h1>從接洽到交屋，整套時程一次看懂。</h1>
         <p class="process-description">
-          把前期提案、設計簽約、開工準備、拆除施工到驗收交屋全部放進同一張甘特圖，
-          也能直接用日期去推算每個節點大約落在何時。
+          把前期提案到完工交屋全部放進同一張甘特圖，也能直接換算每個節點的大致時間。
         </p>
         <div class="process-actions">
           <a href="/contact" class="process-button process-button-primary">預約諮詢</a>
           <a href="/tools" class="process-button process-button-secondary">先做估價</a>
         </div>
       </header>
-
-      <section class="process-highlights" aria-label="流程重點">
-        {stageHighlights.map((item) => (
-          <article class="highlight-card">
-            <p class="highlight-label">{item.label}</p>
-            <h2>{item.title}</h2>
-            <p>{item.body}</p>
-          </article>
-        ))}
-      </section>
 
       <section class="schedule-tools" aria-label="日期換算工具">
         <article class="schedule-card schedule-card-primary">
@@ -746,7 +715,6 @@ const processStructuredData = [
                 data-schedule-mode={view.key}
                 data-mode-label={view.label}
                 data-mode-description={view.description}
-                data-mode-note={view.note}
               >
                 {view.label}
               </button>
@@ -755,13 +723,9 @@ const processStructuredData = [
           <div class="schedule-mode-copy" id="schedule-mode-copy" aria-live="polite">
             <p class="schedule-mode-title">{scheduleViews[0].label}</p>
             <p class="schedule-mode-description">{scheduleViews[0].description}</p>
-            <p class="schedule-mode-note">{scheduleViews[0].note}</p>
           </div>
           <p id="schedule-summary" class="schedule-summary" aria-live="polite">
             輸入日期後，會先看到較貼近真實溝通情境的交付視角。
-          </p>
-          <p class="schedule-helper">
-            這份排程是拿來對齊節奏，不是拿來把交屋時間講死。
           </p>
         </article>
 
@@ -781,13 +745,8 @@ const processStructuredData = [
               <span>高變動工項</span>
             </div>
           </div>
-          <ul class="schedule-reading-list">
-            <li>第一次看這頁，先用「日常節奏」理解整體先後順序。</li>
-            <li>如果你已有搬家、家具進場或租約銜接壓力，再切到「安心安排」。</li>
-            <li>看到高變動工項時，代表那一段最需要保留談調整的空間。</li>
-          </ul>
           <p class="schedule-description">
-            以下日期是排程推算，不是交屋承諾。若遇到缺工、材料交期、現場突發狀況、社區施工限制或中途變更，實際進度仍可能延後，建議至少預留 10%-20% 彈性。
+            以下日期是排程推算，不是交屋承諾，建議至少預留 10%-20% 彈性。
           </p>
         </article>
       </section>
@@ -816,9 +775,6 @@ const processStructuredData = [
           <div class="brief-tag-list">
             {keyFlexStages.map((item) => <span class="brief-tag">{item.title}</span>)}
           </div>
-          <p>
-            這幾段最常牽動後面的節奏，所以比起把每一天算得很準，更重要的是替這些轉折預留空間。
-          </p>
         </article>
       </section>
 
@@ -828,7 +784,6 @@ const processStructuredData = [
             <p class="gantt-label">甘特圖</p>
             <h2 id="gantt-title">以 28 週為基準的全流程節奏</h2>
           </div>
-          <p class="gantt-note">把它當成一份溝通底稿會最剛好，既能先看節奏，也不會把現場變化講得太死。</p>
         </div>
 
         <div class="gantt-legend-grid">
@@ -1101,7 +1056,6 @@ const processStructuredData = [
     grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
   }
 
-  .highlight-card,
   .brief-card,
   .notes-card,
   .schedule-card {
@@ -1110,7 +1064,6 @@ const processStructuredData = [
     box-shadow: 0 18px 34px rgba(47, 47, 47, 0.05);
   }
 
-  .highlight-card,
   .brief-card,
   .notes-card,
   .schedule-card-secondary {
@@ -1123,22 +1076,6 @@ const processStructuredData = [
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 28%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 239, 234, 1) 100%);
-  }
-
-  .highlight-card h2 {
-    margin: 0;
-    font-family: var(--font-serif);
-    color: var(--gray-darkest);
-    font-size: 1.25rem;
-    line-height: 1.42;
-    font-weight: 600;
-  }
-
-  .highlight-card p:last-child {
-    margin: 0.8rem 0 0;
-    color: var(--gray-medium);
-    line-height: 1.82;
-    letter-spacing: 0.008em;
   }
 
   .schedule-form {
@@ -1215,8 +1152,7 @@ const processStructuredData = [
   }
 
   .schedule-mode-title,
-  .schedule-mode-description,
-  .schedule-mode-note {
+  .schedule-mode-description {
     margin: 0;
   }
 
@@ -1226,8 +1162,7 @@ const processStructuredData = [
     letter-spacing: 0.03em;
   }
 
-  .schedule-mode-description,
-  .schedule-mode-note {
+  .schedule-mode-description {
     margin-top: 0.45rem;
     color: var(--gray-medium);
     line-height: 1.75;
@@ -1296,18 +1231,6 @@ const processStructuredData = [
     margin-top: 0.4rem;
     color: var(--gray-medium);
     line-height: 1.6;
-  }
-
-  .schedule-reading-list {
-    margin: 1rem 0 0;
-    padding-left: 1.15rem;
-    color: var(--gray-medium);
-    line-height: 1.8;
-    letter-spacing: 0.008em;
-  }
-
-  .schedule-reading-list li + li {
-    margin-top: 0.4rem;
   }
 
   .brief-card h2 {
@@ -1413,14 +1336,6 @@ const processStructuredData = [
 
   .gantt-header h2 {
     font-size: clamp(1.8rem, 3vw, 2.4rem);
-  }
-
-  .gantt-note {
-    max-width: 24rem;
-    margin: 0;
-    color: var(--gray-medium);
-    line-height: 1.8;
-    letter-spacing: 0.008em;
   }
 
   .gantt-legend-grid {
@@ -1877,7 +1792,6 @@ const processStructuredData = [
   }
 
   @media (max-width: 1180px) {
-    .process-highlights,
     .schedule-tools,
     .process-brief,
     .process-notes,
@@ -1890,9 +1804,6 @@ const processStructuredData = [
       align-items: flex-start;
     }
 
-    .gantt-note {
-      max-width: none;
-    }
   }
 
   @media (max-width: 768px) {
@@ -2026,12 +1937,10 @@ const processStructuredData = [
       const activeButton = modeButtons.find((button) => button.getAttribute("data-schedule-mode") === nextMode);
       const modeTitle = modeCopy?.querySelector(".schedule-mode-title");
       const modeDescription = modeCopy?.querySelector(".schedule-mode-description");
-      const modeNote = modeCopy?.querySelector(".schedule-mode-note");
 
-      if (activeButton && modeTitle && modeDescription && modeNote) {
+      if (activeButton && modeTitle && modeDescription) {
         modeTitle.textContent = activeButton.getAttribute("data-mode-label") || "";
         modeDescription.textContent = activeButton.getAttribute("data-mode-description") || "";
-        modeNote.textContent = activeButton.getAttribute("data-mode-note") || "";
       }
     }
 
