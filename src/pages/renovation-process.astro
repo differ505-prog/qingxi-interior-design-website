@@ -1,223 +1,475 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const ganttWeeks = Array.from({ length: 18 }, (_, index) => index + 1);
+const ganttWeeks = Array.from({ length: 28 }, (_, index) => index + 1);
+const toneLegend = [
+  {
+    key: "planning",
+    label: "前期規劃",
+    note: "接洽、丈量、提案、設計委任與報價簽約節點。",
+  },
+  {
+    key: "base",
+    label: "基礎工程",
+    note: "保護、拆除、泥作與木作骨架等前段工序。",
+  },
+  {
+    key: "hidden",
+    label: "隱蔽協作",
+    note: "水電、防水、空調、弱電與需先埋進去的節點。",
+  },
+  {
+    key: "surface",
+    label: "表面完成",
+    note: "貼磚、油漆、地坪等會直接影響視覺完成面的工項。",
+  },
+  {
+    key: "install",
+    label: "安裝整合",
+    note: "系統櫃、設備、五金與現場安裝配合工序。",
+  },
+  {
+    key: "handoff",
+    label: "驗收交付",
+    note: "細清、驗收、修正與正式交屋。",
+  },
+];
+
+const scopeLegend = [
+  {
+    key: "required",
+    label: "必做",
+    note: "大多數整體裝修案都會出現的工項。",
+  },
+  {
+    key: "optional",
+    label: "視案況追加",
+    note: "依空間條件、設計內容與設備複雜度才會出現。",
+  },
+];
+
 const processStages = [
   {
-    id: "protection",
+    id: "consult",
     stage: "01",
-    category: "開工前置",
-    title: "保護工程與現場放樣",
-    summary: "開工後先做公共區域與室內保護，並依圖面確認基準線與施工位置。",
+    category: "前期接洽",
+    title: "初談與需求釐清",
+    summary: "先確認空間條件、預算範圍、入住成員與預計時程。",
     start: 1,
     span: 1,
     durationLabel: "約 1 週",
+    tone: "planning",
+    toneLabel: "前期規劃",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["屋主已有基本需求與空間資訊"],
+    outputs: ["需求方向", "預算帶", "安排丈量"],
+  },
+  {
+    id: "survey",
+    stage: "02",
+    category: "現況盤點",
+    title: "現場丈量與條件紀錄",
+    summary: "進場丈量格局、拍照記錄，盤點管線、樑柱、窗位與基礎限制。",
+    start: 2,
+    span: 1,
+    durationLabel: "約 1 週",
+    tone: "planning",
+    toneLabel: "前期規劃",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["完成初談", "現場可安排進入丈量"],
+    outputs: ["現況尺寸", "風險盤點", "基礎條件整理"],
+  },
+  {
+    id: "layout-proposal",
+    stage: "03",
+    category: "設計提案",
+    title: "平面提案與初步方向確認",
+    summary: "先把格局、動線、收納量體與主要生活邏輯討論清楚。",
+    start: 3,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    tone: "planning",
+    toneLabel: "前期規劃",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["丈量資料完整", "屋主需求方向清楚"],
+    outputs: ["平面配置", "動線策略", "初步收納方向"],
+  },
+  {
+    id: "design-contract",
+    stage: "04",
+    category: "合作確認",
+    title: "設計委任與時程確認",
+    summary: "確認合作範圍、設計節奏與雙方分工，正式進入深化設計。",
+    start: 4,
+    span: 1,
+    durationLabel: "約 1 週",
+    tone: "planning",
+    toneLabel: "前期規劃",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["平面方向已確認", "合作內容可進一步委任"],
+    outputs: ["設計委任", "里程碑排程", "討論節點確認"],
+  },
+  {
+    id: "detailed-design",
+    stage: "05",
+    category: "深化設計",
+    title: "細部設計、立面、材質與系統櫃整合",
+    summary: "把立面、材質、燈光、開關、設備、系統櫃與收納細節一起定案。",
+    start: 5,
+    span: 4,
+    durationLabel: "約 3-4 週",
+    tone: "planning",
+    toneLabel: "前期規劃",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["設計委任完成", "生活需求與預算邏輯明確"],
+    outputs: ["立面與細部", "材質方向", "櫃體與設備整合"],
+  },
+  {
+    id: "quote-contract",
+    stage: "06",
+    category: "報價簽約",
+    title: "工程報價、修正與施工簽約",
+    summary: "依深化設計整理工程報價、確認增減範圍與付款節點，完成施工簽約。",
+    start: 7,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    tone: "planning",
+    toneLabel: "前期規劃",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["主要設計內容已定案", "工法與材料方向可估價"],
+    outputs: ["工程報價", "項目修正", "施工合約"],
+  },
+  {
+    id: "procurement-prep",
+    stage: "07",
+    category: "開工準備",
+    title: "發包、備料、下單與開工排程",
+    summary: "安排工班順序、確認開工日，並同步處理主材、設備與系統櫃下單。",
+    start: 9,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    tone: "planning",
+    toneLabel: "前期規劃",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["施工合約完成", "主要設備與主材已確認"],
+    outputs: ["施工排程", "工班銜接", "主材下單"],
+  },
+  {
+    id: "protection",
+    stage: "08",
+    category: "開工前置",
+    title: "保護工程與現場放樣",
+    summary: "開工後先做公共區域與室內保護，並依圖面確認基準線與施工位置。",
+    start: 11,
+    span: 1,
+    durationLabel: "約 1 週",
+    tone: "base",
+    toneLabel: "基礎工程",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["管委會或大樓施工申請完成", "圖面與拆除範圍已確認"],
     outputs: ["地坪與電梯保護", "施工基準線", "現場開工確認"],
   },
   {
     id: "demolition",
-    stage: "02",
+    stage: "09",
     category: "拆除清運",
     title: "拆除工程與廢棄物清運",
     summary: "依拆除範圍進行天花、牆面、舊櫃體、設備與既有裝修拆除，並同步清運。",
-    start: 1,
+    start: 11,
     span: 2,
     durationLabel: "約 1-2 週",
+    tone: "base",
+    toneLabel: "基礎工程",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["現場保護已完成", "拆除圖與清運動線已確認"],
     outputs: ["拆除完成面", "垃圾清運", "基底清空"],
   },
   {
     id: "plumbing-electric",
-    stage: "03",
+    stage: "10",
     category: "隱蔽工程",
     title: "水電定位、配管與弱電預埋",
     summary: "依照插座、燈具、設備與系統櫃位置，完成強弱電、給排水與必要預埋。",
-    start: 2,
+    start: 12,
     span: 3,
     durationLabel: "約 2-3 週",
+    tone: "hidden",
+    toneLabel: "隱蔽協作",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["拆除面清楚露出", "開關、插座、設備點位已定案"],
     outputs: ["水電配管", "插座開關定位", "弱電預留"],
   },
   {
     id: "masonry-base",
-    stage: "04",
+    stage: "11",
     category: "泥作基礎",
     title: "砌磚、回填、打底與粉光",
     summary: "處理新隔間、門洞調整、地坪修補與基礎打底，為後續防水與貼磚做準備。",
-    start: 3,
+    start: 13,
     span: 3,
     durationLabel: "約 2-3 週",
+    tone: "base",
+    toneLabel: "基礎工程",
+    scopeType: "optional",
+    scopeLabel: "視案況追加",
+    prerequisites: ["格局變更或局部修補需求明確", "水電基礎路徑已確認"],
     outputs: ["泥作打底", "砌築調整", "地坪修補"],
   },
   {
     id: "waterproofing",
-    stage: "05",
+    stage: "12",
     category: "防水工程",
     title: "浴室、陽台與濕區防水試水",
     summary: "在泥作與管線調整後完成防水施作，並安排試水確認滲漏風險。",
-    start: 4,
+    start: 14,
     span: 2,
     durationLabel: "約 1-2 週",
+    tone: "hidden",
+    toneLabel: "隱蔽協作",
+    scopeType: "optional",
+    scopeLabel: "視案況追加",
+    prerequisites: ["濕區泥作基底完成", "排水坡度與地漏位置已確認"],
     outputs: ["防水層", "試水紀錄", "濕區確認"],
   },
   {
     id: "windows-metal",
-    stage: "06",
+    stage: "13",
     category: "外部配合",
     title: "鋁窗、金屬件與外部修補",
     summary: "若案件涉及窗體更新、鐵件、外牆修補或門框調整，通常會在此階段穿插進行。",
-    start: 5,
+    start: 15,
     span: 2,
     durationLabel: "約 1-2 週",
+    tone: "install",
+    toneLabel: "安裝整合",
+    scopeType: "optional",
+    scopeLabel: "視案況追加",
+    prerequisites: ["窗型與尺寸確認", "外部施工條件允許"],
     outputs: ["窗框更新", "金屬件定位", "外部收邊"],
   },
   {
     id: "carpentry",
-    stage: "07",
+    stage: "14",
     category: "木作工程",
     title: "天花、隔間、包樑與木作基礎",
     summary: "依現場條件施作木作天花、包管包樑、局部隔間與櫃體基礎結構。",
-    start: 5,
+    start: 15,
     span: 4,
     durationLabel: "約 3-4 週",
+    tone: "base",
+    toneLabel: "基礎工程",
+    scopeType: "optional",
+    scopeLabel: "視案況追加",
+    prerequisites: ["空調與弱電套管路徑已確認", "天花與立面設計已定案"],
     outputs: ["木作骨架", "天花結構", "造型基礎"],
   },
   {
     id: "hvac-lowvoltage",
-    stage: "08",
+    stage: "15",
     category: "設備協作",
     title: "空調、消防、弱電與設備套管",
     summary: "配合木作與天花高度，把空調、消防、網路、監控與設備套管一起收進節點。",
-    start: 5,
+    start: 15,
     span: 3,
     durationLabel: "約 2-3 週",
+    tone: "hidden",
+    toneLabel: "隱蔽協作",
+    scopeType: "optional",
+    scopeLabel: "視案況追加",
+    prerequisites: ["設備清單確認", "木作與天花高度條件明確"],
     outputs: ["空調配合", "弱電路徑", "設備預留"],
   },
   {
     id: "tiling",
-    stage: "09",
+    stage: "16",
     category: "表面工程",
     title: "貼磚、石材與濕區完成面",
     summary: "浴室、廚房、陽台與需要石材或磚材的區域，會在這段時間陸續成形。",
-    start: 6,
+    start: 16,
     span: 3,
     durationLabel: "約 2-3 週",
+    tone: "surface",
+    toneLabel: "表面完成",
+    scopeType: "optional",
+    scopeLabel: "視案況追加",
+    prerequisites: ["防水與泥作基底驗收完成", "磚材與石材樣品已確認"],
     outputs: ["貼磚完成面", "石材安裝", "濕區定型"],
   },
   {
     id: "paint",
-    stage: "10",
+    stage: "17",
     category: "塗裝工程",
     title: "批土、研磨、底漆與面漆",
     summary: "木作與牆面基礎完成後，進行批土、修補、打磨與分階段上漆。",
-    start: 8,
+    start: 18,
     span: 3,
     durationLabel: "約 2-3 週",
+    tone: "surface",
+    toneLabel: "表面完成",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["木作與基層修補大致完成", "色號與塗裝方式確認"],
     outputs: ["牆面修飾", "油漆底面漆", "表面平整度"],
   },
   {
     id: "cabinet-factory",
-    stage: "11",
+    stage: "18",
     category: "櫃體製作",
     title: "系統櫃複丈、下單與工廠製作",
     summary: "現場尺寸穩定後安排複丈，系統櫃、門板與部分客製櫃體同步進入製作期。",
-    start: 7,
+    start: 17,
     span: 4,
     durationLabel: "約 3-4 週",
+    tone: "install",
+    toneLabel: "安裝整合",
+    scopeType: "optional",
+    scopeLabel: "視案況追加",
+    prerequisites: ["現場尺寸穩定可複丈", "門片、五金與櫃體配置已定案"],
     outputs: ["複丈完成", "櫃體下單", "工廠排程"],
   },
   {
     id: "flooring",
-    stage: "12",
+    stage: "19",
     category: "地坪工程",
     title: "地板、地坪收邊與保護更新",
     summary: "依材質不同安排 SPC、木地板或其他地坪施工，並同步做收邊與保護更新。",
-    start: 10,
+    start: 20,
     span: 2,
     durationLabel: "約 1-2 週",
+    tone: "surface",
+    toneLabel: "表面完成",
+    scopeType: "optional",
+    scopeLabel: "視案況追加",
+    prerequisites: ["油漆濕作業已過主要階段", "地坪材質與收邊方式確認"],
     outputs: ["地坪完成面", "收邊處理", "新保護更新"],
   },
   {
     id: "cabinet-install",
-    stage: "13",
+    stage: "20",
     category: "安裝階段",
     title: "系統櫃、門片、玻璃與固定家具安裝",
     summary: "櫃體到場後進行系統櫃、門片、玻璃、把手與固定家具安裝與校正。",
-    start: 11,
+    start: 21,
     span: 3,
     durationLabel: "約 2-3 週",
+    tone: "install",
+    toneLabel: "安裝整合",
+    scopeType: "optional",
+    scopeLabel: "視案況追加",
+    prerequisites: ["工廠製作完成", "牆地完成面已達可安裝條件"],
     outputs: ["櫃體安裝", "玻璃門片", "五金校正"],
   },
   {
     id: "equipment-install",
-    stage: "14",
+    stage: "21",
     category: "設備安裝",
     title: "燈具、衛浴、廚具、插座與設備安裝",
     summary: "進入設備安裝期，把燈具、面板、衛浴五金、廚具與家電定位逐一完成。",
-    start: 12,
+    start: 22,
     span: 3,
     durationLabel: "約 2-3 週",
+    tone: "install",
+    toneLabel: "安裝整合",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["完成面與主要安裝基座已到位", "設備型號與交期確認"],
     outputs: ["燈具面板", "衛浴廚具", "設備就位"],
   },
   {
     id: "finishing",
-    stage: "15",
+    stage: "22",
     category: "細部收尾",
     title: "矽利康、補漆、修飾與細節收尾",
     summary: "在大項安裝完成後，集中處理接縫、補漆、修口、調整與各種視覺細節。",
-    start: 14,
+    start: 24,
     span: 2,
     durationLabel: "約 1-2 週",
+    tone: "handoff",
+    toneLabel: "驗收交付",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["設備與櫃體大項安裝完成", "現場缺失點已初步整理"],
     outputs: ["矽利康收邊", "補漆修口", "細節整理"],
   },
   {
     id: "cleaning",
-    stage: "16",
+    stage: "23",
     category: "驗收前整理",
     title: "細清、保護拆除與設備試運轉",
     summary: "拆除施工保護後進行細清，並測試燈具、插座、衛浴、空調與其他設備運作。",
-    start: 16,
+    start: 26,
     span: 1,
     durationLabel: "約 1 週",
+    tone: "handoff",
+    toneLabel: "驗收交付",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["細部收尾完成", "無大量粉塵工序繼續進行"],
     outputs: ["細部清潔", "設備測試", "初驗準備"],
   },
   {
     id: "inspection",
-    stage: "17",
+    stage: "24",
     category: "驗收修正",
     title: "初驗、缺失修正與複驗",
     summary: "依現場驗收清單逐項確認，針對缺失安排修正，並在複驗後完成結案確認。",
-    start: 17,
+    start: 27,
     span: 1,
     durationLabel: "約 1 週",
+    tone: "handoff",
+    toneLabel: "驗收交付",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["現場已達可驗收狀態", "設備操作與清潔完成"],
     outputs: ["驗收清單", "缺失修正", "複驗確認"],
   },
   {
     id: "handoff",
-    stage: "18",
+    stage: "25",
     category: "正式交付",
-    title: "完工交屋與使用說明",
-    summary: "確認現場交付狀態、設備操作方式、保固資訊與後續使用注意事項後正式交屋。",
-    start: 18,
+    title: "完工交屋",
+    summary: "確認現場交付狀態、保固資訊與點交內容後正式交屋。",
+    start: 28,
     span: 1,
     durationLabel: "約 1 週",
-    outputs: ["正式交屋", "設備教學", "保固說明"],
+    tone: "handoff",
+    toneLabel: "驗收交付",
+    scopeType: "required",
+    scopeLabel: "必做",
+    prerequisites: ["複驗通過", "需交付文件與保固資訊已整理"],
+    outputs: ["正式交屋", "點交文件", "保固資訊"],
   },
 ];
 
+const requiredCount = processStages.filter((item) => item.scopeType === "required").length;
+const optionalCount = processStages.filter((item) => item.scopeType === "optional").length;
+const totalWeeks = Math.max(...processStages.map((item) => item.start + item.span - 1));
+
 const stageHighlights = [
   {
-    label: "拆除前後",
-    title: "拆除不是第一刀下去就結束，而是整個工程節奏的起點",
-    body: "拆除完成後，真正影響後面品質的，是保護、放樣、基底整理與隱蔽工程是否被提早處理乾淨。",
+    label: "全流程",
+    title: "從提案、簽約、設計到交屋都放進同一張圖",
+    body: "現在不是只看施工期，而是把前期提案與後段工程整合成一套完整時程。",
   },
   {
-    label: "中段工序",
-    title: "木作、泥作、水電、設備其實是交錯推進",
-    body: "現場不會只剩單一工班。很多節點必須穿插銜接，像空調、弱電、木作與系統櫃就常常彼此卡位。",
+    label: "判讀方式",
+    title: "顏色看工項類型，標籤看必做或視案況",
+    body: "不需要長篇說明，也能快速分辨哪些是固定節點、哪些會依案況增減。",
   },
   {
-    label: "交屋前",
-    title: "真正決定質感的，常常是最後 20% 的收尾",
-    body: "補漆、矽利康、設備校正、清潔、初驗與複驗，往往比前面的大工程更影響屋主最後的入住感受。",
+    label: "日期推算",
+    title: "輸入起算日後，節點就能直接換算成大概日期",
+    body: "很適合屋主先抓搬家、家具進場、設備到貨與請假驗收的大致時點。",
   },
 ];
 
@@ -225,10 +477,10 @@ const processStructuredData = [
   {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: "拆除到交屋的裝修工程甘特圖",
+    name: "提案到交屋的裝修全流程甘特圖",
     description:
-      "青曦空間設計整理的裝修工程甘特圖，從拆除、保護、水電、泥作、木作、油漆、系統櫃安裝到驗收交屋，讓屋主快速掌握工程期節奏。",
-    totalTime: "P18W",
+      "青曦空間設計整理的裝修全流程甘特圖，涵蓋初談、丈量、提案、設計、報價簽約、拆除施工到驗收交屋，讓屋主快速掌握整體節奏。",
+    totalTime: "P28W",
     step: processStages.map((item, index) => ({
       "@type": "HowToStep",
       position: index + 1,
@@ -241,19 +493,19 @@ const processStructuredData = [
 
 <BaseLayout
   title="裝修全流程 - 青曦空間設計"
-  description="用甘特圖看懂青曦空間設計從拆除工程到完工交屋的主要工項，包含保護、水電、泥作、木作、油漆、系統櫃、設備安裝與驗收節點。"
+  description="用甘特圖看懂青曦空間設計從初談、提案、簽約設計到拆除施工與完工交屋的完整流程，並可輸入日期自動換算各節點時間。"
   ogImage="/images/portfolio/xizhi-1.jpg"
   pageType="service"
   structuredData={processStructuredData}
 >
-  <section class="process-page">
+  <section class="process-page" data-total-weeks={totalWeeks}>
     <div class="process-shell">
       <header class="process-hero">
         <p class="process-eyebrow">Renovation Roadmap</p>
-        <h1>從拆除到交屋，工項節奏一次攤開。</h1>
+        <h1>從接洽到交屋，整套時程一次看懂。</h1>
         <p class="process-description">
-          這張甘特圖聚焦在「開工後」的工程期，把拆除工程開始到驗收交屋的主要工項全部拉出來看。
-          實際案場仍會依老屋狀況、格局改動幅度、系統櫃比例與設備複雜度調整先後順序。
+          把前期提案、設計簽約、開工準備、拆除施工到驗收交屋全部放進同一張甘特圖，
+          也能直接用日期去推算每個節點大約落在何時。
         </p>
         <div class="process-actions">
           <a href="/contact" class="process-button process-button-primary">預約諮詢</a>
@@ -271,33 +523,125 @@ const processStructuredData = [
         ))}
       </section>
 
+      <section class="schedule-tools" aria-label="日期換算工具">
+        <article class="schedule-card schedule-card-primary">
+          <p class="schedule-eyebrow">日期換算</p>
+          <h2>輸入起算日期，自動推算各節點時間</h2>
+          <div class="schedule-form">
+            <label class="schedule-field">
+              <span>起算日期</span>
+              <input id="schedule-start-date" type="date" />
+            </label>
+            <div class="schedule-form-actions">
+              <button type="button" id="schedule-fill-today" class="schedule-action schedule-action-primary">今天</button>
+              <button type="button" id="schedule-clear" class="schedule-action">清除</button>
+            </div>
+          </div>
+          <p id="schedule-summary" class="schedule-summary" aria-live="polite">
+            輸入日期後，這裡會顯示整套流程的大致完成時間。
+          </p>
+        </article>
+
+        <article class="schedule-card schedule-card-secondary">
+          <p class="schedule-eyebrow">快速判讀</p>
+          <div class="schedule-metrics">
+            <div class="schedule-metric">
+              <strong>{processStages.length}</strong>
+              <span>主要工項</span>
+            </div>
+            <div class="schedule-metric">
+              <strong>{requiredCount}</strong>
+              <span>必做節點</span>
+            </div>
+            <div class="schedule-metric">
+              <strong>{optionalCount}</strong>
+              <span>視案況追加</span>
+            </div>
+            <div class="schedule-metric">
+              <strong>{totalWeeks}</strong>
+              <span>基準週數</span>
+            </div>
+          </div>
+          <p class="schedule-description">
+            真實案場若遇到老屋問題、訂製交期較長或中途改動需求，交屋時間通常會再往後拉。
+          </p>
+        </article>
+      </section>
+
       <section class="gantt-section" aria-labelledby="gantt-title">
         <div class="gantt-header">
           <div>
             <p class="gantt-label">甘特圖</p>
-            <h2 id="gantt-title">以 18 週為基準的工程工項節奏</h2>
+            <h2 id="gantt-title">以 28 週為基準的全流程節奏</h2>
           </div>
-          <p class="gantt-note">甘特圖顯示各工項常見的進場時機與重疊區，方便先看懂哪些環節會同時發生。</p>
+          <p class="gantt-note">顏色代表工項類型，標籤代表必做或視案況，日期欄位會依你輸入的起算日自動換算。</p>
+        </div>
+
+        <div class="gantt-legend-grid">
+          <div class="legend-group">
+            <p>工項分類</p>
+            <div class="legend-items">
+              {toneLegend.map((item) => (
+                <div class="legend-item">
+                  <span class={`legend-dot legend-dot-${item.key}`}></span>
+                  <div>
+                    <strong>{item.label}</strong>
+                    <small>{item.note}</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div class="legend-group">
+            <p>工項性質</p>
+            <div class="legend-items legend-items-compact">
+              {scopeLegend.map((item) => (
+                <div class="legend-item">
+                  <span class={`legend-badge legend-badge-${item.key}`}>{item.label}</span>
+                  <div>
+                    <small>{item.note}</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div class="gantt-board">
           <div class="gantt-axis" aria-hidden="true">
-            <div class="gantt-axis-stage">階段</div>
+            <div class="gantt-axis-stage">工項</div>
             <div class="gantt-axis-grid">
               {ganttWeeks.map((week) => <span>W{week}</span>)}
             </div>
+            <div class="gantt-axis-detail">前置與產出</div>
           </div>
 
           <div class="gantt-rows">
             {processStages.map((item) => (
-              <article class="gantt-row">
+              <article
+                class={`gantt-row gantt-row-${item.tone} gantt-row-${item.scopeType}`}
+                data-stage-id={item.id}
+                data-stage-title={item.title}
+                data-start-week={item.start}
+                data-span-weeks={item.span}
+              >
                 <div class="gantt-stage">
-                  <span class="gantt-stage-number">{item.stage}</span>
-                  <div>
-                    <p class="gantt-stage-category">{item.category}</p>
+                  <span class={`gantt-stage-number gantt-stage-number-${item.tone}`}>{item.stage}</span>
+                  <div class="gantt-stage-body">
+                    <div class="gantt-stage-topline">
+                      <p class="gantt-stage-category">{item.category}</p>
+                      <span class={`legend-badge legend-badge-${item.scopeType}`}>{item.scopeLabel}</span>
+                    </div>
                     <h3>{item.title}</h3>
                     <p class="gantt-stage-summary">{item.summary}</p>
-                    <p class="gantt-stage-duration">{item.durationLabel}</p>
+                    <div class="gantt-stage-meta">
+                      <span class={`tone-pill tone-pill-${item.tone}`}>{item.toneLabel}</span>
+                      <span class="gantt-stage-duration">{item.durationLabel}</span>
+                    </div>
+                    <p class="gantt-date-range gantt-date-range-empty" data-stage-date={item.id}>
+                      輸入起算日期後，自動換算這個節點的大約日期區間。
+                    </p>
                   </div>
                 </div>
 
@@ -306,7 +650,7 @@ const processStructuredData = [
                     {ganttWeeks.map(() => <span></span>)}
                   </div>
                   <div
-                    class="gantt-bar"
+                    class={`gantt-bar gantt-bar-${item.tone} gantt-bar-${item.scopeType}`}
                     style={`--start:${item.start}; --span:${item.span};`}
                     aria-label={`${item.title}，${item.durationLabel}`}
                   >
@@ -314,11 +658,19 @@ const processStructuredData = [
                   </div>
                 </div>
 
-                <div class="gantt-output">
-                  <p>常見產出</p>
-                  <ul>
-                    {item.outputs.map((output) => <li>{output}</li>)}
-                  </ul>
+                <div class="gantt-detail">
+                  <div class="gantt-detail-block">
+                    <p>前置條件</p>
+                    <ul>
+                      {item.prerequisites.map((condition) => <li>{condition}</li>)}
+                    </ul>
+                  </div>
+                  <div class="gantt-detail-block">
+                    <p>常見產出</p>
+                    <ul>
+                      {item.outputs.map((output) => <li>{output}</li>)}
+                    </ul>
+                  </div>
                 </div>
               </article>
             ))}
@@ -338,11 +690,10 @@ const processStructuredData = [
         </article>
 
         <article class="notes-card">
-          <p class="notes-label">青曦的做法</p>
-          <h2>把收納、系統櫃與日常使用感一起想清楚</h2>
+          <p class="notes-label">補充</p>
+          <h2>視案況追加的工項，最常影響整體節奏</h2>
           <p>
-            青曦平常特別重視收納細節、櫃體整合與實際入住後的使用感。流程的目的不是把案子做快，
-            而是把每個決策放在對的節點，避免後面一直補洞。
+            像泥作變更、鋁窗更新、空調弱電、系統櫃比例較高或特殊材料交期較長時，整體工期通常會一起被拉長。
           </p>
           <div class="notes-actions">
             <a href="/portfolio" class="process-button process-button-secondary">先看作品</a>
@@ -363,12 +714,12 @@ const processStructuredData = [
   }
 
   .process-shell {
-    max-width: 1280px;
+    max-width: 1320px;
     margin: 0 auto;
   }
 
   .process-hero {
-    max-width: 52rem;
+    max-width: 56rem;
     margin: 0 auto;
     text-align: center;
   }
@@ -376,7 +727,8 @@ const processStructuredData = [
   .process-eyebrow,
   .gantt-label,
   .highlight-label,
-  .notes-label {
+  .notes-label,
+  .schedule-eyebrow {
     margin: 0 0 0.85rem;
     color: var(--gray-medium);
     font-size: 0.8rem;
@@ -387,7 +739,8 @@ const processStructuredData = [
 
   .process-hero h1,
   .gantt-header h2,
-  .notes-card h2 {
+  .notes-card h2,
+  .schedule-card h2 {
     margin: 0;
     font-family: var(--font-serif);
     color: var(--gray-darkest);
@@ -397,15 +750,19 @@ const processStructuredData = [
   }
 
   .process-hero h1 {
-    font-size: clamp(2.4rem, 4.6vw, 4.2rem);
+    font-size: clamp(2.3rem, 4.4vw, 4rem);
   }
 
-  .process-description {
+  .process-description,
+  .schedule-description {
     margin: 1.1rem auto 0;
     color: var(--gray-medium);
     line-height: 1.9;
     letter-spacing: 0.008em;
-    max-width: 46rem;
+  }
+
+  .process-description {
+    max-width: 48rem;
   }
 
   .process-actions,
@@ -432,41 +789,61 @@ const processStructuredData = [
       border-color 0.25s ease;
   }
 
-  .process-button:hover {
+  .process-button:hover,
+  .schedule-action:hover {
     transform: translateY(-2px);
   }
 
-  .process-button-primary {
+  .process-button-primary,
+  .schedule-action-primary {
     background: linear-gradient(135deg, var(--gray-darkest) 0%, #6a5f57 100%);
     color: var(--white);
     border: 1px solid rgba(115, 103, 94, 0.18);
     box-shadow: 0 16px 26px rgba(20, 20, 20, 0.14);
   }
 
-  .process-button-secondary {
+  .process-button-secondary,
+  .schedule-action {
     background: rgba(255, 255, 255, 0.96);
     color: var(--gray-darkest);
     border: 1px solid rgba(101, 91, 84, 0.22);
     box-shadow: 0 12px 22px rgba(47, 47, 47, 0.05);
   }
 
-  .process-highlights {
-    margin-top: 2.6rem;
+  .process-highlights,
+  .schedule-tools,
+  .process-notes {
+    margin-top: 2rem;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
   }
 
+  .schedule-tools,
+  .process-notes {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+  }
+
   .highlight-card,
-  .notes-card {
+  .notes-card,
+  .schedule-card {
     border-radius: 26px;
     border: 1px solid rgba(115, 103, 94, 0.14);
     box-shadow: 0 18px 34px rgba(47, 47, 47, 0.05);
   }
 
-  .highlight-card {
+  .highlight-card,
+  .notes-card,
+  .schedule-card-secondary {
     padding: 1.5rem;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
+  }
+
+  .schedule-card-primary {
+    padding: 1.6rem;
+    background:
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 28%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 239, 234, 1) 100%);
   }
 
   .highlight-card h2 {
@@ -485,13 +862,97 @@ const processStructuredData = [
     letter-spacing: 0.008em;
   }
 
+  .schedule-form {
+    margin-top: 1.35rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.9rem;
+    align-items: end;
+  }
+
+  .schedule-field {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .schedule-field span {
+    color: var(--gray-darkest);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .schedule-field input {
+    width: 100%;
+    min-height: 54px;
+    padding: 0.85rem 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(115, 103, 94, 0.18);
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--gray-darkest);
+    font: inherit;
+  }
+
+  .schedule-form-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .schedule-action {
+    min-height: 54px;
+    padding: 0.85rem 1.15rem;
+    border-radius: 16px;
+    cursor: pointer;
+    font: inherit;
+    transition:
+      transform 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .schedule-summary {
+    margin: 1rem 0 0;
+    min-height: 1.8rem;
+    color: var(--gray-darkest);
+    line-height: 1.75;
+    letter-spacing: 0.008em;
+  }
+
+  .schedule-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  .schedule-metric {
+    padding: 1rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+  }
+
+  .schedule-metric strong {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    line-height: 1;
+    color: var(--gray-darkest);
+  }
+
+  .schedule-metric span {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--gray-medium);
+    line-height: 1.6;
+  }
+
   .gantt-section {
     margin-top: 2rem;
     padding: 1.4rem;
     border-radius: 32px;
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.06), transparent 28%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(247, 243, 238, 0.98) 100%);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(247, 243, 238, 0.98) 100%);
     border: 1px solid rgba(115, 103, 94, 0.14);
     box-shadow: 0 22px 42px rgba(47, 47, 47, 0.06);
   }
@@ -509,11 +970,153 @@ const processStructuredData = [
   }
 
   .gantt-note {
-    max-width: 22rem;
+    max-width: 24rem;
     margin: 0;
     color: var(--gray-medium);
     line-height: 1.8;
     letter-spacing: 0.008em;
+  }
+
+  .gantt-legend-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    padding: 0 0.35rem;
+  }
+
+  .legend-group {
+    padding: 1rem 1.05rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.84);
+    border: 1px solid rgba(115, 103, 94, 0.1);
+  }
+
+  .legend-group > p {
+    margin: 0 0 0.8rem;
+    color: var(--gray-darkest);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .legend-items {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+
+  .legend-items-compact {
+    grid-template-columns: 1fr;
+  }
+
+  .legend-item {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+  }
+
+  .legend-item strong,
+  .legend-item small {
+    display: block;
+  }
+
+  .legend-item strong {
+    color: var(--gray-darkest);
+    font-size: 0.92rem;
+  }
+
+  .legend-item small {
+    margin-top: 0.15rem;
+    color: var(--gray-medium);
+    line-height: 1.65;
+  }
+
+  .legend-dot {
+    width: 14px;
+    height: 14px;
+    margin-top: 0.25rem;
+    border-radius: 999px;
+    flex: 0 0 14px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  }
+
+  .legend-dot-planning {
+    background: linear-gradient(135deg, #446075 0%, #6f8ba0 100%);
+  }
+
+  .legend-dot-base {
+    background: linear-gradient(135deg, #5b5048 0%, #887669 100%);
+  }
+
+  .legend-dot-hidden {
+    background: linear-gradient(135deg, #3c5f63 0%, #5e8b90 100%);
+  }
+
+  .legend-dot-surface {
+    background: linear-gradient(135deg, #b98c58 0%, #d3aa7d 100%);
+  }
+
+  .legend-dot-install {
+    background: linear-gradient(135deg, #6a5b86 0%, #8d7daf 100%);
+  }
+
+  .legend-dot-handoff {
+    background: linear-gradient(135deg, #2f5342 0%, #4d7a63 100%);
+  }
+
+  .legend-badge,
+  .tone-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.38rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .legend-badge-required {
+    background: rgba(52, 47, 43, 0.1);
+    color: var(--gray-darkest);
+    border: 1px solid rgba(52, 47, 43, 0.18);
+  }
+
+  .legend-badge-optional {
+    background: rgba(183, 136, 84, 0.12);
+    color: #8b6338;
+    border: 1px dashed rgba(183, 136, 84, 0.28);
+  }
+
+  .tone-pill-planning {
+    background: rgba(68, 96, 117, 0.12);
+    color: #446075;
+  }
+
+  .tone-pill-base {
+    background: rgba(91, 80, 72, 0.12);
+    color: #5b5048;
+  }
+
+  .tone-pill-hidden {
+    background: rgba(60, 95, 99, 0.12);
+    color: #3c5f63;
+  }
+
+  .tone-pill-surface {
+    background: rgba(185, 140, 88, 0.14);
+    color: #9b6f3d;
+  }
+
+  .tone-pill-install {
+    background: rgba(106, 91, 134, 0.14);
+    color: #645378;
+  }
+
+  .tone-pill-handoff {
+    background: rgba(47, 83, 66, 0.14);
+    color: #2f5342;
   }
 
   .gantt-board {
@@ -523,9 +1126,9 @@ const processStructuredData = [
 
   .gantt-axis,
   .gantt-row {
-    min-width: 1120px;
+    min-width: 1600px;
     display: grid;
-    grid-template-columns: minmax(280px, 320px) minmax(500px, 1fr) minmax(220px, 260px);
+    grid-template-columns: minmax(340px, 400px) minmax(520px, 1fr) minmax(280px, 320px);
     gap: 1rem;
     align-items: stretch;
   }
@@ -535,14 +1138,16 @@ const processStructuredData = [
   }
 
   .gantt-axis-stage,
-  .gantt-axis-grid span {
+  .gantt-axis-grid span,
+  .gantt-axis-detail {
     font-size: 0.82rem;
     font-weight: 600;
     color: var(--gray-medium);
     letter-spacing: 0.08em;
   }
 
-  .gantt-axis-stage {
+  .gantt-axis-stage,
+  .gantt-axis-detail {
     padding: 0 0.75rem;
     display: flex;
     align-items: center;
@@ -551,7 +1156,7 @@ const processStructuredData = [
   .gantt-axis-grid,
   .gantt-track-grid {
     display: grid;
-    grid-template-columns: repeat(18, minmax(0, 1fr));
+    grid-template-columns: repeat(28, minmax(0, 1fr));
     gap: 0.45rem;
   }
 
@@ -568,9 +1173,13 @@ const processStructuredData = [
   .gantt-row {
     padding: 1rem;
     border-radius: 26px;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.94);
     border: 1px solid rgba(115, 103, 94, 0.12);
     box-shadow: 0 14px 30px rgba(47, 47, 47, 0.04);
+  }
+
+  .gantt-row-optional {
+    background: linear-gradient(180deg, rgba(255, 250, 245, 0.96) 0%, rgba(255, 255, 255, 0.94) 100%);
   }
 
   .gantt-stage {
@@ -586,14 +1195,50 @@ const processStructuredData = [
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--gray-darkest) 0%, #72665d 100%);
     color: var(--white);
     font-weight: 600;
     letter-spacing: 0.04em;
+    box-shadow: 0 12px 20px rgba(47, 47, 47, 0.12);
+  }
+
+  .gantt-stage-number-planning {
+    background: linear-gradient(135deg, #446075 0%, #6f8ba0 100%);
+  }
+
+  .gantt-stage-number-base {
+    background: linear-gradient(135deg, #5b5048 0%, #887669 100%);
+  }
+
+  .gantt-stage-number-hidden {
+    background: linear-gradient(135deg, #3c5f63 0%, #5e8b90 100%);
+  }
+
+  .gantt-stage-number-surface {
+    background: linear-gradient(135deg, #b98c58 0%, #d3aa7d 100%);
+  }
+
+  .gantt-stage-number-install {
+    background: linear-gradient(135deg, #6a5b86 0%, #8d7daf 100%);
+  }
+
+  .gantt-stage-number-handoff {
+    background: linear-gradient(135deg, #2f5342 0%, #4d7a63 100%);
+  }
+
+  .gantt-stage-body {
+    min-width: 0;
+  }
+
+  .gantt-stage-topline,
+  .gantt-stage-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
   }
 
   .gantt-stage-category,
-  .gantt-output p,
+  .gantt-detail-block > p,
   .gantt-stage-duration {
     margin: 0;
     font-size: 0.8rem;
@@ -602,7 +1247,7 @@ const processStructuredData = [
   }
 
   .gantt-stage h3 {
-    margin: 0.35rem 0 0;
+    margin: 0.45rem 0 0;
     font-family: var(--font-serif);
     font-size: 1.18rem;
     line-height: 1.45;
@@ -617,9 +1262,21 @@ const processStructuredData = [
     letter-spacing: 0.008em;
   }
 
-  .gantt-stage-duration {
-    margin-top: 0.75rem;
-    font-weight: 600;
+  .gantt-stage-meta {
+    margin-top: 0.8rem;
+  }
+
+  .gantt-date-range {
+    margin: 0.8rem 0 0;
+    min-height: 1.5rem;
+    color: var(--gray-darkest);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    letter-spacing: 0.008em;
+  }
+
+  .gantt-date-range-empty {
+    color: var(--gray-medium);
   }
 
   .gantt-track {
@@ -634,25 +1291,52 @@ const processStructuredData = [
   }
 
   .gantt-track-grid span {
-    min-height: 74px;
+    min-height: 102px;
     border-radius: 14px;
-    background: linear-gradient(180deg, rgba(243, 237, 231, 0.9) 0%, rgba(236, 240, 242, 0.7) 100%);
+    background: linear-gradient(180deg, rgba(243, 237, 231, 0.88) 0%, rgba(236, 240, 242, 0.72) 100%);
     border: 1px solid rgba(115, 103, 94, 0.08);
   }
 
   .gantt-bar {
     position: absolute;
-    left: calc(((var(--start) - 1) / 18) * 100%);
-    width: calc((var(--span) / 18) * 100%);
-    min-height: 56px;
+    left: calc(((var(--start) - 1) / 28) * 100%);
+    width: calc((var(--span) / 28) * 100%);
+    min-height: 62px;
     border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background:
-      linear-gradient(135deg, rgba(52, 47, 43, 0.98) 0%, rgba(125, 113, 103, 0.98) 100%);
     color: var(--white);
     box-shadow: 0 16px 22px rgba(47, 47, 47, 0.16);
+  }
+
+  .gantt-bar-planning {
+    background: linear-gradient(135deg, #446075 0%, #6f8ba0 100%);
+  }
+
+  .gantt-bar-base {
+    background: linear-gradient(135deg, #5b5048 0%, #887669 100%);
+  }
+
+  .gantt-bar-hidden {
+    background: linear-gradient(135deg, #3c5f63 0%, #5e8b90 100%);
+  }
+
+  .gantt-bar-surface {
+    background: linear-gradient(135deg, #b98c58 0%, #d3aa7d 100%);
+  }
+
+  .gantt-bar-install {
+    background: linear-gradient(135deg, #6a5b86 0%, #8d7daf 100%);
+  }
+
+  .gantt-bar-handoff {
+    background: linear-gradient(135deg, #2f5342 0%, #4d7a63 100%);
+  }
+
+  .gantt-bar-optional {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.34), 0 14px 20px rgba(47, 47, 47, 0.12);
+    opacity: 0.9;
   }
 
   .gantt-bar span {
@@ -663,34 +1347,35 @@ const processStructuredData = [
     letter-spacing: 0.04em;
   }
 
-  .gantt-output {
-    padding: 0.15rem 0;
+  .gantt-detail {
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
   }
 
-  .gantt-output ul,
+  .gantt-detail-block {
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    background: rgba(250, 250, 250, 0.92);
+    border: 1px solid rgba(115, 103, 94, 0.08);
+  }
+
+  .gantt-detail-block ul,
   .notes-list {
-    margin: 0.75rem 0 0;
+    margin: 0.7rem 0 0;
     padding-left: 1.15rem;
     color: var(--gray-medium);
-    line-height: 1.8;
+    line-height: 1.75;
     letter-spacing: 0.008em;
   }
 
-  .gantt-output li + li,
+  .gantt-detail-block li + li,
   .notes-list li + li {
     margin-top: 0.35rem;
   }
 
-  .process-notes {
-    margin-top: 1.4rem;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 1rem;
-  }
-
   .notes-card {
     padding: 1.7rem;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
   }
 
   .notes-card-dark {
@@ -722,9 +1407,11 @@ const processStructuredData = [
     letter-spacing: 0.008em;
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1180px) {
     .process-highlights,
-    .process-notes {
+    .schedule-tools,
+    .process-notes,
+    .gantt-legend-grid {
       grid-template-columns: 1fr;
     }
 
@@ -744,12 +1431,24 @@ const processStructuredData = [
     }
 
     .process-actions,
-    .notes-actions {
+    .notes-actions,
+    .schedule-form,
+    .schedule-form-actions {
       flex-direction: column;
     }
 
-    .process-button {
+    .process-actions,
+    .notes-actions {
+      display: flex;
+    }
+
+    .process-button,
+    .schedule-action {
       width: 100%;
+    }
+
+    .schedule-form {
+      grid-template-columns: 1fr;
     }
 
     .gantt-section {
@@ -759,8 +1458,110 @@ const processStructuredData = [
 
     .gantt-axis,
     .gantt-row {
-      min-width: 980px;
-      grid-template-columns: minmax(240px, 280px) minmax(480px, 1fr) minmax(200px, 240px);
+      min-width: 1500px;
+    }
+
+    .legend-items,
+    .schedule-metrics {
+      grid-template-columns: 1fr;
     }
   }
 </style>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const startDateInput = document.getElementById("schedule-start-date");
+    const fillTodayButton = document.getElementById("schedule-fill-today");
+    const clearButton = document.getElementById("schedule-clear");
+    const summaryNode = document.getElementById("schedule-summary");
+    const processPage = document.querySelector(".process-page");
+    const stageRows = Array.from(document.querySelectorAll("[data-stage-id]"));
+    const totalWeeks = Number(processPage?.getAttribute("data-total-weeks") || 0);
+    const defaultSummary = summaryNode?.textContent || "";
+
+    function toInputDateValue(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseLocalDate(value) {
+      if (!value) return null;
+      const [year, month, day] = value.split("-").map(Number);
+      if (!year || !month || !day) return null;
+      return new Date(year, month - 1, day, 12, 0, 0, 0);
+    }
+
+    function addDays(date, days) {
+      const next = new Date(date);
+      next.setDate(next.getDate() + days);
+      return next;
+    }
+
+    function formatDate(date) {
+      return new Intl.DateTimeFormat("zh-TW", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(date);
+    }
+
+    function updateSchedule() {
+      const baseDate = parseLocalDate(startDateInput instanceof HTMLInputElement ? startDateInput.value : "");
+      const dateNodes = Array.from(document.querySelectorAll("[data-stage-date]"));
+
+      if (!baseDate) {
+        dateNodes.forEach((node) => {
+          node.textContent = "輸入起算日期後，自動換算這個節點的大約日期區間。";
+          node.classList.add("gantt-date-range-empty");
+        });
+        if (summaryNode) {
+          summaryNode.textContent = defaultSummary;
+        }
+        return;
+      }
+
+      stageRows.forEach((row) => {
+        const stageId = row.getAttribute("data-stage-id");
+        const startWeek = Number(row.getAttribute("data-start-week") || 0);
+        const spanWeeks = Number(row.getAttribute("data-span-weeks") || 0);
+        const title = row.getAttribute("data-stage-title") || "此節點";
+        const targetNode = document.querySelector(`[data-stage-date="${stageId}"]`);
+        if (!targetNode || !startWeek || !spanWeeks) return;
+
+        const stageStart = addDays(baseDate, (startWeek - 1) * 7);
+        const stageEnd = addDays(baseDate, (startWeek + spanWeeks - 1) * 7 - 1);
+        targetNode.textContent = `${title}約落在 ${formatDate(stageStart)} 至 ${formatDate(stageEnd)}`;
+        targetNode.classList.remove("gantt-date-range-empty");
+      });
+
+      if (summaryNode && totalWeeks) {
+        const estimatedEnd = addDays(baseDate, totalWeeks * 7 - 1);
+        summaryNode.textContent =
+          `若以 ${formatDate(baseDate)} 作為起算日，依這份基準甘特圖估算，整體流程大約會在 ${formatDate(estimatedEnd)} 前後收斂到交屋。`;
+      }
+    }
+
+    if (fillTodayButton instanceof HTMLButtonElement && startDateInput instanceof HTMLInputElement) {
+      fillTodayButton.addEventListener("click", () => {
+        startDateInput.value = toInputDateValue(new Date());
+        updateSchedule();
+      });
+    }
+
+    if (clearButton instanceof HTMLButtonElement && startDateInput instanceof HTMLInputElement) {
+      clearButton.addEventListener("click", () => {
+        startDateInput.value = "";
+        updateSchedule();
+      });
+    }
+
+    if (startDateInput instanceof HTMLInputElement) {
+      startDateInput.addEventListener("input", updateSchedule);
+      startDateInput.addEventListener("change", updateSchedule);
+    }
+
+    updateSchedule();
+  });
+</script>
