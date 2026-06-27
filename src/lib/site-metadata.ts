@@ -35,6 +35,11 @@ export const CORE_SITE_PAGES = [
     summary: "快速估算裝修預算帶，幫助使用者先抓出工程規模與諮詢方向。",
   },
   {
+    path: "/renovation-process",
+    title: "裝修全流程",
+    summary: "用甘特圖整理裝修從初談、丈量、設計、報價到施工與交屋的整體節奏。",
+  },
+  {
     path: "/contact",
     title: "聯絡我們",
     summary: "提供 LINE、需求表與諮詢入口，作為正式合作前的聯繫頁面。",

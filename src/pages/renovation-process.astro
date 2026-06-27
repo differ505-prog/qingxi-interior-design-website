@@ -1,0 +1,667 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const ganttWeeks = Array.from({ length: 16 }, (_, index) => index + 1);
+const processStages = [
+  {
+    id: "consult",
+    stage: "01",
+    category: "前期對齊",
+    title: "初談與需求釐清",
+    summary: "先確認空間條件、入住成員、預算帶與希望入住時間。",
+    start: 1,
+    span: 1,
+    durationLabel: "約 1 週",
+    outputs: ["初步需求方向", "預算範圍", "是否安排丈量"],
+  },
+  {
+    id: "survey",
+    stage: "02",
+    category: "現場資訊",
+    title: "現場丈量與條件盤點",
+    summary: "丈量格局、拍照記錄並釐清老屋管線、樑柱與設備限制。",
+    start: 2,
+    span: 1,
+    durationLabel: "約 1 週",
+    outputs: ["現況尺寸", "基礎風險清單", "動線盤點"],
+  },
+  {
+    id: "layout",
+    stage: "03",
+    category: "設計提案",
+    title: "平面配置與方向提案",
+    summary: "先把格局、收納量體與使用動線討論清楚，再進入風格與材質。",
+    start: 3,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    outputs: ["平面配置", "動線提案", "初步收納策略"],
+  },
+  {
+    id: "contract",
+    stage: "04",
+    category: "合作確認",
+    title: "設計委任與方向定案",
+    summary: "確認合作範圍與節奏，正式進入深化設計與工程整合階段。",
+    start: 4,
+    span: 1,
+    durationLabel: "約 1 週",
+    outputs: ["設計委任", "時程框架", "討論節點確認"],
+  },
+  {
+    id: "design",
+    stage: "05",
+    category: "深化設計",
+    title: "細部設計、3D 與系統櫃整合",
+    summary: "把立面、材質、燈光、開關、系統櫃與收納細節一起落實。",
+    start: 5,
+    span: 4,
+    durationLabel: "約 3-4 週",
+    outputs: ["3D / 立面", "材質方向", "系統櫃與收納整合"],
+  },
+  {
+    id: "quote",
+    stage: "06",
+    category: "報價整合",
+    title: "工程報價、修正與簽約",
+    summary: "依最終圖面與工法整理報價，確認項目、增減範圍與付款節點。",
+    start: 7,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    outputs: ["工程報價", "材料確認", "施工合約"],
+  },
+  {
+    id: "prep",
+    stage: "07",
+    category: "開工準備",
+    title: "發包、排程與備料",
+    summary: "安排工班順序、確認進場時間，並處理系統櫃與主要材料下單。",
+    start: 9,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    outputs: ["施工排程", "工班銜接", "主材備料"],
+  },
+  {
+    id: "build",
+    stage: "08",
+    category: "工程施作",
+    title: "拆除、基礎工程到木作安裝",
+    summary: "依工序推進拆除、水電、泥作、木作、油漆、設備與系統櫃安裝。",
+    start: 10,
+    span: 5,
+    durationLabel: "約 4-6 週",
+    outputs: ["現場施工", "節點回報", "品質控管"],
+  },
+  {
+    id: "handoff",
+    stage: "09",
+    category: "交付驗收",
+    title: "完工驗收、清潔與交屋",
+    summary: "逐項確認收尾細節、設備操作與修正清單，再安排正式交屋。",
+    start: 15,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    outputs: ["驗收清單", "修正收尾", "正式交屋"],
+  },
+];
+
+const stageHighlights = [
+  {
+    label: "前期",
+    title: "先把需求、預算與現場條件對齊",
+    body: "真正影響時程的，通常不是畫圖速度，而是需求是否清楚、預算是否現實、現場條件是否提早看見。",
+  },
+  {
+    label: "中段",
+    title: "設計與報價同步整合",
+    body: "青曦會把收納、系統櫃、設備位置與工法一起思考，避免設計定案後才發現預算或施工衝突。",
+  },
+  {
+    label: "後段",
+    title: "施工不是一口氣到底，而是按節點收斂",
+    body: "從開工、備料到驗收，重點在工序銜接與節點回報，這樣成品才會安定、耐看，也真正好住。",
+  },
+];
+
+const processStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: "室內裝修全流程",
+    description:
+      "青曦空間設計整理的裝修全流程，從初談、丈量、設計、報價到施工與交屋，讓屋主快速理解整體節奏。",
+    totalTime: "P16W",
+    step: processStages.map((item, index) => ({
+      "@type": "HowToStep",
+      position: index + 1,
+      name: item.title,
+      text: item.summary,
+    })),
+  },
+];
+---
+
+<BaseLayout
+  title="裝修全流程 - 青曦空間設計"
+  description="用甘特圖看懂青曦空間設計的裝修全流程，從初談、丈量、設計、報價到施工與交屋，一頁掌握整體節奏。"
+  ogImage="/images/portfolio/xizhi-1.jpg"
+  pageType="service"
+  structuredData={processStructuredData}
+>
+  <section class="process-page">
+    <div class="process-shell">
+      <header class="process-hero">
+        <p class="process-eyebrow">Renovation Roadmap</p>
+        <h1>裝修全流程，一頁看懂整體節奏。</h1>
+        <p class="process-description">
+          這不是保證每個案子都一模一樣，而是把多數住宅裝修從前期討論到完工交屋的節點整理成可理解的甘特圖。
+          如果是老屋翻新、格局改動多、系統櫃比例高，時程通常會再往後拉。
+        </p>
+        <div class="process-actions">
+          <a href="/contact" class="process-button process-button-primary">預約諮詢</a>
+          <a href="/tools" class="process-button process-button-secondary">先做估價</a>
+        </div>
+      </header>
+
+      <section class="process-highlights" aria-label="流程重點">
+        {stageHighlights.map((item) => (
+          <article class="highlight-card">
+            <p class="highlight-label">{item.label}</p>
+            <h2>{item.title}</h2>
+            <p>{item.body}</p>
+          </article>
+        ))}
+      </section>
+
+      <section class="gantt-section" aria-labelledby="gantt-title">
+        <div class="gantt-header">
+          <div>
+            <p class="gantt-label">甘特圖</p>
+            <h2 id="gantt-title">以 16 週為基準的裝修節奏</h2>
+          </div>
+          <p class="gantt-note">甘特圖顯示各階段常見的開始點與重疊區，方便屋主先抓整體安排。</p>
+        </div>
+
+        <div class="gantt-board">
+          <div class="gantt-axis" aria-hidden="true">
+            <div class="gantt-axis-stage">階段</div>
+            <div class="gantt-axis-grid">
+              {ganttWeeks.map((week) => <span>W{week}</span>)}
+            </div>
+          </div>
+
+          <div class="gantt-rows">
+            {processStages.map((item) => (
+              <article class="gantt-row">
+                <div class="gantt-stage">
+                  <span class="gantt-stage-number">{item.stage}</span>
+                  <div>
+                    <p class="gantt-stage-category">{item.category}</p>
+                    <h3>{item.title}</h3>
+                    <p class="gantt-stage-summary">{item.summary}</p>
+                    <p class="gantt-stage-duration">{item.durationLabel}</p>
+                  </div>
+                </div>
+
+                <div class="gantt-track">
+                  <div class="gantt-track-grid" aria-hidden="true">
+                    {ganttWeeks.map(() => <span></span>)}
+                  </div>
+                  <div
+                    class="gantt-bar"
+                    style={`--start:${item.start}; --span:${item.span};`}
+                    aria-label={`${item.title}，${item.durationLabel}`}
+                  >
+                    <span>{item.durationLabel}</span>
+                  </div>
+                </div>
+
+                <div class="gantt-output">
+                  <p>常見產出</p>
+                  <ul>
+                    {item.outputs.map((output) => <li>{output}</li>)}
+                  </ul>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="process-notes" aria-label="補充說明">
+        <article class="notes-card notes-card-dark">
+          <p class="notes-label">你會看到的真實差異</p>
+          <h2>哪些因素最常讓時程變動？</h2>
+          <ul class="notes-list">
+            <li>老屋若牽涉漏水、壁癌、電箱更新與管線重拉，施工週期通常會拉長。</li>
+            <li>系統櫃、特殊門片或進口材質若需訂製，備料與安裝節點要預留更多時間。</li>
+            <li>如果屋主在施工中段大幅改動需求，甘特圖的後半段通常會整體往後推。</li>
+          </ul>
+        </article>
+
+        <article class="notes-card">
+          <p class="notes-label">青曦的做法</p>
+          <h2>把收納、系統櫃與日常使用感一起想清楚</h2>
+          <p>
+            青曦平常特別重視收納細節、櫃體整合與實際入住後的使用感。流程的目的不是把案子做快，
+            而是把每個決策放在對的節點，避免後面一直補洞。
+          </p>
+          <div class="notes-actions">
+            <a href="/portfolio" class="process-button process-button-secondary">先看作品</a>
+            <a href="/contact" class="process-button process-button-primary">直接聊需求</a>
+          </div>
+        </article>
+      </section>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .process-page {
+    padding: 5rem 1.5rem;
+    background:
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(245, 240, 234, 1) 100%);
+  }
+
+  .process-shell {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .process-hero {
+    max-width: 52rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .process-eyebrow,
+  .gantt-label,
+  .highlight-label,
+  .notes-label {
+    margin: 0 0 0.85rem;
+    color: var(--gray-medium);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .process-hero h1,
+  .gantt-header h2,
+  .notes-card h2 {
+    margin: 0;
+    font-family: var(--font-serif);
+    color: var(--gray-darkest);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.24;
+  }
+
+  .process-hero h1 {
+    font-size: clamp(2.4rem, 4.6vw, 4.2rem);
+  }
+
+  .process-description {
+    margin: 1.1rem auto 0;
+    color: var(--gray-medium);
+    line-height: 1.9;
+    letter-spacing: 0.008em;
+    max-width: 46rem;
+  }
+
+  .process-actions,
+  .notes-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+  }
+
+  .process-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 0.92rem 1.4rem;
+    border-radius: 999px;
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    transition:
+      transform 0.25s ease,
+      background-color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .process-button:hover {
+    transform: translateY(-2px);
+  }
+
+  .process-button-primary {
+    background: linear-gradient(135deg, var(--gray-darkest) 0%, #6a5f57 100%);
+    color: var(--white);
+    border: 1px solid rgba(115, 103, 94, 0.18);
+    box-shadow: 0 16px 26px rgba(20, 20, 20, 0.14);
+  }
+
+  .process-button-secondary {
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--gray-darkest);
+    border: 1px solid rgba(101, 91, 84, 0.22);
+    box-shadow: 0 12px 22px rgba(47, 47, 47, 0.05);
+  }
+
+  .process-highlights {
+    margin-top: 2.6rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .highlight-card,
+  .notes-card {
+    border-radius: 26px;
+    border: 1px solid rgba(115, 103, 94, 0.14);
+    box-shadow: 0 18px 34px rgba(47, 47, 47, 0.05);
+  }
+
+  .highlight-card {
+    padding: 1.5rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
+  }
+
+  .highlight-card h2 {
+    margin: 0;
+    font-family: var(--font-serif);
+    color: var(--gray-darkest);
+    font-size: 1.25rem;
+    line-height: 1.42;
+    font-weight: 600;
+  }
+
+  .highlight-card p:last-child {
+    margin: 0.8rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.82;
+    letter-spacing: 0.008em;
+  }
+
+  .gantt-section {
+    margin-top: 2rem;
+    padding: 1.4rem;
+    border-radius: 32px;
+    background:
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.06), transparent 28%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(247, 243, 238, 0.98) 100%);
+    border: 1px solid rgba(115, 103, 94, 0.14);
+    box-shadow: 0 22px 42px rgba(47, 47, 47, 0.06);
+  }
+
+  .gantt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1rem;
+    padding: 0.4rem 0.4rem 1.2rem;
+  }
+
+  .gantt-header h2 {
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+  }
+
+  .gantt-note {
+    max-width: 22rem;
+    margin: 0;
+    color: var(--gray-medium);
+    line-height: 1.8;
+    letter-spacing: 0.008em;
+  }
+
+  .gantt-board {
+    overflow-x: auto;
+    padding-bottom: 0.3rem;
+  }
+
+  .gantt-axis,
+  .gantt-row {
+    min-width: 1120px;
+    display: grid;
+    grid-template-columns: minmax(280px, 320px) minmax(500px, 1fr) minmax(220px, 260px);
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .gantt-axis {
+    margin-bottom: 0.9rem;
+  }
+
+  .gantt-axis-stage,
+  .gantt-axis-grid span {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--gray-medium);
+    letter-spacing: 0.08em;
+  }
+
+  .gantt-axis-stage {
+    padding: 0 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .gantt-axis-grid,
+  .gantt-track-grid {
+    display: grid;
+    grid-template-columns: repeat(16, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .gantt-axis-grid span {
+    text-align: center;
+  }
+
+  .gantt-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .gantt-row {
+    padding: 1rem;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+    box-shadow: 0 14px 30px rgba(47, 47, 47, 0.04);
+  }
+
+  .gantt-stage {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .gantt-stage-number {
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--gray-darkest) 0%, #72665d 100%);
+    color: var(--white);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .gantt-stage-category,
+  .gantt-output p,
+  .gantt-stage-duration {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--gray-medium);
+    letter-spacing: 0.08em;
+  }
+
+  .gantt-stage h3 {
+    margin: 0.35rem 0 0;
+    font-family: var(--font-serif);
+    font-size: 1.18rem;
+    line-height: 1.45;
+    color: var(--gray-darkest);
+    font-weight: 600;
+  }
+
+  .gantt-stage-summary {
+    margin: 0.65rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.78;
+    letter-spacing: 0.008em;
+  }
+
+  .gantt-stage-duration {
+    margin-top: 0.75rem;
+    font-weight: 600;
+  }
+
+  .gantt-track {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-height: 100%;
+  }
+
+  .gantt-track-grid {
+    align-self: stretch;
+  }
+
+  .gantt-track-grid span {
+    min-height: 74px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(243, 237, 231, 0.9) 0%, rgba(236, 240, 242, 0.7) 100%);
+    border: 1px solid rgba(115, 103, 94, 0.08);
+  }
+
+  .gantt-bar {
+    position: absolute;
+    left: calc(((var(--start) - 1) / 16) * 100% + ((var(--start) - 1) * 0.45rem / 16));
+    width: calc((var(--span) / 16) * 100% - ((16 - var(--span)) * 0.45rem / 16));
+    min-height: 56px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      linear-gradient(135deg, rgba(52, 47, 43, 0.98) 0%, rgba(125, 113, 103, 0.98) 100%);
+    color: var(--white);
+    box-shadow: 0 16px 22px rgba(47, 47, 47, 0.16);
+  }
+
+  .gantt-bar span {
+    padding: 0 0.7rem;
+    text-align: center;
+    font-size: 0.86rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .gantt-output {
+    padding: 0.15rem 0;
+  }
+
+  .gantt-output ul,
+  .notes-list {
+    margin: 0.75rem 0 0;
+    padding-left: 1.15rem;
+    color: var(--gray-medium);
+    line-height: 1.8;
+    letter-spacing: 0.008em;
+  }
+
+  .gantt-output li + li,
+  .notes-list li + li {
+    margin-top: 0.35rem;
+  }
+
+  .process-notes {
+    margin-top: 1.4rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .notes-card {
+    padding: 1.7rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
+  }
+
+  .notes-card-dark {
+    background:
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.1), transparent 32%),
+      linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(73, 64, 57, 1) 100%);
+    color: var(--white);
+    border-color: rgba(115, 103, 94, 0.06);
+  }
+
+  .notes-card-dark .notes-label,
+  .notes-card-dark h2,
+  .notes-card-dark .notes-list {
+    color: inherit;
+  }
+
+  .notes-card-dark .notes-label {
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  .notes-card h2 {
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+  }
+
+  .notes-card > p:last-of-type {
+    margin: 0.95rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.82;
+    letter-spacing: 0.008em;
+  }
+
+  @media (max-width: 1024px) {
+    .process-highlights,
+    .process-notes {
+      grid-template-columns: 1fr;
+    }
+
+    .gantt-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .gantt-note {
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .process-page {
+      padding: 4rem 1.25rem;
+    }
+
+    .process-actions,
+    .notes-actions {
+      flex-direction: column;
+    }
+
+    .process-button {
+      width: 100%;
+    }
+
+    .gantt-section {
+      padding: 1rem;
+      border-radius: 24px;
+    }
+
+    .gantt-axis,
+    .gantt-row {
+      min-width: 980px;
+      grid-template-columns: minmax(240px, 280px) minmax(480px, 1fr) minmax(200px, 240px);
+    }
+  }
+</style>
