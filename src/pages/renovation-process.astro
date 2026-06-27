@@ -8,6 +8,8 @@ type RiskMeta = {
   bufferDays: number;
 };
 
+type ProjectTypeKey = "old-house" | "new-home";
+
 const ganttWeeks = Array.from({ length: 28 }, (_, index) => index + 1);
 const toneLegend = [
   {
@@ -67,6 +69,19 @@ const scheduleViews = [
     description: "把中高變動工項的緩衝一起算進去。",
   },
 ];
+
+const projectTypeViews = [
+  {
+    key: "old-house",
+    label: "老屋翻新",
+    description: "會預留較多拆除後修補、管線調整與現場變數。",
+  },
+  {
+    key: "new-home",
+    label: "新成屋全戶",
+    description: "基礎修復較少，重點多在設計整合與櫃體設備進場。",
+  },
+] satisfies Array<{ key: ProjectTypeKey; label: string; description: string }>;
 
 const riskLegend = [
   {
@@ -647,12 +662,147 @@ const processStages = rawProcessStages.map((item) => ({
   ...stageRiskConfig[item.id],
 }));
 
-const totalWeeks = Math.max(...processStages.map((item) => item.start + item.span - 1));
-const highRiskCount = processStages.filter((item) => item.riskLevel === "high").length;
-const keyFlexStageIds = ["demolition", "plumbing-electric", "cabinet-factory", "inspection"];
-const keyFlexStages = keyFlexStageIds
-  .map((id) => processStages.find((item) => item.id === id))
-  .filter((item): item is (typeof processStages)[number] => Boolean(item));
+type ProcessStage = (typeof processStages)[number];
+type StageProfileOverride = Partial<
+  Pick<ProcessStage, "start" | "span" | "durationLabel" | "bufferDays" | "riskLevel" | "riskLabel" | "riskNote">
+>;
+
+const projectTypeStageOverrides: Record<ProjectTypeKey, Record<string, StageProfileOverride>> = {
+  "old-house": {},
+  "new-home": {
+    "detailed-design": { span: 3, durationLabel: "約 2-3 週", bufferDays: 3 },
+    "quote-contract": { span: 1, durationLabel: "約 1 週", bufferDays: 2 },
+    "procurement-prep": { start: 8, span: 2, durationLabel: "約 1-2 週", bufferDays: 3 },
+    protection: { start: 10 },
+    demolition: {
+      start: 10,
+      span: 1,
+      durationLabel: "約 3-5 天",
+      bufferDays: 3,
+      riskLevel: "medium",
+      riskLabel: "中變動",
+      riskNote: "新成屋通常拆除較少，但若有客變調整仍會影響後續工序。",
+    },
+    "plumbing-electric": {
+      start: 11,
+      span: 2,
+      durationLabel: "約 1-2 週",
+      bufferDays: 4,
+      riskLevel: "medium",
+      riskLabel: "中變動",
+      riskNote: "新成屋多半以點位整合為主，但設備與櫃體配合仍會牽動進度。",
+    },
+    "masonry-base": {
+      start: 12,
+      span: 2,
+      durationLabel: "約 1-2 週",
+      bufferDays: 4,
+      riskLevel: "medium",
+      riskLabel: "中變動",
+      riskNote: "若浴室、防水或局部格局調整介入，才會明顯拉長時程。",
+    },
+    waterproofing: {
+      start: 13,
+      span: 1,
+      durationLabel: "約 3-5 天",
+      bufferDays: 3,
+      riskLevel: "medium",
+      riskLabel: "中變動",
+      riskNote: "新成屋通常只有局部濕區會影響這段節奏。",
+    },
+    "windows-metal": {
+      start: 14,
+      span: 1,
+      durationLabel: "約 3-5 天",
+      bufferDays: 3,
+      riskLevel: "medium",
+      riskLabel: "中變動",
+      riskNote: "若沒有窗體或金屬追加，這段通常只會輕微穿插。",
+    },
+    carpentry: { start: 14, span: 3, durationLabel: "約 2-3 週", bufferDays: 3 },
+    "hvac-lowvoltage": {
+      start: 14,
+      span: 2,
+      durationLabel: "約 1-2 週",
+      bufferDays: 4,
+      riskLevel: "medium",
+      riskLabel: "中變動",
+      riskNote: "新成屋常見的是空調與弱電整合，而不是大規模修復。",
+    },
+    tiling: { start: 15, span: 2, durationLabel: "約 1-2 週", bufferDays: 3 },
+    paint: { start: 17, span: 2, durationLabel: "約 1-2 週", bufferDays: 2 },
+    "cabinet-factory": { start: 15, span: 4, bufferDays: 6 },
+    flooring: { start: 18, span: 1, durationLabel: "約 3-5 天", bufferDays: 2 },
+    "cabinet-install": { start: 19, span: 2, durationLabel: "約 1-2 週", bufferDays: 3 },
+    "equipment-install": { start: 20, span: 2, durationLabel: "約 1-2 週", bufferDays: 3 },
+    finishing: { start: 21, span: 2, durationLabel: "約 1-2 週", bufferDays: 3 },
+    cleaning: { start: 23 },
+    inspection: { start: 24, bufferDays: 4 },
+    handoff: { start: 25 },
+  },
+};
+
+const projectTypeStages = {
+  "old-house": processStages,
+  "new-home": processStages.map((item) => ({
+    ...item,
+    ...(projectTypeStageOverrides["new-home"][item.id] ?? {}),
+  })),
+} satisfies Record<ProjectTypeKey, ProcessStage[]>;
+
+const projectTypeMetrics = {
+  "old-house": {
+    totalWeeks: Math.max(...projectTypeStages["old-house"].map((item) => item.start + item.span - 1)),
+    highRiskCount: projectTypeStages["old-house"].filter((item) => item.riskLevel === "high").length,
+    flexStageTitles: ["拆除工程與廢棄物清運", "水電定位、配管與弱電預埋", "系統櫃複丈、下單與工廠製作", "初驗、缺失修正與複驗"],
+  },
+  "new-home": {
+    totalWeeks: Math.max(...projectTypeStages["new-home"].map((item) => item.start + item.span - 1)),
+    highRiskCount: projectTypeStages["new-home"].filter((item) => item.riskLevel === "high").length,
+    flexStageTitles: ["水電定位、配管與弱電預埋", "系統櫃複丈、下單與工廠製作", "燈具、衛浴、廚具、插座與設備安裝", "初驗、缺失修正與複驗"],
+  },
+} satisfies Record<ProjectTypeKey, { totalWeeks: number; highRiskCount: number; flexStageTitles: string[] }>;
+
+const projectTypeClientConfig = {
+  "old-house": {
+    label: "老屋翻新",
+    description: "會預留較多拆除後修補、管線調整與現場變數。",
+    briefCopy: "目前以老屋翻新為基準，會把拆除後修補與現場調整一起算進來。",
+    ganttTitle: `以老屋翻新 ${projectTypeMetrics["old-house"].totalWeeks} 週為基準的全流程節奏`,
+  },
+  "new-home": {
+    label: "新成屋全戶",
+    description: "基礎修復較少，重點多在設計整合與櫃體設備進場。",
+    briefCopy: "切到新成屋全戶後，重點會轉成櫃體、設備與整合進場的節奏。",
+    ganttTitle: `以新成屋全戶 ${projectTypeMetrics["new-home"].totalWeeks} 週為基準的全流程節奏`,
+  },
+} satisfies Record<ProjectTypeKey, { label: string; description: string; briefCopy: string; ganttTitle: string }>;
+
+const projectTypeRuntimeConfig = {
+  "old-house": {
+    ...projectTypeClientConfig["old-house"],
+    ...projectTypeMetrics["old-house"],
+  },
+  "new-home": {
+    ...projectTypeClientConfig["new-home"],
+    ...projectTypeMetrics["new-home"],
+  },
+} satisfies Record<
+  ProjectTypeKey,
+  {
+    label: string;
+    description: string;
+    briefCopy: string;
+    ganttTitle: string;
+    totalWeeks: number;
+    highRiskCount: number;
+    flexStageTitles: string[];
+  }
+>;
+
+const totalWeeks = projectTypeMetrics["old-house"].totalWeeks;
+const highRiskCount = projectTypeMetrics["old-house"].highRiskCount;
+const keyFlexStages = projectTypeMetrics["old-house"].flexStageTitles;
 
 const processStructuredData = [
   {
@@ -679,13 +829,18 @@ const processStructuredData = [
   pageType="service"
   structuredData={processStructuredData}
 >
-  <section class="process-page" data-total-weeks={totalWeeks}>
+  <section
+    class="process-page"
+    data-total-weeks={totalWeeks}
+    data-project-type="old-house"
+    data-project-config={JSON.stringify(projectTypeRuntimeConfig)}
+  >
     <div class="process-shell">
       <header class="process-hero">
         <p class="process-eyebrow">Renovation Roadmap</p>
         <h1>從接洽到交屋，整套時程一次看懂。</h1>
         <p class="process-description">
-          把前期提案到完工交屋全部放進同一張甘特圖，也能直接換算每個節點的大致時間。
+          把前期提案到完工交屋全部放進同一張甘特圖，也能依屋況基準換算每個節點的大致時間。
         </p>
         <div class="process-actions">
           <a href="/contact" class="process-button process-button-primary">預約諮詢</a>
@@ -697,6 +852,25 @@ const processStructuredData = [
         <article class="schedule-card schedule-card-primary">
           <p class="schedule-eyebrow">時程視角</p>
           <h2>輸入起算日期，用兩種方式看這份排程</h2>
+          <div class="project-type-picker">
+            <p class="project-type-label">屋況基準</p>
+            <div class="project-type-switch" role="tablist" aria-label="屋況基準">
+              {projectTypeViews.map((view, index) => (
+                <button
+                  type="button"
+                  class={`project-type-button ${index === 0 ? "is-active" : ""}`}
+                  data-project-type={view.key}
+                  data-type-label={view.label}
+                  data-type-description={view.description}
+                >
+                  {view.label}
+                </button>
+              ))}
+            </div>
+            <p class="project-type-copy" id="project-type-copy" aria-live="polite">
+              {projectTypeViews[0].description}
+            </p>
+          </div>
           <div class="schedule-form">
             <label class="schedule-field">
               <span>起算日期</span>
@@ -737,11 +911,11 @@ const processStructuredData = [
               <span>主要節點</span>
             </div>
             <div class="schedule-metric">
-              <strong>{totalWeeks}</strong>
+              <strong id="metric-total-weeks">{totalWeeks}</strong>
               <span>基準週數</span>
             </div>
             <div class="schedule-metric">
-              <strong>{highRiskCount}</strong>
+              <strong id="metric-high-risk-count">{highRiskCount}</strong>
               <span>高變動工項</span>
             </div>
           </div>
@@ -755,6 +929,9 @@ const processStructuredData = [
         <article class="brief-card brief-card-primary">
           <p class="notes-label">交付視窗</p>
           <h2>先看兩種時間視角，再決定你要抓得多保守。</h2>
+          <p class="brief-inline-copy" id="brief-project-type-copy">
+            目前以老屋翻新為基準，會把拆除後修補與現場調整一起算進來。
+          </p>
           <div class="brief-window-grid">
             <div class="brief-window-item">
               <span>日常節奏</span>
@@ -772,8 +949,8 @@ const processStructuredData = [
         <article class="brief-card">
           <p class="notes-label">最需留白</p>
           <h2>真正該保留彈性的，通常不是全部工項，而是幾個關鍵轉折。</h2>
-          <div class="brief-tag-list">
-            {keyFlexStages.map((item) => <span class="brief-tag">{item.title}</span>)}
+          <div class="brief-tag-list" id="brief-flex-tags">
+            {keyFlexStages.map((item) => <span class="brief-tag">{item}</span>)}
           </div>
         </article>
       </section>
@@ -782,7 +959,7 @@ const processStructuredData = [
         <div class="gantt-header">
           <div>
             <p class="gantt-label">甘特圖</p>
-            <h2 id="gantt-title">以 28 週為基準的全流程節奏</h2>
+            <h2 id="gantt-title">以老屋翻新 28 週為基準的全流程節奏</h2>
           </div>
         </div>
 
@@ -835,13 +1012,16 @@ const processStructuredData = [
           <div class="gantt-axis" aria-hidden="true">
             <div class="gantt-axis-stage">工項</div>
             <div class="gantt-axis-grid">
-              {ganttWeeks.map((week) => <span>W{week}</span>)}
+              {ganttWeeks.map((week) => <span data-axis-week={week}>W{week}</span>)}
             </div>
             <div class="gantt-axis-detail">前置與產出</div>
           </div>
 
           <div class="gantt-rows">
-            {processStages.map((item) => (
+            {processStages.map((item, index) => {
+              const newHomeStage = projectTypeStages["new-home"][index];
+
+              return (
               <article
                 class={`gantt-row gantt-row-${item.tone} gantt-row-${item.scopeType}`}
                 data-stage-id={item.id}
@@ -850,6 +1030,20 @@ const processStructuredData = [
                 data-span-weeks={item.span}
                 data-buffer-days={item.bufferDays}
                 data-risk-level={item.riskLevel}
+                data-old-house-start-week={item.start}
+                data-old-house-span-weeks={item.span}
+                data-old-house-buffer-days={item.bufferDays}
+                data-old-house-risk-level={item.riskLevel}
+                data-old-house-risk-label={item.riskLabel}
+                data-old-house-risk-note={item.riskNote}
+                data-old-house-duration-label={item.durationLabel}
+                data-new-home-start-week={newHomeStage.start}
+                data-new-home-span-weeks={newHomeStage.span}
+                data-new-home-buffer-days={newHomeStage.bufferDays}
+                data-new-home-risk-level={newHomeStage.riskLevel}
+                data-new-home-risk-label={newHomeStage.riskLabel}
+                data-new-home-risk-note={newHomeStage.riskNote}
+                data-new-home-duration-label={newHomeStage.durationLabel}
               >
                 <div class="gantt-stage">
                   <span class={`gantt-stage-number gantt-stage-number-${item.tone}`}>{item.stage}</span>
@@ -862,8 +1056,8 @@ const processStructuredData = [
                     <p class="gantt-stage-summary">{item.summary}</p>
                     <div class="gantt-stage-meta">
                       <span class={`tone-pill tone-pill-${item.tone}`}>{item.toneLabel}</span>
-                      <span class={`risk-pill risk-pill-${item.riskLevel}`}>{item.riskLabel}</span>
-                      <span class="gantt-stage-duration">{item.durationLabel}</span>
+                      <span class={`risk-pill risk-pill-${item.riskLevel}`} data-stage-risk-pill>{item.riskLabel}</span>
+                      <span class="gantt-stage-duration" data-stage-duration>{item.durationLabel}</span>
                     </div>
                     <p class="gantt-date-range gantt-date-range-empty" data-stage-date={item.id}>
                       輸入日期後，這段流程的時間感會出現在這裡。
@@ -873,12 +1067,13 @@ const processStructuredData = [
 
                 <div class="gantt-track">
                   <div class="gantt-track-grid" aria-hidden="true">
-                    {ganttWeeks.map(() => <span></span>)}
+                    {ganttWeeks.map((week) => <span data-track-week={week}></span>)}
                   </div>
                   <div
                     class={`gantt-bar gantt-bar-${item.tone} gantt-bar-${item.scopeType}`}
                     style={`--start:${item.start}; --span:${item.span};`}
                     aria-label={`${item.title}，${item.durationLabel}`}
+                    data-stage-bar
                   >
                     <span>{item.durationLabel}</span>
                   </div>
@@ -893,7 +1088,7 @@ const processStructuredData = [
                   </div>
                   <div class="gantt-detail-block">
                     <p>變動提醒</p>
-                    <p class="gantt-risk-note">{item.riskNote}</p>
+                    <p class="gantt-risk-note" data-stage-risk-note>{item.riskNote}</p>
                   </div>
                   <div class="gantt-detail-block">
                     <p>常見產出</p>
@@ -903,7 +1098,8 @@ const processStructuredData = [
                   </div>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1078,6 +1274,54 @@ const processStructuredData = [
       linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 239, 234, 1) 100%);
   }
 
+  .project-type-picker {
+    margin-top: 1.1rem;
+  }
+
+  .project-type-label {
+    margin: 0 0 0.55rem;
+    color: var(--gray-darkest);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .project-type-switch {
+    display: inline-flex;
+    gap: 0.55rem;
+    padding: 0.35rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+  }
+
+  .project-type-button {
+    min-height: 40px;
+    padding: 0.68rem 1rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--gray-medium);
+    font: inherit;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .project-type-button.is-active {
+    background: rgba(46, 41, 37, 0.92);
+    color: var(--white);
+    box-shadow: 0 12px 20px rgba(20, 20, 20, 0.1);
+  }
+
+  .project-type-copy {
+    margin: 0.7rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.72;
+    letter-spacing: 0.008em;
+  }
+
   .schedule-form {
     margin-top: 1.35rem;
     display: grid;
@@ -1246,6 +1490,13 @@ const processStructuredData = [
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 30%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 241, 236, 1) 100%);
+  }
+
+  .brief-inline-copy {
+    margin: 0.7rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    letter-spacing: 0.008em;
   }
 
   .brief-window-grid {
@@ -1503,10 +1754,10 @@ const processStructuredData = [
 
   .gantt-axis,
   .gantt-row {
-    min-width: 1600px;
+    min-width: 1500px;
     display: grid;
-    grid-template-columns: minmax(340px, 400px) minmax(520px, 1fr) minmax(280px, 320px);
-    gap: 1rem;
+    grid-template-columns: minmax(340px, 388px) minmax(460px, 0.88fr) minmax(250px, 292px);
+    gap: 0.85rem;
     align-items: stretch;
   }
 
@@ -1541,6 +1792,11 @@ const processStructuredData = [
     text-align: center;
   }
 
+  .gantt-axis-grid span.is-outside-range,
+  .gantt-track-grid span.is-outside-range {
+    opacity: 0.24;
+  }
+
   .gantt-rows {
     display: flex;
     flex-direction: column;
@@ -1548,7 +1804,7 @@ const processStructuredData = [
   }
 
   .gantt-row {
-    padding: 1rem;
+    padding: 0.95rem;
     border-radius: 26px;
     background: rgba(255, 255, 255, 0.94);
     border: 1px solid rgba(115, 103, 94, 0.12);
@@ -1670,8 +1926,17 @@ const processStructuredData = [
   .gantt-track-grid span {
     min-height: 102px;
     border-radius: 14px;
-    background: linear-gradient(180deg, rgba(243, 237, 231, 0.88) 0%, rgba(236, 240, 242, 0.72) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.08);
+    background: linear-gradient(180deg, rgba(245, 240, 235, 0.58) 0%, rgba(238, 241, 243, 0.44) 100%);
+    border: 1px solid rgba(115, 103, 94, 0.05);
+  }
+
+  .gantt-row-planning .gantt-track-grid span {
+    background: linear-gradient(180deg, rgba(245, 240, 235, 0.42) 0%, rgba(239, 242, 244, 0.32) 100%);
+    border-color: rgba(115, 103, 94, 0.035);
+  }
+
+  .gantt-row-planning .gantt-bar {
+    box-shadow: 0 14px 20px rgba(47, 47, 47, 0.1);
   }
 
   .gantt-bar {
@@ -1825,7 +2090,8 @@ const processStructuredData = [
 
     .process-button,
     .schedule-action,
-    .schedule-mode-button {
+    .schedule-mode-button,
+    .project-type-button {
       width: 100%;
     }
 
@@ -1833,7 +2099,8 @@ const processStructuredData = [
       width: 100%;
     }
 
-    .schedule-mode-switch {
+    .schedule-mode-switch,
+    .project-type-switch {
       width: 100%;
       display: grid;
       grid-template-columns: 1fr;
@@ -1867,12 +2134,22 @@ const processStructuredData = [
     const modeCopy = document.getElementById("schedule-mode-copy");
     const baselineWindowNode = document.getElementById("brief-baseline-window");
     const conservativeWindowNode = document.getElementById("brief-conservative-window");
+    const projectTypeCopyNode = document.getElementById("project-type-copy");
+    const briefProjectTypeCopyNode = document.getElementById("brief-project-type-copy");
+    const briefFlexTagsNode = document.getElementById("brief-flex-tags");
+    const metricTotalWeeksNode = document.getElementById("metric-total-weeks");
+    const metricHighRiskCountNode = document.getElementById("metric-high-risk-count");
+    const ganttTitleNode = document.getElementById("gantt-title");
     const processPage = document.querySelector(".process-page");
+    const projectTypeConfig = JSON.parse(processPage?.getAttribute("data-project-config") || "{}");
     const stageRows = Array.from(document.querySelectorAll("[data-stage-id]"));
     const modeButtons = Array.from(document.querySelectorAll("[data-schedule-mode]"));
-    const totalWeeks = Number(processPage?.getAttribute("data-total-weeks") || 0);
+    const projectTypeButtons = Array.from(document.querySelectorAll(".project-type-button"));
+    const axisWeekNodes = Array.from(document.querySelectorAll("[data-axis-week]"));
+    const trackWeekNodes = Array.from(document.querySelectorAll("[data-track-week]"));
     const defaultSummary = summaryNode?.textContent || "";
     let scheduleMode = "baseline";
+    let projectType = processPage?.getAttribute("data-project-type") || "old-house";
 
     function toInputDateValue(date) {
       const year = date.getFullYear();
@@ -1927,6 +2204,18 @@ const processStructuredData = [
       return `${startYear} 年 ${startMonth} 月${startPhase}至 ${endYear} 年 ${endMonth} 月${endPhase}`;
     }
 
+    function setBriefFlexTags(titles) {
+      if (!briefFlexTagsNode) return;
+
+      briefFlexTagsNode.innerHTML = "";
+      titles.forEach((title) => {
+        const tag = document.createElement("span");
+        tag.className = "brief-tag";
+        tag.textContent = title;
+        briefFlexTagsNode.appendChild(tag);
+      });
+    }
+
     function setScheduleMode(nextMode) {
       scheduleMode = nextMode;
       modeButtons.forEach((button) => {
@@ -1944,9 +2233,99 @@ const processStructuredData = [
       }
     }
 
+    function applyProjectType(nextType) {
+      const config = projectTypeConfig[nextType];
+      if (!config) return;
+
+      projectType = nextType;
+      processPage?.setAttribute("data-project-type", nextType);
+      processPage?.setAttribute("data-total-weeks", String(config.totalWeeks));
+
+      projectTypeButtons.forEach((button) => {
+        const isActive = button.getAttribute("data-project-type") === nextType;
+        button.classList.toggle("is-active", isActive);
+      });
+
+      if (projectTypeCopyNode) {
+        projectTypeCopyNode.textContent = config.description;
+      }
+
+      if (briefProjectTypeCopyNode) {
+        briefProjectTypeCopyNode.textContent = config.briefCopy;
+      }
+
+      if (metricTotalWeeksNode) {
+        metricTotalWeeksNode.textContent = String(config.totalWeeks);
+      }
+
+      if (metricHighRiskCountNode) {
+        metricHighRiskCountNode.textContent = String(config.highRiskCount);
+      }
+
+      if (ganttTitleNode) {
+        ganttTitleNode.textContent = config.ganttTitle;
+      }
+
+      setBriefFlexTags(config.flexStageTitles);
+
+      axisWeekNodes.forEach((node) => {
+        const week = Number(node.getAttribute("data-axis-week") || 0);
+        node.classList.toggle("is-outside-range", week > config.totalWeeks);
+      });
+
+      trackWeekNodes.forEach((node) => {
+        const week = Number(node.getAttribute("data-track-week") || 0);
+        node.classList.toggle("is-outside-range", week > config.totalWeeks);
+      });
+
+      stageRows.forEach((row) => {
+        const startWeek = row.getAttribute(`data-${nextType}-start-week`) || row.getAttribute("data-start-week") || "";
+        const spanWeeks = row.getAttribute(`data-${nextType}-span-weeks`) || row.getAttribute("data-span-weeks") || "";
+        const bufferDays = row.getAttribute(`data-${nextType}-buffer-days`) || row.getAttribute("data-buffer-days") || "";
+        const riskLevel = row.getAttribute(`data-${nextType}-risk-level`) || row.getAttribute("data-risk-level") || "low";
+        const riskLabel = row.getAttribute(`data-${nextType}-risk-label`) || "";
+        const riskNote = row.getAttribute(`data-${nextType}-risk-note`) || "";
+        const durationLabel = row.getAttribute(`data-${nextType}-duration-label`) || "";
+        const stageTitle = row.getAttribute("data-stage-title") || "此節點";
+
+        row.setAttribute("data-start-week", startWeek);
+        row.setAttribute("data-span-weeks", spanWeeks);
+        row.setAttribute("data-buffer-days", bufferDays);
+        row.setAttribute("data-risk-level", riskLevel);
+
+        const riskPill = row.querySelector("[data-stage-risk-pill]");
+        if (riskPill) {
+          riskPill.className = `risk-pill risk-pill-${riskLevel}`;
+          riskPill.textContent = riskLabel;
+        }
+
+        const durationNode = row.querySelector("[data-stage-duration]");
+        if (durationNode) {
+          durationNode.textContent = durationLabel;
+        }
+
+        const riskNoteNode = row.querySelector("[data-stage-risk-note]");
+        if (riskNoteNode) {
+          riskNoteNode.textContent = riskNote;
+        }
+
+        const barNode = row.querySelector("[data-stage-bar]");
+        if (barNode instanceof HTMLElement) {
+          barNode.style.setProperty("--start", startWeek);
+          barNode.style.setProperty("--span", spanWeeks);
+          barNode.setAttribute("aria-label", `${stageTitle}，${durationLabel}`);
+          const labelNode = barNode.querySelector("span");
+          if (labelNode) {
+            labelNode.textContent = durationLabel;
+          }
+        }
+      });
+    }
+
     function updateSchedule() {
       const baseDate = parseLocalDate(startDateInput instanceof HTMLInputElement ? startDateInput.value : "");
       const dateNodes = Array.from(document.querySelectorAll("[data-stage-date]"));
+      const totalWeeks = projectTypeConfig[projectType]?.totalWeeks || 0;
 
       if (!baseDate) {
         dateNodes.forEach((node) => {
@@ -2048,6 +2427,16 @@ const processStructuredData = [
       });
     });
 
+    projectTypeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextType = button.getAttribute("data-project-type");
+        if (!nextType || nextType === projectType) return;
+        applyProjectType(nextType);
+        updateSchedule();
+      });
+    });
+
+    applyProjectType(projectType);
     setScheduleMode(scheduleMode);
     updateSchedule();
   });
