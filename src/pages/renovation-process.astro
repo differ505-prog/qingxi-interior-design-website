@@ -55,6 +55,21 @@ const scopeLegend = [
   },
 ];
 
+const scheduleViews = [
+  {
+    key: "baseline",
+    label: "日常節奏",
+    description: "適合先看整體流程怎麼推進，抓大方向與主要重疊工序。",
+    note: "第一次看這頁，建議先從這個視角開始。",
+  },
+  {
+    key: "conservative",
+    label: "安心安排",
+    description: "把中高變動工項的緩衝一起算進去，較適合安排搬家與交屋前後的實際決策。",
+    note: "若有搬家、租約或家具進場壓力，建議優先看這個視角。",
+  },
+];
+
 const riskLegend = [
   {
     key: "low",
@@ -634,8 +649,6 @@ const processStages = rawProcessStages.map((item) => ({
   ...stageRiskConfig[item.id],
 }));
 
-const requiredCount = processStages.filter((item) => item.scopeType === "required").length;
-const optionalCount = processStages.filter((item) => item.scopeType === "optional").length;
 const totalWeeks = Math.max(...processStages.map((item) => item.start + item.span - 1));
 const highRiskCount = processStages.filter((item) => item.riskLevel === "high").length;
 
@@ -677,7 +690,7 @@ const processStructuredData = [
 
 <BaseLayout
   title="裝修全流程 - 青曦空間設計"
-  description="用甘特圖看懂青曦空間設計從初談、提案、簽約設計到拆除施工與完工交屋的完整流程，並提供基準版與保守版日期推算。"
+  description="用甘特圖看懂青曦空間設計從初談、提案、簽約設計到拆除施工與完工交屋的完整流程，並提供兩種更貼近真實溝通情境的日期視角。"
   ogImage="/images/portfolio/xizhi-1.jpg"
   pageType="service"
   structuredData={processStructuredData}
@@ -709,8 +722,8 @@ const processStructuredData = [
 
       <section class="schedule-tools" aria-label="日期換算工具">
         <article class="schedule-card schedule-card-primary">
-          <p class="schedule-eyebrow">日期換算</p>
-          <h2>輸入起算日期，切換基準版或保守版</h2>
+          <p class="schedule-eyebrow">時程視角</p>
+          <h2>輸入起算日期，用兩種方式看這份排程</h2>
           <div class="schedule-form">
             <label class="schedule-field">
               <span>起算日期</span>
@@ -722,31 +735,38 @@ const processStructuredData = [
             </div>
           </div>
           <div class="schedule-mode-switch" role="tablist" aria-label="排程模式">
-            <button type="button" class="schedule-mode-button is-active" data-schedule-mode="baseline">基準版</button>
-            <button type="button" class="schedule-mode-button" data-schedule-mode="conservative">保守版</button>
+            {scheduleViews.map((view, index) => (
+              <button
+                type="button"
+                class={`schedule-mode-button ${index === 0 ? "is-active" : ""}`}
+                data-schedule-mode={view.key}
+                data-mode-label={view.label}
+                data-mode-description={view.description}
+                data-mode-note={view.note}
+              >
+                {view.label}
+              </button>
+            ))}
+          </div>
+          <div class="schedule-mode-copy" id="schedule-mode-copy" aria-live="polite">
+            <p class="schedule-mode-title">{scheduleViews[0].label}</p>
+            <p class="schedule-mode-description">{scheduleViews[0].description}</p>
+            <p class="schedule-mode-note">{scheduleViews[0].note}</p>
           </div>
           <p id="schedule-summary" class="schedule-summary" aria-live="polite">
-            選好日期後，這裡會顯示整體節奏與預留彈性。
+            選好日期後，這裡會整理一個較貼近真實溝通情境的時間觀點。
           </p>
           <p class="schedule-helper">
-            保守版會對中高變動工項自動加入緩衝，較適合拿來抓搬家、家具進場與租約銜接。
+            這裡提供的是排程視角，不是死板的交屋承諾；目的在於先把節奏看清楚，再保留現場調整空間。
           </p>
         </article>
 
         <article class="schedule-card schedule-card-secondary">
-          <p class="schedule-eyebrow">期待管理</p>
-          <div class="schedule-metrics">
+          <p class="schedule-eyebrow">閱讀建議</p>
+          <div class="schedule-metrics schedule-metrics-compact">
             <div class="schedule-metric">
               <strong>{processStages.length}</strong>
-              <span>主要工項</span>
-            </div>
-            <div class="schedule-metric">
-              <strong>{requiredCount}</strong>
-              <span>必做節點</span>
-            </div>
-            <div class="schedule-metric">
-              <strong>{optionalCount}</strong>
-              <span>視案況追加</span>
+              <span>主要節點</span>
             </div>
             <div class="schedule-metric">
               <strong>{totalWeeks}</strong>
@@ -757,6 +777,11 @@ const processStructuredData = [
               <span>高變動工項</span>
             </div>
           </div>
+          <ul class="schedule-reading-list">
+            <li>第一次看這頁，先用「日常節奏」理解整體先後順序。</li>
+            <li>如果你已有搬家、家具進場或租約銜接壓力，再切到「安心安排」。</li>
+            <li>看到高變動工項時，代表那一段最需要保留談調整的空間。</li>
+          </ul>
           <p class="schedule-description">
             以下日期是排程推算，不是交屋承諾。若遇到缺工、材料交期、現場突發狀況、社區施工限制或中途變更，實際進度仍可能延後，建議至少預留 10%-20% 彈性。
           </p>
@@ -769,7 +794,7 @@ const processStructuredData = [
             <p class="gantt-label">甘特圖</p>
             <h2 id="gantt-title">以 28 週為基準的全流程節奏</h2>
           </div>
-          <p class="gantt-note">切到保守版後，日期會對中高變動工項自動加上緩衝。</p>
+          <p class="gantt-note">把它當成一份溝通底稿會最剛好，既能先看節奏，也不會把現場變化講得太死。</p>
         </div>
 
         <div class="gantt-legend-grid">
@@ -1140,6 +1165,34 @@ const processStructuredData = [
     letter-spacing: 0.008em;
   }
 
+  .schedule-mode-copy {
+    margin-top: 1rem;
+    padding: 1rem 1.05rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(115, 103, 94, 0.1);
+  }
+
+  .schedule-mode-title,
+  .schedule-mode-description,
+  .schedule-mode-note {
+    margin: 0;
+  }
+
+  .schedule-mode-title {
+    color: var(--gray-darkest);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .schedule-mode-description,
+  .schedule-mode-note {
+    margin-top: 0.45rem;
+    color: var(--gray-medium);
+    line-height: 1.75;
+    letter-spacing: 0.008em;
+  }
+
   .schedule-mode-switch {
     display: inline-flex;
     gap: 0.65rem;
@@ -1178,6 +1231,10 @@ const processStructuredData = [
     margin-top: 1rem;
   }
 
+  .schedule-metrics-compact {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .schedule-metric {
     padding: 1rem;
     border-radius: 20px;
@@ -1198,6 +1255,18 @@ const processStructuredData = [
     margin-top: 0.4rem;
     color: var(--gray-medium);
     line-height: 1.6;
+  }
+
+  .schedule-reading-list {
+    margin: 1rem 0 0;
+    padding-left: 1.15rem;
+    color: var(--gray-medium);
+    line-height: 1.8;
+    letter-spacing: 0.008em;
+  }
+
+  .schedule-reading-list li + li {
+    margin-top: 0.4rem;
   }
 
   .gantt-section {
@@ -1759,6 +1828,7 @@ const processStructuredData = [
     const fillTodayButton = document.getElementById("schedule-fill-today");
     const clearButton = document.getElementById("schedule-clear");
     const summaryNode = document.getElementById("schedule-summary");
+    const modeCopy = document.getElementById("schedule-mode-copy");
     const processPage = document.querySelector(".process-page");
     const stageRows = Array.from(document.querySelectorAll("[data-stage-id]"));
     const modeButtons = Array.from(document.querySelectorAll("[data-schedule-mode]"));
@@ -1800,6 +1870,17 @@ const processStructuredData = [
         const isActive = button.getAttribute("data-schedule-mode") === nextMode;
         button.classList.toggle("is-active", isActive);
       });
+
+      const activeButton = modeButtons.find((button) => button.getAttribute("data-schedule-mode") === nextMode);
+      const modeTitle = modeCopy?.querySelector(".schedule-mode-title");
+      const modeDescription = modeCopy?.querySelector(".schedule-mode-description");
+      const modeNote = modeCopy?.querySelector(".schedule-mode-note");
+
+      if (activeButton && modeTitle && modeDescription && modeNote) {
+        modeTitle.textContent = activeButton.getAttribute("data-mode-label") || "";
+        modeDescription.textContent = activeButton.getAttribute("data-mode-description") || "";
+        modeNote.textContent = activeButton.getAttribute("data-mode-note") || "";
+      }
     }
 
     function updateSchedule() {
@@ -1838,10 +1919,10 @@ const processStructuredData = [
           const bufferText =
             riskLevel === "high" || riskLevel === "medium" ? `，已含約 ${bufferDays} 天緩衝` : "";
           targetNode.textContent =
-            `${title}保守抓約 ${formatDate(conservativeStart)} 至 ${formatDate(conservativeEnd)}${bufferText}`;
+            `${title}在安心安排裡，約會落在 ${formatDate(conservativeStart)} 至 ${formatDate(conservativeEnd)}${bufferText}`;
         } else {
           targetNode.textContent =
-            `${title}基準抓約 ${formatDate(baselineStart)} 至 ${formatDate(baselineEnd)}`;
+            `${title}在日常節奏裡，約會落在 ${formatDate(baselineStart)} 至 ${formatDate(baselineEnd)}`;
         }
         targetNode.classList.remove("gantt-date-range-empty");
 
@@ -1854,10 +1935,10 @@ const processStructuredData = [
 
         if (scheduleMode === "conservative") {
           summaryNode.textContent =
-            `若以 ${formatDate(baseDate)} 起算，保守版大約會落在 ${formatDate(conservativeEnd)} 前後交屋，較適合用來安排搬家、家具進場與租約銜接。`;
+            `若以 ${formatDate(baseDate)} 起算，依安心安排來看，整體大約會在 ${formatDate(conservativeEnd)} 前後收斂到交屋，較適合拿來安排搬家、家具進場與租約銜接。`;
         } else {
           summaryNode.textContent =
-            `若以 ${formatDate(baseDate)} 起算，基準版大約會在 ${formatDate(baselineEnd)} 前後收斂到交屋；若要抓更安全的時間，建議再看保守版。`;
+            `若以 ${formatDate(baseDate)} 起算，依日常節奏來看，整體大約會在 ${formatDate(baselineEnd)} 前後收斂到交屋；若要預留更充足彈性，建議再看安心安排。`;
         }
       }
     }
