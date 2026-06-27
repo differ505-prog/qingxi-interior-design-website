@@ -1,124 +1,223 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const ganttWeeks = Array.from({ length: 16 }, (_, index) => index + 1);
+const ganttWeeks = Array.from({ length: 18 }, (_, index) => index + 1);
 const processStages = [
   {
-    id: "consult",
+    id: "protection",
     stage: "01",
-    category: "前期對齊",
-    title: "初談與需求釐清",
-    summary: "先確認空間條件、入住成員、預算帶與希望入住時間。",
+    category: "開工前置",
+    title: "保護工程與現場放樣",
+    summary: "開工後先做公共區域與室內保護，並依圖面確認基準線與施工位置。",
     start: 1,
     span: 1,
     durationLabel: "約 1 週",
-    outputs: ["初步需求方向", "預算範圍", "是否安排丈量"],
+    outputs: ["地坪與電梯保護", "施工基準線", "現場開工確認"],
   },
   {
-    id: "survey",
+    id: "demolition",
     stage: "02",
-    category: "現場資訊",
-    title: "現場丈量與條件盤點",
-    summary: "丈量格局、拍照記錄並釐清老屋管線、樑柱與設備限制。",
-    start: 2,
-    span: 1,
-    durationLabel: "約 1 週",
-    outputs: ["現況尺寸", "基礎風險清單", "動線盤點"],
-  },
-  {
-    id: "layout",
-    stage: "03",
-    category: "設計提案",
-    title: "平面配置與方向提案",
-    summary: "先把格局、收納量體與使用動線討論清楚，再進入風格與材質。",
-    start: 3,
+    category: "拆除清運",
+    title: "拆除工程與廢棄物清運",
+    summary: "依拆除範圍進行天花、牆面、舊櫃體、設備與既有裝修拆除，並同步清運。",
+    start: 1,
     span: 2,
     durationLabel: "約 1-2 週",
-    outputs: ["平面配置", "動線提案", "初步收納策略"],
+    outputs: ["拆除完成面", "垃圾清運", "基底清空"],
   },
   {
-    id: "contract",
+    id: "plumbing-electric",
+    stage: "03",
+    category: "隱蔽工程",
+    title: "水電定位、配管與弱電預埋",
+    summary: "依照插座、燈具、設備與系統櫃位置，完成強弱電、給排水與必要預埋。",
+    start: 2,
+    span: 3,
+    durationLabel: "約 2-3 週",
+    outputs: ["水電配管", "插座開關定位", "弱電預留"],
+  },
+  {
+    id: "masonry-base",
     stage: "04",
-    category: "合作確認",
-    title: "設計委任與方向定案",
-    summary: "確認合作範圍與節奏，正式進入深化設計與工程整合階段。",
-    start: 4,
-    span: 1,
-    durationLabel: "約 1 週",
-    outputs: ["設計委任", "時程框架", "討論節點確認"],
+    category: "泥作基礎",
+    title: "砌磚、回填、打底與粉光",
+    summary: "處理新隔間、門洞調整、地坪修補與基礎打底，為後續防水與貼磚做準備。",
+    start: 3,
+    span: 3,
+    durationLabel: "約 2-3 週",
+    outputs: ["泥作打底", "砌築調整", "地坪修補"],
   },
   {
-    id: "design",
+    id: "waterproofing",
     stage: "05",
-    category: "深化設計",
-    title: "細部設計、3D 與系統櫃整合",
-    summary: "把立面、材質、燈光、開關、系統櫃與收納細節一起落實。",
+    category: "防水工程",
+    title: "浴室、陽台與濕區防水試水",
+    summary: "在泥作與管線調整後完成防水施作，並安排試水確認滲漏風險。",
+    start: 4,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    outputs: ["防水層", "試水紀錄", "濕區確認"],
+  },
+  {
+    id: "windows-metal",
+    stage: "06",
+    category: "外部配合",
+    title: "鋁窗、金屬件與外部修補",
+    summary: "若案件涉及窗體更新、鐵件、外牆修補或門框調整，通常會在此階段穿插進行。",
+    start: 5,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    outputs: ["窗框更新", "金屬件定位", "外部收邊"],
+  },
+  {
+    id: "carpentry",
+    stage: "07",
+    category: "木作工程",
+    title: "天花、隔間、包樑與木作基礎",
+    summary: "依現場條件施作木作天花、包管包樑、局部隔間與櫃體基礎結構。",
     start: 5,
     span: 4,
     durationLabel: "約 3-4 週",
-    outputs: ["3D / 立面", "材質方向", "系統櫃與收納整合"],
+    outputs: ["木作骨架", "天花結構", "造型基礎"],
   },
   {
-    id: "quote",
-    stage: "06",
-    category: "報價整合",
-    title: "工程報價、修正與簽約",
-    summary: "依最終圖面與工法整理報價，確認項目、增減範圍與付款節點。",
-    start: 7,
-    span: 2,
-    durationLabel: "約 1-2 週",
-    outputs: ["工程報價", "材料確認", "施工合約"],
-  },
-  {
-    id: "prep",
-    stage: "07",
-    category: "開工準備",
-    title: "發包、排程與備料",
-    summary: "安排工班順序、確認進場時間，並處理系統櫃與主要材料下單。",
-    start: 9,
-    span: 2,
-    durationLabel: "約 1-2 週",
-    outputs: ["施工排程", "工班銜接", "主材備料"],
-  },
-  {
-    id: "build",
+    id: "hvac-lowvoltage",
     stage: "08",
-    category: "工程施作",
-    title: "拆除、基礎工程到木作安裝",
-    summary: "依工序推進拆除、水電、泥作、木作、油漆、設備與系統櫃安裝。",
+    category: "設備協作",
+    title: "空調、消防、弱電與設備套管",
+    summary: "配合木作與天花高度，把空調、消防、網路、監控與設備套管一起收進節點。",
+    start: 5,
+    span: 3,
+    durationLabel: "約 2-3 週",
+    outputs: ["空調配合", "弱電路徑", "設備預留"],
+  },
+  {
+    id: "tiling",
+    stage: "09",
+    category: "表面工程",
+    title: "貼磚、石材與濕區完成面",
+    summary: "浴室、廚房、陽台與需要石材或磚材的區域，會在這段時間陸續成形。",
+    start: 6,
+    span: 3,
+    durationLabel: "約 2-3 週",
+    outputs: ["貼磚完成面", "石材安裝", "濕區定型"],
+  },
+  {
+    id: "paint",
+    stage: "10",
+    category: "塗裝工程",
+    title: "批土、研磨、底漆與面漆",
+    summary: "木作與牆面基礎完成後，進行批土、修補、打磨與分階段上漆。",
+    start: 8,
+    span: 3,
+    durationLabel: "約 2-3 週",
+    outputs: ["牆面修飾", "油漆底面漆", "表面平整度"],
+  },
+  {
+    id: "cabinet-factory",
+    stage: "11",
+    category: "櫃體製作",
+    title: "系統櫃複丈、下單與工廠製作",
+    summary: "現場尺寸穩定後安排複丈，系統櫃、門板與部分客製櫃體同步進入製作期。",
+    start: 7,
+    span: 4,
+    durationLabel: "約 3-4 週",
+    outputs: ["複丈完成", "櫃體下單", "工廠排程"],
+  },
+  {
+    id: "flooring",
+    stage: "12",
+    category: "地坪工程",
+    title: "地板、地坪收邊與保護更新",
+    summary: "依材質不同安排 SPC、木地板或其他地坪施工，並同步做收邊與保護更新。",
     start: 10,
-    span: 5,
-    durationLabel: "約 4-6 週",
-    outputs: ["現場施工", "節點回報", "品質控管"],
+    span: 2,
+    durationLabel: "約 1-2 週",
+    outputs: ["地坪完成面", "收邊處理", "新保護更新"],
+  },
+  {
+    id: "cabinet-install",
+    stage: "13",
+    category: "安裝階段",
+    title: "系統櫃、門片、玻璃與固定家具安裝",
+    summary: "櫃體到場後進行系統櫃、門片、玻璃、把手與固定家具安裝與校正。",
+    start: 11,
+    span: 3,
+    durationLabel: "約 2-3 週",
+    outputs: ["櫃體安裝", "玻璃門片", "五金校正"],
+  },
+  {
+    id: "equipment-install",
+    stage: "14",
+    category: "設備安裝",
+    title: "燈具、衛浴、廚具、插座與設備安裝",
+    summary: "進入設備安裝期，把燈具、面板、衛浴五金、廚具與家電定位逐一完成。",
+    start: 12,
+    span: 3,
+    durationLabel: "約 2-3 週",
+    outputs: ["燈具面板", "衛浴廚具", "設備就位"],
+  },
+  {
+    id: "finishing",
+    stage: "15",
+    category: "細部收尾",
+    title: "矽利康、補漆、修飾與細節收尾",
+    summary: "在大項安裝完成後，集中處理接縫、補漆、修口、調整與各種視覺細節。",
+    start: 14,
+    span: 2,
+    durationLabel: "約 1-2 週",
+    outputs: ["矽利康收邊", "補漆修口", "細節整理"],
+  },
+  {
+    id: "cleaning",
+    stage: "16",
+    category: "驗收前整理",
+    title: "細清、保護拆除與設備試運轉",
+    summary: "拆除施工保護後進行細清，並測試燈具、插座、衛浴、空調與其他設備運作。",
+    start: 16,
+    span: 1,
+    durationLabel: "約 1 週",
+    outputs: ["細部清潔", "設備測試", "初驗準備"],
+  },
+  {
+    id: "inspection",
+    stage: "17",
+    category: "驗收修正",
+    title: "初驗、缺失修正與複驗",
+    summary: "依現場驗收清單逐項確認，針對缺失安排修正，並在複驗後完成結案確認。",
+    start: 17,
+    span: 1,
+    durationLabel: "約 1 週",
+    outputs: ["驗收清單", "缺失修正", "複驗確認"],
   },
   {
     id: "handoff",
-    stage: "09",
-    category: "交付驗收",
-    title: "完工驗收、清潔與交屋",
-    summary: "逐項確認收尾細節、設備操作與修正清單，再安排正式交屋。",
-    start: 15,
-    span: 2,
-    durationLabel: "約 1-2 週",
-    outputs: ["驗收清單", "修正收尾", "正式交屋"],
+    stage: "18",
+    category: "正式交付",
+    title: "完工交屋與使用說明",
+    summary: "確認現場交付狀態、設備操作方式、保固資訊與後續使用注意事項後正式交屋。",
+    start: 18,
+    span: 1,
+    durationLabel: "約 1 週",
+    outputs: ["正式交屋", "設備教學", "保固說明"],
   },
 ];
 
 const stageHighlights = [
   {
-    label: "前期",
-    title: "先把需求、預算與現場條件對齊",
-    body: "真正影響時程的，通常不是畫圖速度，而是需求是否清楚、預算是否現實、現場條件是否提早看見。",
+    label: "拆除前後",
+    title: "拆除不是第一刀下去就結束，而是整個工程節奏的起點",
+    body: "拆除完成後，真正影響後面品質的，是保護、放樣、基底整理與隱蔽工程是否被提早處理乾淨。",
   },
   {
-    label: "中段",
-    title: "設計與報價同步整合",
-    body: "青曦會把收納、系統櫃、設備位置與工法一起思考，避免設計定案後才發現預算或施工衝突。",
+    label: "中段工序",
+    title: "木作、泥作、水電、設備其實是交錯推進",
+    body: "現場不會只剩單一工班。很多節點必須穿插銜接，像空調、弱電、木作與系統櫃就常常彼此卡位。",
   },
   {
-    label: "後段",
-    title: "施工不是一口氣到底，而是按節點收斂",
-    body: "從開工、備料到驗收，重點在工序銜接與節點回報，這樣成品才會安定、耐看，也真正好住。",
+    label: "交屋前",
+    title: "真正決定質感的，常常是最後 20% 的收尾",
+    body: "補漆、矽利康、設備校正、清潔、初驗與複驗，往往比前面的大工程更影響屋主最後的入住感受。",
   },
 ];
 
@@ -126,10 +225,10 @@ const processStructuredData = [
   {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: "室內裝修全流程",
+    name: "拆除到交屋的裝修工程甘特圖",
     description:
-      "青曦空間設計整理的裝修全流程，從初談、丈量、設計、報價到施工與交屋，讓屋主快速理解整體節奏。",
-    totalTime: "P16W",
+      "青曦空間設計整理的裝修工程甘特圖，從拆除、保護、水電、泥作、木作、油漆、系統櫃安裝到驗收交屋，讓屋主快速掌握工程期節奏。",
+    totalTime: "P18W",
     step: processStages.map((item, index) => ({
       "@type": "HowToStep",
       position: index + 1,
@@ -142,7 +241,7 @@ const processStructuredData = [
 
 <BaseLayout
   title="裝修全流程 - 青曦空間設計"
-  description="用甘特圖看懂青曦空間設計的裝修全流程，從初談、丈量、設計、報價到施工與交屋，一頁掌握整體節奏。"
+  description="用甘特圖看懂青曦空間設計從拆除工程到完工交屋的主要工項，包含保護、水電、泥作、木作、油漆、系統櫃、設備安裝與驗收節點。"
   ogImage="/images/portfolio/xizhi-1.jpg"
   pageType="service"
   structuredData={processStructuredData}
@@ -151,10 +250,10 @@ const processStructuredData = [
     <div class="process-shell">
       <header class="process-hero">
         <p class="process-eyebrow">Renovation Roadmap</p>
-        <h1>裝修全流程，一頁看懂整體節奏。</h1>
+        <h1>從拆除到交屋，工項節奏一次攤開。</h1>
         <p class="process-description">
-          這不是保證每個案子都一模一樣，而是把多數住宅裝修從前期討論到完工交屋的節點整理成可理解的甘特圖。
-          如果是老屋翻新、格局改動多、系統櫃比例高，時程通常會再往後拉。
+          這張甘特圖聚焦在「開工後」的工程期，把拆除工程開始到驗收交屋的主要工項全部拉出來看。
+          實際案場仍會依老屋狀況、格局改動幅度、系統櫃比例與設備複雜度調整先後順序。
         </p>
         <div class="process-actions">
           <a href="/contact" class="process-button process-button-primary">預約諮詢</a>
@@ -176,9 +275,9 @@ const processStructuredData = [
         <div class="gantt-header">
           <div>
             <p class="gantt-label">甘特圖</p>
-            <h2 id="gantt-title">以 16 週為基準的裝修節奏</h2>
+            <h2 id="gantt-title">以 18 週為基準的工程工項節奏</h2>
           </div>
-          <p class="gantt-note">甘特圖顯示各階段常見的開始點與重疊區，方便屋主先抓整體安排。</p>
+          <p class="gantt-note">甘特圖顯示各工項常見的進場時機與重疊區，方便先看懂哪些環節會同時發生。</p>
         </div>
 
         <div class="gantt-board">
@@ -232,9 +331,9 @@ const processStructuredData = [
           <p class="notes-label">你會看到的真實差異</p>
           <h2>哪些因素最常讓時程變動？</h2>
           <ul class="notes-list">
-            <li>老屋若牽涉漏水、壁癌、電箱更新與管線重拉，施工週期通常會拉長。</li>
-            <li>系統櫃、特殊門片或進口材質若需訂製，備料與安裝節點要預留更多時間。</li>
-            <li>如果屋主在施工中段大幅改動需求，甘特圖的後半段通常會整體往後推。</li>
+            <li>老屋若拆除後才發現漏水、結構修補、電箱更新或管線重拉，後面所有工項都可能往後延。</li>
+            <li>系統櫃、特殊門片、玻璃、石材或進口五金若製作週期較長，安裝與收尾階段會一起被拉長。</li>
+            <li>若施工中段改動櫃體、燈具、空調或設備配置，最常受影響的是木作、配線、油漆與收尾節點。</li>
           </ul>
         </article>
 
@@ -452,7 +551,7 @@ const processStructuredData = [
   .gantt-axis-grid,
   .gantt-track-grid {
     display: grid;
-    grid-template-columns: repeat(16, minmax(0, 1fr));
+    grid-template-columns: repeat(18, minmax(0, 1fr));
     gap: 0.45rem;
   }
 
@@ -543,8 +642,8 @@ const processStructuredData = [
 
   .gantt-bar {
     position: absolute;
-    left: calc(((var(--start) - 1) / 16) * 100% + ((var(--start) - 1) * 0.45rem / 16));
-    width: calc((var(--span) / 16) * 100% - ((16 - var(--span)) * 0.45rem / 16));
+    left: calc(((var(--start) - 1) / 18) * 100%);
+    width: calc((var(--span) / 18) * 100%);
     min-height: 56px;
     border-radius: 18px;
     display: flex;
