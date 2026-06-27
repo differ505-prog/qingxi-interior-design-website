@@ -1933,60 +1933,71 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       (sum, item) => sum + item.weight,
       0,
     );
-    const selectedWeight = selectedConfigs.reduce(
-      (sum, item) => sum + item.weight,
-      0,
-    );
-    const selectedScopeRatio = selectedWeight / totalWeight || 0;
-    const baselineNoticeRatio = projectMeta.baselineNoticeRatio ?? 0;
     const selectedDetailConfigs = selectedConfigs.map((item) => ({
       ...item,
       detail: getItemDetailMeta(item.value),
     }));
-    const weightedDetailMultiplier = selectedWeight
-      ? selectedDetailConfigs.reduce(
-          (sum, item) => sum + item.weight * item.detail.multiplier,
-          0,
-        ) / selectedWeight
-      : 1;
-    const scopeFactor =
-      projectType.value === "design-only"
-        ? 0
-        : Math.min(
-            1,
-            projectMeta.baseScopeFactor +
-              projectMeta.variableScopeFactor * selectedScopeRatio,
-          );
-    const detailFactor = projectType.value === "design-only" ? 1 : weightedDetailMultiplier;
+    const getConstructionRangeForConfigs = (configs) => {
+      const configWeight = configs.reduce((sum, item) => sum + item.weight, 0);
+      const configScopeRatio = configWeight / totalWeight || 0;
+      const weightedConfigDetailMultiplier = configWeight
+        ? configs.reduce(
+            (sum, item) => sum + item.weight * item.detail.multiplier,
+            0,
+          ) / configWeight
+        : 1;
+      const configScopeFactor =
+        projectType.value === "design-only"
+          ? 0
+          : Math.min(
+              1,
+              projectMeta.baseScopeFactor +
+                projectMeta.variableScopeFactor * configScopeRatio,
+            );
+      const configDetailFactor =
+        projectType.value === "design-only" ? 1 : weightedConfigDetailMultiplier;
 
-    const minConstruction =
-      projectType.value === "design-only"
-        ? 0
-        : Math.round(
-            area *
-              pricePerPing.min *
-              projectMeta.constructionMultiplier *
-              conditionMeta.multiplier *
-              residenceMeta.multiplier *
-              usePurposeInfo.multiplier *
-              timelineInfo.multiplier *
-              scopeFactor *
-              detailFactor,
-          );
-    const maxConstruction =
-      projectType.value === "design-only"
-        ? 0
-        : Math.round(
-            area *
-              pricePerPing.max *
-              projectMeta.constructionMultiplier *
-              conditionMeta.multiplier *
-              residenceMeta.multiplier *
-              usePurposeInfo.multiplier *
-              timelineInfo.multiplier *
-              scopeFactor *
-              detailFactor,
-          );
+      return {
+        selectedWeight: configWeight,
+        selectedScopeRatio: configScopeRatio,
+        detailFactor: configDetailFactor,
+        min:
+          projectType.value === "design-only"
+            ? 0
+            : Math.round(
+                area *
+                  pricePerPing.min *
+                  projectMeta.constructionMultiplier *
+                  conditionMeta.multiplier *
+                  residenceMeta.multiplier *
+                  usePurposeInfo.multiplier *
+                  timelineInfo.multiplier *
+                  configScopeFactor *
+                  configDetailFactor,
+              ),
+        max:
+          projectType.value === "design-only"
+            ? 0
+            : Math.round(
+                area *
+                  pricePerPing.max *
+                  projectMeta.constructionMultiplier *
+                  conditionMeta.multiplier *
+                  residenceMeta.multiplier *
+                  usePurposeInfo.multiplier *
+                  timelineInfo.multiplier *
+                  configScopeFactor *
+                  configDetailFactor,
+              ),
+      };
+    };
+    const constructionRange = getConstructionRangeForConfigs(selectedDetailConfigs);
+    const selectedWeight = constructionRange.selectedWeight;
+    const selectedScopeRatio = constructionRange.selectedScopeRatio;
+    const baselineNoticeRatio = projectMeta.baselineNoticeRatio ?? 0;
+    const detailFactor = constructionRange.detailFactor;
+    const minConstruction = constructionRange.min;
+    const maxConstruction = constructionRange.max;
 
     const minDesign = Math.round(
       area * designFeePerPing.min * projectMeta.designMultiplier,
@@ -2026,21 +2037,48 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               max: maxDesign,
             },
           ]
-        : selectedDetailConfigs.map((item) => {
-            const totalEffectiveWeight = selectedDetailConfigs.reduce(
-              (sum, config) => sum + config.weight * config.detail.multiplier,
+        : (() => {
+            const itemBreakdowns = selectedDetailConfigs.map((item) => {
+              const configsWithoutCurrentItem = selectedDetailConfigs.filter(
+                (config) => config.value !== item.value,
+              );
+              const rangeWithoutCurrentItem = getConstructionRangeForConfigs(
+                configsWithoutCurrentItem,
+              );
+
+              return {
+                label: item.label,
+                description: item.detail.label
+                  ? `${item.description}｜目前條件：${item.detail.label}`
+                  : item.description,
+                min: Math.max(0, minConstruction - rangeWithoutCurrentItem.min),
+                max: Math.max(0, maxConstruction - rangeWithoutCurrentItem.max),
+              };
+            });
+
+            const itemBreakdownTotal = itemBreakdowns.reduce(
+              (sum, item) => sum + item.min,
               0,
-            ) || 1;
-            const share = item.weight * item.detail.multiplier / totalEffectiveWeight;
-            return {
-              label: item.label,
-              description: item.detail.label
-                ? `${item.description}｜目前條件：${item.detail.label}`
-                : item.description,
-              min: Math.round(minConstruction * share),
-              max: Math.round(maxConstruction * share),
-            };
-          });
+            );
+            const itemBreakdownTotalMax = itemBreakdowns.reduce(
+              (sum, item) => sum + item.max,
+              0,
+            );
+            const commonBaseMin = Math.max(0, minConstruction - itemBreakdownTotal);
+            const commonBaseMax = Math.max(0, maxConstruction - itemBreakdownTotalMax);
+
+            return commonBaseMin > 0 || commonBaseMax > 0
+              ? [
+                  {
+                    label: "共通基礎工程 / 現場整合",
+                    description: "含全案共通的基礎整合、保護、收尾與難以切回單一工項的共同成本。",
+                    min: commonBaseMin,
+                    max: commonBaseMax,
+                  },
+                  ...itemBreakdowns,
+                ]
+              : itemBreakdowns;
+          })();
     const trackingSignature = JSON.stringify({
       area,
       projectType: projectType.value,
@@ -2308,24 +2346,15 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         return;
       }
 
-      const totalEffectiveWeight = selectedDetailConfigs.reduce(
-        (sum, item) => sum + item.weight * item.detail.multiplier,
-        0,
-      ) || 1;
-
-      breakdownList.innerHTML = selectedDetailConfigs
+      breakdownList.innerHTML = breakdownItems
         .map((item) => {
-          const share = item.weight * item.detail.multiplier / totalEffectiveWeight;
-          const minItem = Math.round(minConstruction * share);
-          const maxItem = Math.round(maxConstruction * share);
-
           return `
             <div class="breakdown-item">
               <div class="breakdown-copy">
                 <strong>${item.label}</strong>
-                <span>${item.detail.label ? `${item.description}｜目前條件：${item.detail.label}` : item.description}</span>
+                <span>${item.description}</span>
               </div>
-              <span class="breakdown-value">${formatRange(minItem, maxItem)}</span>
+              <span class="breakdown-value">${formatRange(item.min, item.max)}</span>
             </div>
           `;
         })
