@@ -112,16 +112,28 @@ const renovationItems = [
   },
 ];
 
-const qualityLevelLabels = {
-  basic: "經濟型",
-  standard: "標準型",
-  premium: "精緻型",
-  luxury: "豪華型",
+const qualityLevelMeta = {
+  basic: {
+    label: "經濟型",
+    helper: "偏出租整理、基礎更新與實用導向，櫃體與材料以常規入門配置為主。",
+  },
+  standard: {
+    label: "標準型",
+    helper: "偏一般自住或常規翻新，重點在耐用與完整度；若你很在意櫃體質感、五金與整體細節，通常要往精緻型看。",
+  },
+  premium: {
+    label: "精緻型",
+    helper: "更接近多數自住客對櫃體、五金、收邊與材料質感的期待，系統家具通常會比標準型更貼近實際感受。",
+  },
+  luxury: {
+    label: "豪華型",
+    helper: "適合高規格訂製、設備全面升級或細節要求明顯更高的案型。",
+  },
 };
 
-const qualityLevelOptions = Object.entries(qualityLevelLabels).map(
-  ([value, label]) => {
-    const typedValue = value as keyof typeof qualityLevelLabels;
+const qualityLevelOptions = Object.entries(qualityLevelMeta).map(
+  ([value, meta]) => {
+    const typedValue = value as keyof typeof qualityLevelMeta;
     const range = estimatorConfig.qualityLevels[typedValue];
     const rangeLabel =
       value === "luxury"
@@ -130,7 +142,8 @@ const qualityLevelOptions = Object.entries(qualityLevelLabels).map(
 
     return {
       value,
-      label: `${label} (${rangeLabel})`,
+      label: `${meta.label} (${rangeLabel})`,
+      helper: meta.helper,
     };
   },
 );
@@ -236,6 +249,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 ))
               }
             </select>
+            <p id="quality-level-note" class="field-help">
+              {qualityLevelOptions.find((item) => item.value === "standard")?.helper}
+            </p>
           </div>
 
           <div class="form-group">
@@ -812,6 +828,13 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     color: var(--gray-medium);
     line-height: 1.7;
     font-size: 0.92rem;
+  }
+
+  .field-help {
+    margin: 0.55rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.7;
+    font-size: 0.9rem;
   }
 
   .detail-grid {
@@ -1605,6 +1628,24 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 <script>
   // @ts-nocheck
   // Calculator logic
+  const qualityLevelMeta = {
+    basic: {
+      helper:
+        "偏出租整理、基礎更新與實用導向，櫃體與材料以常規入門配置為主。",
+    },
+    standard: {
+      helper:
+        "偏一般自住或常規翻新，重點在耐用與完整度；若你很在意櫃體質感、五金與整體細節，通常要往精緻型看。",
+    },
+    premium: {
+      helper:
+        "更接近多數自住客對櫃體、五金、收邊與材料質感的期待，系統家具通常會比標準型更貼近實際感受。",
+    },
+    luxury: {
+      helper:
+        "適合高規格訂製、設備全面升級或細節要求明顯更高的案型。",
+    },
+  };
   const estimatorConfig = JSON.parse(
     document.getElementById("estimator-config")?.textContent || "{}",
   );
@@ -1618,6 +1659,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   const qualityLevel = document.getElementById(
     "quality-level",
   ) as HTMLSelectElement;
+  const qualityLevelNote = document.getElementById("quality-level-note");
   const houseCondition = document.getElementById(
     "house-condition",
   ) as HTMLSelectElement;
@@ -1900,8 +1942,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     return { label: "", multiplier: 1 };
   }
 
+  function syncQualityLevelNote() {
+    if (!qualityLevelNote) return;
+    const meta =
+      qualityLevelMeta[qualityLevel?.value as keyof typeof qualityLevelMeta] ||
+      qualityLevelMeta.standard;
+    qualityLevelNote.textContent = meta.helper;
+  }
+
   function calculate() {
     syncDetailControls();
+    syncQualityLevelNote();
     const area = Math.min(200, Math.max(1, parseFloat(areaInput.value) || 30));
     const pricePerPing =
       estimatorConfig.qualityLevels?.[qualityLevel.value] ||
