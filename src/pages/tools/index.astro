@@ -627,10 +627,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="feedback-card" id="feedback-form">
             <div class="feedback-card-header">
               <div class="feedback-card-copy">
-                <p class="feedback-eyebrow">BUG FEEDBACK</p>
-                <h3>覺得結果怪怪的，再展開回報就好。</h3>
+                <p class="feedback-eyebrow">需要協助</p>
+                <h3>如果這次試算和你的預期有落差，我們可以再幫你看一次。</h3>
                 <p class="feedback-description">
-                  送出時會自動附上這次估價摘要與拆解結果，青曦比較好直接檢查問題。
+                  留下你覺得不確定的地方，我們會連同這次試算內容一起確認。
                 </p>
               </div>
               <button
@@ -640,7 +640,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 aria-expanded="false"
                 aria-controls="feedback-panel"
               >
-                展開問題回報
+                回報這次試算
               </button>
             </div>
 
@@ -731,7 +731,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                       送出問題回報
                     </button>
                     <p class="feedback-note">
-                      這份回報會自動附上本次估價摘要與拆解結果，方便直接重現。
+                      送出後會一併附上本次試算內容，方便我們更快確認。
                     </p>
                   </div>
                 </form>
@@ -746,7 +746,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         <div class="faq-header">
           <div>
             <h2>常見問題</h2>
-            <p>真的想看再展開，先把頁面留給試算結果。</p>
+            <p>如果你想先了解這份試算怎麼看，可以先看這幾個常見問題。</p>
           </div>
           <button
             type="button"
@@ -755,7 +755,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             aria-expanded="false"
             aria-controls="faq-list"
           >
-            展開常見問題
+            查看常見問題
           </button>
         </div>
         <div class="faq-list is-hidden" id="faq-list">
@@ -2336,7 +2336,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     feedbackStatusSuccess?.classList.toggle("is-hidden", feedbackParam !== "success");
     feedbackStatusError?.classList.toggle("is-hidden", feedbackParam !== "error");
     if (feedbackParam === "success" || feedbackParam === "error") {
-      setExpandableSection(feedbackPanel, feedbackToggle, true, "展開問題回報", "收起問題回報");
+      setExpandableSection(feedbackPanel, feedbackToggle, true, "回報這次試算", "收起回報表單");
     }
   }
 
@@ -2362,7 +2362,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       new URLSearchParams(window.location.search).get("faq") === "open";
 
     if (shouldOpenFaq) {
-      setExpandableSection(faqList, faqToggle, true, "展開常見問題", "收起常見問題");
+      setExpandableSection(faqList, faqToggle, true, "查看常見問題", "收起常見問題");
     }
   }
 
@@ -2907,8 +2907,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         feedbackPanel,
         feedbackToggle,
         !isExpanded,
-        "展開問題回報",
-        "收起問題回報",
+        "回報這次試算",
+        "收起回報表單",
       );
     });
 
@@ -2918,7 +2918,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         faqList,
         faqToggle,
         !isExpanded,
-        "展開常見問題",
+        "查看常見問題",
         "收起常見問題",
       );
     });
