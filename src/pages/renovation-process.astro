@@ -654,7 +654,7 @@ const highRiskCount = processStages.filter((item) => item.riskLevel === "high").
 const keyFlexStageIds = ["demolition", "plumbing-electric", "cabinet-factory", "inspection"];
 const keyFlexStages = keyFlexStageIds
   .map((id) => processStages.find((item) => item.id === id))
-  .filter(Boolean);
+  .filter((item): item is (typeof processStages)[number] => Boolean(item));
 
 const stageHighlights = [
   {
@@ -758,10 +758,10 @@ const processStructuredData = [
             <p class="schedule-mode-note">{scheduleViews[0].note}</p>
           </div>
           <p id="schedule-summary" class="schedule-summary" aria-live="polite">
-            選好日期後，這裡會整理一個較貼近真實溝通情境的時間觀點。
+            輸入日期後，會先看到較貼近真實溝通情境的交付視角。
           </p>
           <p class="schedule-helper">
-            這裡提供的是排程視角，不是死板的交屋承諾；目的在於先把節奏看清楚，再保留現場調整空間。
+            這份排程是拿來對齊節奏，不是拿來把交屋時間講死。
           </p>
         </article>
 
@@ -799,12 +799,12 @@ const processStructuredData = [
           <div class="brief-window-grid">
             <div class="brief-window-item">
               <span>日常節奏</span>
-              <strong id="brief-baseline-window">選好日期後，這裡會先出現較日常的交付視窗。</strong>
+              <strong id="brief-baseline-window">輸入日期後，這裡會先出現日常節奏下的交付視窗。</strong>
               <small>先用來理解整體推進感</small>
             </div>
             <div class="brief-window-item">
               <span>安心安排</span>
-              <strong id="brief-conservative-window">若你有搬家或租約安排，這裡會提供更保守的交付抓法。</strong>
+              <strong id="brief-conservative-window">如果你手上已有固定時程，這裡會同步給你更保守的抓法。</strong>
               <small>更適合拿來安排實際決策</small>
             </div>
           </div>
@@ -911,7 +911,7 @@ const processStructuredData = [
                       <span class="gantt-stage-duration">{item.durationLabel}</span>
                     </div>
                     <p class="gantt-date-range gantt-date-range-empty" data-stage-date={item.id}>
-                      選好日期後，這裡會顯示這個節點的大約區間。
+                      輸入日期後，這段流程的時間感會出現在這裡。
                     </p>
                   </div>
                 </div>
@@ -1143,8 +1143,8 @@ const processStructuredData = [
 
   .schedule-form {
     margin-top: 1.35rem;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    display: flex;
+    flex-wrap: wrap;
     gap: 0.9rem;
     align-items: end;
   }
@@ -1152,6 +1152,8 @@ const processStructuredData = [
   .schedule-field {
     display: grid;
     gap: 0.45rem;
+    flex: 1 1 320px;
+    min-width: 0;
   }
 
   .schedule-field span {
@@ -1173,7 +1175,10 @@ const processStructuredData = [
 
   .schedule-form-actions {
     display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
     gap: 0.75rem;
+    align-items: center;
   }
 
   .schedule-action {
@@ -1182,6 +1187,7 @@ const processStructuredData = [
     border-radius: 16px;
     cursor: pointer;
     font: inherit;
+    white-space: nowrap;
     transition:
       transform 0.25s ease,
       background-color 0.25s ease,
@@ -1916,7 +1922,7 @@ const processStructuredData = [
     }
 
     .schedule-form {
-      grid-template-columns: 1fr;
+      width: 100%;
     }
 
     .schedule-mode-switch {
@@ -2038,17 +2044,17 @@ const processStructuredData = [
 
       if (!baseDate) {
         dateNodes.forEach((node) => {
-          node.textContent = "選好日期後，這裡會顯示這個節點的大約區間。";
+          node.textContent = "輸入日期後，這段流程的時間感會出現在這裡。";
           node.classList.add("gantt-date-range-empty");
         });
         if (summaryNode) {
           summaryNode.textContent = defaultSummary;
         }
         if (baselineWindowNode) {
-          baselineWindowNode.textContent = "選好日期後，這裡會先出現較日常的交付視窗。";
+          baselineWindowNode.textContent = "輸入日期後，這裡會先出現日常節奏下的交付視窗。";
         }
         if (conservativeWindowNode) {
-          conservativeWindowNode.textContent = "若你有搬家或租約安排，這裡會提供更保守的交付抓法。";
+          conservativeWindowNode.textContent = "如果你手上已有固定時程，這裡會同步給你更保守的抓法。";
         }
         return;
       }
