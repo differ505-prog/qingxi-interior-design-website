@@ -500,7 +500,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             只留本週任務、生文主線與工種名錄。
           </p>
           <div class="hero-actions">
-            <a href="#quest-board" class="btn btn-primary">開始本週任務</a>
+            <button type="button" class="btn btn-primary" data-open-workspace-pane="operations" data-workspace-scroll-target="quest-board">開始本週任務</button>
           </div>
           <p id="ops-feedback" class="ops-feedback" aria-live="polite"></p>
         </div>
@@ -550,67 +550,132 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         </div>
       </header>
 
+      <section class="ops-panel workspace-nav" id="workspace-tabs">
+        <div class="workspace-nav-head">
+          <div>
+            <p class="panel-tag">工作台分區</p>
+            <h2>按場景切換，不再全部堆在同一頁</h2>
+          </div>
+          <p>先用頁內分區整理動線，保留同一個工作台但降低視覺負擔。</p>
+        </div>
+        <div class="workspace-tab-list" role="tablist" aria-label="設計師工作台分區">
+          <button type="button" class="workspace-tab is-active" data-workspace-tab="operations" aria-pressed="true">
+            <strong>作戰台</strong>
+            <small>每日任務、週任務、來源入口</small>
+          </button>
+          <button type="button" class="workspace-tab" data-workspace-tab="content" aria-pressed="false">
+            <strong>內容台</strong>
+            <small>判題、生文、書架、Gemini 備份</small>
+          </button>
+          <button type="button" class="workspace-tab" data-workspace-tab="knowledge" aria-pressed="false">
+            <strong>知識庫</strong>
+            <small>內部裝修知識、尺寸表、工班權責</small>
+          </button>
+          <button type="button" class="workspace-tab" data-workspace-tab="vendors" aria-pressed="false">
+            <strong>工班台</strong>
+            <small>工班登錄池與優質廠商筆記</small>
+          </button>
+          <button type="button" class="workspace-tab" data-workspace-tab="review" aria-pressed="false">
+            <strong>回看</strong>
+            <small>內容成效與低頻檢視資料</small>
+          </button>
+        </div>
+      </section>
+
       <div class="ops-grid">
         <div class="ops-main">
-          <div class="ops-task-layout">
-            <div class="ops-task-main">
-              <section id="daily-ops-board" class="ops-panel quest-board">
-                <div class="panel-heading">
-                  <div>
-                    <p class="panel-tag">日常任務</p>
-                    <h2>主動獵殺</h2>
-                    <p id="daily-panel-note" class="panel-inline-note">今日還差 3 個完成條件</p>
+          <div class="workspace-pane is-active" data-workspace-pane="operations">
+            <div class="ops-task-layout">
+              <div class="ops-task-main">
+                <section id="daily-ops-board" class="ops-panel quest-board">
+                  <div class="panel-heading">
+                    <div>
+                      <p class="panel-tag">日常任務</p>
+                      <h2>主動獵殺</h2>
+                      <p id="daily-panel-note" class="panel-inline-note">今日還差 3 個完成條件</p>
+                    </div>
                   </div>
-                </div>
-                <div id="daily-quest-grid" class="quest-grid"></div>
-              </section>
+                  <div id="daily-quest-grid" class="quest-grid"></div>
+                </section>
 
-              <section id="quest-board" class="ops-panel quest-board">
-                <div class="panel-heading">
-                  <div>
-                    <p class="panel-tag">任務 6</p>
-                    <h2>高意圖社群回覆與低成本分發</h2>
-                    <p id="weekly-panel-note" class="panel-inline-note">本週還差 3 輪主任務</p>
+                <section id="quest-board" class="ops-panel quest-board">
+                  <div class="panel-heading">
+                    <div>
+                      <p class="panel-tag">任務 6</p>
+                      <h2>高意圖社群回覆與低成本分發</h2>
+                      <p id="weekly-panel-note" class="panel-inline-note">本週還差 3 輪主任務</p>
+                    </div>
                   </div>
-                </div>
-                <div id="quest-grid" class="quest-grid"></div>
-              </section>
+                  <div id="quest-grid" class="quest-grid"></div>
+                </section>
+              </div>
+
+              <aside class="ops-side ops-task-side">
+                <section class="ops-panel bookshelf-canned-replies bookshelf-canned-replies-priority ops-canned-sidebar">
+                  <div class="panel-heading panel-heading-compact">
+                    <div>
+                      <p class="panel-tag">快速工具</p>
+                      <h2>常見罐頭回覆</h2>
+                    </div>
+                    <p>方便直接複製貼上回覆貼文</p>
+                  </div>
+                  <div class="bookshelf-reply-grid bookshelf-canned-grid">
+                    {cannedReplies.map((reply) => (
+                      <article class="bookshelf-reply-card bookshelf-canned-card bookshelf-canned-card-priority">
+                        <span>{reply.category}</span>
+                        <strong>{reply.promptTitle}</strong>
+                        <em>{reply.promptHint}</em>
+                        <p>{reply.message}</p>
+                        <div class="bookshelf-actions bookshelf-canned-actions">
+                          <button
+                            type="button"
+                            class="bookshelf-action bookshelp-action-primary"
+                            data-canned-reply-copy-button
+                            data-canned-reply-copy={reply.message}
+                            data-canned-reply-label={reply.promptTitle}
+                          >
+                            複製這則
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              </aside>
             </div>
 
-            <aside class="ops-side ops-task-side">
-              <section class="ops-panel bookshelf-canned-replies bookshelf-canned-replies-priority ops-canned-sidebar">
-                <div class="panel-heading panel-heading-compact">
-                  <div>
-                    <p class="panel-tag">快速工具</p>
-                    <h2>常見罐頭回覆</h2>
+            <details id="portal-grid" class="ops-panel ops-fold portal-board">
+              <summary class="ops-fold-summary">
+                <div>
+                  <p class="panel-tag">來源入口</p>
+                  <h2>來源入口</h2>
+                </div>
+                <small>低頻時再展開</small>
+              </summary>
+              <div class="ops-fold-body">
+                <div class="portal-section">
+                  <div class="portal-section-heading">
+                    <p>Facebook 社團</p>
                   </div>
-                  <p>方便直接複製貼上回覆貼文</p>
+                  <div id="facebook-card-grid" class="portal-card-grid"></div>
                 </div>
-                <div class="bookshelf-reply-grid bookshelf-canned-grid">
-                  {cannedReplies.map((reply) => (
-                    <article class="bookshelf-reply-card bookshelf-canned-card bookshelf-canned-card-priority">
-                      <span>{reply.category}</span>
-                      <strong>{reply.promptTitle}</strong>
-                      <em>{reply.promptHint}</em>
-                      <p>{reply.message}</p>
-                      <div class="bookshelf-actions bookshelf-canned-actions">
-                        <button
-                          type="button"
-                          class="bookshelf-action bookshelp-action-primary"
-                          data-canned-reply-copy-button
-                          data-canned-reply-copy={reply.message}
-                          data-canned-reply-label={reply.promptTitle}
-                        >
-                          複製這則
-                        </button>
-                      </div>
-                    </article>
-                  ))}
+                <div class="portal-section">
+                  <div class="portal-section-heading">
+                    <p>LINE 社群</p>
+                  </div>
+                  <div id="line-card-grid" class="portal-card-grid"></div>
                 </div>
-              </section>
-            </aside>
+                <div class="portal-section">
+                  <div class="portal-section-heading">
+                    <p>Google 商家</p>
+                  </div>
+                  <div id="google-card-grid" class="portal-card-grid"></div>
+                </div>
+              </div>
+            </details>
           </div>
 
+          <div class="workspace-pane" data-workspace-pane="content" hidden>
           <section id="bookshelf-board" class="ops-panel bookshelf-board">
             <div class="panel-heading">
               <div>
@@ -846,7 +911,64 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </template>
             ))}
 
-            <details id="renovation-knowhow-board" class="bookshelf-fold">
+          </section>
+
+          <details id="gemini-backup-board" class="ops-panel ops-fold gemini-board">
+            <summary class="ops-fold-summary">
+              <div>
+                <p class="panel-tag">Gemini 備份艙</p>
+                <h2>Gemini Canvas 備份</h2>
+              </div>
+              <small>低頻時再展開</small>
+            </summary>
+            <div class="ops-fold-body">
+              <div class="gemini-actions gemini-actions-primary">
+                <button type="button" id="run-gemini-backup" class="bookshelf-action bookshelp-action-primary">立即備份</button>
+              </div>
+
+              <p class="gemini-note">每按一次都會留下一版，最近保留 10 版。</p>
+              <p id="gemini-feedback" class="gemini-feedback" aria-live="polite"></p>
+
+              <details class="gemini-composer" id="gemini-composer">
+                <summary>
+                  <span>進階設定</span>
+                  <small>需要改連結、內容或下載時再展開</small>
+                </summary>
+                <div class="gemini-editor-grid">
+                  <label class="gemini-field">
+                    <span>分享網址</span>
+                    <input id="gemini-source-url" type="url" placeholder="貼上 Gemini 分享網址" />
+                  </label>
+                  <label class="gemini-field">
+                    <span>備份標題</span>
+                    <input id="gemini-title" type="text" placeholder="這次備份名稱" />
+                  </label>
+                  <label class="gemini-field gemini-field-full">
+                    <span>內容</span>
+                    <textarea id="gemini-content" rows="16" placeholder="把 Gemini Canvas 內容整段貼進來"></textarea>
+                  </label>
+                </div>
+                <div class="gemini-composer-actions">
+                  <button type="button" id="import-gemini-share" class="bookshelf-action bookshelp-action-primary">從分享網址載入</button>
+                  <button type="button" id="load-gemini-master" class="bookshelf-action">載入主檔</button>
+                  <button type="button" id="copy-gemini-markdown" class="bookshelf-action">複製 Markdown</button>
+                  <button type="button" id="download-gemini-json" class="bookshelf-action">下載 JSON</button>
+                </div>
+              </details>
+
+              <div class="gemini-history">
+                <div class="bookshelf-preview-head">
+                  <p>版本列表</p>
+                  <span id="gemini-history-count">0 版</span>
+                </div>
+                <div id="gemini-history-list" class="gemini-version-list"></div>
+              </div>
+            </div>
+          </details>
+          </div>
+
+          <div class="workspace-pane" data-workspace-pane="knowledge" hidden>
+            <details id="renovation-knowhow-board" class="bookshelf-fold" open>
               <summary>
                 <span>內部裝修知識 / 筆記</span>
                 <small>第一波：里程碑手冊 + 人體工學尺寸</small>
@@ -961,7 +1083,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 </div>
               </div>
             </details>
+          </div>
 
+          <div class="workspace-pane" data-workspace-pane="vendors" hidden>
             <details id="vendor-intake-board" class="bookshelf-fold" open>
               <summary>
                 <span>工班登錄池</span>
@@ -1149,8 +1273,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 </div>
               </div>
             </details>
+          </div>
 
-            <details id="content-analytics-details" class="bookshelf-fold">
+          <div class="workspace-pane" data-workspace-pane="review" hidden>
+            <details id="content-analytics-details" class="bookshelf-fold" open>
               <summary>
                 <span>回看與成效</span>
                 <small>低頻時再展開</small>
@@ -1250,91 +1376,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 </details>
               </div>
             </details>
-
-          </section>
-
-          <details id="gemini-backup-board" class="ops-panel ops-fold gemini-board">
-            <summary class="ops-fold-summary">
-              <div>
-                <p class="panel-tag">Gemini 備份艙</p>
-                <h2>Gemini Canvas 備份</h2>
-              </div>
-              <small>低頻時再展開</small>
-            </summary>
-            <div class="ops-fold-body">
-              <div class="gemini-actions gemini-actions-primary">
-                <button type="button" id="run-gemini-backup" class="bookshelf-action bookshelp-action-primary">立即備份</button>
-              </div>
-
-              <p class="gemini-note">每按一次都會留下一版，最近保留 10 版。</p>
-              <p id="gemini-feedback" class="gemini-feedback" aria-live="polite"></p>
-
-              <details class="gemini-composer" id="gemini-composer">
-                <summary>
-                  <span>進階設定</span>
-                  <small>需要改連結、內容或下載時再展開</small>
-                </summary>
-                <div class="gemini-editor-grid">
-                  <label class="gemini-field">
-                    <span>分享網址</span>
-                    <input id="gemini-source-url" type="url" placeholder="貼上 Gemini 分享網址" />
-                  </label>
-                  <label class="gemini-field">
-                    <span>備份標題</span>
-                    <input id="gemini-title" type="text" placeholder="這次備份名稱" />
-                  </label>
-                  <label class="gemini-field gemini-field-full">
-                    <span>內容</span>
-                    <textarea id="gemini-content" rows="16" placeholder="把 Gemini Canvas 內容整段貼進來"></textarea>
-                  </label>
-                </div>
-                <div class="gemini-composer-actions">
-                  <button type="button" id="import-gemini-share" class="bookshelf-action bookshelp-action-primary">從分享網址載入</button>
-                  <button type="button" id="load-gemini-master" class="bookshelf-action">載入主檔</button>
-                  <button type="button" id="copy-gemini-markdown" class="bookshelf-action">複製 Markdown</button>
-                  <button type="button" id="download-gemini-json" class="bookshelf-action">下載 JSON</button>
-                </div>
-              </details>
-
-              <div class="gemini-history">
-                <div class="bookshelf-preview-head">
-                  <p>版本列表</p>
-                  <span id="gemini-history-count">0 版</span>
-                </div>
-                <div id="gemini-history-list" class="gemini-version-list"></div>
-              </div>
-            </div>
-          </details>
-
-          <details id="portal-grid" class="ops-panel ops-fold portal-board">
-            <summary class="ops-fold-summary">
-              <div>
-                <p class="panel-tag">來源入口</p>
-                <h2>來源入口</h2>
-              </div>
-              <small>低頻時再展開</small>
-            </summary>
-            <div class="ops-fold-body">
-              <div class="portal-section">
-                <div class="portal-section-heading">
-                  <p>Facebook 社團</p>
-                </div>
-                <div id="facebook-card-grid" class="portal-card-grid"></div>
-              </div>
-              <div class="portal-section">
-                <div class="portal-section-heading">
-                  <p>LINE 社群</p>
-                </div>
-                <div id="line-card-grid" class="portal-card-grid"></div>
-              </div>
-              <div class="portal-section">
-                <div class="portal-section-heading">
-                  <p>Google 商家</p>
-                </div>
-                <div id="google-card-grid" class="portal-card-grid"></div>
-              </div>
-            </div>
-          </details>
+          </div>
         </div>
       </div>
     </div>
@@ -1351,6 +1393,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   const GEMINI_BACKUPS_KEY = "qingxi-gemini-canvas-backups-v1";
   const PUBLISHING_CHECKLIST_KEY = "qingxi-publishing-checklist-v1";
   const TOPIC_MODE_KEY = "qingxi-topic-mode-v1";
+  const WORKSPACE_PANE_KEY = "qingxi-workspace-pane-v1";
   const GEMINI_RECENT_LIMIT = 10;
   const WEEKLY_TARGET = 3;
   const DAILY_OPS_XP = 15;
@@ -1432,6 +1475,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   let geminiBackups = [];
   let publishingChecklistOverrides = {};
   let currentTopicMode = topicModeOptions?.[0]?.value || "publishing";
+  let currentWorkspacePane = "operations";
   let vendorNoteEditingId = "";
   let vendorNoteSearch = "";
   let vendorNoteTradeFilter = "";
@@ -2264,6 +2308,70 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       };
     } catch (error) {
       console.error("讀取社群作戰台資料失敗：", error);
+    }
+  }
+
+  function getWorkspaceTabs() {
+    return Array.from(document.querySelectorAll("[data-workspace-tab]"));
+  }
+
+  function getWorkspacePanes() {
+    return Array.from(document.querySelectorAll("[data-workspace-pane]"));
+  }
+
+  function isValidWorkspacePane(pane) {
+    return ["operations", "content", "knowledge", "vendors", "review"].includes(pane);
+  }
+
+  function saveWorkspacePane() {
+    localStorage.setItem(WORKSPACE_PANE_KEY, currentWorkspacePane);
+  }
+
+  function loadWorkspacePane() {
+    const savedPane = localStorage.getItem(WORKSPACE_PANE_KEY);
+    if (isValidWorkspacePane(savedPane)) {
+      currentWorkspacePane = savedPane;
+    }
+  }
+
+  function refreshWorkspacePaneUi() {
+    getWorkspaceTabs().forEach((tab) => {
+      const isActive = tab.dataset.workspaceTab === currentWorkspacePane;
+      tab.classList.toggle("is-active", isActive);
+      tab.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+
+    getWorkspacePanes().forEach((pane) => {
+      const isActive = pane.dataset.workspacePane === currentWorkspacePane;
+      pane.classList.toggle("is-active", isActive);
+      pane.hidden = !isActive;
+    });
+  }
+
+  function handleWorkspacePaneSideEffects() {
+    if (currentWorkspacePane !== "review") return;
+
+    renderContentAnalytics();
+    if (contentAnalyticsState.status === "idle" || contentAnalyticsState.status === "error") {
+      loadContentAnalytics();
+    }
+  }
+
+  function setWorkspacePane(nextPane, options = {}) {
+    if (!isValidWorkspacePane(nextPane)) return;
+
+    const { persist = true, scrollTarget = "" } = options;
+    currentWorkspacePane = nextPane;
+    refreshWorkspacePaneUi();
+    handleWorkspacePaneSideEffects();
+
+    if (persist) {
+      saveWorkspacePane();
+    }
+
+    if (scrollTarget) {
+      const target = document.getElementById(scrollTarget);
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 
@@ -6087,6 +6195,21 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     });
   });
 
+  document.querySelectorAll("[data-workspace-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextPane = button.dataset.workspaceTab || "operations";
+      setWorkspacePane(nextPane);
+    });
+  });
+
+  document.querySelectorAll("[data-open-workspace-pane]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextPane = button.dataset.openWorkspacePane || "operations";
+      const scrollTarget = button.dataset.workspaceScrollTarget || "";
+      setWorkspacePane(nextPane, { scrollTarget });
+    });
+  });
+
   document.addEventListener("click", async (event) => {
     const target = event.target instanceof HTMLElement
       ? event.target.closest("[data-copy-next-topic-brief],[data-reset-publishing-checklist]")
@@ -6587,6 +6710,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   loadGeminiBackupState();
   loadPublishingChecklist();
   loadTopicMode();
+  loadWorkspacePane();
   loadState();
   normalizeWeeklyState();
   normalizeDailyState();
@@ -6597,6 +6721,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   applyGeminiDraftToFields();
   renderTopicModePanels();
   renderPublishingChecklist();
+  refreshWorkspacePaneUi();
+  handleWorkspacePaneSideEffects();
   // 监听「回看與成效」details 标签的展开事件
   const analyticsDetails = document.getElementById('content-analytics-details');
   if (analyticsDetails) {
