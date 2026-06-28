@@ -201,8 +201,6 @@ const cannedReplies = [
   },
 ];
 
-const renovationKnowHowSourceUrl = "https://share.gemini.google/4UfhRBWS2hML";
-const renovationErgonomicsSourceUrl = "https://share.gemini.google/C4M1Lz0fCKYF";
 const renovationKnowHowMilestones = [
   {
     id: "m1",
@@ -280,6 +278,11 @@ const renovationKnowHowMilestones = [
     ],
   },
 ];
+type RenovationMilestoneDetail = {
+  label: string;
+  owner: string;
+  detail: string;
+};
 const renovationKnowHowRoles = [
   {
     title: "結構法規",
@@ -385,6 +388,92 @@ const renovationErgonomicsReferences = [
     ],
   },
 ];
+const renovationMilestoneDetails: Record<string, RenovationMilestoneDetail[]> = {
+  m1: [
+    { label: "1.1 公用事業申請", owner: "屋主", detail: "先申請智慧微電腦瓦斯表與寬頻網路，否則 M4 / M5 的點火測試與裝機容易延誤。" },
+    { label: "1.2 行政許可", owner: "統包 / 設計師", detail: "室內裝修許可證要張貼到位，工程險也要在進場前完成。" },
+    { label: "1.3 現場保護", owner: "保護工班", detail: "電梯防撞、排水孔封堵與原屋況拍照都屬開工前必要動作。" },
+    { label: "1.4 鋁窗法規核對", owner: "鋁窗廠商", detail: "消防逃生口規格要先核對，否則後面油漆、窗簾與整改範圍都會回頭重排。" },
+  ],
+  m2: [
+    { label: "2.1 拆除工程", owner: "拆除工班", detail: "依圖面拆除並先標記牆內原管位，避免後續打壞既有路徑。" },
+    { label: "2.3 水電配管與接地", owner: "水電工班", detail: "全室插座接地線與設備專用迴路先配齊，後面木作與系統櫃才接得上。" },
+    { label: "2.4 空調隱蔽與排水測試", owner: "空調工班", detail: "吊隱式室內機與排水要先試水，沒測過就不能封天花。" },
+    { label: "2.5 隱蔽驗收", owner: "水電 / 泥作", detail: "冷熱水加壓、浴室防水與 48 小時閉水都要驗過，地漏此時只固定管位不裝本體。" },
+  ],
+  m3: [
+    { label: "3.1 木作與門框工程", owner: "木工 / 門廠", detail: "天花封板、窗簾盒、吊燈補強與門框懸空高度要跟完成面一起抓。" },
+    { label: "3.2 油漆工程", owner: "油漆工班", detail: "批土、打磨、底漆與面漆完整走完，後段才有乾淨的安裝面。" },
+    { label: "3.3 系統櫃下單與干涉複核", owner: "系統櫃廠商", detail: "先檢查馬桶掀蓋是否干涉浴櫃，臥榻軟包要等底座完成後二次丈量。" },
+    { label: "3.4 素地整平", owner: "泥作 / 地坪廠商", detail: "自流平先建立基準面，後續 Epoxy 或其他地坪才不會亂。" },
+  ],
+  m4: [
+    { label: "4.1 地坪施工", owner: "地坪廠商", detail: "Epoxy 或超耐磨地板完成後，才能精準處理地漏高度與收邊。" },
+    { label: "4.2 地漏後置安裝", owner: "水電工班", detail: "地坪穩定後再切割埋入地漏本體，避免高度抓錯。" },
+    { label: "4.4 廚衛與給水銜接", owner: "水電工班", detail: "馬桶優先安裝，排水接高到櫃內底板上方約 5 到 10 公分並做防臭塞。" },
+    { label: "4.5 機電與家飾安裝", owner: "各專業工班", detail: "熱水器先通水再測，電視壁掛架先拆箱核點位，正式掛機留到細清後。" },
+  ],
+  m5: [
+    { label: "5.1 裝潢細清", owner: "細清工班", detail: "細清前不能先開冷氣，避免粉塵吸進設備內部。" },
+    { label: "5.2 空調聯調", owner: "空調工班", detail: "環境淨化後正式開機至少 1 小時，確認冷房與排水穩定。" },
+    { label: "5.3 機能總複檢", owner: "水電 / 瓦斯 / 電視商", detail: "網路、熱水器、瓦斯爐與電視掛機一起測，插座相位與 N-PE 電壓也要驗。" },
+    { label: "5.4 搬家與點交", owner: "統包 / 屋主", detail: "活動家具與臥榻軟包最後進場，再進入正式點交與搬家。" },
+  ],
+};
+const renovationErgonomicsDetails = [
+  {
+    area: "玄關",
+    rows: [
+      { item: "鞋櫃深度", range: "35 - 40 cm", best: "35", note: "含門板多數大號運動鞋可放入。" },
+      { item: "鞋櫃層板間距", range: "15 - 20 cm", best: "16", note: "靴子區需另外留 45 cm 以上。" },
+      { item: "懸空底部留空", range: "15 - 20 cm", best: "15", note: "方便掃地機器人與室內鞋。" },
+      { item: "穿鞋凳高度", range: "38 - 45 cm", best: "40", note: "過高不便彎腰，過低起身困難。" },
+      { item: "玄關走道寬度", range: "100 - 120 cm", best: "100", note: "兩人錯身與搬物較順。" },
+    ],
+  },
+  {
+    area: "客廳",
+    rows: [
+      { item: "沙發座深", range: "50 - 65 cm", best: "55", note: "不含靠墊深度，坐感最舒適。" },
+      { item: "沙發座高", range: "40 - 45 cm", best: "42", note: "雙腳可自然著地。" },
+      { item: "茶几與沙發間距", range: "30 - 45 cm", best: "40", note: "取物與起身兼顧。" },
+      { item: "電視與沙發距離", range: "200 - 400 cm", best: "300", note: "55 至 65 吋大多落在 2.5 至 3 公尺。" },
+      { item: "電視中心高度", range: "100 - 110 cm", best: "105", note: "視線平視或略低 5 cm 最舒適。" },
+    ],
+  },
+  {
+    area: "廚房 / 餐廳",
+    rows: [
+      { item: "廚房檯面高度", range: "80 - 90 cm", best: "(身高/2)+5", note: "160 cm 身高通常落在 85 cm 左右。" },
+      { item: "吊櫃底部離地", range: "150 - 160 cm", best: "155", note: "避免撞頭且伸手可及。" },
+      { item: "廚房走道寬度", range: "90 - 120 cm", best: "100", note: "櫃門開啟後仍可通行。" },
+      { item: "餐桌高 / 餐椅高", range: "75 / 45 cm", best: "75 / 45", note: "高差約 30 cm 最舒適。" },
+      { item: "餐桌離牆 / 水槽", range: "70 - 120 cm", best: "90 / 120", note: "依純入座、後方通行或操作區而不同。" },
+    ],
+  },
+  {
+    area: "臥室 / 衛浴",
+    rows: [
+      { item: "床側走道", range: "50 - 60 cm", best: "60", note: "起床與整理床鋪不侷促。" },
+      { item: "衣櫃深度", range: "55 - 65 cm", best: "60", note: "大衣掛入後門板可關上。" },
+      { item: "床墊高度", range: "45 - 55 cm", best: "50", note: "膝蓋接近 90 度最好起身。" },
+      { item: "洗手台高度", range: "80 - 85 cm", best: "80", note: "台上盆需先扣掉盆體高度。" },
+      { item: "馬桶前方 / 側牆", range: "45 - 60 cm", best: "60 / 45", note: "前方空間與中心距側牆都要預留。" },
+      { item: "淋浴間 / 花灑高度", range: "80x80 - 90x90 / 190 - 210 cm", best: "90x90 / 200", note: "低於 80 cm 轉身困難。" },
+    ],
+  },
+  {
+    area: "走道 / 插座高度",
+    rows: [
+      { item: "主走道寬度", range: "80 - 120 cm", best: "90 / 120", note: "單人通行抓 90，雙人錯身抓 120。" },
+      { item: "房門寬度", range: "80 - 90 cm", best: "85", note: "兼顧家具搬運與日常進出。" },
+      { item: "床頭插座", range: "60 - 70 cm", best: "65", note: "略高於床頭櫃最順手。" },
+      { item: "桌面插座", range: "80 - 95 cm", best: "85", note: "桌面高 75 cm 時大約高出 10 cm。" },
+      { item: "洗衣機 / 一般開關", range: "120 - 135 cm", best: "125", note: "多數家事區與開關高度都落在這裡。" },
+      { item: "智慧馬桶插座", range: "30 - 40 cm", best: "35", note: "通常在馬桶後方側邊。" },
+    ],
+  },
+];
 
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
@@ -423,26 +512,28 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <small id="level-value">第 1 級</small>
           </div>
           <div class="command-metrics">
-            <article class="metric-card metric-card-primary">
-              <span>本週主線</span>
-              <strong id="weekly-progress-count">0 / 3</strong>
-              <small id="weekly-progress-note">還差 3 個任務</small>
-              <div class="progress-track">
-                <div id="weekly-progress-bar" class="progress-bar"></div>
-              </div>
-            </article>
-            <article class="metric-card metric-card-xp">
-              <span>總進度</span>
-              <strong id="xp-value">0 XP</strong>
-              <small id="xp-progress-note">本級 0 / 200 XP</small>
-              <div class="progress-track progress-track-xp">
-                <div id="xp-progress-bar" class="progress-bar progress-bar-xp"></div>
-              </div>
-            </article>
-            <details class="metric-fold">
+            <div class="command-metrics-main">
+              <article class="metric-card metric-card-primary">
+                <span>本週主線</span>
+                <strong id="weekly-progress-count">0 / 3</strong>
+                <small id="weekly-progress-note">還差 3 個任務</small>
+                <div class="progress-track">
+                  <div id="weekly-progress-bar" class="progress-bar"></div>
+                </div>
+              </article>
+              <article class="metric-card metric-card-xp">
+                <span>總進度</span>
+                <strong id="xp-value">0 XP</strong>
+                <small id="xp-progress-note">本級 0 / 200 XP</small>
+                <div class="progress-track progress-track-xp">
+                  <div id="xp-progress-bar" class="progress-bar progress-bar-xp"></div>
+                </div>
+              </article>
+            </div>
+            <details class="metric-fold metric-fold-secondary">
               <summary>
                 <span>累積節奏</span>
-                <small>低頻時再看</small>
+                <small>看連勝與累積完成數</small>
               </summary>
               <div class="metric-fold-grid">
                 <article class="metric-card">
@@ -772,14 +863,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <p>這份手冊不是對外內容，而是給設計師與統包在安排工序、驗收與提醒業主時快速對齊順序用。</p>
                   </article>
                   <article class="bookshelf-guide-card">
-                    <span>來源</span>
-                    <strong>Gemini 兩份第一波整理稿，已收斂成工作台版本</strong>
-                    <p>先放 milestone 核心節點、工班權責與常用尺寸速查，後續可再逐步擴成更多內部 SOP 與案例備忘。</p>
+                    <span>收錄範圍</span>
+                    <strong>直接把 Gemini 第一波內容收進工作台，不再只留超連結</strong>
+                    <p>目前已內嵌里程碑手冊、尺寸速查與工班權責；之後新增內容可以持續用同一個內部知識區往下擴。</p>
                   </article>
-                </div>
-                <div class="bookshelf-actions renovation-knowhow-actions">
-                  <a href={renovationKnowHowSourceUrl} class="bookshelf-action bookshelp-action-primary" target="_blank" rel="noreferrer">開啟 Gemini 原始稿</a>
-                  <a href={renovationErgonomicsSourceUrl} class="bookshelf-action" target="_blank" rel="noreferrer">開啟尺寸原始稿</a>
                 </div>
                 <div class="renovation-knowhow-grid">
                   {renovationKnowHowMilestones.map((milestone) => (
@@ -811,6 +898,20 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                           ))}
                         </ul>
                       </div>
+                      <div class="renovation-knowhow-block">
+                        <span>原始條目重點</span>
+                        <div class="renovation-knowhow-item-list">
+                          {renovationMilestoneDetails[milestone.id].map((item) => (
+                            <article class="renovation-knowhow-item">
+                              <div class="renovation-knowhow-item-head">
+                                <strong>{item.label}</strong>
+                                <em>{item.owner}</em>
+                              </div>
+                              <p>{item.detail}</p>
+                            </article>
+                          ))}
+                        </div>
+                      </div>
                     </article>
                   ))}
                 </div>
@@ -819,19 +920,28 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   <span>平常量尺寸、畫配置時直接回看</span>
                 </div>
                 <div class="renovation-knowhow-grid renovation-ergonomics-grid">
-                  {renovationErgonomicsReferences.map((reference) => (
+                  {renovationErgonomicsDetails.map((reference) => (
                     <article class="renovation-knowhow-card renovation-ergonomics-card">
                       <div class="renovation-knowhow-card-head">
                         <p>{reference.area}</p>
-                        <strong>{reference.title}</strong>
+                        <strong>{renovationErgonomicsReferences.find((item) => item.area === reference.area)?.title || reference.area}</strong>
                       </div>
                       <div class="renovation-knowhow-block">
-                        <span>速查筆記</span>
-                        <ul>
-                          {reference.points.map((item) => (
-                            <li>{item}</li>
+                        <span>尺寸表</span>
+                        <div class="renovation-ergonomics-table">
+                          {reference.rows.map((row) => (
+                            <article class="renovation-ergonomics-row">
+                              <div class="renovation-ergonomics-main">
+                                <strong>{row.item}</strong>
+                                <small>{row.note}</small>
+                              </div>
+                              <div class="renovation-ergonomics-values">
+                                <span>{row.range}</span>
+                                <em>{row.best}</em>
+                              </div>
+                            </article>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     </article>
                   ))}
