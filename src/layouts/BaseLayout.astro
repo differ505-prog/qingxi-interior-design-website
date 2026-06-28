@@ -219,6 +219,7 @@ const MAINTENANCE_MODE =
     {allStructuredData.map((schema) => (
       <script type="application/ld+json" set:html={JSON.stringify(schema)} />
     ))}
+    <slot name="head" />
   
   <!-- Google Analytics 4 (僅在生產環境且已設定時載入) -->
   {import.meta.env.PROD && googleAnalyticsId && (

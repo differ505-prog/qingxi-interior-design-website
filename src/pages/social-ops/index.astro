@@ -19,7 +19,7 @@ import {
   publishingTopicModeOptions,
 } from "../../lib/content-taxonomy";
 import { geminiCanvasMaster } from "../../lib/gemini-canvas-master";
-import "../../styles/social-ops.css";
+import socialOpsStylesheetHref from "../../styles/social-ops.css?url";
 
 const defaultSources = [
   {
@@ -571,6 +571,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   description="青曦內部使用的設計師工作面板，只留必要任務、進度與來源入口。"
   noindex={true}
 >
+  <link rel="stylesheet" href={socialOpsStylesheetHref} slot="head" />
   <section class="social-ops-page">
     <div class="social-ops-shell">
       <header class="ops-hero">
