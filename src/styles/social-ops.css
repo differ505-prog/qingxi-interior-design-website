@@ -2042,6 +2042,150 @@
     gap: 0.85rem;
   }
 
+  .renovation-milestone-flow-overview,
+  .renovation-milestone-brief,
+  .renovation-milestone-support,
+  .renovation-milestone-steps {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .renovation-milestone-flow-overview {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .renovation-milestone-flow-node,
+  .renovation-milestone-brief-card,
+  .renovation-milestone-support-card,
+  .renovation-milestone-step {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.024);
+  }
+
+  .renovation-milestone-flow-node {
+    position: relative;
+    display: grid;
+    gap: 0.32rem;
+    padding: 0.95rem 1rem;
+  }
+
+  .renovation-milestone-flow-node:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 34px;
+    right: -0.62rem;
+    width: 0.4rem;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .renovation-milestone-flow-node p,
+  .renovation-milestone-flow-node strong,
+  .renovation-milestone-flow-node span,
+  .renovation-milestone-brief-card span,
+  .renovation-milestone-brief-card p,
+  .renovation-milestone-support-card strong,
+  .renovation-milestone-support-card ul,
+  .renovation-milestone-step-code,
+  .renovation-milestone-step-body p {
+    margin: 0;
+  }
+
+  .renovation-milestone-flow-node p,
+  .renovation-milestone-brief-card span {
+    color: rgba(224, 221, 214, 0.5);
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+  }
+
+  .renovation-milestone-flow-node strong,
+  .renovation-milestone-support-card strong {
+    color: #f5f3ef;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+
+  .renovation-milestone-flow-node span,
+  .renovation-milestone-brief-card p,
+  .renovation-milestone-step-body p {
+    color: rgba(229, 226, 220, 0.66);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .renovation-milestone-brief {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .renovation-milestone-brief-card,
+  .renovation-milestone-support-card {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.9rem 0.95rem;
+  }
+
+  .renovation-milestone-support {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .renovation-milestone-support-card ul {
+    padding-left: 1.15rem;
+    color: rgba(232, 228, 220, 0.82);
+    font-size: 0.84rem;
+    line-height: 1.7;
+  }
+
+  .renovation-milestone-steps {
+    position: relative;
+    gap: 0.7rem;
+  }
+
+  .renovation-milestone-steps::before {
+    content: "";
+    position: absolute;
+    left: 0.92rem;
+    top: 0.9rem;
+    bottom: 0.9rem;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .renovation-milestone-step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 0.9rem;
+    padding: 0.82rem 0.9rem 0.82rem 1.55rem;
+  }
+
+  .renovation-milestone-step::before {
+    content: "";
+    position: absolute;
+    left: 0.63rem;
+    top: 1rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #f2eee6;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+  }
+
+  .renovation-milestone-step-code {
+    color: #f0ede6;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .renovation-milestone-step-body {
+    display: grid;
+    gap: 0.24rem;
+  }
+
   .renovation-knowhow-entry {
     overflow: hidden;
   }
@@ -3336,6 +3480,7 @@
     .bookshelf-guide-grid,
     .bookshelf-track-grid,
     .renovation-knowhow-grid,
+    .renovation-milestone-flow-overview,
     .command-metrics-main,
   .vendor-intake-guide-grid,
   .vendor-intake-metrics,
@@ -3391,6 +3536,8 @@
     .bookshelf-outline-meta,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
+    .renovation-milestone-brief,
+    .renovation-milestone-support,
     .vendor-form-grid {
       grid-template-columns: 1fr 1fr;
     }
@@ -3462,13 +3609,29 @@
     .bookshelf-outline-grid,
     .renovation-knowhow-grid,
     .command-metrics-main,
+    .renovation-milestone-flow-overview,
     .bookshelf-outline-meta,
     .bookshelf-intake-grid,
     .bookshelf-rule-grid,
     .gemini-editor-grid,
   .vendor-intake-actions,
+    .renovation-milestone-brief,
+    .renovation-milestone-support,
     .vendor-form-grid {
       grid-template-columns: 1fr;
+    }
+
+    .renovation-milestone-flow-node:not(:last-child)::after {
+      display: none;
+    }
+
+    .renovation-milestone-step {
+      grid-template-columns: 1fr;
+      padding-left: 1.55rem;
+    }
+
+    .renovation-milestone-step-code {
+      margin-bottom: -0.15rem;
     }
 
   .vendor-intake-link-row {

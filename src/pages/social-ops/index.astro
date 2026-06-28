@@ -1074,7 +1074,16 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 </div>
                 <div class="bookshelf-preview-head">
                   <p>Milestone 手冊</p>
-                  <span>依階段展開，每次只看當前里程碑</span>
+                  <span>先看這關在做什麼，再看原始資料逐條內容</span>
+                </div>
+                <div class="renovation-milestone-flow-overview">
+                  {renovationKnowHowMilestones.map((milestone) => (
+                    <article class="renovation-milestone-flow-node">
+                      <p>{milestone.code}</p>
+                      <strong>{milestone.title}</strong>
+                      <span>{milestone.objective}</span>
+                    </article>
+                  ))}
                 </div>
                 <div class="renovation-knowhow-accordion">
                   {renovationKnowHowMilestones.map((milestone) => (
@@ -1084,48 +1093,58 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                           <p>{milestone.code}</p>
                           <strong>{milestone.title}</strong>
                         </div>
-                        <span class="renovation-knowhow-summary-text">{milestone.objective}</span>
+                        <span class="renovation-knowhow-summary-text">這一關目標：{milestone.objective}</span>
                       </summary>
                       <div class="renovation-knowhow-entry-body">
-                        <p class="renovation-knowhow-objective">目標：{milestone.objective}</p>
-                        <div class="renovation-knowhow-block">
-                          <span>驗收閘門</span>
-                          <ul>
-                            <li>{milestone.gate}</li>
-                          </ul>
+                        <div class="renovation-milestone-brief">
+                          <article class="renovation-milestone-brief-card">
+                            <span>這一關目標</span>
+                            <p>{milestone.objective}</p>
+                          </article>
+                          <article class="renovation-milestone-brief-card">
+                            <span>過關條件</span>
+                            <p>{milestone.gate}</p>
+                          </article>
                         </div>
                         <div class="renovation-knowhow-block">
-                          <span>優先任務</span>
-                          <ul>
-                            {milestone.priorities.map((item) => (
-                              <li>{item}</li>
-                            ))}
-                          </ul>
+                          <span>這一關要先抓住的重點</span>
+                          <div class="renovation-milestone-support">
+                            <article class="renovation-milestone-support-card">
+                              <strong>優先任務</strong>
+                              <ul>
+                                {milestone.priorities.map((item) => (
+                                  <li>{item}</li>
+                                ))}
+                              </ul>
+                            </article>
+                            <article class="renovation-milestone-support-card">
+                              <strong>補充筆記</strong>
+                              <ul>
+                                {milestone.actions.map((item) => (
+                                  <li>{item}</li>
+                                ))}
+                              </ul>
+                            </article>
+                          </div>
                         </div>
                         <div class="renovation-knowhow-block">
-                          <span>補充筆記</span>
-                          <ul>
-                            {milestone.actions.map((item) => (
-                              <li>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div class="renovation-knowhow-block">
-                          <span>原始條目重點</span>
-                          <div class="renovation-knowhow-item-list">
+                          <span>原始資料逐條重現</span>
+                          <div class="renovation-milestone-steps">
                             {renovationMilestoneDetails[milestone.id].map((item) => (
-                              <article class="renovation-knowhow-item">
-                                <div class="renovation-knowhow-item-head">
-                                  <strong>{item.label}</strong>
-                                  <em>{item.owner}</em>
+                              <article class="renovation-milestone-step">
+                                <div class="renovation-milestone-step-code">{item.label}</div>
+                                <div class="renovation-milestone-step-body">
+                                  <div class="renovation-knowhow-item-head">
+                                    <strong>{item.owner}</strong>
+                                  </div>
+                                  <p>{item.detail}</p>
                                 </div>
-                                <p>{item.detail}</p>
                               </article>
                             ))}
                           </div>
                         </div>
                         <div class="renovation-knowhow-block">
-                          <span>本節點協作對齊</span>
+                          <span>這一關要先跟誰對齊</span>
                           <div class="bookshelf-rule-grid renovation-knowhow-role-grid renovation-knowhow-role-grid-inline">
                             {renovationMilestoneCoordinationMap[milestone.id].map((role) => (
                               <article class="bookshelf-rule-card renovation-knowhow-role-card">
