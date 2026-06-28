@@ -2309,6 +2309,52 @@
     padding: 0.78rem 0.85rem;
   }
 
+  .digital-blueprint-grid {
+    display: grid;
+    gap: 0.72rem;
+  }
+
+  .digital-blueprint-card {
+    display: grid;
+    gap: 0.45rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.022);
+    padding: 0.88rem 0.92rem;
+  }
+
+  .digital-blueprint-card-head {
+    display: grid;
+    gap: 0.28rem;
+  }
+
+  .digital-blueprint-card-head span,
+  .digital-blueprint-card-head strong,
+  .digital-blueprint-card p,
+  .digital-blueprint-role {
+    margin: 0;
+  }
+
+  .digital-blueprint-card-head span,
+  .digital-blueprint-role {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+  }
+
+  .digital-blueprint-card-head strong {
+    color: #f5f3ef;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+
+  .digital-blueprint-card p {
+    color: rgba(229, 226, 220, 0.68);
+    font-size: 0.84rem;
+    line-height: 1.72;
+  }
+
   .renovation-knowhow-item-head,
   .renovation-ergonomics-values {
     display: flex;

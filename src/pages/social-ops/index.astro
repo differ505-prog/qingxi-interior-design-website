@@ -299,6 +299,17 @@ type RenovationFieldNote = {
     points: string[];
   }>;
 };
+type DigitalToolRating = {
+  name: string;
+  score: string;
+  role: string;
+  value: string;
+};
+type DigitalBlueprintApp = {
+  name: string;
+  replaces: string;
+  logic: string;
+};
 const renovationMilestoneCoordinationMap: Record<string, RenovationMilestoneCoordination[]> = {
   m1: [
     {
@@ -553,6 +564,60 @@ const renovationFieldNotes: RenovationFieldNote[] = [
         ],
       },
     ],
+  },
+];
+const digitalCoreTools: DigitalToolRating[] = [
+  {
+    name: "Cursor AI Code Editor / Large Language Model (LLM) APIs",
+    score: "10 🌟",
+    role: "造物主引擎",
+    value: "它是你「手搓」一切客製化工具的母體，負責生成程式碼與驅動底層 AI 邏輯。",
+  },
+  {
+    name: "Synology NAS 私有雲系統 (Network Attached Storage) & Docker",
+    score: "9.8 📈",
+    role: "數位總部主機",
+    value: "提供 24 小時不關機的實體 Host，用來託管你自寫的網頁、資料庫與 AI 代理。",
+  },
+  {
+    name: "Coohom (酷家樂) 雲端 3D 室內設計平台",
+    score: "9.5",
+    role: "3D 生產力核心",
+    value: "提供雲端百萬品牌家具模型庫與即時光追渲染，是無法被自建程式取代的商業壁壘。",
+  },
+  {
+    name: "Midjourney AI / Stable Diffusion (Stability AI) API",
+    score: "9.2",
+    role: "審美與畫素引擎",
+    value: "提供極高審美質感的風格情緒板生成，直接串接其 API 作為你自建系統的視覺外掛。",
+  },
+  {
+    name: "Polycam 3D Scanner & LiDAR 數位丈量",
+    score: "8.5",
+    role: "空間演算法核心",
+    value: "現場 15 分鐘快速 3D 掃描，將複雜的空間點雲重構交給專業 App，匯出 3D 檔。",
+  },
+];
+const digitalBlueprintApps: DigitalBlueprintApp[] = [
+  {
+    name: "自建現場驗收輕量化 PWA",
+    replaces: "Fieldwire / GoodNotes",
+    logic: "手機現場拍照，透過自建網頁直接上傳至 NAS，背景串接 Gemini Vision API 自動辨識缺失（如油漆不均、裂縫）並分類，自動產生帶標記的 PDF 報告。",
+  },
+  {
+    name: "自建專案 Dashboard & 提案導航頁",
+    replaces: "Notion",
+    logic: "用 HTML/Tailwind 寫一個極簡網頁並託管在 NAS 上。客戶可用專屬密碼登入，在線查看合約、工程進度條、以及酷家樂產出的 720 度全景圖。",
+  },
+  {
+    name: "LINE 智慧客服 & 自動估價 Bot",
+    replaces: "一般客服系統 / 估價軟體",
+    logic: "利用 Python 串接 LINE Bot API。客戶在 LINE 輸入需求後，Bot 自動比對你存在 NAS 的歷年報價單與材料庫，自動生成專業的初步報價草稿供你確認。",
+  },
+  {
+    name: "發票與收據自動 OCR 記帳工具",
+    replaces: "專業記帳 App",
+    logic: "串接 Gemini Vision API，用手機拍下發票或估價單，系統自動辨識金額、項目並匯入 NAS 的 Excel 檔案中，每到報稅季一鍵打包交給記帳士。",
   },
 ];
 
@@ -1053,7 +1118,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <details id="renovation-knowhow-board" class="bookshelf-fold" open>
               <summary>
                 <span>內部裝修知識 / 筆記</span>
-                <small>里程碑手冊、尺寸速查、現場安裝備忘</small>
+                <small>數位工具戰力、里程碑手冊、尺寸速查、現場安裝備忘</small>
               </summary>
               <div class="bookshelf-fold-stack">
                 <div class="bookshelf-preview-head">
@@ -1069,8 +1134,61 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   <article class="bookshelf-guide-card">
                     <span>收錄範圍</span>
                     <strong>直接把 Gemini 內容收進工作台，不再只留超連結</strong>
-                    <p>目前已內嵌里程碑手冊、尺寸速查、工班權責與 85 吋電視掛架安裝備忘；後續可沿用同一結構擴充。</p>
+                    <p>目前已內嵌數位工具戰力、里程碑手冊、尺寸速查與 85 吋電視掛架安裝備忘；後續可沿用同一結構擴充。</p>
                   </article>
+                </div>
+                <div class="bookshelf-preview-head">
+                  <p>數位工具戰力</p>
+                  <span>把一人設計公司的數位母體與自建工具分開整理，方便回頭校準投資方向</span>
+                </div>
+                <div class="renovation-knowhow-accordion">
+                  <details class="renovation-knowhow-entry">
+                    <summary class="renovation-knowhow-entry-summary">
+                      <div class="renovation-knowhow-card-head">
+                        <p>基礎核心工具</p>
+                        <strong>不可取代的母體與外掛</strong>
+                      </div>
+                      <span class="renovation-knowhow-summary-text">這 5 個工具是無法也不該花時間自建的底層基礎設施，要靠它們的 API、算力與商業壁壘餵養整個工作台。</span>
+                    </summary>
+                    <div class="renovation-knowhow-entry-body">
+                      <p class="renovation-knowhow-objective">整理方式：依照推薦評分、工具定位與核心價值重現，方便你快速判斷哪些是數位母體、哪些只是外掛。</p>
+                      <div class="digital-blueprint-grid">
+                        {digitalCoreTools.map((tool) => (
+                          <article class="digital-blueprint-card">
+                            <div class="digital-blueprint-card-head">
+                              <span>{tool.score}</span>
+                              <strong>{tool.name}</strong>
+                            </div>
+                            <p class="digital-blueprint-role">{tool.role}</p>
+                            <p>{tool.value}</p>
+                          </article>
+                        ))}
+                      </div>
+                    </div>
+                  </details>
+                  <details class="renovation-knowhow-entry">
+                    <summary class="renovation-knowhow-entry-summary">
+                      <div class="renovation-knowhow-card-head">
+                        <p>Vibe Coding 自建應用</p>
+                        <strong>手搓替代傳統 SaaS</strong>
+                      </div>
+                      <span class="renovation-knowhow-summary-text">這些不是去買一堆零散工具，而是用 Cursor 與 NAS 在幾天甚至幾小時內做出來，直接取代 Notion、Fieldwire、估價與記帳流程。</span>
+                    </summary>
+                    <div class="renovation-knowhow-entry-body">
+                      <p class="renovation-knowhow-objective">整理方式：每個應用都保留它原本想替代的傳統軟體，並直接寫清楚 Vibe Coding 的運作邏輯。</p>
+                      <div class="digital-blueprint-grid">
+                        {digitalBlueprintApps.map((app) => (
+                          <article class="digital-blueprint-card">
+                            <div class="digital-blueprint-card-head">
+                              <span>替代 {app.replaces}</span>
+                              <strong>{app.name}</strong>
+                            </div>
+                            <p>{app.logic}</p>
+                          </article>
+                        ))}
+                      </div>
+                    </div>
+                  </details>
                 </div>
                 <div class="bookshelf-preview-head">
                   <p>Milestone 手冊</p>
