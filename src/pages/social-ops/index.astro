@@ -283,6 +283,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   <div>
                     <p class="panel-tag">日常任務</p>
                     <h2>主動獵殺</h2>
+                    <p id="daily-panel-note" class="panel-inline-note">今日還差 3 個完成條件</p>
                   </div>
                 </div>
                 <div id="daily-quest-grid" class="quest-grid"></div>
@@ -293,6 +294,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   <div>
                     <p class="panel-tag">任務 6</p>
                     <h2>高意圖社群回覆與低成本分發</h2>
+                    <p id="weekly-panel-note" class="panel-inline-note">本週還差 3 輪主任務</p>
                   </div>
                 </div>
                 <div id="quest-grid" class="quest-grid"></div>
@@ -1874,17 +1876,63 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function isRunComplete(run) {
-    return (run.actionOutreach || run.actionOutreachFallback)
+    return isRunOutreachSatisfied(run)
       && run.actionImageGeneration
       && run.actionWebsite
       && run.actionGoogleBusiness
-      && (run.actionThreads || run.actionLocalCommunity);
+      && isRunDistributionSatisfied(run);
   }
 
   function isDailyOpsComplete(daily = state.daily) {
     return daily.actionMorningPatrol
       && daily.actionEveningPatrol
-      && (daily.actionOutboundHunt || daily.actionOutboundFallback);
+      && isDailyHuntSatisfied(daily);
+  }
+
+  function isDailyHuntSatisfied(daily = state.daily) {
+    return Boolean(daily.actionOutboundHunt || daily.actionOutboundFallback);
+  }
+
+  function isRunOutreachSatisfied(run) {
+    return Boolean(run.actionOutreach || run.actionOutreachFallback);
+  }
+
+  function isRunDistributionSatisfied(run) {
+    return Boolean(run.actionThreads || run.actionLocalCommunity);
+  }
+
+  function getDailyCompletedRequirementCount(daily = state.daily) {
+    return [
+      daily.actionMorningPatrol,
+      daily.actionEveningPatrol,
+      isDailyHuntSatisfied(daily),
+    ].filter(Boolean).length;
+  }
+
+  function getChoiceState(isChecked, alternativeChecked) {
+    if (isChecked) {
+      return {
+        className: "is-checked",
+        badge: "已完成",
+      };
+    }
+
+    if (alternativeChecked) {
+      return {
+        className: "is-satisfied",
+        badge: "已滿足",
+      };
+    }
+
+    return {
+      className: "",
+      badge: "",
+    };
+  }
+
+  function renderChoiceStateBadge(choiceState) {
+    if (!choiceState?.badge) return "";
+    return `<em class="quest-check-state ${choiceState.className === "is-satisfied" ? "is-satisfied" : "is-complete"}">${choiceState.badge}</em>`;
   }
 
   function buildCarryoverWeeklyRuns(previousRuns = []) {
@@ -2029,7 +2077,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const xpPercent = Math.round((currentLevelXp / nextLevelXpRequirement) * 100);
     document.getElementById("weekly-progress-count").textContent = `${completedRuns} / ${WEEKLY_TARGET}`;
     document.getElementById("weekly-progress-note").textContent = remaining === 0
-      ? "本週主線已達標，待下週刷新。"
+      ? "本週已清空，待下週刷新。"
       : `還差 ${remaining} 個任務`;
     document.getElementById("weekly-progress-bar").style.width = `${percent}%`;
     document.getElementById("xp-value").textContent = `${state.stats.xp} XP`;
@@ -2045,6 +2093,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const shell = document.getElementById("quest-grid");
     if (!shell) return;
 
+    const completedRuns = getCompletedRunCount();
+    const weeklyRemaining = Math.max(WEEKLY_TARGET - completedRuns, 0);
+    const weeklyPanelNote = document.getElementById("weekly-panel-note");
+    if (weeklyPanelNote) {
+      weeklyPanelNote.textContent = weeklyRemaining === 0
+        ? "本週可完成項目已全數完成"
+        : `本週還差 ${weeklyRemaining} 輪主任務`;
+    }
+
     const activeRunIndex = getActiveRunIndex();
     const run = state.weekly.runs[activeRunIndex];
     if (!run) {
@@ -2053,21 +2110,39 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
 
     const complete = isRunComplete(run);
-    const actionOneComplete = run.actionOutreach || run.actionOutreachFallback;
+    const actionOneComplete = isRunOutreachSatisfied(run);
     const actionTwoComplete = run.actionImageGeneration
       && run.actionWebsite
       && run.actionGoogleBusiness
-      && (run.actionThreads || run.actionLocalCommunity);
+      && isRunDistributionSatisfied(run);
+    const outreachState = getChoiceState(run.actionOutreach, run.actionOutreachFallback);
+    const outreachFallbackState = getChoiceState(run.actionOutreachFallback, run.actionOutreach);
+    const threadsState = getChoiceState(run.actionThreads, run.actionLocalCommunity);
+    const localCommunityState = getChoiceState(run.actionLocalCommunity, run.actionThreads);
     const completedSteps = [
-      run.actionOutreach || run.actionOutreachFallback,
+      actionOneComplete,
       run.actionImageGeneration,
       run.actionWebsite,
       run.actionGoogleBusiness,
-      run.actionThreads || run.actionLocalCommunity,
+      isRunDistributionSatisfied(run),
       run.actionFacadeMaintenance,
     ].filter(Boolean).length;
     const progressLabel = `(${activeRunIndex + 1}/${WEEKLY_TARGET})`;
-    const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
+    const progressState = completedRuns >= WEEKLY_TARGET
+      ? "本週已清空"
+      : complete
+        ? "本輪已完成"
+        : completedSteps > 0
+          ? "進行中"
+          : "待開始";
+    const actionOneNote = actionOneComplete
+      ? "這組擇一條件已滿足，另一個選項不用再做。"
+      : "這組任務請在「高意圖回覆」與「巡邏無合適發問」之間擇一完成。";
+    const actionTwoNote = actionTwoComplete
+      ? "這組任務已滿足，Threads 與在地社群的另一個替代選項可略過。"
+      : run.actionImageGeneration && run.actionWebsite && run.actionGoogleBusiness
+        ? "固定步驟已完成，最後請在 Threads 與在地社群之間擇一完成。"
+        : "先完成官網文章與必要圖檔，再同步 Google 商家，最後在 Threads 與在地社群之間擇一。";
     const geminiDraftUrl = normalizeLinkValue(run.linkStash?.gemini);
     const websiteDraftUrl = normalizeLinkValue(run.linkStash?.website);
     const googleBusinessDraftUrl = normalizeLinkValue(run.linkStash?.googleBusiness);
@@ -2097,18 +2172,25 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <p class="quest-main-copy">在在地 FB 或 LINE 社群先給完整可用的專業建議；只有真的適合時，才自然補上官網文章或估價器連結。若本週巡邏沒有合適發問，不必硬回，可直接由行動 2 補位。</p>
             <div class="quest-checklist">
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionOutreach ? "is-checked" : ""}">
+                <label class="quest-check ${run.actionOutreach ? "is-checked" : ""} ${!run.actionOutreach && run.actionOutreachFallback ? "is-satisfied" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionOutreach" ${run.actionOutreach ? "checked" : ""} />
-                  <span>已在在地 FB 或 LINE 社群完成一次高意圖專業回覆，必要時才補上文章或估價器</span>
+                  <span class="quest-check-copy">
+                    <span>已在在地 FB 或 LINE 社群完成一次高意圖專業回覆，必要時才補上文章或估價器</span>
+                    ${renderChoiceStateBadge(outreachState)}
+                  </span>
                 </label>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionOutreachFallback ? "is-checked" : ""}">
+                <label class="quest-check ${run.actionOutreachFallback ? "is-checked" : ""} ${!run.actionOutreachFallback && run.actionOutreach ? "is-satisfied" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionOutreachFallback" ${run.actionOutreachFallback ? "checked" : ""} />
-                  <span>本週巡邏沒有適合發問，已不硬回，直接以行動 2 主動分發補位</span>
+                  <span class="quest-check-copy">
+                    <span>本週巡邏沒有適合發問，已不硬回，直接以行動 2 主動分發補位</span>
+                    ${renderChoiceStateBadge(outreachFallbackState)}
+                  </span>
                 </label>
               </div>
             </div>
+            <p class="quest-main-copy">${actionOneNote}</p>
           </section>
           <section class="quest-main ${actionTwoComplete ? "is-complete" : ""}">
             <div class="quest-main-head">
@@ -2142,16 +2224,22 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <a class="quest-link-btn" href="${GOOGLE_BUSINESS_URL}" target="_blank" rel="noreferrer">Google 商家</a>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionThreads ? "is-checked" : ""}">
+                <label class="quest-check ${run.actionThreads ? "is-checked" : ""} ${!run.actionThreads && run.actionLocalCommunity ? "is-satisfied" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionThreads" ${run.actionThreads ? "checked" : ""} />
-                  <span>已改寫並發佈 Threads（測試場，與在地社群擇一即可）</span>
+                  <span class="quest-check-copy">
+                    <span>已改寫並發佈 Threads（測試場，與在地社群擇一即可）</span>
+                    ${renderChoiceStateBadge(threadsState)}
+                  </span>
                 </label>
                 <a class="quest-link-btn" href="${THREADS_PROFILE_URL}" target="_blank" rel="noreferrer">Threads</a>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${run.actionLocalCommunity ? "is-checked" : ""}">
+                <label class="quest-check ${run.actionLocalCommunity ? "is-checked" : ""} ${!run.actionLocalCommunity && run.actionThreads ? "is-satisfied" : ""}">
                   <input type="checkbox" data-run-index="${activeRunIndex}" data-run-check="actionLocalCommunity" ${run.actionLocalCommunity ? "checked" : ""} />
-                  <span>已將文章改寫後發佈到在地 FB / LINE 社群（與 Threads 擇一即可）</span>
+                  <span class="quest-check-copy">
+                    <span>已將文章改寫後發佈到在地 FB / LINE 社群（與 Threads 擇一即可）</span>
+                    ${renderChoiceStateBadge(localCommunityState)}
+                  </span>
                 </label>
                 <a class="quest-link-btn" href="${PORTAL_BOARD_URL}">來源入口</a>
               </div>
@@ -2162,6 +2250,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 </label>
               </div>
             </div>
+            <p class="quest-main-copy">${actionTwoNote}</p>
             <div class="quest-link-stash">
               <div class="quest-link-stash-head">
                 <p>臨時稿件網址</p>
@@ -2236,13 +2325,22 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
     const daily = state.daily;
     const complete = isDailyOpsComplete(daily);
-    const completedSteps = [
-      daily.actionMorningPatrol,
-      daily.actionEveningPatrol,
-      daily.actionOutboundHunt || daily.actionOutboundFallback,
-    ].filter(Boolean).length;
-    const progressState = complete ? "已完成" : completedSteps > 0 ? "進行中" : "待開始";
-    const huntComplete = daily.actionOutboundHunt || daily.actionOutboundFallback;
+    const completedSteps = getDailyCompletedRequirementCount(daily);
+    const progressState = complete ? "今日已清空" : completedSteps > 0 ? "進行中" : "待開始";
+    const huntComplete = isDailyHuntSatisfied(daily);
+    const outboundHuntState = getChoiceState(daily.actionOutboundHunt, daily.actionOutboundFallback);
+    const outboundFallbackState = getChoiceState(daily.actionOutboundFallback, daily.actionOutboundHunt);
+    const dailyPanelNote = document.getElementById("daily-panel-note");
+    if (dailyPanelNote) {
+      dailyPanelNote.textContent = complete
+        ? "今日可完成項目已全數完成"
+        : `今日還差 ${Math.max(3 - completedSteps, 0)} 個完成條件`;
+    }
+    const dailyStatusNote = complete
+      ? "今日可完成項目已全數完成，其他替代選項不用再勾。"
+      : huntComplete
+        ? "今日獵殺判定已滿足，另一個擇一選項可略過；剩下確認早晚巡邏。"
+        : "今日尚未完成獵殺判定，請在「已私訊」與「無合適目標」之間擇一。";
 
     shell.innerHTML = `
       <article class="quest-card ${complete ? "is-complete" : ""}">
@@ -2277,20 +2375,26 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 </label>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${daily.actionOutboundHunt ? "is-checked" : ""}">
+                <label class="quest-check ${daily.actionOutboundHunt ? "is-checked" : ""} ${!daily.actionOutboundHunt && daily.actionOutboundFallback ? "is-satisfied" : ""}">
                   <input type="checkbox" data-daily-check="actionOutboundHunt" ${daily.actionOutboundHunt ? "checked" : ""} />
-                  <span>已鎖定高意圖貼文並第一時間私訊</span>
+                  <span class="quest-check-copy">
+                    <span>已鎖定高意圖貼文並第一時間私訊</span>
+                    ${renderChoiceStateBadge(outboundHuntState)}
+                  </span>
                 </label>
                 <a class="quest-link-btn" href="${PORTAL_BOARD_URL}">來源入口</a>
               </div>
               <div class="quest-check-row">
-                <label class="quest-check ${daily.actionOutboundFallback ? "is-checked" : ""}">
+                <label class="quest-check ${daily.actionOutboundFallback ? "is-checked" : ""} ${!daily.actionOutboundFallback && daily.actionOutboundHunt ? "is-satisfied" : ""}">
                   <input type="checkbox" data-daily-check="actionOutboundFallback" ${daily.actionOutboundFallback ? "checked" : ""} />
-                  <span>今日巡邏沒有合適目標，已不硬私訊</span>
+                  <span class="quest-check-copy">
+                    <span>今日巡邏沒有合適目標，已不硬私訊</span>
+                    ${renderChoiceStateBadge(outboundFallbackState)}
+                  </span>
                 </label>
               </div>
             </div>
-            <p class="quest-main-copy">${huntComplete ? "今日獵殺判定已完成，剩下看早晚巡邏是否都已勾選。" : "今日尚未完成獵殺判定，請在『已私訊』與『無合適目標』之間擇一。"}
+            <p class="quest-main-copy">${dailyStatusNote}
             </p>
           </section>
         </div>
