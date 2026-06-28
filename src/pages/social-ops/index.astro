@@ -301,13 +301,18 @@ type RenovationFieldNote = {
 };
 type DigitalToolRating = {
   name: string;
-  score: string;
   role: string;
   value: string;
 };
+type DigitalSharedBrain = {
+  name: string;
+  stack: string;
+  pain: string;
+};
 type DigitalBlueprintApp = {
   name: string;
-  replaces: string;
+  stack: string;
+  gap: string;
   logic: string;
 };
 const renovationMilestoneCoordinationMap: Record<string, RenovationMilestoneCoordination[]> = {
@@ -568,56 +573,68 @@ const renovationFieldNotes: RenovationFieldNote[] = [
 ];
 const digitalCoreTools: DigitalToolRating[] = [
   {
-    name: "Cursor AI Code Editor / Large Language Model (LLM) APIs",
-    score: "10 🌟",
+    name: "Cursor AI Code Editor / LLM APIs",
     role: "造物主引擎",
-    value: "它是你「手搓」一切客製化工具的母體，負責生成程式碼與驅動底層 AI 邏輯。",
+    value: "負責生成程式碼與驅動底層 AI 邏輯，是你手搓一切系統的起點。",
   },
   {
-    name: "Synology NAS 私有雲系統 (Network Attached Storage) & Docker",
-    score: "9.8 📈",
+    name: "Synology NAS 私有雲系統 & Docker",
     role: "數位總部主機",
-    value: "提供 24 小時不關機的實體 Host，用來託管你自寫的網頁、資料庫與 AI 代理。",
+    value: "提供 24 小時不關機的實體 Host，確保數據主權與穩定託管。",
   },
   {
-    name: "Coohom (酷家樂) 雲端 3D 室內設計平台",
-    score: "9.5",
+    name: "Coohom (酷家樂) 雲端 3D 平台",
     role: "3D 生產力核心",
-    value: "提供雲端百萬品牌家具模型庫與即時光追渲染，是無法被自建程式取代的商業壁壘。",
+    value: "百萬真實模型庫與極速渲染，直接取代 SketchUp 的耗時工作流。",
   },
   {
-    name: "Midjourney AI / Stable Diffusion (Stability AI) API",
-    score: "9.2",
+    name: "Midjourney / Stable Diffusion API",
     role: "審美與畫素引擎",
-    value: "提供極高審美質感的風格情緒板生成，直接串接其 API 作為你自建系統的視覺外掛。",
+    value: "提供極高審美質感的風格情緒板生成，鎖定高客單價客戶。",
   },
   {
-    name: "Polycam 3D Scanner & LiDAR 數位丈量",
-    score: "8.5",
+    name: "Polycam (LiDAR 數位丈量)",
     role: "空間演算法核心",
-    value: "現場 15 分鐘快速 3D 掃描，將複雜的空間點雲重構交給專業 App，匯出 3D 檔。",
+    value: "獨家點雲重構與 AR 演算法，15 分鐘完成複雜空間掃描。",
+  },
+];
+const digitalSharedBrains: DigitalSharedBrain[] = [
+  {
+    name: "自建共用資料庫 (BaaS 平台)",
+    stack: "在 NAS Docker 上部署開源的 Supabase (基於 PostgreSQL)，並嚴格設定 RLS (資料列層級安全性) 規則。",
+    pain: "作為單一真相來源。RLS 確保客戶登入 Dashboard 時絕對無法越權看到他人的報價單，建立企業級資安防護。",
   },
 ];
 const digitalBlueprintApps: DigitalBlueprintApp[] = [
   {
     name: "自建現場驗收輕量化 PWA",
-    replaces: "Fieldwire / GoodNotes",
-    logic: "手機現場拍照，透過自建網頁直接上傳至 NAS，背景串接 Gemini Vision API 自動辨識缺失（如油漆不均、裂縫）並分類，自動產生帶標記的 PDF 報告。",
+    stack: "技術棧：React / Next.js / PWA",
+    gap: "完美替代 Fieldwire，介面 100% 貼合個人習慣。",
+    logic: "手機現場拍照，背景串接 Gemini Vision API 辨識缺失並寫入 Supabase，自動產生帶標記的報告。",
   },
   {
-    name: "自建專案 Dashboard & 提案導航頁",
-    replaces: "Notion",
-    logic: "用 HTML/Tailwind 寫一個極簡網頁並託管在 NAS 上。客戶可用專屬密碼登入，在線查看合約、工程進度條、以及酷家樂產出的 720 度全景圖。",
+    name: "客戶專屬 Dashboard 導航頁",
+    stack: "技術棧：React / Next.js / PWA",
+    gap: "替代 Notion，建立高度專業的品牌專屬形象。",
+    logic: "從 Supabase 讀取合約與進度，內嵌酷家樂 720 度全景圖。客戶憑專屬密碼登入查看。",
   },
   {
     name: "LINE 智慧客服 & 自動估價 Bot",
-    replaces: "一般客服系統 / 估價軟體",
-    logic: "利用 Python 串接 LINE Bot API。客戶在 LINE 輸入需求後，Bot 自動比對你存在 NAS 的歷年報價單與材料庫，自動生成專業的初步報價草稿供你確認。",
+    stack: "技術棧：React / Next.js / PWA",
+    gap: "替代昂貴的客服 CRM 與估價軟體，24 小時接單。",
+    logic: "串接 LINE Messaging API 與 Supabase 歷史報價表，由 LLM 自動生成初步報價草稿。",
   },
   {
-    name: "發票與收據自動 OCR 記帳工具",
-    replaces: "專業記帳 App",
-    logic: "串接 Gemini Vision API，用手機拍下發票或估價單，系統自動辨識金額、項目並匯入 NAS 的 Excel 檔案中，每到報稅季一鍵打包交給記帳士。",
+    name: "發票與收據自動 OCR 記帳",
+    stack: "技術棧：React / Next.js / PWA",
+    gap: "替代專業記帳 App，無痛對接每年報稅需求。",
+    logic: "用手機拍下單據，Gemini Vision 辨識金額後直接寫入 Supabase 財務表。",
+  },
+  {
+    name: "實體物料與 QR Code 自動標籤系統",
+    stack: "技術棧：React / Next.js / PWA",
+    gap: "補足實體物理生意的缺口，徹底解決建材報價失準與樣板管理的混亂。",
+    logic: "系統內建 QR Code 生成器並對接標籤機。新增建材時自動印出貼紙。手機掃描實體貼紙，立即讀取 Supabase 中的最新進價與庫存狀態。",
   },
 ];
 
@@ -1139,7 +1156,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 </div>
                 <div class="bookshelf-preview-head">
                   <p>數位工具戰力</p>
-                  <span>把一人設計公司的數位母體與自建工具分開整理，方便回頭校準投資方向</span>
+                  <span>把數位母體、共用大腦與自建應用拆開整理，方便校準工具投資、資安與虛實整合方向</span>
                 </div>
                 <div class="renovation-knowhow-accordion">
                   <details class="renovation-knowhow-entry">
@@ -1151,15 +1168,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                       <span class="renovation-knowhow-summary-text">這 5 個工具是無法也不該花時間自建的底層基礎設施，要靠它們的 API、算力與商業壁壘餵養整個工作台。</span>
                     </summary>
                     <div class="renovation-knowhow-entry-body">
-                      <p class="renovation-knowhow-objective">整理方式：依照推薦評分、工具定位與核心價值重現，方便你快速判斷哪些是數位母體、哪些只是外掛。</p>
+                      <p class="renovation-knowhow-objective">整理方式：依照工具定位與核心價值重現，方便你快速判斷哪些是數位母體、哪些只是外掛。</p>
                       <div class="digital-blueprint-grid">
                         {digitalCoreTools.map((tool) => (
                           <article class="digital-blueprint-card">
                             <div class="digital-blueprint-card-head">
-                              <span>{tool.score}</span>
+                              <span>{tool.role}</span>
                               <strong>{tool.name}</strong>
                             </div>
-                            <p class="digital-blueprint-role">{tool.role}</p>
                             <p>{tool.value}</p>
                           </article>
                         ))}
@@ -1169,20 +1185,45 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   <details class="renovation-knowhow-entry">
                     <summary class="renovation-knowhow-entry-summary">
                       <div class="renovation-knowhow-card-head">
-                        <p>Vibe Coding 自建應用</p>
-                        <strong>手搓替代傳統 SaaS</strong>
+                        <p>Vibe Coding 共用大腦</p>
+                        <strong>解決維運與資安</strong>
                       </div>
-                      <span class="renovation-knowhow-summary-text">這些不是去買一堆零散工具，而是用 Cursor 與 NAS 在幾天甚至幾小時內做出來，直接取代 Notion、Fieldwire、估價與記帳流程。</span>
+                      <span class="renovation-knowhow-summary-text">為了避免同時維護多個獨立專案造成的 DevOps 災難與資安風險，所有自建應用都應該串接到這個唯一核心。</span>
                     </summary>
                     <div class="renovation-knowhow-entry-body">
-                      <p class="renovation-knowhow-objective">整理方式：每個應用都保留它原本想替代的傳統軟體，並直接寫清楚 Vibe Coding 的運作邏輯。</p>
+                      <p class="renovation-knowhow-objective">整理方式：直接把基礎設施名稱、技術棧與要解決的痛點並排，讓這段不只是技術名詞，而是實際的營運防線。</p>
+                      <div class="digital-blueprint-grid">
+                        {digitalSharedBrains.map((brain) => (
+                          <article class="digital-blueprint-card">
+                            <div class="digital-blueprint-card-head">
+                              <span>單一真相來源</span>
+                              <strong>{brain.name}</strong>
+                            </div>
+                            <p class="digital-blueprint-role">{brain.stack}</p>
+                            <p>{brain.pain}</p>
+                          </article>
+                        ))}
+                      </div>
+                    </div>
+                  </details>
+                  <details class="renovation-knowhow-entry">
+                    <summary class="renovation-knowhow-entry-summary">
+                      <div class="renovation-knowhow-card-head">
+                        <p>Vibe Coding 自建應用</p>
+                        <strong>取代 SaaS 軟體</strong>
+                      </div>
+                      <span class="renovation-knowhow-summary-text">這些是你利用 Cursor 開發、共用上述 Supabase 資料庫的輕量化前端應用，直接補上現場驗收、客戶入口、估價記帳與實體物料管理缺口。</span>
+                    </summary>
+                    <div class="renovation-knowhow-entry-body">
+                      <p class="renovation-knowhow-objective">整理方式：每個應用都保留技術棧、運作邏輯與業務缺口，讓你回頭看時不只知道要做什麼，也知道它到底補哪個洞。</p>
                       <div class="digital-blueprint-grid">
                         {digitalBlueprintApps.map((app) => (
                           <article class="digital-blueprint-card">
                             <div class="digital-blueprint-card-head">
-                              <span>替代 {app.replaces}</span>
+                              <span>{app.stack}</span>
                               <strong>{app.name}</strong>
                             </div>
+                            <p class="digital-blueprint-role">{app.gap}</p>
                             <p>{app.logic}</p>
                           </article>
                         ))}
