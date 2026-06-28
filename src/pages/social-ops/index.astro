@@ -283,6 +283,11 @@ type RenovationMilestoneDetail = {
   owner: string;
   detail: string;
 };
+type RenovationMilestoneCoordination = {
+  title: string;
+  owner: string;
+  note: string;
+};
 type RenovationFieldNote = {
   id: string;
   category: string;
@@ -294,38 +299,68 @@ type RenovationFieldNote = {
     points: string[];
   }>;
 };
-const renovationKnowHowRoles = [
-  {
-    title: "結構法規",
-    owner: "鋁窗工程行",
-    note: "優先對齊窗簾廠商，窗體未驗收前不掛簾。",
-  },
-  {
-    title: "機電安全",
-    owner: "水電工程行",
-    note: "所有插座接地、負載與相位測試都要在交付前驗到。",
-  },
-  {
-    title: "溫控排氣",
-    owner: "空調工程行",
-    note: "除塵完成後才允許開機試機，避免粉塵傷機。",
-  },
-  {
-    title: "地坪介面",
-    owner: "地板 / Epoxy 廠商",
-    note: "門框懸空高度與完成面厚度必須跟木工同步。",
-  },
-  {
-    title: "廚衛整合",
-    owner: "系統櫃 / 廚具工班",
-    note: "要和水電先對齊排水接高與地漏切割安裝。",
-  },
-  {
-    title: "影音安裝",
-    owner: "電視安裝商",
-    note: "鑽孔防塵與正式掛機要分段，不要在細清前掛上螢幕。",
-  },
-];
+const renovationMilestoneCoordinationMap: Record<string, RenovationMilestoneCoordination[]> = {
+  m1: [
+    {
+      title: "結構法規",
+      owner: "鋁窗工程行",
+      note: "優先對齊窗簾廠商，窗體未驗收前不掛簾。",
+    },
+  ],
+  m2: [
+    {
+      title: "機電安全",
+      owner: "水電工程行",
+      note: "所有插座接地、負載與相位測試都要在交付前驗到。",
+    },
+    {
+      title: "溫控排氣",
+      owner: "空調工程行",
+      note: "除塵完成前先完成排水與隱蔽測試，避免後續封板後才回頭拆修。",
+    },
+  ],
+  m3: [
+    {
+      title: "地坪介面",
+      owner: "地板 / Epoxy 廠商",
+      note: "門框懸空高度與完成面厚度必須跟木工同步。",
+    },
+    {
+      title: "廚衛整合",
+      owner: "系統櫃 / 廚具工班",
+      note: "系統櫃下單前就要先跟水電對齊排水接高、設備開孔與地漏切割條件。",
+    },
+  ],
+  m4: [
+    {
+      title: "廚衛整合",
+      owner: "系統櫃 / 廚具工班",
+      note: "正式安裝前要再跟水電核對排水接高與現場設備順序，避免馬桶、浴櫃互相卡到。",
+    },
+    {
+      title: "影音安裝",
+      owner: "電視安裝商",
+      note: "鑽孔防塵與正式掛機要分段，不要在細清前掛上螢幕。",
+    },
+  ],
+  m5: [
+    {
+      title: "機電安全",
+      owner: "水電工程行",
+      note: "交付前要把插座接地、負載、相位與 N-PE 電壓全部驗完。",
+    },
+    {
+      title: "溫控排氣",
+      owner: "空調工程行",
+      note: "除塵完成後才允許正式開機試機，避免粉塵傷機。",
+    },
+    {
+      title: "影音安裝",
+      owner: "電視安裝商",
+      note: "細清後再正式掛機，並同步確認插座遮蔽、訊號與觀看高度。",
+    },
+  ],
+};
 const renovationErgonomicsReferences = [
   {
     area: "玄關",
@@ -1088,6 +1123,18 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                             ))}
                           </div>
                         </div>
+                        <div class="renovation-knowhow-block">
+                          <span>本節點協作對齊</span>
+                          <div class="bookshelf-rule-grid renovation-knowhow-role-grid renovation-knowhow-role-grid-inline">
+                            {renovationMilestoneCoordinationMap[milestone.id].map((role) => (
+                              <article class="bookshelf-rule-card renovation-knowhow-role-card">
+                                <span>{role.title}</span>
+                                <strong>{role.owner}</strong>
+                                <p>{role.note}</p>
+                              </article>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </details>
                   ))}
@@ -1156,19 +1203,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                         ))}
                       </div>
                     </details>
-                  ))}
-                </div>
-                <div class="bookshelf-preview-head">
-                  <p>核心工班權責</p>
-                  <span>用來快速判斷誰先對齊誰</span>
-                </div>
-                <div class="bookshelf-rule-grid renovation-knowhow-role-grid">
-                  {renovationKnowHowRoles.map((role) => (
-                    <article class="bookshelf-rule-card renovation-knowhow-role-card">
-                      <span>{role.title}</span>
-                      <strong>{role.owner}</strong>
-                      <p>{role.note}</p>
-                    </article>
                   ))}
                 </div>
               </div>
