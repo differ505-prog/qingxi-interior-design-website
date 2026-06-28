@@ -314,7 +314,8 @@ const MAINTENANCE_MODE =
         --font-serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
         --type-overline-spacing: 0.18em;
         --type-title-tracking: 0.022em;
-        --type-body-tracking: 0.008em;
+        --type-body-tracking: 0.05em;
+        --type-body-line-height: 1.78;
         --type-cta-tracking: 0.06em;
 
         /* 中性深浅层次 */
@@ -337,8 +338,8 @@ const MAINTENANCE_MODE =
       body {
         font-family: var(--font-sans);
         font-weight: 400;
-        line-height: 1.72;
-        letter-spacing: 0.008em;
+        line-height: var(--type-body-line-height);
+        letter-spacing: var(--type-body-tracking);
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -365,6 +366,8 @@ const MAINTENANCE_MODE =
       li,
       blockquote {
         text-wrap: pretty;
+        line-height: var(--type-body-line-height);
+        letter-spacing: var(--type-body-tracking);
       }
 
       input,

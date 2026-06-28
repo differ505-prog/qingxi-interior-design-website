@@ -273,9 +273,9 @@ const homeStructuredData = [
     <div class="smart-case-container">
       <div class="section-header smart-case-header">
         <h6 class="section-subtitle">智能家居</h6>
-        <h2 class="section-title">把智能、空間與使用感一起規劃</h2>
+        <h2 class="section-title">將智能科技與空間美學完美融合</h2>
         <p class="smart-case-intro">
-          智能、弱電與空間一次規劃。
+          從弱電配置到使用情境，為您一次規劃到位。
         </p>
       </div>
 
@@ -513,7 +513,7 @@ const homeStructuredData = [
     <div class="consult-shell">
       <div class="consult-copy">
         <p class="section-subtitle consult-subtitle">下一步</p>
-        <h2 class="consult-title">準備開始，就直接留下需求。</h2>
+        <h2 class="consult-title">準備好打造理想空間了嗎？歡迎留下您的需求。</h2>
         <p class="consult-description">
           需求、預算、時程一次整理。
         </p>
@@ -807,7 +807,7 @@ const homeStructuredData = [
 
     /* About Section Styles */
     .about-section {
-      padding: 6rem 2rem 5rem;
+      padding: clamp(5rem, 8vw, 7rem) 2rem;
       background:
         radial-gradient(circle at top left, rgba(159, 147, 136, 0.06), transparent 26%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(247, 242, 237, 1) 100%);
@@ -845,7 +845,8 @@ const homeStructuredData = [
       font-size: 1.05rem;
       color: var(--gray-medium);
       margin: 0;
-      line-height: 1.8;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
     }
 
     /* Core Philosophy */
@@ -899,13 +900,13 @@ const homeStructuredData = [
       font-size: 0.95rem;
       color: var(--gray-light);
       margin: 0;
-      line-height: 1.68;
-      letter-spacing: 0.008em;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
     }
 
     /* Stats Section Styles */
     .stats-section {
-      padding: 4rem 2rem;
+      padding: clamp(5rem, 8vw, 7rem) 2rem;
       background:
         radial-gradient(circle at top left, rgba(159, 147, 136, 0.06), transparent 26%),
         linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(73, 64, 57, 1) 100%);
@@ -957,20 +958,20 @@ const homeStructuredData = [
     .stat-label {
       font-size: 0.95rem;
       color: rgba(255, 255, 255, 0.72);
-      line-height: 1.7;
-      letter-spacing: 0.008em;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
     }
 
     /* Testimonial Section Styles */
     .testimonial-section {
-      padding: 5rem 2rem;
+      padding: clamp(5rem, 8vw, 7rem) 2rem;
       background:
         radial-gradient(circle at top right, rgba(159, 147, 136, 0.04), transparent 24%),
         linear-gradient(180deg, rgba(247, 242, 237, 1) 0%, rgba(243, 245, 246, 1) 100%);
     }
 
     .site-proof-section {
-      padding: 0 2rem 5rem;
+      padding: 0 2rem clamp(5rem, 8vw, 7rem);
       background:
         radial-gradient(circle at top left, rgba(159, 147, 136, 0.04), transparent 22%),
         linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(245, 240, 234, 0.96) 100%);
@@ -1023,8 +1024,8 @@ const homeStructuredData = [
       margin: 0;
       color: rgba(79, 79, 79, 0.82);
       font-size: 0.98rem;
-      line-height: 1.82;
-      letter-spacing: 0.008em;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
     }
 
     .site-proof-photo {
@@ -1109,15 +1110,16 @@ const homeStructuredData = [
 
     .testimonial-text {
       font-size: 1rem;
-      line-height: 1.7;
+      line-height: var(--type-body-line-height);
       color: var(--gray-medium);
       margin-bottom: 0;
       text-align: center;
+      letter-spacing: var(--type-body-tracking);
     }
 
     /* FAQ Section Styles */
     .faq-section {
-      padding: 5rem 2rem;
+      padding: clamp(5rem, 8vw, 7rem) 2rem;
       background:
         radial-gradient(circle at top right, rgba(159, 147, 136, 0.04), transparent 24%),
         linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 241, 236, 1) 100%);
@@ -1138,7 +1140,8 @@ const homeStructuredData = [
       max-width: 38rem;
       margin: 1rem auto 0;
       color: var(--gray-medium);
-      line-height: 1.85;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
     }
 
     .faq-item {
@@ -1221,7 +1224,8 @@ const homeStructuredData = [
     .faq-answer p {
       padding: 0 2rem 1.5rem 2rem;
       color: var(--gray-medium);
-      line-height: 1.7;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
       margin: 0;
     }
 
@@ -1505,7 +1509,7 @@ const homeStructuredData = [
     }
 
     .service-section {
-      padding: 5rem 2rem;
+      padding: clamp(5rem, 8vw, 7rem) 2rem;
       background:
         radial-gradient(circle at top right, rgba(159, 147, 136, 0.05), transparent 24%),
         linear-gradient(180deg, rgba(250, 250, 250, 1) 0%, rgba(245, 240, 234, 1) 100%);
@@ -1525,8 +1529,8 @@ const homeStructuredData = [
       max-width: 44rem;
       margin: 1rem auto 0;
       color: var(--gray-medium);
-      line-height: 1.8;
-      letter-spacing: 0.008em;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
     }
 
     .section-subtitle {
@@ -1726,7 +1730,7 @@ const homeStructuredData = [
     }
 
     .smart-case-section {
-      padding: 5rem 2rem;
+      padding: clamp(5rem, 8vw, 7rem) 2rem;
       background:
         radial-gradient(circle at top right, rgba(159, 147, 136, 0.06), transparent 22%),
         linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 241, 236, 1) 100%);
@@ -1745,8 +1749,8 @@ const homeStructuredData = [
       max-width: 46rem;
       margin: 1rem auto 0;
       color: var(--gray-medium);
-      line-height: 1.82;
-      letter-spacing: 0.008em;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
     }
 
     .smart-case-shell {
@@ -1796,8 +1800,8 @@ const homeStructuredData = [
     .smart-case-description {
       margin: 1rem 0 0;
       color: rgba(255, 255, 255, 0.76);
-      line-height: 1.82;
-      letter-spacing: 0.008em;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
     }
 
     .smart-case-tags {
@@ -1890,13 +1894,13 @@ const homeStructuredData = [
     .smart-case-card p:last-child {
       margin: 0.75rem 0 0;
       color: var(--gray-medium);
-      line-height: 1.78;
-      letter-spacing: 0.008em;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
     }
 
     /* Workflow Section Styles */
     .workflow-section {
-      padding: 5rem 2rem;
+      padding: clamp(5rem, 8vw, 7rem) 2rem;
       background:
         linear-gradient(180deg, rgba(245, 245, 245, 1) 0%, rgba(251, 251, 251, 1) 100%);
     }
@@ -2024,7 +2028,7 @@ const homeStructuredData = [
     }
 
     .consult-section {
-      padding: 1rem 2rem 5rem;
+      padding: clamp(5rem, 8vw, 7rem) 2rem;
       background:
         radial-gradient(circle at top left, rgba(159, 147, 136, 0.04), transparent 24%),
         linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 241, 236, 1) 100%);
@@ -2062,8 +2066,8 @@ const homeStructuredData = [
     .consult-description {
       margin: 1rem 0 0;
       max-width: 44rem;
-      line-height: 1.82;
-      letter-spacing: 0.008em;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
       color: rgba(255, 255, 255, 0.76);
     }
 
@@ -2120,8 +2124,8 @@ const homeStructuredData = [
     .workflow-content p {
       font-size: 1rem;
       color: var(--gray-medium);
-      line-height: 1.75;
-      letter-spacing: 0.008em;
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
       margin: 0;
     }
 
