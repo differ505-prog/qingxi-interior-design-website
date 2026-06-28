@@ -201,6 +201,191 @@ const cannedReplies = [
   },
 ];
 
+const renovationKnowHowSourceUrl = "https://share.gemini.google/4UfhRBWS2hML";
+const renovationErgonomicsSourceUrl = "https://share.gemini.google/C4M1Lz0fCKYF";
+const renovationKnowHowMilestones = [
+  {
+    id: "m1",
+    code: "M1",
+    title: "開工前置里程碑",
+    objective: "行政合法化、建立現場保護防護網。",
+    gate: "室內裝修許可、現場保護、鋁窗法規核對與公用事業申請確認後再進場。",
+    priorities: [
+      "公用事業先申請：智慧微電腦瓦斯表與寬頻方案會卡住後段點火與裝機。",
+      "鋁窗法規先核對：太晚處理會回頭影響油漆、窗簾與整改範圍。",
+    ],
+    actions: [
+      "行政許可：張貼室內裝修許可證並完成工程險。",
+      "現場保護：公設防護、排水孔封堵、原屋況拍照存檔。",
+    ],
+  },
+  {
+    id: "m2",
+    code: "M2",
+    title: "基礎隱蔽里程碑",
+    objective: "完成建築體質工程，確保管路安全與法規合規。",
+    gate: "鋁窗整改結構完工、水電壓降測試與浴室 48hr 閉水測試通過。",
+    priorities: [
+      "全室插座接地與專用迴路要先到位，才接得上後面的木作與系統櫃。",
+      "空調排水一定要先試水，沒測過木工不能封天花。",
+    ],
+    actions: [
+      "隱蔽驗收：冷熱水管加壓、防水施作、浴室閉水測試。",
+      "影像存檔：電箱接地排、管路走向與關鍵轉折都要留影。",
+    ],
+  },
+  {
+    id: "m3",
+    code: "M3",
+    title: "裝修造型里程碑",
+    objective: "完成木作與油漆，並鎖定系統櫃與家具干涉。",
+    gate: "天花、門框、油漆完成且系統櫃干涉點複核後，才往地坪與安裝前進。",
+    priorities: [
+      "門框要依完成面懸空，底部高度要跟地板厚度同步預留。",
+      "系統櫃下單前先確認馬桶掀蓋路徑與浴櫃干涉，臥榻軟包要等底座完工再二次丈量。",
+    ],
+    actions: [
+      "油漆工程：批土、打磨、底漆與面漆完整走完。",
+      "素地整平：為後續 Epoxy 或其他地坪建立基準面。",
+    ],
+  },
+  {
+    id: "m4",
+    code: "M4",
+    title: "收尾安裝里程碑",
+    objective: "完成硬體安裝與法規驗收，讓環境進入準完工狀態。",
+    gate: "鋁窗法規驗收、排水乾燥無滲漏、馬桶掀蓋與地吸定位檢查全部通過。",
+    priorities: [
+      "地坪厚度先確定，地漏本體再精準後置安裝，不能反過來。",
+      "馬桶優先裝，排水接高到櫃內底板上方約 5 到 10 公分並做防臭處理。",
+    ],
+    actions: [
+      "機電家飾：瓦斯表、熱水器、插座面板、燈具、暖風機、蜂巢簾分批進場。",
+      "電視壁掛架先拆箱核對鎖點後安裝，正式掛機留到細清之後。",
+    ],
+  },
+  {
+    id: "m5",
+    code: "M5",
+    title: "完工交付里程碑",
+    objective: "完成環境淨化、系統聯調與正式點交。",
+    gate: "細清完成後才開冷氣試機，水電瓦斯、網路與電視掛機全部實測完畢。",
+    priorities: [
+      "細清前絕不先開冷氣，避免粉塵吸入設備。",
+      "完工總複檢要含插座相位與 N-PE 電壓，接地有效性要驗到。",
+    ],
+    actions: [
+      "空調聯調：環境淨化後正式開機至少 1 小時檢查冷房與排水。",
+      "搬家點交：活動家具與臥榻軟包最後進場，再做正式交屋。",
+    ],
+  },
+];
+const renovationKnowHowRoles = [
+  {
+    title: "結構法規",
+    owner: "鋁窗工程行",
+    note: "優先對齊窗簾廠商，窗體未驗收前不掛簾。",
+  },
+  {
+    title: "機電安全",
+    owner: "水電工程行",
+    note: "所有插座接地、負載與相位測試都要在交付前驗到。",
+  },
+  {
+    title: "溫控排氣",
+    owner: "空調工程行",
+    note: "除塵完成後才允許開機試機，避免粉塵傷機。",
+  },
+  {
+    title: "地坪介面",
+    owner: "地板 / Epoxy 廠商",
+    note: "門框懸空高度與完成面厚度必須跟木工同步。",
+  },
+  {
+    title: "廚衛整合",
+    owner: "系統櫃 / 廚具工班",
+    note: "要和水電先對齊排水接高與地漏切割安裝。",
+  },
+  {
+    title: "影音安裝",
+    owner: "電視安裝商",
+    note: "鑽孔防塵與正式掛機要分段，不要在細清前掛上螢幕。",
+  },
+];
+const renovationErgonomicsReferences = [
+  {
+    area: "玄關",
+    title: "鞋櫃、穿鞋凳與入口走道",
+    points: [
+      "鞋櫃深度以 35 公分最穩，靴子區另抓 45 公分以上。",
+      "懸空鞋櫃底部留空 15 公分，方便掃地機器人與常穿鞋。",
+      "玄關走道建議 100 公分，兩人錯身與搬運物品才不卡。",
+    ],
+  },
+  {
+    area: "客廳",
+    title: "沙發、茶几與電視觀看距離",
+    points: [
+      "沙發座深約 55 公分、座高約 42 公分，坐感最穩定。",
+      "茶几與沙發之間抓 40 公分，兼顧取物與起身。",
+      "55 到 65 吋電視離沙發約 300 公分，電視中心高度約 105 公分。",
+    ],
+  },
+  {
+    area: "廚房",
+    title: "檯面、吊櫃與走道",
+    points: [
+      "檯面高度用身高 / 2 + 5 公分估算，160 公分身高約做 85 公分。",
+      "檯面深度 60 公分、吊櫃底離地約 155 公分，最貼近多數設備。",
+      "廚房走道建議 100 公分，櫃門開啟後仍保有操作餘裕。",
+    ],
+  },
+  {
+    area: "餐廳",
+    title: "餐桌與餐邊櫃操作距離",
+    points: [
+      "餐桌高 / 餐椅高以 75 / 45 公分為基準，高差 30 公分最舒適。",
+      "純入座時桌邊離牆約 70 公分；後方還要通行時至少抓 90 公分。",
+      "若旁邊有餐邊水槽，餐桌到操作區建議留 120 公分。",
+    ],
+  },
+  {
+    area: "臥室",
+    title: "床側走道與衣櫃尺度",
+    points: [
+      "床側走道至少留 60 公分，起身與整理床鋪才不侷促。",
+      "衣櫃深度抓 60 公分，大衣吊掛後門板才關得上。",
+      "床墊高度約 50 公分，坐下時膝蓋接近 90 度最省力。",
+    ],
+  },
+  {
+    area: "衛浴",
+    title: "洗手台、馬桶與淋浴間",
+    points: [
+      "洗手台檯面約 80 公分，若用台上盆要先扣掉盆高。",
+      "馬桶前方至少留 60 公分，中心到側牆約 45 公分。",
+      "淋浴間以 90 x 90 公分最穩，蓮蓬頭高度抓 200 公分左右。",
+    ],
+  },
+  {
+    area: "全屋動線",
+    title: "走道與房門寬度",
+    points: [
+      "主走道單人通行約 90 公分，雙人錯身則建議 120 公分。",
+      "房門寬度以 85 公分最實用，兼顧家具搬運與日常進出。",
+    ],
+  },
+  {
+    area: "插座高度",
+    title: "常用水電定位速查",
+    points: [
+      "床頭兩側插座約 65 公分、書桌桌面插座約 85 公分。",
+      "壁掛電視插座約 105 公分，最好能被機身完全遮住。",
+      "洗衣機與暖風機遙控器多落在 125 公分；智慧馬桶插座約 35 公分。",
+    ],
+  },
+];
+
 const defaultSourcesJson = JSON.stringify(defaultSources);
 const blogPostsJson = JSON.stringify(blogPosts);
 const bookshelfTracksJson = JSON.stringify(bookshelfTracks);
@@ -569,6 +754,103 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <PublishingModePanel modeOption={modeOption} modeState={topicModeMap[modeOption.value]} />
               </template>
             ))}
+
+            <details id="renovation-knowhow-board" class="bookshelf-fold">
+              <summary>
+                <span>內部裝修知識 / 筆記</span>
+                <small>第一波：里程碑手冊 + 人體工學尺寸</small>
+              </summary>
+              <div class="bookshelf-fold-stack">
+                <div class="bookshelf-preview-head">
+                  <p>Milestone 手冊</p>
+                  <span>內部 know-how，不放公開知識區</span>
+                </div>
+                <div class="bookshelf-guide-grid renovation-knowhow-guide-grid">
+                  <article class="bookshelf-guide-card">
+                    <span>使用方式</span>
+                    <strong>先看 Gate，再看本階段優先任務與依賴順序</strong>
+                    <p>這份手冊不是對外內容，而是給設計師與統包在安排工序、驗收與提醒業主時快速對齊順序用。</p>
+                  </article>
+                  <article class="bookshelf-guide-card">
+                    <span>來源</span>
+                    <strong>Gemini 兩份第一波整理稿，已收斂成工作台版本</strong>
+                    <p>先放 milestone 核心節點、工班權責與常用尺寸速查，後續可再逐步擴成更多內部 SOP 與案例備忘。</p>
+                  </article>
+                </div>
+                <div class="bookshelf-actions renovation-knowhow-actions">
+                  <a href={renovationKnowHowSourceUrl} class="bookshelf-action bookshelp-action-primary" target="_blank" rel="noreferrer">開啟 Gemini 原始稿</a>
+                  <a href={renovationErgonomicsSourceUrl} class="bookshelf-action" target="_blank" rel="noreferrer">開啟尺寸原始稿</a>
+                </div>
+                <div class="renovation-knowhow-grid">
+                  {renovationKnowHowMilestones.map((milestone) => (
+                    <article class="renovation-knowhow-card">
+                      <div class="renovation-knowhow-card-head">
+                        <p>{milestone.code}</p>
+                        <strong>{milestone.title}</strong>
+                      </div>
+                      <p class="renovation-knowhow-objective">目標：{milestone.objective}</p>
+                      <div class="renovation-knowhow-block">
+                        <span>驗收閘門</span>
+                        <ul>
+                          <li>{milestone.gate}</li>
+                        </ul>
+                      </div>
+                      <div class="renovation-knowhow-block">
+                        <span>優先任務</span>
+                        <ul>
+                          {milestone.priorities.map((item) => (
+                            <li>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div class="renovation-knowhow-block">
+                        <span>補充筆記</span>
+                        <ul>
+                          {milestone.actions.map((item) => (
+                            <li>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <div class="bookshelf-preview-head">
+                  <p>人體工學尺寸速查</p>
+                  <span>平常量尺寸、畫配置時直接回看</span>
+                </div>
+                <div class="renovation-knowhow-grid renovation-ergonomics-grid">
+                  {renovationErgonomicsReferences.map((reference) => (
+                    <article class="renovation-knowhow-card renovation-ergonomics-card">
+                      <div class="renovation-knowhow-card-head">
+                        <p>{reference.area}</p>
+                        <strong>{reference.title}</strong>
+                      </div>
+                      <div class="renovation-knowhow-block">
+                        <span>速查筆記</span>
+                        <ul>
+                          {reference.points.map((item) => (
+                            <li>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <div class="bookshelf-preview-head">
+                  <p>核心工班權責</p>
+                  <span>用來快速判斷誰先對齊誰</span>
+                </div>
+                <div class="bookshelf-rule-grid renovation-knowhow-role-grid">
+                  {renovationKnowHowRoles.map((role) => (
+                    <article class="bookshelf-rule-card renovation-knowhow-role-card">
+                      <span>{role.title}</span>
+                      <strong>{role.owner}</strong>
+                      <p>{role.note}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </details>
 
             <details id="vendor-intake-board" class="bookshelf-fold" open>
               <summary>
