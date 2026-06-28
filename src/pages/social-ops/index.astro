@@ -283,6 +283,17 @@ type RenovationMilestoneDetail = {
   owner: string;
   detail: string;
 };
+type RenovationFieldNote = {
+  id: string;
+  category: string;
+  title: string;
+  summary: string;
+  scenario: string;
+  sections: Array<{
+    heading: string;
+    points: string[];
+  }>;
+};
 const renovationKnowHowRoles = [
   {
     title: "結構法規",
@@ -471,6 +482,41 @@ const renovationErgonomicsDetails = [
       { item: "桌面插座", range: "80 - 95 cm", best: "85", note: "桌面高 75 cm 時大約高出 10 cm。" },
       { item: "洗衣機 / 一般開關", range: "120 - 135 cm", best: "125", note: "多數家事區與開關高度都落在這裡。" },
       { item: "智慧馬桶插座", range: "30 - 40 cm", best: "35", note: "通常在馬桶後方側邊。" },
+    ],
+  },
+];
+const renovationFieldNotes: RenovationFieldNote[] = [
+  {
+    id: "tv-mount-85-inch",
+    category: "影音安裝",
+    title: "85 吋電視掛架高度標定與調整邏輯",
+    summary: "先抓 VESA 孔與掛鉤距離，再打壁板線，避免鑽完才發現高度撞插座。",
+    scenario: "Haier LE85S8UX2，目標底部離地 58 公分，下排 VESA 孔距電視底邊 28.2 公分。",
+    sections: [
+      {
+        heading: "關鍵原理",
+        points: [
+          "壁掛架的高低微調，多半來自鎖在電視背面的垂直掛鉤排孔，一般約有上下正負 5 到 8 公分彈性。",
+          "掛鉤鎖得越靠近電視底部，掛上牆後整台電視就會越高；反過來則越低。",
+          "85 吋大尺寸機種不能盲鎖，因為壁板很可能直接擋到插座、網路孔，且重型電視最好讓掛鉤接近 VESA 中心受力。",
+        ],
+      },
+      {
+        heading: "快速標定公式",
+        points: [
+          "若目標是電視底部離地 58 公分，且下排 VESA 孔距底邊 28.2 公分，則下排 VESA 螺絲孔最終離地高度要抓 86.2 公分。",
+          "把掛鉤先放在電視背面的 VESA 下孔位置，量出『螺絲孔到掛鉤勾住壁板那一點』的距離，記為 B。",
+          "雷射水平儀直接打在 86.2 公分加 B 的高度，這條線就是壁掛架上橫樑的施工線。",
+        ],
+      },
+      {
+        heading: "施工容錯提醒",
+        points: [
+          "若後續還要鋪超耐磨地板或其他完成面，記得把約 1.2 到 1.5 公分厚度一起算進去。",
+          "如果算出來的高度剛好會撞插座，寧可先鎖高一點，因為高了還能靠掛鉤孔位往下調，低了撞到插座通常只能重鑽。",
+          "實務上先確保壁掛架中心線落在離地 90 到 100 公分區間內，通常就還保有足夠調整空間達到底部離地 58 公分。",
+        ],
+      },
     ],
   },
 ];
@@ -971,101 +1017,145 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
             <details id="renovation-knowhow-board" class="bookshelf-fold" open>
               <summary>
                 <span>內部裝修知識 / 筆記</span>
-                <small>第一波：里程碑手冊 + 人體工學尺寸</small>
+                <small>里程碑手冊、尺寸速查、現場安裝備忘</small>
               </summary>
               <div class="bookshelf-fold-stack">
                 <div class="bookshelf-preview-head">
-                  <p>Milestone 手冊</p>
-                  <span>內部 know-how，不放公開知識區</span>
+                  <p>知識庫閱讀模式</p>
+                  <span>先看標題，再點開全文，不用整頁上下掃</span>
                 </div>
                 <div class="bookshelf-guide-grid renovation-knowhow-guide-grid">
                   <article class="bookshelf-guide-card">
                     <span>使用方式</span>
-                    <strong>先看 Gate，再看本階段優先任務與依賴順序</strong>
-                    <p>這份手冊不是對外內容，而是給設計師與統包在安排工序、驗收與提醒業主時快速對齊順序用。</p>
+                    <strong>先找分類，再開單篇條目</strong>
+                    <p>里程碑、尺寸速查與現場備忘都改成可收斂式閱讀，先定位標題，確定要看再展開全文。</p>
                   </article>
                   <article class="bookshelf-guide-card">
                     <span>收錄範圍</span>
-                    <strong>直接把 Gemini 第一波內容收進工作台，不再只留超連結</strong>
-                    <p>目前已內嵌里程碑手冊、尺寸速查與工班權責；之後新增內容可以持續用同一個內部知識區往下擴。</p>
+                    <strong>直接把 Gemini 內容收進工作台，不再只留超連結</strong>
+                    <p>目前已內嵌里程碑手冊、尺寸速查、工班權責與 85 吋電視掛架安裝備忘；後續可沿用同一結構擴充。</p>
                   </article>
                 </div>
-                <div class="renovation-knowhow-grid">
+                <div class="bookshelf-preview-head">
+                  <p>Milestone 手冊</p>
+                  <span>依階段展開，每次只看當前里程碑</span>
+                </div>
+                <div class="renovation-knowhow-accordion">
                   {renovationKnowHowMilestones.map((milestone) => (
-                    <article class="renovation-knowhow-card">
-                      <div class="renovation-knowhow-card-head">
-                        <p>{milestone.code}</p>
-                        <strong>{milestone.title}</strong>
-                      </div>
-                      <p class="renovation-knowhow-objective">目標：{milestone.objective}</p>
-                      <div class="renovation-knowhow-block">
-                        <span>驗收閘門</span>
-                        <ul>
-                          <li>{milestone.gate}</li>
-                        </ul>
-                      </div>
-                      <div class="renovation-knowhow-block">
-                        <span>優先任務</span>
-                        <ul>
-                          {milestone.priorities.map((item) => (
-                            <li>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div class="renovation-knowhow-block">
-                        <span>補充筆記</span>
-                        <ul>
-                          {milestone.actions.map((item) => (
-                            <li>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div class="renovation-knowhow-block">
-                        <span>原始條目重點</span>
-                        <div class="renovation-knowhow-item-list">
-                          {renovationMilestoneDetails[milestone.id].map((item) => (
-                            <article class="renovation-knowhow-item">
-                              <div class="renovation-knowhow-item-head">
-                                <strong>{item.label}</strong>
-                                <em>{item.owner}</em>
-                              </div>
-                              <p>{item.detail}</p>
-                            </article>
-                          ))}
+                    <details class="renovation-knowhow-entry">
+                      <summary class="renovation-knowhow-entry-summary">
+                        <div class="renovation-knowhow-card-head">
+                          <p>{milestone.code}</p>
+                          <strong>{milestone.title}</strong>
+                        </div>
+                        <span class="renovation-knowhow-summary-text">{milestone.objective}</span>
+                      </summary>
+                      <div class="renovation-knowhow-entry-body">
+                        <p class="renovation-knowhow-objective">目標：{milestone.objective}</p>
+                        <div class="renovation-knowhow-block">
+                          <span>驗收閘門</span>
+                          <ul>
+                            <li>{milestone.gate}</li>
+                          </ul>
+                        </div>
+                        <div class="renovation-knowhow-block">
+                          <span>優先任務</span>
+                          <ul>
+                            {milestone.priorities.map((item) => (
+                              <li>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div class="renovation-knowhow-block">
+                          <span>補充筆記</span>
+                          <ul>
+                            {milestone.actions.map((item) => (
+                              <li>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div class="renovation-knowhow-block">
+                          <span>原始條目重點</span>
+                          <div class="renovation-knowhow-item-list">
+                            {renovationMilestoneDetails[milestone.id].map((item) => (
+                              <article class="renovation-knowhow-item">
+                                <div class="renovation-knowhow-item-head">
+                                  <strong>{item.label}</strong>
+                                  <em>{item.owner}</em>
+                                </div>
+                                <p>{item.detail}</p>
+                              </article>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </article>
+                    </details>
                   ))}
                 </div>
                 <div class="bookshelf-preview-head">
                   <p>人體工學尺寸速查</p>
-                  <span>平常量尺寸、畫配置時直接回看</span>
+                  <span>先選空間，再展開尺寸表</span>
                 </div>
-                <div class="renovation-knowhow-grid renovation-ergonomics-grid">
+                <div class="renovation-knowhow-accordion">
                   {renovationErgonomicsDetails.map((reference) => (
-                    <article class="renovation-knowhow-card renovation-ergonomics-card">
-                      <div class="renovation-knowhow-card-head">
-                        <p>{reference.area}</p>
-                        <strong>{renovationErgonomicsReferences.find((item) => item.area === reference.area)?.title || reference.area}</strong>
-                      </div>
-                      <div class="renovation-knowhow-block">
-                        <span>尺寸表</span>
-                        <div class="renovation-ergonomics-table">
-                          {reference.rows.map((row) => (
-                            <article class="renovation-ergonomics-row">
-                              <div class="renovation-ergonomics-main">
-                                <strong>{row.item}</strong>
-                                <small>{row.note}</small>
-                              </div>
-                              <div class="renovation-ergonomics-values">
-                                <span>{row.range}</span>
-                                <em>{row.best}</em>
-                              </div>
-                            </article>
-                          ))}
+                    <details class="renovation-knowhow-entry">
+                      <summary class="renovation-knowhow-entry-summary">
+                        <div class="renovation-knowhow-card-head">
+                          <p>{reference.area}</p>
+                          <strong>{renovationErgonomicsReferences.find((item) => item.area === reference.area)?.title || reference.area}</strong>
+                        </div>
+                        <span class="renovation-knowhow-summary-text">共 {reference.rows.length} 筆常用尺寸</span>
+                      </summary>
+                      <div class="renovation-knowhow-entry-body">
+                        <div class="renovation-knowhow-block">
+                          <span>尺寸表</span>
+                          <div class="renovation-ergonomics-table">
+                            {reference.rows.map((row) => (
+                              <article class="renovation-ergonomics-row">
+                                <div class="renovation-ergonomics-main">
+                                  <strong>{row.item}</strong>
+                                  <small>{row.note}</small>
+                                </div>
+                                <div class="renovation-ergonomics-values">
+                                  <span>{row.range}</span>
+                                  <em>{row.best}</em>
+                                </div>
+                              </article>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </article>
+                    </details>
+                  ))}
+                </div>
+                <div class="bookshelf-preview-head">
+                  <p>現場安裝備忘</p>
+                  <span>把單篇 Gemini know-how 收成可點開的案例筆記</span>
+                </div>
+                <div class="renovation-knowhow-accordion">
+                  {renovationFieldNotes.map((note) => (
+                    <details class="renovation-knowhow-entry">
+                      <summary class="renovation-knowhow-entry-summary">
+                        <div class="renovation-knowhow-card-head">
+                          <p>{note.category}</p>
+                          <strong>{note.title}</strong>
+                        </div>
+                        <span class="renovation-knowhow-summary-text">{note.summary}</span>
+                      </summary>
+                      <div class="renovation-knowhow-entry-body">
+                        <p class="renovation-knowhow-objective">情境：{note.scenario}</p>
+                        {note.sections.map((section) => (
+                          <div class="renovation-knowhow-block">
+                            <span>{section.heading}</span>
+                            <ul>
+                              {section.points.map((point) => (
+                                <li>{point}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
                   ))}
                 </div>
                 <div class="bookshelf-preview-head">

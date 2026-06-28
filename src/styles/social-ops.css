@@ -1939,6 +1939,11 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .renovation-knowhow-accordion {
+    display: grid;
+    gap: 0.85rem;
+  }
+
   .bookshelf-intake-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1951,7 +1956,8 @@
   .bookshelf-guide-card,
   .bookshelf-intake-item,
   .bookshelf-rule-card,
-  .renovation-knowhow-card {
+  .renovation-knowhow-card,
+  .renovation-knowhow-entry {
     border-radius: 18px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     background: linear-gradient(180deg, rgba(55, 55, 54, 0.58), rgba(31, 31, 31, 0.82));
@@ -2036,6 +2042,47 @@
     gap: 0.85rem;
   }
 
+  .renovation-knowhow-entry {
+    overflow: hidden;
+  }
+
+  .renovation-knowhow-entry-summary {
+    list-style: none;
+    display: grid;
+    gap: 0.4rem;
+    padding: 1rem 1.05rem;
+    cursor: pointer;
+  }
+
+  .renovation-knowhow-entry-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .renovation-knowhow-entry-summary::after {
+    content: "展開";
+    justify-self: start;
+    color: rgba(224, 221, 214, 0.5);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+  }
+
+  .renovation-knowhow-entry[open] .renovation-knowhow-entry-summary::after {
+    content: "收起";
+  }
+
+  .renovation-knowhow-summary-text {
+    color: rgba(229, 226, 220, 0.64);
+    font-size: 0.84rem;
+    line-height: 1.7;
+  }
+
+  .renovation-knowhow-entry-body {
+    display: grid;
+    gap: 0.85rem;
+    padding: 0 1.05rem 1.05rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
   .renovation-knowhow-card-head,
   .renovation-knowhow-block,
   .renovation-knowhow-role-card {
@@ -2052,6 +2099,7 @@
   .renovation-knowhow-card-head p,
   .renovation-knowhow-card-head strong,
   .renovation-knowhow-objective,
+  .renovation-knowhow-summary-text,
   .renovation-knowhow-block span,
   .renovation-knowhow-block ul,
   .renovation-knowhow-role-card span,
