@@ -25,6 +25,19 @@ export const DEFAULT_BLOG_COVER_IMAGE =
 
 export const staticBlogPosts: BlogCatalogPost[] = [
   {
+    title: "老屋翻新驗收重點怎麼看？最容易忽略的重點整理",
+    slug: "old-house-renovation-acceptance-checklist",
+    date: "2026-06-29",
+    summary:
+      "老屋翻新的完工驗收，不僅是檢視視覺美感，更是確認未來居住安全的關鍵防線。本文整理水路、防水、電工、泥作與木作驗收時最容易忽略的重點，幫助建立清晰的檢視邏輯。",
+    siteCategory: "老屋翻新",
+    category: "老屋翻新",
+    track: "老屋翻新系",
+    chapter: "完工避雷",
+    tags: ["老屋翻新", "完工驗收", "防水測試", "電箱迴路", "泥作平整", "系統櫃五金"],
+    coverImage: "/images/blog/old-house-renovation-acceptance-checklist-cover.png",
+  },
+  {
     title: "老屋翻新格局怎麼調才順？從結構、採光到動線的空間重整邏輯",
     slug: "old-house-layout-strategy",
     date: "2026-06-25",
