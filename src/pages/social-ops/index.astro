@@ -3163,7 +3163,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </div>
               <span>${complete ? "已完成" : "進行中"}</span>
             </div>
-            <p class="quest-main-copy">鎖定明確尋找設計 / 統包的貼文，第一時間私訊，主打地緣極近與系統免費初步報價。若今日巡邏沒有合適目標，不必硬私訊，但早晚巡邏仍要完成。</p>
+            <p class="quest-main-copy">鎖定明確尋找設計 / 統包的貼文，第一時間留下高價值專業留言，並適度引導私訊（1+1 策略）。若今日巡邏沒有合適目標，不必硬回，但早晚巡邏仍要完成。</p>
             <div class="quest-checklist">
               <div class="quest-check-row">
                 <label class="quest-check ${daily.actionMorningPatrol ? "is-checked" : ""}">
@@ -3181,7 +3181,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <label class="quest-check ${daily.actionOutboundHunt ? "is-checked" : ""} ${!daily.actionOutboundHunt && daily.actionOutboundFallback ? "is-satisfied" : ""}">
                   <input type="checkbox" data-daily-check="actionOutboundHunt" ${daily.actionOutboundHunt ? "checked" : ""} />
                   <span class="quest-check-copy">
-                    <span>已鎖定高意圖貼文並第一時間私訊</span>
+                    <span>已鎖定高意圖貼文並第一時間留下專業留言</span>
                     ${renderChoiceStateBadge(outboundHuntState)}
                   </span>
                 </label>
@@ -3191,7 +3191,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <label class="quest-check ${daily.actionOutboundFallback ? "is-checked" : ""} ${!daily.actionOutboundFallback && daily.actionOutboundHunt ? "is-satisfied" : ""}">
                   <input type="checkbox" data-daily-check="actionOutboundFallback" ${daily.actionOutboundFallback ? "checked" : ""} />
                   <span class="quest-check-copy">
-                    <span>今日巡邏沒有合適目標，已不硬私訊</span>
+                    <span>今日巡邏沒有合適目標，已不硬回覆</span>
                     ${renderChoiceStateBadge(outboundFallbackState)}
                   </span>
                 </label>
