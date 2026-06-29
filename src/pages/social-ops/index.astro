@@ -2824,7 +2824,16 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return state.weekly.runs.filter(isRunComplete).length;
   }
 
+  function isRunLockedUntilNextDay(run, date = new Date()) {
+    if (!isRunComplete(run) || !run?.completedAt) return false;
+    const completedAt = new Date(run.completedAt);
+    if (Number.isNaN(completedAt.getTime())) return false;
+    return getDayKey(completedAt) === getDayKey(date);
+  }
+
   function getActiveRunIndex() {
+    const lockedRunIndex = state.weekly.runs.findIndex((run) => isRunLockedUntilNextDay(run));
+    if (lockedRunIndex !== -1) return lockedRunIndex;
     const nextIndex = state.weekly.runs.findIndex((run) => !isRunComplete(run));
     return nextIndex === -1 ? Math.max(state.weekly.runs.length - 1, 0) : nextIndex;
   }
@@ -2931,10 +2940,13 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       run.actionFacadeMaintenance,
     ].filter(Boolean).length;
     const progressLabel = `(${activeRunIndex + 1}/${WEEKLY_TARGET})`;
+    const isLockedUntilNextDay = isRunLockedUntilNextDay(run);
     const progressState = completedRuns >= WEEKLY_TARGET
       ? "本週已清空"
-      : complete
-        ? "本輪已完成"
+      : isLockedUntilNextDay
+        ? "今日已完成"
+        : complete
+          ? "本輪已完成"
         : completedSteps > 0
           ? "進行中"
           : "待開始";
@@ -2942,7 +2954,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       ? "這組擇一條件已滿足，另一個選項不用再做。"
       : "這組任務請在「高意圖回覆」與「巡邏無合適發問」之間擇一完成。";
     const actionTwoNote = actionTwoComplete
-      ? "這組任務已滿足，Threads 與在地社群的另一個替代選項可略過。"
+      ? isLockedUntilNextDay
+        ? "這一輪已完成，面板會保留到今天結束，隔天 00:00 後才切換到下一輪。"
+        : "這組任務已滿足，Threads 與在地社群的另一個替代選項可略過。"
       : run.actionImageGeneration && run.actionWebsite && run.actionGoogleBusiness
         ? "固定步驟已完成，最後請在 Threads 與在地社群之間擇一完成。"
         : "先完成官網文章與必要圖檔，再同步 Google 商家，最後在 Threads 與在地社群之間擇一。";
