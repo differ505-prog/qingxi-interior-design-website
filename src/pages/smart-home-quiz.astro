@@ -357,7 +357,7 @@ const quizStepsJson = JSON.stringify(quizSteps);
             <div class="result-summary-card">
               <div class="result-summary-row">
                 <span>推薦情境包</span>
-                <strong id="result-package">尚未完成快篩</strong>
+                <strong id="result-package">請完成上方測驗以生成建議</strong>
               </div>
               <div class="result-summary-row">
                 <span>方案層級</span>
@@ -1199,7 +1199,7 @@ const quizStepsJson = JSON.stringify(quizSteps);
       resultDescription.textContent =
         "完成後會顯示最適合的情境包、智能預算方向、弱電預留粗估與最值得先做的重點。";
     }
-    if (resultPackage) resultPackage.textContent = "尚未完成快篩";
+    if (resultPackage) resultPackage.textContent = "請完成上方測驗以生成建議";
     if (resultTier) resultTier.textContent = "--";
     if (resultBudget) resultBudget.textContent = "--";
     if (resultWeakBudget) resultWeakBudget.textContent = "--";
