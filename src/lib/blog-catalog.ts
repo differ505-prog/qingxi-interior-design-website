@@ -25,6 +25,18 @@ export const DEFAULT_BLOG_COVER_IMAGE =
 
 export const staticBlogPosts: BlogCatalogPost[] = [
   {
+    slug: "old-house-renovation-scope-guide",
+    title: "老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南",
+    summary: "老屋翻新宛如一場資源分配的考驗，面對有限的預算與修繕項目，該如何界定翻新範圍？本文帶您梳理「基礎工程優先」、「生活軌跡盤點」與「預算收斂」三大核心判斷點，幫助您釐清必做與選做項目，找回面對老屋改造的安定感。",
+    coverImage: "/images/blog/old-house-renovation-scope-guide-cover.png",
+    category: "知識分享",
+    track: "老屋翻新系",
+    chapter: "現況判讀",
+    siteCategory: "老屋翻新",
+    tags: ["範圍評估", "基礎工程", "預算分配", "格局更動"],
+    date: "2026-06-29T22:30:00.000Z",
+  },
+  {
     title: "老屋翻新驗收重點怎麼看？最容易忽略的重點整理",
     slug: "old-house-renovation-acceptance-checklist",
     date: "2026-06-29",

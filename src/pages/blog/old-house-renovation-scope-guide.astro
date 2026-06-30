@@ -1,0 +1,119 @@
+---
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+
+const articlePublishedTime = "2026-06-29T22:30:00.000Z";
+const articleModifiedTime = "2026-06-29T22:30:00.000Z";
+
+const articleStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南",
+    description: "老屋翻新宛如一場資源分配的考驗，面對有限的預算與修繕項目，該如何界定翻新範圍？本文帶您梳理「基礎工程優先」、「生活軌跡盤點」與「預算收斂」三大核心判斷點，幫助您釐清必做與選做項目，找回面對老屋改造的安定感。",
+    image: ["https://qingxidesign.tw/images/blog/old-house-renovation-scope-guide-cover.png"],
+    datePublished: articlePublishedTime,
+    dateModified: articleModifiedTime,
+    author: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://qingxidesign.tw/images/logo.png",
+      },
+    },
+    articleSection: "老屋翻新系",
+    keywords: "老屋翻新, 範圍評估, 基礎工程, 預算分配, 格局更動",
+    mainEntityOfPage: "https://qingxidesign.tw/blog/old-house-renovation-scope-guide",
+  },
+];
+---
+
+<EditorialArticleLayout
+  title="老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南"
+  description="老屋翻新宛如一場資源分配的考驗，面對有限的預算與修繕項目，該如何界定翻新範圍？本文帶您梳理「基礎工程優先」、「生活軌跡盤點」與「預算收斂」三大核心判斷點，幫助您釐清必做與選做項目，找回面對老屋改造的安定感。"
+  ogImage="/images/blog/old-house-renovation-scope-guide-cover.png"
+  publishedTime={articlePublishedTime}
+  modifiedTime={articleModifiedTime}
+  structuredData={articleStructuredData}
+  track="老屋翻新系"
+  chapter="現況判讀"
+  siteCategory="老屋翻新"
+  tags={["範圍評估", "基礎工程", "預算分配", "格局更動"]}
+>
+  <div class="article-content-wrapper">
+    <p>
+      老屋翻新，往往是一場理想與現實的拉鋸。當終於擁有一處屬於自己的空間，腦海中常會浮現許多對未來生活的想像：開放式的中島廚房、採光極佳的閱讀角落、或是擁有大片留白的極簡客廳。然而，當目光拉回現實的老屋況——壁癌、老舊管線、不符現代需求的封閉格局，許多屋主在裝修前期的第一個難題往往是：「範圍到底該怎麼抓？我該全室翻新，還是局部微調？」
+    </p>
+    
+    <p>
+      缺乏評估框架的翻新，容易在基礎工程與視覺裝修間迷失，最終可能導致預算超支，或是妥協了最重要的居住品質。要精準界定老屋翻新的範圍，我們建議從以下三個關鍵判斷點依序盤點。
+    </p>
+
+    <h2>關鍵一：基礎工程不可妥協，鞏固空間的「健康體質」</h2>
+    <p>
+      老屋就像是年邁的軀體，比起穿上華麗的外衣，更重要的是確保內在器官的健康運作。在評估翻新範圍時，<strong>「基礎工程」絕對是優先順序的最高層級</strong>，這牽涉到居住的安全與耐久性。請先針對以下項目進行嚴格盤點：
+    </p>
+
+    <ul>
+      <li><strong>水電管線的屋齡：</strong>若房屋屋齡超過 15 至 20 年，且前次裝修未曾更換，強烈建議將冷熱水管、電線迴路與無熔絲開關全面更新。現代人的用電量遠高於二、三十年前，舊有的電線線徑與迴路配置，往往無法負荷現今的家電需求。</li>
+      <li><strong>防水與漏水檢視：</strong>窗框周邊、衛浴共用牆、天花板角落是否有水漬或壁癌？漏水是老屋的致命傷，只要有疑慮，防水工程與泥作修補就必須納入翻新範圍的「必做清單」。</li>
+      <li><strong>結構與承重考量：</strong>任何牽涉到牆面拆除的格局變更，都必須確認是否為剪力牆或承重牆。若有安全疑慮，應果斷放棄變更，或尋求結構技師的專業補強建議。</li>
+    </ul>
+
+    <figure class="article-figure">
+      <img
+        src="/images/blog/old-house-renovation-scope-guide-detail.png"
+        alt="老屋翻新基礎工程評估"
+        loading="lazy"
+      />
+      <figcaption>基礎工程可能不會帶來立竿見影的「視覺驚豔感」，但它卻是未來十年、二十年居住安定感的基石。</figcaption>
+    </figure>
+
+    <h2>關鍵二：梳理生活軌跡，用「核心使用率」決定格局更動</h2>
+    <p>
+      當確認了基礎工程的範圍後，接下來要面對的是格局與機能的取捨。老屋常見的問題是隔間過多，導致採光受阻、走道狹窄。但「全部打掉重練」並不一定是最好的解答。判斷格局是否需要大幅更動的標準，在於<strong>「真實的生活軌跡」</strong>。試著誠實列出全家人在空間中的時間分配：
+    </p>
+
+    <ul>
+      <li>你們是習慣各自在房間獨立活動，還是喜歡在公領域共處？</li>
+      <li>廚房是每天開伙的重鎮，還是偶爾煮泡麵的角落？</li>
+      <li>未來五到十年內，家庭成員結構是否會發生改變？</li>
+    </ul>
+
+    <p>
+      若現有格局的動線與你們的「核心使用習慣」存在巨大落差（例如：極度重視家人互動，但公領域卻被切割得支離破碎），那麼拆除部分隔牆、重新定義空間的泥作與木作工程，就值得納入翻新範圍。反之，若現有格局已能滿足八成的生活需求，僅需透過材質更新或系統櫃重新佈局，便能大幅省下拆除與重建的費用。
+    </p>
+
+    <h2>關鍵三：預算與範圍的收斂，釐清「想要」與「需要」</h2>
+    <p>
+      經過前兩階段的盤點，您手上應該已經有一份初步的項目清單。最後一步，是將這份清單與實際預算進行收斂。在合理的裝修規劃中，我們不會給予不切實際的保證價，因為每一間老屋的狀況皆是獨一無二的。但一個健康的評估心法是：<strong>將清單分為「不可妥協的需要（Need）」與「可被替代的想要（Want）」</strong>。
+    </p>
+
+    <ul>
+      <li><strong>不可妥協的需要：</strong>如上述的管線更新、防水工程、改善嚴重不良的採光動線。這部分預算應優先保留。</li>
+      <li><strong>可被替代的想要：</strong>例如特定進口建材、複雜的天花板造型、或是過度訂製的特殊五金。</li>
+    </ul>
+
+    <p>
+      當預算緊繃時，設計的價值便在於「減法」。我們可以選擇保留老屋原有的美好歲月痕跡（如狀況良好的磨石子地），透過簡約的油漆跳色、俐落的線條收邊，或是藉由活動家具與軟裝的搭配，來取代繁複的硬體裝修。
+    </p>
+
+    <figure class="article-figure">
+      <img
+        src="/images/blog/old-house-renovation-scope-guide-scene.png"
+        alt="老屋翻新預算收斂與設計減法"
+        loading="lazy"
+      />
+      <figcaption>當方向清晰了，面對老屋的焦慮便會消散，取而代之的，將是迎接嶄新生活的從容與安定。</figcaption>
+    </figure>
+
+    <h2>結語：找到屬於自己的裝修安定感</h2>
+    <p>
+      老屋翻新的範圍評估，不是盲目跟從網路上的必做清單，而是一場對自我生活需求的深度審視。從基礎體質的鞏固，到生活軌跡的對焦，最後透過理性的預算收斂，您將能描繪出最適合自己的翻新藍圖。
+    </p>
+  </div>
+</EditorialArticleLayout>
