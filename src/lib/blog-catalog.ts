@@ -35,14 +35,14 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     siteCategory: "老屋翻新",
     category: "老屋翻新",
     track: "老屋翻新系",
-    chapter: "現況判讀",
-    subchapter: "水電安全",
+    chapter: "基礎工程",
+    subchapter: "水電更新",
     tags: ["老屋翻新", "水電更新", "迴路重整", "隱蔽工程", "用電安全", "基礎工程"],
     coverImage: "/images/blog/old-house-rewiring-and-electrical-safety-cover.png",
   },
   {
     slug: "old-house-renovation-scope-guide",
-    title: "老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南",
+    title: "屋況盤點：範圍界定與核心判斷基準",
     summary: "老屋翻新宛如一場資源分配的考驗，面對有限的預算與修繕項目，該如何界定翻新範圍？本文帶您梳理「基礎工程優先」、「生活軌跡盤點」與「預算收斂」三大核心判斷點，幫助您釐清必做與選做項目，找回面對老屋改造的安定感。",
     coverImage: "/images/blog/old-house-renovation-scope-guide-cover.png",
     category: "知識分享",
@@ -54,7 +54,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     date: "2026-06-29T22:30:00.000Z",
   },
   {
-    title: "老屋翻新驗收重點怎麼看？最容易忽略的重點整理",
+    title: "完工驗收：老屋翻新的檢核重點整理",
     slug: "old-house-renovation-acceptance-checklist",
     date: "2026-06-29",
     summary:
@@ -68,7 +68,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     coverImage: "/images/blog/old-house-renovation-acceptance-checklist-cover.png",
   },
   {
-    title: "老屋翻新格局怎麼調才順？從結構、採光到動線的空間重整邏輯",
+    title: "格局重整：結構、採光與動線的空間配置邏輯",
     slug: "old-house-layout-strategy",
     date: "2026-06-25",
     summary:
@@ -82,7 +82,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     coverImage: "/images/blog/old-house-layout-strategy-cover.png",
   },
   {
-    title: "智能居家系統建置指南：從平台生態到設備協定，回歸生活場景的決策心法",
+    title: "智能居家系統：從平台生態到設備協定，回歸生活場景的決策心法",
     slug: "smart-home-system-ecosystem-guide",
     date: "2026-06-23",
     summary:
@@ -124,7 +124,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     coverImage: "/images/blog/old-house-condition-assessment-cover.png",
   },
   {
-    title: "客廳局部改造預算怎麼抓？天花板、地板與家具的費用拆解與取捨",
+    title: "局部預算拆解：客廳天地壁與家具配置費用",
     slug: "living-room-partial-renovation-budget",
     date: "2026-06-17",
     summary:
