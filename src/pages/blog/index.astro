@@ -49,15 +49,33 @@ try {
   // 如果連接失敗，posts 保持為空數組
 }
 
-const mergedPosts = mergeBlogPosts([...posts, ...staticBlogPosts]);
+const dateFormatter = new Intl.DateTimeFormat("zh-TW", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+function formatPostDate(date: string) {
+  const parsedDate = new Date(date);
+  return Number.isNaN(parsedDate.getTime()) ? date : dateFormatter.format(parsedDate);
+}
+
+const mergedPosts = mergeBlogPosts([...posts, ...staticBlogPosts]).map((post) => ({
+  ...post,
+  displayDate: formatPostDate(post.date),
+  previewTags: post.tags.slice(0, 3),
+}));
 const blogTrackFilters = bookshelfTracks;
+const trackCount = new Set(mergedPosts.map((post) => post.track)).size;
+const chapterCount = new Set(mergedPosts.map((post) => `${post.track}-${post.chapter}`)).size;
+const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).size;
 ---
 
 <style is:inline>
   .blog-page {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 4.5rem 1.5rem 5rem;
+    padding: 5.2rem 1.5rem 6rem;
   }
 
   .blog-hero {
@@ -65,7 +83,7 @@ const blogTrackFilters = bookshelfTracks;
     grid-template-columns: minmax(0, 1.25fr) minmax(280px, 360px);
     gap: 2rem;
     align-items: end;
-    margin-bottom: 3rem;
+    margin-bottom: 3.6rem;
   }
 
   .hero-eyebrow,
@@ -127,10 +145,41 @@ const blogTrackFilters = bookshelfTracks;
     letter-spacing: 0.02em;
   }
 
+  .panel-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-top: 1.35rem;
+  }
+
+  .panel-stat {
+    padding: 0.9rem 0.85rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+  }
+
+  .panel-stat strong {
+    margin: 0;
+    font-size: 1.4rem;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+  }
+
+  .panel-stat span {
+    display: block;
+    margin-top: 0.45rem;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
   .category-filters {
     display: flex;
     gap: 0.75rem;
-    margin: 1.5rem 0 0;
+    margin: 1.75rem 0 0;
     flex-wrap: wrap;
   }
 
@@ -222,24 +271,30 @@ const blogTrackFilters = bookshelfTracks;
 
   .blog-list {
     display: grid;
-    gap: 1.5rem;
+    gap: 1.8rem;
+    margin-top: 2rem;
   }
 
   .post-card {
     display: grid;
-    grid-template-columns: minmax(260px, 0.95fr) minmax(0, 1.05fr);
+    grid-template-columns: minmax(320px, 0.95fr) minmax(0, 1.05fr);
     gap: 0;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 28px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 247, 243, 0.96));
+    border-radius: 32px;
     border: 1px solid rgba(115, 103, 94, 0.14);
     overflow: hidden;
     text-decoration: none;
     color: inherit;
-    box-shadow: 0 22px 45px rgba(47, 47, 47, 0.05);
+    box-shadow: 0 24px 50px rgba(47, 47, 47, 0.06);
     transition:
       transform 0.3s ease,
       box-shadow 0.3s ease,
       border-color 0.3s ease;
+  }
+
+  .post-card:first-child {
+    grid-template-columns: minmax(360px, 1.04fr) minmax(0, 0.96fr);
   }
 
   .post-card:hover {
@@ -251,7 +306,7 @@ const blogTrackFilters = bookshelfTracks;
   .post-image {
     position: relative;
     overflow: hidden;
-    min-height: 260px;
+    min-height: 300px;
     background: var(--gray-bg);
   }
 
@@ -259,7 +314,9 @@ const blogTrackFilters = bookshelfTracks;
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(20, 20, 20, 0.04) 0%, rgba(20, 20, 20, 0.18) 100%);
+    background:
+      linear-gradient(180deg, rgba(20, 20, 20, 0.04) 0%, rgba(20, 20, 20, 0.12) 58%, rgba(20, 20, 20, 0.2) 100%),
+      linear-gradient(135deg, rgba(14, 25, 36, 0.08), transparent 36%);
   }
 
   .post-image img {
@@ -269,15 +326,41 @@ const blogTrackFilters = bookshelfTracks;
     transition: transform 0.7s ease;
   }
 
+  .post-image-badge {
+    position: absolute;
+    left: 1.2rem;
+    bottom: 1.2rem;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.48rem 0.82rem;
+    border-radius: 999px;
+    background: rgba(255, 252, 248, 0.9);
+    color: #4d463f;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    box-shadow: 0 14px 30px rgba(27, 27, 27, 0.12);
+  }
+
   .post-card:hover .post-image img {
     transform: scale(1.05);
   }
 
   .post-content {
-    padding: 2rem;
+    padding: 2.15rem 2.2rem 2rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  .post-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+    flex-wrap: wrap;
   }
 
   .post-category {
@@ -290,7 +373,13 @@ const blogTrackFilters = bookshelfTracks;
     font-size: 0.8rem;
     font-weight: 600;
     letter-spacing: 0.1em;
-    margin-bottom: 0.85rem;
+  }
+
+  .post-date {
+    color: var(--gray-light);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
   }
 
   .post-title {
@@ -303,11 +392,17 @@ const blogTrackFilters = bookshelfTracks;
     letter-spacing: 0.02em;
   }
 
+  .post-card:first-child .post-title {
+    font-size: clamp(1.75rem, 2.8vw, 2.45rem);
+    line-height: 1.38;
+  }
+
   .post-taxonomy {
-    margin: 0 0 0.95rem;
+    margin: 0 0 1rem;
     color: var(--gray-light);
-    font-size: 0.86rem;
-    letter-spacing: 0.06em;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .post-summary {
@@ -316,10 +411,39 @@ const blogTrackFilters = bookshelfTracks;
     color: var(--gray-medium);
     line-height: 1.82;
     letter-spacing: 0.008em;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-footer {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .post-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .post-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.36rem 0.68rem;
+    border-radius: 999px;
+    background: rgba(115, 103, 94, 0.08);
+    color: #73675e;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
   }
 
   .post-link {
-    margin-top: 1.35rem;
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
@@ -368,11 +492,19 @@ const blogTrackFilters = bookshelfTracks;
     display: none;
   }
 
+  .post-card[hidden] {
+    display: none;
+  }
+
   @media (max-width: 900px) {
     .blog-hero,
     .library-header,
     .post-card {
       grid-template-columns: 1fr;
+    }
+
+    .panel-stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .library-header {
@@ -385,6 +517,10 @@ const blogTrackFilters = bookshelfTracks;
       padding: 4rem 1.25rem 4.5rem;
     }
 
+    .panel-stats {
+      grid-template-columns: 1fr;
+    }
+
     .post-content,
     .blog-panel,
     .blog-library {
@@ -392,7 +528,16 @@ const blogTrackFilters = bookshelfTracks;
     }
 
     .post-image {
-      min-height: 220px;
+      min-height: 240px;
+    }
+
+    .post-topline,
+    .post-footer {
+      align-items: start;
+    }
+
+    .post-taxonomy {
+      letter-spacing: 0.08em;
     }
   }
 </style>
@@ -418,6 +563,20 @@ const blogTrackFilters = bookshelfTracks;
         <p class="panel-label">READING GUIDE</p>
         <p>先依主書系整理，再往下延伸章節與標籤，讓每篇文章都能回到同一套知識骨架。</p>
         <strong>{mergedPosts.length} 篇文章持續整理中</strong>
+        <div class="panel-stats">
+          <div class="panel-stat">
+            <strong>{trackCount}</strong>
+            <span>主書系</span>
+          </div>
+          <div class="panel-stat">
+            <strong>{chapterCount}</strong>
+            <span>章節切面</span>
+          </div>
+          <div class="panel-stat">
+            <strong>{siteCategoryCount}</strong>
+            <span>主題分類</span>
+          </div>
+        </div>
       </aside>
     </div>
 
@@ -452,13 +611,24 @@ const blogTrackFilters = bookshelfTracks;
                 >
                   <div class="post-image">
                     <img src={post.coverImage} alt={post.title} />
+                    <span class="post-image-badge">{post.siteCategory}</span>
                   </div>
                   <div class="post-content">
-                    <span class="post-category">{post.track}</span>
+                    <div class="post-topline">
+                      <span class="post-category">{post.track}</span>
+                      <span class="post-date">{post.displayDate}</span>
+                    </div>
                     <p class="post-taxonomy">{post.chapter} / {post.siteCategory}</p>
                     <h2 class="post-title">{post.title}</h2>
                     <p class="post-summary">{post.summary}</p>
-                    <span class="post-link">閱讀文章</span>
+                    <div class="post-footer">
+                      <div class="post-tags">
+                        {post.previewTags.map((tag) => (
+                          <span class="post-tag">{tag}</span>
+                        ))}
+                      </div>
+                      <span class="post-link">閱讀文章</span>
+                    </div>
                   </div>
                 </a>
               ))}
@@ -504,10 +674,10 @@ const blogTrackFilters = bookshelfTracks;
           selectedTrack === "全部" ||
           postTrack === selectedTrack
         ) {
-          card.style.display = "flex";
+          card.hidden = false;
           visibleCount += 1;
         } else {
-          card.style.display = "none";
+          card.hidden = true;
         }
       });
 
@@ -520,8 +690,12 @@ const blogTrackFilters = bookshelfTracks;
       button.addEventListener("click", () => {
         const selectedTrack = button.dataset.track;
 
-        categoryButtons.forEach((btn) => btn.classList.remove("active"));
+        categoryButtons.forEach((btn) => {
+          btn.classList.remove("active");
+          btn.setAttribute("aria-pressed", "false");
+        });
         button.classList.add("active");
+        button.setAttribute("aria-pressed", "true");
         updateTrackFilter(selectedTrack || "全部");
       });
     });
