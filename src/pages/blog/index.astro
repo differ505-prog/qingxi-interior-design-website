@@ -293,10 +293,6 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
       border-color 0.3s ease;
   }
 
-  .post-card:first-child {
-    grid-template-columns: minmax(360px, 1.04fr) minmax(0, 0.96fr);
-  }
-
   .post-card:hover {
     transform: translateY(-6px);
     border-color: rgba(115, 103, 94, 0.32);
@@ -311,10 +307,6 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
     background:
       linear-gradient(180deg, rgba(237, 231, 224, 0.92), rgba(226, 219, 211, 0.94));
     isolation: isolate;
-  }
-
-  .post-card:first-child .post-image {
-    aspect-ratio: 5 / 4;
   }
 
   .post-image::after {
@@ -332,11 +324,6 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
     object-fit: cover;
     object-position: center center;
     transition: transform 0.7s ease;
-  }
-
-  .post-image img.post-image-media--rewiring {
-    transform: scale(1.12);
-    transform-origin: center center;
   }
 
   .post-image-badge {
@@ -358,10 +345,6 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
 
   .post-card:hover .post-image img {
     transform: scale(1.05);
-  }
-
-  .post-card:hover .post-image img.post-image-media--rewiring {
-    transform: scale(1.16);
   }
 
   .post-content {
@@ -407,11 +390,6 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
     color: var(--gray-darkest);
     line-height: 1.42;
     letter-spacing: 0.02em;
-  }
-
-  .post-card:first-child .post-title {
-    font-size: clamp(1.75rem, 2.8vw, 2.45rem);
-    line-height: 1.38;
   }
 
   .post-taxonomy {
@@ -627,11 +605,7 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
                   data-post-track={post.track}
                 >
                   <div class="post-image">
-                    <img
-                      src={post.coverImage}
-                      alt={post.title}
-                      class={post.slug === "old-house-rewiring-and-electrical-safety" ? "post-image-media--rewiring" : undefined}
-                    />
+                    <img src={post.coverImage} alt={post.title} />
                     <span class="post-image-badge">{post.siteCategory}</span>
                   </div>
                   <div class="post-content">
