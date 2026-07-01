@@ -1472,6 +1472,143 @@
     line-height: 1.7;
   }
 
+  .bookshelf-review-board {
+    display: grid;
+    gap: 0.95rem;
+    margin-top: 1rem;
+    padding: 1rem;
+  }
+
+  .bookshelf-review-next {
+    display: grid;
+    gap: 0.45rem;
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.08), rgba(214, 210, 200, 0.03));
+  }
+
+  .bookshelf-review-next-head {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .bookshelf-review-next-head span {
+    color: rgba(224, 221, 214, 0.58);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+
+  .bookshelf-review-next-head strong {
+    color: #f7f6f2;
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+
+  .bookshelf-review-plan {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+
+  .bookshelf-review-chapter-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-review-chapter-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    align-items: flex-start;
+  }
+
+  .bookshelf-review-chapter-head div {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .bookshelf-review-chapter-head span,
+  .bookshelf-review-chapter-head small,
+  .bookshelf-review-chapter-note {
+    color: rgba(230, 228, 222, 0.58);
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+
+  .bookshelf-review-chapter-head strong {
+    color: #f4f2ed;
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+
+  .bookshelf-review-chapter-note {
+    margin: 0;
+  }
+
+  .bookshelf-review-article-list {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bookshelf-review-article-item {
+    display: grid;
+    gap: 0.28rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.014);
+  }
+
+  .bookshelf-review-article-item.is-next {
+    border-color: rgba(214, 210, 200, 0.18);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.07), rgba(214, 210, 200, 0.02));
+  }
+
+  .bookshelf-review-article-item.is-empty {
+    opacity: 0.76;
+  }
+
+  .bookshelf-review-article-copy {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .bookshelf-review-article-copy span {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.76rem;
+    letter-spacing: 0.05em;
+  }
+
+  .bookshelf-review-article-copy strong {
+    color: #f3efe7;
+    font-size: 0.92rem;
+    line-height: 1.68;
+    font-weight: 600;
+  }
+
+  .bookshelf-review-article-copy small {
+    color: rgba(233, 231, 225, 0.62);
+    line-height: 1.65;
+  }
+
+  .bookshelf-review-article-item.is-published {
+    opacity: 0.5;
+  }
+
+  .bookshelf-review-article-item.is-published .bookshelf-review-article-copy strong,
+  .bookshelf-review-article-item.is-published .bookshelf-review-article-copy small {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
   .bookshelf-analytics-panel {
     margin-top: 0;
     padding: 1rem;

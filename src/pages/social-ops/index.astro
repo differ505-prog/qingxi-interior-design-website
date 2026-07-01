@@ -1087,6 +1087,59 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               </template>
             ))}
 
+            <section id="publishing-review-board" class="bookshelf-confirm bookshelf-review-board">
+              <div class="bookshelf-preview-head">
+                <p>出版閉環覆核</p>
+                <span>貼新文章前，先用這份清單看書稿補位是否還需要調整</span>
+              </div>
+              <div class="bookshelf-confirm-grid">
+                <article class="bookshelf-confirm-card">
+                  <span>目前決題模式</span>
+                  <strong id="publishing-review-mode">尚未判定</strong>
+                </article>
+                <article class="bookshelf-confirm-card">
+                  <span>主攻書系</span>
+                  <strong id="publishing-review-track">尚未判定</strong>
+                </article>
+                <article class="bookshelf-confirm-card">
+                  <span>距離出版基線</span>
+                  <strong id="publishing-review-baseline">尚未計算</strong>
+                </article>
+                <article class="bookshelf-confirm-card">
+                  <span>主書完成度</span>
+                  <strong id="publishing-review-coverage">尚未計算</strong>
+                </article>
+              </div>
+              <article class="bookshelf-review-next">
+                <div class="bookshelf-review-next-head">
+                  <span>最推薦下一篇</span>
+                  <strong id="publishing-review-next-title">尚未產生</strong>
+                </div>
+                <p id="publishing-review-next-meta" class="bookshelf-confirm-note">會依目前決題模式與出版缺口自動更新。</p>
+              </article>
+              <div class="bookshelf-actions bookshelf-confirm-actions">
+                <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製閉環覆核稿</button>
+                <button type="button" id="copy-publishing-review-outline" class="bookshelf-action">複製出版清單摘要</button>
+              </div>
+              <div id="publishing-review-plan" class="bookshelf-review-plan"></div>
+              <details class="bookshelf-mini-fold">
+                <summary>
+                  <span>查看閉環覆核稿</span>
+                  <small>手動複製備援</small>
+                </summary>
+                <div class="bookshelf-pro-prompt-body">
+                  <textarea
+                    id="publishing-review-prompt-content"
+                    class="bookshelf-pro-prompt-content"
+                    rows="18"
+                    readonly
+                    placeholder="這裡會顯示可直接貼給高階 LLM 的出版閉環覆核稿"
+                  ></textarea>
+                </div>
+              </details>
+              <p class="bookshelf-confirm-note">清單中已上線官網文章會自動以橫線與降低透明度標示；未劃線者代表仍屬待補或下一篇候選。</p>
+            </section>
+
           </section>
 
           <details id="gemini-backup-board" class="ops-panel ops-fold gemini-board">
@@ -4047,6 +4100,257 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     ].join("\n");
   }
 
+  function normalizeTitleForCompare(value = "") {
+    return value.replace(/\s+/g, "").trim().toLowerCase();
+  }
+
+  function isPublishedArticleTitle(title = "") {
+    const normalizedTitle = normalizeTitleForCompare(title);
+    if (!normalizedTitle) return false;
+    return articleLibrary.some((post) => normalizeTitleForCompare(post.title) === normalizedTitle);
+  }
+
+  function getPublishedPostsForChapter(trackTitle = "", chapterTitle = "") {
+    return articleLibrary.filter((post) => post.track === trackTitle && post.chapter === chapterTitle);
+  }
+
+  function buildPublishingReviewOutline(mode = currentTopicMode) {
+    const modeState = getCurrentTopicModeState(mode);
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    const recommendation = modeState?.nextRecommendedTopic;
+    if (!focusTrack) return "目前尚無可用的出版補位清單。";
+
+    const lines = [
+      `決題模式：${modeState?.label || mode}`,
+      `主攻書系：${focusTrack.title}`,
+      `主書完成度：${focusTrack.coverageRate}%`,
+      `距離出版基線：還差 ${focusTrack.remainingToBaseline} 篇`,
+      `最推薦下一篇：${recommendation?.primaryTitle || "尚未產生"}`,
+    ];
+
+    if (recommendation) {
+      lines.push(
+        `下一篇定位：${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}`,
+        `下一篇推薦原因：${recommendation.reason}`,
+      );
+    }
+
+    lines.push("", "【目前出版清單】");
+
+    focusTrack.chapterGaps.forEach((gap, index) => {
+      const publishedPosts = getPublishedPostsForChapter(focusTrack.title, gap.chapter);
+      lines.push(
+        `${index + 1}. ${gap.chapter}｜已上線 ${publishedPosts.length} 篇｜待補 ${gap.remainingToBaseline} 篇`,
+      );
+      if (gap.recommendedTopic?.primaryTitle) {
+        lines.push(
+          `- 本章下一篇：${gap.recommendedTopic.primaryTitle}｜子章節：${gap.recommendedTopic.subchapter}`,
+        );
+      }
+      if (publishedPosts.length) {
+        lines.push(`- 官網已上線：${publishedPosts.map((post) => `[已上線] ${post.title}`).join(" / ")}`);
+      } else {
+        lines.push("- 官網已上線：目前無");
+      }
+      lines.push(`- 待補子章：${gap.missingSubchapters.join(" / ") || "本章主幹已立住"}`);
+    });
+
+    if (articleTopicDecision) {
+      lines.push(
+        "",
+        "【本輪動態決題】",
+        `本輪建議標題：${articleTopicDecision.title || "尚未決題"}`,
+        `本輪主書系：${articleTopicDecision.track || "尚未決題"}`,
+        `本輪章節：${articleTopicDecision.chapter || "尚未決題"}`,
+        `本輪子章節：${articleTopicDecision.subchapter || "尚未決題"}`,
+        `本輪決題理由：${articleTopicDecision.reason || articleTopicDecision.summary || "尚未提供"}`,
+      );
+    }
+
+    const confirmData = getArticleConfirmData(articleAiResult);
+    if (confirmData.title !== "尚未判定") {
+      lines.push(
+        "",
+        "【目前工作台解析出的正式落地資訊】",
+        `網站分類：${confirmData.category}`,
+        `主書系：${confirmData.track}`,
+        `章節定位：${confirmData.chapter}`,
+        `文章標題：${confirmData.title}`,
+      );
+    }
+
+    return lines.join("\n");
+  }
+
+  function buildPublishingReviewPrompt(mode = currentTopicMode) {
+    const modeState = getCurrentTopicModeState(mode);
+    const recommendation = modeState?.nextRecommendedTopic;
+    const questionBlock = articleSourceQuestion.trim() || "（本輪尚未貼入新的社團原始問題，可先針對長線出版清單做覆核。）";
+
+    return [
+      "你是青曦空間設計的高階內容總編、出版統稿者與閉環優化覆核者。",
+      "以下是 social-ops 目前的出版補位清單、官網已上線文章，以及本輪最推薦下一篇。",
+      "你的任務不是直接改稿，而是站在『最終要出版成書』的角度，檢查這份安排是否已足夠成熟，並指出最值得立即修正的地方。",
+      "請用繁體中文回覆。",
+      "",
+      "請固定依序輸出：",
+      "0. 整體評分：X/10",
+      "1. 是否建議立即修改：是 / 否",
+      "2. 修改急迫度：高 / 中 / 低",
+      "3. 判定理由：用 2-4 句說明為什麼現在該改，或為什麼可以先沿用。",
+      "",
+      "A. 出版結構總判斷",
+      "- 判斷目前書名、章節與文章標題安排是否夠穩，是否能支撐後續集結成書。",
+      "- 若有結構性問題，請先指出最上游的問題，不要只談表面措辭。",
+      "",
+      "B. 重複與缺口覆核",
+      "- 已標示 [已上線] 的文章代表官網已有內容，請檢查是否有重複、撞題或章節失衡。",
+      "- 請指出哪些章節仍明顯過薄，哪些題目應延後，哪些缺口最值得優先補。",
+      "",
+      "C. 下一篇是否真的是最佳選擇",
+      `- 目前最推薦下一篇為：${recommendation?.primaryTitle || "尚未產生"}`,
+      "- 請判斷這一篇是否真的應該先發；若不是，請給出更好的優先順序與原因。",
+      "",
+      "D. 書名、章節、文章標題的微調建議",
+      "- 請分別指出：哪些書名不用動、哪些章節命名可再收斂、哪些文章標題應改得更像書稿章名。",
+      "- 只講最重要的，不要做無謂的大改名。",
+      "",
+      "E. 最終優先順序建議",
+      "- 請列出接下來最值得先做的 3 篇，依優先順序排序。",
+      "- 每一篇都要附 1-2 句原因。",
+      "",
+      "F. 給 IDE 的修改提示詞 1：內容修改與增補 / 刪除",
+      "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
+      "- 目標是調整目前這份出版清單與文章安排本身，不是直接生成全文文章。",
+      "",
+      "G. 給 IDE 的修改提示詞 2：來源母提示詞的優化建議",
+      "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
+      "- 只提供『IDE 給高階 LLM 的母提示詞』該怎麼改的建議，不要重寫整份母提示詞全文。",
+      "- 重點放在規則缺漏、排序衝突、判斷條件不夠硬或輸出格式不夠穩。",
+      "",
+      "H. 給 IDE 的修改提示詞 3：網站結構設計的優化建議",
+      "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
+      "- 重點放在 social-ops 的資訊架構、顯示順序、決策動線、狀態標示與操作成本。",
+      "",
+      "【本輪原始問題】",
+      questionBlock,
+      "",
+      "【目前出版資料】",
+      buildPublishingReviewOutline(mode),
+      "",
+      "請嚴格依照上述格式輸出，不要省略 0-3，也不要省略最後 3 個給 IDE 的提示詞。",
+    ].join("\n");
+  }
+
+  function renderPublishingReviewBoard() {
+    const modeState = getCurrentTopicModeState(currentTopicMode);
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    const recommendation = modeState?.nextRecommendedTopic;
+    const mode = document.getElementById("publishing-review-mode");
+    const track = document.getElementById("publishing-review-track");
+    const baseline = document.getElementById("publishing-review-baseline");
+    const coverage = document.getElementById("publishing-review-coverage");
+    const nextTitle = document.getElementById("publishing-review-next-title");
+    const nextMeta = document.getElementById("publishing-review-next-meta");
+    const plan = document.getElementById("publishing-review-plan");
+    const promptContent = document.getElementById("publishing-review-prompt-content");
+    if (
+      !(mode instanceof HTMLElement) ||
+      !(track instanceof HTMLElement) ||
+      !(baseline instanceof HTMLElement) ||
+      !(coverage instanceof HTMLElement) ||
+      !(nextTitle instanceof HTMLElement) ||
+      !(nextMeta instanceof HTMLElement) ||
+      !(plan instanceof HTMLElement) ||
+      !(promptContent instanceof HTMLTextAreaElement)
+    ) {
+      return;
+    }
+
+    if (!focusTrack) {
+      mode.textContent = "尚未判定";
+      track.textContent = "尚未判定";
+      baseline.textContent = "尚未計算";
+      coverage.textContent = "尚未計算";
+      nextTitle.textContent = "尚未產生";
+      nextMeta.textContent = "目前資料不足，暫時無法建立出版閉環覆核。";
+      plan.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版清單。</p>';
+      promptContent.value = "目前尚無可用的出版閉環覆核稿。";
+      return;
+    }
+
+    mode.textContent = modeState?.label || currentTopicMode;
+    track.textContent = focusTrack.title;
+    baseline.textContent = `還差 ${focusTrack.remainingToBaseline} 篇`;
+    coverage.textContent = `${focusTrack.coverageRate}%`;
+    nextTitle.textContent = recommendation?.primaryTitle || "尚未產生";
+    nextMeta.textContent = recommendation
+      ? `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜補前 ${recommendation.coverageBefore}% → 補後 ${recommendation.coverageAfter}%`
+      : "目前尚未產生下一篇推薦。";
+
+    plan.innerHTML = focusTrack.chapterGaps.map((gap, index) => {
+      const publishedPosts = getPublishedPostsForChapter(focusTrack.title, gap.chapter);
+      const hasRecommendation = Boolean(gap.recommendedTopic?.primaryTitle);
+      const items = [];
+
+      if (hasRecommendation) {
+        const isPublished = isPublishedArticleTitle(gap.recommendedTopic.primaryTitle);
+        const isPrimaryRecommendation = recommendation?.primaryTitle === gap.recommendedTopic.primaryTitle;
+        items.push(`
+          <li class="bookshelf-review-article-item ${isPublished ? "is-published" : ""} ${isPrimaryRecommendation ? "is-next" : ""}">
+            <div class="bookshelf-review-article-copy">
+              <span>${isPrimaryRecommendation ? "最推薦下一篇" : "本章下一篇"}</span>
+              <strong>${escapeHtml(gap.recommendedTopic.primaryTitle)}</strong>
+              <small>${escapeHtml(gap.recommendedTopic.subchapter)}${gap.recommendedTopic.backupTitles?.[0] ? `｜備選：${escapeHtml(gap.recommendedTopic.backupTitles[0])}` : ""}</small>
+            </div>
+          </li>
+        `);
+      }
+
+      publishedPosts.forEach((post) => {
+        items.push(`
+          <li class="bookshelf-review-article-item is-published">
+            <div class="bookshelf-review-article-copy">
+              <span>官網已上線</span>
+              <strong>${escapeHtml(post.title)}</strong>
+              <small>${escapeHtml(post.siteCategory || post.category || "已發布文章")}</small>
+            </div>
+          </li>
+        `);
+      });
+
+      if (!items.length) {
+        items.push(`
+          <li class="bookshelf-review-article-item is-empty">
+            <div class="bookshelf-review-article-copy">
+              <span>目前狀態</span>
+              <strong>這一章暫時沒有可顯示的文章項目</strong>
+              <small>可先依待補子章往下補齊。</small>
+            </div>
+          </li>
+        `);
+      }
+
+      return `
+        <article class="bookshelf-review-chapter-card">
+          <div class="bookshelf-review-chapter-head">
+            <div>
+              <span>章節 ${index + 1}</span>
+              <strong>${escapeHtml(gap.chapter)}</strong>
+            </div>
+            <small>已上線 ${publishedPosts.length} 篇 / 待補 ${gap.remainingToBaseline} 篇</small>
+          </div>
+          <p class="bookshelf-review-chapter-note">待補子章：${escapeHtml(gap.missingSubchapters.join(" / ") || "本章主幹已立住")}</p>
+          <ul class="bookshelf-review-article-list">
+            ${items.join("")}
+          </ul>
+        </article>
+      `;
+    }).join("");
+
+    promptContent.value = buildPublishingReviewPrompt(currentTopicMode);
+  }
+
   function getCurrentTopicModeState(mode = currentTopicMode) {
     return topicModeDataMap?.[mode] || topicModeDataMap?.[topicModeOptions?.[0]?.value] || null;
   }
@@ -4084,6 +4388,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     if (!(template instanceof HTMLTemplateElement)) return;
 
     panelRoot.replaceChildren(template.content.cloneNode(true));
+    renderPublishingReviewBoard();
   }
 
   function buildNextTopicBriefText(mode = currentTopicMode) {
@@ -4881,6 +5186,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
     if (!articleTopicDecision) {
       shell.hidden = true;
+      renderPublishingReviewBoard();
       return;
     }
 
@@ -4897,6 +5203,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     note.textContent =
       articleTopicDecision.bookLink ||
       `這一步會先依真實社團問題理解痛點，再從 ${candidateCount || "目前"} 個出版候選裡挑最適合落進書稿的題目。`;
+    renderPublishingReviewBoard();
   }
 
   function loadArticleAiResult() {
@@ -5116,10 +5423,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     decisionArticleTitle.textContent = confirmData.title;
     content.textContent = articleAiResult;
     shell.open = hasResult;
+    renderPublishingReviewBoard();
   }
 
   function setArticleAiBusy(isBusy) {
-    ["run-article-ai-flow", "run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload", "copy-social-reply-short", "copy-social-reply-pro", "copy-social-reply-lead"].forEach((id) => {
+    ["run-article-ai-flow", "run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload", "copy-social-reply-short", "copy-social-reply-pro", "copy-social-reply-lead", "copy-publishing-review-prompt", "copy-publishing-review-outline"].forEach((id) => {
       const button = document.getElementById(id);
       if (button instanceof HTMLButtonElement) {
         button.disabled = isBusy;
@@ -6922,6 +7230,26 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       articleIntakeFields.map((field) => `${field}：`).join("\n"),
       "已複製文章入庫欄位。",
     );
+  });
+
+  document.getElementById("copy-publishing-review-outline")?.addEventListener("click", async () => {
+    const result = await copyText(
+      buildPublishingReviewOutline(),
+      "已複製出版清單摘要。",
+      { manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。" },
+    );
+    const feedback = getCopyFeedbackState(result, "已複製出版清單摘要。", "已開啟手動複製視窗，可直接複製出版清單摘要。");
+    setFeedback(feedback.message, feedback.mode);
+  });
+
+  document.getElementById("copy-publishing-review-prompt")?.addEventListener("click", async () => {
+    const result = await copyText(
+      buildPublishingReviewPrompt(),
+      "已複製出版閉環覆核稿。",
+      { manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。" },
+    );
+    const feedback = getCopyFeedbackState(result, "已複製出版閉環覆核稿。", "已開啟手動複製視窗，可直接複製出版閉環覆核稿。");
+    setFeedback(feedback.message, feedback.mode);
   });
 
   document.getElementById("copy-article-prompt")?.addEventListener("click", async () => {
