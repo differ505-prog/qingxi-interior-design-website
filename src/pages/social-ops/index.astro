@@ -179,6 +179,16 @@ const defaultTopicMode = publishingTopicModeOptions[0]?.value || "publishing";
 const defaultModeOption = publishingTopicModeOptions.find((modeOption) => modeOption.value === defaultTopicMode) || publishingTopicModeOptions[0];
 const defaultModeState = topicModeMap[defaultTopicMode];
 const publishingDashboard = topicModeMap[defaultTopicMode].publishingDashboard;
+const initialFocusTrack = defaultModeState?.publishingDashboard?.focusTrack || null;
+const initialBookProposal = defaultModeState?.bookProposal || null;
+const initialRecommendation = defaultModeState?.nextRecommendedTopic || null;
+const initialRecommendationTitle = initialRecommendation?.primaryTitle || initialRecommendation?.webTitle || initialRecommendation?.bookTitle || "報價拆讀：全室預算拆解與避險指南";
+const initialRecommendationMeta = initialRecommendation
+  ? `${initialRecommendation.chapter} / ${initialRecommendation.subchapter} / ${initialRecommendation.category}｜補前 ${initialRecommendation.coverageBefore}% → 補後 ${initialRecommendation.coverageAfter}%`
+  : "預算拆解 / 報價拆讀 / 裝修預算｜補前 0% → 補後 0%";
+const initialRecommendationModeText = initialFocusTrack
+  ? `${defaultModeState?.label || defaultTopicMode}｜${initialFocusTrack.title} 尚差 ${initialFocusTrack.remainingToBaseline} 篇`
+  : "會跟內容書架同步";
 const vendorIntakeShortUrl = "https://qingxidesign.tw/crew-intake";
 const cannedReplies = [
   {
@@ -912,16 +922,23 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               <article class="bookshelf-review-next">
                 <div class="bookshelf-review-next-head">
                   <span>最推薦下一篇</span>
-                  <strong id="publishing-review-next-title">尚未產生</strong>
+                  <strong id="publishing-review-next-title">{initialRecommendationTitle}</strong>
                 </div>
-                <p id="publishing-review-next-meta" class="bookshelf-confirm-note">會依目前決題模式與出版缺口自動更新。</p>
+                <p id="publishing-review-next-meta" class="bookshelf-confirm-note">{initialRecommendationMeta}</p>
                 <div class="bookshelf-review-risk-row">
-                  <strong id="publishing-review-risk-badge" class="bookshelf-review-risk-badge is-low">撞題風險低</strong>
-                  <span id="publishing-review-risk-note" class="bookshelf-confirm-note">會根據已上線文章自動比對。</span>
+                  <strong id="publishing-review-risk-badge" class={`bookshelf-review-risk-badge is-${initialRecommendation?.collisionRisk || "low"}`}>{initialRecommendation?.collisionRisk === "high" ? "撞題風險高" : initialRecommendation?.collisionRisk === "medium" ? "撞題風險中" : "撞題風險低"}</strong>
+                  <span id="publishing-review-risk-note" class="bookshelf-confirm-note">{initialRecommendation?.collisionReason || "會根據已上線文章自動比對。"}</span>
                 </div>
-                <p id="publishing-review-action-hint" class="bookshelf-review-action-hint">可直接推進</p>
+                <p id="publishing-review-action-hint" class="bookshelf-review-action-hint">{initialRecommendation?.actionHint || "可直接推進"}</p>
                 <ul id="publishing-review-similar-list" class="bookshelf-review-similar-list">
-                  <li>相似舊文比對後顯示</li>
+                  {initialRecommendation?.similarArticles?.length
+                    ? initialRecommendation.similarArticles.slice(0, 2).map((article) => (
+                      <li class={article.score >= 60 ? "is-alert" : ""}>
+                        <strong>{article.title}</strong>
+                        <small>{article.chapter} / {article.subchapter}｜相似度 {article.score}｜{article.reason}</small>
+                      </li>
+                    ))
+                    : <li>相似舊文比對後顯示</li>}
                 </ul>
                 <button type="button" id="publishing-review-diff-toggle" class="bookshelf-action bookshelf-review-diff-toggle">查看相似度差異分析</button>
                 <details id="publishing-review-diff-panel" class="bookshelf-mini-fold bookshelf-review-diff-panel">
@@ -1819,16 +1836,23 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 <article id="review-next-topic-panel" class="bookshelf-review-top-card">
                   <div class="bookshelf-preview-head">
                     <p>現在最推薦先發</p>
-                    <span id="review-next-topic-mode">會跟內容書架同步</span>
+                    <span id="review-next-topic-mode">{initialRecommendationModeText}</span>
                   </div>
-                  <strong id="review-next-topic-title">尚未產生</strong>
-                  <p id="review-next-topic-meta" class="bookshelf-confirm-note">切換決題模式後，這裡會同步更新下一篇建議。</p>
+                  <strong id="review-next-topic-title">{initialRecommendationTitle}</strong>
+                  <p id="review-next-topic-meta" class="bookshelf-confirm-note">{initialRecommendation?.chapter && initialRecommendation?.subchapter && initialRecommendation?.category ? `${initialRecommendation.chapter} / ${initialRecommendation.subchapter} / ${initialRecommendation.category}｜${initialRecommendation.reason}` : "切換決題模式後，這裡會同步更新下一篇建議。"}</p>
                   <div class="bookshelf-review-risk-row">
-                    <strong id="review-next-topic-risk-badge" class="bookshelf-review-risk-badge is-low">撞題風險低</strong>
-                    <span id="review-next-topic-risk-note" class="bookshelf-confirm-note">會根據已上線文章自動比對。</span>
+                    <strong id="review-next-topic-risk-badge" class={`bookshelf-review-risk-badge is-${initialRecommendation?.collisionRisk || "low"}`}>{initialRecommendation?.collisionRisk === "high" ? "撞題風險高" : initialRecommendation?.collisionRisk === "medium" ? "撞題風險中" : "撞題風險低"}</strong>
+                    <span id="review-next-topic-risk-note" class="bookshelf-confirm-note">{initialRecommendation?.collisionReason || "會根據已上線文章自動比對。"}</span>
                   </div>
                   <ul id="review-next-topic-similar-list" class="bookshelf-review-similar-list">
-                    <li>相似舊文比對後顯示</li>
+                    {initialRecommendation?.similarArticles?.length
+                      ? initialRecommendation.similarArticles.slice(0, 2).map((article) => (
+                        <li class={article.score >= 60 ? "is-alert" : ""}>
+                          <strong>{article.title}</strong>
+                          <small>{article.chapter} / {article.subchapter}｜相似度 {article.score}｜{article.reason}</small>
+                        </li>
+                      ))
+                      : <li>相似舊文比對後顯示</li>}
                   </ul>
                 </article>
                 <div id="content-analytics-panel" class="bookshelf-confirm bookshelf-analytics-panel">
@@ -9165,7 +9189,11 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   rerender();
-  hydrateVendorIntakeTools();
+  try {
+    hydrateVendorIntakeTools();
+  } catch (error) {
+    console.error("初始化工班登錄工具失敗：", error);
+  }
   renderVendorIntakes();
   loadVendorIntakes();
   renderContentAnalytics();
