@@ -1500,6 +1500,14 @@
     text-align: center;
   }
 
+  .bookshelf-analytics-trend-comment {
+    margin: 0;
+    color: rgba(239, 236, 230, 0.78);
+    font-size: 0.86rem;
+    line-height: 1.75;
+    letter-spacing: 0.04em;
+  }
+
   .bookshelf-analytics-chart-svg {
     display: block;
     width: 100%;

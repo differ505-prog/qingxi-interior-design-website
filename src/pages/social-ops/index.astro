@@ -1632,6 +1632,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <div id="content-analytics-trend-chart" class="bookshelf-analytics-chart">
                       <div class="bookshelf-analytics-chart-empty">正在準備趨勢圖...</div>
                     </div>
+                    <p id="content-analytics-trend-comment" class="bookshelf-analytics-trend-comment">同步後顯示流量判讀。</p>
                     <div class="bookshelf-analytics-trend-footer">
                       <span id="content-analytics-trend-period">近 7 天 sessions</span>
                       <strong id="content-analytics-trend-total">-</strong>
@@ -3292,6 +3293,34 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return "與前 7 天持平";
   }
 
+  function getTrafficTrendComment(trend) {
+    const currentTotal = Number(trend?.currentTotal || 0);
+    const previousTotal = Number(trend?.previousTotal || 0);
+    const percent = Number(trend?.changePercent || 0);
+
+    if (currentTotal <= 0 && previousTotal <= 0) {
+      return "目前還沒有足夠流量資料，先持續累積內容與導流來源。";
+    }
+
+    if (percent >= 20) {
+      return "這波流量有明顯升溫，代表近期內容或導流入口開始接住關注，可以持續追哪個來源正在放大。";
+    }
+
+    if (percent >= 5) {
+      return "流量正在穩定往上，節奏是健康的，適合繼續延續最近有效的發文與導流做法。";
+    }
+
+    if (percent <= -20) {
+      return "流量下滑幅度偏明顯，建議先回看來源是否掉量，或落地頁是否沒有接住進站意圖。";
+    }
+
+    if (percent <= -5) {
+      return "流量有小幅回落，先檢查最近一週的發文節奏、連結入口與 CTA 是否變弱。";
+    }
+
+    return "整體流量仍在盤整區間，沒有明顯升降，現階段重點是持續觀察哪些題目最能穩定帶來進站。";
+  }
+
   function buildTrafficTrendSvg(points = []) {
     if (!Array.isArray(points) || !points.length) {
       return '<div class="bookshelf-analytics-chart-empty">近 7 天尚無流量資料。</div>';
@@ -3402,6 +3431,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const requirementSuccessNode = document.getElementById("content-analytics-requirement-success");
     const trendSummaryNode = document.getElementById("content-analytics-trend-summary");
     const trendChartNode = document.getElementById("content-analytics-trend-chart");
+    const trendCommentNode = document.getElementById("content-analytics-trend-comment");
     const trendPeriodNode = document.getElementById("content-analytics-trend-period");
     const trendTotalNode = document.getElementById("content-analytics-trend-total");
 
@@ -3420,6 +3450,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       if (updatedAtNode) updatedAtNode.textContent = "同步中";
       if (noteNode) noteNode.textContent = "正在向 GA4 讀取即時活躍使用者、近 7 天內容、來源與轉換成效。";
       if (trendSummaryNode) trendSummaryNode.textContent = "同步中";
+      if (trendCommentNode) trendCommentNode.textContent = "正在整理近 7 天流量判讀...";
       if (trendPeriodNode) trendPeriodNode.textContent = "近 7 天 sessions";
       if (trendTotalNode) trendTotalNode.textContent = "-";
       if (trendChartNode) trendChartNode.innerHTML = '<div class="bookshelf-analytics-chart-empty">正在讀取每日流量資料...</div>';
@@ -3436,6 +3467,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         contentAnalyticsState.note ||
         "設定好 GA4 權限後，這裡會自動顯示即時活躍使用者、內容、來源與落地頁成效。";
       if (trendSummaryNode) trendSummaryNode.textContent = "待接 GA4";
+      if (trendCommentNode) trendCommentNode.textContent = "接通 GA4 後，這裡會自動顯示簡單流量判讀。";
       if (trendPeriodNode) trendPeriodNode.textContent = "近 7 天 sessions";
       if (trendTotalNode) trendTotalNode.textContent = "-";
       if (trendChartNode) trendChartNode.innerHTML = '<div class="bookshelf-analytics-chart-empty">接通 GA4 後會顯示近 7 天流量走勢。</div>';
@@ -3450,6 +3482,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       if (updatedAtNode) updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
       if (noteNode) noteNode.textContent = contentAnalyticsState.note || "GA4 報表暫時讀取失敗，請稍後再試。";
       if (trendSummaryNode) trendSummaryNode.textContent = "讀取失敗";
+      if (trendCommentNode) trendCommentNode.textContent = "目前無法產生流量判讀，請稍後再試。";
       if (trendPeriodNode) trendPeriodNode.textContent = "近 7 天 sessions";
       if (trendTotalNode) trendTotalNode.textContent = "-";
       if (trendChartNode) trendChartNode.innerHTML = '<div class="bookshelf-analytics-chart-empty">目前無法產生流量趨勢圖。</div>';
@@ -3477,6 +3510,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       ? contentAnalyticsState.trafficTrend.points
       : [];
     if (trendSummaryNode) trendSummaryNode.textContent = getTrafficTrendSummary(contentAnalyticsState.trafficTrend);
+    if (trendCommentNode) trendCommentNode.textContent = getTrafficTrendComment(contentAnalyticsState.trafficTrend);
     if (trendPeriodNode) {
       const firstPoint = trendPoints[0];
       const lastPoint = trendPoints[trendPoints.length - 1];
