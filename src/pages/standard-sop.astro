@@ -209,10 +209,11 @@ const faqStructuredData = {
           </p>
         </div>
         <div class="flow-grid">
-          {collaborationSteps.map((step) => (
+          {collaborationSteps.map((step, index) => (
             <article class="flow-card">
               <div class="flow-stage-row">
                 <span class="flow-stage">{step.stage}</span>
+                <span class="flow-tag">第 {index + 1} 階段</span>
               </div>
               <h3>{step.title}</h3>
               <p>{step.description}</p>
@@ -295,6 +296,7 @@ const faqStructuredData = {
             <article class="payment-card">
               <div class="payment-top">
                 <span class="payment-order">0{index + 1}</span>
+                <span class="flow-tag">里程碑 {index + 1}</span>
                 <strong>{stage.percent}%</strong>
               </div>
               <h3>{stage.label}</h3>
@@ -494,25 +496,71 @@ const faqStructuredData = {
     max-width: 70ch;
   }
 
-  .flow-grid,
   .module-grid,
-  .tree-grid,
-  .payment-grid {
+  .tree-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
+  }
+
+  .flow-grid,
+  .payment-grid {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .flow-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding-top: 1.65rem;
+  }
+
+  .payment-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-top: 1.65rem;
+  }
+
+  .flow-grid::before,
+  .payment-grid::before {
+    content: "";
+    position: absolute;
+    top: 0.45rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(139, 106, 77, 0.12) 0%, rgba(139, 106, 77, 0.42) 16%, rgba(139, 106, 77, 0.42) 84%, rgba(139, 106, 77, 0.12) 100%);
   }
 
   .flow-card,
   .module-card,
   .tree-card,
   .payment-card {
+    position: relative;
     border-radius: 24px;
     border: 1px solid rgba(109, 82, 58, 0.12);
     background: #fffdf8;
     padding: 24px;
     display: grid;
     gap: 0.95rem;
+    box-shadow: 0 18px 34px rgba(88, 62, 39, 0.06);
+  }
+
+  .flow-card,
+  .payment-card {
+    padding-top: 2rem;
+  }
+
+  .flow-card::before,
+  .payment-card::before {
+    content: "";
+    position: absolute;
+    top: -1.2rem;
+    left: 24px;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: #6b4d36;
+    box-shadow: 0 0 0 7px rgba(245, 239, 231, 0.95);
   }
 
   .flow-stage-row,
@@ -530,6 +578,14 @@ const faqStructuredData = {
     color: #8b6a4d;
     font-weight: 700;
     letter-spacing: 0.14em;
+  }
+
+  .payment-top {
+    flex-wrap: wrap;
+  }
+
+  .payment-top strong {
+    margin-left: auto;
   }
 
   .flow-tag,
@@ -652,6 +708,26 @@ const faqStructuredData = {
     .tree-grid,
     .payment-grid {
       grid-template-columns: 1fr;
+    }
+
+    .flow-grid,
+    .payment-grid {
+      padding-top: 0;
+    }
+
+    .flow-grid::before,
+    .payment-grid::before {
+      display: none;
+    }
+
+    .flow-card::before,
+    .payment-card::before {
+      top: 24px;
+      right: 24px;
+      left: auto;
+      width: 10px;
+      height: 10px;
+      box-shadow: 0 0 0 5px rgba(245, 239, 231, 0.95);
     }
 
     .sop-hero,

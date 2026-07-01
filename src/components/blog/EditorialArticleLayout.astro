@@ -394,6 +394,67 @@ const {
     line-height: 1.78;
   }
 
+  .article-content :global(.article-step-flow) {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 2.25rem 0 2.6rem;
+    padding-top: 1.45rem;
+  }
+
+  .article-content :global(.article-step-flow::before) {
+    content: "";
+    position: absolute;
+    top: 0.45rem;
+    left: 1.35rem;
+    right: 1.35rem;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(164, 171, 160, 0.12) 0%, rgba(164, 171, 160, 0.5) 18%, rgba(164, 171, 160, 0.5) 82%, rgba(164, 171, 160, 0.12) 100%);
+  }
+
+  .article-content :global(.article-step-card) {
+    position: relative;
+    padding: 1.7rem 1.15rem 1.15rem;
+    border-radius: 20px;
+    border: 1px solid rgba(164, 171, 160, 0.2);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(246, 242, 236, 0.88));
+    box-shadow: 0 16px 34px rgba(58, 52, 46, 0.06);
+  }
+
+  .article-content :global(.article-step-card::before) {
+    content: "";
+    position: absolute;
+    top: -1rem;
+    left: 1.1rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: #8a837b;
+    box-shadow: 0 0 0 6px rgba(250, 247, 242, 0.96);
+  }
+
+  .article-content :global(.article-step-index) {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 0 0.7rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #7b736b;
+  }
+
+  .article-content :global(.article-step-card h3) {
+    margin-top: 0;
+    margin-bottom: 0.55rem;
+  }
+
+  .article-content :global(.article-step-card p:last-child) {
+    margin-bottom: 0;
+  }
+
   .back-link {
     display: inline-block;
     margin-top: 4rem;
@@ -448,9 +509,27 @@ const {
     }
 
     .article-content :global(.article-card-grid),
-    .article-content :global(.article-check-grid) {
+    .article-content :global(.article-check-grid),
+    .article-content :global(.article-step-flow) {
       grid-template-columns: 1fr;
       gap: 0.9rem;
+    }
+
+    .article-content :global(.article-step-flow) {
+      padding-top: 0;
+    }
+
+    .article-content :global(.article-step-flow::before) {
+      display: none;
+    }
+
+    .article-content :global(.article-step-card::before) {
+      top: 1rem;
+      right: 1rem;
+      left: auto;
+      width: 10px;
+      height: 10px;
+      box-shadow: 0 0 0 5px rgba(250, 247, 242, 0.96);
     }
 
     .article-content :global(.article-insight-panel) {

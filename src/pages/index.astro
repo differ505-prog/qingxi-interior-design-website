@@ -352,10 +352,24 @@ const homeStructuredData = [
         </div>
       </div>
 
+      <div class="workflow-summary">
+        <p class="workflow-summary-label">Flow Snapshot</p>
+        <div class="workflow-phase-list">
+          <span>需求對焦</span>
+          <span>方案確認</span>
+          <span>設計報價</span>
+          <span>施工交付</span>
+        </div>
+        <p class="workflow-summary-note">
+          從第一次接洽開始，流程會沿著需求收斂、方案確認、報價簽約到施工驗收推進，不讓每一步只剩片段資訊。
+        </p>
+      </div>
+
       <ul class="workflow-list">
         <li class="workflow-item" data-animate="left">
           <div class="workflow-number">01</div>
           <div class="workflow-content">
+            <p class="workflow-step-kicker">需求對焦</p>
             <h3>初步接洽</h3>
             <p>了解需求與預算，釐清設計方向。</p>
           </div>
@@ -364,6 +378,7 @@ const homeStructuredData = [
         <li class="workflow-item" data-animate="right">
           <div class="workflow-number">02</div>
           <div class="workflow-content">
+            <p class="workflow-step-kicker">需求對焦</p>
             <h3>現場丈量</h3>
             <p>專業團隊到場，完整記錄空間現況。</p>
           </div>
@@ -372,6 +387,7 @@ const homeStructuredData = [
         <li class="workflow-item" data-animate="left">
           <div class="workflow-number">03</div>
           <div class="workflow-content">
+            <p class="workflow-step-kicker">方案確認</p>
             <h3>平面提案</h3>
             <p>規劃平面動線與收納整理策略，提供風格、系統櫃配件清單與初步預算。</p>
           </div>
@@ -380,6 +396,7 @@ const homeStructuredData = [
         <li class="workflow-item" data-animate="right">
           <div class="workflow-number">04</div>
           <div class="workflow-content">
+            <p class="workflow-step-kicker">方案確認</p>
             <h3>設計委任</h3>
             <p>簽訂合約，進入深入規劃階段。</p>
           </div>
@@ -388,6 +405,7 @@ const homeStructuredData = [
         <li class="workflow-item" data-animate="left">
           <div class="workflow-number">05</div>
           <div class="workflow-content">
+            <p class="workflow-step-kicker">設計報價</p>
             <h3>細部設計</h3>
             <p>繪製 3D 與施工圖，確認每個細節。</p>
           </div>
@@ -396,6 +414,7 @@ const homeStructuredData = [
         <li class="workflow-item" data-animate="right">
           <div class="workflow-number">06</div>
           <div class="workflow-content">
+            <p class="workflow-step-kicker">設計報價</p>
             <h3>工程報價</h3>
             <p>依最終設計與選材，提出透明報價。</p>
           </div>
@@ -404,6 +423,7 @@ const homeStructuredData = [
         <li class="workflow-item" data-animate="left">
           <div class="workflow-number">07</div>
           <div class="workflow-content">
+            <p class="workflow-step-kicker">施工交付</p>
             <h3>工程施作</h3>
             <p>安排進度，嚴格控管施工品質。</p>
           </div>
@@ -412,6 +432,7 @@ const homeStructuredData = [
         <li class="workflow-item" data-animate="right">
           <div class="workflow-number">08</div>
           <div class="workflow-content">
+            <p class="workflow-step-kicker">施工交付</p>
             <h3>完工交屋</h3>
             <p>陪同驗收，確認細節後交屋。</p>
           </div>
@@ -1945,6 +1966,54 @@ const homeStructuredData = [
       border-color: rgba(115, 103, 94, 0.24);
     }
 
+    .workflow-summary {
+      margin-bottom: 2.4rem;
+      padding: 1.35rem 1.45rem;
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(244, 239, 232, 0.92) 100%);
+      border: 1px solid rgba(115, 103, 94, 0.12);
+      box-shadow: 0 16px 34px rgba(47, 47, 47, 0.05);
+    }
+
+    .workflow-summary-label,
+    .workflow-step-kicker {
+      margin: 0;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(115, 103, 94, 0.78);
+    }
+
+    .workflow-phase-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.9rem;
+    }
+
+    .workflow-phase-list span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(115, 103, 94, 0.16);
+      color: var(--gray-darkest);
+      font-size: 0.88rem;
+      letter-spacing: 0.05em;
+    }
+
+    .workflow-summary-note {
+      margin: 0.95rem 0 0;
+      max-width: 52rem;
+      color: var(--gray-medium);
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
+    }
+
     .workflow-list {
       list-style: none;
       padding: 0;
@@ -2022,7 +2091,8 @@ const homeStructuredData = [
       flex: 1;
       padding: 1.4rem 1.5rem;
       border-radius: 22px;
-      background: rgba(255, 255, 255, 0.82);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(249, 246, 241, 0.9) 100%);
       border: 1px solid rgba(115, 103, 94, 0.12);
       box-shadow: 0 16px 30px rgba(47, 47, 47, 0.05);
     }
@@ -2115,6 +2185,7 @@ const homeStructuredData = [
       font-family: var(--font-serif);
       font-size: 1.5rem;
       color: var(--gray-darkest);
+      margin-top: 0.4rem;
       margin-bottom: 0.75rem;
       font-weight: 600;
       line-height: 1.34;
@@ -2136,6 +2207,10 @@ const homeStructuredData = [
 
       .workflow-item {
         gap: 1.5rem;
+      }
+
+      .workflow-summary {
+        padding: 1.15rem 1.1rem;
       }
 
       .workflow-item[data-animate="right"] {
@@ -2173,6 +2248,10 @@ const homeStructuredData = [
         align-items: center;
         text-align: center;
         gap: 1rem;
+      }
+
+      .workflow-phase-list {
+        justify-content: center;
       }
 
       .workflow-item[data-animate="right"] {
