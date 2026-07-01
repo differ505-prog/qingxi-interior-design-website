@@ -153,6 +153,16 @@ export const publishingFocusTrackTitle = "老屋翻新系";
 export const publicationChapterOrder = ["現況判讀", "預算拆解", "基礎工程", "空間重整", "完工避雷"] as const;
 export const publicationChronologyMinCompletionRate = 25;
 export const crossSeriesForbiddenKeywords = ["預售屋", "客變", "新成屋", "商空"] as const;
+export const publicationChapterDisplayTitles: Record<string, string> = {
+  "現況判讀": "屋況與範圍盤點",
+  "預算拆解": "預算與報價拆解",
+};
+
+const assetIntentKeywords = ["表單", "清單", "checklist", "check-list", "試算表", "交接表", "追蹤表", "確認表"] as const;
+
+export function getPublicationChapterDisplayTitle(chapterTitle = "") {
+  return publicationChapterDisplayTitles[chapterTitle] || chapterTitle;
+}
 
 export interface PublicationMergeDirective {
   trackTitle: string;
@@ -167,7 +177,7 @@ export const publicationMergeDirectives: PublicationMergeDirective[] = [
   {
     trackTitle: publishingFocusTrackTitle,
     chapterTitle: "現況判讀",
-    targetTitle: "翻新起手式：屋況盤點與範圍界定總表",
+    targetTitle: "屋況盤點與範圍界定總表",
     targetSubchapter: "翻新起手式",
     sourceTitles: [
       "老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南",
@@ -241,7 +251,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "翻新起手式",
             keywords: ["屋況盤點", "翻新範圍", "先做什麼", "第一步", "從哪開始", "翻新前", "準備階段"],
             nodeKind: "core",
-            titleOverride: "翻新起手式：屋況盤點與範圍界定總表",
+            titleOverride: "屋況盤點與範圍界定總表",
           },
           {
             title: "實戰表單",
@@ -254,13 +264,13 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "專案節點",
             keywords: ["初勘流程", "估價前", "決策順序", "判讀流程", "是否開工", "專案節點", "開工前"],
             nodeKind: "project",
-            titleOverride: "專案節點：初勘至開工的決策沙盤推演",
+            titleOverride: "初勘至開工的決策沙盤推演",
           },
           {
             title: "案例解析",
             keywords: ["before after", "漏水", "結構老化", "血淚案例", "翻車案例", "案例解析"],
             nodeKind: "case",
-            titleOverride: "案例解析：忽視漏水與結構老化的翻車代價",
+            titleOverride: "忽視漏水與結構老化的翻車代價",
           },
           {
             title: "迷思破解",
@@ -278,19 +288,19 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "預算分級",
             keywords: ["預算", "費用", "多少錢", "怎麼抓", "抓多少", "天地壁", "家具"],
             nodeKind: "core",
-            titleOverride: "預算分級：客廳天地壁與家具的費用拆解",
+            titleOverride: "客廳天地壁與家具的費用拆解",
           },
           {
             title: "報價拆讀",
             keywords: ["報價", "單價", "估價", "報價單", "費用拆解"],
             nodeKind: "core",
-            titleOverride: "報價拆讀：全室預算拆解與避險指南",
+            titleOverride: "全室預算拆解與避險指南",
           },
           {
             title: "追加風險",
             keywords: ["追加", "超支", "爆預算", "變更多", "加價"],
             nodeKind: "core",
-            titleOverride: "追加風險：變更、漏項與超支的預防策略",
+            titleOverride: "變更、漏項與超支的預防策略",
           },
           {
             title: "案例解析",
@@ -402,7 +412,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "實戰表單",
             keywords: ["系統櫃", "配件", "清單", "規格確認", "表單"],
             nodeKind: "form",
-            titleOverride: "實戰表單：系統櫃配件清單與規格確認表",
+            titleOverride: "系統櫃配件清單與規格確認表",
             assetSlotLabel: "系統櫃配件清單與規格確認表",
           },
           {
@@ -729,9 +739,25 @@ function getBookTitleOverride(trackTitle = "", chapterTitle = "", subchapterTitl
     return subchapterPlan.titleOverride;
   }
   const overrides: Record<string, string> = {
-    [`${publishingFocusTrackTitle}|預算拆解|報價拆讀`]: "報價拆讀：全室預算拆解與避險指南",
+    [`${publishingFocusTrackTitle}|預算拆解|報價拆讀`]: "全室預算拆解與避險指南",
   };
   return overrides[`${trackTitle}|${chapterTitle}|${subchapterTitle}`] || "";
+}
+
+function isAssetIntentText(text = "") {
+  const normalized = text.toLowerCase();
+  return assetIntentKeywords.some((keyword) => normalized.includes(keyword.toLowerCase()));
+}
+
+function isAssetIntentPlan(plan: BookshelfSubchapterPlan | null | undefined) {
+  if (!plan) return false;
+  if (plan.nodeKind === "form") return true;
+  return isAssetIntentText([
+    plan.title,
+    plan.titleOverride || "",
+    plan.assetSlotLabel || "",
+    plan.keywords.join(" "),
+  ].join(" "));
 }
 
 export function buildBookTopicTitle(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
@@ -801,7 +827,7 @@ function getOldHouseFallbackCandidateConfig(chapterTitle = "") {
     },
     "預算拆解": {
       chapterTitle: "預算拆解",
-      subchapterTitle: "追加風險",
+      subchapterTitle: "報價拆讀",
       category: "裝修預算",
     },
     "基礎工程": {
@@ -837,12 +863,13 @@ function getOldHouseRecommendationPriorityBoost(
   };
   const chapterSubchapterBoostMap: Record<string, number> = {
     "現況判讀::翻新起手式": 360,
-    "現況判讀::實戰表單": 260,
+    "現況判讀::迷思破解": 320,
+    "現況判讀::案例解析": 260,
     "現況判讀::專案節點": 154,
-    "預算拆解::發包合約": 188,
+    "預算拆解::報價拆讀": 260,
+    "預算拆解::追加風險": 188,
+    "預算拆解::發包合約": 128,
     "預算拆解::合約檢核": -120,
-    "預算拆解::報價拆讀": 104,
-    "預算拆解::追加風險": 118,
     "基礎工程::實戰表單": 48,
     "基礎工程::工序銜接": 116,
   };
@@ -1094,9 +1121,10 @@ function buildTitlePoolItem(
   const subchapterPlan = getTrackPlan(trackTitle)?.chapters
     .find((chapter) => chapter.title === chapterTitle)
     ?.subchapters.find((subchapter) => subchapter.title === subchapterTitle);
+  const assetIntentTriggered = isAssetIntentPlan(subchapterPlan);
   const mergeDirective = getPublicationMergeDirective(trackTitle, chapterTitle);
   const mergeBackedTheoryReady = Boolean(
-    subchapterPlan?.nodeKind === "form" &&
+    assetIntentTriggered &&
     mergeDirective &&
     hasMergeSourceCoverage(entries.filter((entry) => entry.trackTitle === trackTitle), mergeDirective)
   );
@@ -1128,7 +1156,7 @@ function buildTitlePoolItem(
         : "medium";
   const workflowAction: PublicationTitlePoolItem["workflowAction"] = mergeNeeded || collisionMergeNeeded
     ? "Merge_and_Update"
-    : mergeBackedTheoryReady
+    : assetIntentTriggered || mergeBackedTheoryReady
       ? "Merge_into_Asset"
     : topSemanticScore > 35
       ? "Revise_Angle"
@@ -1137,7 +1165,7 @@ function buildTitlePoolItem(
     ? "整併執行中"
     : collisionMergeNeeded
       ? "需整併舊文"
-    : mergeBackedTheoryReady
+    : assetIntentTriggered || mergeBackedTheoryReady
       ? "待覆核_資產化"
     : hasPublishedEntry
       ? "已上線"
@@ -1156,6 +1184,8 @@ function buildTitlePoolItem(
       ? "此子章與既有文章的核心解法重疊度過高，應先整併舊文或改切角，不建議直接發布。"
     : mergeBackedTheoryReady
       ? "此節點較適合作為整併主文的附屬資產，待高階 LLM 覆核是否直接掛載，不建議佔用純新文章額度。"
+    : assetIntentTriggered
+      ? "此節點帶有表單、清單、確認表或追蹤表意圖，預設先扣留在資產審查池，不直接進入純新文章軌道。"
     : hasPublishedEntry
       ? "此子章已有已上線文章，標題池保留作為整體出版視角參考。"
       : isRecommended
@@ -1680,6 +1710,8 @@ function buildRecommendationFromCandidate(
 ) {
   const titleSet = getTopicTitleSet(candidate.trackTitle, candidate.chapter, candidate.subchapter);
   const unifiedTitle = titleSet.webTitle;
+  const subchapterPlan = getSubchapterPlan(candidate.trackTitle, candidate.chapter, candidate.subchapter);
+  const assetIntentTriggered = isAssetIntentPlan(subchapterPlan);
   const reason = buildRecommendationReason(
     candidate.trackTitle,
     candidate.subchapter,
@@ -1701,7 +1733,7 @@ function buildRecommendationFromCandidate(
   const topSemanticScore = similarArticles[0]?.score || 0;
   const mergeDirective = getPublicationMergeDirective(candidate.trackTitle, candidate.chapter);
   const mergeBackedAssetTriggered = Boolean(
-    getSubchapterPlan(candidate.trackTitle, candidate.chapter, candidate.subchapter)?.nodeKind === "form" &&
+    assetIntentTriggered &&
     mergeDirective &&
     hasMergeSourceCoverage(entries.filter((entry) => entry.trackTitle === candidate.trackTitle), mergeDirective)
   );
@@ -1738,6 +1770,8 @@ function buildRecommendationFromCandidate(
     ? mergeDirective?.note || "這個主題已與既有文章形成整併關係，較適合合併而非另開新題。"
     : mergeBackedAssetTriggered
       ? "本章理論主幹已可由舊文整併成立，這組表單更適合作為附屬資產掛載，不宜佔用純新文章發布額度。"
+    : assetIntentTriggered
+      ? "這題帶有表單、清單、確認表或追蹤表意圖，預設先扣留在 Merge_into_Asset 審查池，避免誤入純新文章軌道。"
     : duplicateFormAssetTriggered
       ? "這組實戰表單與既有掛載資產高度重複，應直接併入同一份工具資產，不宜拆成兩篇送審。"
     : collisionRisk === "high"
@@ -1749,6 +1783,8 @@ function buildRecommendationFromCandidate(
     ? "Merge_and_Update｜先整併舊文"
     : mergeBackedAssetTriggered
       ? "Merge_into_Asset｜掛回主文資產槽"
+    : assetIntentTriggered
+      ? "Merge_into_Asset｜先進資產審查池"
     : duplicateFormAssetTriggered
       ? "Merge_into_Asset｜先整併同資產表單"
     : collisionRisk === "high"
@@ -1758,7 +1794,7 @@ function buildRecommendationFromCandidate(
         : "New_Publish｜可直接推進";
   const workflowAction: NextTopicRecommendation["workflowAction"] = mergeTriggered || (topSimilarArticle?.subchapter === candidate.subchapter && topSemanticScore > 50)
     ? "Merge_and_Update"
-    : mergeBackedAssetTriggered || duplicateFormAssetTriggered
+    : mergeBackedAssetTriggered || assetIntentTriggered || duplicateFormAssetTriggered
       ? "Merge_into_Asset"
     : collisionRisk === "medium"
       ? "Revise_Angle"

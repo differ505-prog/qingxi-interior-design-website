@@ -12,11 +12,13 @@ import {
   bookshelfSubchapterPools,
   bookshelfTracks,
   getPublishingDashboard,
+  getPublicationChapterDisplayTitle,
   getPublicationBookProposal,
   getNextRecommendedTopic,
   getNextRecommendedTopics,
   publicationChronologyMinCompletionRate,
   publicationChapterOrder,
+  publicationChapterDisplayTitles,
   publicationMergeDirectives,
   getTrackRecommendedTopics,
   getPublishingCoverageSummary,
@@ -216,12 +218,12 @@ const initialRankedCandidates = (() => {
   };
   const explicitPriorityMap = {
     "現況判讀::翻新起手式": 0,
-    "現況判讀::實戰表單": 1,
-    "現況判讀::專案節點": 2,
-    "現況判讀::案例解析": 3,
-    "現況判讀::迷思破解": 4,
-    "預算拆解::發包合約": 5,
-    "預算拆解::報價拆讀": 6,
+    "現況判讀::迷思破解": 1,
+    "現況判讀::案例解析": 2,
+    "現況判讀::專案節點": 3,
+    "預算拆解::報價拆讀": 4,
+    "預算拆解::追加風險": 5,
+    "預算拆解::發包合約": 6,
   };
   const rankCandidate = (candidate: any, index: number) => {
     const riskRank = candidate?.collisionRisk === "low"
@@ -247,20 +249,40 @@ const initialRankedCandidates = (() => {
     .sort((left, right) => rankCandidate(left, merged.indexOf(left)) - rankCandidate(right, merged.indexOf(right)))
     .slice(0, 6);
 })();
-const initialMergeTask = initialRankedCandidates.find((candidate) => candidate?.workflowAction === "Merge_and_Update") || null;
+const initialForcedTopPriorityTitles = [
+  "屋況初勘：你最容易漏看的 5 個風險訊號",
+  "全室預算拆解與避險指南",
+  "變更、漏項與超支的預防策略",
+];
+const initialMergeTask = initialRankedCandidates.find((candidate) => ["Merge_and_Update", "Merge_into_Asset"].includes(candidate?.workflowAction)) || null;
 const initialMergeRule = initialMergeTask
   ? publicationMergeDirectives.find((rule) => rule.trackTitle === initialMergeTask.trackTitle && rule.chapterTitle === initialMergeTask.chapter) || null
   : null;
-const initialTopPriorityRecommendations = initialRankedCandidates
-  .filter((candidate) => candidate?.workflowAction === "New_Publish")
-  .slice(0, 3);
+const initialTopPriorityRecommendations = (() => {
+  const newPublishCandidates = initialRankedCandidates.filter((candidate) => candidate?.workflowAction === "New_Publish");
+  const forced = initialForcedTopPriorityTitles
+    .map((title) => newPublishCandidates.find((candidate) => (
+      (candidate.primaryTitle || candidate.webTitle || candidate.bookTitle) === title
+    )))
+    .filter((candidate): candidate is NonNullable<typeof initialRecommendation> => Boolean(candidate));
+  const seen = new Set(forced.map((candidate) => candidate.primaryTitle || candidate.webTitle || candidate.bookTitle));
+  const remainder = newPublishCandidates.filter((candidate) => {
+    const title = candidate.primaryTitle || candidate.webTitle || candidate.bookTitle;
+    if (!title || seen.has(title)) return false;
+    seen.add(title);
+    return true;
+  });
+  return [...forced, ...remainder].slice(0, 3);
+})();
 const initialCrossTrackSyncNote = initialMergeTask
-  ? "注意：本題主要解法已分配至 [Merge_and_Update] 軌道處理。當前推薦的新文章僅作為配套工具發布。"
+  ? initialMergeTask.workflowAction === "Merge_into_Asset"
+    ? "注意：本題主要解法已分配至 [Merge_into_Asset] 軌道處理。操作型資產需掛回主文，純新文章軌道不得再把它列入 Top 3。"
+    : "注意：本題主要解法已分配至 [Merge_and_Update] 軌道處理。當前推薦的新文章僅作為配套工具發布。"
   : "";
 const initialDisplayRecommendation = initialTopPriorityRecommendations[0] || initialRecommendation;
 const initialRecommendationTitle = initialDisplayRecommendation?.primaryTitle || initialDisplayRecommendation?.webTitle || initialDisplayRecommendation?.bookTitle || "收納補強：老屋機能配置與櫃體整合策略";
 const initialRecommendationMeta = initialDisplayRecommendation
-  ? `${initialDisplayRecommendation.chapter} / ${initialDisplayRecommendation.subchapter} / ${initialDisplayRecommendation.category}｜補前 ${initialDisplayRecommendation.coverageBefore}% → 補後 ${initialDisplayRecommendation.coverageAfter}%`
+  ? `${getPublicationChapterDisplayTitle(initialDisplayRecommendation.chapter)} / ${initialDisplayRecommendation.subchapter} / ${initialDisplayRecommendation.category}｜補前 ${initialDisplayRecommendation.coverageBefore}% → 補後 ${initialDisplayRecommendation.coverageAfter}%`
   : "空間重整 / 收納補強 / 收納機能｜補前 0% → 補後 0%";
 const vendorIntakeShortUrl = "https://qingxidesign.tw/crew-intake";
 const cannedReplies = [
@@ -737,6 +759,7 @@ const topicModeOptionsJson = JSON.stringify(publishingTopicModeOptions);
 const topicModeMapJson = JSON.stringify(topicModeMap);
 const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives);
 const publicationChapterOrderJson = JSON.stringify(publicationChapterOrder);
+const publicationChapterDisplayTitlesJson = JSON.stringify(publicationChapterDisplayTitles);
 const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 ---
 
@@ -1065,7 +1088,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
                       <article class={`bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}`}>
                         <div class="bookshelf-review-top3-head">
                           <span>{`Top ${index + 1}`}</span>
-                          <em>{`${candidate.chapter} / ${candidate.subchapter}`}</em>
+                          <em>{`${getPublicationChapterDisplayTitle(candidate.chapter)} / ${candidate.subchapter}`}</em>
                         </div>
                         <strong>{candidate.primaryTitle || candidate.webTitle || candidate.bookTitle || "尚未命名"}</strong>
                         <p>{candidate.reason}</p>
@@ -1084,7 +1107,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
                   <input
                     id="article-preset-title"
                     type="text"
-                    placeholder="例如：老屋翻新起手式：屋況盤點與範圍界定總表"
+                    placeholder="例如：屋況盤點與範圍界定總表"
                   />
                 </label>
                 <div class="bookshelf-review-composer-grid">
@@ -2099,7 +2122,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson, publicationMergeDirectivesJson, publicationChapterOrderJson, publishingFocusTrackTitleJson, publicationChronologyMinCompletionRate }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson, publicationMergeDirectivesJson, publicationChapterOrderJson, publicationChapterDisplayTitlesJson, publishingFocusTrackTitleJson, publicationChronologyMinCompletionRate }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const ARTICLE_PRESET_TITLE_KEY = "qingxi-article-preset-title-v1";
@@ -2145,7 +2168,13 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   const topicModeDataMap = topicModeMapJson ? JSON.parse(topicModeMapJson) : {};
   const publicationMergeRules = publicationMergeDirectivesJson ? JSON.parse(publicationMergeDirectivesJson) : [];
   const publicationChapterOrder = publicationChapterOrderJson ? JSON.parse(publicationChapterOrderJson) : [];
+  const publicationChapterDisplayTitles = publicationChapterDisplayTitlesJson ? JSON.parse(publicationChapterDisplayTitlesJson) : {};
   const publishingFocusTrackTitle = publishingFocusTrackTitleJson ? JSON.parse(publishingFocusTrackTitleJson) : "";
+  const forcedTopPriorityTitles = [
+    "屋況初勘：你最容易漏看的 5 個風險訊號",
+    "全室預算拆解與避險指南",
+    "變更、漏項與超支的預防策略",
+  ];
   const articleIntakeFields = [
     "主書系",
     "章節定位",
@@ -4790,9 +4819,19 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   }
 
   function getTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
-    return getRankedTopicCandidates(mode, 8)
-      .filter((candidate) => candidate?.workflowAction === "New_Publish")
-      .slice(0, Math.max(1, limit));
+    const candidates = getRankedTopicCandidates(mode, 20)
+      .filter((candidate) => candidate?.workflowAction === "New_Publish");
+    const forced = forcedTopPriorityTitles
+      .map((title) => candidates.find((candidate) => getDisplayTitle(candidate) === title))
+      .filter(Boolean);
+    const seen = new Set(forced.map((candidate) => getDisplayTitle(candidate)));
+    const remainder = candidates.filter((candidate) => {
+      const title = getDisplayTitle(candidate);
+      if (seen.has(title)) return false;
+      seen.add(title);
+      return true;
+    });
+    return [...forced, ...remainder].slice(0, Math.max(1, limit));
   }
 
   function getPrimaryMergeTaskRecommendation(mode = currentTopicMode) {
@@ -4937,7 +4976,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "【純新文章軌道 Top 3】",
       "以下 3 題已先排除 Merge_and_Update 與 Merge_into_Asset；若高階 LLM 判定其中任一題仍應整併或資產化，必須先移出新文章軌道再重排。",
       ...candidates.map((candidate, index) => (
-        `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${getPublishingReviewCandidateReason(candidate)}`
+        `${index + 1}. ${getDisplayTitle(candidate)}｜${getPublicationChapterLabel(candidate.chapter)} / ${candidate.subchapter}｜${getPublishingReviewCandidateReason(candidate)}`
       )),
     ].join("\n");
   }
@@ -4948,15 +4987,41 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     if (!candidates.length) {
       const fallbackCandidates = getPureNewPublishFallbackCandidates(mode, limit);
       const fallbackMarkup = fallbackCandidates.length
-        ? `<ul>${fallbackCandidates.map((candidate, index) => `<li><strong>候補 ${index + 1}</strong><span>${escapeHtml(getDisplayTitle(candidate))}</span></li>`).join("")}</ul>`
-        : "";
-      return `<p class="bookshelf-confirm-note">${escapeHtml(getPureNewPublishEmptyStateGuidance(mode))}</p>${fallbackMarkup}`;
+        ? fallbackCandidates.map((candidate, index) => `
+          <article class="bookshelf-review-empty-card">
+            <div class="bookshelf-review-empty-head">
+              <span>${index === 0 ? "同章補充（建議）" : "下一章主幹"}</span>
+              <em>${escapeHtml(getPublicationChapterLabel(candidate.chapter))} / ${escapeHtml(candidate.subchapter)}</em>
+            </div>
+            <strong>${escapeHtml(getDisplayTitle(candidate))}</strong>
+            <p>${escapeHtml(getPublishingReviewCandidateReason(candidate))}</p>
+            <button
+              type="button"
+              class="bookshelf-action"
+              data-apply-replenish-title="${escapeHtml(getDisplayTitle(candidate))}"
+            >一鍵置入本輪題目</button>
+          </article>
+        `).join("")
+        : `<article class="bookshelf-review-empty-card">
+          <div class="bookshelf-review-empty-head">
+            <span>待 Gemini Pro 遞補</span>
+            <em>規則層不預設答案</em>
+          </div>
+          <strong>目前沒有可直接自動置入的純新文章候選</strong>
+          <p>系統已保留章節缺口與時間軸上下文，避免把應整併或應資產化的題目誤塞回 New_Publish。</p>
+        </article>`;
+      return `
+        <section class="bookshelf-review-empty-state">
+          <p class="bookshelf-confirm-note">${escapeHtml(getPureNewPublishEmptyStateGuidance(mode))}</p>
+          <div class="bookshelf-review-empty-grid">${fallbackMarkup}</div>
+        </section>
+      `;
     }
     return candidates.map((candidate, index) => `
       <article class="bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}">
         <div class="bookshelf-review-top3-head">
           <span>Top ${index + 1}</span>
-          <em>${escapeHtml(candidate.chapter)} / ${escapeHtml(candidate.subchapter)}</em>
+          <em>${escapeHtml(getPublicationChapterLabel(candidate.chapter))} / ${escapeHtml(candidate.subchapter)}</em>
         </div>
         <strong>${escapeHtml(getDisplayTitle(candidate))}</strong>
         <div class="bookshelf-review-top3-meta">
@@ -5009,7 +5074,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       category: "老屋翻新",
       track: publishingFocusTrackTitle,
       chapter: "現況判讀",
-      title: "翻新起手式：屋況盤點與範圍界定總表",
+      title: "屋況盤點與範圍界定總表",
     };
   }
 
@@ -5026,7 +5091,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       track: publishingFocusTrackTitle,
       chapter: "現況判讀",
       subchapter: "翻新起手式",
-      title: "翻新起手式：屋況盤點與範圍界定總表",
+      title: "屋況盤點與範圍界定總表",
       reason: "老屋主書模式下偵測到預售屋／客變污染，系統已強制回退到老屋主線最前段的起手式整併題目。",
       questionLink: "",
       bookLink: "",
@@ -5193,7 +5258,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     return [
       "【純新文章空窗候補素材池】",
       "以下僅為規則層整理給 Gemini Pro 的遞補素材池，不是正式 New_Publish 排序；最終是否遞補、遞補哪一題，必須由 Gemini Pro 裁定。",
-      ...candidates.map((candidate, index) => `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${getPublishingReviewCandidateReason(candidate)}`),
+      ...candidates.map((candidate, index) => `${index + 1}. ${getDisplayTitle(candidate)}｜${getPublicationChapterLabel(candidate.chapter)} / ${candidate.subchapter}｜${getPublishingReviewCandidateReason(candidate)}`),
     ].join("\n");
   }
 
@@ -5391,7 +5456,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     ];
 
     focusTrack.chapterGaps.forEach((gap, index) => {
-      lines.push("", `${index + 1}. ${gap.chapter}`);
+      lines.push("", `${index + 1}. ${getPublicationChapterLabel(gap.chapter)}`);
       gap.titlePool.forEach((item) => {
         const manualReview = getManualReviewStatus(item);
         lines.push(
@@ -5400,6 +5465,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
           `  備選標題：${item.backupTitles.join(" / ") || "無"}`,
           `  狀態：${getTitlePoolStatusLabel(item.status, item.statusTag)}｜${getTitlePoolConfidenceLabel(item.confidence)}${item.isRecommended ? "｜最推薦" : ""}`,
           `  工作流：${item.workflowAction}｜${getWorkflowActionLabel(item.workflowAction)}`,
+          `  資產預判：${item.workflowAction === "Merge_into_Asset" ? "Asset Ready（資產掛載預備）" : "一般節點"}`,
           `  人工覆核：${getManualReviewLabel(manualReview)}`,
           `${item.assetSlotLabel ? `  資產掛載：${item.assetSlotLabel}` : "  資產掛載：無"}`,
           `  備註：${item.note}`,
@@ -5419,12 +5485,12 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       <article class="bookshelf-review-title-pool-chapter">
         <div class="bookshelf-review-title-pool-head">
           <span>第 ${index + 1} 章</span>
-          <strong>${escapeHtml(gap.chapter)}</strong>
+          <strong>${escapeHtml(getPublicationChapterLabel(gap.chapter))}</strong>
           <small>${gap.titlePool.length} 個子章標題</small>
         </div>
         <ul class="bookshelf-review-title-pool-items">
           ${gap.titlePool.map((item) => `
-            <li class="bookshelf-review-title-pool-item is-${item.status} is-review-${getManualReviewStatus(item) || "none"} ${item.isRecommended ? "is-recommended" : ""}">
+            <li class="bookshelf-review-title-pool-item is-${item.status} is-review-${getManualReviewStatus(item) || "none"} ${item.isRecommended ? "is-recommended" : ""} ${item.workflowAction === "Merge_into_Asset" ? "is-asset-ready" : ""}">
               <div class="bookshelf-review-title-pool-copy">
                 <div class="bookshelf-review-title-pool-meta">
                   <span>${escapeHtml(item.subchapter)}</span>
@@ -5432,6 +5498,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
                 </div>
                 <strong>${escapeHtml(item.primaryTitle)}</strong>
                 <small>${escapeHtml(item.note)}</small>
+                ${item.workflowAction === "Merge_into_Asset" ? '<p><span class="bookshelf-asset-ready-badge">Asset Ready｜資產掛載預備</span></p>' : ""}
                 ${item.backupTitles?.length ? `<p>備選：${escapeHtml(item.backupTitles.join(" / "))}</p>` : ""}
                 ${item.assetSlotLabel ? `<p>掛載槽：${escapeHtml(item.assetSlotLabel)}</p>` : ""}
                 <div class="bookshelf-review-title-pool-review">
@@ -5464,6 +5531,10 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   function getDisplayTitle(recommendation) {
     if (!recommendation) return "尚未產生";
     return recommendation.primaryTitle || recommendation.webTitle || recommendation.bookTitle || "尚未產生";
+  }
+
+  function getPublicationChapterLabel(chapterTitle = "") {
+    return publicationChapterDisplayTitles?.[chapterTitle] || chapterTitle;
   }
 
   function getPublishedPostDisplayTitle(post) {
@@ -7077,7 +7148,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const field = document.getElementById("article-preset-title");
     if (!(field instanceof HTMLInputElement)) return;
     field.value = articlePresetTitle || "";
-    field.placeholder = getResolvedArticlePresetTitle() || "例如：老屋翻新起手式：屋況盤點與範圍界定總表";
+    field.placeholder = getResolvedArticlePresetTitle() || "例如：屋況盤點與範圍界定總表";
   }
 
   function persistArticleSourceQuestion() {
@@ -7116,7 +7187,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     target.innerHTML = assetSlots.length
       ? assetSlots.map((item) => {
         const key = getPublishingAssetSlotKey(item);
-        return `<option value="${escapeHtml(key)}">${escapeHtml(item.chapter)} / ${escapeHtml(item.assetSlotLabel || item.primaryTitle)}</option>`;
+        return `<option value="${escapeHtml(key)}">${escapeHtml(getPublicationChapterLabel(item.chapter))} / ${escapeHtml(item.assetSlotLabel || item.primaryTitle)}</option>`;
       }).join("")
       : '<option value="">目前尚無可掛載的附錄節點</option>';
     if (assetSlots.some((item) => getPublishingAssetSlotKey(item) === currentValue)) {
@@ -9635,7 +9706,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
   document.addEventListener("click", async (event) => {
     const target = event.target instanceof HTMLElement
-      ? event.target.closest("[data-copy-next-topic-brief],[data-reset-publishing-checklist]")
+      ? event.target.closest("[data-copy-next-topic-brief],[data-reset-publishing-checklist],[data-apply-replenish-title]")
       : null;
     if (!(target instanceof HTMLElement)) return;
 
@@ -9646,6 +9717,18 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
         return;
       }
       await copyText(buildNextTopicBriefText(mode), "已複製下一篇補位資訊。");
+      return;
+    }
+
+    if (target.hasAttribute("data-apply-replenish-title")) {
+      articlePresetTitle = target.dataset.applyReplenishTitle || "";
+      applyArticlePresetTitleToField();
+      persistArticlePresetTitle();
+      clearArticleTopicDecision();
+      clearArticleProFinalizePrompt();
+      renderArticleComposerPanel();
+      setWorkspacePane("content", { scrollTarget: "article-topic-shell" });
+      setFeedback(`已置入本輪題目：「${articlePresetTitle || "未命名題目"}」。`, "is-success");
       return;
     }
 
