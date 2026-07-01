@@ -7056,6 +7056,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "【Gemini Flash 結構化判題結果】",
       aiDraftBlock,
       "",
+      buildArticleQualityTargetSection("【正式文章品質目標】"),
+      "",
       structuredDataContext,
       "",
       "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下所有段落都必須寫在同一份 Markdown 文件內。",
@@ -7113,6 +7115,20 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "3. 建議改寫：只寫最應重寫的 1-3 條原指令，並說明應如何改寫；若沒有，寫「無」。",
       "4. 本次觸發原因：用 2-4 句說明這些建議是因為本次哪裡不夠清楚、過度、衝突或缺漏。",
       "5. 是否建議立即修改：只能回答「是」或「否」，並補 1 句原因。",
+    ].join("\n");
+  }
+
+  function buildArticleQualityTargetSection(sectionTitle = "【正式文章品質目標】") {
+    return [
+      `${sectionTitle}`,
+      "- 這一段不是要你先輸出自評，而是要你在動筆前就先用正式書稿標準倒推文章結構。",
+      "- 本篇正式文章的寫作目標，是在完成後有機會達到 `9.0/10` 以上的正式書稿水準；這是目標門檻，不是允許你虛高打分。",
+      "- 請在寫作過程中，優先依以下權重倒推文章內容：書稿成熟度 22%、內容判斷力 20%、數據與硬資訊密度 20%、章節定位與補位正確性 15%、工具書可用性 13%、品牌與文氣穩定度 5%、SEO 與發布完整度 5%。",
+      "- 若無法同時滿足上述權重，寧可保守補強最弱項，也不可先寫完再用漂亮語氣灌高分數。",
+      "- 若你預估本篇目前仍無法達到 `9.0/10`，請在正文生成階段優先補強最弱的 1 至 2 項，常見優先順序為：數據與硬資訊密度 -> 工具書可用性 -> 章節定位與補位正確性 -> 書稿成熟度。",
+      "- 若命中設備、規格、預算、驗收或配置類主題，卻沒有落實表格型工具書模組，則本篇不得以 `9.0/10` 以上為目標自我判定。",
+      "- 若命中流程、時序、施工節奏或先後取捨題型，卻沒有流程步驟模組，本篇也不應以 `9.0/10` 以上為目標自我判定。",
+      "- 你的任務不是把文章寫得看起來很完整，而是把文章寫到真的足以接近 9 分門檻。",
     ].join("\n");
   }
 
@@ -7266,6 +7282,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       `相似舊文：${decision.similar}`,
       `回覆視角：${decision.angle}`,
       "",
+      buildArticleQualityTargetSection("【正式文章品質目標】"),
+      "",
       structuredDataContext,
       "",
       "寫作要求：",
@@ -7364,6 +7382,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       relatedArticleContext,
       "",
       gapContext,
+      "",
+      buildArticleQualityTargetSection("【正式文章品質目標】"),
       "",
       structuredDataContext,
       "",
@@ -7554,6 +7574,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "你是青曦空間設計的內容總編與正式撰稿編輯。",
       "請根據下方資料，直接產出一篇可發布於官網、並可收進後續書稿的完整 Markdown 文章。",
       "全文請用繁體中文，維持專業、務實、安定的語氣。",
+      buildArticleQualityTargetSection("【正式文章品質目標】"),
       "文章至少包含 1 個 H1、3 個以上 H2，必要時加入 H3。",
       "若題目涉及流程、比較、清單、判斷或預算，請主動整理成可視化段落或條列模組。",
       "正文至少要有 3 個定量支點；若命中上方數據包，至少 2 個定量支點必須來自數據包或依其改寫成保守區間。",
@@ -8378,6 +8399,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "- 標題格式嚴格綁定為「2-4 字子概念：實務操作說明」。",
       "- 在評估章節成熟度時，若該章缺少案例、QA 或表單任一實務節點，不得把章節完成度視為成熟完成，應優先補齊非理論節點。",
     ].join("\n");
+    const qualityTargetText = buildArticleQualityTargetSection("正式文章品質目標");
 
     if (mode === "metadata") {
       return [
@@ -8464,6 +8486,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         "【相似題處理規則】",
         overlapRuleText,
         "",
+        qualityTargetText,
+        "",
         hardGuardText,
         "",
       "優先判斷規則：",
@@ -8531,6 +8555,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "",
       "相似題處理規則：",
       overlapRuleText,
+      "",
+      qualityTargetText,
       "",
       hardGuardText,
       "",
