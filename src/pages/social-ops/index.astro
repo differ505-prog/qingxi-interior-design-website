@@ -979,6 +979,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   <button type="button" id="copy-article-prep-package" class="bookshelf-action">複製完整生文前置包</button>
                   <button type="button" id="run-article-ai-flow-highfreq" class="bookshelf-action bookshelp-action-primary">一鍵備好 Pro 生文包</button>
                 </div>
+                <p id="article-composer-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
                 <p id="article-prep-note" class="bookshelf-confirm-note">若有真實社團問題，系統會自動併入前置包；若沒有，也會用出版落位與情境摘要補足起稿資訊。</p>
               </section>
               <div class="bookshelf-actions bookshelf-confirm-actions">
@@ -6098,10 +6099,12 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function setArticleAiFeedback(message, mode = "") {
-    const shell = document.getElementById("article-ai-feedback");
-    if (!shell) return;
-    shell.className = `bookshelf-ai-feedback ${mode}`.trim();
-    shell.textContent = message;
+    ["article-ai-feedback", "article-composer-feedback"].forEach((id) => {
+      const shell = document.getElementById(id);
+      if (!(shell instanceof HTMLElement)) return;
+      shell.className = `bookshelf-ai-feedback ${mode}`.trim();
+      shell.textContent = message;
+    });
   }
 
   function spotlightActionButton(id) {
@@ -7611,6 +7614,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         setArticleAiFeedback(finalMessage, storageOk ? "is-success" : "is-warning");
       } else {
         revealArticleProPrompt();
+        document.getElementById("article-pro-prompt-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
         spotlightActionButton("copy-pro-finalize-prompt");
         spotlightActionButton("copy-pro-finalize-prompt-inline");
         const fallbackMessage = promptState.usedFallback
@@ -7628,6 +7632,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       if (articleProFinalizePrompt.trim()) {
         renderArticleProPrompt();
         revealArticleProPrompt();
+        document.getElementById("article-pro-prompt-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
         spotlightActionButton("copy-pro-finalize-prompt");
         spotlightActionButton("copy-pro-finalize-prompt-inline");
         setFeedback("判題已完成，Pro 生文提示詞也已備好，但後續流程中斷；可直接展開下方內容手動複製。", "is-warning");
