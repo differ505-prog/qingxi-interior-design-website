@@ -27,7 +27,7 @@ export const DEFAULT_BLOG_COVER_IMAGE =
 
 export const staticBlogPosts: BlogCatalogPost[] = [
   {
-    title: "水電更新與迴路重整：老屋翻新無法妥協的隱蔽工程與安全基準",
+    title: "水電更新：老屋基礎工程的迴路重整與用電安全",
     slug: "old-house-rewiring-and-electrical-safety",
     date: "2026-07-02",
     summary:
