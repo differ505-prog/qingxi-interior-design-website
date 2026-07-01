@@ -941,6 +941,46 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 </div>
                 <div id="publishing-review-top3" class="bookshelf-review-top3-list"></div>
               </section>
+              <section class="bookshelf-review-composer">
+                <div class="bookshelf-preview-head">
+                  <p>高頻生文起稿台</p>
+                  <span>直接貼本輪預設題目，系統會自動整理情境摘要與完整生文前置包；高階 LLM 仍可沿用、微調或改題</span>
+                </div>
+                <label class="gemini-field bookshelf-prompt-field">
+                  <span>本輪預設題目</span>
+                  <input
+                    id="article-preset-title"
+                    type="text"
+                    placeholder="例如：老屋翻新起手式：屋況盤點與範圍界定總表"
+                  />
+                </label>
+                <div class="bookshelf-review-composer-grid">
+                  <label class="gemini-field bookshelf-prompt-field">
+                    <span>情境摘要</span>
+                    <textarea
+                      id="article-context-summary"
+                      rows="8"
+                      readonly
+                      placeholder="系統會依本輪題目、自動決題與出版落位整理可直接複製的情境摘要"
+                    ></textarea>
+                  </label>
+                  <label class="gemini-field bookshelf-prompt-field">
+                    <span>完整生文前置包</span>
+                    <textarea
+                      id="article-prep-package"
+                      rows="12"
+                      readonly
+                      placeholder="這裡會整理可直接貼給高階 LLM 或作為 Pro 生文流程來源的完整前置包"
+                    ></textarea>
+                  </label>
+                </div>
+                <div class="bookshelf-actions bookshelf-confirm-actions">
+                  <button type="button" id="copy-article-context-summary" class="bookshelf-action">複製情境摘要</button>
+                  <button type="button" id="copy-article-prep-package" class="bookshelf-action">複製完整生文前置包</button>
+                  <button type="button" id="run-article-ai-flow-highfreq" class="bookshelf-action bookshelp-action-primary">一鍵備好 Pro 生文包</button>
+                </div>
+                <p id="article-prep-note" class="bookshelf-confirm-note">若有真實社團問題，系統會自動併入前置包；若沒有，也會用出版落位與情境摘要補足起稿資訊。</p>
+              </section>
               <div class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
                 <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製給高階 LLM 覆核</button>
@@ -1878,6 +1918,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 <script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson, publicationMergeDirectivesJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
+  const ARTICLE_PRESET_TITLE_KEY = "qingxi-article-preset-title-v1";
   const ARTICLE_TOPIC_DECISION_KEY = "qingxi-article-topic-decision-v1";
   const ARTICLE_AI_RESULT_KEY = "qingxi-article-ai-result-v1";
   const ARTICLE_PRO_FINALIZE_PROMPT_KEY = "qingxi-article-pro-finalize-prompt-v1";
@@ -1962,6 +2003,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     "主理中",
   ];
   let articleSourceQuestion = "";
+  let articlePresetTitle = "";
   let articleTopicDecision = null;
   let articleAiResult = "";
   let articleAiMode = "";
@@ -5184,7 +5226,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function buildArticleTopicPrompt(question = "", mode = currentTopicMode) {
-    const questionBlock = question.trim() || "（請在此貼上社團原始發問內容）";
+    const questionBlock = question.trim() || "（請在此貼上本輪生文前置包）";
     const modeState = getCurrentTopicModeState(mode);
     const candidateText = buildArticleTopicCandidateText(mode);
     const candidateCount = getCurrentTopicCandidates(mode).length;
@@ -5192,12 +5234,12 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     return [
       "你是青曦空間設計的內容總編、出版策劃與第一線接案設計師。",
       "現在只做『本題動態決題』，不是直接寫文章。",
-      "你的任務是先理解真實社團問題，再從系統提供的出版候選裡，挑出最適合落進書稿的一個題目。",
+      "你的任務是先理解本輪生文前置包，再從系統提供的出版候選裡，挑出最適合落進書稿的一個題目。",
       "你不能跳出候選清單自創新的主書系、章節或子章節。",
-      "但你必須讓最後選出的標題，更貼近這次真實問題，而不是只複誦系統模板。",
+      "但你必須讓最後選出的標題，更貼近這次輸入情境，而不是只複誦系統模板。",
       "",
       "決策原則：",
-      "1. 先抓這次社團問題真正的痛點、情境與決策點。",
+      "1. 先抓這次前置包真正描述的痛點、情境與決策點。",
       "2. 最終只能從候選清單中擇一落位。",
       "3. 標題要能回答這次問題，也要能自然收進未來書稿章名。",
       "4. 若多個候選都可用，優先選最能兼顧真實回覆價值與出版補位效率者。",
@@ -5206,7 +5248,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       `【本次決題模式】${modeState?.label || mode}`,
       modeState?.modeRationale || "目前先沿用既有模式。",
       "",
-      "【真實社團問題】",
+      "【本輪生文前置包】",
       questionBlock,
       "",
       `【系統候選清單】共 ${candidateCount} 個`,
@@ -5414,17 +5456,17 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function buildEmergencyProFinalizePrompt(problemText = "", aiDraft = "") {
-    const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
+    const questionBlock = problemText.trim() || "（請在此貼上本輪生文前置包）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
 
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
-      "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
+      "請根據下方本輪生文前置包與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
       "這篇文章不是一次性流量稿，而是未來可持續收錄、整併、出版的內容資產；寫作時請同時滿足網站發布與出書收錄兩個目的。",
       "請把整份輸出都寫成可直接放進 Gemini 內建 Canvas 的單一完整 Markdown 文件，方便後續在同一份 Canvas 內繼續編修。",
       "",
-      "【真實社團問題】",
+      "【本輪生文前置包】",
       questionBlock,
       "",
       "【Gemini Flash 結構化判題結果】",
@@ -5552,7 +5594,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function buildBasicProFinalizePrompt(problemText = "", aiDraft = "") {
-    const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
+    const questionBlock = problemText.trim() || "（請在此貼上本輪生文前置包）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
     let confirmData = {
       category: "尚未判定",
@@ -5581,12 +5623,12 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
-      "請根據下方真實社團問題與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
+      "請根據下方本輪生文前置包與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
       "這篇文章不是一次性流量稿，而是未來要整理成書的內容資產；請一開始就用『可發布、可收錄、可長期保存』的標準寫作。",
       "請把整份輸出都寫成可直接放進 Gemini 內建 Canvas 的單一完整 Markdown 文件，方便後續在同一份 Canvas 內繼續編修。",
       "",
-      "【真實社團問題】",
+      "【本輪生文前置包】",
       questionBlock,
       "",
       "【Gemini Flash 結構化判題結果】",
@@ -5651,7 +5693,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function buildProFinalizePrompt(problemText = "", aiDraft = "") {
-    const questionBlock = problemText.trim() || "（請在此貼上真實社團問題）";
+    const questionBlock = problemText.trim() || "（請在此貼上本輪生文前置包）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
     const confirmData = getArticleConfirmData(aiDraftBlock);
     const decision = getArticleAiDecision(aiDraftBlock);
@@ -5669,7 +5711,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "請把 Flash 提供的判題、分類、標題與入庫資訊當成文章骨架，再把真正的文章品質、邏輯、文氣、內部連貫與 SEO 完整拉高。",
       "這篇文章最終必須同時滿足兩個用途：一是可直接發布在官網，二是未來整理成書時，可自然放進對應主書系與章節，不顯得像零散拼貼文。",
       "",
-      "【真實社團問題】",
+      "【本輪生文前置包】",
       questionBlock,
       "",
       "【Gemini Flash 結構化判題結果】",
@@ -5852,10 +5894,45 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     }
   }
 
+  function loadArticlePresetTitle() {
+    try {
+      articlePresetTitle = localStorage.getItem(ARTICLE_PRESET_TITLE_KEY) || "";
+    } catch (error) {
+      console.error("讀取本輪預設題目失敗：", error);
+      articlePresetTitle = "";
+    }
+  }
+
   function applyArticleSourceQuestionToField() {
     const field = document.getElementById("article-source-question");
     if (!(field instanceof HTMLTextAreaElement)) return;
     field.value = articleSourceQuestion;
+  }
+
+  function getRecommendedArticleSeed() {
+    const modeState = getCurrentTopicModeState(currentTopicMode);
+    const recommendation = modeState?.nextRecommendedTopic;
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    return {
+      recommendation,
+      focusTrack,
+      bookProposal: getBookProposal(currentTopicMode),
+    };
+  }
+
+  function getResolvedArticlePresetTitle() {
+    const field = document.getElementById("article-preset-title");
+    const rawValue = field instanceof HTMLInputElement ? field.value.trim() : articlePresetTitle.trim();
+    if (rawValue) return rawValue;
+    if (articleTopicDecision?.title) return articleTopicDecision.title;
+    return getDisplayTitle(getRecommendedArticleSeed().recommendation);
+  }
+
+  function applyArticlePresetTitleToField() {
+    const field = document.getElementById("article-preset-title");
+    if (!(field instanceof HTMLInputElement)) return;
+    field.value = articlePresetTitle || "";
+    field.placeholder = getResolvedArticlePresetTitle() || "例如：老屋翻新起手式：屋況盤點與範圍界定總表";
   }
 
   function persistArticleSourceQuestion() {
@@ -5868,6 +5945,18 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       console.error("儲存社團問題草稿失敗：", error);
     }
     return articleSourceQuestion;
+  }
+
+  function persistArticlePresetTitle() {
+    const field = document.getElementById("article-preset-title");
+    if (!(field instanceof HTMLInputElement)) return articlePresetTitle;
+    articlePresetTitle = field.value.trim();
+    try {
+      localStorage.setItem(ARTICLE_PRESET_TITLE_KEY, articlePresetTitle);
+    } catch (error) {
+      console.error("儲存本輪預設題目失敗：", error);
+    }
+    return articlePresetTitle;
   }
 
   function loadArticleTopicDecision() {
@@ -5900,6 +5989,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       console.error("清除本題動態決題失敗：", error);
     }
     renderArticleTopicDecision();
+    renderArticleComposerPanel();
   }
 
   function renderArticleTopicDecision() {
@@ -5944,7 +6034,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     reason.textContent = articleTopicDecision.reason || articleTopicDecision.questionLink || "已完成動態決題。";
     note.textContent =
       articleTopicDecision.bookLink ||
-      `這一步會先依真實社團問題理解痛點，再從 ${candidateCount || "目前"} 個出版候選裡挑最適合落進書稿的題目。`;
+      `這一步會先依本輪生文前置包理解痛點，再從 ${candidateCount || "目前"} 個出版候選裡挑最適合落進書稿的題目。`;
     renderPublishingReviewBoard();
   }
 
@@ -6061,7 +6151,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function prepareProFinalizePrompt(question = "") {
-    const resolvedQuestion = question || articleSourceQuestion;
+    const resolvedQuestion = question || buildResolvedArticleSourcePackage().packageText;
     let usedFallback = false;
 
     try {
@@ -6166,10 +6256,11 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     content.textContent = articleAiResult;
     shell.open = hasResult;
     renderPublishingReviewBoard();
+    renderArticleComposerPanel();
   }
 
   function setArticleAiBusy(isBusy) {
-    ["run-article-ai-flow", "run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload", "copy-social-reply-short", "copy-social-reply-pro", "copy-social-reply-lead", "copy-publishing-review-prompt", "copy-publishing-review-outline"].forEach((id) => {
+    ["run-article-ai-flow", "run-article-ai-flow-highfreq", "run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload", "copy-social-reply-short", "copy-social-reply-pro", "copy-social-reply-lead", "copy-publishing-review-prompt", "copy-publishing-review-outline", "copy-article-context-summary", "copy-article-prep-package"].forEach((id) => {
       const button = document.getElementById(id);
       if (button instanceof HTMLButtonElement) {
         button.disabled = isBusy;
@@ -6196,8 +6287,86 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     ].join("\n");
   }
 
+  function buildChapterMissionText(chapter = "", subchapter = "") {
+    if (chapter === "現況判讀") return `先立住「${subchapter || "前期判讀"}」這個主幹，讓讀者知道翻新前應先看什麼、先判斷什麼。`;
+    if (chapter === "預算拆解") return `補強「${subchapter || "預算拆解"}」的決策框架，避免讀者只看到零散預算資訊。`;
+    if (chapter === "基礎工程") return `把「${subchapter || "基礎工程"}」寫成能支撐後續施工排序與避雷的基礎主幹。`;
+    if (chapter === "空間重整") return `把「${subchapter || "空間重整"}」整理成可直接對應生活動線與配置取捨的實用框架。`;
+    if (chapter === "完工避雷") return `讓「${subchapter || "完工避雷"}」成為讀者在驗收、保固與爭議預防上的收尾工具文。`;
+    return `請把這篇寫成能補齊「${chapter || "本章"} / ${subchapter || "本子章"}」缺口的主幹文。`;
+  }
+
+  function buildArticleContextSummary() {
+    const { recommendation, focusTrack, bookProposal } = getRecommendedArticleSeed();
+    const title = getResolvedArticlePresetTitle() || "尚未設定";
+    const track = articleTopicDecision?.track || recommendation?.trackTitle || focusTrack?.title || "尚未判定";
+    const chapter = articleTopicDecision?.chapter || recommendation?.chapter || "尚未判定";
+    const subchapter = articleTopicDecision?.subchapter || recommendation?.subchapter || "尚未判定";
+    const similarArticles = recommendation?.similarArticles?.slice(0, 2) || [];
+    const sourceQuestion = articleSourceQuestion.trim();
+    return [
+      `目標書名：${bookProposal?.bookTitle || track}`,
+      `本輪預設題目：${title}`,
+      `出版落位：${track} / ${chapter} / ${subchapter}`,
+      `文章任務：${buildChapterMissionText(chapter, subchapter)}`,
+      `推薦理由：${articleTopicDecision?.reason || recommendation?.reason || "目前先沿用系統推薦落位與出版缺口判斷。"}`,
+      `撞題風險：${recommendation?.collisionRisk ? `${recommendation.collisionRisk}｜${recommendation.collisionReason}` : "尚未比對"}`,
+      `相似舊文：${similarArticles.length ? similarArticles.map((item) => `${item.title}（${item.score}）`).join(" / ") : "目前未發現高相似舊文"}`,
+      `真實社團問題：${sourceQuestion || "目前尚未貼入；請先用出版落位與預設題目起稿，高階 LLM 可視需要改題。"}`,
+    ].join("\n");
+  }
+
+  function buildArticlePrepPackage() {
+    const sourceQuestion = articleSourceQuestion.trim();
+    const presetTitle = getResolvedArticlePresetTitle();
+    const topicDecisionBlock = buildArticleTopicDecisionContext();
+    return [
+      "【本輪預設題目】",
+      presetTitle || "尚未設定",
+      "",
+      "【題目使用原則】",
+      "這是目前最推薦的起稿題目，高階 LLM 可沿用、微調或改題，但需維持在同一本主書骨架內並交代理由。",
+      "",
+      "【情境摘要】",
+      buildArticleContextSummary(),
+      "",
+      "【本題動態決題】",
+      topicDecisionBlock,
+      "",
+      "【真實社團問題】",
+      sourceQuestion || "目前尚未貼入真實社團問題。",
+    ].join("\n");
+  }
+
+  function buildResolvedArticleSourcePackage() {
+    const sourceQuestion = persistArticleSourceQuestion();
+    const presetTitle = persistArticlePresetTitle();
+    const packageText = buildArticlePrepPackage();
+    return {
+      sourceQuestion,
+      presetTitle,
+      packageText,
+      hasSeed: Boolean(sourceQuestion || presetTitle || articleTopicDecision?.title || getRecommendedArticleSeed().recommendation?.primaryTitle),
+    };
+  }
+
+  function renderArticleComposerPanel() {
+    const summaryField = document.getElementById("article-context-summary");
+    const prepField = document.getElementById("article-prep-package");
+    const note = document.getElementById("article-prep-note");
+    if (!(summaryField instanceof HTMLTextAreaElement) || !(prepField instanceof HTMLTextAreaElement) || !(note instanceof HTMLElement)) {
+      return;
+    }
+    summaryField.value = buildArticleContextSummary();
+    prepField.value = buildArticlePrepPackage();
+    note.textContent = articleSourceQuestion.trim()
+      ? "目前前置包已包含真實社團問題；高階 LLM 可沿用、微調或改題。"
+      : "目前未貼入真實社團問題，前置包會先用出版落位與情境摘要補足起稿資訊。";
+    applyArticlePresetTitleToField();
+  }
+
   function buildArticlePrompt(problemText = "", mode = "full", currentContent = "") {
-    const questionBlock = problemText.trim() || "（請在此貼上社團的發問內容）";
+    const questionBlock = problemText.trim() || "（請在此貼上本輪生文前置包）";
     const isShortQuestion = questionBlock.length <= 90;
     const currentContentBlock = currentContent.trim() || "（目前尚無 AI 初判內容）";
     const topicDecisionBlock = buildArticleTopicDecisionContext();
@@ -6241,7 +6410,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         "你的第一行必須直接從「0. 【判題結論】」開始。",
         "若資訊不足，也要依目前問題與既有初判，給出最合理的暫定判斷，不可留空，不可寫尚未判定。",
         "",
-        "【真實社團問題】",
+        "【本輪生文前置包】",
         questionBlock,
         "",
         "【目前 AI 初判內容】",
@@ -6297,7 +6466,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         "你的第一行必須直接從「0. 【判題結論】」開始。",
         "若沒有把握，也必須先依目前資訊給出最合理的暫定主書系與章節定位，不可留空。",
         "",
-        "【真實社團問題】",
+        "【本輪生文前置包】",
         questionBlock,
         "",
         "【固定主書系】",
@@ -6360,7 +6529,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     }
 
     return [
-      "【真實社團問題】",
+      "【本輪生文前置包】",
       questionBlock,
       "",
       "你是「青曦空間設計」的設計總監與內容策劃。",
@@ -6385,7 +6554,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "",
       contextInstruction,
       "",
-      "請根據以上【真實社團問題】，幫我產出一套完整的內容，並嚴格遵守以下結構：",
+      "請根據以上【本輪生文前置包】，幫我產出一套完整的內容，並嚴格遵守以下結構：",
       "- 禁止輸出任何前言、結語、補充說明或『我已收到』之類的句子。",
       "- 各段標題必須完整保留編號與【】格式。",
       "",
@@ -7212,10 +7381,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   async function requestArticleTopicDecision(mode = currentTopicMode) {
-    const question = persistArticleSourceQuestion();
-    if (!question) {
-      setFeedback("請先貼上真實社團問題。", "is-warning");
-      setArticleAiFeedback("請先貼上真實社團問題。", "is-warning");
+    const sourceState = buildResolvedArticleSourcePackage();
+    if (!sourceState.hasSeed) {
+      setFeedback("請先在高頻區提供本輪預設題目，或貼上真實社團問題。", "is-warning");
+      setArticleAiFeedback("請先在高頻區提供本輪預設題目，或貼上真實社團問題。", "is-warning");
       return null;
     }
 
@@ -7230,7 +7399,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         signal: controller.signal,
         body: JSON.stringify({
           mode: "topic",
-          prompt: buildArticleTopicPrompt(question, mode),
+          prompt: buildArticleTopicPrompt(sourceState.packageText, mode),
         }),
       });
       window.clearTimeout(timeoutId);
@@ -7263,19 +7432,19 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   async function ensureArticleTopicDecision(mode = currentTopicMode) {
-    const question = persistArticleSourceQuestion();
-    if (!question) return null;
+    const sourceState = buildResolvedArticleSourcePackage();
+    if (!sourceState.hasSeed) return null;
 
-    if (articleTopicDecision?.question === question && articleTopicDecision?.mode === mode) {
+    if (articleTopicDecision?.question === sourceState.packageText && articleTopicDecision?.mode === mode) {
       renderArticleTopicDecision();
       return articleTopicDecision;
     }
 
-    setArticleAiFeedback("第 1 步進行中：正在依真實問題做本題動態決題...", "is-success");
+    setArticleAiFeedback("第 1 步進行中：正在依高頻區前置包做本題動態決題...", "is-success");
     const content = await requestArticleTopicDecision(mode);
     if (!content) return null;
 
-    const parsed = parseArticleTopicDecision(content, mode, question);
+    const parsed = parseArticleTopicDecision(content, mode, sourceState.packageText);
     if (!parsed) {
       setArticleAiFeedback("本題動態決題格式不完整，先改用固定骨架繼續。", "is-warning");
       return null;
@@ -7289,10 +7458,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   async function requestArticleAi(mode, currentContent = "") {
-    const question = persistArticleSourceQuestion();
-    if (!question) {
-      setFeedback("請先貼上真實社團問題。", "is-warning");
-      setArticleAiFeedback("請先貼上真實社團問題。", "is-warning");
+    const sourceState = buildResolvedArticleSourcePackage();
+    if (!sourceState.hasSeed) {
+      setFeedback("請先在高頻區提供本輪預設題目，或貼上真實社團問題。", "is-warning");
+      setArticleAiFeedback("請先在高頻區提供本輪預設題目，或貼上真實社團問題。", "is-warning");
       return null;
     }
 
@@ -7307,7 +7476,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         signal: controller.signal,
         body: JSON.stringify({
           mode,
-          prompt: buildArticlePrompt(question, mode, currentContent),
+          prompt: buildArticlePrompt(sourceState.packageText, mode, currentContent),
         }),
       });
       window.clearTimeout(timeoutId);
@@ -7421,9 +7590,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       const saved = saveArticleAiResult();
       renderArticleAiResult();
 
-      const question = persistArticleSourceQuestion();
+      const sourceState = buildResolvedArticleSourcePackage();
       setArticleAiFeedback("結果已整理，正在備好 Pro 生文提示詞...", "is-success");
-      const promptState = prepareProFinalizePrompt(question);
+      const promptState = prepareProFinalizePrompt(sourceState.packageText);
       const storageOk = saved && promptState.saved;
       setArticleAiFeedback(
         promptState.usedFallback ? "Pro 生文提示詞已用穩定版備好，正在嘗試自動複製..." : "Pro 生文提示詞已備好，正在嘗試自動複製...",
@@ -8048,11 +8217,11 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   });
 
   document.getElementById("copy-article-prompt")?.addEventListener("click", async () => {
-    const question = persistArticleSourceQuestion();
-    const successMessage = question
+    const sourceState = buildResolvedArticleSourcePackage();
+    const successMessage = sourceState.packageText.trim()
       ? "已複製 Flash 長稿備援提示詞。"
       : "已複製 Flash 長稿備援提示詞模板。";
-    await copyText(buildArticlePrompt(question, "full"), successMessage);
+    await copyText(buildArticlePrompt(sourceState.packageText, "full"), successMessage);
   });
 
   const runArticleAiFlowButton = document.getElementById("run-article-ai-flow");
@@ -8060,12 +8229,30 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     await runArticleAiFlow();
   });
 
+  document.getElementById("run-article-ai-flow-highfreq")?.addEventListener("click", async () => {
+    await runArticleAiFlow();
+  });
+
+  document.getElementById("copy-article-context-summary")?.addEventListener("click", async () => {
+    const result = await copyText(buildArticleContextSummary(), "已複製情境摘要。");
+    const feedback = getCopyFeedbackState(result, "已複製情境摘要。", "已開啟手動複製視窗，可直接複製情境摘要。");
+    setFeedback(feedback.message, feedback.mode);
+    setArticleAiFeedback(feedback.message, feedback.mode);
+  });
+
+  document.getElementById("copy-article-prep-package")?.addEventListener("click", async () => {
+    const result = await copyText(buildArticlePrepPackage(), "已複製完整生文前置包。");
+    const feedback = getCopyFeedbackState(result, "已複製完整生文前置包。", "已開啟手動複製視窗，可直接複製完整生文前置包。");
+    setFeedback(feedback.message, feedback.mode);
+    setArticleAiFeedback(feedback.message, feedback.mode);
+  });
+
   document.getElementById("copy-pro-finalize-prompt")?.addEventListener("click", async () => {
-    const question = persistArticleSourceQuestion();
+    const sourceState = buildResolvedArticleSourcePackage();
     const successMessage = articleAiResult.trim()
       ? "已複製 Pro 生文提示詞。"
       : "已複製 Pro 生文提示詞模板，建議先生成 Flash 判題結果再使用。";
-    const result = await copyProArticlePrompt(question, successMessage, {
+    const result = await copyProArticlePrompt(sourceState.packageText, successMessage, {
       manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。",
     });
     if (result.copyResult !== "clipboard") {
@@ -8085,11 +8272,11 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   });
 
   document.getElementById("copy-pro-finalize-prompt-inline")?.addEventListener("click", async () => {
-    const question = persistArticleSourceQuestion();
+    const sourceState = buildResolvedArticleSourcePackage();
     const successMessage = articleAiResult.trim()
       ? "已複製 Pro 生文提示詞。"
       : "已複製 Pro 生文提示詞模板，建議先生成 Flash 判題結果再使用。";
-    const result = await copyProArticlePrompt(question, successMessage, {
+    const result = await copyProArticlePrompt(sourceState.packageText, successMessage, {
       manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。",
     });
     if (result.copyResult !== "clipboard") {
@@ -8185,6 +8372,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     clearArticleTopicDecision();
     clearArticleProFinalizePrompt();
     applyArticleSourceQuestionToField();
+    renderArticleComposerPanel();
     setFeedback("已清空真實社團問題。", "is-warning");
   });
 
@@ -8492,7 +8680,19 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const nextQuestion = persistArticleSourceQuestion();
     if (nextQuestion !== previousQuestion) {
       clearArticleTopicDecision();
+      clearArticleProFinalizePrompt();
     }
+    renderArticleComposerPanel();
+  });
+
+  document.getElementById("article-preset-title")?.addEventListener("input", () => {
+    const previousTitle = articlePresetTitle;
+    const nextTitle = persistArticlePresetTitle();
+    if (nextTitle !== previousTitle) {
+      clearArticleTopicDecision();
+      clearArticleProFinalizePrompt();
+    }
+    renderArticleComposerPanel();
   });
 
   document.getElementById("article-pro-prompt-content")?.addEventListener("focus", (event) => {
@@ -8502,6 +8702,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   });
 
   loadArticleSourceQuestion();
+  loadArticlePresetTitle();
   loadArticleTopicDecision();
   loadArticleAiResult();
   loadArticleProFinalizePrompt();
@@ -8515,9 +8716,11 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   normalizeWeeklyState();
   normalizeDailyState();
   applyArticleSourceQuestionToField();
+  applyArticlePresetTitleToField();
   renderArticleTopicDecision();
   renderArticleAiResult();
   renderArticleProPrompt();
+  renderArticleComposerPanel();
   applyGeminiDraftToFields();
   renderTopicModePanels();
   renderPublishingChecklist();
