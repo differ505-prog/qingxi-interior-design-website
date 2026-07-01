@@ -1562,6 +1562,54 @@ function buildRecommendationCandidates(
     .sort((left, right) => right.score - left.score);
 }
 
+function buildForcedFallbackCandidate(
+  entries: BookshelfEntry[],
+  focusTrackTitle: string,
+  mode: PublishingTopicMode,
+  fallbackTrackTitle = publishingFocusTrackTitle,
+  fallbackChapterTitle = "預算拆解",
+  fallbackSubchapterTitle = "報價拆讀",
+) {
+  if (focusTrackTitle !== publishingFocusTrackTitle) return null;
+  const track = getTrackPlan(fallbackTrackTitle);
+  const chapter = track?.chapters.find((item) => item.title === fallbackChapterTitle);
+  const subchapter = chapter?.subchapters.find((item) => item.title === fallbackSubchapterTitle);
+  if (!track || !chapter || !subchapter) return null;
+
+  const trackEntries = entries.filter((entry) => entry.trackTitle === fallbackTrackTitle);
+  const chapterEntries = trackEntries.filter((entry) => entry.chapter === fallbackChapterTitle);
+  const subchapterEntries = chapterEntries.filter((entry) => entry.subchapter === fallbackSubchapterTitle);
+  const totalSubchapters = track.chapters.reduce((sum, item) => sum + item.subchapters.length, 0);
+  const completedSubchapters = track.chapters.reduce(
+    (sum, item) =>
+      sum + item.subchapters.filter((child) =>
+        trackEntries.some((entry) => entry.chapter === item.title && entry.subchapter === child.title),
+      ).length,
+    0,
+  );
+  const coverageBefore = totalSubchapters ? Math.round((completedSubchapters / totalSubchapters) * 100) : 0;
+  const coverageAfter = totalSubchapters
+    ? Math.round(((completedSubchapters + (subchapterEntries.length ? 0 : 1)) / totalSubchapters) * 100)
+    : coverageBefore;
+
+  return buildRecommendationFromCandidate(
+    entries,
+    {
+      trackTitle: fallbackTrackTitle,
+      chapter: fallbackChapterTitle,
+      subchapter: fallbackSubchapterTitle,
+      category: "裝修預算",
+      articleCountInTrack: trackEntries.length,
+      articleCountInChapter: chapterEntries.length,
+      articleCountInSubchapter: subchapterEntries.length,
+      coverageBefore,
+      coverageAfter,
+    },
+    focusTrackTitle,
+    mode,
+  );
+}
+
 function getChapterRecommendedTopicFromEntries(
   entries: BookshelfEntry[],
   trackTitle: string,
@@ -1570,7 +1618,11 @@ function getChapterRecommendedTopicFromEntries(
   mode: PublishingTopicMode = "publishing",
 ) {
   const best = buildRecommendationCandidates(entries, focusTrackTitle, mode, { trackTitle, chapterTitle })[0];
-  if (!best) return null;
+  if (!best) {
+    return trackTitle === publishingFocusTrackTitle && chapterTitle === "預算拆解"
+      ? buildForcedFallbackCandidate(entries, focusTrackTitle, mode)
+      : null;
+  }
   return buildRecommendationFromCandidate(entries, best, focusTrackTitle, mode);
 }
 
@@ -1591,7 +1643,11 @@ function getTrackRecommendedTopicFromEntries(
   mode: PublishingTopicMode = "publishing",
 ) {
   const best = buildRecommendationCandidates(entries, focusTrackTitle, mode, { trackTitle })[0];
-  if (!best) return null;
+  if (!best) {
+    return trackTitle === publishingFocusTrackTitle
+      ? buildForcedFallbackCandidate(entries, focusTrackTitle, mode)
+      : null;
+  }
   return buildRecommendationFromCandidate(entries, best, focusTrackTitle, mode);
 }
 
@@ -1622,9 +1678,12 @@ export function getNextRecommendedTopics(
   limit = 6,
 ) {
   const entries = buildBookshelfEntries(posts);
-  return buildRecommendationCandidates(entries, focusTrackTitle, mode)
+  const recommendations = buildRecommendationCandidates(entries, focusTrackTitle, mode)
     .slice(0, Math.max(1, limit))
     .map((candidate) => buildRecommendationFromCandidate(entries, candidate, focusTrackTitle, mode));
+  if (recommendations.length) return recommendations;
+  const fallback = buildForcedFallbackCandidate(entries, focusTrackTitle, mode);
+  return fallback ? [fallback] : [];
 }
 
 export function getNextRecommendedTopic(
@@ -1634,6 +1693,6 @@ export function getNextRecommendedTopic(
 ): NextTopicRecommendation | null {
   const entries = buildBookshelfEntries(posts);
   const best = buildRecommendationCandidates(entries, focusTrackTitle, mode)[0];
-  if (!best) return null;
+  if (!best) return buildForcedFallbackCandidate(entries, focusTrackTitle, mode);
   return buildRecommendationFromCandidate(entries, best, focusTrackTitle, mode);
 }
