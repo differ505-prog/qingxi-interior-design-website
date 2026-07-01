@@ -2196,6 +2196,65 @@
     font-size: 0.85rem;
   }
 
+  .bookshelf-review-semantic-row,
+  .bookshelf-review-top3-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .bookshelf-review-semantic-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(239, 236, 229, 0.82);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .bookshelf-review-semantic-badge.is-high {
+    border-color: rgba(106, 151, 117, 0.24);
+    background: rgba(106, 151, 117, 0.12);
+    color: #edf8ef;
+  }
+
+  .bookshelf-review-semantic-badge.is-medium {
+    border-color: rgba(231, 198, 126, 0.24);
+    background: rgba(231, 198, 126, 0.12);
+    color: #f6eedb;
+  }
+
+  .bookshelf-review-semantic-badge.is-low {
+    border-color: rgba(196, 113, 113, 0.24);
+    background: rgba(196, 113, 113, 0.12);
+    color: #fae7e7;
+  }
+
+  .bookshelf-review-semantic-badge.is-neutral {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(239, 236, 229, 0.76);
+  }
+
+  .bookshelf-dependency-lock {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: rgba(201, 198, 190, 0.72);
+    font-size: 0.76rem;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    cursor: help;
+  }
+
   .bookshelf-review-diff-panel {
     margin-top: 0.1rem;
   }

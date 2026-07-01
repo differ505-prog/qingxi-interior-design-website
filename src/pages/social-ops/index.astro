@@ -184,10 +184,6 @@ const publishingDashboard = topicModeMap[defaultTopicMode].publishingDashboard;
 const initialFocusTrack = defaultModeState?.publishingDashboard?.focusTrack || null;
 const initialBookProposal = defaultModeState?.bookProposal || null;
 const initialRecommendation = defaultModeState?.nextRecommendedTopic || null;
-const initialRecommendationTitle = initialRecommendation?.primaryTitle || initialRecommendation?.webTitle || initialRecommendation?.bookTitle || "收納補強：老屋機能配置與櫃體整合策略";
-const initialRecommendationMeta = initialRecommendation
-  ? `${initialRecommendation.chapter} / ${initialRecommendation.subchapter} / ${initialRecommendation.category}｜補前 ${initialRecommendation.coverageBefore}% → 補後 ${initialRecommendation.coverageAfter}%`
-  : "空間重整 / 收納補強 / 收納機能｜補前 0% → 補後 0%";
 const initialRecommendationModeText = initialFocusTrack
   ? `${defaultModeState?.label || defaultTopicMode}｜${initialFocusTrack.title} 尚差 ${initialFocusTrack.remainingToBaseline} 篇`
   : "會跟內容書架同步";
@@ -221,8 +217,8 @@ const initialTopPriorityRecommendations = (() => {
   const explicitPriorityMap = {
     "現況判讀::翻新起手式": 0,
     "現況判讀::實戰表單": 1,
-    "預算拆解::發包合約": 2,
-    "現況判讀::判讀流程": 3,
+    "現況判讀::專案節點": 2,
+    "預算拆解::發包合約": 3,
     "預算拆解::報價拆讀": 4,
   };
   const rankCandidate = (candidate: any, index: number) => {
@@ -249,6 +245,11 @@ const initialTopPriorityRecommendations = (() => {
     .sort((left, right) => rankCandidate(left, merged.indexOf(left)) - rankCandidate(right, merged.indexOf(right)))
     .slice(0, 3);
 })();
+const initialDisplayRecommendation = initialTopPriorityRecommendations[0] || initialRecommendation;
+const initialRecommendationTitle = initialDisplayRecommendation?.primaryTitle || initialDisplayRecommendation?.webTitle || initialDisplayRecommendation?.bookTitle || "收納補強：老屋機能配置與櫃體整合策略";
+const initialRecommendationMeta = initialDisplayRecommendation
+  ? `${initialDisplayRecommendation.chapter} / ${initialDisplayRecommendation.subchapter} / ${initialDisplayRecommendation.category}｜補前 ${initialDisplayRecommendation.coverageBefore}% → 補後 ${initialDisplayRecommendation.coverageAfter}%`
+  : "空間重整 / 收納補強 / 收納機能｜補前 0% → 補後 0%";
 const vendorIntakeShortUrl = "https://qingxidesign.tw/crew-intake";
 const cannedReplies = [
   {
@@ -986,18 +987,22 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 </div>
                 <p id="publishing-review-next-meta" class="bookshelf-confirm-note">{initialRecommendationMeta}</p>
                 <div class="bookshelf-review-risk-row">
-                  <strong id="publishing-review-risk-badge" class={`bookshelf-review-risk-badge is-${initialRecommendation?.collisionRisk || "low"}`}>{initialRecommendation?.collisionRisk === "high" ? "規則初篩高相近" : initialRecommendation?.collisionRisk === "medium" ? "規則初篩中相近" : "規則初篩低相近"}</strong>
-                  <span id="publishing-review-risk-note" class="bookshelf-confirm-note">{initialRecommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。"}</span>
+                  <strong id="publishing-review-risk-badge" class={`bookshelf-review-risk-badge is-${initialDisplayRecommendation?.collisionRisk || "low"}`}>{initialDisplayRecommendation?.collisionRisk === "high" ? "規則初篩高相近" : initialDisplayRecommendation?.collisionRisk === "medium" ? "規則初篩中相近" : "規則初篩低相近"}</strong>
+                  <span id="publishing-review-risk-note" class="bookshelf-confirm-note">{initialDisplayRecommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。"}</span>
                 </div>
-                <p id="publishing-review-action-hint" class="bookshelf-review-action-hint">{initialRecommendation?.actionHint ? `${initialRecommendation.actionHint}｜待高階 LLM 裁定` : "待高階 LLM 裁定"}</p>
-                <div id="publishing-review-blocker" class={`bookshelf-review-blocker ${initialRecommendation?.collisionRisk === "high" ? "is-visible" : ""}`}>
-                  {initialRecommendation?.collisionRisk === "high"
-                    ? `送審提醒：規則層初篩認為此題與 ${initialRecommendation.similarArticles?.[0]?.title || "相近舊文"} 靠近，請要求高階 LLM 明確裁定是否整併、改切角，或可直接新發。`
+                <div class="bookshelf-review-semantic-row">
+                  <strong id="publishing-review-semantic-badge" class="bookshelf-review-semantic-badge is-neutral">意圖待比對</strong>
+                  <span id="publishing-review-semantic-note" class="bookshelf-confirm-note">貼入本輪原始問題後，這裡會顯示候選與問題的語意匹配度。</span>
+                </div>
+                <p id="publishing-review-action-hint" class="bookshelf-review-action-hint">{initialDisplayRecommendation?.actionHint ? `${initialDisplayRecommendation.actionHint}｜待高階 LLM 裁定` : "待高階 LLM 裁定"}</p>
+                <div id="publishing-review-blocker" class={`bookshelf-review-blocker ${initialDisplayRecommendation?.collisionRisk === "high" ? "is-visible" : ""}`}>
+                  {initialDisplayRecommendation?.collisionRisk === "high"
+                    ? `送審提醒：規則層初篩認為此題與 ${initialDisplayRecommendation.similarArticles?.[0]?.title || "相近舊文"} 靠近，請要求高階 LLM 明確裁定是否整併、改切角，或可直接新發。`
                     : ""}
                 </div>
                 <ul id="publishing-review-similar-list" class="bookshelf-review-similar-list">
-                  {initialRecommendation?.similarArticles?.length
-                    ? initialRecommendation.similarArticles.slice(0, 2).map((article) => (
+                  {initialDisplayRecommendation?.similarArticles?.length
+                    ? initialDisplayRecommendation.similarArticles.slice(0, 2).map((article) => (
                       <li class={article.score >= 60 ? "is-alert" : ""}>
                         <strong>{article.title}</strong>
                         <small>{article.chapter} / {article.subchapter}｜規則分數 {article.score}｜{article.reason}</small>
@@ -4674,6 +4679,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function getTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
     const modeState = getCurrentTopicModeState(mode);
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
     const focusTrackTitle = modeState?.publishingDashboard?.focusTrack?.title;
     const allCandidates = Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates : [];
     const primaryRecommendation = modeState?.nextRecommendedTopic || null;
@@ -4704,8 +4710,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const explicitPriorityMap = {
       "現況判讀::翻新起手式": 0,
       "現況判讀::實戰表單": 1,
-      "預算拆解::發包合約": 2,
-      "現況判讀::判讀流程": 3,
+      "現況判讀::專案節點": 2,
+      "預算拆解::發包合約": 3,
       "預算拆解::報價拆讀": 4,
     };
     const rankCandidate = (candidate, index) => {
@@ -4721,8 +4727,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       const chapterRank = Object.prototype.hasOwnProperty.call(chapterPriorityMap, candidate?.chapter || "")
         ? chapterPriorityMap[candidate.chapter]
         : 9;
+      const semanticScore = getCandidateIntentScore(candidate, articleSourceQuestion);
+      const mergeIntentOverride = articleSourceQuestion.trim() && candidate?.workflowAction === "Merge_and_Update" && semanticScore >= 0.5
+        ? -5000 - Math.round(semanticScore * 100)
+        : 0;
+      const dependencyPenalty = isDependencyLocked(focusTrack, candidate?.chapter, candidate?.subchapter) ? 1500 : 0;
       const riskPenalty = candidate?.workflowAction === "Merge_and_Update" && explicitRank < 10 ? 0 : riskRank * 1000;
-      return riskPenalty + explicitRank * 100 + chapterRank * 10 + index;
+      return mergeIntentOverride + riskPenalty + dependencyPenalty + explicitRank * 100 + chapterRank * 10 + index;
     };
     const safeCandidates = merged.filter((candidate) => (
       candidate?.collisionRisk !== "high" || candidate?.workflowAction === "Merge_and_Update"
@@ -4849,6 +4860,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function buildTopPriorityMarkup(mode = currentTopicMode, limit = 3) {
     const candidates = getTopPriorityRecommendations(mode, limit);
+    const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
     if (!candidates.length) {
       return '<p class="bookshelf-confirm-note">目前尚無可用的 Top 3 優先發布建議。</p>';
     }
@@ -4859,6 +4871,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
           <em>${escapeHtml(candidate.chapter)} / ${escapeHtml(candidate.subchapter)}</em>
         </div>
         <strong>${escapeHtml(getDisplayTitle(candidate))}</strong>
+        <div class="bookshelf-review-top3-meta">
+          <span class="bookshelf-review-semantic-badge is-${getSemanticMatchBadgeData(candidate).state}">${escapeHtml(getSemanticMatchBadgeData(candidate).label)}</span>
+          ${isDependencyLocked(focusTrack, candidate.chapter, candidate.subchapter) ? '<span class="bookshelf-dependency-lock" title="需先完成前置觀念文章" aria-label="需先完成前置觀念文章">&#128274; 前置觀念未完成</span>' : ""}
+        </div>
         <p>${escapeHtml(candidate.reason)}</p>
       </article>
     `).join("");
@@ -4931,6 +4947,53 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     if (!recommendation || recommendation.collisionRisk !== "high") return "";
     const similarTitles = recommendation.similarArticles?.slice(0, 2).map((article) => `${article.title}（${article.score}）`).join(" / ");
     return `送審提醒：規則層初篩認為此題與 ${similarTitles || "相近舊文"} 靠近；請交由高階 LLM 裁定是否改走「Merge_and_Update」、「更改切角」或保留「New_Publish」。`;
+  }
+
+  function getSemanticMatchBadgeData(recommendation, question = articleSourceQuestion) {
+    if (!recommendation) {
+      return {
+        score: 0,
+        state: "neutral",
+        label: "意圖待比對",
+        note: "尚未選定候選，暫時無法比對語意匹配度。",
+      };
+    }
+    if (!question.trim()) {
+      return {
+        score: 0,
+        state: "neutral",
+        label: "意圖待比對",
+        note: "尚未貼入本輪原始問題，因此暫不顯示匹配分數。",
+      };
+    }
+    const score = Math.round(getCandidateIntentScore(recommendation, question) * 100);
+    const state = score >= 80 ? "high" : score >= 60 ? "medium" : "low";
+    const note = state === "high"
+      ? "本輪原始問題與這個候選高度貼合，可直接作為送審主軸。"
+      : state === "medium"
+        ? "語意仍在合理範圍，但建議再檢查是否有更切題的整併候選。"
+        : "本輪原始問題與候選距離偏大，建議優先重檢排序或改回更切題的整併題。";
+    return {
+      score,
+      state,
+      label: `意圖匹配 ${score}%`,
+      note,
+    };
+  }
+
+  function isDependencyLocked(focusTrack, chapterTitle = "", subchapterTitle = "") {
+    if (!focusTrack?.chapterGaps?.length) return false;
+    const chapterGap = focusTrack.chapterGaps.find((gap) => gap.chapter === chapterTitle);
+    const titlePoolItem = chapterGap?.titlePool?.find((item) => item.subchapter === subchapterTitle) || null;
+    if (titlePoolItem?.nodeKind !== "form") return false;
+    const hasTheoryPublished = Boolean(
+      chapterGap?.titlePool?.some((item) => item.nodeKind === "core" && item.status === "published")
+    );
+    return !hasTheoryPublished;
+  }
+
+  function getPrimaryReviewRecommendation(mode = currentTopicMode) {
+    return getTopPriorityRecommendations(mode, 1)[0] || getCurrentTopicModeState(mode)?.nextRecommendedTopic || null;
   }
 
   function getExpectedCandidate(mode = currentTopicMode) {
@@ -5283,7 +5346,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function buildPublishingReviewOutline(mode = currentTopicMode) {
     const modeState = getCurrentTopicModeState(mode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
-    const recommendation = modeState?.nextRecommendedTopic;
+    const recommendation = getPrimaryReviewRecommendation(mode);
     const bookProposal = getBookProposal(mode);
     if (!focusTrack) return "目前尚無可用的出版補位清單。";
 
@@ -5369,7 +5432,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function buildPublishingReviewPrompt(mode = currentTopicMode) {
     const modeState = getCurrentTopicModeState(mode);
-    const recommendation = modeState?.nextRecommendedTopic;
+    const recommendation = getPrimaryReviewRecommendation(mode);
     const bookProposal = getBookProposal(mode);
     const questionBlock = articleSourceQuestion.trim() || "（本輪尚未貼入新的社團原始問題，可先針對長線出版清單做覆核。）";
 
@@ -5471,7 +5534,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       return;
     }
 
-    const recommendation = modeState?.nextRecommendedTopic;
+    const recommendation = getPrimaryReviewRecommendation(currentTopicMode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
     if (!recommendation || !focusTrack) {
       title.textContent = "尚未產生";
@@ -5520,7 +5583,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function renderPublishingReviewBoard() {
     const modeState = getCurrentTopicModeState(currentTopicMode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
-    const recommendation = modeState?.nextRecommendedTopic;
+    const recommendation = getPrimaryReviewRecommendation(currentTopicMode);
     const bookProposal = getBookProposal(currentTopicMode);
     const draftState = getCurrentDraftState();
     const mode = document.getElementById("publishing-review-mode");
@@ -5533,6 +5596,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const nextMeta = document.getElementById("publishing-review-next-meta");
     const riskBadge = document.getElementById("publishing-review-risk-badge");
     const riskNote = document.getElementById("publishing-review-risk-note");
+    const semanticBadge = document.getElementById("publishing-review-semantic-badge");
+    const semanticNote = document.getElementById("publishing-review-semantic-note");
     const actionHint = document.getElementById("publishing-review-action-hint");
     const blocker = document.getElementById("publishing-review-blocker");
     const similarList = document.getElementById("publishing-review-similar-list");
@@ -5556,6 +5621,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       !(nextMeta instanceof HTMLElement) ||
       !(riskBadge instanceof HTMLElement) ||
       !(riskNote instanceof HTMLElement) ||
+      !(semanticBadge instanceof HTMLElement) ||
+      !(semanticNote instanceof HTMLElement) ||
       !(actionHint instanceof HTMLElement) ||
       !(blocker instanceof HTMLElement) ||
       !(similarList instanceof HTMLElement) ||
@@ -5587,6 +5654,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       nextMeta.textContent = "目前資料不足，暫時無法建立出版閉環覆核。";
       applyRiskBadge(riskBadge, "low", "規則初篩低相近");
       riskNote.textContent = "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。";
+      semanticBadge.textContent = "意圖待比對";
+      semanticBadge.className = "bookshelf-review-semantic-badge is-neutral";
+      semanticNote.textContent = "貼入本輪原始問題後，這裡會顯示候選與問題的語意匹配度。";
       actionHint.textContent = "待高階 LLM 裁定";
       blocker.textContent = "";
       blocker.classList.remove("is-visible");
@@ -5616,6 +5686,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       : "目前尚未產生送審候選。";
     applyRiskBadge(riskBadge, recommendation?.collisionRisk || "low", "規則初篩低相近");
     riskNote.textContent = recommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。";
+    const semanticData = getSemanticMatchBadgeData(recommendation);
+    semanticBadge.textContent = semanticData.label;
+    semanticBadge.className = `bookshelf-review-semantic-badge is-${semanticData.state}`;
+    semanticNote.textContent = semanticData.note;
     actionHint.textContent = recommendation?.actionHint ? `${recommendation.actionHint}｜待高階 LLM 裁定` : "待高階 LLM 裁定";
     blocker.textContent =
       getChronologyWarningMessage(recommendation, focusTrack) ||
@@ -5654,6 +5728,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         const subchapterMarkup = visibleSubchapters.map((subchapter) => {
           const subchapterRecommendation = gap.recommendedTopic?.subchapter === subchapter.title ? gap.recommendedTopic : null;
           const titlePoolItem = (gap.titlePool || []).find((item) => item.subchapter === subchapter.title);
+          const dependencyLocked = isDependencyLocked(focusTrack, gap.chapter, subchapter.title);
           const recommendationPublished = subchapterRecommendation
             ? isPublishedArticleTitle(subchapterRecommendation.primaryTitle)
             : false;
@@ -5682,9 +5757,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   <span>${escapeHtml(titlePoolItem?.statusTag || "子章節")}</span>
                   <strong>${escapeHtml(subchapter.title)}</strong>
                 </div>
-                <em>${subchapter.coveredByArticle ? `已有 ${subchapter.articleCount} 篇` : isDraft ? "草稿中" : "待補"}</em>
+                <em>${subchapter.coveredByArticle ? `已有 ${subchapter.articleCount} 篇` : isDraft ? "草稿中" : dependencyLocked ? "依賴鎖定" : "待補"}</em>
               </div>
               ${titlePoolItem?.assetSlotLabel ? `<small class="bookshelf-review-subchapter-asset">附錄掛載：${escapeHtml(titlePoolItem.assetSlotLabel)}</small>` : ""}
+              ${dependencyLocked ? '<small class="bookshelf-dependency-lock" title="需先完成前置觀念文章" aria-label="需先完成前置觀念文章">&#128274; 需先完成前置觀念文章</small>' : ""}
               ${recommendationMarkup}
             </li>
           `;
@@ -5797,7 +5873,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function buildNextTopicBriefText(mode = currentTopicMode) {
     const modeState = getCurrentTopicModeState(mode);
-    const recommendation = modeState?.nextRecommendedTopic;
+    const recommendation = getPrimaryReviewRecommendation(mode);
     if (!recommendation) return "";
 
     return [
@@ -5823,7 +5899,15 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function getCurrentTopicCandidates(mode = currentTopicMode) {
     const modeState = getCurrentTopicModeState(mode);
-    return Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates : [];
+    const topCandidates = getTopPriorityRecommendations(mode, 3);
+    const rawCandidates = Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates : [];
+    const merged = [...topCandidates];
+    rawCandidates.forEach((candidate) => {
+      if (!merged.some((item) => item.primaryTitle === candidate.primaryTitle && item.subchapter === candidate.subchapter)) {
+        merged.push(candidate);
+      }
+    });
+    return merged;
   }
 
   function buildArticleTopicCandidateText(mode = currentTopicMode) {
@@ -6582,7 +6666,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function getRecommendedArticleSeed() {
     const modeState = getCurrentTopicModeState(currentTopicMode);
-    const recommendation = modeState?.nextRecommendedTopic;
+    const recommendation = getPrimaryReviewRecommendation(currentTopicMode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
     return {
       recommendation,

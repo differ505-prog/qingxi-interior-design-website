@@ -263,10 +263,10 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             assetSlotLabel: "老屋初勘健檢 Check-list",
           },
           {
-            title: "判讀流程",
-            keywords: ["初勘流程", "估價前", "決策順序", "判讀流程", "是否開工"],
+            title: "專案節點",
+            keywords: ["初勘流程", "估價前", "決策順序", "判讀流程", "是否開工", "專案節點", "開工前"],
             nodeKind: "project",
-            titleOverride: "判讀流程：初勘、估價與是否開工的決策順序",
+            titleOverride: "專案節點：初勘至開工的決策沙盤推演",
           },
         ],
       },
@@ -838,7 +838,7 @@ function getOldHouseRecommendationPriorityBoost(
   const chapterSubchapterBoostMap: Record<string, number> = {
     "現況判讀::翻新起手式": 360,
     "現況判讀::實戰表單": 260,
-    "現況判讀::判讀流程": 154,
+    "現況判讀::專案節點": 154,
     "預算拆解::發包合約": 188,
     "預算拆解::合約檢核": -120,
     "預算拆解::報價拆讀": 104,
@@ -983,6 +983,20 @@ function getIncompleteCoreBoost(
   if (!hasToolForm && candidateIsToolForm) boost += 50;
   if (!hasProcess && candidateIsProcess) boost += 50;
   return boost;
+}
+
+function getToolBeforeTheoryPenalty(
+  trackTitle: string,
+  chapterTitle: string,
+  subchapterTitle: string,
+  chapterEntries: BookshelfEntry[],
+) {
+  const candidatePlan = getSubchapterPlan(trackTitle, chapterTitle, subchapterTitle);
+  if (candidatePlan?.nodeKind !== "form") return 0;
+  const hasTheory = chapterEntries.some((entry) => (
+    getSubchapterPlan(trackTitle, chapterTitle, entry.subchapter)?.nodeKind === "core"
+  ));
+  return hasTheory ? 0 : 260;
 }
 
 function isMicroCoverageTitle(title = "") {
@@ -1878,6 +1892,8 @@ function buildRecommendationCandidates(
         const incompleteCoreBoost = track.title === publishingFocusTrackTitle
           ? getIncompleteCoreBoost(track.title, chapter.title, subchapter.title, chapterEntries)
           : 0;
+        const toolBeforeTheoryPenalty = getToolBeforeTheoryPenalty(track.title, chapter.title, subchapter.title, chapterEntries);
+        const mergeTargetBoost = allowCoveredMergeCandidate ? 320 : 0;
         const timelinePenalty = getOldHouseTimelinePenalty(track.title, chapter.title, nodeKind, trackEntries);
         const score =
           focusBoost +
@@ -1887,10 +1903,12 @@ function buildRecommendationCandidates(
           seededSubchapterBoost +
           multiTrackDiversityBoost +
           structuralVacuumBoost +
+          mergeTargetBoost +
           oldHousePriorityBoost +
           incompleteCoreBoost +
           macroPriorityBoost -
           recentPenalty -
+          toolBeforeTheoryPenalty -
           timelinePenalty -
           chapterSaturationPenalty -
           collisionPenalty;
