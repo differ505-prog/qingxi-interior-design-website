@@ -736,6 +736,8 @@ const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
 const topicModeOptionsJson = JSON.stringify(publishingTopicModeOptions);
 const topicModeMapJson = JSON.stringify(topicModeMap);
 const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives);
+const publicationChapterOrderJson = JSON.stringify(publicationChapterOrder);
+const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 ---
 
 <BaseLayout
@@ -2097,7 +2099,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson, publicationMergeDirectivesJson }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson, publicationMergeDirectivesJson, publicationChapterOrderJson, publishingFocusTrackTitleJson, publicationChronologyMinCompletionRate }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const ARTICLE_PRESET_TITLE_KEY = "qingxi-article-preset-title-v1";
@@ -2141,6 +2143,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   const topicModeOptions = JSON.parse(topicModeOptionsJson);
   const topicModeDataMap = topicModeMapJson ? JSON.parse(topicModeMapJson) : {};
   const publicationMergeRules = publicationMergeDirectivesJson ? JSON.parse(publicationMergeDirectivesJson) : [];
+  const publicationChapterOrder = publicationChapterOrderJson ? JSON.parse(publicationChapterOrderJson) : [];
+  const publishingFocusTrackTitle = publishingFocusTrackTitleJson ? JSON.parse(publishingFocusTrackTitleJson) : "";
   const articleIntakeFields = [
     "主書系",
     "章節定位",
