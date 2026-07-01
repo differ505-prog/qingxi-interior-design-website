@@ -7442,19 +7442,21 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const note = document.getElementById("article-cross-series-lock-note");
     const confirmButton = document.getElementById("copy-article-confirm-payload");
     const categoryButton = document.getElementById("copy-article-category");
-    const runFlowButton = document.getElementById("run-article-ai-flow-highfreq");
-    const quickButton = document.getElementById("run-article-ai-quick");
-    const draftButton = document.getElementById("run-article-ai-draft");
     const currentBookTitle = getBookProposal(currentTopicMode)?.bookTitle || "";
     const confirmData = getArticleConfirmData(content);
-    const conflictKeyword = currentBookTitle.includes("老屋")
+    const hasResolvedConfirm = Boolean(
+      confirmData.title &&
+      confirmData.title !== "尚未判定" &&
+      confirmData.track &&
+      confirmData.track !== "尚未判定",
+    );
+    const conflictKeyword = currentBookTitle.includes("老屋") && hasResolvedConfirm
       ? hasCrossSeriesConflict(
-        articlePresetTitle,
-        articleSourceQuestion,
         confirmData.title,
         confirmData.category,
         confirmData.track,
-        content,
+        articleTopicDecision?.title || "",
+        articleTopicDecision?.track || "",
       )
       : "";
     const isLocked = Boolean(conflictKeyword);
@@ -7464,7 +7466,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     if (note instanceof HTMLElement && isLocked) {
       note.textContent = `偵測到互斥詞彙「${conflictKeyword}」，目前主書為老屋翻新主線，請退回改題或清理標籤後再確認。`;
     }
-    [confirmButton, categoryButton, runFlowButton, quickButton, draftButton].forEach((button) => {
+    [confirmButton, categoryButton].forEach((button) => {
       if (button instanceof HTMLButtonElement) {
         button.disabled = isLocked;
       }

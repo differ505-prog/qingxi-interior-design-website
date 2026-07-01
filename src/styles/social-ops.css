@@ -2062,25 +2062,18 @@
   }
 
   .bookshelf-cross-series-lock {
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    display: grid;
-    place-items: center;
-    padding: 1.5rem;
-    background: rgba(72, 14, 14, 0.72);
-    backdrop-filter: blur(10px);
+    margin-top: 0.8rem;
   }
 
   .bookshelf-cross-series-lock-card {
-    width: min(560px, 100%);
+    width: 100%;
     display: grid;
     gap: 0.45rem;
-    padding: 1.25rem 1.3rem;
-    border-radius: 24px;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
     border: 1px solid rgba(226, 114, 114, 0.34);
-    background: linear-gradient(180deg, rgba(104, 24, 24, 0.96), rgba(54, 18, 18, 0.96));
-    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(180deg, rgba(104, 24, 24, 0.92), rgba(54, 18, 18, 0.92));
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
   }
 
   .bookshelf-cross-series-lock-card span {
