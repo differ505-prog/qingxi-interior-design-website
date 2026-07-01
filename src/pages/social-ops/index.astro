@@ -6608,6 +6608,31 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     ].join("\n");
   }
 
+  function buildMinimalProFinalizePrompt(problemText = "", aiDraft = "") {
+    const questionBlock = problemText.trim() || "（請在此貼上本輪生文前置包）";
+    const aiDraftBlock = aiDraft.trim() || "（請在此貼上 Gemini Flash 判題結果）";
+    return [
+      "你是青曦空間設計的內容總編與正式撰稿編輯。",
+      "請根據下方資料，直接產出一篇可發布於官網、並可收進後續書稿的完整 Markdown 文章。",
+      "全文請用繁體中文，維持專業、務實、安定的語氣。",
+      "文章至少包含 1 個 H1、3 個以上 H2，必要時加入 H3。",
+      "若題目涉及流程、比較、清單、判斷或預算，請主動整理成可視化段落或條列模組。",
+      "",
+      "【本輪生文前置包】",
+      questionBlock,
+      "",
+      "【Gemini Flash 判題結果】",
+      aiDraftBlock,
+      "",
+      "請依序輸出：",
+      "1. 文章標題",
+      "2. Lead 與核心引言",
+      "3. 正文主體（分節清楚）",
+      "4. 結尾總結",
+      "5. SEO 標題與 meta description",
+    ].join("\n");
+  }
+
   function loadArticleSourceQuestion() {
     try {
       articleSourceQuestion = localStorage.getItem(ARTICLE_SOURCE_QUESTION_KEY) || "";
@@ -7006,21 +7031,35 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     let usedFallback = false;
 
     try {
-      try {
-        articleProFinalizePrompt = buildProFinalizePrompt(resolvedQuestion, articleAiResult);
-      } catch (error) {
-        console.error("完整 Pro 生文提示詞生成失敗，改用穩定版：", error);
-        articleProFinalizePrompt = buildBasicProFinalizePrompt(resolvedQuestion, articleAiResult);
-        usedFallback = true;
-      }
-
+      articleProFinalizePrompt = buildProFinalizePrompt(resolvedQuestion, articleAiResult);
       if (!articleProFinalizePrompt.trim()) {
-        articleProFinalizePrompt = buildBasicProFinalizePrompt(resolvedQuestion, articleAiResult);
-        usedFallback = true;
+        throw new Error("完整版 Pro 提示詞為空字串");
       }
-    } catch (error) {
-      console.error("穩定版 Pro 生文提示詞生成失敗，改用緊急保底版：", error);
-      articleProFinalizePrompt = buildEmergencyProFinalizePrompt(resolvedQuestion, articleAiResult);
+    } catch (fullError) {
+      console.error("完整 Pro 生文提示詞生成失敗，改用穩定版：", fullError);
+      usedFallback = true;
+      try {
+        articleProFinalizePrompt = buildBasicProFinalizePrompt(resolvedQuestion, articleAiResult);
+        if (!articleProFinalizePrompt.trim()) {
+          throw new Error("穩定版 Pro 提示詞為空字串");
+        }
+      } catch (basicError) {
+        console.error("穩定版 Pro 生文提示詞生成失敗，改用緊急保底版：", basicError);
+        try {
+          articleProFinalizePrompt = buildEmergencyProFinalizePrompt(resolvedQuestion, articleAiResult);
+          if (!articleProFinalizePrompt.trim()) {
+            throw new Error("緊急版 Pro 提示詞為空字串");
+          }
+        } catch (emergencyError) {
+          console.error("緊急版 Pro 生文提示詞生成失敗，改用最小保底版：", emergencyError);
+          articleProFinalizePrompt = buildMinimalProFinalizePrompt(resolvedQuestion, articleAiResult);
+        }
+      }
+    }
+
+    if (!articleProFinalizePrompt.trim()) {
+      console.error("所有 Pro 生文提示詞版本皆為空，改用最小保底版。");
+      articleProFinalizePrompt = buildMinimalProFinalizePrompt(resolvedQuestion, articleAiResult);
       usedFallback = true;
     }
 
@@ -7206,7 +7245,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function buildFallbackArticleSourcePackage() {
     const sourceQuestion = articleSourceQuestion.trim();
-    const presetTitle = articlePresetTitle.trim() || articleTopicDecision?.title || getDisplayTitle(getPrimaryReviewRecommendation(currentTopicMode));
+    const presetTitle = articlePresetTitle.trim() || articleTopicDecision?.title || "尚未設定";
     const lines = [
       "【本輪預設題目】",
       presetTitle || "尚未設定",
