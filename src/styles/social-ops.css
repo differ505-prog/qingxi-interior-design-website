@@ -1617,6 +1617,111 @@
     gap: 0.85rem;
   }
 
+  .bookshelf-review-title-pool {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .bookshelf-review-title-pool-list {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .bookshelf-review-title-pool-chapter {
+    display: grid;
+    gap: 0.7rem;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-review-title-pool-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .bookshelf-review-title-pool-head span,
+  .bookshelf-review-title-pool-head small {
+    color: rgba(230, 228, 222, 0.58);
+    font-size: 0.78rem;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-review-title-pool-head strong {
+    color: #f4f2ed;
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  .bookshelf-review-title-pool-items {
+    display: grid;
+    gap: 0.7rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .bookshelf-review-title-pool-item {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.85rem 0.9rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.014);
+  }
+
+  .bookshelf-review-title-pool-item.is-published {
+    opacity: 0.62;
+  }
+
+  .bookshelf-review-title-pool-item.is-merge_needed {
+    border-color: rgba(196, 113, 113, 0.22);
+    background: linear-gradient(180deg, rgba(196, 113, 113, 0.08), rgba(255, 255, 255, 0.014));
+  }
+
+  .bookshelf-review-title-pool-item.is-recommended {
+    border-color: rgba(214, 210, 200, 0.18);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.06), rgba(214, 210, 200, 0.02));
+  }
+
+  .bookshelf-review-title-pool-copy {
+    display: grid;
+    gap: 0.22rem;
+  }
+
+  .bookshelf-review-title-pool-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .bookshelf-review-title-pool-meta span,
+  .bookshelf-review-title-pool-meta em,
+  .bookshelf-review-title-pool-copy small,
+  .bookshelf-review-title-pool-copy p {
+    color: rgba(233, 231, 225, 0.62);
+    font-size: 0.8rem;
+    line-height: 1.7;
+    font-style: normal;
+    margin: 0;
+  }
+
+  .bookshelf-review-title-pool-meta em {
+    white-space: nowrap;
+  }
+
+  .bookshelf-review-title-pool-copy strong {
+    color: #f4f2ed;
+    font-size: 0.92rem;
+    line-height: 1.68;
+    font-weight: 600;
+  }
+
   .bookshelf-review-progress-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));

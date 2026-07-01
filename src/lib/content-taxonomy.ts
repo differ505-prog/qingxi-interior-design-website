@@ -59,6 +59,7 @@ export interface PublishingChapterGap {
   remainingToBaseline: number;
   subchapters: PublishingSubchapterStatus[];
   recommendedTopic: NextTopicRecommendation | null;
+  titlePool: PublicationTitlePoolItem[];
 }
 
 export interface PublishingTrackDashboard extends PublishingTrackCoverage {
@@ -66,12 +67,26 @@ export interface PublishingTrackDashboard extends PublishingTrackCoverage {
   remainingToBaseline: number;
   readyToPublish: boolean;
   chapterGaps: PublishingChapterGap[];
+  titlePool: PublicationTitlePoolItem[];
 }
 
 export interface PublishingSubchapterStatus {
   title: string;
   articleCount: number;
   coveredByArticle: boolean;
+}
+
+export interface PublicationTitlePoolItem {
+  trackTitle: string;
+  chapter: string;
+  subchapter: string;
+  primaryTitle: string;
+  backupTitles: string[];
+  category: string;
+  status: "published" | "merge_needed" | "draft" | "pending";
+  confidence: "high" | "medium" | "low";
+  isRecommended: boolean;
+  note: string;
 }
 
 export interface SimilarArticleMatch {
@@ -577,6 +592,70 @@ function buildRecommendationReason(trackTitle: string, subchapterTitle: string, 
   return `${focusLead} ${chapterLead} ${subchapterLead}`;
 }
 
+function buildTitlePoolItem(
+  entries: BookshelfEntry[],
+  trackTitle: string,
+  chapterTitle: string,
+  subchapterTitle: string,
+  recommendedTopic: NextTopicRecommendation | null,
+): PublicationTitlePoolItem {
+  const titleSet = getTopicTitleSet(trackTitle, chapterTitle, subchapterTitle);
+  const mergeDirective = getPublicationMergeDirective(trackTitle, chapterTitle);
+  const hasPublishedEntry = entries.some((entry) => (
+    entry.trackTitle === trackTitle &&
+    entry.chapter === chapterTitle &&
+    entry.subchapter === subchapterTitle
+  ));
+  const mergeNeeded = Boolean(
+    mergeDirective &&
+    mergeDirective.targetSubchapter === subchapterTitle &&
+    mergeDirective.sourceTitles.length > 0
+  );
+  const isRecommended = recommendedTopic?.subchapter === subchapterTitle;
+  const status: PublicationTitlePoolItem["status"] = mergeNeeded
+    ? "merge_needed"
+    : hasPublishedEntry
+      ? "published"
+      : "pending";
+  const confidence: PublicationTitlePoolItem["confidence"] = isRecommended
+    ? "high"
+    : mergeNeeded
+      ? "high"
+      : hasPublishedEntry
+        ? "medium"
+        : "medium";
+  const note = mergeNeeded
+    ? mergeDirective?.note || "此子章目前應先整併既有文章，不建議另開新標題。"
+    : hasPublishedEntry
+      ? "此子章已有已上線文章，標題池保留作為整體出版視角參考。"
+      : isRecommended
+        ? "這是目前系統最推薦優先補位的標題。"
+        : "這是未來待補的候選標題，可交由高階 LLM 進一步覆核、重排與刪修。";
+  return {
+    trackTitle,
+    chapter: chapterTitle,
+    subchapter: subchapterTitle,
+    primaryTitle: titleSet.webTitle,
+    backupTitles: titleSet.backupTitles,
+    category: normalizeSiteCategory(trackTitle) || resolveTrackRootLabel(trackTitle),
+    status,
+    confidence,
+    isRecommended,
+    note,
+  } satisfies PublicationTitlePoolItem;
+}
+
+function buildChapterTitlePool(
+  entries: BookshelfEntry[],
+  trackTitle: string,
+  chapterPlan: BookshelfChapterPlan,
+  recommendedTopic: NextTopicRecommendation | null,
+) {
+  return chapterPlan.subchapters.map((subchapter) => (
+    buildTitlePoolItem(entries, trackTitle, chapterPlan.title, subchapter.title, recommendedTopic)
+  ));
+}
+
 export function getTrackPlan(trackTitle = "") {
   return bookshelfTrackPlans.find((track) => track.title === trackTitle) || null;
 }
@@ -853,13 +932,16 @@ export function getPublishingDashboard(
         .filter((subchapter) => !chapterEntries.some((entry) => entry.subchapter === subchapter.title))
         .map((subchapter) => subchapter.title);
 
+      const recommendedTopic = getChapterRecommendedTopicFromEntries(entries, track.title, chapter.title, focusTrackTitle, mode);
+      const titlePool = buildChapterTitlePool(entries, track.title, chapter, recommendedTopic);
       return {
         chapter: chapter.title,
         articleCount: chapterEntries.length,
         missingSubchapters,
         remainingToBaseline: missingSubchapters.length,
         subchapters,
-        recommendedTopic: getChapterRecommendedTopicFromEntries(entries, track.title, chapter.title, focusTrackTitle, mode),
+        recommendedTopic,
+        titlePool,
       } satisfies PublishingChapterGap;
     });
 
@@ -882,6 +964,7 @@ export function getPublishingDashboard(
       remainingToBaseline,
       readyToPublish: remainingToBaseline === 0,
       chapterGaps,
+      titlePool: chapterGaps.flatMap((gap) => gap.titlePool),
     } satisfies PublishingTrackDashboard;
   });
 

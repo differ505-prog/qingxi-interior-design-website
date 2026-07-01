@@ -927,6 +927,16 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 <span><i class="is-pending"></i>待補</span>
               </div>
               <div id="publishing-review-plan" class="bookshelf-review-plan"></div>
+              <section class="bookshelf-review-title-pool">
+                <div class="bookshelf-preview-head">
+                  <p>未來出版標題池</p>
+                  <span>把所有待補子章先補成完整標題池，再交給高階 LLM 做刪修、重排與優先順序判斷</span>
+                </div>
+                <div class="bookshelf-actions bookshelf-confirm-actions">
+                  <button type="button" id="copy-publishing-title-pool" class="bookshelf-action">複製完整出版標題池</button>
+                </div>
+                <div id="publishing-review-title-pool" class="bookshelf-review-title-pool-list"></div>
+              </section>
               <details class="bookshelf-mini-fold">
                 <summary>
                   <span>查看閉環覆核稿</span>
@@ -4210,6 +4220,77 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     }).join("");
   }
 
+  function getTitlePoolStatusLabel(status = "pending") {
+    if (status === "merge_needed") return "需整併";
+    if (status === "published") return "已上線";
+    if (status === "draft") return "草稿中";
+    return "待補";
+  }
+
+  function getTitlePoolConfidenceLabel(confidence = "medium") {
+    if (confidence === "high") return "高信心";
+    if (confidence === "low") return "低信心";
+    return "中信心";
+  }
+
+  function buildPublishingTitlePoolText(mode = currentTopicMode) {
+    const modeState = getCurrentTopicModeState(mode);
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    if (!focusTrack?.chapterGaps?.length) return "目前尚無可用的未來出版標題池。";
+
+    const lines = [
+      `主攻書系：${focusTrack.title}`,
+      `主書完成度：${focusTrack.coverageRate}%`,
+      "【完整未來出版標題池】",
+    ];
+
+    focusTrack.chapterGaps.forEach((gap, index) => {
+      lines.push("", `${index + 1}. ${gap.chapter}`);
+      gap.titlePool.forEach((item) => {
+        lines.push(
+          `- 子章節：${item.subchapter}`,
+          `  主標題：${item.primaryTitle}`,
+          `  備選標題：${item.backupTitles.join(" / ") || "無"}`,
+          `  狀態：${getTitlePoolStatusLabel(item.status)}｜${getTitlePoolConfidenceLabel(item.confidence)}${item.isRecommended ? "｜最推薦" : ""}`,
+          `  備註：${item.note}`,
+        );
+      });
+    });
+
+    return lines.join("\n");
+  }
+
+  function buildPublishingTitlePoolMarkup(focusTrack) {
+    if (!focusTrack?.chapterGaps?.length) {
+      return '<p class="bookshelf-confirm-note">目前尚無可用的未來出版標題池。</p>';
+    }
+
+    return focusTrack.chapterGaps.map((gap, index) => `
+      <article class="bookshelf-review-title-pool-chapter">
+        <div class="bookshelf-review-title-pool-head">
+          <span>第 ${index + 1} 章</span>
+          <strong>${escapeHtml(gap.chapter)}</strong>
+          <small>${gap.titlePool.length} 個子章標題</small>
+        </div>
+        <ul class="bookshelf-review-title-pool-items">
+          ${gap.titlePool.map((item) => `
+            <li class="bookshelf-review-title-pool-item is-${item.status} ${item.isRecommended ? "is-recommended" : ""}">
+              <div class="bookshelf-review-title-pool-copy">
+                <div class="bookshelf-review-title-pool-meta">
+                  <span>${escapeHtml(item.subchapter)}</span>
+                  <em>${escapeHtml(getTitlePoolStatusLabel(item.status))}｜${escapeHtml(getTitlePoolConfidenceLabel(item.confidence))}${item.isRecommended ? "｜最推薦" : ""}</em>
+                </div>
+                <strong>${escapeHtml(item.primaryTitle)}</strong>
+                <small>${escapeHtml(item.note)}</small>
+                ${item.backupTitles?.length ? `<p>備選：${escapeHtml(item.backupTitles.join(" / "))}</p>` : ""}
+              </div>
+            </li>
+          `).join("")}
+        </ul>
+      </article>
+    `).join("");
+  }
+
   function getDisplayTitle(recommendation) {
     if (!recommendation) return "尚未產生";
     return recommendation.primaryTitle || recommendation.webTitle || recommendation.bookTitle || "尚未產生";
@@ -4356,6 +4437,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       lines.push(`- 待補子章：${gap.missingSubchapters.join(" / ") || "本章主幹已立住"}`);
     });
 
+    lines.push("", buildPublishingTitlePoolText(mode));
+
     if (articleTopicDecision) {
       lines.push(
         "",
@@ -4407,6 +4490,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "B. 重複與缺口覆核",
       "- 已標示 [已上線] 的文章代表官網已有內容，請檢查是否有重複、撞題或章節失衡。",
       "- 請指出哪些章節仍明顯過薄，哪些題目應延後，哪些缺口最值得優先補。",
+      "- 請一併檢查『完整未來出版標題池』是否有缺章、冗題、撞題或標題體例不穩的問題。",
       "",
       "C. 下一篇是否真的是最佳選擇",
       `- 目前最推薦下一篇標題為：${getDisplayTitle(recommendation)}`,
@@ -4525,6 +4609,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const progress = document.getElementById("publishing-review-progress");
     const diffContent = document.getElementById("publishing-review-diff-content");
     const plan = document.getElementById("publishing-review-plan");
+    const titlePool = document.getElementById("publishing-review-title-pool");
     const promptContent = document.getElementById("publishing-review-prompt-content");
     const toggleButton = document.getElementById("toggle-publishing-review-unpublished");
     const filterNote = document.getElementById("publishing-review-filter-note");
@@ -4542,6 +4627,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       !(progress instanceof HTMLElement) ||
       !(diffContent instanceof HTMLElement) ||
       !(plan instanceof HTMLElement) ||
+      !(titlePool instanceof HTMLElement) ||
       !(promptContent instanceof HTMLTextAreaElement) ||
       !(toggleButton instanceof HTMLButtonElement) ||
       !(filterNote instanceof HTMLElement)
@@ -4567,6 +4653,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       renderSimilarityDiffAnalysis(diffContent, null);
       progress.innerHTML = "";
       plan.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版清單。</p>';
+      titlePool.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的未來出版標題池。</p>';
       promptContent.value = "目前尚無可用的出版閉環覆核稿。";
       filterNote.textContent = "目前尚無可用的出版清單。";
       renderReviewNextTopicPanel(modeState);
@@ -4587,6 +4674,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     renderSimilarArticleList(similarList, recommendation);
     renderSimilarityDiffAnalysis(diffContent, recommendation);
     progress.innerHTML = buildChapterProgressMarkup(focusTrack);
+    titlePool.innerHTML = buildPublishingTitlePoolMarkup(focusTrack);
     const chapterCards = focusTrack.chapterGaps
       .map((gap, index) => {
         const publishedPosts = getPublishedPostsForChapter(focusTrack.title, gap.chapter);
@@ -7629,6 +7717,16 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       { manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。" },
     );
     const feedback = getCopyFeedbackState(result, "已複製出版清單摘要。", "已開啟手動複製視窗，可直接複製出版清單摘要。");
+    setFeedback(feedback.message, feedback.mode);
+  });
+
+  document.getElementById("copy-publishing-title-pool")?.addEventListener("click", async () => {
+    const result = await copyText(
+      buildPublishingTitlePoolText(),
+      "已複製完整出版標題池。",
+      { manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。" },
+    );
+    const feedback = getCopyFeedbackState(result, "已複製完整出版標題池。", "已開啟手動複製視窗，可直接複製完整出版標題池。");
     setFeedback(feedback.message, feedback.mode);
   });
 
