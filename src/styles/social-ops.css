@@ -1557,6 +1557,14 @@
     line-height: 1.7;
   }
 
+  .bookshelf-review-similar-list li.is-alert strong {
+    color: #f3b0b0;
+  }
+
+  .bookshelf-review-similar-list li.is-alert small {
+    color: rgba(243, 176, 176, 0.78);
+  }
+
   .bookshelf-review-similar-list strong {
     color: #f2eee6;
     font-size: 0.88rem;
@@ -1609,6 +1617,117 @@
     gap: 0.85rem;
   }
 
+  .bookshelf-review-progress-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .bookshelf-review-progress-card {
+    display: grid;
+    gap: 0.42rem;
+    padding: 0.82rem 0.9rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.014);
+  }
+
+  .bookshelf-review-progress-card.is-empty {
+    border-color: rgba(196, 113, 113, 0.18);
+    background: linear-gradient(180deg, rgba(196, 113, 113, 0.08), rgba(255, 255, 255, 0.014));
+  }
+
+  .bookshelf-review-progress-card.is-complete {
+    border-color: rgba(106, 151, 117, 0.18);
+    background: linear-gradient(180deg, rgba(106, 151, 117, 0.08), rgba(255, 255, 255, 0.014));
+  }
+
+  .bookshelf-review-progress-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .bookshelf-review-progress-head span,
+  .bookshelf-review-progress-card small {
+    color: rgba(230, 228, 222, 0.58);
+    font-size: 0.76rem;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-review-progress-head strong,
+  .bookshelf-review-progress-head em {
+    color: #f4f2ed;
+    font-size: 0.88rem;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .bookshelf-review-progress-bar {
+    position: relative;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  .bookshelf-review-progress-bar i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, rgba(214, 210, 200, 0.42), rgba(231, 198, 126, 0.92));
+  }
+
+  .bookshelf-review-action-hint {
+    margin: 0;
+    color: rgba(231, 198, 126, 0.9);
+    font-size: 0.82rem;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-review-diff-toggle {
+    justify-self: start;
+  }
+
+  .bookshelf-review-diff-panel {
+    margin-top: 0.1rem;
+  }
+
+  .bookshelf-review-diff-content {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .bookshelf-review-diff-card {
+    display: grid;
+    gap: 0.28rem;
+    padding: 0.85rem 0.9rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.014);
+  }
+
+  .bookshelf-review-diff-card.is-alert {
+    border-color: rgba(196, 113, 113, 0.22);
+    background: linear-gradient(180deg, rgba(196, 113, 113, 0.08), rgba(255, 255, 255, 0.014));
+  }
+
+  .bookshelf-review-diff-card strong {
+    color: #f4f2ed;
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .bookshelf-review-diff-card p {
+    margin: 0;
+    color: rgba(233, 231, 225, 0.68);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
   .bookshelf-review-chapter-card {
     display: grid;
     gap: 0.75rem;
@@ -1632,7 +1751,8 @@
 
   .bookshelf-review-chapter-head span,
   .bookshelf-review-chapter-head small,
-  .bookshelf-review-chapter-note {
+  .bookshelf-review-chapter-note,
+  .bookshelf-review-chapter-merge {
     color: rgba(230, 228, 222, 0.58);
     font-size: 0.8rem;
     line-height: 1.7;
@@ -1646,6 +1766,11 @@
 
   .bookshelf-review-chapter-note {
     margin: 0;
+  }
+
+  .bookshelf-review-chapter-merge {
+    margin: 0;
+    color: rgba(231, 198, 126, 0.82);
   }
 
   .bookshelf-review-subchapter-list {
@@ -1805,10 +1930,20 @@
     opacity: 0.5;
   }
 
+  .bookshelf-review-article-item.is-merge-needed {
+    opacity: 0.9;
+    border-color: rgba(196, 113, 113, 0.22);
+    background: linear-gradient(180deg, rgba(196, 113, 113, 0.08), rgba(255, 255, 255, 0.014));
+  }
+
   .bookshelf-review-article-item.is-published .bookshelf-review-article-copy strong,
   .bookshelf-review-article-item.is-published .bookshelf-review-article-copy small {
     text-decoration: line-through;
     text-decoration-thickness: 1px;
+  }
+
+  .bookshelf-review-article-item.is-merge-needed .bookshelf-review-article-copy span {
+    color: rgba(243, 176, 176, 0.86);
   }
 
   .bookshelf-review-top-card {

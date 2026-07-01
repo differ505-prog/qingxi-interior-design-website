@@ -14,6 +14,7 @@ import {
   getPublishingDashboard,
   getNextRecommendedTopic,
   getNextRecommendedTopics,
+  publicationMergeDirectives,
   getTrackRecommendedTopics,
   getPublishingCoverageSummary,
   inferSubchapterFromTrack,
@@ -154,6 +155,7 @@ const topicModeMap = Object.fromEntries(
     const nextTopicCandidates = getNextRecommendedTopics(blogPosts, publishingFocusTrackTitle, modeOption.value, 6);
     const trackRecommendations = getTrackRecommendedTopics(blogPosts, publishingFocusTrackTitle, modeOption.value)
       .sort((left, right) => {
+        if (!left || !right) return 0;
         const leftRank = publishingDashboard.rankedTracks.findIndex((track) => track.title === left.trackTitle);
         const rightRank = publishingDashboard.rankedTracks.findIndex((track) => track.title === right.trackTitle);
         return leftRank - rightRank;
@@ -648,6 +650,7 @@ const geminiCanvasMasterJson = JSON.stringify(geminiCanvasMaster);
 const vendorTradeOptionsJson = JSON.stringify(vendorTradeOptions);
 const topicModeOptionsJson = JSON.stringify(publishingTopicModeOptions);
 const topicModeMapJson = JSON.stringify(topicModeMap);
+const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives);
 ---
 
 <BaseLayout
@@ -886,6 +889,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   <strong id="publishing-review-coverage">尚未計算</strong>
                 </article>
               </div>
+              <div id="publishing-review-progress" class="bookshelf-review-progress-list"></div>
               <article class="bookshelf-review-next">
                 <div class="bookshelf-review-next-head">
                   <span>最推薦下一篇</span>
@@ -896,9 +900,20 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                   <strong id="publishing-review-risk-badge" class="bookshelf-review-risk-badge is-low">撞題風險低</strong>
                   <span id="publishing-review-risk-note" class="bookshelf-confirm-note">會根據已上線文章自動比對。</span>
                 </div>
+                <p id="publishing-review-action-hint" class="bookshelf-review-action-hint">可直接推進</p>
                 <ul id="publishing-review-similar-list" class="bookshelf-review-similar-list">
                   <li>相似舊文比對後顯示</li>
                 </ul>
+                <button type="button" id="publishing-review-diff-toggle" class="bookshelf-action bookshelf-review-diff-toggle">查看相似度差異分析</button>
+                <details id="publishing-review-diff-panel" class="bookshelf-mini-fold bookshelf-review-diff-panel">
+                  <summary>
+                    <span>相似度差異分析</span>
+                    <small>撞題判定依據</small>
+                  </summary>
+                  <div id="publishing-review-diff-content" class="bookshelf-review-diff-content">
+                    尚未產生相似度分析。
+                  </div>
+                </details>
               </article>
               <div class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
@@ -1824,7 +1839,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson, publicationMergeDirectivesJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const ARTICLE_TOPIC_DECISION_KEY = "qingxi-article-topic-decision-v1";
@@ -1864,6 +1879,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   const vendorTradeOptions = JSON.parse(vendorTradeOptionsJson);
   const topicModeOptions = JSON.parse(topicModeOptionsJson);
   const topicModeDataMap = topicModeMapJson ? JSON.parse(topicModeMapJson) : {};
+  const publicationMergeRules = publicationMergeDirectivesJson ? JSON.parse(publicationMergeDirectivesJson) : [];
   const articleIntakeFields = [
     "主書系",
     "章節定位",
@@ -4161,6 +4177,39 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return post.title || buildBookTopicTitle(post.track || "", post.chapter || "", getPublishedPostSubchapter(post));
   }
 
+  function getPublicationMergeRule(trackTitle = "", chapterTitle = "") {
+    return publicationMergeRules.find((rule) => (
+      rule.trackTitle === trackTitle && rule.chapterTitle === chapterTitle
+    )) || null;
+  }
+
+  function isMergeRequiredPublishedPost(post) {
+    const mergeRule = getPublicationMergeRule(post.track || "", post.chapter || "");
+    return Boolean(mergeRule?.sourceTitles?.includes(post.title));
+  }
+
+  function buildChapterProgressMarkup(focusTrack) {
+    if (!focusTrack?.chapterGaps?.length) return "";
+    return focusTrack.chapterGaps.map((gap, index) => {
+      const completed = gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length;
+      const total = gap.subchapters.length || 1;
+      const rate = Math.round((completed / total) * 100);
+      return `
+        <article class="bookshelf-review-progress-card ${rate === 100 ? "is-complete" : rate === 0 ? "is-empty" : ""}">
+          <div class="bookshelf-review-progress-head">
+            <span>第 ${index + 1} 章</span>
+            <strong>${escapeHtml(gap.chapter)}</strong>
+            <em>${rate}%</em>
+          </div>
+          <div class="bookshelf-review-progress-bar">
+            <i style="width: ${Math.max(rate, completed > 0 ? 12 : 0)}%"></i>
+          </div>
+          <small>${completed} / ${total} 子章已到位</small>
+        </article>
+      `;
+    }).join("");
+  }
+
   function getDisplayTitle(recommendation) {
     if (!recommendation) return "尚未產生";
     return recommendation.primaryTitle || recommendation.webTitle || recommendation.bookTitle || "尚未產生";
@@ -4205,10 +4254,26 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
 
     container.innerHTML = recommendation.similarArticles.map((article) => `
-      <li>
+      <li class="${recommendation.collisionRisk === "low" ? "" : "is-alert"}">
         <strong>${escapeHtml(article.title)}</strong>
-        <small>${escapeHtml(article.chapter)} / ${escapeHtml(article.subchapter)}｜相似度 ${article.score}</small>
+        <small>${escapeHtml(article.chapter)} / ${escapeHtml(article.subchapter)}｜相似度 ${article.score}${article.reason ? `｜${escapeHtml(article.reason)}` : ""}</small>
       </li>
+    `).join("");
+  }
+
+  function renderSimilarityDiffAnalysis(container, recommendation) {
+    if (!(container instanceof HTMLElement)) return;
+    if (!recommendation?.similarArticles?.length) {
+      container.innerHTML = "<p>目前未發現需要展開比對的相似舊文。</p>";
+      return;
+    }
+    container.innerHTML = recommendation.similarArticles.map((article, index) => `
+      <article class="bookshelf-review-diff-card ${recommendation.collisionRisk === "low" ? "" : "is-alert"}">
+        <strong>相似舊文 ${index + 1}｜${escapeHtml(article.title)}</strong>
+        <p>章節定位：${escapeHtml(article.chapter)} / ${escapeHtml(article.subchapter)}</p>
+        <p>相似度：${article.score}</p>
+        <p>判定理由：${escapeHtml(article.reason || "系統依章節、子章與核心詞彙重疊進行判定。")}</p>
+      </article>
     `).join("");
   }
 
@@ -4228,6 +4293,15 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
     textarea.focus();
     textarea.select();
+  }
+
+  function togglePublishingDiffPanel() {
+    const panel = document.getElementById("publishing-review-diff-panel");
+    if (!(panel instanceof HTMLDetailsElement)) return;
+    panel.open = !panel.open;
+    if (panel.open) {
+      panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }
 
   function buildPublishingReviewOutline(mode = currentTopicMode) {
@@ -4259,16 +4333,23 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
     focusTrack.chapterGaps.forEach((gap, index) => {
       const publishedPosts = getPublishedPostsForChapter(focusTrack.title, gap.chapter);
+      const mergeRule = getPublicationMergeRule(focusTrack.title, gap.chapter);
       lines.push(
         `${index + 1}. ${gap.chapter}｜已上線 ${publishedPosts.length} 篇｜待補 ${gap.remainingToBaseline} 篇`,
       );
+      if (mergeRule) {
+        lines.push(
+          `- 整併目標：${mergeRule.targetTitle}`,
+          `- 需整併舊文：${mergeRule.sourceTitles.join(" / ")}`,
+        );
+      }
       if (gap.recommendedTopic?.primaryTitle) {
         lines.push(
           `- 本章下一篇：${getDisplayTitle(gap.recommendedTopic)}｜子章節：${gap.recommendedTopic.subchapter}`,
         );
       }
       if (publishedPosts.length) {
-        lines.push(`- 官網已上線：${publishedPosts.map((post) => `[已上線] ${getPublishedPostDisplayTitle(post)}`).join(" / ")}`);
+        lines.push(`- 官網已上線：${publishedPosts.map((post) => `[已上線${isMergeRequiredPublishedPost(post) ? "｜需整併" : ""}] ${getPublishedPostDisplayTitle(post)}`).join(" / ")}`);
       } else {
         lines.push("- 官網已上線：目前無");
       }
@@ -4343,15 +4424,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "F. 給 IDE 的修改提示詞 1：內容修改與增補 / 刪除",
       "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
       "- 目標是調整目前這份出版清單與文章安排本身，不是直接生成全文文章。",
+      "- 若你判斷需要重組 current_publication_list，請直接寫出章節重排、需整併舊文、待補條目改名與去問句化規則。",
+      "- 最後請附上更新後的出版清單結構樹。",
       "",
       "G. 給 IDE 的修改提示詞 2：來源母提示詞的優化建議",
       "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
       "- 只提供『IDE 給高階 LLM 的母提示詞』該怎麼改的建議，不要重寫整份母提示詞全文。",
       "- 重點放在規則缺漏、排序衝突、判斷條件不夠硬或輸出格式不夠穩。",
+      "- 請特別檢查撞題語意判定、書籍標題體例、章節平衡硬限制是否夠強。",
       "",
       "H. 給 IDE 的修改提示詞 3：網站結構設計的優化建議",
       "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
       "- 重點放在 social-ops 的資訊架構、顯示順序、決策動線、狀態標示與操作成本。",
+      "- 請優先評估出版視角切換、撞題雷達、章節微型進度條還缺哪些關鍵互動。",
       "",
       "【本輪原始問題】",
       questionBlock,
@@ -4435,7 +4520,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const nextMeta = document.getElementById("publishing-review-next-meta");
     const riskBadge = document.getElementById("publishing-review-risk-badge");
     const riskNote = document.getElementById("publishing-review-risk-note");
+    const actionHint = document.getElementById("publishing-review-action-hint");
     const similarList = document.getElementById("publishing-review-similar-list");
+    const progress = document.getElementById("publishing-review-progress");
+    const diffContent = document.getElementById("publishing-review-diff-content");
     const plan = document.getElementById("publishing-review-plan");
     const promptContent = document.getElementById("publishing-review-prompt-content");
     const toggleButton = document.getElementById("toggle-publishing-review-unpublished");
@@ -4449,7 +4537,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       !(nextMeta instanceof HTMLElement) ||
       !(riskBadge instanceof HTMLElement) ||
       !(riskNote instanceof HTMLElement) ||
+      !(actionHint instanceof HTMLElement) ||
       !(similarList instanceof HTMLElement) ||
+      !(progress instanceof HTMLElement) ||
+      !(diffContent instanceof HTMLElement) ||
       !(plan instanceof HTMLElement) ||
       !(promptContent instanceof HTMLTextAreaElement) ||
       !(toggleButton instanceof HTMLButtonElement) ||
@@ -4471,7 +4562,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       nextMeta.textContent = "目前資料不足，暫時無法建立出版閉環覆核。";
       applyRiskBadge(riskBadge, "low", "撞題風險低");
       riskNote.textContent = "會根據已上線文章自動比對。";
+      actionHint.textContent = "可直接推進";
       renderSimilarArticleList(similarList, null);
+      renderSimilarityDiffAnalysis(diffContent, null);
+      progress.innerHTML = "";
       plan.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版清單。</p>';
       promptContent.value = "目前尚無可用的出版閉環覆核稿。";
       filterNote.textContent = "目前尚無可用的出版清單。";
@@ -4489,10 +4583,14 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       : "目前尚未產生下一篇推薦。";
     applyRiskBadge(riskBadge, recommendation?.collisionRisk || "low", "撞題風險低");
     riskNote.textContent = recommendation?.collisionReason || "會根據已上線文章自動比對。";
+    actionHint.textContent = recommendation?.actionHint || "可直接推進";
     renderSimilarArticleList(similarList, recommendation);
+    renderSimilarityDiffAnalysis(diffContent, recommendation);
+    progress.innerHTML = buildChapterProgressMarkup(focusTrack);
     const chapterCards = focusTrack.chapterGaps
       .map((gap, index) => {
         const publishedPosts = getPublishedPostsForChapter(focusTrack.title, gap.chapter);
+        const mergeRule = getPublicationMergeRule(focusTrack.title, gap.chapter);
         const visibleSubchapters = gap.subchapters.filter((subchapter) => {
           const subchapterRecommendation = gap.recommendedTopic?.subchapter === subchapter.title ? gap.recommendedTopic : null;
           const hasPendingRecommendation = Boolean(
@@ -4555,9 +4653,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               <p class="bookshelf-review-block-title">本章已上線文章</p>
               <ul class="bookshelf-review-article-list">
                 ${publishedPosts.map((post) => `
-                  <li class="bookshelf-review-article-item is-published">
+                  <li class="bookshelf-review-article-item is-published ${isMergeRequiredPublishedPost(post) ? "is-merge-needed" : ""}">
                     <div class="bookshelf-review-article-copy">
-                      <span>官網已上線</span>
+                      <span>${isMergeRequiredPublishedPost(post) ? "官網已上線｜需整併" : "官網已上線"}</span>
                       <strong>${escapeHtml(getPublishedPostDisplayTitle(post))}</strong>
                       <small>${escapeHtml(post.siteCategory || post.category || "已發布文章")}</small>
                     </div>
@@ -4578,6 +4676,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               <small>子章完成 ${gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length} / ${gap.subchapters.length}</small>
             </div>
             <p class="bookshelf-review-chapter-note">待補子章：${escapeHtml(gap.missingSubchapters.join(" / ") || "本章主幹已立住")}</p>
+            ${mergeRule ? `<p class="bookshelf-review-chapter-merge">整併目標：${escapeHtml(mergeRule.targetTitle)}｜需整併：${escapeHtml(mergeRule.sourceTitles.join(" / "))}</p>` : ""}
             <ol class="bookshelf-review-subchapter-list">
               ${subchapterMarkup}
             </ol>
@@ -7517,6 +7616,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   document.getElementById("toggle-publishing-review-unpublished")?.addEventListener("click", () => {
     handlePublishingReviewFilterToggle();
+  });
+
+  document.getElementById("publishing-review-diff-toggle")?.addEventListener("click", () => {
+    togglePublishingDiffPanel();
   });
 
   document.getElementById("copy-publishing-review-outline")?.addEventListener("click", async () => {

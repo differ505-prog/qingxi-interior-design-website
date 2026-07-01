@@ -79,6 +79,7 @@ export interface SimilarArticleMatch {
   chapter: string;
   subchapter: string;
   score: number;
+  reason: string;
 }
 
 export interface NextTopicRecommendation {
@@ -104,6 +105,7 @@ export interface NextTopicRecommendation {
   similarArticles: SimilarArticleMatch[];
   collisionRisk: "low" | "medium" | "high";
   collisionReason: string;
+  actionHint: string;
   flashPrompt: string;
 }
 
@@ -116,6 +118,30 @@ export interface PublishingTopicModeOption {
 }
 
 export const publishingFocusTrackTitle = "老屋翻新系";
+export const publicationChapterOrder = ["現況判讀", "預算拆解", "基礎工程", "空間重整", "完工避雷"] as const;
+
+export interface PublicationMergeDirective {
+  trackTitle: string;
+  chapterTitle: string;
+  targetTitle: string;
+  targetSubchapter: string;
+  sourceTitles: string[];
+  note: string;
+}
+
+export const publicationMergeDirectives: PublicationMergeDirective[] = [
+  {
+    trackTitle: publishingFocusTrackTitle,
+    chapterTitle: "現況判讀",
+    targetTitle: "老屋翻新起手式：屋況盤點與範圍界定總表",
+    targetSubchapter: "翻新起手式",
+    sourceTitles: [
+      "老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南",
+      "啟動老屋翻新之前：精準盤點屋況的 5 個核心判斷點",
+    ],
+    note: "這兩篇屬同一組前置決策內容，應整併為單一的翻新起手式條目，而不是繼續拆成分散子題。",
+  },
+];
 
 export const publishingTopicModeOptions: PublishingTopicModeOption[] = [
   {
@@ -144,9 +170,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
         title: "現況判讀",
         keywords: ["屋況", "老屋", "中古屋", "翻新前", "現況", "評估"],
         subchapters: [
-          { title: "屋況盤點", keywords: ["屋況", "現況", "中古屋", "老屋", "盤點", "評估"] },
-          { title: "翻新範圍", keywords: ["局部翻新", "翻新範圍", "要不要拆", "整修範圍", "改造範圍"] },
-          { title: "翻新起手式", keywords: ["先做什麼", "第一步", "從哪開始", "翻新前", "準備階段"] },
+          { title: "翻新起手式", keywords: ["屋況盤點", "翻新範圍", "先做什麼", "第一步", "從哪開始", "翻新前", "準備階段"] },
         ],
       },
       {
@@ -439,10 +463,18 @@ function resolveTrackRootLabel(trackTitle = "") {
 
 function getBookTitleOverride(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
   const overrides: Record<string, string> = {
-    [`${publishingFocusTrackTitle}|現況判讀|翻新起手式`]: "翻新起手式：老屋改造的前置盤點與啟動順序",
+    [`${publishingFocusTrackTitle}|現況判讀|翻新起手式`]: "老屋翻新起手式：屋況盤點與範圍界定總表",
     [`${publishingFocusTrackTitle}|預算拆解|預算分級`]: "預算分級：全室裝修的預算配置框架",
     [`${publishingFocusTrackTitle}|預算拆解|報價拆讀`]: "報價識讀：全室預算拆解與避險指南",
     [`${publishingFocusTrackTitle}|預算拆解|追加風險`]: "追加風險：變更、漏項與超支的預防策略",
+    [`${publishingFocusTrackTitle}|基礎工程|水電更新`]: "水電更新：老屋基礎工程的迴路重整與用電安全",
+    [`${publishingFocusTrackTitle}|基礎工程|防水地坪`]: "防水地坪：老屋防水修復與地坪施作基準",
+    [`${publishingFocusTrackTitle}|空間重整|格局調整`]: "格局調整：老屋空間重整與生活動線規劃",
+    [`${publishingFocusTrackTitle}|空間重整|收納補強`]: "收納補強：老屋機能配置與櫃體整合策略",
+    [`${publishingFocusTrackTitle}|空間重整|家具配置`]: "家具配置：老屋尺度配置與起居動線校準",
+    [`${publishingFocusTrackTitle}|完工避雷|驗收重點`]: "驗收重點：老屋完工檢核與缺失排查清單",
+    [`${publishingFocusTrackTitle}|完工避雷|保固界線`]: "保固界線：老屋修繕責任與保固邊界",
+    [`${publishingFocusTrackTitle}|完工避雷|糾紛預防`]: "糾紛預防：老屋裝修爭議的溝通節點與證據留存",
   };
   return overrides[`${trackTitle}|${chapterTitle}|${subchapterTitle}`] || "";
 }
@@ -472,113 +504,21 @@ export function buildBookTopicTitle(trackTitle = "", chapterTitle = "", subchapt
   return `${subchapterTitle}：${root}${chapterTitle ? `的${chapterTitle}` : ""}實務指南`;
 }
 
-export function getTopicTitleSet(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
+function buildTitleBackups(trackTitle = "", chapterTitle = "", subchapterTitle = "", bookTitle = "") {
   const root = resolveTrackRootLabel(trackTitle);
+  const base = bookTitle || buildBookTopicTitle(trackTitle, chapterTitle, subchapterTitle);
+  return Array.from(new Set([
+    base,
+    `${subchapterTitle}：${root}${chapterTitle ? ` ${chapterTitle}` : ""}的重點整理`,
+    `${subchapterTitle}：${root}${chapterTitle ? ` ${chapterTitle}` : ""}的決策框架`,
+  ])).filter((title) => title !== base).slice(0, 2);
+}
+
+export function getTopicTitleSet(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
   const bookTitle = buildBookTopicTitle(trackTitle, chapterTitle, subchapterTitle);
-
-  if (chapterTitle === "現況判讀") {
-    if (subchapterTitle === "翻新起手式") {
-      return {
-        webTitle: `${root}第一步是什麼？從前置盤點到改造順序的起手式`,
-        backupTitles: [
-          `${root}該從哪裡開始？先把前置盤點與改造順序想清楚`,
-          `${root}起手式怎麼排？先建立前期判斷與施工順序`,
-        ],
-        bookTitle,
-      };
-    }
-    return {
-      webTitle: `${root}前怎麼做${subchapterTitle}？先抓最關鍵的判斷點`,
-      backupTitles: [
-        `${root}${subchapterTitle}先看什麼，才知道值不值得做？`,
-        `${root}${subchapterTitle}最容易漏看的 3 個地方`,
-      ],
-      bookTitle,
-    };
-  }
-
-  if (chapterTitle === "客變判斷" || chapterTitle === "驗屋判讀") {
-    return {
-      webTitle: `${root}${subchapterTitle}怎麼判斷？先抓最核心的決策點`,
-      backupTitles: [
-        `${root}${subchapterTitle}先看這幾件事，就知道要不要做`,
-        `${root}${subchapterTitle}最容易忽略的 3 個重點`,
-      ],
-      bookTitle,
-    };
-  }
-
-  if (chapterTitle === "預算拆解") {
-    if (subchapterTitle === "報價拆讀") {
-      return {
-        webTitle: `${root}報價單怎麼讀？從全室預算分配到項目拆解的識讀指南`,
-        backupTitles: [
-          `${root}預算怎麼分配？先建立全室框架，再看報價單怎麼拆`,
-          `${root}報價識讀指南：先看全室預算，再避開漏項與追加`,
-        ],
-        bookTitle,
-      };
-    }
-    return {
-      webTitle: `${root}${subchapterTitle}怎麼抓？先看最容易失手的地方`,
-      backupTitles: [
-        `${root}${subchapterTitle}最常多花在哪裡？`,
-        `${root}${subchapterTitle}先抓對，後面才不容易爆預算`,
-      ],
-      bookTitle,
-    };
-  }
-
-  if (chapterTitle === "基礎工程" || chapterTitle === "配置預留" || chapterTitle === "設備整合") {
-    return {
-      webTitle: `${root}${subchapterTitle}怎麼排？先看順序再動工`,
-      backupTitles: [
-        `${root}${subchapterTitle}要先決定什麼？`,
-        `${root}${subchapterTitle}最容易漏掉的 3 個前置`,
-      ],
-      bookTitle,
-    };
-  }
-
-  if (chapterTitle === "完工避雷" || chapterTitle === "缺失排序" || chapterTitle === "點交策略") {
-    return {
-      webTitle: `${root}${subchapterTitle}怎麼看？最容易忽略的重點整理`,
-      backupTitles: [
-        `${root}${subchapterTitle}先抓這幾個重點就夠了`,
-        `${root}${subchapterTitle}最容易出錯的地方在哪裡？`,
-      ],
-      bookTitle,
-    };
-  }
-
-  if (chapterTitle === "照明設計" || chapterTitle === "插座開關" || chapterTitle === "智能控制") {
-    return {
-      webTitle: `${root}${subchapterTitle}怎麼做才順手？`,
-      backupTitles: [
-        `${root}${subchapterTitle}先想清楚，入住後才不後悔`,
-        `${root}${subchapterTitle}最值得先確認的 3 件事`,
-      ],
-      bookTitle,
-    };
-  }
-
-  if (chapterTitle === "空間重整" || chapterTitle === "動線配置" || chapterTitle === "家具配置" || chapterTitle === "生活動線") {
-    return {
-      webTitle: `${root}${subchapterTitle}怎麼排才順？`,
-      backupTitles: [
-        `${root}${subchapterTitle}先看取捨，再決定怎麼做`,
-        `${root}${subchapterTitle}最常做錯的配置是什麼？`,
-      ],
-      bookTitle,
-    };
-  }
-
   return {
-    webTitle: `${root}${subchapterTitle}怎麼判斷？`,
-    backupTitles: [
-      `${root}${subchapterTitle}最值得先補的重點是什麼？`,
-      `${root}${subchapterTitle}先看這幾件事，再決定要不要做`,
-    ],
+    webTitle: bookTitle,
+    backupTitles: buildTitleBackups(trackTitle, chapterTitle, subchapterTitle, bookTitle),
     bookTitle,
   };
 }
@@ -605,19 +545,17 @@ function buildSimilarArticleMatches(
   chapterTitle: string,
   subchapterTitle: string,
 ) {
+  const mergeDirective = getPublicationMergeDirective(trackTitle, chapterTitle);
   return entries
     .filter((entry) => entry.trackTitle === trackTitle)
     .map((entry) => {
-      const score = entry.subchapter === subchapterTitle
-        ? 100
-        : entry.chapter === chapterTitle
-          ? 72
-          : 38;
+      const score = getSemanticOverlapScore(trackTitle, chapterTitle, subchapterTitle, entry, mergeDirective);
       return {
         title: entry.title,
         chapter: entry.chapter,
         subchapter: entry.subchapter,
         score,
+        reason: buildSimilarityReason(score, chapterTitle, subchapterTitle, entry, mergeDirective),
       } satisfies SimilarArticleMatch;
     })
     .sort((left, right) => right.score - left.score)
@@ -641,6 +579,16 @@ function buildRecommendationReason(trackTitle: string, subchapterTitle: string, 
 
 export function getTrackPlan(trackTitle = "") {
   return bookshelfTrackPlans.find((track) => track.title === trackTitle) || null;
+}
+
+export function getPublicationMergeDirective(trackTitle = "", chapterTitle = "") {
+  return publicationMergeDirectives.find((directive) => (
+    directive.trackTitle === trackTitle && directive.chapterTitle === chapterTitle
+  )) || null;
+}
+
+export function getPublicationMergeSourceTitles(trackTitle = "", chapterTitle = "") {
+  return getPublicationMergeDirective(trackTitle, chapterTitle)?.sourceTitles || [];
 }
 
 export function getTrackConfig(trackTitle = "") {
@@ -747,6 +695,71 @@ export function inferSubchapterFromTrack(trackTitle = "", chapterTitle = "", ...
   });
 
   return bestSubchapter || chapterPlan.subchapters[0]?.title || "";
+}
+
+function normalizeSemanticText(...values: string[]) {
+  return values.join(" ").replace(/[：:？?、，,。！!（）()「」『』《》\-\s]/g, "").trim();
+}
+
+function buildCandidateSemanticTerms(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
+  const trackPlan = getTrackPlan(trackTitle);
+  const chapterPlan = trackPlan?.chapters.find((chapter) => chapter.title === chapterTitle);
+  const subchapterPlan = chapterPlan?.subchapters.find((subchapter) => subchapter.title === subchapterTitle);
+  return Array.from(new Set([
+    resolveTrackRootLabel(trackTitle),
+    trackTitle,
+    chapterTitle,
+    subchapterTitle,
+    ...normalizeTagList(chapterPlan?.keywords || []),
+    ...normalizeTagList(subchapterPlan?.keywords || []),
+  ].filter(Boolean).map((term) => normalizeSemanticText(String(term)))));
+}
+
+function getSemanticOverlapScore(
+  trackTitle: string,
+  chapterTitle: string,
+  subchapterTitle: string,
+  entry: BookshelfEntry,
+  mergeDirective: PublicationMergeDirective | null = null,
+) {
+  if (mergeDirective?.targetSubchapter === subchapterTitle && mergeDirective.sourceTitles.includes(entry.title)) {
+    return 88;
+  }
+
+  const candidateTerms = buildCandidateSemanticTerms(trackTitle, chapterTitle, subchapterTitle);
+  const entryText = normalizeSemanticText(entry.title, entry.chapter, entry.subchapter, entry.trackTitle, entry.category);
+  const matchedTerms = candidateTerms.filter((term) => term && entryText.includes(term));
+  const termScore = candidateTerms.length
+    ? Math.round((matchedTerms.length / candidateTerms.length) * 100)
+    : 0;
+
+  const sameTrackBoost = entry.trackTitle === trackTitle ? 16 : 0;
+  const sameChapterBoost = entry.chapter === chapterTitle ? 22 : 0;
+  const sameSubchapterBoost = entry.subchapter === subchapterTitle ? 24 : 0;
+
+  return Math.min(100, termScore + sameTrackBoost + sameChapterBoost + sameSubchapterBoost);
+}
+
+function buildSimilarityReason(
+  score: number,
+  chapterTitle: string,
+  subchapterTitle: string,
+  entry: BookshelfEntry,
+  mergeDirective: PublicationMergeDirective | null = null,
+) {
+  if (mergeDirective?.targetSubchapter === subchapterTitle && mergeDirective.sourceTitles.includes(entry.title)) {
+    return "這篇已屬同一組前置決策內容，較適合整併而不是另開新題。";
+  }
+  if (entry.subchapter === subchapterTitle) {
+    return "同子章內容重疊度高，容易形成直接撞題。";
+  }
+  if (entry.chapter === chapterTitle && score >= 60) {
+    return "同章核心解法接近，應避免重複描述相同決策方案。";
+  }
+  if (entry.chapter === chapterTitle) {
+    return "同章相鄰內容已有基底，需強化切角差異。";
+  }
+  return "同書系已有相關內容，可作為差異化比對參考。";
 }
 
 export function normalizeTagList(value: unknown) {
@@ -868,7 +881,7 @@ export function getPublishingDashboard(
       missingChapterTitles,
       remainingToBaseline,
       readyToPublish: remainingToBaseline === 0,
-      chapterGaps: chapterGaps.sort((left, right) => right.remainingToBaseline - left.remainingToBaseline),
+      chapterGaps,
     } satisfies PublishingTrackDashboard;
   });
 
@@ -899,15 +912,16 @@ export function buildNextTopicFlashPrompt(recommendation: Omit<NextTopicRecommen
   };
   return [
     "你是青曦空間設計的內容總編，現在只要替『下一篇最推薦主題』潤題，不要改變主題缺口本身。",
-    "請根據下列固定缺口，輸出 1 個最推薦 Web/SEO 標題、1 個書籍收錄標題，以及 2 個 Web 備選標題。",
+    "請根據下列固定缺口，輸出 1 個最推薦統一標題，以及 2 個備選標題。",
     modeLeadMap[recommendation.mode],
     "要求：",
     "1. 不能跳出指定主書系、章節與子章節。",
     "2. 目標是加速補全書稿完整度，而不是追求花俏流量題。",
-    "3. Web/SEO 標題可保留搜尋導向，但 Book 標題必須是書籍章節體例，嚴禁問句。",
+    "3. 標題必須符合實體出版目錄體例，採用「主標題：副標題」結構，嚴禁問句與內容農場腔。",
     "4. 語氣要高級、乾淨、穩定，不要內容農場腔。",
     "5. 若該章目前只有局部、單空間或微觀文章，優先補能立住全局框架的宏觀題。",
-    "6. 必須先檢查同子章與相似舊文；若與已上線內容撞題，必須直接更換角度或子章節，不可硬寫。",
+    "6. 必須先檢查同子章與相似舊文；若核心解法與既有內容重疊度超過 60%，必須直接更換角度、改子章節，或明確判定應整併舊文。",
+    "7. 若某章完成度為 0%，其優先權必須高於已有兩篇以上文章的章節，先補結構性真空。",
     "",
     `主攻書系：${recommendation.focusTrackTitle}`,
     `本次固定主書系：${recommendation.trackTitle}`,
@@ -929,11 +943,10 @@ export function buildNextTopicFlashPrompt(recommendation: Omit<NextTopicRecommen
     recommendation.sameTrackArticles.length ? recommendation.sameTrackArticles.join(" / ") : "目前沒有同書系其他文章，請把這篇寫成可立主幹的起手文。",
     "",
     "請直接輸出：",
-    "A. 最推薦 Web/SEO 標題（1 個）",
-    "B. 最推薦 Book 標題（1 個）",
-    "C. Web 備選標題（2 個）",
-    "D. 撞題檢查（2-4 句，明確說明是否與既有文章重疊）",
-    "E. 為什麼這一題最適合現在先寫（2-4 句）",
+    "A. 最推薦統一標題（1 個）",
+    "B. 備選標題（2 個）",
+    "C. 撞題檢查（2-4 句，明確說明是否與既有文章重疊）",
+    "D. 為什麼這一題最適合現在先寫（2-4 句）",
   ].join("\n");
 }
 
@@ -1001,16 +1014,32 @@ function buildRecommendationFromCandidate(
     candidate.chapter,
     candidate.subchapter,
   );
-  const collisionRisk: NextTopicRecommendation["collisionRisk"] = existingArticleContext.sameSubchapterArticles.length > 0
+  const topSemanticScore = similarArticles[0]?.score || 0;
+  const mergeDirective = getPublicationMergeDirective(candidate.trackTitle, candidate.chapter);
+  const mergeTriggered = Boolean(
+    mergeDirective &&
+    mergeDirective.targetSubchapter === candidate.subchapter &&
+    similarArticles.some((article) => mergeDirective.sourceTitles.includes(article.title)),
+  );
+  const collisionRisk: NextTopicRecommendation["collisionRisk"] = topSemanticScore >= 60
     ? "high"
-    : existingArticleContext.sameChapterArticles.length > 0
+    : topSemanticScore >= 35
       ? "medium"
       : "low";
-  const collisionReason = collisionRisk === "high"
-    ? "同子章已存在已上線內容，若再提相同角度會高度撞題。"
-    : collisionRisk === "medium"
-      ? "同章已有相近文章，需強化錯位與補位角度。"
-      : "目前未發現明顯撞題，可優先補齊此缺口。";
+  const collisionReason = mergeTriggered
+    ? mergeDirective?.note || "這個主題已與既有文章形成整併關係，較適合合併而非另開新題。"
+    : collisionRisk === "high"
+      ? "核心解法與既有文章重疊度超過 60%，應優先改子章節或直接整併舊文。"
+      : collisionRisk === "medium"
+        ? "同章已有相近解法，需強化差異與補位角度。"
+        : "目前未發現明顯語意撞題，可優先補齊此缺口。";
+  const actionHint = mergeTriggered
+    ? "應合併舊文"
+    : collisionRisk === "high"
+      ? "需改子章節"
+      : collisionRisk === "medium"
+        ? "需拉開差異"
+        : "可直接推進";
   const recommendationBase = {
     mode,
     focusTrackTitle,
@@ -1032,6 +1061,7 @@ function buildRecommendationFromCandidate(
     similarArticles,
     collisionRisk,
     collisionReason,
+    actionHint,
   };
 
   return {
@@ -1052,6 +1082,8 @@ function getRecommendationScoreWeights(mode: PublishingTopicMode) {
       recentPenalty: [number, number];
       seededSubchapterBoost: number;
       multiTrackDiversityBoost: number;
+      structuralVacuumBoost: number;
+      chapterSaturationPenalty: number;
     }
   > = {
     publishing: {
@@ -1063,6 +1095,8 @@ function getRecommendationScoreWeights(mode: PublishingTopicMode) {
       recentPenalty: [28, 12],
       seededSubchapterBoost: 0,
       multiTrackDiversityBoost: 0,
+      structuralVacuumBoost: 140,
+      chapterSaturationPenalty: 72,
     },
     balanced: {
       focusBoost: 34,
@@ -1073,6 +1107,8 @@ function getRecommendationScoreWeights(mode: PublishingTopicMode) {
       recentPenalty: [20, 9],
       seededSubchapterBoost: 10,
       multiTrackDiversityBoost: 10,
+      structuralVacuumBoost: 112,
+      chapterSaturationPenalty: 54,
     },
     flash: {
       focusBoost: 14,
@@ -1083,6 +1119,8 @@ function getRecommendationScoreWeights(mode: PublishingTopicMode) {
       recentPenalty: [10, 4],
       seededSubchapterBoost: 18,
       multiTrackDiversityBoost: 16,
+      structuralVacuumBoost: 90,
+      chapterSaturationPenalty: 42,
     },
   };
   return weights[mode];
@@ -1151,6 +1189,13 @@ function buildRecommendationCandidates(
           getMacroPrioritySubchapters(chapter.title).includes(subchapter.title)
           ? 26
           : 0;
+        const trackHasStructuralVacuum = track.chapters.some((item) => (
+          trackEntries.filter((entry) => entry.chapter === item.title).length === 0
+        ));
+        const structuralVacuumBoost = chapterEntries.length === 0 ? weights.structuralVacuumBoost : 0;
+        const chapterSaturationPenalty = trackHasStructuralVacuum && chapterEntries.length >= 2
+          ? weights.chapterSaturationPenalty
+          : 0;
         const collisionPenalty = subchapterEntries.length > 0 ? 90 : 0;
         const score =
           focusBoost +
@@ -1159,8 +1204,10 @@ function buildRecommendationCandidates(
           trackCoverageBoost +
           seededSubchapterBoost +
           multiTrackDiversityBoost +
+          structuralVacuumBoost +
           macroPriorityBoost -
           recentPenalty -
+          chapterSaturationPenalty -
           collisionPenalty;
 
         return {
