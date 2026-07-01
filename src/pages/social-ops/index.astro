@@ -977,18 +977,18 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               </section>
               <article class="bookshelf-review-next">
                 <div class="bookshelf-review-next-head">
-                  <span>最推薦下一篇</span>
+                  <span>本輪送審候選（規則初排）</span>
                   <strong id="publishing-review-next-title">{initialRecommendationTitle}</strong>
                 </div>
                 <p id="publishing-review-next-meta" class="bookshelf-confirm-note">{initialRecommendationMeta}</p>
                 <div class="bookshelf-review-risk-row">
-                  <strong id="publishing-review-risk-badge" class={`bookshelf-review-risk-badge is-${initialRecommendation?.collisionRisk || "low"}`}>{initialRecommendation?.collisionRisk === "high" ? "撞題風險高" : initialRecommendation?.collisionRisk === "medium" ? "撞題風險中" : "撞題風險低"}</strong>
-                  <span id="publishing-review-risk-note" class="bookshelf-confirm-note">{initialRecommendation?.collisionReason || "會根據已上線文章自動比對。"}</span>
+                  <strong id="publishing-review-risk-badge" class={`bookshelf-review-risk-badge is-${initialRecommendation?.collisionRisk || "low"}`}>{initialRecommendation?.collisionRisk === "high" ? "規則初篩高相近" : initialRecommendation?.collisionRisk === "medium" ? "規則初篩中相近" : "規則初篩低相近"}</strong>
+                  <span id="publishing-review-risk-note" class="bookshelf-confirm-note">{initialRecommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。"}</span>
                 </div>
-                <p id="publishing-review-action-hint" class="bookshelf-review-action-hint">{initialRecommendation?.actionHint || "可直接推進"}</p>
+                <p id="publishing-review-action-hint" class="bookshelf-review-action-hint">{initialRecommendation?.actionHint ? `${initialRecommendation.actionHint}｜待高階 LLM 裁定` : "待高階 LLM 裁定"}</p>
                 <div id="publishing-review-blocker" class={`bookshelf-review-blocker ${initialRecommendation?.collisionRisk === "high" ? "is-visible" : ""}`}>
                   {initialRecommendation?.collisionRisk === "high"
-                    ? `Blocker：此題與既有舊文相似度過高，請先比對 ${initialRecommendation.similarArticles?.[0]?.title || "相似舊文"}，改走整併或另建新切角。`
+                    ? `送審提醒：規則層初篩認為此題與 ${initialRecommendation.similarArticles?.[0]?.title || "相近舊文"} 靠近，請要求高階 LLM 明確裁定是否整併、改切角，或可直接新發。`
                     : ""}
                 </div>
                 <ul id="publishing-review-similar-list" class="bookshelf-review-similar-list">
@@ -996,26 +996,26 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                     ? initialRecommendation.similarArticles.slice(0, 2).map((article) => (
                       <li class={article.score >= 60 ? "is-alert" : ""}>
                         <strong>{article.title}</strong>
-                        <small>{article.chapter} / {article.subchapter}｜相似度 {article.score}｜{article.reason}</small>
+                        <small>{article.chapter} / {article.subchapter}｜規則分數 {article.score}｜{article.reason}</small>
                       </li>
                     ))
-                    : <li>相似舊文比對後顯示</li>}
+                    : <li>規則初篩相近題會在送審前列出</li>}
                 </ul>
-                <button type="button" id="publishing-review-diff-toggle" class="bookshelf-action bookshelf-review-diff-toggle">查看相似度差異分析</button>
+                <button type="button" id="publishing-review-diff-toggle" class="bookshelf-action bookshelf-review-diff-toggle">查看規則初篩依據</button>
                 <details id="publishing-review-diff-panel" class="bookshelf-mini-fold bookshelf-review-diff-panel">
                   <summary>
-                    <span>相似度差異分析</span>
-                    <small>撞題判定依據</small>
+                    <span>規則初篩依據</span>
+                    <small>僅供送審參考</small>
                   </summary>
                   <div id="publishing-review-diff-content" class="bookshelf-review-diff-content">
-                    尚未產生相似度分析。
+                    尚未產生規則初篩分析。
                   </div>
                 </details>
               </article>
               <section class="bookshelf-review-top3">
                 <div class="bookshelf-preview-head">
-                  <p>Top 3 最值得先發</p>
-                  <span>不是只看單一答案，而是同時看同一本主書內 3 個優先順位的出版補位選項</span>
+                  <p>本輪送審 Top 3 候選（規則初排）</p>
+                  <span>這裡只提供同一本主書內的候選順位，最終排序與取捨交由高階 LLM 覆核後裁定</span>
                 </div>
                 <div id="publishing-review-top3" class="bookshelf-review-top3-list">
                   {initialTopPriorityRecommendations.length
@@ -1029,7 +1029,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                         <p>{candidate.reason}</p>
                       </article>
                     ))
-                    : <p class="bookshelf-confirm-note">目前尚無可用的 Top 3 優先發布建議。</p>}
+                    : <p class="bookshelf-confirm-note">目前尚無可用的送審 Top 3 候選。</p>}
                 </div>
               </section>
               <section class="bookshelf-review-composer">
@@ -1097,7 +1097,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               </section>
               <div class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
-                <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製給高階 LLM 覆核</button>
+                <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製送高階 LLM 覆核包</button>
                 <button type="button" id="copy-publishing-review-outline" class="bookshelf-action">複製出版清單摘要</button>
               </div>
               <p id="publishing-review-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
@@ -1210,7 +1210,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                     <strong id="article-ai-decision-action">先貼問題再判題</strong>
                   </article>
                   <article class="bookshelf-ai-decision-card">
-                    <span>相似舊文</span>
+                    <span>規則初篩相近題</span>
                     <strong id="article-ai-decision-similar">尚未比對</strong>
                   </article>
                   <article class="bookshelf-ai-decision-card">
@@ -1910,18 +1910,18 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               <div class="bookshelf-fold-stack">
                 <article id="review-next-topic-panel" class="bookshelf-review-top-card">
                   <div class="bookshelf-preview-head">
-                    <p>現在最推薦先發</p>
+                    <p>本輪送審候選（規則初排）</p>
                     <span id="review-next-topic-mode">{initialRecommendationModeText}</span>
                   </div>
                   <strong id="review-next-topic-title">{initialRecommendationTitle}</strong>
-                  <p id="review-next-topic-meta" class="bookshelf-confirm-note">{initialRecommendation?.chapter && initialRecommendation?.subchapter && initialRecommendation?.category ? `${initialRecommendation.chapter} / ${initialRecommendation.subchapter} / ${initialRecommendation.category}｜${initialRecommendation.reason}` : "切換決題模式後，這裡會同步更新下一篇建議。"}</p>
+                  <p id="review-next-topic-meta" class="bookshelf-confirm-note">{initialRecommendation?.chapter && initialRecommendation?.subchapter && initialRecommendation?.category ? `${initialRecommendation.chapter} / ${initialRecommendation.subchapter} / ${initialRecommendation.category}｜${initialRecommendation.reason}` : "切換決題模式後，這裡會同步更新送審候選。"}</p>
                   <div class="bookshelf-review-risk-row">
-                    <strong id="review-next-topic-risk-badge" class={`bookshelf-review-risk-badge is-${initialRecommendation?.collisionRisk || "low"}`}>{initialRecommendation?.collisionRisk === "high" ? "撞題風險高" : initialRecommendation?.collisionRisk === "medium" ? "撞題風險中" : "撞題風險低"}</strong>
-                    <span id="review-next-topic-risk-note" class="bookshelf-confirm-note">{initialRecommendation?.collisionReason || "會根據已上線文章自動比對。"}</span>
+                    <strong id="review-next-topic-risk-badge" class={`bookshelf-review-risk-badge is-${initialRecommendation?.collisionRisk || "low"}`}>{initialRecommendation?.collisionRisk === "high" ? "規則初篩高相近" : initialRecommendation?.collisionRisk === "medium" ? "規則初篩中相近" : "規則初篩低相近"}</strong>
+                    <span id="review-next-topic-risk-note" class="bookshelf-confirm-note">{initialRecommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。"}</span>
                   </div>
                   <div id="review-next-topic-blocker" class={`bookshelf-review-blocker ${initialRecommendation?.collisionRisk === "high" ? "is-visible" : ""}`}>
                     {initialRecommendation?.collisionRisk === "high"
-                      ? `Blocker：請先比對 ${initialRecommendation.similarArticles?.[0]?.title || "相似舊文"}，確認整併或重切角後再推進。`
+                      ? `送審提醒：規則層初篩認為此題與 ${initialRecommendation.similarArticles?.[0]?.title || "相近舊文"} 靠近，請交由高階 LLM 明確裁定是否整併或改切角。`
                       : ""}
                   </div>
                   <ul id="review-next-topic-similar-list" class="bookshelf-review-similar-list">
@@ -1929,10 +1929,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                       ? initialRecommendation.similarArticles.slice(0, 2).map((article) => (
                         <li class={article.score >= 60 ? "is-alert" : ""}>
                           <strong>{article.title}</strong>
-                          <small>{article.chapter} / {article.subchapter}｜相似度 {article.score}｜{article.reason}</small>
+                          <small>{article.chapter} / {article.subchapter}｜規則分數 {article.score}｜{article.reason}</small>
                         </li>
                       ))
-                      : <li>相似舊文比對後顯示</li>}
+                      : <li>規則初篩相近題會在送審前列出</li>}
                   </ul>
                 </article>
                 <div id="content-analytics-panel" class="bookshelf-confirm bookshelf-analytics-panel">
@@ -4759,10 +4759,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function buildTopPriorityText(mode = currentTopicMode, limit = 3) {
     const candidates = getTopPriorityRecommendations(mode, limit);
-    if (!candidates.length) return "目前尚無可用的 Top 3 優先發布建議。";
+    if (!candidates.length) return "目前尚無可用的送審 Top 3 候選。";
     return [
-      "【Top 3 最值得先發】",
-      "以下 3 題已限制在同一本主書內排序，不跨到其他書系。",
+      "【本輪送審 Top 3 候選】",
+      "以下 3 題為規則層初排，已限制在同一本主書內排序，不跨到其他書系；最終排序以高階 LLM 覆核為準。",
       ...candidates.map((candidate, index) => (
         `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${candidate.reason}`
       )),
@@ -4835,7 +4835,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function getRecommendationBlockerMessage(recommendation) {
     if (!recommendation || recommendation.collisionRisk !== "high") return "";
     const similarTitles = recommendation.similarArticles?.slice(0, 2).map((article) => `${article.title}（${article.score}）`).join(" / ");
-    return `Blocker：此題為高撞題候選，已鎖定 New_Publish；請先比對 ${similarTitles || "相似舊文"}，並改走「Merge_and_Update」或「更改切角」。`;
+    return `送審提醒：規則層初篩認為此題與 ${similarTitles || "相近舊文"} 靠近；請交由高階 LLM 裁定是否改走「Merge_and_Update」、「更改切角」或保留「New_Publish」。`;
   }
 
   function sanitizeArticleConfirmData(data, sourceText = "", mode = currentTopicMode) {
@@ -5002,14 +5002,14 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function renderSimilarArticleList(container, recommendation) {
     if (!(container instanceof HTMLElement)) return;
     if (!recommendation?.similarArticles?.length) {
-      container.innerHTML = "<li>目前未發現高相似舊文</li>";
+      container.innerHTML = "<li>目前尚無需送審比對的規則初篩相近題</li>";
       return;
     }
 
     container.innerHTML = recommendation.similarArticles.map((article) => `
       <li class="${recommendation.collisionRisk === "low" ? "" : "is-alert"}">
         <strong>${escapeHtml(article.title)}</strong>
-        <small>${escapeHtml(article.chapter)} / ${escapeHtml(article.subchapter)}｜相似度 ${article.score}${article.reason ? `｜${escapeHtml(article.reason)}` : ""}</small>
+        <small>${escapeHtml(article.chapter)} / ${escapeHtml(article.subchapter)}｜規則分數 ${article.score}${article.reason ? `｜${escapeHtml(article.reason)}` : ""}</small>
       </li>
     `).join("");
   }
@@ -5017,24 +5017,25 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function renderSimilarityDiffAnalysis(container, recommendation) {
     if (!(container instanceof HTMLElement)) return;
     if (!recommendation?.similarArticles?.length) {
-      container.innerHTML = "<p>目前未發現需要展開比對的相似舊文。</p>";
+      container.innerHTML = "<p>目前未發現需要展開送審的規則初篩相近題。</p>";
       return;
     }
     container.innerHTML = recommendation.similarArticles.map((article, index) => `
       <article class="bookshelf-review-diff-card ${recommendation.collisionRisk === "low" ? "" : "is-alert"}">
-        <strong>相似舊文 ${index + 1}｜${escapeHtml(article.title)}</strong>
+        <strong>規則初篩相近題 ${index + 1}｜${escapeHtml(article.title)}</strong>
         <p>章節定位：${escapeHtml(article.chapter)} / ${escapeHtml(article.subchapter)}</p>
-        <p>相似度：${article.score}</p>
-        <p>判定理由：${escapeHtml(article.reason || "系統依章節、子章與核心詞彙重疊進行判定。")}</p>
+        <p>規則分數：${article.score}</p>
+        <p>初篩理由：${escapeHtml(article.reason || "系統依章節、子章與核心詞彙重疊進行初篩。")}</p>
+        <p>覆核提醒：這不是最終撞題判決，請交由高階 LLM 或人工覆核確認是否真的重疊。</p>
       </article>
     `).join("");
   }
 
-  function applyRiskBadge(element, risk = "low", fallbackText = "撞題風險低") {
+  function applyRiskBadge(element, risk = "low", fallbackText = "規則初篩低相近") {
     if (!(element instanceof HTMLElement)) return;
     element.classList.remove("is-low", "is-medium", "is-high");
     element.classList.add(`is-${risk}`);
-    element.textContent = risk === "high" ? "撞題風險高" : risk === "medium" ? "撞題風險中" : fallbackText;
+    element.textContent = risk === "high" ? "規則初篩高相近" : risk === "medium" ? "規則初篩中相近" : fallbackText;
   }
 
   function revealPublishingReviewPrompt() {
@@ -5072,17 +5073,17 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       `主攻書系：${focusTrack.title}`,
       `主書完成度：${focusTrack.coverageRate}%`,
       `距離出版基線：還差 ${focusTrack.remainingToBaseline} 篇`,
-      `最推薦下一篇：${getDisplayTitle(recommendation)}`,
+      `本輪送審候選：${getDisplayTitle(recommendation)}`,
     ];
 
     if (recommendation) {
       lines.push(
-        `下一篇定位：${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}`,
-        `下一篇推薦原因：${recommendation.reason}`,
-        `撞題風險：${recommendation.collisionRisk}｜${recommendation.collisionReason}`,
+        `送審候選定位：${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}`,
+        `送審候選原因：${recommendation.reason}`,
+        `規則層初篩：${recommendation.collisionRisk}｜${recommendation.collisionReason}`,
       );
       if (recommendation.similarArticles?.length) {
-        lines.push(`最相似舊文：${recommendation.similarArticles.map((article) => `${article.title}（${article.score}）`).join(" / ")}`);
+        lines.push(`規則初篩相近題：${recommendation.similarArticles.map((article) => `${article.title}（${article.score}）`).join(" / ")}`);
       }
     }
 
@@ -5152,8 +5153,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
     return [
       "你是青曦空間設計的高階內容總編、出版統稿者與閉環優化覆核者。",
-      "以下是 social-ops 目前的出版補位清單、官網已上線文章，以及本輪最推薦下一篇。",
+      "以下是 social-ops 目前的出版補位清單、官網已上線文章，以及本輪規則層送審候選。",
+      "網站內顯示的下一篇候選、Top 3 候選、相近題與工作流建議，都只是規則層送審素材，不是最終判決。",
       "你的任務不是直接改稿，而是站在『最終要出版成書』的角度，檢查這份安排是否已足夠成熟，並指出最值得立即修正的地方。",
+      "若你認為規則層有誤判、過度保守、排序失真或文案誤導，必須直接在給 IDE 的提示詞中寫出規則層該怎麼改。",
       "請用繁體中文回覆。",
       "",
       "請固定依序輸出：",
@@ -5177,7 +5180,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "- 每一大章至少要有 1 篇觀念建立、1 篇表單／工具、以及 1 篇工序／發包／介面協調的硬知識；若只有 QA 與案例，仍判定為出版體量不足。",
       "",
       "C. 下一篇是否真的是最佳選擇",
-      `- 目前最推薦下一篇標題為：${getDisplayTitle(recommendation)}`,
+      `- 目前規則層送審的下一篇候選為：${getDisplayTitle(recommendation)}`,
       "- 網站文章標題與書籍標題視為同一套，不做雙標題分流。",
       "- 請判斷這一篇是否真的應該先發；若不是，請給出更好的優先順序與原因。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
@@ -5192,7 +5195,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "E. 最終優先順序建議",
       "- 請列出接下來最值得先做的 3 篇，依優先順序排序。",
       "- 每一篇都要附 1-2 句原因。",
-      "- 請直接參考本文附帶的 Top 3 最值得先發清單，必要時可以推翻並重排。",
+      "- 請直接參考本文附帶的送審 Top 3 候選，必要時可以推翻並重排。",
       "",
       "F. 給 IDE 的修改提示詞 1：內容修改與增補 / 刪除",
       "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
@@ -5207,6 +5210,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "- 重點放在規則缺漏、排序衝突、判斷條件不夠硬或輸出格式不夠穩。",
       "- 請特別檢查撞題語意判定、書籍標題體例、章節平衡硬限制是否夠強。",
       "- 請加入實體出版體量檢核、書名與章節邏輯綁定、前後章節時間軸綁定、跨書系絕對隔離四項硬規則。",
+      "- 若你認為規則層提供的下一篇候選、Top 3、相近題或工作流建議有誤判，必須直接寫出要給 IDE 的規則層修改建議，包含 heuristic、分數門檻、顯示文案與送審流程該怎麼改。",
       "",
       "H. 給 IDE 的修改提示詞 3：網站結構設計的優化建議",
       "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
@@ -5250,9 +5254,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     if (!recommendation || !focusTrack) {
       title.textContent = "尚未產生";
       mode.textContent = "會跟內容書架同步";
-      meta.textContent = "切換決題模式後，這裡會同步更新下一篇建議。";
-      applyRiskBadge(riskBadge, "low", "撞題風險低");
-      riskNote.textContent = "會根據已上線文章自動比對。";
+      meta.textContent = "切換決題模式後，這裡會同步更新送審候選。";
+      applyRiskBadge(riskBadge, "low", "規則初篩低相近");
+      riskNote.textContent = "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。";
       blocker.textContent = "";
       blocker.classList.remove("is-visible");
       renderSimilarArticleList(similarList, null);
@@ -5262,7 +5266,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     mode.textContent = `${modeState?.label || currentTopicMode}｜${focusTrack.title} 尚差 ${focusTrack.remainingToBaseline} 篇`;
     title.textContent = getDisplayTitle(recommendation);
     meta.textContent = `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜${recommendation.reason}`;
-    applyRiskBadge(riskBadge, recommendation.collisionRisk, "撞題風險低");
+    applyRiskBadge(riskBadge, recommendation.collisionRisk, "規則初篩低相近");
     riskNote.textContent = recommendation.collisionReason;
     blocker.textContent = getRecommendationBlockerMessage(recommendation);
     blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
@@ -5356,13 +5360,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       coverage.textContent = "尚未計算";
       nextTitle.textContent = "尚未產生";
       nextMeta.textContent = "目前資料不足，暫時無法建立出版閉環覆核。";
-      applyRiskBadge(riskBadge, "low", "撞題風險低");
-      riskNote.textContent = "會根據已上線文章自動比對。";
-      actionHint.textContent = "可直接推進";
+      applyRiskBadge(riskBadge, "low", "規則初篩低相近");
+      riskNote.textContent = "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。";
+      actionHint.textContent = "待高階 LLM 裁定";
       blocker.textContent = "";
       blocker.classList.remove("is-visible");
       renderSimilarArticleList(similarList, null);
-      top3.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的 Top 3 優先發布建議。</p>';
+      top3.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的送審 Top 3 候選。</p>';
       baselinePath.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版基線達標路徑。</p>';
       renderSimilarityDiffAnalysis(diffContent, null);
       progress.innerHTML = "";
@@ -5384,10 +5388,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     nextTitle.textContent = recommendation ? getDisplayTitle(recommendation) : "尚未產生";
     nextMeta.textContent = recommendation
       ? `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜補前 ${recommendation.coverageBefore}% → 補後 ${recommendation.coverageAfter}%`
-      : "目前尚未產生下一篇推薦。";
-    applyRiskBadge(riskBadge, recommendation?.collisionRisk || "low", "撞題風險低");
-    riskNote.textContent = recommendation?.collisionReason || "會根據已上線文章自動比對。";
-    actionHint.textContent = recommendation?.actionHint || "可直接推進";
+      : "目前尚未產生送審候選。";
+    applyRiskBadge(riskBadge, recommendation?.collisionRisk || "low", "規則初篩低相近");
+    riskNote.textContent = recommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。";
+    actionHint.textContent = recommendation?.actionHint ? `${recommendation.actionHint}｜待高階 LLM 裁定` : "待高階 LLM 裁定";
     blocker.textContent = getRecommendationBlockerMessage(recommendation);
     blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
     renderSimilarArticleList(similarList, recommendation);
@@ -5436,7 +5440,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
           const recommendationMarkup = subchapterRecommendation && (!publishingReviewShowUnpublishedOnly || !recommendationPublished)
             ? `
               <div class="bookshelf-review-subchapter-article ${recommendationPublished ? "is-published" : ""} ${isPrimaryRecommendation ? "is-next" : ""}">
-                <span>${isPrimaryRecommendation ? "最推薦下一篇" : "本章下一篇"}</span>
+                <span>${isPrimaryRecommendation ? "主送審候選" : "本章送審候選"}</span>
                 <strong>${escapeHtml(getDisplayTitle(subchapterRecommendation))}</strong>
                 <small>${escapeHtml(subchapterRecommendation.category)}</small>
               </div>
@@ -5582,7 +5586,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       `推薦原因：${recommendation.reason}`,
       `補前完成度：${recommendation.coverageBefore}%`,
       `補後完成度：${recommendation.coverageAfter}%`,
-      `撞題風險：${recommendation.collisionRisk}｜${recommendation.collisionReason}`,
+      `規則層初篩：${recommendation.collisionRisk}｜${recommendation.collisionReason}`,
       `同子章既有文章：${recommendation.sameSubchapterArticles.join(" / ") || "目前沒有"}`,
       `同章既有文章：${recommendation.sameChapterArticles.join(" / ") || "目前沒有"}`,
       `同書系其他文章：${recommendation.sameTrackArticles.join(" / ") || "目前沒有"}`,
@@ -5608,7 +5612,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         `系統理由：${candidate.reason}`,
         `補前完成度：${candidate.coverageBefore}%`,
         `補後完成度：${candidate.coverageAfter}%`,
-        `撞題風險：${candidate.collisionRisk}｜${candidate.collisionReason}`,
+        `規則層初篩：${candidate.collisionRisk}｜${candidate.collisionReason}`,
         `同子章既有文章：${candidate.sameSubchapterArticles?.join(" / ") || "目前沒有"}`,
         `同章既有文章：${candidate.sameChapterArticles?.join(" / ") || "目前沒有"}`,
       ].join("\n"))
@@ -6846,8 +6850,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       `出版落位：${track} / ${chapter} / ${subchapter}`,
       `文章任務：${buildChapterMissionText(chapter, subchapter)}`,
       `推薦理由：${articleTopicDecision?.reason || recommendation?.reason || "目前先沿用系統推薦落位與出版缺口判斷。"}`,
-      `撞題風險：${recommendation?.collisionRisk ? `${recommendation.collisionRisk}｜${recommendation.collisionReason}` : "尚未比對"}`,
-      `相似舊文：${similarArticles.length ? similarArticles.map((item) => `${item.title}（${item.score}）`).join(" / ") : "目前未發現高相似舊文"}`,
+      `規則層初篩：${recommendation?.collisionRisk ? `${recommendation.collisionRisk}｜${recommendation.collisionReason}` : "尚未比對"}`,
+      `規則初篩相近題：${similarArticles.length ? similarArticles.map((item) => `${item.title}（${item.score}）`).join(" / ") : "目前尚無需送審比對的規則初篩相近題"}`,
       `真實社團問題：${sourceQuestion || "目前尚未貼入；請先用出版落位與預設題目起稿，高階 LLM 可視需要改題。"}`,
     ].join("\n");
   }
