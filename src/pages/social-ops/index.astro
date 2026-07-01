@@ -944,7 +944,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               <section class="bookshelf-review-composer">
                 <div class="bookshelf-preview-head">
                   <p>高頻生文起稿台</p>
-                  <span>直接貼本輪預設題目，系統會自動整理情境摘要與完整生文前置包；高階 LLM 仍可沿用、微調或改題</span>
+                  <span>直接貼本輪預設題目，系統會先整理情境摘要並直送一鍵生文；完整前置包與備援操作降到次層</span>
                 </div>
                 <label class="gemini-field bookshelf-prompt-field">
                   <span>本輪預設題目</span>
@@ -964,23 +964,45 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                       placeholder="系統會依本輪題目、自動決題與出版落位整理可直接複製的情境摘要"
                     ></textarea>
                   </label>
-                  <label class="gemini-field bookshelf-prompt-field">
-                    <span>完整生文前置包</span>
-                    <textarea
-                      id="article-prep-package"
-                      rows="12"
-                      readonly
-                      placeholder="這裡會整理可直接貼給高階 LLM 或作為 Pro 生文流程來源的完整前置包"
-                    ></textarea>
-                  </label>
                 </div>
                 <div class="bookshelf-actions bookshelf-confirm-actions">
                   <button type="button" id="copy-article-context-summary" class="bookshelf-action">複製情境摘要</button>
-                  <button type="button" id="copy-article-prep-package" class="bookshelf-action">複製完整生文前置包</button>
                   <button type="button" id="run-article-ai-flow-highfreq" class="bookshelf-action bookshelp-action-primary">一鍵備好 Pro 生文包</button>
                 </div>
                 <p id="article-composer-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
-                <p id="article-prep-note" class="bookshelf-confirm-note">若有真實社團問題，系統會自動併入前置包；若沒有，也會用出版落位與情境摘要補足起稿資訊。</p>
+                <p id="article-prep-note" class="bookshelf-confirm-note">若有真實社團問題，系統會自動併入；若沒有，也會先用出版落位與情境摘要補足起稿資訊。</p>
+                <details class="bookshelf-mini-fold">
+                  <summary>
+                    <span>進階輸入與備援</span>
+                    <small>低頻時再展開</small>
+                  </summary>
+                  <div class="bookshelf-pro-prompt-body">
+                    <label class="gemini-field bookshelf-prompt-field">
+                      <span>真實社團問題（選填）</span>
+                      <textarea
+                        id="article-source-question"
+                        rows="7"
+                        placeholder="直接貼上社團原始發問內容"
+                      ></textarea>
+                    </label>
+                    <label class="gemini-field bookshelf-prompt-field">
+                      <span>完整生文前置包（低頻匯出）</span>
+                      <textarea
+                        id="article-prep-package"
+                        rows="12"
+                        readonly
+                        placeholder="這裡會整理可直接貼給高階 LLM 或作為 Pro 生文流程來源的完整前置包"
+                      ></textarea>
+                    </label>
+                    <div class="bookshelf-actions bookshelf-mini-actions">
+                      <button type="button" id="copy-article-prep-package" class="bookshelf-action">複製完整前置包</button>
+                      <button type="button" id="run-article-ai-quick" class="bookshelf-action">AI 快速判題</button>
+                      <button type="button" id="run-article-ai-draft" class="bookshelf-action">Flash 生成長稿（備援）</button>
+                      <button type="button" id="clear-article-question" class="bookshelf-action">清空真實問題</button>
+                    </div>
+                    <p class="bookshelf-prompt-note">高頻主路徑只保留情境摘要與一鍵生文；完整前置包與備援操作在需要時再展開。</p>
+                  </div>
+                </details>
               </section>
               <div class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
@@ -1022,32 +1044,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               <p class="bookshelf-confirm-note">清單中已上線官網文章會自動以橫線與降低透明度標示；未劃線者代表仍屬待補或下一篇候選。</p>
             </section>
 
-            <div class="bookshelf-prompt-tool">
-              <label class="gemini-field bookshelf-prompt-field">
-                <span>真實社團問題</span>
-                <textarea
-                  id="article-source-question"
-                  rows="7"
-                  placeholder="直接貼上社團原始發問內容"
-                ></textarea>
-              </label>
-              <div class="bookshelf-actions bookshelf-prompt-actions">
-                <button type="button" id="run-article-ai-flow" class="bookshelf-action bookshelp-action-primary">一鍵備好 Pro 生文包</button>
-                <button type="button" id="run-article-ai-quick" class="bookshelf-action">AI 快速判題</button>
-              </div>
-              <details class="bookshelf-mini-fold">
-                <summary>
-                  <span>備援操作</span>
-                  <small>需要時才展開</small>
-                </summary>
-                <div class="bookshelf-actions bookshelf-mini-actions">
-                  <button type="button" id="run-article-ai-draft" class="bookshelf-action">Flash 生成長稿（備援）</button>
-                  <button type="button" id="clear-article-question" class="bookshelf-action">清空問題</button>
-                </div>
-              </details>
-              <p class="bookshelf-prompt-note">主路徑只用一鍵備好 Pro 生文包；備援按鈕只在例外情況再打開。</p>
-              <p id="article-ai-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
-              <div id="article-topic-shell" class="bookshelf-confirm" hidden>
+            <div id="article-topic-shell" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
                   <p>本題動態決題</p>
                   <span id="article-topic-label">尚未決題</span>
@@ -1075,12 +1072,12 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   </article>
                   <article class="bookshelf-confirm-card bookshelf-confirm-card-wide">
                     <span>決題理由</span>
-                    <strong id="article-topic-reason">先貼上真實社團問題，再由 Flash 在出版候選裡選最適合的切角。</strong>
+                    <strong id="article-topic-reason">先理解本輪前置包，再由 Flash 在出版候選裡選最適合的切角。</strong>
                   </article>
                 </div>
-                <p id="article-topic-note" class="bookshelf-confirm-note">這一步會先依真實社團問題理解痛點，再從系統候選缺口內挑最適合落進書稿的題目。</p>
-              </div>
-              <div id="article-pro-prompt-shell" class="bookshelf-confirm" hidden>
+                <p id="article-topic-note" class="bookshelf-confirm-note">這一步會先依本輪前置包理解痛點，再從系統候選缺口內挑最適合落進書稿的題目。</p>
+            </div>
+            <div id="article-pro-prompt-shell" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
                   <p>Pro 生文提示詞</p>
                   <span id="article-pro-prompt-label">尚未備好</span>
@@ -1105,8 +1102,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                     ></textarea>
                   </div>
                 </details>
-              </div>
-              <details id="article-ai-result-shell" class="bookshelf-ai-result">
+            </div>
+            <details id="article-ai-result-shell" class="bookshelf-ai-result">
                 <summary>
                   <span>AI 結果</span>
                   <small id="article-ai-result-label">尚未生成</small>
@@ -1167,8 +1164,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   </div>
                 </div>
                 <pre id="article-ai-result-content" class="bookshelf-ai-content"></pre>
-              </details>
-              <div id="article-category-confirm" class="bookshelf-confirm" hidden>
+            </details>
+            <div id="article-category-confirm" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
                   <p>這題會寫成什麼</p>
                   <span>可直接拿去定稿</span>
@@ -1196,7 +1193,6 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   <button type="button" id="copy-article-confirm-payload" class="bookshelf-action">複製分類落地資訊</button>
                 </div>
                 <p class="bookshelf-confirm-note">這裡先做 AI 建議分類確認；確認後再手動貼回知識分享資料源，避免誤寫正式文章。</p>
-              </div>
             </div>
 
             <div class="bookshelf-summary">
@@ -6263,7 +6259,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function setArticleAiBusy(isBusy) {
-    ["run-article-ai-flow", "run-article-ai-flow-highfreq", "run-article-ai-quick", "run-article-ai-draft", "copy-pro-finalize-prompt", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload", "copy-social-reply-short", "copy-social-reply-pro", "copy-social-reply-lead", "copy-publishing-review-prompt", "copy-publishing-review-outline", "copy-article-context-summary", "copy-article-prep-package"].forEach((id) => {
+    ["run-article-ai-flow-highfreq", "run-article-ai-quick", "run-article-ai-draft", "copy-article-ai-result", "copy-article-category", "copy-article-confirm-payload", "copy-social-reply-short", "copy-social-reply-pro", "copy-social-reply-lead", "copy-publishing-review-prompt", "copy-publishing-review-outline", "copy-article-context-summary", "copy-article-prep-package"].forEach((id) => {
       const button = document.getElementById(id);
       if (button instanceof HTMLButtonElement) {
         button.disabled = isBusy;
@@ -6277,7 +6273,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function buildArticleTopicDecisionContext(decision = articleTopicDecision) {
-    if (!decision) return "（尚未產生本題動態決題，請先依真實問題與固定骨架保守判斷。）";
+    if (!decision) return "（尚未產生本題動態決題，請先依本輪前置包與固定骨架保守判斷。）";
     return [
       `決題模式：${decision.modeLabel || decision.mode || currentTopicMode}`,
       `主書系：${decision.track}`,
@@ -6285,7 +6281,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       `子章節：${decision.subchapter}`,
       `建議標題：${decision.title}`,
       `決題理由：${decision.reason || decision.summary || "已先完成動態決題。"}`,
-      `問題連結：${decision.questionLink || "請沿用原始問題核心痛點"}`,
+      `問題連結：${decision.questionLink || "請沿用本輪前置包的核心痛點"}`,
       `書稿連結：${decision.bookLink || "請維持在這個書稿骨架內落位"}`,
     ].join("\n");
   }
@@ -7615,7 +7611,6 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       } else {
         revealArticleProPrompt();
         document.getElementById("article-pro-prompt-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        spotlightActionButton("copy-pro-finalize-prompt");
         spotlightActionButton("copy-pro-finalize-prompt-inline");
         const fallbackMessage = promptState.usedFallback
           ? (storageOk
@@ -7633,7 +7628,6 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         renderArticleProPrompt();
         revealArticleProPrompt();
         document.getElementById("article-pro-prompt-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        spotlightActionButton("copy-pro-finalize-prompt");
         spotlightActionButton("copy-pro-finalize-prompt-inline");
         setFeedback("判題已完成，Pro 生文提示詞也已備好，但後續流程中斷；可直接展開下方內容手動複製。", "is-warning");
         setArticleAiFeedback("判題已完成，Pro 生文提示詞也已備好，但後續流程中斷；可直接展開下方內容手動複製。", "is-warning");
@@ -8221,19 +8215,6 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     setFeedback(feedback.message, feedback.mode);
   });
 
-  document.getElementById("copy-article-prompt")?.addEventListener("click", async () => {
-    const sourceState = buildResolvedArticleSourcePackage();
-    const successMessage = sourceState.packageText.trim()
-      ? "已複製 Flash 長稿備援提示詞。"
-      : "已複製 Flash 長稿備援提示詞模板。";
-    await copyText(buildArticlePrompt(sourceState.packageText, "full"), successMessage);
-  });
-
-  const runArticleAiFlowButton = document.getElementById("run-article-ai-flow");
-  runArticleAiFlowButton?.addEventListener("click", async () => {
-    await runArticleAiFlow();
-  });
-
   document.getElementById("run-article-ai-flow-highfreq")?.addEventListener("click", async () => {
     await runArticleAiFlow();
   });
@@ -8249,30 +8230,6 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const result = await copyText(buildArticlePrepPackage(), "已複製完整生文前置包。");
     const feedback = getCopyFeedbackState(result, "已複製完整生文前置包。", "已開啟手動複製視窗，可直接複製完整生文前置包。");
     setFeedback(feedback.message, feedback.mode);
-    setArticleAiFeedback(feedback.message, feedback.mode);
-  });
-
-  document.getElementById("copy-pro-finalize-prompt")?.addEventListener("click", async () => {
-    const sourceState = buildResolvedArticleSourcePackage();
-    const successMessage = articleAiResult.trim()
-      ? "已複製 Pro 生文提示詞。"
-      : "已複製 Pro 生文提示詞模板，建議先生成 Flash 判題結果再使用。";
-    const result = await copyProArticlePrompt(sourceState.packageText, successMessage, {
-      manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。",
-    });
-    if (result.copyResult !== "clipboard") {
-      revealArticleProPrompt();
-    }
-    const feedback = getCopyFeedbackState(
-      result.copyResult,
-      successMessage,
-      result.hasAiResult
-        ? "Pro 生文提示詞已備好，已開啟手動複製視窗。"
-        : "Pro 生文提示詞模板已備好，已開啟手動複製視窗。",
-      result.hasAiResult
-        ? "Pro 生文提示詞已備好，但複製失敗，請直接展開下方內容手動複製。"
-        : "Pro 生文提示詞模板已備好，但複製失敗，請直接展開下方內容手動複製。",
-    );
     setArticleAiFeedback(feedback.message, feedback.mode);
   });
 
