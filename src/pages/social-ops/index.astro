@@ -4932,7 +4932,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
   function buildTopPriorityText(mode = currentTopicMode, limit = 3) {
     const candidates = getTopPriorityRecommendations(mode, limit);
-    if (!candidates.length) return "目前尚無可用的純新文章軌道 Top 3。";
+    if (!candidates.length) return ["目前尚無可用的純新文章軌道 Top 3。", "", buildPureNewPublishFallbackText(mode, limit)].join("\n");
     return [
       "【純新文章軌道 Top 3】",
       "以下 3 題已先排除 Merge_and_Update 與 Merge_into_Asset；若高階 LLM 判定其中任一題仍應整併或資產化，必須先移出新文章軌道再重排。",
@@ -4946,7 +4946,11 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const candidates = getTopPriorityRecommendations(mode, limit);
     const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
     if (!candidates.length) {
-      return `<p class="bookshelf-confirm-note">${escapeHtml(getPureNewPublishEmptyStateGuidance(mode))}</p>`;
+      const fallbackCandidates = getPureNewPublishFallbackCandidates(mode, limit);
+      const fallbackMarkup = fallbackCandidates.length
+        ? `<ul>${fallbackCandidates.map((candidate, index) => `<li><strong>候補 ${index + 1}</strong><span>${escapeHtml(getDisplayTitle(candidate))}</span></li>`).join("")}</ul>`
+        : "";
+      return `<p class="bookshelf-confirm-note">${escapeHtml(getPureNewPublishEmptyStateGuidance(mode))}</p>${fallbackMarkup}`;
     }
     return candidates.map((candidate, index) => `
       <article class="bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}">
@@ -5146,27 +5150,63 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     return topCandidates.find((candidate) => !isDependencyLocked(focusTrack, candidate.chapter, candidate.subchapter)) || topCandidates[0] || null;
   }
 
+  function isAssetLikeReviewCandidate(candidate) {
+    if (!candidate) return false;
+    const probeText = `${candidate.subchapter || ""} ${getDisplayTitle(candidate)}`;
+    return /表單|清單|檢核|確認表|試算表|Checklist|Check-list|交接表|追蹤表|配件清單/.test(probeText);
+  }
+
+  function getPureNewPublishFallbackCandidates(mode = currentTopicMode, limit = 3) {
+    const modeState = getCurrentTopicModeState(mode);
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    if (!focusTrack) return [];
+
+    const mergeTask = getPrimaryMergeTaskRecommendation(mode);
+    const mergeChapter = mergeTask?.chapter || publicationChapterOrder[0] || "";
+    const mergeChapterIndex = publicationChapterOrder.indexOf(mergeChapter);
+    const ranked = getRankedTopicCandidates(mode, 12)
+      .filter((candidate) => ["New_Publish", "Revise_Angle"].includes(candidate?.workflowAction))
+      .filter((candidate) => !isAssetLikeReviewCandidate(candidate))
+      .filter((candidate) => !isDependencyLocked(focusTrack, candidate.chapter, candidate.subchapter));
+
+    const scored = ranked.map((candidate) => {
+      const chapterIndex = publicationChapterOrder.indexOf(candidate.chapter);
+      const sameChapterSupplement = candidate.chapter === mergeChapter && ["案例解析", "專案節點", "迷思破解"].includes(candidate.subchapter);
+      const nextChapterTheory = chapterIndex === mergeChapterIndex + 1 && !["實戰表單", "案例解析", "迷思破解", "專案節點"].includes(candidate.subchapter);
+      const fallbackScore =
+        (sameChapterSupplement ? 300 : 0) +
+        (nextChapterTheory ? 220 : 0) +
+        (candidate.workflowAction === "New_Publish" ? 120 : 0) +
+        Math.max(0, 100 - chapterIndex * 10);
+      return { candidate, fallbackScore };
+    });
+
+    return scored
+      .sort((left, right) => right.fallbackScore - left.fallbackScore)
+      .slice(0, Math.max(1, limit))
+      .map((item) => item.candidate);
+  }
+
+  function buildPureNewPublishFallbackText(mode = currentTopicMode, limit = 3) {
+    const candidates = getPureNewPublishFallbackCandidates(mode, limit);
+    if (!candidates.length) return "【純新文章空窗候補素材池】\n目前尚無可用的候補素材，請交由高階 LLM 直接從章節缺口與時間軸重新判題。";
+    return [
+      "【純新文章空窗候補素材池】",
+      "以下僅為規則層整理給 Gemini Pro 的遞補素材池，不是正式 New_Publish 排序；最終是否遞補、遞補哪一題，必須由 Gemini Pro 裁定。",
+      ...candidates.map((candidate, index) => `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${getPublishingReviewCandidateReason(candidate)}`),
+    ].join("\n");
+  }
+
   function getPureNewPublishEmptyStateGuidance(mode = currentTopicMode) {
     const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
     if (!focusTrack?.title) {
-      return "目前純新文章池為空，請先判定是否應補同章案例／專案節點，或直接推進下一章主幹理論。";
+      return "目前純新文章池為空；系統只整理候補素材池，請交由 Gemini Pro 決定是否補同章案例／專案節點，或直接推進下一章主幹理論。";
     }
-    const reviewCandidates = getCurrentTopicCandidates(mode)
-      .filter((candidate) => candidate?.workflowAction === "Revise_Angle");
-    const sameChapterSupplement = reviewCandidates.find((candidate) => (
-      candidate.chapter === "現況判讀" && ["案例解析", "專案節點", "迷思破解"].includes(candidate.subchapter)
-    ));
-    if (sameChapterSupplement) {
-      return `目前純新文章池為空，建議先覆核同章補充節點，例如「${getDisplayTitle(sameChapterSupplement)}」；若仍不成立，再推進下一章主幹理論。`;
+    const fallbackCandidates = getPureNewPublishFallbackCandidates(mode, 2);
+    if (fallbackCandidates.length) {
+      return `目前純新文章池為空；系統已整理候補素材池，請交由 Gemini Pro 從「${getDisplayTitle(fallbackCandidates[0])}」${fallbackCandidates[1] ? ` / 「${getDisplayTitle(fallbackCandidates[1])}」` : ""} 等候補題中裁定正式遞補順位。`;
     }
-    const nextChapterTheory = reviewCandidates.find((candidate) => (
-      publicationChapterOrder.indexOf(candidate.chapter) >= 1 &&
-      !["實戰表單", "案例解析", "迷思破解", "專案節點"].includes(candidate.subchapter)
-    ));
-    if (nextChapterTheory) {
-      return `目前純新文章池為空，建議優先推進下一章主幹理論，例如「${getDisplayTitle(nextChapterTheory)}」。`;
-    }
-    return "目前純新文章池為空，請先判定是否應補同章案例／專案節點，或直接推進下一章主幹理論。";
+    return "目前純新文章池為空；系統僅提供章節缺口與時間軸上下文，請交由 Gemini Pro 直接判定下一個純新文章遞補題。";
   }
 
   function getExpectedCandidate(mode = currentTopicMode) {
@@ -5547,6 +5587,9 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
     lines.push("", buildPublicationBaselinePlanText(mode));
     lines.push("", buildTopPriorityText(mode));
+    if (!recommendation) {
+      lines.push("", buildPureNewPublishFallbackText(mode));
+    }
     lines.push("", "【目前出版清單】");
 
     focusTrack.chapterGaps.forEach((gap, index) => {
@@ -5630,7 +5673,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "C. 本輪候選是否應留在新文章池",
       `- 目前規則層送審的純新文章候選為：${getDisplayTitle(recommendation)}`,
       "- 網站文章標題與書籍標題視為同一套，不做雙標題分流。",
-      "- 若目前純新文章候選為「尚未產生」，請直接判定「目前純新文章池是否為空」，並說明下一步應優先補同章案例、專案節點，或推進下一章主幹理論。",
+      "- 若目前純新文章候選為「尚未產生」，請直接判定「目前純新文章池是否為空」，並參考本文附帶的『純新文章空窗候補素材池』決定下一步應優先補同章案例、專案節點，或推進下一章主幹理論；候補素材池只是送審參考，不是系統層已決定好的順位。",
       "- 若目前純新文章候選不是空值，請判斷這一篇是否真的應該留在新文章池；若不是，請給出更好的優先順序與原因。",
       "- 若你判定目前 Top 1 其實不該存在於新文章池，請直接明寫「應移出新文章順位」，不得只用模糊語句帶過。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
@@ -5653,6 +5696,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 請列出接下來最值得先做的 3 篇純新文章，依優先順序排序；此處只允許 New_Publish，不得混入 Merge_and_Update 或 Merge_into_Asset。",
       "- 若你在 C 區已判定本輪候選應移出新文章池，這裡必須改用剩餘的純 New_Publish 候選重新排序。",
       "- 若目前合格的純 New_Publish 候選不足 3 篇，請明確寫出「目前純新文章池為空」或「不足 3 篇」，不得硬湊。",
+      "- 若本文附帶『純新文章空窗候補素材池』，請把它視為遞補素材來源，而不是既定答案；最終哪些題目正式進入純新文章池，仍由你裁定。",
       "- 每一篇都要附 1-2 句原因。",
       "- 請直接參考本文附帶的送審 Top 3 候選，必要時可以推翻並重排。",
       "- 此處優先順序必須先扣除應整併或應資產化的題目，不可把已判定應整併者繼續列入新文章 Top 3。",
@@ -5712,7 +5756,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const recommendation = getPrimaryReviewRecommendation(currentTopicMode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
     if (!recommendation || !focusTrack) {
-      title.textContent = "尚未產生";
+      title.textContent = "待 Gemini Pro 遞補";
       mode.textContent = "會跟內容書架同步";
       meta.textContent = "切換決題模式後，這裡會同步更新送審候選。";
       applyRiskBadge(riskBadge, "low", "規則初篩低相近");
@@ -5877,7 +5921,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     mergeNote.textContent = getMergeTaskNote(mergeTask);
     crossTrackNote.textContent = getCrossTrackSyncMessage(currentTopicMode);
     crossTrackNote.classList.toggle("is-visible", Boolean(crossTrackNote.textContent));
-    nextTitle.textContent = recommendation ? getDisplayTitle(recommendation) : "尚未產生";
+      nextTitle.textContent = recommendation ? getDisplayTitle(recommendation) : "待 Gemini Pro 遞補";
     nextMeta.textContent = recommendation
       ? `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜完成前 ${recommendation.coverageBefore}% → 完成後 ${recommendation.coverageAfter}%`
       : getPureNewPublishEmptyStateGuidance(currentTopicMode);
