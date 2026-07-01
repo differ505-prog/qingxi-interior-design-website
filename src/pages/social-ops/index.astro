@@ -26,6 +26,7 @@ import {
   publishingFocusTrackTitle,
   publishingTopicModeOptions,
 } from "../../lib/content-taxonomy";
+import { bookDataPacks } from "../../lib/book-data-packs";
 import { geminiCanvasMaster } from "../../lib/gemini-canvas-master";
 import socialOpsStylesheetHref from "../../styles/social-ops.css?url";
 
@@ -761,6 +762,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 const publicationChapterOrderJson = JSON.stringify(publicationChapterOrder);
 const publicationChapterDisplayTitlesJson = JSON.stringify(publicationChapterDisplayTitles);
 const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
+const bookDataPacksJson = JSON.stringify(bookDataPacks);
 ---
 
 <BaseLayout
@@ -2122,7 +2124,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson, publicationMergeDirectivesJson, publicationChapterOrderJson, publicationChapterDisplayTitlesJson, publishingFocusTrackTitleJson, publicationChronologyMinCompletionRate }}>
+<script is:inline define:vars={{ defaultSourcesJson, blogPostsJson, bookshelfTracksJson, bookshelfSubchapterPoolsJson, geminiCanvasMasterJson, vendorTradeOptionsJson, topicModeOptionsJson, topicModeMapJson, publicationMergeDirectivesJson, publicationChapterOrderJson, publicationChapterDisplayTitlesJson, publishingFocusTrackTitleJson, publicationChronologyMinCompletionRate, bookDataPacksJson }}>
   const STORAGE_KEY = "qingxi-social-ops-v2";
   const ARTICLE_SOURCE_QUESTION_KEY = "qingxi-article-source-question-v1";
   const ARTICLE_PRESET_TITLE_KEY = "qingxi-article-preset-title-v1";
@@ -2170,6 +2172,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   const publicationChapterOrder = publicationChapterOrderJson ? JSON.parse(publicationChapterOrderJson) : [];
   const publicationChapterDisplayTitles = publicationChapterDisplayTitlesJson ? JSON.parse(publicationChapterDisplayTitlesJson) : {};
   const publishingFocusTrackTitle = publishingFocusTrackTitleJson ? JSON.parse(publishingFocusTrackTitleJson) : "";
+  const structuredBookDataPacks = bookDataPacksJson ? JSON.parse(bookDataPacksJson) : {};
   const forcedTopPriorityTitles = [
     "屋況初勘避雷：隱蔽風險排查與檢測要點",
     "全室預算拆解：報價單判讀與超支預防指南",
@@ -6732,9 +6735,99 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     ].join("\n");
   }
 
+  function resolveStructuredBookDataTrack(confirmData = {}, problemText = "", aiDraftBlock = "") {
+    const candidates = [
+      confirmData?.track,
+      findTrackFromText(confirmData?.title || "", `${problemText}\n${aiDraftBlock}`),
+      "老屋翻新系",
+    ].filter(Boolean);
+    return candidates.find((track) => structuredBookDataPacks[track]) || "";
+  }
+
+  function resolveStructuredBookDataChapter(trackPack, confirmData = {}, problemText = "", aiDraftBlock = "") {
+    if (!trackPack?.chapterPacks) return "";
+    const directChapter = confirmData?.chapter;
+    if (directChapter && trackPack.chapterPacks[directChapter]) {
+      return directChapter;
+    }
+
+    const haystack = [confirmData?.title, problemText, aiDraftBlock].filter(Boolean).join("\n");
+    const fallback = Array.isArray(trackPack.keywordFallbacks)
+      ? trackPack.keywordFallbacks.find((entry) =>
+          Array.isArray(entry?.keywords) &&
+          entry.keywords.some((keyword) => haystack.includes(keyword)) &&
+          trackPack.chapterPacks[entry.chapter],
+        )
+      : null;
+    return fallback?.chapter || "";
+  }
+
+  function buildStructuredBookDataContext(confirmData = {}, problemText = "", aiDraftBlock = "") {
+    const resolvedTrack = resolveStructuredBookDataTrack(confirmData, problemText, aiDraftBlock);
+    const trackPack = resolvedTrack ? structuredBookDataPacks[resolvedTrack] : null;
+    if (!trackPack) {
+      return [
+        "【本次可用書稿數據補強包】",
+        "目前尚未命中對應的結構化數據包；正文仍需自行補出至少 3 個定量支點，並以保守區間與前提條件表達。",
+      ].join("\n");
+    }
+
+    const resolvedChapter = resolveStructuredBookDataChapter(trackPack, confirmData, problemText, aiDraftBlock);
+    const chapterPack = resolvedChapter ? trackPack.chapterPacks?.[resolvedChapter] : null;
+    const globalRuleLines = Array.isArray(trackPack.globalRules)
+      ? trackPack.globalRules.map((rule, index) => `${index + 1}. ${rule}`)
+      : [];
+    const hintLines = Array.isArray(chapterPack?.mandatoryUseHints)
+      ? chapterPack.mandatoryUseHints.map((rule, index) => `${index + 1}. ${rule}`)
+      : [];
+    const dataPointLines = Array.isArray(chapterPack?.dataPoints)
+      ? chapterPack.dataPoints.map((point, index) => {
+          return [
+            `${index + 1}. ${point.label}｜${point.type}`,
+            `   - 建議寫法：${point.value}`,
+            `   - 適用段落：${point.usage}`,
+            `   - 使用提醒：${point.caution}`,
+          ].join("\n");
+        })
+      : [];
+
+    return [
+      "【本次可用書稿數據補強包】",
+      `數據包版本：${trackPack.version || "未標示"}`,
+      `主書系：${resolvedTrack}`,
+      `命中章節：${resolvedChapter || "尚未命中特定章節，請至少沿用全域規則補強正文數據密度"}`,
+      `數據包定位：${trackPack.summary || "未提供"}`,
+      "",
+      "全域數據寫作硬規則：",
+      globalRuleLines.join("\n") || "1. 正文至少補 3 個定量支點。",
+      "",
+      chapterPack?.chapterSummary ? `本章補強方向：${chapterPack.chapterSummary}` : "本章補強方向：請優先建立尺度感、門檻感與情境差異。",
+      "",
+      "本章數據使用提醒：",
+      hintLines.join("\n") || "1. 若無法命中特定章節，請至少補出合理區間、風險門檻與前提條件。",
+      "",
+      "建議優先引用的定量支點：",
+      dataPointLines.join("\n\n") || "1. 目前沒有對應章節數據點，請自行補足至少 3 個定量支點。",
+    ].join("\n");
+  }
+
   function buildEmergencyProFinalizePrompt(problemText = "", aiDraft = "") {
     const questionBlock = problemText.trim() || "（請在此貼上本輪生文前置包）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
+    let confirmData = {
+      category: "尚未判定",
+      track: "尚未判定",
+      chapter: "尚未判定",
+      title: "尚未判定",
+    };
+
+    try {
+      confirmData = getArticleConfirmData(aiDraftBlock);
+    } catch (error) {
+      console.error("解析緊急版 Pro 提示詞落地資訊失敗，改用預設值：", error);
+    }
+
+    const structuredDataContext = buildStructuredBookDataContext(confirmData, questionBlock, aiDraftBlock);
 
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
@@ -6749,6 +6842,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "【Gemini Flash 結構化判題結果】",
       aiDraftBlock,
       "",
+      structuredDataContext,
+      "",
       "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下所有段落都必須寫在同一份 Markdown 文件內。",
       "除這份文件本體外，不要在前後額外補操作說明、註解或對話式補充。",
       "正式文章正文必須有明確 Markdown 階層，不可只輸出一整段純文字。",
@@ -6758,6 +6853,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "不要只寫成 H2 加長段落；若整篇缺少次標、小節分層與視覺停頓，代表排版成熟度不足。",
       "若文章談的是判斷、比較、範圍、清單、驗收、預算或流程，請主動整理成可視化的資訊模組，例如：三個檢查點、兩欄對照、先後順序、必做 / 選做、Need / Want。",
       "正文至少要安排 1 個『可視化摘要段』，例如先用短段整理判斷骨架，再展開細節，而不是一開始就一路說理到底。",
+      "正文至少要帶出 3 個定量支點；若有命中上方數據包，至少 2 個定量支點必須來自該數據包或以其為基礎改寫。",
+      "每個數字都要交代前提條件、適用情境與變動因子；若無法給單一數字，請優先寫保守區間。",
       "結尾不要只用平鋪直敘收掉；請用一句更有收束感的總結，讓整篇像可收進書稿的完整章節。",
       "請固定依序輸出：",
       "A. 文章策略確認",
@@ -6898,6 +6995,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       console.error("解析 Pro 提示詞判題摘要失敗，改用預設值：", error);
     }
 
+    const structuredDataContext = buildStructuredBookDataContext(confirmData, questionBlock, aiDraftBlock);
+
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
       "請根據下方本輪生文前置包與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
@@ -6921,6 +7020,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       `相似舊文：${decision.similar}`,
       `回覆視角：${decision.angle}`,
       "",
+      structuredDataContext,
+      "",
       "寫作要求：",
       "1. 請把題目自然延伸成一篇完整文章，不要只重述原始發問。",
       "2. 這篇文要能直接收進未來書稿的對應章節，所以結構、邏輯與段落成熟度都要符合出書標準。",
@@ -6929,6 +7030,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "5. 若牽涉預算、費用、單價或報價，只能寫保守區間、條件差異與影響因子，不可寫成保證價或正式估價口吻。",
       "6. 文氣要穩定、乾淨、有設計感，不要推銷腔。",
       "7. 若 Flash 的分類或標題不夠精準，你可以微調，但不要偏離原始問題，而且調整後仍要留在同一套書稿脈絡內。",
+      "8. 正文至少要有 3 個定量支點；若命中上方數據包，至少 2 個定量支點必須來自數據包或依其改寫成保守區間。",
+      "9. 每個數字都要寫清楚前提條件與適用情境；若無法給單一數字，請優先寫區間，不要退回空泛形容詞。",
       "",
       "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下所有段落都必須寫在同一份 Markdown 文件內。",
       "除這份文件本體外，不要在前後額外補操作說明、註解或對話式補充。",
@@ -6976,6 +7079,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const decision = getArticleAiDecision(aiDraftBlock);
     const relatedArticleContext = buildProRelatedArticleContext(confirmData, aiDraftBlock);
     const gapContext = buildProGapContext(confirmData, aiDraftBlock);
+    const structuredDataContext = buildStructuredBookDataContext(confirmData, questionBlock, aiDraftBlock);
 
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
@@ -7008,6 +7112,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "",
       gapContext,
       "",
+      structuredDataContext,
+      "",
       "【出版導向寫作原則】",
       "1. 請把這篇文視為未來書中的一個章節單元，不要寫成只追當下流量的短期文章。",
       "2. 文氣要能長期保存，可讀性高，但不要浮誇、不要過度聳動、不要把簡單問題硬寫得過度戲劇化。",
@@ -7017,6 +7123,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "6. 若原始問題帶有地區名稱，例如南港、內湖、汐止，請先判斷該地區是否真的影響法規、屋況、行情、日照、西曬、通勤或生活條件；若沒有實質影響，正式文章標題與內文請優先寫成可跨區閱讀的通用版本，不要把地區寫死。",
       "7. 若牽涉預算、費用、單價或報價，請只寫保守區間、情境差異與影響因子，不可寫成保證價、固定單價、精準總價或像正式估價單的口吻，避免讓讀者把文章當成日後對價依據。",
       "8. 若 Flash 給的主書系、章節或標題不夠精準，你可以微調，但調整後仍需維持在同一套書稿脈絡內。",
+      "9. 正文至少要有 3 個定量支點；若命中上方數據包，至少 2 個定量支點必須來自數據包或依其改寫成保守區間。",
+      "10. 每個數字都要標明前提條件、適用情境與變動因子；若無法給單一數字，請優先寫區間、門檻與尺度感，不可只寫『多、少、通常、容易』。",
       "",
       "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下 A 到 P 全部都必須寫在同一份 Markdown 文件內。",
       "除這份文件本體外，不要在前後額外補操作說明、註解、摘要前言或對話式補充。",
@@ -7058,6 +7166,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 文章內文必須真正根據原始問題展開，而不是只重述 Flash 判題結果。",
       "- 若題目原始資訊不足，請合理補全背景與情境，讓文章仍能成立為完整章節。",
       "- 若某些段落屬於補舊文邏輯，請整理成可直接回填舊文的段落版本，不要無謂重複。",
+      "- 內文至少要安排 1 段『數據補強段』，把本篇最關鍵的 2-3 個數字或區間集中整理，讓讀者能直接拿來判斷尺度。",
       "- 內文請自然安排 1-3 個可延伸閱讀的位置，優先參照上方既有文章清單，指出適合互鏈的文章方向，但不要硬塞推銷句。",
       "- 絕對不要出現推銷腔、口號腔、空泛形容詞堆砌。",
       "- 若文中提到預算或費用，請以區間、條件式差異、材料層級與施工範圍變動來表達；不要給過度精準的數字，不要像正式報價，也不要寫成讀者可直接拿來對價的承諾句。",
@@ -7165,18 +7274,37 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   function buildMinimalProFinalizePrompt(problemText = "", aiDraft = "") {
     const questionBlock = problemText.trim() || "（請在此貼上本輪生文前置包）";
     const aiDraftBlock = aiDraft.trim() || "（請在此貼上 Gemini Flash 判題結果）";
+    let confirmData = {
+      category: "尚未判定",
+      track: "尚未判定",
+      chapter: "尚未判定",
+      title: "尚未判定",
+    };
+
+    try {
+      confirmData = getArticleConfirmData(aiDraftBlock);
+    } catch (error) {
+      console.error("解析最小版 Pro 提示詞落地資訊失敗，改用預設值：", error);
+    }
+
+    const structuredDataContext = buildStructuredBookDataContext(confirmData, questionBlock, aiDraftBlock);
+
     return [
       "你是青曦空間設計的內容總編與正式撰稿編輯。",
       "請根據下方資料，直接產出一篇可發布於官網、並可收進後續書稿的完整 Markdown 文章。",
       "全文請用繁體中文，維持專業、務實、安定的語氣。",
       "文章至少包含 1 個 H1、3 個以上 H2，必要時加入 H3。",
       "若題目涉及流程、比較、清單、判斷或預算，請主動整理成可視化段落或條列模組。",
+      "正文至少要有 3 個定量支點；若命中上方數據包，至少 2 個定量支點必須來自數據包或依其改寫成保守區間。",
+      "每個數字都要交代前提條件與適用情境；若無法給單一數字，請優先寫區間，不可退回空泛形容詞。",
       "",
       "【本輪生文前置包】",
       questionBlock,
       "",
       "【Gemini Flash 判題結果】",
       aiDraftBlock,
+      "",
+      structuredDataContext,
       "",
       "請依序輸出：",
       "1. 文章標題",
