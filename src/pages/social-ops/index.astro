@@ -4933,7 +4933,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "【待覆核新文章 Top 3 候選】",
       "以下 3 題僅列暫時仍留在 New_Publish / Revise_Angle 池的候選；若高階 LLM 判定應整併或資產化，必須先移出新文章順位。",
       ...candidates.map((candidate, index) => (
-        `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${candidate.reason}`
+        `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${getPublishingReviewCandidateReason(candidate)}`
       )),
     ].join("\n");
   }
@@ -4960,9 +4960,25 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
               : "";
           })()}
         </div>
-        <p>${escapeHtml(candidate.reason)}</p>
+        <p>${escapeHtml(getPublishingReviewCandidateReason(candidate))}</p>
       </article>
     `).join("");
+  }
+
+  function getPublishingReviewCandidateReason(candidate) {
+    if (!candidate) return "規則層暫無候選理由。";
+    const trackTitle = candidate.track || getCurrentTopicModeState(currentTopicMode)?.publishingDashboard?.focusTrack?.title || "";
+    const hasMergeBackedTheory = hasMergeBackedTheoryCoverage(trackTitle, candidate.chapter);
+    const similarTitles = candidate.similarArticles?.slice(0, 2).map((article) => `${article.title}（${article.score}）`).join(" / ");
+    const isAssetLike = /表單|清單|檢核|確認表|試算表|交接表|追蹤表/.test(candidate.subchapter || "") || /表單|清單|檢核|確認表|試算表|交接表|追蹤表/.test(getDisplayTitle(candidate));
+
+    if (hasMergeBackedTheory && isAssetLike) {
+      return `規則層暫列為補位工具候選；但本章已有已上線舊文可支撐整併主幹，請優先檢查是否應移出新文章池，或改判為 Merge_into_Asset${similarTitles ? `｜相近舊文：${similarTitles}` : ""}。`;
+    }
+    if (hasMergeBackedTheory) {
+      return `規則層暫列為同章補位候選；但本章理論主幹可由已上線舊文整併成立，請以整併後狀態重排，不可沿用「空章／先立主幹」敘述${similarTitles ? `｜相近舊文：${similarTitles}` : ""}。`;
+    }
+    return `規則層暫列候選，仍需高階 LLM 覆核是否應保留在新文章池${similarTitles ? `｜相近舊文：${similarTitles}` : ""}。`;
   }
 
   function getBookProposal(mode = currentTopicMode) {
@@ -5494,7 +5510,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     if (recommendation) {
       lines.push(
         `送審候選定位：${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}`,
-        `送審候選原因：${recommendation.reason}`,
+        `送審候選原因：${getPublishingReviewCandidateReason(recommendation)}`,
         `規則層初篩：${recommendation.collisionRisk}｜${recommendation.collisionReason}`,
       );
       if (recommendation.similarArticles?.length) {
@@ -5589,11 +5605,13 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 若你判定目前 Top 1 其實不該存在於新文章池，請直接明寫「應移出新文章順位」，不得只用模糊語句帶過。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
       "- 若主問題已被 Merge_and_Update 軌道完美命中，New_Publish 軌道必須切換為補充模式，優先推薦同章的表單或案例，不可讓後段流程文搶主導權。",
+      "- 若表單、清單、檢查表或工具資產只是把既有主文操作化，請直接改判為 Merge_into_Asset，不得保留在 New_Publish 池。",
       "- 同一主章節內也必須遵守微觀時序：theory > tool/form > process/contract > case；但若該章已有已上線舊文可透過整併成立理論主幹，不可再用『理論未發布』當成硬性阻擋新文章的理由。",
       "- 若已整併下架轉向的舊文標題已足以支撐該章理論主幹，請直接視為理論位可由整併成立，而非未發布。",
       "- 判斷章節前置是否成立時，請優先看官網已上線舊文是否足以支撐整併，不要把整本書誤當成從零開始的空白書稿。",
       "- 若前段章節仍為 0% 或基礎明顯不足，不可優先推薦後段章節的細部表單與配件節點，書稿推進必須符合裝修工程時間軸。",
       "- 若候選標題、章節或補位理由出現「預售屋 / 客變 / 新成屋 / 商空」等非老屋詞彙，直接判 Invalid，不得納入本書。",
+      "- 若規則層候選理由與官網已上線／已整併下架轉向清單衝突，請以已上線與整併事實為優先，不得沿用規則層錯誤敘述。",
       "",
       "D. 書名、章節、文章標題的微調建議",
       "- 請分別指出：哪些書名不用動、哪些章節命名可再收斂、哪些文章標題應改得更像書稿章名。",
@@ -5601,7 +5619,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 若書名仍帶有過窄的階段性限制，卻無法對稱覆蓋後段章節，請直接提示需要升級主書名。",
       "",
       "E. 最終優先順序建議",
-      "- 請列出接下來最值得先做的 3 篇，依優先順序排序。",
+      "- 請列出接下來最值得先做的 3 個動作，依優先順序排序；可包含 Merge_and_Update、Merge_into_Asset、New_Publish，不限於新文章。",
       "- 每一篇都要附 1-2 句原因。",
       "- 請直接參考本文附帶的送審 Top 3 候選，必要時可以推翻並重排。",
       "- 此處優先順序必須先扣除應整併或應資產化的題目，不可把已判定應整併者繼續列入新文章 Top 3。",
