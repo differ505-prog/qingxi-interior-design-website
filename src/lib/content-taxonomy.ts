@@ -151,6 +151,7 @@ export interface PublishingTopicModeOption {
 
 export const publishingFocusTrackTitle = "老屋翻新系";
 export const publicationChapterOrder = ["現況判讀", "預算拆解", "基礎工程", "空間重整", "完工避雷"] as const;
+export const publicationChronologyMinCompletionRate = 25;
 export const crossSeriesForbiddenKeywords = ["預售屋", "客變", "新成屋", "商空"] as const;
 
 export interface PublicationMergeDirective {
@@ -835,11 +836,11 @@ function getOldHouseRecommendationPriorityBoost(
     "完工避雷": 16,
   };
   const chapterSubchapterBoostMap: Record<string, number> = {
-    "現況判讀::翻新起手式": 280,
-    "現況判讀::實戰表單": 220,
+    "現況判讀::翻新起手式": 360,
+    "現況判讀::實戰表單": 260,
     "現況判讀::判讀流程": 154,
-    "預算拆解::發包合約": 126,
-    "預算拆解::合約檢核": 98,
+    "預算拆解::發包合約": 188,
+    "預算拆解::合約檢核": -120,
     "預算拆解::報價拆讀": 104,
     "預算拆解::追加風險": 118,
     "基礎工程::實戰表單": 48,
@@ -859,6 +860,15 @@ function getOldHouseRecommendationPriorityBoost(
   );
 }
 
+function isEntryPendingMerge(entry: BookshelfEntry) {
+  const mergeDirective = getPublicationMergeDirective(entry.trackTitle, entry.chapter);
+  return Boolean(mergeDirective?.sourceTitles.includes(entry.title));
+}
+
+function getEffectiveTrackEntries(trackEntries: BookshelfEntry[]) {
+  return trackEntries.filter((entry) => !isEntryPendingMerge(entry));
+}
+
 function getChapterCompletionRateFromEntries(
   trackTitle: string,
   chapterTitle: string,
@@ -873,6 +883,45 @@ function getChapterCompletionRateFromEntries(
   return Math.round((completed / total) * 100);
 }
 
+function getEffectiveChapterCompletionRateFromEntries(
+  trackTitle: string,
+  chapterTitle: string,
+  trackEntries: BookshelfEntry[],
+) {
+  return getChapterCompletionRateFromEntries(trackTitle, chapterTitle, getEffectiveTrackEntries(trackEntries));
+}
+
+function isCandidateBlockedByChronology(
+  trackTitle: string,
+  chapterTitle: string,
+  trackEntries: BookshelfEntry[],
+) {
+  if (trackTitle !== publishingFocusTrackTitle) return false;
+  const chapterIndex = publicationChapterOrder.indexOf(chapterTitle as typeof publicationChapterOrder[number]);
+  if (chapterIndex <= 0) return false;
+  return publicationChapterOrder.some((orderedChapter, orderedIndex) => (
+    orderedIndex < chapterIndex &&
+    getEffectiveChapterCompletionRateFromEntries(trackTitle, orderedChapter, trackEntries) < publicationChronologyMinCompletionRate
+  ));
+}
+
+function isDeferredOldHouseCandidate(
+  trackTitle: string,
+  chapterTitle: string,
+  subchapterTitle: string,
+  trackEntries: BookshelfEntry[],
+) {
+  if (trackTitle !== publishingFocusTrackTitle) return false;
+  if (chapterTitle !== "預算拆解" || subchapterTitle !== "合約檢核") return false;
+  const hasContractCore = getEffectiveTrackEntries(trackEntries).some((entry) => (
+    entry.chapter === "預算拆解" && entry.subchapter === "發包合約"
+  ));
+  return (
+    !hasContractCore ||
+    getEffectiveChapterCompletionRateFromEntries(trackTitle, "現況判讀", trackEntries) < publicationChronologyMinCompletionRate
+  );
+}
+
 function getOldHouseTimelinePenalty(
   trackTitle: string,
   chapterTitle: string,
@@ -881,16 +930,17 @@ function getOldHouseTimelinePenalty(
 ) {
   if (trackTitle !== publishingFocusTrackTitle) return 0;
   const chapterIndex = publicationChapterOrder.indexOf(chapterTitle as typeof publicationChapterOrder[number]);
-  const diagnosisCount = trackEntries.filter((entry) => entry.chapter === "現況判讀").length;
-  const budgetCount = trackEntries.filter((entry) => entry.chapter === "預算拆解").length;
-  const foundationCount = trackEntries.filter((entry) => ["現況判讀", "預算拆解"].includes(entry.chapter)).length;
+  const effectiveEntries = getEffectiveTrackEntries(trackEntries);
+  const diagnosisCount = effectiveEntries.filter((entry) => entry.chapter === "現況判讀").length;
+  const budgetCount = effectiveEntries.filter((entry) => entry.chapter === "預算拆解").length;
+  const foundationCount = effectiveEntries.filter((entry) => ["現況判讀", "預算拆解"].includes(entry.chapter)).length;
   let penalty = 0;
   const hasChronologyBlock = publicationChapterOrder.some((orderedChapter, orderedIndex) => (
     orderedIndex <= chapterIndex - 2 &&
-    getChapterCompletionRateFromEntries(trackTitle, orderedChapter, trackEntries) < 30
+    getEffectiveChapterCompletionRateFromEntries(trackTitle, orderedChapter, trackEntries) < publicationChronologyMinCompletionRate
   ));
   if (hasChronologyBlock) {
-    penalty += 420;
+    penalty += 880;
   }
   if (diagnosisCount === 0 && chapterIndex >= 3 && (nodeKind === "form" || nodeKind === "project")) {
     penalty += 260;
@@ -929,9 +979,9 @@ function getIncompleteCoreBoost(
   const candidateIsToolForm = candidatePlan.nodeKind === "form";
   const candidateIsProcess = isProcessKnowledgeSubchapter(trackTitle, chapterTitle, subchapterTitle);
   let boost = 0;
-  if (!hasTheory && candidateIsTheory) boost += 160;
-  if (!hasToolForm && candidateIsToolForm) boost += 140;
-  if (!hasProcess && candidateIsProcess) boost += 150;
+  if (!hasTheory && candidateIsTheory) boost += 50;
+  if (!hasToolForm && candidateIsToolForm) boost += 50;
+  if (!hasProcess && candidateIsProcess) boost += 50;
   return boost;
 }
 
@@ -1363,7 +1413,7 @@ export function buildBookshelfEntries(posts: PublishingCatalogPost[] = []): Book
 export function getPublishingCoverageSummary(posts: PublishingCatalogPost[] = [], focusTrackTitle = publishingFocusTrackTitle) {
   const entries = buildBookshelfEntries(posts);
   const tracks = bookshelfTrackPlans.map((track) => {
-    const trackEntries = entries.filter((entry) => entry.trackTitle === track.title);
+    const trackEntries = getEffectiveTrackEntries(entries.filter((entry) => entry.trackTitle === track.title));
     const totalChapters = track.chapters.length;
     const completedChapters = track.chapters.filter((chapter) =>
       trackEntries.some((entry) => entry.chapter === chapter.title),
@@ -1402,7 +1452,7 @@ export function getPublishingDashboard(
 ) {
   const entries = buildBookshelfEntries(posts);
   const tracks = bookshelfTrackPlans.map((track) => {
-    const trackEntries = entries.filter((entry) => entry.trackTitle === track.title);
+    const trackEntries = getEffectiveTrackEntries(entries.filter((entry) => entry.trackTitle === track.title));
     const chapterGaps = track.chapters.map((chapter) => {
       const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter.title);
       const subchapters = chapter.subchapters.map((subchapter) => {
@@ -1738,7 +1788,8 @@ function buildRecommendationCandidates(
     (strictIsolation && track.title !== focusTrackTitle ? [] :
     (filters.trackTitle && track.title !== filters.trackTitle ? [] : track.chapters).flatMap((chapter) =>
       (filters.chapterTitle && chapter.title !== filters.chapterTitle ? [] : chapter.subchapters).map((subchapter) => {
-        const trackEntries = entries.filter((entry) => entry.trackTitle === track.title);
+        const rawTrackEntries = entries.filter((entry) => entry.trackTitle === track.title);
+        const trackEntries = getEffectiveTrackEntries(rawTrackEntries);
         const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter.title);
         const subchapterEntries = chapterEntries.filter((entry) => entry.subchapter === subchapter.title);
         const mergeDirective = getPublicationMergeDirective(track.title, chapter.title);
@@ -1747,9 +1798,17 @@ function buildRecommendationCandidates(
         )).length;
         const allowCoveredMergeCandidate = Boolean(
           mergeDirective?.targetSubchapter === subchapter.title &&
-          subchapterEntries.some((entry) => mergeDirective.sourceTitles.includes(entry.title)),
+          rawTrackEntries
+            .filter((entry) => entry.chapter === chapter.title && entry.subchapter === subchapter.title)
+            .some((entry) => mergeDirective.sourceTitles.includes(entry.title)),
         );
         if (subchapterEntries.length > 0 && missingSubchapterCount > 0 && !allowCoveredMergeCandidate) {
+          return null;
+        }
+        if (isCandidateBlockedByChronology(track.title, chapter.title, rawTrackEntries)) {
+          return null;
+        }
+        if (isDeferredOldHouseCandidate(track.title, chapter.title, subchapter.title, rawTrackEntries)) {
           return null;
         }
         const totalSubchapters = track.chapters.reduce((sum, item) => sum + item.subchapters.length, 0);
@@ -1874,7 +1933,7 @@ function buildForcedFallbackCandidate(
   const subchapter = chapter?.subchapters.find((item) => item.title === fallbackSubchapterTitle);
   if (!track || !chapter || !subchapter) return null;
 
-  const trackEntries = entries.filter((entry) => entry.trackTitle === fallbackTrackTitle);
+  const trackEntries = getEffectiveTrackEntries(entries.filter((entry) => entry.trackTitle === fallbackTrackTitle));
   const chapterEntries = trackEntries.filter((entry) => entry.chapter === fallbackChapterTitle);
   const subchapterEntries = chapterEntries.filter((entry) => entry.subchapter === fallbackSubchapterTitle);
   const totalSubchapters = track.chapters.reduce((sum, item) => sum + item.subchapters.length, 0);

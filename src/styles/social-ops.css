@@ -1898,6 +1898,54 @@
     background: linear-gradient(90deg, rgba(214, 210, 200, 0.42), rgba(231, 198, 126, 0.92));
   }
 
+  .bookshelf-review-progress-card.is-minimum-ready {
+    border-color: rgba(106, 151, 117, 0.2);
+  }
+
+  .bookshelf-review-progress-meter-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .bookshelf-review-progress-meter {
+    display: grid;
+    gap: 0.28rem;
+    padding: 0.58rem 0.68rem;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.024);
+  }
+
+  .bookshelf-review-progress-meter.is-empty {
+    border-style: dashed;
+    border-color: rgba(196, 113, 113, 0.28);
+    background: rgba(196, 113, 113, 0.06);
+  }
+
+  .bookshelf-review-progress-meter.is-complete {
+    border-color: rgba(106, 151, 117, 0.24);
+    background: rgba(106, 151, 117, 0.08);
+  }
+
+  .bookshelf-review-progress-meter-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .bookshelf-review-progress-meter-head span,
+  .bookshelf-review-progress-meter-head em {
+    color: rgba(236, 233, 227, 0.78);
+    font-size: 0.74rem;
+    line-height: 1.5;
+    font-style: normal;
+  }
+
   .bookshelf-review-baseline {
     display: grid;
     gap: 0.8rem;
@@ -2108,6 +2156,44 @@
     color: rgba(255, 235, 235, 0.84);
     font-size: 0.9rem;
     line-height: 1.75;
+  }
+
+  .bookshelf-sync-guard {
+    margin-top: 0.85rem;
+  }
+
+  .bookshelf-sync-guard-card {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(106, 151, 117, 0.2);
+    background: linear-gradient(180deg, rgba(106, 151, 117, 0.08), rgba(255, 255, 255, 0.014));
+  }
+
+  .bookshelf-sync-guard.is-alert .bookshelf-sync-guard-card {
+    border-color: rgba(196, 113, 113, 0.24);
+    background: linear-gradient(180deg, rgba(196, 113, 113, 0.08), rgba(255, 255, 255, 0.014));
+  }
+
+  .bookshelf-sync-guard-card span {
+    color: rgba(244, 214, 214, 0.72);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .bookshelf-sync-guard-card strong {
+    color: #f7f2eb;
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+
+  .bookshelf-sync-guard-card p {
+    margin: 0;
+    color: rgba(238, 231, 223, 0.74);
+    line-height: 1.7;
+    font-size: 0.85rem;
   }
 
   .bookshelf-review-diff-panel {

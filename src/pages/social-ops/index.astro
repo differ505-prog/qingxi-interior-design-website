@@ -15,6 +15,7 @@ import {
   getPublicationBookProposal,
   getNextRecommendedTopic,
   getNextRecommendedTopics,
+  publicationChronologyMinCompletionRate,
   publicationChapterOrder,
   publicationMergeDirectives,
   getTrackRecommendedTopics,
@@ -220,9 +221,9 @@ const initialTopPriorityRecommendations = (() => {
   const explicitPriorityMap = {
     "現況判讀::翻新起手式": 0,
     "現況判讀::實戰表單": 1,
-    "預算拆解::報價拆讀": 2,
-    "預算拆解::發包合約": 3,
-    "預算拆解::合約檢核": 4,
+    "預算拆解::發包合約": 2,
+    "現況判讀::判讀流程": 3,
+    "預算拆解::報價拆讀": 4,
   };
   const rankCandidate = (candidate: any, index: number) => {
     const riskRank = candidate?.collisionRisk === "low"
@@ -1288,6 +1289,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   <button type="button" id="copy-article-confirm-payload" class="bookshelf-action">複製分類落地資訊</button>
                 </div>
                 <p class="bookshelf-confirm-note">這裡先做 AI 建議分類確認；確認後再手動貼回知識分享資料源，避免誤寫正式文章。</p>
+                <div id="article-sync-guard" class="bookshelf-sync-guard" hidden>
+                  <div class="bookshelf-sync-guard-card">
+                    <span>State Sync Guard</span>
+                    <strong id="article-sync-guard-title">本輪送審候選與落地資訊已同步</strong>
+                    <p id="article-sync-guard-note">若候選標題、原始問題與正式落地資訊脫鉤，這裡會即時鎖定確認動作。</p>
+                  </div>
+                </div>
                 <div id="article-cross-series-lock" class="bookshelf-cross-series-lock" hidden>
                   <div class="bookshelf-cross-series-lock-card">
                     <span>Cross-Series Error</span>
@@ -4414,6 +4422,37 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const titlePoolItems = Array.isArray(focusTrack.titlePool)
       ? focusTrack.titlePool
       : focusTrack.chapterGaps.flatMap((gap) => gap.titlePool || []);
+    const dimensionDefinitions = [
+      {
+        key: "theory",
+        label: "觀念",
+        helper: "核心原理與起手判讀",
+        matcher: (item) => item.nodeKind === "core",
+      },
+      {
+        key: "toolForm",
+        label: "表單",
+        helper: "清單、總表與工具資產",
+        matcher: (item) => item.nodeKind === "form",
+      },
+      {
+        key: "process",
+        label: "硬知識",
+        helper: "工序、發包、介面與合約",
+        matcher: (item) => item.nodeKind === "project" || /工序|流程|發包|合約|介面|點交/.test(`${item.chapter} ${item.subchapter} ${item.primaryTitle}`),
+      },
+      {
+        key: "case",
+        label: "案例",
+        helper: "案例拆解與 QA 補位",
+        matcher: (item) => ["case", "qa"].includes(item.nodeKind),
+      },
+    ];
+    const buildDimensionMetrics = (items = []) => dimensionDefinitions.map((definition) => ({
+      ...definition,
+      completed: items.filter((item) => definition.matcher(item) && item.status === "published").length,
+      total: items.filter((item) => definition.matcher(item)).length,
+    }));
     const chapterProgressMetrics = focusTrack.chapterGaps.map((gap) => {
       const total = gap.subchapters.length || 1;
       const completed = gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length;
@@ -4422,7 +4461,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     });
     const contiguousTimelineCovered = chapterProgressMetrics.reduce((count, item, index) => {
       if (count !== index) return count;
-      return item.rate >= 30 ? count + 1 : count;
+      return item.rate >= publicationChronologyMinCompletionRate ? count + 1 : count;
     }, 0);
     const timelineRate = chapterProgressMetrics.length
       ? Math.round((contiguousTimelineCovered / chapterProgressMetrics.length) * 100)
@@ -4434,29 +4473,16 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       form: 900,
       project: 2200,
     };
-    const dimensionMetrics = [
-      {
-        label: "核心理論",
-        helper: "主幹章節與核心決策",
-        completed: titlePoolItems.filter((item) => item.nodeKind === "core" && item.status === "published").length,
-        total: titlePoolItems.filter((item) => item.nodeKind === "core").length,
-      },
-      {
-        label: "實務案例",
-        helper: "案例、QA、工序協調與專案演練",
-        completed: titlePoolItems.filter((item) => ["case", "qa", "project"].includes(item.nodeKind) && item.status === "published").length,
-        total: titlePoolItems.filter((item) => ["case", "qa", "project"].includes(item.nodeKind)).length,
-      },
-      {
-        label: "圖表配件",
-        helper: "Check-list、試算表、規格表與互動工具",
-        completed: titlePoolItems.filter((item) => item.nodeKind === "form" && item.status === "published").length,
-        total: titlePoolItems.filter((item) => item.nodeKind === "form").length,
-      },
-    ];
-    const practicalCompleted = dimensionMetrics[1].completed + dimensionMetrics[2].completed;
-    const practicalTotal = dimensionMetrics[1].total + dimensionMetrics[2].total;
-    const practicalRate = practicalTotal ? Math.round((practicalCompleted / practicalTotal) * 100) : 0;
+    const dimensionMetrics = buildDimensionMetrics(titlePoolItems);
+    const minimumReadyCount = focusTrack.chapterGaps.filter((gap) => {
+      const chapterMetrics = buildDimensionMetrics(gap.titlePool || []);
+      return chapterMetrics
+        .filter((item) => ["theory", "toolForm", "process"].includes(item.key))
+        .every((item) => item.total > 0 && item.completed > 0);
+    }).length;
+    const minimumReadyRate = focusTrack.chapterGaps.length
+      ? Math.round((minimumReadyCount / focusTrack.chapterGaps.length) * 100)
+      : 0;
     const estimatedTotalWords = titlePoolItems.reduce(
       (sum, item) => sum + (wordWeightMap[item.nodeKind] || 1600),
       0,
@@ -4492,18 +4518,18 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         <div class="bookshelf-review-progress-bar">
           <i style="width: ${Math.max(timelineRate, contiguousTimelineCovered > 0 ? 12 : 0)}%"></i>
         </div>
-        <small>以前段章節是否至少達 30% 為基準，避免後段工程排程早於前置決策。</small>
+        <small>以前段章節是否至少達 ${publicationChronologyMinCompletionRate}% 為基準，避免後段工程排程早於前置決策。</small>
       </article>
-      <article class="bookshelf-review-progress-card bookshelf-review-progress-card-dimension ${practicalRate === 100 ? "is-complete" : practicalRate === 0 ? "is-empty" : ""}">
+      <article class="bookshelf-review-progress-card bookshelf-review-progress-card-dimension ${minimumReadyRate === 100 ? "is-complete" : minimumReadyRate === 0 ? "is-empty" : ""}">
         <div class="bookshelf-review-progress-head">
-          <span>內容配比</span>
-          <strong>${practicalCompleted} / ${practicalTotal}</strong>
-          <em>${practicalRate}%</em>
+          <span>最小出版體積</span>
+          <strong>${minimumReadyCount} / ${focusTrack.chapterGaps.length}</strong>
+          <em>${minimumReadyRate}%</em>
         </div>
         <div class="bookshelf-review-progress-bar">
-          <i style="width: ${Math.max(practicalRate, practicalCompleted > 0 ? 12 : 0)}%"></i>
+          <i style="width: ${Math.max(minimumReadyRate, minimumReadyCount > 0 ? 12 : 0)}%"></i>
         </div>
-        <small>觀念 ${dimensionMetrics[0].completed}/${dimensionMetrics[0].total}｜表單 ${dimensionMetrics[2].completed}/${dimensionMetrics[2].total}｜案例/硬知識 ${dimensionMetrics[1].completed}/${dimensionMetrics[1].total}</small>
+        <small>每章至少要有觀念、表單、硬知識三種核心節點，才算達到可出版的最小骨架。</small>
       </article>
       <article class="bookshelf-review-progress-card bookshelf-review-progress-card-dimension ${estimatedCompletedWords >= estimatedTotalWords && estimatedTotalWords > 0 ? "is-complete" : ""}">
         <div class="bookshelf-review-progress-head">
@@ -4517,12 +4543,31 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         <small>依節點類型估算全書體量，不只看文章篇數。</small>
       </article>
     `;
-    const chapterMarkup = chapterProgressMetrics.map((gap, index) => {
-      const completed = gap.completed;
-      const total = gap.total || 1;
-      const rate = gap.rate;
+    const chapterMarkup = focusTrack.chapterGaps.map((gap, index) => {
+      const completed = gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length;
+      const total = gap.subchapters.length || 1;
+      const rate = Math.round((completed / total) * 100);
+      const chapterDimensions = buildDimensionMetrics(gap.titlePool || []);
+      const minimumReady = chapterDimensions
+        .filter((item) => ["theory", "toolForm", "process"].includes(item.key))
+        .every((item) => item.total > 0 && item.completed > 0);
+      const chapterMeters = chapterDimensions.map((item) => {
+        const totalCount = item.total || 1;
+        const itemRate = Math.round((item.completed / totalCount) * 100);
+        return `
+          <li class="bookshelf-review-progress-meter ${itemRate === 100 ? "is-complete" : itemRate === 0 ? "is-empty" : ""}">
+            <div class="bookshelf-review-progress-meter-head">
+              <span>${escapeHtml(item.label)}</span>
+              <em>${item.completed} / ${item.total}</em>
+            </div>
+            <div class="bookshelf-review-progress-bar">
+              <i style="width: ${Math.max(itemRate, item.completed > 0 ? 12 : 0)}%"></i>
+            </div>
+          </li>
+        `;
+      }).join("");
       return `
-        <article class="bookshelf-review-progress-card ${rate === 100 ? "is-complete" : rate === 0 ? "is-empty" : ""}">
+        <article class="bookshelf-review-progress-card ${rate === 100 ? "is-complete" : rate === 0 ? "is-empty" : ""} ${minimumReady ? "is-minimum-ready" : ""}">
           <div class="bookshelf-review-progress-head">
             <span>第 ${index + 1} 章</span>
             <strong>${escapeHtml(gap.chapter)}</strong>
@@ -4531,7 +4576,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
           <div class="bookshelf-review-progress-bar">
             <i style="width: ${Math.max(rate, completed > 0 ? 12 : 0)}%"></i>
           </div>
-          <small>${completed} / ${total} 子章已到位</small>
+          <small>${completed} / ${total} 子章已到位｜${minimumReady ? "最小出版體積已成形" : "仍缺觀念／表單／硬知識核心節點"}</small>
+          <ul class="bookshelf-review-progress-meter-list">
+            ${chapterMeters}
+          </ul>
         </article>
       `;
     }).join("");
@@ -4656,9 +4704,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const explicitPriorityMap = {
       "現況判讀::翻新起手式": 0,
       "現況判讀::實戰表單": 1,
-      "預算拆解::報價拆讀": 2,
-      "預算拆解::發包合約": 3,
-      "預算拆解::合約檢核": 4,
+      "預算拆解::發包合約": 2,
+      "現況判讀::判讀流程": 3,
+      "預算拆解::報價拆讀": 4,
     };
     const rankCandidate = (candidate, index) => {
       const riskRank = candidate?.collisionRisk === "low"
@@ -4833,10 +4881,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function getOldHouseFallbackConfirmData() {
     return {
-      category: "收納機能",
+      category: "老屋翻新",
       track: publishingFocusTrackTitle,
-      chapter: "空間重整",
-      title: "收納補強：老屋機能配置與櫃體整合策略",
+      chapter: "現況判讀",
+      title: "翻新起手式：屋況盤點與範圍界定總表",
     };
   }
 
@@ -4851,10 +4899,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         ? `偵測到互斥詞彙「${conflictKeyword}」，已回退到老屋主線的安全題目。`
         : "已回退到老屋主線的安全題目。",
       track: publishingFocusTrackTitle,
-      chapter: "空間重整",
-      subchapter: "收納補強",
-      title: "收納補強：老屋機能配置與櫃體整合策略",
-      reason: "老屋主書模式下偵測到預售屋／客變污染，系統已強制回退到老屋主線的空間重整補位題目。",
+      chapter: "現況判讀",
+      subchapter: "翻新起手式",
+      title: "翻新起手式：屋況盤點與範圍界定總表",
+      reason: "老屋主書模式下偵測到預售屋／客變污染，系統已強制回退到老屋主線最前段的起手式整併題目。",
       questionLink: "",
       bookLink: "",
       invalid: true,
@@ -4871,18 +4919,145 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function getChronologyWarningMessage(recommendation, focusTrack) {
     if (!recommendation || !focusTrack) return "";
     const chapterIndex = publicationChapterOrder.indexOf(recommendation.chapter);
-    if (chapterIndex < 2) return "";
+    if (chapterIndex < 1) return "";
     const blockingChapter = publicationChapterOrder.find((chapterTitle, index) => (
-      index <= chapterIndex - 2 && getFocusTrackChapterCoverageRate(focusTrack, chapterTitle) < 30
+      index < chapterIndex && getFocusTrackChapterCoverageRate(focusTrack, chapterTitle) < publicationChronologyMinCompletionRate
     ));
     if (!blockingChapter) return "";
-    return `Warning: Chronological Violation｜${blockingChapter} 目前完成度仍低於 30%，不建議先排 ${recommendation.chapter} 的後段工程題；若要特例推進，請先在高階 LLM 覆核報告中寫明理由。`;
+    return `前置工程章節尚未穩固，禁止跳躍發布｜${blockingChapter} 目前有效完成度仍低於 ${publicationChronologyMinCompletionRate}%，暫時不可先排 ${recommendation.chapter}；請先補前段章節，或在高階 LLM 覆核報告明寫特例理由。`;
   }
 
   function getRecommendationBlockerMessage(recommendation) {
     if (!recommendation || recommendation.collisionRisk !== "high") return "";
     const similarTitles = recommendation.similarArticles?.slice(0, 2).map((article) => `${article.title}（${article.score}）`).join(" / ");
     return `送審提醒：規則層初篩認為此題與 ${similarTitles || "相近舊文"} 靠近；請交由高階 LLM 裁定是否改走「Merge_and_Update」、「更改切角」或保留「New_Publish」。`;
+  }
+
+  function getExpectedCandidate(mode = currentTopicMode) {
+    const modeState = getCurrentTopicModeState(mode);
+    if (articleTopicDecision?.title && articleTopicDecision?.track && articleTopicDecision?.chapter) {
+      return {
+        trackTitle: articleTopicDecision.track,
+        chapter: articleTopicDecision.chapter,
+        subchapter: articleTopicDecision.subchapter,
+        category: modeState?.nextRecommendedTopic?.category || "老屋翻新",
+        primaryTitle: articleTopicDecision.title,
+        reason: articleTopicDecision.reason || articleTopicDecision.summary || "",
+      };
+    }
+    return modeState?.nextRecommendedTopic || null;
+  }
+
+  function getRawArticleConfirmData(content) {
+    if (!content.trim()) {
+      return {
+        category: "尚未判定",
+        track: "尚未判定",
+        chapter: "尚未判定",
+        title: "尚未判定",
+        invalid: false,
+        conflictKeyword: "",
+      };
+    }
+
+    const intake = parseArticleIntakeCard(content);
+    return sanitizeArticleConfirmData({
+      ...intake,
+      title: parseArticleTitle(content),
+    }, content);
+  }
+
+  function getCandidateIntentScore(candidate, question = articleSourceQuestion) {
+    if (!candidate || !question.trim()) return 1;
+    const inferredTrack = findTrackFromText(question) || candidate.trackTitle || publishingFocusTrackTitle;
+    const inferredChapter = inferChapterFromTrack(inferredTrack, question, question);
+    const inferredSubchapter = inferSubchapterFromTrack(inferredTrack, inferredChapter, question, question);
+    const candidateTerms = buildTitleKeywordSet([
+      getDisplayTitle(candidate),
+      candidate.chapter || "",
+      candidate.subchapter || "",
+      candidate.reason || "",
+    ].join("\n"));
+    const questionTerms = buildTitleKeywordSet(question);
+    const sharedTerms = questionTerms.filter((term) => candidateTerms.includes(term));
+    let score = 0;
+    if (candidate.trackTitle === inferredTrack) score += 0.2;
+    if (candidate.chapter === inferredChapter) score += 0.25;
+    if (candidate.subchapter === inferredSubchapter) score += 0.25;
+    if (questionTerms.length) {
+      score += Math.min(0.3, sharedTerms.length / Math.max(1, Math.min(questionTerms.length, candidateTerms.length || 1)));
+    }
+    return Math.max(0, Math.min(1, Number(score.toFixed(2))));
+  }
+
+  function getLandingConsistencyScore(confirmData, candidate) {
+    if (!candidate || !confirmData || confirmData.title === "尚未判定") return 1;
+    const expectedTitle = normalizeComparableText(getDisplayTitle(candidate));
+    const landingTitle = normalizeComparableText(confirmData.title);
+    const inferredSubchapter = inferSubchapterFromTrack(
+      confirmData.track || candidate.trackTitle || publishingFocusTrackTitle,
+      confirmData.chapter || candidate.chapter || "",
+      confirmData.title || "",
+      confirmData.title || "",
+    );
+    let score = 0;
+    if (expectedTitle && landingTitle && expectedTitle === landingTitle) score += 0.7;
+    if (confirmData.track === candidate.trackTitle) score += 0.1;
+    if (confirmData.chapter === candidate.chapter) score += 0.1;
+    if (inferredSubchapter === candidate.subchapter) score += 0.1;
+    if (/系統櫃配件清單|規格確認表/.test(confirmData.title) && candidate.subchapter !== "實戰表單") {
+      score = Math.min(score, 0.2);
+    }
+    return Math.max(0, Math.min(1, Number(score.toFixed(2))));
+  }
+
+  function getTopicStateSyncState(content = articleAiResult, mode = currentTopicMode) {
+    const expectedCandidate = getExpectedCandidate(mode);
+    const rawConfirmData = getRawArticleConfirmData(content);
+    if (!expectedCandidate) {
+      return {
+        fatal: false,
+        intentScore: 1,
+        landingScore: 1,
+        expectedCandidate: null,
+        confirmData: rawConfirmData,
+        message: "",
+      };
+    }
+    const intentScore = getCandidateIntentScore(expectedCandidate, articleSourceQuestion);
+    const landingScore = getLandingConsistencyScore(rawConfirmData, expectedCandidate);
+    const hasStaleLanding = /系統櫃配件清單|規格確認表/.test(rawConfirmData.title || "") && expectedCandidate.subchapter !== "實戰表單";
+    const fatal = hasStaleLanding || intentScore < 0.6 || landingScore < 0.6;
+    const confirmData = fatal
+      ? {
+          category: expectedCandidate.category || "老屋翻新",
+          track: expectedCandidate.trackTitle || publishingFocusTrackTitle,
+          chapter: expectedCandidate.chapter || "現況判讀",
+          title: getDisplayTitle(expectedCandidate),
+          invalid: false,
+          conflictKeyword: "",
+        }
+      : rawConfirmData;
+    const message = hasStaleLanding
+      ? "偵測到舊的落地資訊仍停在「系統櫃配件清單」，已自動清空並校準回本輪送審候選。"
+      : intentScore < 0.6
+        ? `原始問題與本輪候選的語意關聯僅 ${Math.round(intentScore * 100)}%，低於 60%，已判定為 Fatal Error 並回退到同步狀態。`
+        : landingScore < 0.6
+          ? `正式落地資訊與本輪候選的同步分數僅 ${Math.round(landingScore * 100)}%，已判定為 Fatal Error 並改用候選資料覆寫顯示。`
+          : "本輪送審候選、原始問題與正式落地資訊已同步。";
+    return {
+      fatal,
+      intentScore,
+      landingScore,
+      expectedCandidate,
+      confirmData,
+      message,
+    };
+  }
+
+  function getStateSyncWarningMessage(content = articleAiResult, mode = currentTopicMode) {
+    const syncState = getTopicStateSyncState(content, mode);
+    return syncState.fatal ? syncState.message : "";
   }
 
   function sanitizeArticleConfirmData(data, sourceText = "", mode = currentTopicMode) {
@@ -5315,7 +5490,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     meta.textContent = `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜${recommendation.reason}`;
     applyRiskBadge(riskBadge, recommendation.collisionRisk, "規則初篩低相近");
     riskNote.textContent = recommendation.collisionReason;
-    blocker.textContent = getChronologyWarningMessage(recommendation, focusTrack) || getRecommendationBlockerMessage(recommendation);
+    blocker.textContent =
+      getChronologyWarningMessage(recommendation, focusTrack) ||
+      getStateSyncWarningMessage(articleAiResult, currentTopicMode) ||
+      getRecommendationBlockerMessage(recommendation);
     blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
     renderSimilarArticleList(similarList, recommendation);
   }
@@ -5439,7 +5617,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     applyRiskBadge(riskBadge, recommendation?.collisionRisk || "low", "規則初篩低相近");
     riskNote.textContent = recommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。";
     actionHint.textContent = recommendation?.actionHint ? `${recommendation.actionHint}｜待高階 LLM 裁定` : "待高階 LLM 裁定";
-    blocker.textContent = getChronologyWarningMessage(recommendation, focusTrack) || getRecommendationBlockerMessage(recommendation);
+    blocker.textContent =
+      getChronologyWarningMessage(recommendation, focusTrack) ||
+      getStateSyncWarningMessage(articleAiResult, currentTopicMode) ||
+      getRecommendationBlockerMessage(recommendation);
     blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
     renderSimilarArticleList(similarList, recommendation);
     top3.innerHTML = buildTopPriorityMarkup(currentTopicMode);
@@ -7744,20 +7925,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function getArticleConfirmData(content) {
-    if (!content.trim()) {
-      return {
-        category: "尚未判定",
-        track: "尚未判定",
-        chapter: "尚未判定",
-        title: "尚未判定",
-      };
-    }
-
-    const intake = parseArticleIntakeCard(content);
-    return sanitizeArticleConfirmData({
-      ...intake,
-      title: parseArticleTitle(content),
-    }, content);
+    return getTopicStateSyncState(content).confirmData;
   }
 
   function needsArticleMetadataFallback(content) {
@@ -7821,8 +7989,6 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function renderCrossSeriesLock(content = articleAiResult) {
     const shell = document.getElementById("article-cross-series-lock");
     const note = document.getElementById("article-cross-series-lock-note");
-    const confirmButton = document.getElementById("copy-article-confirm-payload");
-    const categoryButton = document.getElementById("copy-article-category");
     const currentBookTitle = getBookProposal(currentTopicMode)?.bookTitle || "";
     const confirmData = getArticleConfirmData(content);
     const hasResolvedConfirm = Boolean(
@@ -7847,11 +8013,33 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     if (note instanceof HTMLElement && isLocked) {
       note.textContent = `偵測到互斥詞彙「${conflictKeyword}」，目前主書為老屋翻新主線，請退回改題或清理標籤後再確認。`;
     }
-    [confirmButton, categoryButton].forEach((button) => {
-      if (button instanceof HTMLButtonElement) {
-        button.disabled = isLocked;
-      }
-    });
+    return isLocked;
+  }
+
+  function renderArticleSyncGuard(content = articleAiResult) {
+    const shell = document.getElementById("article-sync-guard");
+    const title = document.getElementById("article-sync-guard-title");
+    const note = document.getElementById("article-sync-guard-note");
+    const modeState = getCurrentTopicModeState(currentTopicMode);
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    const syncState = getTopicStateSyncState(content, currentTopicMode);
+    const chronologyMessage = getChronologyWarningMessage(syncState.expectedCandidate, focusTrack);
+    const isLocked = Boolean(chronologyMessage || syncState.fatal);
+    if (shell instanceof HTMLElement) {
+      shell.hidden = !content.trim();
+      shell.classList.toggle("is-alert", isLocked);
+    }
+    if (title instanceof HTMLElement) {
+      title.textContent = chronologyMessage
+        ? "前置工程章節尚未穩固，禁止跳躍發布"
+        : syncState.fatal
+          ? "候選、問題與落地資訊不同步，已鎖定確認動作"
+          : "本輪送審候選與落地資訊已同步";
+    }
+    if (note instanceof HTMLElement) {
+      note.textContent = chronologyMessage || syncState.message;
+    }
+    return isLocked;
   }
 
   function renderArticleConfirm(content) {
@@ -7860,6 +8048,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const track = document.getElementById("article-confirm-track");
     const chapter = document.getElementById("article-confirm-chapter");
     const title = document.getElementById("article-confirm-title");
+    const confirmButton = document.getElementById("copy-article-confirm-payload");
+    const categoryButton = document.getElementById("copy-article-category");
     if (
       !(shell instanceof HTMLElement) ||
       !(category instanceof HTMLElement) ||
@@ -7877,7 +8067,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     track.textContent = data.track;
     chapter.textContent = data.chapter;
     title.textContent = data.title;
-    renderCrossSeriesLock(content);
+    const crossSeriesLocked = renderCrossSeriesLock(content);
+    const syncLocked = renderArticleSyncGuard(content);
+    [confirmButton, categoryButton].forEach((button) => {
+      if (button instanceof HTMLButtonElement) {
+        button.disabled = Boolean(crossSeriesLocked || syncLocked);
+      }
+    });
   }
 
   async function renderArticleSocialReplies(content) {
