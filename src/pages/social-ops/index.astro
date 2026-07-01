@@ -4840,9 +4840,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       .slice(0, Math.max(1, limit));
   }
 
-  function getTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
-    const candidates = getRankedTopicCandidates(mode, 20)
-      .filter((candidate) => candidate?.workflowAction === "New_Publish");
+  function sortTopPriorityCandidates(candidates = [], limit = 3) {
     const forced = forcedTopPriorityTitles
       .map((title) => candidates.find((candidate) => getDisplayTitle(candidate) === title))
       .filter(Boolean);
@@ -4854,6 +4852,47 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       return true;
     });
     return [...forced, ...remainder].slice(0, Math.max(1, limit));
+  }
+
+  function getDirectTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
+    const candidates = getRankedTopicCandidates(mode, 20)
+      .filter((candidate) => candidate?.workflowAction === "New_Publish");
+    return sortTopPriorityCandidates(candidates, limit);
+  }
+
+  function getTopPriorityRecommendationResolution(mode = currentTopicMode, limit = 3) {
+    const safeLimit = Math.max(1, limit);
+    const directCandidates = getDirectTopPriorityRecommendations(mode, safeLimit);
+    if (directCandidates.length >= safeLimit) {
+      return {
+        candidates: directCandidates,
+        directCandidates,
+        fallbackCandidates: [],
+        autoReplenished: false,
+        partiallyAutoReplenished: false,
+      };
+    }
+
+    const seen = new Set(directCandidates.map((candidate) => getDisplayTitle(candidate)));
+    const fallbackCandidates = getPureNewPublishFallbackCandidates(mode, safeLimit * 2)
+      .filter((candidate) => {
+        const title = getDisplayTitle(candidate);
+        if (seen.has(title)) return false;
+        seen.add(title);
+        return true;
+      });
+    const mergedCandidates = sortTopPriorityCandidates([...directCandidates, ...fallbackCandidates], safeLimit);
+    return {
+      candidates: mergedCandidates,
+      directCandidates,
+      fallbackCandidates,
+      autoReplenished: directCandidates.length === 0 && mergedCandidates.length > 0,
+      partiallyAutoReplenished: directCandidates.length > 0 && mergedCandidates.length > directCandidates.length,
+    };
+  }
+
+  function getTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
+    return getTopPriorityRecommendationResolution(mode, limit).candidates;
   }
 
   function getPrimaryMergeTaskRecommendation(mode = currentTopicMode) {
@@ -4906,7 +4945,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
         return left.chapter.localeCompare(right.chapter, "zh-Hant");
       });
     const weakestChapter = chapterBreakdown[0] || null;
-    const topRecommendations = getTopPriorityRecommendations(mode, articleLimit);
+    const topPriorityResolution = getTopPriorityRecommendationResolution(mode, articleLimit);
+    const topRecommendations = topPriorityResolution.candidates;
     const recoverableCount = Math.min(articleLimit, focusTrack.remainingToBaseline);
     const projectedCoverage = focusTrack.totalSubchapters
       ? Math.round(((focusTrack.completedSubchapters + recoverableCount) / focusTrack.totalSubchapters) * 100)
@@ -4920,6 +4960,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       fastTrackLabel: topRecommendations.length
         ? topRecommendations.map((item) => getDisplayTitle(item)).join(" / ")
         : "目前 Top 3 為空，請改讀純新文章空窗候補素材池。",
+      autoReplenished: topPriorityResolution.autoReplenished,
+      partiallyAutoReplenished: topPriorityResolution.partiallyAutoReplenished,
     };
   }
 
@@ -4932,7 +4974,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "以下為理想推估，不代表目前已存在 3 篇可立即發布的純新文章。",
       `距離出版基線：還差 ${plan.remainingToBaseline} 篇`,
       `目前最短板章節：${plan.weakestChapter?.chapter || "尚未判定"}｜缺口 ${plan.weakestChapter?.missingCount ?? 0} 篇｜完成度 ${plan.weakestChapter?.completionRate ?? 0}%`,
-      `純新文章軌道最快推進路徑：${plan.fastTrackLabel}`,
+      `純新文章軌道最快推進路徑：${plan.autoReplenished ? `系統已自動由候補素材池試排：${plan.fastTrackLabel}` : plan.partiallyAutoReplenished ? `系統已補齊候補素材：${plan.fastTrackLabel}` : plan.fastTrackLabel}`,
       `若後續補足 3 篇合格的純新文章：主書完成度可由現況推進至 ${plan.projectedCoverage}%`,
       "章節缺口排序：",
       ...plan.chapterBreakdown.map((item, index) => `${index + 1}. ${item.chapter}｜缺口 ${item.missingCount} 篇｜完成度 ${item.completionRate}%`),
@@ -4992,7 +5034,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   }
 
   function buildTopPriorityText(mode = currentTopicMode, limit = 3) {
-    const candidates = getTopPriorityRecommendations(mode, limit);
+    const resolution = getTopPriorityRecommendationResolution(mode, limit);
+    const candidates = resolution.candidates;
     if (!candidates.length) {
       return [
         "目前純新文章軌道 Top 3 為空。",
@@ -5000,8 +5043,14 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       ].join("\n");
     }
     return [
-      "【純新文章軌道 Top 3】",
-      "以下 3 題已先排除 Merge_and_Update 與 Merge_into_Asset；若高階 LLM 判定其中任一題仍應整併或資產化，必須先移出新文章軌道再重排。",
+      resolution.autoReplenished
+        ? "【純新文章軌道 Top 3｜系統已自動由候補素材池試排】"
+        : resolution.partiallyAutoReplenished
+          ? "【純新文章軌道 Top 3｜系統已自動補齊候補素材】"
+          : "【純新文章軌道 Top 3】",
+      resolution.autoReplenished || resolution.partiallyAutoReplenished
+        ? "以下題目已先排除 Merge_and_Update 與 Merge_into_Asset；當正式 New_Publish 不足時，系統會自動從候補素材池遞補並試排，再交由高階 LLM 最終裁定是否保留、改題或重排。"
+        : "以下 3 題已先排除 Merge_and_Update 與 Merge_into_Asset；若高階 LLM 判定其中任一題仍應整併或資產化，必須先移出新文章軌道再重排。",
       ...candidates.map((candidate, index) => (
         `${index + 1}. ${getDisplayTitle(candidate)}｜${getPublicationChapterLabel(candidate.chapter)} / ${candidate.subchapter}｜${getPublishingReviewCandidateReason(candidate)}`
       )),
@@ -5009,7 +5058,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   }
 
   function buildTopPriorityMarkup(mode = currentTopicMode, limit = 3) {
-    const candidates = getTopPriorityRecommendations(mode, limit);
+    const resolution = getTopPriorityRecommendationResolution(mode, limit);
+    const candidates = resolution.candidates;
     const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
     if (!candidates.length) {
       const fallbackCandidates = getPureNewPublishFallbackCandidates(mode, limit);
@@ -5047,7 +5097,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     return candidates.map((candidate, index) => `
       <article class="bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}">
         <div class="bookshelf-review-top3-head">
-          <span>Top ${index + 1}</span>
+          <span>${resolution.autoReplenished || (resolution.partiallyAutoReplenished && index >= resolution.directCandidates.length) ? `Auto Top ${index + 1}` : `Top ${index + 1}`}</span>
           <em>${escapeHtml(getPublicationChapterLabel(candidate.chapter))} / ${escapeHtml(candidate.subchapter)}</em>
         </div>
         <strong>${escapeHtml(getDisplayTitle(candidate))}</strong>
