@@ -1,6 +1,7 @@
 import {
   getTrackChapters,
   inferChapterFromTrack,
+  inferSubchapterFromTrack,
   inferTrackFromText,
   normalizeSiteCategory,
   normalizeTagList,
@@ -16,6 +17,7 @@ export interface BlogCatalogPost {
   category: string;
   track: string;
   chapter: string;
+  subchapter?: string;
   tags: string[];
   coverImage: string;
 }
@@ -32,6 +34,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     category: "知識分享",
     track: "老屋翻新系",
     chapter: "現況判讀",
+    subchapter: "翻新範圍",
     siteCategory: "老屋翻新",
     tags: ["範圍評估", "基礎工程", "預算分配", "格局更動"],
     date: "2026-06-29T22:30:00.000Z",
@@ -46,6 +49,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     category: "老屋翻新",
     track: "老屋翻新系",
     chapter: "完工避雷",
+    subchapter: "驗收重點",
     tags: ["老屋翻新", "完工驗收", "防水測試", "電箱迴路", "泥作平整", "系統櫃五金"],
     coverImage: "/images/blog/old-house-renovation-acceptance-checklist-cover.png",
   },
@@ -59,6 +63,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     category: "格局動線",
     track: "老屋翻新系",
     chapter: "空間重整",
+    subchapter: "格局調整",
     tags: ["老屋翻新", "格局動線", "空間重整", "採光通風", "生活動線", "結構判讀"],
     coverImage: "/images/blog/old-house-layout-strategy-cover.png",
   },
@@ -72,6 +77,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     category: "智能家居",
     track: "水電照明系",
     chapter: "智能控制",
+    subchapter: "語音整合",
     tags: ["智能家居", "Apple Home", "Aqara", "Zigbee", "Thread", "智能控制"],
     coverImage: "/images/blog/smart-home-system-ecosystem-guide-cover.png",
   },
@@ -85,6 +91,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     category: "老屋翻新",
     track: "老屋翻新系",
     chapter: "基礎工程",
+    subchapter: "拆除泥作",
     tags: ["老屋翻新", "基礎工程", "拆除工程", "泥作工程", "防水", "施工順序"],
     coverImage: "/images/blog/old-house-demolition-masonry-cover.png",
   },
@@ -98,6 +105,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     category: "老屋翻新",
     track: "老屋翻新系",
     chapter: "現況判讀",
+    subchapter: "屋況盤點",
     tags: ["老屋翻新", "屋況盤點", "結構防水", "水電管線", "採光通風", "隔音"],
     coverImage: "/images/blog/old-house-condition-assessment-cover.png",
   },
@@ -111,6 +119,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     category: "裝修預算",
     track: "老屋翻新系",
     chapter: "預算拆解",
+    subchapter: "預算分級",
     tags: ["客廳", "局部翻新", "裝修預算", "天花板", "地板", "家具"],
     coverImage: "/images/blog/living-room-budget-cover.png",
   },
@@ -124,6 +133,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     category: "水電照明",
     track: "水電照明系",
     chapter: "插座開關",
+    subchapter: "插座迴路",
     tags: ["插座", "開關", "迴路", "動線", "家具尺寸"],
     coverImage: "/images/blog/插座被沙發遮蓋住.png",
   },
@@ -144,6 +154,9 @@ export function mapContentfulBlogPosts(items: any[]): BlogCatalogPost[] {
       getTrackChapters(track)[0] ||
       "";
     const siteCategory = normalizeSiteCategory(rawCategory) || normalizeSiteCategory(track) || rawCategory.trim();
+    const subchapter =
+      String(fields.subchapter ?? "").trim() ||
+      inferSubchapterFromTrack(track, chapter, rawCategory, title, summary);
     const tags = Array.from(
       new Set(
         [
@@ -151,6 +164,7 @@ export function mapContentfulBlogPosts(items: any[]): BlogCatalogPost[] {
           siteCategory,
           track,
           chapter,
+          subchapter,
         ].filter(Boolean),
       ),
     );
@@ -164,6 +178,7 @@ export function mapContentfulBlogPosts(items: any[]): BlogCatalogPost[] {
       category: siteCategory,
       track,
       chapter,
+      subchapter,
       tags,
       coverImage: fields.coverImage?.fields?.file?.url
         ? `https:${fields.coverImage.fields.file.url}`

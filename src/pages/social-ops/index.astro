@@ -4223,6 +4223,17 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     element.textContent = risk === "high" ? "撞題風險高" : risk === "medium" ? "撞題風險中" : fallbackText;
   }
 
+  function revealPublishingReviewPrompt() {
+    const textarea = document.getElementById("publishing-review-prompt-content");
+    if (!(textarea instanceof HTMLTextAreaElement)) return;
+    const details = textarea.closest("details");
+    if (details instanceof HTMLDetailsElement) {
+      details.open = true;
+    }
+    textarea.focus();
+    textarea.select();
+  }
+
   function buildPublishingReviewOutline(mode = currentTopicMode) {
     const modeState = getCurrentTopicModeState(mode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
@@ -7529,6 +7540,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "已複製出版閉環覆核稿。",
       { manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。" },
     );
+    if (result !== "clipboard") {
+      revealPublishingReviewPrompt();
+    }
     const feedback = getCopyFeedbackState(result, "已複製出版閉環覆核稿。", "已開啟手動複製視窗，可直接複製出版閉環覆核稿。");
     setFeedback(feedback.message, feedback.mode);
   });

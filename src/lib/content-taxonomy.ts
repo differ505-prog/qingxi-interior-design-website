@@ -25,6 +25,7 @@ export interface PublishingCatalogPost {
   title: string;
   track?: string;
   chapter?: string;
+  subchapter?: string;
   siteCategory?: string;
   category?: string;
   summary?: string;
@@ -767,7 +768,9 @@ export function buildBookshelfEntries(posts: PublishingCatalogPost[] = []): Book
     const chapter =
       String(post.chapter ?? "").trim() ||
       inferChapterFromTrack(trackTitle, post.title || "", post.summary || "", normalizeTagList(post.tags).join(" "));
-    const subchapter = inferSubchapterFromTrack(trackTitle, chapter, post.title || "", post.summary || "", normalizeTagList(post.tags).join(" "));
+    const subchapter =
+      String(post.subchapter ?? "").trim() ||
+      inferSubchapterFromTrack(trackTitle, chapter, post.title || "", post.summary || "", normalizeTagList(post.tags).join(" "));
     const category = normalizeSiteCategory(String(post.siteCategory || post.category || "")) || String(post.siteCategory || post.category || "");
     return {
       title: post.title || "未命名文章",
@@ -997,7 +1000,7 @@ function buildRecommendationFromCandidate(
     candidate.chapter,
     candidate.subchapter,
   );
-  const collisionRisk = existingArticleContext.sameSubchapterArticles.length > 0
+  const collisionRisk: NextTopicRecommendation["collisionRisk"] = existingArticleContext.sameSubchapterArticles.length > 0
     ? "high"
     : existingArticleContext.sameChapterArticles.length > 0
       ? "medium"
