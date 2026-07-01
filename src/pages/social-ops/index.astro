@@ -7002,7 +7002,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function prepareProFinalizePrompt(question = "") {
-    const resolvedQuestion = question || buildResolvedArticleSourcePackage().packageText;
+    const resolvedQuestion = question || getSafeResolvedArticleSourcePackage().packageText;
     let usedFallback = false;
 
     try {
@@ -7202,6 +7202,47 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       packageText,
       hasSeed: Boolean(sourceQuestion || presetTitle || articleTopicDecision?.title || getRecommendedArticleSeed().recommendation?.primaryTitle),
     };
+  }
+
+  function buildFallbackArticleSourcePackage() {
+    const sourceQuestion = articleSourceQuestion.trim();
+    const presetTitle = articlePresetTitle.trim() || articleTopicDecision?.title || getDisplayTitle(getPrimaryReviewRecommendation(currentTopicMode));
+    const lines = [
+      "【本輪預設題目】",
+      presetTitle || "尚未設定",
+      "",
+      "【真實社團問題】",
+      sourceQuestion || "目前尚未貼入真實社團問題。",
+    ];
+    if (articleTopicDecision?.title) {
+      lines.push(
+        "",
+        "【本題動態決題】",
+        `建議標題：${articleTopicDecision.title}`,
+        `主書系：${articleTopicDecision.track || "尚未判定"}`,
+        `章節：${articleTopicDecision.chapter || "尚未判定"}`,
+        `子章節：${articleTopicDecision.subchapter || "尚未判定"}`,
+      );
+    }
+    return {
+      sourceQuestion,
+      presetTitle,
+      packageText: lines.join("\n"),
+      hasSeed: Boolean(sourceQuestion || presetTitle),
+      usedFallback: true,
+    };
+  }
+
+  function getSafeResolvedArticleSourcePackage() {
+    try {
+      return {
+        ...buildResolvedArticleSourcePackage(),
+        usedFallback: false,
+      };
+    } catch (error) {
+      console.error("整理生文前置包失敗，改用最小可用版本：", error);
+      return buildFallbackArticleSourcePackage();
+    }
   }
 
   function renderArticleComposerPanel() {
@@ -8517,7 +8558,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       const saved = saveArticleAiResult();
       renderArticleAiResult();
 
-      const sourceState = buildResolvedArticleSourcePackage();
+      const sourceState = getSafeResolvedArticleSourcePackage();
       setArticleAiFeedback("結果已整理，正在備好 Pro 生文提示詞...", "is-success");
       const promptState = prepareProFinalizePrompt(sourceState.packageText);
       const storageOk = saved && promptState.saved;
@@ -9198,7 +9239,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   });
 
   document.getElementById("copy-pro-finalize-prompt-inline")?.addEventListener("click", async () => {
-    const sourceState = buildResolvedArticleSourcePackage();
+    const sourceState = getSafeResolvedArticleSourcePackage();
     const successMessage = articleAiResult.trim()
       ? "已複製 Pro 生文提示詞。"
       : "已複製 Pro 生文提示詞模板，建議先生成 Flash 判題結果再使用。";
