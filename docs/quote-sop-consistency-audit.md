@@ -6,6 +6,7 @@
 - `src/lib/contract-studio.ts`
 - `src/pages/renovation-process.astro`
 - `src/pages/standard-sop.astro`
+- `src/pages/standard-sop-print.astro`
 
 ## 1. 隱蔽工程對照查核
 
@@ -40,5 +41,5 @@
 ## 3. 綜合結論
 
 - 查核結果：`通過`
-- 可進入後續任務：`青曦標準 SOP 公開頁`、`合作流程圖版本`、`公版老屋翻新甘特圖串接`
-- 目前仍未涵蓋的非 IDE 項：`可面談使用的 PDF / 實體圖表版`
+- 已完成任務：`青曦標準 SOP 公開頁`、`合作流程圖版本`、`公版老屋翻新甘特圖串接`、`可列印公版提案頁`
+- 目前仍未涵蓋的延伸項：`個案客製版 PDF / 實體圖表版`

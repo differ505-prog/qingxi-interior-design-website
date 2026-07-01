@@ -145,6 +145,7 @@
 ## 對齊檢核
 
 - 公開版頁面：`src/pages/standard-sop.astro`
+- 公版列印版：`src/pages/standard-sop-print.astro`
 - 公版甘特圖：`src/pages/renovation-process.astro`
 - 報價骨架：`src/lib/quote-studio.ts`
 - 合約付款節點：`src/lib/contract-studio.ts`
@@ -154,6 +155,8 @@
 
 - 內部提案 SOP：已建立
 - 官網公開 SOP 頁：已建立
+- 公版列印版 / PDF 版：已建立
 - 合作流程圖版本：已建立
 - 公版老屋翻新甘特圖：已串接
-- PDF / 實體圖表版：未建立，屬後續非純前端交付
+- 可面談使用的公版 PDF / 實體輸出版：已建立
+- 個案客製版：未建立，屬後續延伸任務

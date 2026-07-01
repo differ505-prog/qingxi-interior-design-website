@@ -1,0 +1,533 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { contractDefaultPaymentStages } from "../lib/contract-studio";
+import { quoteCategories } from "../lib/quote-studio";
+
+const collaborationSteps = [
+  {
+    stage: "01",
+    title: "需求快篩與預算定錨",
+    description: "先確認空間類型、預算帶、入住成員與案件優先順序，避免第一次會議停在模糊描述。",
+  },
+  {
+    stage: "02",
+    title: "現況盤點與風險拆解",
+    description: "丈量前後同步盤點結構、水電、防水、收納與動線問題，先把容易失控的地方講明白。",
+  },
+  {
+    stage: "03",
+    title: "提案說明與合作流程對齊",
+    description: "先講流程節奏、責任分工與時程邏輯，再進入報價與施作內容，不讓雙方理解錯位。",
+  },
+  {
+    stage: "04",
+    title: "報價校正與付款節點確認",
+    description: "將報價分類、查驗里程碑與付款節點一起校對，避免簽約後才發現對工序理解不同。",
+  },
+  {
+    stage: "05",
+    title: "施工追蹤、驗收與點交",
+    description: "依查驗節點推進施工，完工後進入驗收、缺失修正與正式交屋，不提早把使用與交付混在一起。",
+  },
+];
+
+const hiddenWorkModules = [
+  {
+    title: "前置保護與拆除",
+    categoryIds: ["preparation"],
+    points: ["公共區與室內保護", "拆除清運與社區規範", "素地整理與現場基準確認"],
+  },
+  {
+    title: "管線、弱電與設備預留",
+    categoryIds: ["electrical", "hvac", "smart-home"],
+    points: ["插座、迴路與給排水調整", "空調與設備預埋", "網路、監控與智能家居預留"],
+  },
+  {
+    title: "泥作、防水與基礎修補",
+    categoryIds: ["masonry"],
+    points: ["牆地面打底與修補", "濕區防水與試水", "貼材前基準面校正"],
+  },
+  {
+    title: "木作、櫃體與表面整合",
+    categoryIds: ["cabinet", "finish"],
+    points: ["天花、封板與木作基礎", "系統櫃量測與下單", "油漆、表面與收邊整理"],
+  },
+  {
+    title: "設備、衛浴與門窗收邊",
+    categoryIds: ["fixtures", "doors-windows"],
+    points: ["衛浴與家電安裝", "玻璃、門窗與五金整合", "功能測試、缺失修正與點交準備"],
+  },
+];
+
+const hiddenWorkRows = hiddenWorkModules.map((module) => ({
+  ...module,
+  categoryLabels: module.categoryIds
+    .map((id) => quoteCategories.find((category) => category.id === id)?.label)
+    .filter(Boolean)
+    .join(" / "),
+}));
+
+const ganttSummary = [
+  {
+    label: "前期規劃",
+    span: "第 1-8 週",
+    detail: "初談、丈量、平面提案、設計委任、細部設計與工程報價簽約。",
+  },
+  {
+    label: "基礎工程",
+    span: "第 9-14 週",
+    detail: "保護、拆除、清運、水電定位、泥作打底、防水試水與必要窗體調整。",
+  },
+  {
+    label: "中段整合",
+    span: "第 15-21 週",
+    detail: "木作天花、空調弱電、貼磚石材、批土油漆與系統櫃複丈下單。",
+  },
+  {
+    label: "安裝交付",
+    span: "第 22-28 週",
+    detail: "地坪、櫃體、設備安裝、細清、功能測試、驗收複驗與正式交屋。",
+  },
+];
+
+const paymentAlignment = [
+  "對應合作確認後的檔期保留、前置備料與施工排程啟動。",
+  "建議預設以水電管線配置完成，並完成主要隱蔽工程查驗作為付款門檻。",
+  "對應現場尺寸穩定、系統櫃與設備排產或進場施作前的成本集中節點。",
+  "對應工程完工並通知點交後支付，若有小瑕疵則依保留款機制處理。",
+];
+---
+
+<BaseLayout
+  title="青曦標準提案公版 - 青曦空間設計"
+  description="青曦空間設計可列印的標準提案公版，整合合作流程、排程摘要、隱蔽工程解剖圖與付款節點。"
+  noindex={true}
+>
+  <section class="proposal-print-page">
+    <div class="screen-toolbar print-hidden">
+      <div>
+        <p class="toolbar-eyebrow">PRINT TEMPLATE</p>
+        <h1>青曦標準提案公版</h1>
+        <p>此頁已整理為可列印版型，可直接使用瀏覽器列印或另存 PDF。</p>
+      </div>
+      <div class="toolbar-actions">
+        <button type="button" class="toolbar-button toolbar-button-primary" onclick="window.print()">列印 / 另存 PDF</button>
+        <a href="/standard-sop" class="toolbar-button toolbar-button-secondary">返回公開 SOP</a>
+      </div>
+    </div>
+
+    <div class="paper-stack">
+      <article class="paper-sheet cover-sheet">
+        <header class="cover-header">
+          <p class="cover-eyebrow">Qing Hsi Spatial Design</p>
+          <h2>青曦標準提案公版</h2>
+          <p class="cover-description">
+            給第一次面談、需求對齊與報價說明使用的標準提案頁。先講流程，再講排程，最後才進入隱蔽工程與付款節點。
+          </p>
+        </header>
+
+        <section class="cover-grid">
+          <div class="cover-card">
+            <h3>這份公版的用途</h3>
+            <ul>
+              <li>第一次面談時快速對齊合作節奏</li>
+              <li>降低只看總價、不看工序的誤判</li>
+              <li>作為後續客製提案與正式報價的共同基準</li>
+            </ul>
+          </div>
+          <div class="cover-card">
+            <h3>面談建議順序</h3>
+            <ol>
+              <li>先講合作流程圖</li>
+              <li>再講老屋翻新甘特摘要</li>
+              <li>最後講樹狀工程解剖圖與付款節點</li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="notes-panel">
+          <h3>面談時先講的三個重點</h3>
+          <ul>
+            <li>裝修不是先比總價，而是先確認流程、節奏與風險節點。</li>
+            <li>真正影響返工率與追加風險的，多半是隱蔽工程與工序銜接。</li>
+            <li>付款節點必須跟查驗里程碑綁定，才有辦法同時保護雙方。</li>
+          </ul>
+        </section>
+      </article>
+
+      <article class="paper-sheet">
+        <header class="sheet-header">
+          <p class="sheet-eyebrow">Page 1</p>
+          <h2>合作流程圖</h2>
+          <p>先把合作從需求盤點到點交的五個步驟講清楚，讓雙方在同一套節奏上溝通。</p>
+        </header>
+        <div class="flow-list">
+          {collaborationSteps.map((step) => (
+            <section class="flow-row">
+              <div class="flow-stage">{step.stage}</div>
+              <div class="flow-content">
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
+            </section>
+          ))}
+        </div>
+      </article>
+
+      <article class="paper-sheet">
+        <header class="sheet-header">
+          <p class="sheet-eyebrow">Page 2</p>
+          <h2>公版老屋翻新甘特摘要</h2>
+          <p>用週次節奏說明老屋翻新常見工序，避免把排程當成一句「大概幾週」帶過。</p>
+        </header>
+        <div class="gantt-summary-grid">
+          {ganttSummary.map((item) => (
+            <section class="summary-card">
+              <div class="summary-top">
+                <h3>{item.label}</h3>
+                <span>{item.span}</span>
+              </div>
+              <p>{item.detail}</p>
+            </section>
+          ))}
+        </div>
+        <section class="notes-panel compact">
+          <h3>排程判讀原則</h3>
+          <ul>
+            <li>老屋案的變數多集中在拆除後修補、管線調整、防水與設備排產。</li>
+            <li>越早把隱蔽工程講清楚，越能降低後續追加與工期誤解。</li>
+            <li>甘特圖是用來建立預期，不是用來承諾一個脫離現場條件的死日期。</li>
+          </ul>
+        </section>
+      </article>
+
+      <article class="paper-sheet">
+        <header class="sheet-header">
+          <p class="sheet-eyebrow">Page 3</p>
+          <h2>樹狀工程解剖圖</h2>
+          <p>這張頁面專門用來說明：為什麼報價不能只看表面材，而要看整體工序與隱蔽工程管理。</p>
+        </header>
+        <div class="tree-grid">
+          {hiddenWorkRows.map((item) => (
+            <section class="tree-card">
+              <div class="tree-card-head">
+                <h3>{item.title}</h3>
+                <span>{item.categoryLabels}</span>
+              </div>
+              <ul>
+                {item.points.map((point) => (
+                  <li>{point}</li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </article>
+
+      <article class="paper-sheet">
+        <header class="sheet-header">
+          <p class="sheet-eyebrow">Page 4</p>
+          <h2>付款節點與查驗里程碑</h2>
+          <p>付款不是單獨收款表，而是和工程節點綁在一起的合作機制。</p>
+        </header>
+        <div class="payment-list">
+          {contractDefaultPaymentStages.map((stage, index) => (
+            <section class="payment-row">
+              <div class="payment-percent">{stage.percent}%</div>
+              <div class="payment-copy">
+                <h3>{stage.label}</h3>
+                <p>{stage.note}</p>
+                <p class="payment-alignment">{paymentAlignment[index]}</p>
+              </div>
+            </section>
+          ))}
+        </div>
+        <section class="notes-panel compact">
+          <h3>結論說法</h3>
+          <ul>
+            <li>如果別人的報價更低，先不要只比總價，先比有沒有把這些節點列清楚。</li>
+            <li>青曦的報價價值不只在材料，而在工序整合、隱蔽工程判斷與返工風險控制。</li>
+            <li>這份公版可作為面談版底稿，後續再依案件條件疊加個案內容。</li>
+          </ul>
+        </section>
+      </article>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  :global(body) {
+    background: #efe7dc;
+  }
+
+  .proposal-print-page {
+    color: #2f241d;
+    padding: 32px 0 72px;
+  }
+
+  .screen-toolbar {
+    width: min(1120px, calc(100% - 2rem));
+    margin: 0 auto 24px;
+    padding: 24px 28px;
+    border-radius: 24px;
+    background: rgba(255, 252, 247, 0.96);
+    border: 1px solid rgba(109, 82, 58, 0.12);
+    box-shadow: 0 18px 50px rgba(88, 62, 39, 0.08);
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .toolbar-eyebrow,
+  .cover-eyebrow,
+  .sheet-eyebrow {
+    margin: 0 0 0.6rem;
+    color: #8b6a4d;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .screen-toolbar h1,
+  .cover-header h2,
+  .sheet-header h2,
+  .flow-content h3,
+  .summary-card h3,
+  .tree-card h3,
+  .payment-copy h3,
+  .cover-card h3,
+  .notes-panel h3 {
+    margin: 0;
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+  }
+
+  .screen-toolbar p,
+  .cover-description,
+  .sheet-header p,
+  .flow-content p,
+  .summary-card p,
+  .payment-copy p,
+  .notes-panel li,
+  .cover-card li,
+  .tree-card li {
+    margin: 0;
+    line-height: 1.75;
+    letter-spacing: 0.05em;
+  }
+
+  .toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .toolbar-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 1.15rem;
+    border-radius: 999px;
+    text-decoration: none;
+    border: 1px solid rgba(109, 82, 58, 0.15);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+
+  .toolbar-button-primary {
+    background: #6b4d36;
+    color: #fff9f3;
+  }
+
+  .toolbar-button-secondary {
+    background: #fffdf8;
+    color: #6b4d36;
+  }
+
+  .paper-stack {
+    width: min(1120px, calc(100% - 2rem));
+    margin: 0 auto;
+    display: grid;
+    gap: 20px;
+  }
+
+  .paper-sheet {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 16mm;
+    background: #fffdfa;
+    border: 1px solid rgba(109, 82, 58, 0.12);
+    box-shadow: 0 24px 70px rgba(88, 62, 39, 0.1);
+    display: grid;
+    align-content: start;
+    gap: 14mm;
+  }
+
+  .cover-sheet {
+    background:
+      linear-gradient(180deg, rgba(241, 230, 216, 0.7) 0%, rgba(255, 253, 250, 1) 26%),
+      #fffdfa;
+  }
+
+  .cover-header,
+  .sheet-header {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .cover-header h2 {
+    font-size: 2.1rem;
+  }
+
+  .cover-grid,
+  .gantt-summary-grid,
+  .tree-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10mm;
+  }
+
+  .cover-card,
+  .summary-card,
+  .tree-card,
+  .notes-panel {
+    border: 1px solid rgba(109, 82, 58, 0.12);
+    border-radius: 20px;
+    background: #fffcf7;
+    padding: 16px 18px;
+  }
+
+  .cover-card ul,
+  .cover-card ol,
+  .notes-panel ul,
+  .tree-card ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .notes-panel.compact {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .flow-list,
+  .payment-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .flow-row,
+  .payment-row {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    border: 1px solid rgba(109, 82, 58, 0.12);
+    border-radius: 18px;
+    padding: 16px;
+    background: #fffcf7;
+  }
+
+  .flow-stage,
+  .payment-percent {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    border-radius: 18px;
+    background: rgba(139, 106, 77, 0.1);
+    color: #6b4d36;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  .summary-card {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .summary-top,
+  .tree-card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+  }
+
+  .summary-top span,
+  .tree-card-head span,
+  .payment-alignment {
+    color: #7a5a3f;
+    font-weight: 600;
+  }
+
+  .payment-copy {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  @media (max-width: 980px) {
+    .screen-toolbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .paper-stack {
+      width: min(100% - 1rem, 1120px);
+    }
+
+    .paper-sheet {
+      width: 100%;
+      min-height: auto;
+      padding: 24px;
+    }
+
+    .cover-grid,
+    .gantt-summary-grid,
+    .tree-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media print {
+    :global(body) {
+      background: #ffffff;
+    }
+
+    .print-hidden {
+      display: none !important;
+    }
+
+    .proposal-print-page {
+      padding: 0;
+    }
+
+    .paper-stack {
+      width: 100%;
+      gap: 0;
+    }
+
+    .paper-sheet {
+      width: 100%;
+      min-height: auto;
+      margin: 0;
+      border: none;
+      box-shadow: none;
+      page-break-after: always;
+      break-after: page;
+      padding: 12mm;
+    }
+
+    .paper-sheet:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+  }
+</style>
