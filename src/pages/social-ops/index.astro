@@ -902,6 +902,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 </article>
               </div>
               <div id="publishing-review-progress" class="bookshelf-review-progress-list"></div>
+              <section class="bookshelf-review-baseline">
+                <div class="bookshelf-preview-head">
+                  <p>出版基線達標路徑</p>
+                  <span>直接看哪一章拖慢出版進度、先補哪幾篇最划算，以及補完後完成度會推進到哪裡</span>
+                </div>
+                <div id="publishing-review-baseline-path" class="bookshelf-review-baseline-path"></div>
+              </section>
               <article class="bookshelf-review-next">
                 <div class="bookshelf-review-next-head">
                   <span>最推薦下一篇</span>
@@ -930,7 +937,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               <section class="bookshelf-review-top3">
                 <div class="bookshelf-preview-head">
                   <p>Top 3 最值得先發</p>
-                  <span>不是只看單一答案，而是同時看 3 個優先順位的出版補位選項</span>
+                  <span>不是只看單一答案，而是同時看同一本主書內 3 個優先順位的出版補位選項</span>
                 </div>
                 <div id="publishing-review-top3" class="bookshelf-review-top3-list"></div>
               </section>
@@ -4313,7 +4320,124 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function getTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
     const modeState = getCurrentTopicModeState(mode);
-    return Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates.slice(0, Math.max(1, limit)) : [];
+    const focusTrackTitle = modeState?.publishingDashboard?.focusTrack?.title;
+    const allCandidates = Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates : [];
+    const filtered = focusTrackTitle
+      ? allCandidates.filter((candidate) => candidate.trackTitle === focusTrackTitle)
+      : allCandidates;
+    const chapterFallbacks = (modeState?.publishingDashboard?.focusTrack?.chapterGaps || [])
+      .map((gap) => gap.recommendedTopic)
+      .filter(Boolean)
+      .filter((candidate) => !focusTrackTitle || candidate.trackTitle === focusTrackTitle);
+    const merged = [...filtered];
+    chapterFallbacks.forEach((candidate) => {
+      if (!merged.some((item) => item.primaryTitle === candidate.primaryTitle && item.subchapter === candidate.subchapter)) {
+        merged.push(candidate);
+      }
+    });
+    return merged.slice(0, Math.max(1, limit));
+  }
+
+  function getPublicationBaselinePlan(mode = currentTopicMode, articleLimit = 3) {
+    const modeState = getCurrentTopicModeState(mode);
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    if (!focusTrack) return null;
+    const chapterBreakdown = [...focusTrack.chapterGaps]
+      .map((gap) => ({
+        chapter: gap.chapter,
+        missingCount: gap.remainingToBaseline,
+        publishedCount: gap.articleCount,
+        completionRate: gap.subchapters.length
+          ? Math.round((gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length / gap.subchapters.length) * 100)
+          : 0,
+      }))
+      .sort((left, right) => {
+        if (right.missingCount !== left.missingCount) return right.missingCount - left.missingCount;
+        if (left.publishedCount !== right.publishedCount) return left.publishedCount - right.publishedCount;
+        return left.chapter.localeCompare(right.chapter, "zh-Hant");
+      });
+    const weakestChapter = chapterBreakdown[0] || null;
+    const topRecommendations = getTopPriorityRecommendations(mode, articleLimit);
+    const recoverableCount = Math.min(articleLimit, focusTrack.remainingToBaseline);
+    const projectedCoverage = focusTrack.totalSubchapters
+      ? Math.round(((focusTrack.completedSubchapters + recoverableCount) / focusTrack.totalSubchapters) * 100)
+      : focusTrack.coverageRate;
+    return {
+      remainingToBaseline: focusTrack.remainingToBaseline,
+      weakestChapter,
+      topRecommendations,
+      projectedCoverage,
+      chapterBreakdown,
+      fastTrackLabel: topRecommendations.length
+        ? topRecommendations.map((item) => getDisplayTitle(item)).join(" / ")
+        : "目前尚無可用的優先補位題目。",
+    };
+  }
+
+  function buildPublicationBaselinePlanText(mode = currentTopicMode, articleLimit = 3) {
+    const plan = getPublicationBaselinePlan(mode, articleLimit);
+    if (!plan) return "目前尚無可用的出版基線達標路徑。";
+    const lines = [
+      "【出版基線達標路徑】",
+      `距離出版基線：還差 ${plan.remainingToBaseline} 篇`,
+      `目前最短板章節：${plan.weakestChapter?.chapter || "尚未判定"}｜缺口 ${plan.weakestChapter?.missingCount ?? 0} 篇｜完成度 ${plan.weakestChapter?.completionRate ?? 0}%`,
+      `最快達標路徑：${plan.fastTrackLabel}`,
+      `若先補 3 篇：主書完成度可由現況推進至 ${plan.projectedCoverage}%`,
+      "章節缺口排序：",
+      ...plan.chapterBreakdown.map((item, index) => `${index + 1}. ${item.chapter}｜缺口 ${item.missingCount} 篇｜完成度 ${item.completionRate}%`),
+    ];
+    return lines.join("\n");
+  }
+
+  function buildPublicationBaselinePlanMarkup(mode = currentTopicMode, articleLimit = 3) {
+    const plan = getPublicationBaselinePlan(mode, articleLimit);
+    if (!plan) {
+      return '<p class="bookshelf-confirm-note">目前尚無可用的出版基線達標路徑。</p>';
+    }
+    const recommendationList = plan.topRecommendations.length
+      ? plan.topRecommendations.map((item, index) => `
+        <li>
+          <strong>Top ${index + 1}</strong>
+          <span>${escapeHtml(getDisplayTitle(item))}</span>
+        </li>
+      `).join("")
+      : "<li><span>目前尚無可用的優先補位題目。</span></li>";
+    return `
+      <div class="bookshelf-review-baseline-summary">
+        <article class="bookshelf-review-baseline-card">
+          <span>距離出版基線</span>
+          <strong>還差 ${plan.remainingToBaseline} 篇</strong>
+          <small>主書完成度補齊前，仍有結構性缺口待填。</small>
+        </article>
+        <article class="bookshelf-review-baseline-card is-alert">
+          <span>目前最短板章節</span>
+          <strong>${escapeHtml(plan.weakestChapter?.chapter || "尚未判定")}</strong>
+          <small>缺口 ${plan.weakestChapter?.missingCount ?? 0} 篇｜完成度 ${plan.weakestChapter?.completionRate ?? 0}%</small>
+        </article>
+        <article class="bookshelf-review-baseline-card">
+          <span>補 3 篇後預估</span>
+          <strong>${plan.projectedCoverage}%</strong>
+          <small>以同一本主書優先補位推估，不跨到其他書。</small>
+        </article>
+      </div>
+      <div class="bookshelf-review-baseline-route">
+        <article class="bookshelf-review-baseline-route-card">
+          <span>最快達標路徑</span>
+          <ul>${recommendationList}</ul>
+        </article>
+        <article class="bookshelf-review-baseline-route-card">
+          <span>章節缺口排序</span>
+          <ol>
+            ${plan.chapterBreakdown.map((item) => `
+              <li>
+                <strong>${escapeHtml(item.chapter)}</strong>
+                <small>缺口 ${item.missingCount} 篇｜完成度 ${item.completionRate}%</small>
+              </li>
+            `).join("")}
+          </ol>
+        </article>
+      </div>
+    `;
   }
 
   function buildTopPriorityText(mode = currentTopicMode, limit = 3) {
@@ -4321,6 +4445,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     if (!candidates.length) return "目前尚無可用的 Top 3 優先發布建議。";
     return [
       "【Top 3 最值得先發】",
+      "以下 3 題已限制在同一本主書內排序，不跨到其他書系。",
       ...candidates.map((candidate, index) => (
         `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${candidate.reason}`
       )),
@@ -4554,6 +4679,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       }
     }
 
+    lines.push("", buildPublicationBaselinePlanText(mode));
     lines.push("", buildTopPriorityText(mode));
     lines.push("", "【目前出版清單】");
 
@@ -4633,6 +4759,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "- 判斷目前書名、章節與文章標題安排是否夠穩，是否能支撐後續集結成書。",
       "- 若有結構性問題，請先指出最上游的問題，不要只談表面措辭。",
       `- 本次覆核以書名「${bookProposal?.bookTitle || modeState?.publishingDashboard?.focusTrack?.title || "尚未定義"}」為單位，不是只看書系代稱。`,
+      "- 本文中的 Top 3 已限制在同一本主書內排序，不應跨到其他書。",
       "",
       "B. 重複與缺口覆核",
       "- 已標示 [已上線] 的文章代表官網已有內容，請檢查是否有重複、撞題或章節失衡。",
@@ -4759,6 +4886,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const similarList = document.getElementById("publishing-review-similar-list");
     const top3 = document.getElementById("publishing-review-top3");
     const progress = document.getElementById("publishing-review-progress");
+    const baselinePath = document.getElementById("publishing-review-baseline-path");
     const diffContent = document.getElementById("publishing-review-diff-content");
     const plan = document.getElementById("publishing-review-plan");
     const titlePool = document.getElementById("publishing-review-title-pool");
@@ -4780,6 +4908,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       !(similarList instanceof HTMLElement) ||
       !(top3 instanceof HTMLElement) ||
       !(progress instanceof HTMLElement) ||
+      !(baselinePath instanceof HTMLElement) ||
       !(diffContent instanceof HTMLElement) ||
       !(plan instanceof HTMLElement) ||
       !(titlePool instanceof HTMLElement) ||
@@ -4808,6 +4937,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       actionHint.textContent = "可直接推進";
       renderSimilarArticleList(similarList, null);
       top3.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的 Top 3 優先發布建議。</p>';
+      baselinePath.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版基線達標路徑。</p>';
       renderSimilarityDiffAnalysis(diffContent, null);
       progress.innerHTML = "";
       plan.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版清單。</p>';
@@ -4835,6 +4965,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     top3.innerHTML = buildTopPriorityMarkup(currentTopicMode);
     renderSimilarityDiffAnalysis(diffContent, recommendation);
     progress.innerHTML = buildChapterProgressMarkup(focusTrack);
+    baselinePath.innerHTML = buildPublicationBaselinePlanMarkup(currentTopicMode);
     titlePool.innerHTML = buildPublishingTitlePoolMarkup(focusTrack);
     const chapterCards = focusTrack.chapterGaps
       .map((gap, index) => {
