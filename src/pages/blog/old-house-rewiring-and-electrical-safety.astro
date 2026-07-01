@@ -1,0 +1,225 @@
+---
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogPost } from "../../lib/blog-catalog";
+
+const articleMeta = getStaticBlogPost("old-house-rewiring-and-electrical-safety");
+const articleTitle = articleMeta.title;
+const articleDescription = articleMeta.summary;
+const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
+const articleImage = articleMeta.coverImage;
+const articleDetailImage =
+  "https://core-normal.trae.ai/api/ide/v1/text_to_image?prompt=close-up%20of%20a%20modernized%20electrical%20distribution%20panel%20inside%20an%20old%20apartment%2C%20labeled%20circuits%2C%20clean%20conduit%20routing%2C%20architectural%20detail%2C%20warm%20minimal%20interior%20style%2C%20premium%20editorial%20illustration&image_size=landscape_4_3";
+const articleSceneImage =
+  "https://core-normal.trae.ai/api/ide/v1/text_to_image?prompt=renovated%20Taiwan%20apartment%20kitchen%20and%20living%20area%20with%20induction%20cooktop%2C%20dishwasher%2C%20air%20conditioner%20and%20concealed%20wiring%2C%20showing%20modern%20high-power%20appliance%20usage%2C%20calm%20neutral%20palette%2C%20realistic%20interior%20editorial%20rendering&image_size=landscape_16_9";
+const articleStructuredData = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: articleTitle,
+    description: articleDescription,
+    image: [articleImage],
+    datePublished: articlePublishedTime,
+    dateModified: articlePublishedTime,
+    articleSection: articleMeta.track,
+    keywords: articleMeta.tags.join(", "),
+    author: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "青曦空間設計",
+    },
+    mainEntityOfPage: "https://qingxidesign.tw/blog/old-house-rewiring-and-electrical-safety",
+  },
+];
+---
+<EditorialArticleLayout
+  title={articleTitle}
+  description={articleDescription}
+  ogImage={articleImage}
+  publishedTime={articlePublishedTime}
+  modifiedTime={articlePublishedTime}
+  structuredData={articleStructuredData}
+  track={articleMeta.track}
+  chapter={articleMeta.chapter}
+  siteCategory={articleMeta.siteCategory}
+  tags={articleMeta.tags}
+>
+  <p class="article-lead">
+    面對老屋翻新，多數屋主最先浮現的疑問，往往不是風格，而是範圍與預算：到底哪些地方一定得做，哪些又可以暫緩？真正成熟的判斷，從來不只看表面有沒有老舊，而是先看空間最核心的基礎系統，是否還能安全承接未來十年到二十年的生活。
+  </p>
+
+  <p>
+    在看得見的建材、櫃體與格局之外，決定老屋翻新範圍最關鍵，也最不容忽視的判斷點，其實是藏在牆面與天花板之下的隱蔽工程：水電更新與迴路重整。這不只是施工清單上的其中一項，而是整個居住安全與日常穩定度的底線。
+  </p>
+
+  <p>
+    若在翻新初期只把預算集中在表面更新，卻讓老舊電線、鏽蝕水管與過時配電邏輯繼續留在牆內，之後再漂亮的空間，也可能被跳電、漏水與難以預期的維修干擾打斷。真正值得優先投資的，往往就是那些入住後最不想再打開來重做的地方。
+  </p>
+
+  <blockquote>
+    老屋翻新最不該妥協的，不是看得見的材料升級，而是看不見的安全基準是否被重新建立。
+  </blockquote>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">判斷主軸</p>
+    <h3 class="article-insight-title">先確認老系統是否還能承載現代生活，再決定裝修範圍與預算排序。</h3>
+    <p>
+      水電更新不是額外加分，而是老屋翻新裡最接近底線管理的一層。只要這層沒有先釐清，後續所有櫃體、飾材與設備配置，都可能建立在不夠穩定的基礎上。
+    </p>
+  </div>
+
+  <div class="article-step-flow">
+    <article class="article-step-card">
+      <p class="article-step-index">01</p>
+      <h3>先看屋齡與老化</h3>
+      <p>判斷電線絕緣、水管材質與配電箱條件，確認是否已超出安全使用年限。</p>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">02</p>
+      <h3>再算現代負載</h3>
+      <p>把空調、IH 爐、烤箱、洗碗機與暖風機等高功率設備納入實際生活情境。</p>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">03</p>
+      <h3>最後重整迴路</h3>
+      <p>用專用迴路、分區配置與弱電佈局，重新建立可長期維護的隱蔽工程骨架。</p>
+    </article>
+  </div>
+
+  <h2>為什麼水電更新是老屋翻新的首要任務？</h2>
+
+  <p>
+    許多屋主在初步看屋時，若發現插座仍可通電、水龍頭仍可出水，就容易產生「先沿用舊系統，把預算留給看得到的地方」的想法。然而，基礎工程的折舊往往不是肉眼能直接辨識的，真正的風險通常藏在絕緣層老化、管壁脆化與迴路配置過時這些細節裡。
+  </p>
+
+  <p>
+    一般而言，屋齡超過 15 至 20 年的住宅，即使表面仍可正常使用，其內部電線外皮也常已出現硬化、脆裂或保護力下降的情況。當絕緣層失效，短路與電線走火的風險就會隨之升高。老舊冷熱水管若仍使用鐵管或早期塑膠管材，也可能伴隨鏽蝕、積垢、滲漏與水質疑慮，最後直接破壞後續裝修成果。
+  </p>
+
+  <p>
+    在青曦空間設計的實務裡，只要屋況到達一定年限，我們通常都會把水電管線的全面盤點與必要汰換，視為翻新計畫中不可妥協的優先項，而不是等預算有餘裕才補做的選項。
+  </p>
+
+  <div class="article-card-grid">
+    <div class="article-card">
+      <p class="article-card-kicker">常見誤區</p>
+      <h3>能用，不代表適合繼續承接未來生活</h3>
+      <p>
+        插座還有電、水管還有水，只能說明系統尚未完全失效，不能等同於安全、穩定與足夠耐久。
+      </p>
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">真正重點</p>
+      <h3>老屋翻新不是補表面，而是重新整理空間骨架</h3>
+      <p>
+        一旦基礎系統沒有先重整，後續的裝修投資都可能在未來維修時被迫拆開重做，成本更高，也更干擾生活。
+      </p>
+    </div>
+  </div>
+
+  <figure class="article-figure">
+    <img src={articleDetailImage} alt="老屋配電箱、電線管路與迴路標示重整的示意畫面" loading="lazy" />
+    <figcaption>
+      真正成熟的老屋翻新，會在開工前先把配電箱、管線材質與迴路標示整理清楚，而不是只處理最後看得到的表面。
+    </figcaption>
+  </figure>
+
+  <h2>用電型態已經改變：判斷基準不再只是夠用</h2>
+
+  <p>
+    比起單純的老化問題，更核心的關鍵，其實是現代生活用電型態早已與 20 年前截然不同。當年的電力配置，多半只預留了基本照明與一般家電插座，並沒有預設今天家庭裡會同時存在洗碗機、IH 爐、水波爐、全熱交換機、除濕機與多組空調設備。
+  </p>
+
+  <p>
+    這代表老屋若仍沿用原始總安培數與單一迴路配置，很可能在現代生活裡長期處於過載邊緣。最常見的表現，不只是偶爾跳電，更是某些高功率設備被迫共用插座、分接延長線，或在裝修後才發現原本的配置根本無法支撐預計的生活模式。
+  </p>
+
+  <div class="article-check-grid">
+    <div class="article-check-item">
+      <strong>看總電量</strong>
+      <p>現有安培數是否足以支撐空調、廚房設備與日常同時用電？</p>
+    </div>
+    <div class="article-check-item">
+      <strong>看設備密度</strong>
+      <p>廚房、衛浴與客廳是否已成為高功率家電密集使用的區域？</p>
+    </div>
+    <div class="article-check-item">
+      <strong>看未來需求</strong>
+      <p>是否已預計導入智慧家居、網路佈線或新增固定式大型設備？</p>
+    </div>
+  </div>
+
+  <h2>迴路重整的正確觀念</h2>
+
+  <p>
+    水電更新真正重要的，從來不只是把舊電線換成新電線，而是重新建立一套符合未來生活的迴路邏輯。這包含總安培與配電箱容量是否合理、各區域是否依使用情境重新分路，以及高功率設備是否具備獨立迴路與對應保護機制。
+  </p>
+
+  <h3>高功率家電要有專用迴路</h3>
+
+  <p>
+    空調、IH 爐、烤箱、洗碗機、電熱水器或浴室暖風機等設備，都不該再與一般插座共用模糊分配的舊迴路。獨立專用迴路與對應無熔絲開關，不只是防止跳電，更是從根本降低過載與異常發熱風險的必要條件。
+  </p>
+
+  <h3>廚房與浴室要被視為用電重鎮</h3>
+
+  <p>
+    對現代家庭來說，真正高密度用電的區域，常常集中在廚房與浴室。這些空間除了需要更細緻的安培數分配，也應同步評估漏電斷路器、防潮條件與設備同時運作的情境。若一開始沒有在圖面階段把這些條件盤清，等設備進場後才補救，代價通常更高。
+  </p>
+
+  <h3>弱電與網路佈局要一起進場</h3>
+
+  <p>
+    現代老屋翻新已不只是強電工程。網路線、路由器節點、智慧家庭控制線與影音設備的佈局，都應在水電重整階段同步納入。只有在牆內一次規劃完成，空間才能維持乾淨、穩定且可擴充的使用邏輯，而不是入住後再靠外露線材補破網。
+  </p>
+
+  <div class="article-card-grid">
+    <div class="article-card">
+      <p class="article-card-kicker">專用迴路</p>
+      <h3>把高功率設備從共用風險中拆開</h3>
+      <p>
+        獨立配置不是為了複雜，而是讓每一個高負載設備都能在明確、安全且可維護的條件下運作。
+      </p>
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">同步規劃</p>
+      <h3>強電、弱電與生活設備要一起看</h3>
+      <p>
+        只有把未來設備清單與生活習慣前置，迴路重整才不會流於表面更新，而能真正承接日後的使用密度。
+      </p>
+    </div>
+  </div>
+
+  <figure class="article-figure">
+    <img src={articleSceneImage} alt="現代住宅廚房與客廳高功率家電同時使用的情境示意" loading="lazy" />
+    <figcaption>
+      當洗碗機、IH 爐、空調與影音設備成為日常，老屋原本的配電邏輯往往已不足以承接新的生活密度。
+    </figcaption>
+  </figure>
+
+  <h2>隱蔽工程，才是居住安定感真正的來源</h2>
+
+  <p>
+    把預算投進看不見的水電工程，在施工初期或許不會立即帶來視覺上的回饋，卻會決定入住之後的長期安定度。一個能經得起時間考驗的家，除了需要乾淨耐看的設計語彙，更需要一套健康、安全且可維護的基礎骨架來支撐。
+  </p>
+
+  <p>
+    老屋翻新的成熟之處，不在於把每個可見面都做滿，而在於先處理那些一旦忽略，未來就最容易返工的隱蔽條件。確實排查風險、重新梳理水電與迴路，是所有後續美感與收納得以成立的第一步。
+  </p>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">決策提醒</p>
+    <h3 class="article-insight-title">先把看不見的地方做對，空間的安定感才有可能長久成立。</h3>
+    <p>
+      住得安心，從來不是靠漂亮材料堆出來的。真正穩定的居住品質，往往來自那些入住後不需要反覆修補、不必擔心過載與漏水的基礎系統。
+    </p>
+  </div>
+
+  <h2>結語：真正成熟的翻新，先從安全基準開始</h2>
+
+  <blockquote>
+    面對老屋翻新，範圍判斷最值得先看的，不是天花板做不做、櫃體換不換，而是牆內的水電系統是否還配得上未來的生活。當迴路重整、管線更新與用電安全被重新建立，後續的空間設計才不會只是漂亮一時，而能真正支撐長久、穩定且安心的日常。
+  </blockquote>
+</EditorialArticleLayout>

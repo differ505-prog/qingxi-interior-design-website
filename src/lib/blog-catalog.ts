@@ -27,6 +27,21 @@ export const DEFAULT_BLOG_COVER_IMAGE =
 
 export const staticBlogPosts: BlogCatalogPost[] = [
   {
+    title: "水電更新與迴路重整：老屋翻新無法妥協的隱蔽工程與安全基準",
+    slug: "old-house-rewiring-and-electrical-safety",
+    date: "2026-07-02",
+    summary:
+      "面對老屋翻新，判斷翻新範圍最關鍵的指標往往是看不見的水電管線。隨著生活型態改變與高功率家電普及，20 年前的電路早已無法負荷現代需求。本文拆解水電更新與迴路重整的必要性，帶您看懂隱蔽工程為何是居住安全的基石。",
+    siteCategory: "老屋翻新",
+    category: "老屋翻新",
+    track: "老屋翻新系",
+    chapter: "現況判讀",
+    subchapter: "水電安全",
+    tags: ["老屋翻新", "水電更新", "迴路重整", "隱蔽工程", "用電安全", "基礎工程"],
+    coverImage:
+      "https://core-normal.trae.ai/api/ide/v1/text_to_image?prompt=editorial%20cover%20illustration%20of%20an%20aged%20Taiwan%20apartment%20wall%20opened%20to%20reveal%20electrical%20conduits%2C%20circuit%20breaker%20panel%2C%20copper%20wiring%20and%20water%20pipes%2C%20warm%20neutral%20palette%2C%20premium%20interior%20design%20magazine%20style%2C%20realistic%20architectural%20rendering&image_size=landscape_16_9",
+  },
+  {
     slug: "old-house-renovation-scope-guide",
     title: "老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南",
     summary: "老屋翻新宛如一場資源分配的考驗，面對有限的預算與修繕項目，該如何界定翻新範圍？本文帶您梳理「基礎工程優先」、「生活軌跡盤點」與「預算收斂」三大核心判斷點，幫助您釐清必做與選做項目，找回面對老屋改造的安定感。",
