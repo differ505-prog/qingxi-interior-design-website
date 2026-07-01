@@ -1154,236 +1154,264 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <p>目前已內嵌數位工具戰力、里程碑手冊、尺寸速查與 85 吋電視掛架安裝備忘；後續可沿用同一結構擴充。</p>
                   </article>
                 </div>
-                <div class="bookshelf-preview-head">
-                  <p>數位工具戰力</p>
-                  <span>把數位母體、共用大腦與自建應用拆開整理，方便校準工具投資、資安與虛實整合方向</span>
-                </div>
-                <div class="renovation-knowhow-accordion">
-                  <details class="renovation-knowhow-entry">
-                    <summary class="renovation-knowhow-entry-summary">
-                      <div class="renovation-knowhow-card-head">
-                        <p>基礎核心工具</p>
-                        <strong>不可取代的母體與外掛</strong>
-                      </div>
-                      <span class="renovation-knowhow-summary-text">這 5 個工具是無法也不該花時間自建的底層基礎設施，要靠它們的 API、算力與商業壁壘餵養整個工作台。</span>
-                    </summary>
-                    <div class="renovation-knowhow-entry-body">
-                      <p class="renovation-knowhow-objective">整理方式：依照工具定位與核心價值重現，方便你快速判斷哪些是數位母體、哪些只是外掛。</p>
-                      <div class="digital-blueprint-grid">
-                        {digitalCoreTools.map((tool) => (
-                          <article class="digital-blueprint-card">
-                            <div class="digital-blueprint-card-head">
-                              <span>{tool.role}</span>
-                              <strong>{tool.name}</strong>
-                            </div>
-                            <p>{tool.value}</p>
-                          </article>
-                        ))}
-                      </div>
+                <details class="renovation-knowhow-topic">
+                  <summary class="renovation-knowhow-topic-summary">
+                    <div class="renovation-knowhow-topic-head">
+                      <p>數位工具戰力</p>
+                      <strong>數位母體、共用大腦與自建應用</strong>
                     </div>
-                  </details>
-                  <details class="renovation-knowhow-entry">
-                    <summary class="renovation-knowhow-entry-summary">
-                      <div class="renovation-knowhow-card-head">
-                        <p>Vibe Coding 共用大腦</p>
-                        <strong>解決維運與資安</strong>
-                      </div>
-                      <span class="renovation-knowhow-summary-text">為了避免同時維護多個獨立專案造成的 DevOps 災難與資安風險，所有自建應用都應該串接到這個唯一核心。</span>
-                    </summary>
-                    <div class="renovation-knowhow-entry-body">
-                      <p class="renovation-knowhow-objective">整理方式：直接把基礎設施名稱、技術棧與要解決的痛點並排，讓這段不只是技術名詞，而是實際的營運防線。</p>
-                      <div class="digital-blueprint-grid">
-                        {digitalSharedBrains.map((brain) => (
-                          <article class="digital-blueprint-card">
-                            <div class="digital-blueprint-card-head">
-                              <span>單一真相來源</span>
-                              <strong>{brain.name}</strong>
-                            </div>
-                            <p class="digital-blueprint-role">{brain.stack}</p>
-                            <p>{brain.pain}</p>
-                          </article>
-                        ))}
-                      </div>
+                    <span class="renovation-knowhow-topic-text">把數位母體、共用大腦與自建應用拆開整理，方便校準工具投資、資安與虛實整合方向。</span>
+                  </summary>
+                  <div class="renovation-knowhow-topic-body">
+                    <div class="renovation-knowhow-accordion">
+                      <details class="renovation-knowhow-entry">
+                        <summary class="renovation-knowhow-entry-summary">
+                          <div class="renovation-knowhow-card-head">
+                            <p>基礎核心工具</p>
+                            <strong>不可取代的母體與外掛</strong>
+                          </div>
+                          <span class="renovation-knowhow-summary-text">這 5 個工具是無法也不該花時間自建的底層基礎設施，要靠它們的 API、算力與商業壁壘餵養整個工作台。</span>
+                        </summary>
+                        <div class="renovation-knowhow-entry-body">
+                          <p class="renovation-knowhow-objective">整理方式：依照工具定位與核心價值重現，方便你快速判斷哪些是數位母體、哪些只是外掛。</p>
+                          <div class="digital-blueprint-grid">
+                            {digitalCoreTools.map((tool) => (
+                              <article class="digital-blueprint-card">
+                                <div class="digital-blueprint-card-head">
+                                  <span>{tool.role}</span>
+                                  <strong>{tool.name}</strong>
+                                </div>
+                                <p>{tool.value}</p>
+                              </article>
+                            ))}
+                          </div>
+                        </div>
+                      </details>
+                      <details class="renovation-knowhow-entry">
+                        <summary class="renovation-knowhow-entry-summary">
+                          <div class="renovation-knowhow-card-head">
+                            <p>Vibe Coding 共用大腦</p>
+                            <strong>解決維運與資安</strong>
+                          </div>
+                          <span class="renovation-knowhow-summary-text">為了避免同時維護多個獨立專案造成的 DevOps 災難與資安風險，所有自建應用都應該串接到這個唯一核心。</span>
+                        </summary>
+                        <div class="renovation-knowhow-entry-body">
+                          <p class="renovation-knowhow-objective">整理方式：直接把基礎設施名稱、技術棧與要解決的痛點並排，讓這段不只是技術名詞，而是實際的營運防線。</p>
+                          <div class="digital-blueprint-grid">
+                            {digitalSharedBrains.map((brain) => (
+                              <article class="digital-blueprint-card">
+                                <div class="digital-blueprint-card-head">
+                                  <span>單一真相來源</span>
+                                  <strong>{brain.name}</strong>
+                                </div>
+                                <p class="digital-blueprint-role">{brain.stack}</p>
+                                <p>{brain.pain}</p>
+                              </article>
+                            ))}
+                          </div>
+                        </div>
+                      </details>
+                      <details class="renovation-knowhow-entry">
+                        <summary class="renovation-knowhow-entry-summary">
+                          <div class="renovation-knowhow-card-head">
+                            <p>Vibe Coding 自建應用</p>
+                            <strong>取代 SaaS 軟體</strong>
+                          </div>
+                          <span class="renovation-knowhow-summary-text">這些是你利用 Cursor 開發、共用上述 Supabase 資料庫的輕量化前端應用，直接補上現場驗收、客戶入口、估價記帳與實體物料管理缺口。</span>
+                        </summary>
+                        <div class="renovation-knowhow-entry-body">
+                          <p class="renovation-knowhow-objective">整理方式：每個應用都保留技術棧、運作邏輯與業務缺口，讓你回頭看時不只知道要做什麼，也知道它到底補哪個洞。</p>
+                          <div class="digital-blueprint-grid">
+                            {digitalBlueprintApps.map((app) => (
+                              <article class="digital-blueprint-card">
+                                <div class="digital-blueprint-card-head">
+                                  <span>{app.stack}</span>
+                                  <strong>{app.name}</strong>
+                                </div>
+                                <p class="digital-blueprint-role">{app.gap}</p>
+                                <p>{app.logic}</p>
+                              </article>
+                            ))}
+                          </div>
+                        </div>
+                      </details>
                     </div>
-                  </details>
-                  <details class="renovation-knowhow-entry">
-                    <summary class="renovation-knowhow-entry-summary">
-                      <div class="renovation-knowhow-card-head">
-                        <p>Vibe Coding 自建應用</p>
-                        <strong>取代 SaaS 軟體</strong>
-                      </div>
-                      <span class="renovation-knowhow-summary-text">這些是你利用 Cursor 開發、共用上述 Supabase 資料庫的輕量化前端應用，直接補上現場驗收、客戶入口、估價記帳與實體物料管理缺口。</span>
-                    </summary>
-                    <div class="renovation-knowhow-entry-body">
-                      <p class="renovation-knowhow-objective">整理方式：每個應用都保留技術棧、運作邏輯與業務缺口，讓你回頭看時不只知道要做什麼，也知道它到底補哪個洞。</p>
-                      <div class="digital-blueprint-grid">
-                        {digitalBlueprintApps.map((app) => (
-                          <article class="digital-blueprint-card">
-                            <div class="digital-blueprint-card-head">
-                              <span>{app.stack}</span>
-                              <strong>{app.name}</strong>
-                            </div>
-                            <p class="digital-blueprint-role">{app.gap}</p>
-                            <p>{app.logic}</p>
-                          </article>
-                        ))}
-                      </div>
+                  </div>
+                </details>
+                <details class="renovation-knowhow-topic">
+                  <summary class="renovation-knowhow-topic-summary">
+                    <div class="renovation-knowhow-topic-head">
+                      <p>Milestone 手冊</p>
+                      <strong>先看關卡，再看逐條內容</strong>
                     </div>
-                  </details>
-                </div>
-                <div class="bookshelf-preview-head">
-                  <p>Milestone 手冊</p>
-                  <span>先看這關在做什麼，再看原始資料逐條內容</span>
-                </div>
-                <div class="renovation-milestone-flow-overview">
-                  {renovationKnowHowMilestones.map((milestone) => (
-                    <article class="renovation-milestone-flow-node">
-                      <p>{milestone.code}</p>
-                      <strong>{milestone.title}</strong>
-                      <span>{milestone.objective}</span>
-                    </article>
-                  ))}
-                </div>
-                <div class="renovation-knowhow-accordion">
-                  {renovationKnowHowMilestones.map((milestone) => (
-                    <details class="renovation-knowhow-entry">
-                      <summary class="renovation-knowhow-entry-summary">
-                        <div class="renovation-knowhow-card-head">
+                    <span class="renovation-knowhow-topic-text">先看這關在做什麼，再看原始資料逐條內容，回頭校準目前卡在哪一關會更快。</span>
+                  </summary>
+                  <div class="renovation-knowhow-topic-body">
+                    <div class="renovation-milestone-flow-overview">
+                      {renovationKnowHowMilestones.map((milestone) => (
+                        <article class="renovation-milestone-flow-node">
                           <p>{milestone.code}</p>
                           <strong>{milestone.title}</strong>
-                        </div>
-                        <span class="renovation-knowhow-summary-text">這一關目標：{milestone.objective}</span>
-                      </summary>
-                      <div class="renovation-knowhow-entry-body">
-                        <div class="renovation-milestone-brief">
-                          <article class="renovation-milestone-brief-card">
-                            <span>這一關目標</span>
-                            <p>{milestone.objective}</p>
-                          </article>
-                          <article class="renovation-milestone-brief-card">
-                            <span>過關條件</span>
-                            <p>{milestone.gate}</p>
-                          </article>
-                        </div>
-                        <div class="renovation-knowhow-block">
-                          <span>這一關要先抓住的重點</span>
-                          <div class="renovation-milestone-support">
-                            <article class="renovation-milestone-support-card">
-                              <strong>優先任務</strong>
-                              <ul>
-                                {milestone.priorities.map((item) => (
-                                  <li>{item}</li>
+                          <span>{milestone.objective}</span>
+                        </article>
+                      ))}
+                    </div>
+                    <div class="renovation-knowhow-accordion">
+                      {renovationKnowHowMilestones.map((milestone) => (
+                        <details class="renovation-knowhow-entry">
+                          <summary class="renovation-knowhow-entry-summary">
+                            <div class="renovation-knowhow-card-head">
+                              <p>{milestone.code}</p>
+                              <strong>{milestone.title}</strong>
+                            </div>
+                            <span class="renovation-knowhow-summary-text">這一關目標：{milestone.objective}</span>
+                          </summary>
+                          <div class="renovation-knowhow-entry-body">
+                            <div class="renovation-milestone-brief">
+                              <article class="renovation-milestone-brief-card">
+                                <span>這一關目標</span>
+                                <p>{milestone.objective}</p>
+                              </article>
+                              <article class="renovation-milestone-brief-card">
+                                <span>過關條件</span>
+                                <p>{milestone.gate}</p>
+                              </article>
+                            </div>
+                            <div class="renovation-knowhow-block">
+                              <span>這一關要先抓住的重點</span>
+                              <div class="renovation-milestone-support">
+                                <article class="renovation-milestone-support-card">
+                                  <strong>優先任務</strong>
+                                  <ul>
+                                    {milestone.priorities.map((item) => (
+                                      <li>{item}</li>
+                                    ))}
+                                  </ul>
+                                </article>
+                                <article class="renovation-milestone-support-card">
+                                  <strong>補充筆記</strong>
+                                  <ul>
+                                    {milestone.actions.map((item) => (
+                                      <li>{item}</li>
+                                    ))}
+                                  </ul>
+                                </article>
+                              </div>
+                            </div>
+                            <div class="renovation-knowhow-block">
+                              <span>原始資料逐條重現</span>
+                              <div class="renovation-milestone-steps">
+                                {renovationMilestoneDetails[milestone.id].map((item) => (
+                                  <article class="renovation-milestone-step">
+                                    <div class="renovation-milestone-step-code">{item.label}</div>
+                                    <div class="renovation-milestone-step-body">
+                                      <div class="renovation-knowhow-item-head">
+                                        <strong>{item.owner}</strong>
+                                      </div>
+                                      <p>{item.detail}</p>
+                                    </div>
+                                  </article>
                                 ))}
-                              </ul>
-                            </article>
-                            <article class="renovation-milestone-support-card">
-                              <strong>補充筆記</strong>
-                              <ul>
-                                {milestone.actions.map((item) => (
-                                  <li>{item}</li>
+                              </div>
+                            </div>
+                            <div class="renovation-knowhow-block">
+                              <span>這一關要先跟誰對齊</span>
+                              <div class="bookshelf-rule-grid renovation-knowhow-role-grid renovation-knowhow-role-grid-inline">
+                                {renovationMilestoneCoordinationMap[milestone.id].map((role) => (
+                                  <article class="bookshelf-rule-card renovation-knowhow-role-card">
+                                    <span>{role.title}</span>
+                                    <strong>{role.owner}</strong>
+                                    <p>{role.note}</p>
+                                  </article>
                                 ))}
-                              </ul>
-                            </article>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                        <div class="renovation-knowhow-block">
-                          <span>原始資料逐條重現</span>
-                          <div class="renovation-milestone-steps">
-                            {renovationMilestoneDetails[milestone.id].map((item) => (
-                              <article class="renovation-milestone-step">
-                                <div class="renovation-milestone-step-code">{item.label}</div>
-                                <div class="renovation-milestone-step-body">
-                                  <div class="renovation-knowhow-item-head">
-                                    <strong>{item.owner}</strong>
-                                  </div>
-                                  <p>{item.detail}</p>
-                                </div>
-                              </article>
+                        </details>
+                      ))}
+                    </div>
+                  </div>
+                </details>
+                <details class="renovation-knowhow-topic">
+                  <summary class="renovation-knowhow-topic-summary">
+                    <div class="renovation-knowhow-topic-head">
+                      <p>人體工學尺寸速查</p>
+                      <strong>先選空間，再展開尺寸表</strong>
+                    </div>
+                    <span class="renovation-knowhow-topic-text">把常用尺寸按空間整理成主題收折，需要時再展開，不用整段往下掃。</span>
+                  </summary>
+                  <div class="renovation-knowhow-topic-body">
+                    <div class="renovation-knowhow-accordion">
+                      {renovationErgonomicsDetails.map((reference) => (
+                        <details class="renovation-knowhow-entry">
+                          <summary class="renovation-knowhow-entry-summary">
+                            <div class="renovation-knowhow-card-head">
+                              <p>{reference.area}</p>
+                              <strong>{renovationErgonomicsReferences.find((item) => item.area === reference.area)?.title || reference.area}</strong>
+                            </div>
+                            <span class="renovation-knowhow-summary-text">共 {reference.rows.length} 筆常用尺寸</span>
+                          </summary>
+                          <div class="renovation-knowhow-entry-body">
+                            <div class="renovation-knowhow-block">
+                              <span>尺寸表</span>
+                              <div class="renovation-ergonomics-table">
+                                {reference.rows.map((row) => (
+                                  <article class="renovation-ergonomics-row">
+                                    <div class="renovation-ergonomics-main">
+                                      <strong>{row.item}</strong>
+                                      <small>{row.note}</small>
+                                    </div>
+                                    <div class="renovation-ergonomics-values">
+                                      <span>{row.range}</span>
+                                      <em>{row.best}</em>
+                                    </div>
+                                  </article>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </details>
+                      ))}
+                    </div>
+                  </div>
+                </details>
+                <details class="renovation-knowhow-topic">
+                  <summary class="renovation-knowhow-topic-summary">
+                    <div class="renovation-knowhow-topic-head">
+                      <p>現場安裝備忘</p>
+                      <strong>案例筆記集中收折</strong>
+                    </div>
+                    <span class="renovation-knowhow-topic-text">把單篇 Gemini know-how 收成可點開的案例筆記，需要時再展開看情境、重點與現場提醒。</span>
+                  </summary>
+                  <div class="renovation-knowhow-topic-body">
+                    <div class="renovation-knowhow-accordion">
+                      {renovationFieldNotes.map((note) => (
+                        <details class="renovation-knowhow-entry">
+                          <summary class="renovation-knowhow-entry-summary">
+                            <div class="renovation-knowhow-card-head">
+                              <p>{note.category}</p>
+                              <strong>{note.title}</strong>
+                            </div>
+                            <span class="renovation-knowhow-summary-text">{note.summary}</span>
+                          </summary>
+                          <div class="renovation-knowhow-entry-body">
+                            <p class="renovation-knowhow-objective">情境：{note.scenario}</p>
+                            {note.sections.map((section) => (
+                              <div class="renovation-knowhow-block">
+                                <span>{section.heading}</span>
+                                <ul>
+                                  {section.points.map((point) => (
+                                    <li>{point}</li>
+                                  ))}
+                                </ul>
+                              </div>
                             ))}
                           </div>
-                        </div>
-                        <div class="renovation-knowhow-block">
-                          <span>這一關要先跟誰對齊</span>
-                          <div class="bookshelf-rule-grid renovation-knowhow-role-grid renovation-knowhow-role-grid-inline">
-                            {renovationMilestoneCoordinationMap[milestone.id].map((role) => (
-                              <article class="bookshelf-rule-card renovation-knowhow-role-card">
-                                <span>{role.title}</span>
-                                <strong>{role.owner}</strong>
-                                <p>{role.note}</p>
-                              </article>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </details>
-                  ))}
-                </div>
-                <div class="bookshelf-preview-head">
-                  <p>人體工學尺寸速查</p>
-                  <span>先選空間，再展開尺寸表</span>
-                </div>
-                <div class="renovation-knowhow-accordion">
-                  {renovationErgonomicsDetails.map((reference) => (
-                    <details class="renovation-knowhow-entry">
-                      <summary class="renovation-knowhow-entry-summary">
-                        <div class="renovation-knowhow-card-head">
-                          <p>{reference.area}</p>
-                          <strong>{renovationErgonomicsReferences.find((item) => item.area === reference.area)?.title || reference.area}</strong>
-                        </div>
-                        <span class="renovation-knowhow-summary-text">共 {reference.rows.length} 筆常用尺寸</span>
-                      </summary>
-                      <div class="renovation-knowhow-entry-body">
-                        <div class="renovation-knowhow-block">
-                          <span>尺寸表</span>
-                          <div class="renovation-ergonomics-table">
-                            {reference.rows.map((row) => (
-                              <article class="renovation-ergonomics-row">
-                                <div class="renovation-ergonomics-main">
-                                  <strong>{row.item}</strong>
-                                  <small>{row.note}</small>
-                                </div>
-                                <div class="renovation-ergonomics-values">
-                                  <span>{row.range}</span>
-                                  <em>{row.best}</em>
-                                </div>
-                              </article>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </details>
-                  ))}
-                </div>
-                <div class="bookshelf-preview-head">
-                  <p>現場安裝備忘</p>
-                  <span>把單篇 Gemini know-how 收成可點開的案例筆記</span>
-                </div>
-                <div class="renovation-knowhow-accordion">
-                  {renovationFieldNotes.map((note) => (
-                    <details class="renovation-knowhow-entry">
-                      <summary class="renovation-knowhow-entry-summary">
-                        <div class="renovation-knowhow-card-head">
-                          <p>{note.category}</p>
-                          <strong>{note.title}</strong>
-                        </div>
-                        <span class="renovation-knowhow-summary-text">{note.summary}</span>
-                      </summary>
-                      <div class="renovation-knowhow-entry-body">
-                        <p class="renovation-knowhow-objective">情境：{note.scenario}</p>
-                        {note.sections.map((section) => (
-                          <div class="renovation-knowhow-block">
-                            <span>{section.heading}</span>
-                            <ul>
-                              {section.points.map((point) => (
-                                <li>{point}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    </details>
-                  ))}
-                </div>
+                        </details>
+                      ))}
+                    </div>
+                  </div>
+                </details>
               </div>
             </details>
           </div>

@@ -2036,6 +2036,78 @@
     gap: 0.85rem;
   }
 
+  .renovation-knowhow-topic {
+    overflow: hidden;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(61, 60, 58, 0.62), rgba(27, 27, 27, 0.84));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 30px rgba(0, 0, 0, 0.14);
+  }
+
+  .renovation-knowhow-topic-summary {
+    list-style: none;
+    display: grid;
+    gap: 0.48rem;
+    padding: 1.08rem 1.18rem;
+    cursor: pointer;
+  }
+
+  .renovation-knowhow-topic-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .renovation-knowhow-topic-summary::after {
+    content: "展開主題";
+    justify-self: start;
+    color: rgba(224, 221, 214, 0.48);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+
+  .renovation-knowhow-topic[open] .renovation-knowhow-topic-summary::after {
+    content: "收起主題";
+  }
+
+  .renovation-knowhow-topic-head,
+  .renovation-knowhow-topic-body {
+    display: grid;
+  }
+
+  .renovation-knowhow-topic-head {
+    gap: 0.3rem;
+  }
+
+  .renovation-knowhow-topic-head p,
+  .renovation-knowhow-topic-head strong,
+  .renovation-knowhow-topic-text {
+    margin: 0;
+  }
+
+  .renovation-knowhow-topic-head p {
+    color: rgba(224, 221, 214, 0.52);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+  }
+
+  .renovation-knowhow-topic-head strong {
+    color: #f5f3ef;
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  .renovation-knowhow-topic-text {
+    color: rgba(232, 228, 220, 0.64);
+    font-size: 0.86rem;
+    line-height: 1.75;
+  }
+
+  .renovation-knowhow-topic-body {
+    gap: 1rem;
+    padding: 0 1.18rem 1.18rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
   .bookshelf-intake-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
