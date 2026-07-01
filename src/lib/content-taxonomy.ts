@@ -833,7 +833,7 @@ function getOldHouseFallbackCandidateConfig(chapterTitle = "") {
     },
     "基礎工程": {
       chapterTitle: "基礎工程",
-      subchapterTitle: "實戰表單",
+      subchapterTitle: "水電更新",
       category: "老屋翻新",
     },
     "空間重整": {
@@ -858,9 +858,9 @@ function getOldHouseRecommendationPriorityBoost(
   const chapterBoostMap: Record<string, number> = {
     "現況判讀": 120,
     "預算拆解": 88,
-    "基礎工程": 30,
+    "基礎工程": 96,
     "空間重整": 18,
-    "完工避雷": 16,
+    "完工避雷": 10,
   };
   const chapterSubchapterBoostMap: Record<string, number> = {
     "現況判讀::翻新起手式": 360,
@@ -871,8 +871,10 @@ function getOldHouseRecommendationPriorityBoost(
     "預算拆解::追加風險": 188,
     "預算拆解::發包合約": 128,
     "預算拆解::合約檢核": -120,
-    "基礎工程::實戰表單": 48,
-    "基礎工程::工序銜接": 116,
+    "基礎工程::水電更新": 280,
+    "基礎工程::防水地坪": 210,
+    "基礎工程::工序銜接": 72,
+    "完工避雷::保固界線": -40,
   };
   const nodeKindBoostMap: Record<PublicationNodeKind, number> = {
     core: 0,
