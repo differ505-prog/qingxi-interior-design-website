@@ -10,8 +10,6 @@ const collaborationSteps = [
     description:
       "先用估價器與需求表把空間條件、預算帶與是否適合進一步丈量先收斂，不讓第一次溝通停在空話。",
     outputs: ["初步預算區間", "案件適配度判斷", "是否安排丈量"],
-    actionLabel: "先做估價",
-    actionHref: "/tools",
   },
   {
     stage: "02",
@@ -19,8 +17,6 @@ const collaborationSteps = [
     description:
       "丈量前後會先盤點結構、水電、防水、收納與動線問題，把後續最容易失控的地方先講清楚。",
     outputs: ["現況紀錄", "風險節點", "優先順序建議"],
-    actionLabel: "填需求表",
-    actionHref: "/requirement-form",
   },
   {
     stage: "03",
@@ -28,8 +24,6 @@ const collaborationSteps = [
     description:
       "把合作節奏、責任分工、排程邏輯與常見變動點整理成同一頁，讓屋主知道每一步為什麼要這樣走。",
     outputs: ["合作流程圖", "排程說明", "面談重點摘要"],
-    actionLabel: "看甘特圖",
-    actionHref: "/renovation-process",
   },
   {
     stage: "04",
@@ -37,8 +31,6 @@ const collaborationSteps = [
     description:
       "報價不只列價格，也會對齊隱蔽工程、設備進場與驗收節點，避免簽完才發現雙方理解不同。",
     outputs: ["報價邏輯", "付款節點", "查驗里程碑"],
-    actionLabel: "預約諮詢",
-    actionHref: "/contact",
   },
   {
     stage: "05",
@@ -46,43 +38,29 @@ const collaborationSteps = [
     description:
       "施工階段依照公開版甘特圖與查驗節點推進，完工後才進入驗收、修正與正式點交。",
     outputs: ["進場排程", "查驗節點", "點交與保固資訊"],
-    actionLabel: "直接聊需求",
-    actionHref: "/contact",
   },
 ];
 
 const proposalModules = [
   {
     title: "合作流程圖",
-    label: "公開版",
     description: "第一次接洽就能先看懂從需求盤點到完工交付的五大步驟。",
     bullets: ["適合初談使用", "對齊雙方節奏", "可直接搭配需求表"],
-    href: "#collaboration-flow",
-    actionLabel: "看流程圖",
   },
   {
     title: "公版老屋翻新甘特圖",
-    label: "公開版",
     description: "把前期提案、簽約、拆除、隱蔽工程到驗收交屋的排程邏輯公開化。",
     bullets: ["用週次解釋工序", "降低時程誤解", "建立專業形象"],
-    href: "/renovation-process",
-    actionLabel: "開啟甘特圖",
   },
   {
     title: "隱蔽工程解剖圖",
-    label: "提案版",
     description: "把水電、泥作、防水、木作與設備節點拆成可對照的說明框架，用來支撐報價價值。",
     bullets: ["對齊報價類別", "適合面談解說", "避免只比總價"],
-    href: "#hidden-work-tree",
-    actionLabel: "看解剖圖",
   },
   {
     title: "需求與格局健檢入口",
-    label: "導流版",
     description: "讓高意圖屋主先完成需求整理，再進入諮詢與丈量安排。",
     bullets: ["直接蒐集條件", "利於前置判斷", "提升諮詢效率"],
-    href: "/requirement-form",
-    actionLabel: "填需求表",
   },
 ];
 
@@ -149,7 +127,7 @@ const milestoneAlignment = [
   },
   {
     step: "完工尾款",
-    flow: "工程完工並通知點交後支付，保留小瑕疵保留款的處理空間。",
+    flow: "對齊正式驗收點交，並預留合理修繕緩衝。",
     note: "與驗收、複驗與正式交屋節點一致，不提前把交付與尾款混在一起。",
   },
 ];
@@ -210,8 +188,6 @@ const faqStructuredData = {
           <div class="hero-actions">
             <a href="/tools" class="hero-button hero-button-primary">先做估價</a>
             <a href="/requirement-form" class="hero-button hero-button-secondary">填需求表</a>
-            <a href="/contact" class="hero-button hero-button-secondary">預約諮詢</a>
-            <a href="/standard-sop-print" class="hero-button hero-button-secondary">開啟公版列印版</a>
           </div>
         </div>
         <aside class="hero-panel">
@@ -229,7 +205,7 @@ const faqStructuredData = {
           <p class="section-eyebrow">Collaboration Flow</p>
           <h2 id="flow-heading">合作流程圖</h2>
           <p>
-            先用五個步驟把雙方合作節奏講清楚，避免還沒確認需求與風險，就直接跳進報價與施工。
+            從初次接觸到完工交付的五大關鍵階段，確保每一步都建立在清晰的需求與風險評估之上。
           </p>
         </div>
         <div class="flow-grid">
@@ -237,7 +213,6 @@ const faqStructuredData = {
             <article class="flow-card">
               <div class="flow-stage-row">
                 <span class="flow-stage">{step.stage}</span>
-                <span class="flow-tag">可公開說明</span>
               </div>
               <h3>{step.title}</h3>
               <p>{step.description}</p>
@@ -246,7 +221,6 @@ const faqStructuredData = {
                   <li>{output}</li>
                 ))}
               </ul>
-              <a href={step.actionHref} class="inline-link">{step.actionLabel}</a>
             </article>
           ))}
         </div>
@@ -265,7 +239,6 @@ const faqStructuredData = {
             <article class="module-card">
               <div class="module-head">
                 <h3>{module.title}</h3>
-                <span class="module-label">{module.label}</span>
               </div>
               <p>{module.description}</p>
               <ul class="module-list">
@@ -273,7 +246,6 @@ const faqStructuredData = {
                   <li>{bullet}</li>
                 ))}
               </ul>
-              <a href={module.href} class="inline-link">{module.actionLabel}</a>
             </article>
           ))}
         </div>
@@ -295,10 +267,11 @@ const faqStructuredData = {
                 <span class="tree-tag">{module.tag}</span>
               </div>
               <p>{module.summary}</p>
-              <p class="tree-mapping">
-                對應報價類別：
-                <strong>{module.categoryLabels.join(" / ")}</strong>
-              </p>
+              <div class="tree-mapping-tags">
+                {module.categoryLabels.map((label) => (
+                  <span class="mapping-tag">{label}</span>
+                ))}
+              </div>
               <ul class="tree-points">
                 {module.points.map((point) => (
                   <li>{point}</li>
@@ -603,10 +576,25 @@ const faqStructuredData = {
     letter-spacing: 0.05em;
   }
 
-  .tree-mapping,
   .payment-alignment,
   .payment-note {
     font-size: 0.95rem;
+  }
+
+  .tree-mapping-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .mapping-tag {
+    border-radius: 4px;
+    background: rgba(107, 77, 54, 0.05);
+    border: 1px solid rgba(107, 77, 54, 0.1);
+    color: #6b4d36;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
   }
 
   .payment-card strong {
