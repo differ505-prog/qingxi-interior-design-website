@@ -1479,6 +1479,12 @@
     padding: 1rem;
   }
 
+  .bookshelf-review-board .bookshelf-action.is-active {
+    border-color: rgba(214, 210, 200, 0.18);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.07), rgba(214, 210, 200, 0.02));
+    color: #f4f2ed;
+  }
+
   .bookshelf-review-next {
     display: grid;
     gap: 0.45rem;
@@ -1507,7 +1513,7 @@
 
   .bookshelf-review-plan {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.85rem;
   }
 
@@ -1547,6 +1553,105 @@
   }
 
   .bookshelf-review-chapter-note {
+    margin: 0;
+  }
+
+  .bookshelf-review-subchapter-list {
+    display: grid;
+    gap: 0.7rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bookshelf-review-subchapter-item {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.85rem 0.9rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.014);
+  }
+
+  .bookshelf-review-subchapter-item.is-covered {
+    opacity: 0.62;
+  }
+
+  .bookshelf-review-subchapter-item.is-next {
+    border-color: rgba(214, 210, 200, 0.18);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.06), rgba(214, 210, 200, 0.02));
+    opacity: 1;
+  }
+
+  .bookshelf-review-subchapter-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .bookshelf-review-subchapter-copy {
+    display: grid;
+    gap: 0.16rem;
+  }
+
+  .bookshelf-review-subchapter-copy span,
+  .bookshelf-review-subchapter-head em,
+  .bookshelf-review-block-title {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    font-style: normal;
+  }
+
+  .bookshelf-review-subchapter-copy strong {
+    color: #f3efe7;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    font-weight: 600;
+  }
+
+  .bookshelf-review-subchapter-article {
+    display: grid;
+    gap: 0.2rem;
+    padding-left: 1rem;
+    border-left: 1px solid rgba(214, 210, 200, 0.18);
+  }
+
+  .bookshelf-review-subchapter-article span {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  .bookshelf-review-subchapter-article strong {
+    color: #f4f2ed;
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .bookshelf-review-subchapter-article small {
+    color: rgba(233, 231, 225, 0.62);
+    line-height: 1.65;
+  }
+
+  .bookshelf-review-subchapter-article.is-published {
+    opacity: 0.5;
+  }
+
+  .bookshelf-review-subchapter-article.is-published strong,
+  .bookshelf-review-subchapter-article.is-published small {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
+  .bookshelf-review-published-block {
+    display: grid;
+    gap: 0.6rem;
+    padding-top: 0.1rem;
+  }
+
+  .bookshelf-review-block-title {
     margin: 0;
   }
 
@@ -1607,6 +1712,22 @@
   .bookshelf-review-article-item.is-published .bookshelf-review-article-copy small {
     text-decoration: line-through;
     text-decoration-thickness: 1px;
+  }
+
+  .bookshelf-review-top-card {
+    display: grid;
+    gap: 0.55rem;
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.08), rgba(214, 210, 200, 0.03));
+  }
+
+  .bookshelf-review-top-card strong {
+    color: #f7f6f2;
+    font-size: 1rem;
+    line-height: 1.65;
+    font-weight: 600;
   }
 
   .bookshelf-analytics-panel {
