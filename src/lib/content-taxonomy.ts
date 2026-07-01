@@ -1178,6 +1178,13 @@ function buildTitlePoolItem(
             : nodeKind === "project"
               ? "待補_專案"
               : "待補_正規";
+  const recommendationNote = workflowAction === "New_Publish"
+    ? "這是目前系統最推薦優先補位的標題。"
+    : workflowAction === "Revise_Angle"
+      ? "這是目前系統優先送審的改切角候選，仍需由高階 LLM 判定是否改寫後保留在純新文章池。"
+      : workflowAction === "Merge_into_Asset"
+        ? "這是目前系統優先送審的資產掛載候選，待高階 LLM 覆核是否直接掛回主文。"
+        : "這是目前系統優先送審的整併候選，建議先檢查既有文章是否應合併升級。";
   const note = mergeNeeded
     ? mergeDirective?.note || "此子章目前應先整併既有文章，不建議另開新標題。"
     : collisionMergeNeeded
@@ -1189,7 +1196,7 @@ function buildTitlePoolItem(
     : hasPublishedEntry
       ? "此子章已有已上線文章，標題池保留作為整體出版視角參考。"
       : isRecommended
-        ? "這是目前系統最推薦優先補位的標題。"
+      ? recommendationNote
         : nodeKind === "form" || nodeKind === "project"
           ? "這是可掛載實體資產的節點，後續可綁定試算表、PDF 或專案附件。"
           : "這是未來待補的候選標題，可交由高階 LLM 進一步覆核、重排與刪修。";

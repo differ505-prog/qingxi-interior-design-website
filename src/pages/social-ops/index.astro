@@ -4686,6 +4686,28 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     return "待判定";
   }
 
+  function getRecommendationBadgeLabel(item) {
+    if (!item?.isRecommended) return "";
+    if (item.workflowAction === "New_Publish") return "最推薦";
+    if (item.workflowAction === "Revise_Angle") return "優先覆核";
+    if (item.workflowAction === "Merge_into_Asset") return "優先審資產";
+    if (item.workflowAction === "Merge_and_Update") return "優先整併";
+    return "優先處理";
+  }
+
+  function getChapterCandidateLead(recommendation) {
+    if (!recommendation) return "本章候選";
+    if (recommendation.workflowAction === "New_Publish") return "本章純新候選";
+    if (recommendation.workflowAction === "Revise_Angle") return "本章待覆核候選";
+    if (recommendation.workflowAction === "Merge_into_Asset") return "本章資產候選";
+    if (recommendation.workflowAction === "Merge_and_Update") return "本章修復候選";
+    return "本章候選";
+  }
+
+  function getPublishingReviewCandidateDisplayTitle(recommendation) {
+    return recommendation ? getDisplayTitle(recommendation) : "待 Gemini Pro 由候補素材池裁定";
+  }
+
   function getTitlePoolReviewKey(item) {
     return [
       item.trackTitle || "",
@@ -4897,7 +4919,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       chapterBreakdown,
       fastTrackLabel: topRecommendations.length
         ? topRecommendations.map((item) => getDisplayTitle(item)).join(" / ")
-        : "目前尚無可用的優先候選動作。",
+        : "目前 Top 3 為空，請改讀純新文章空窗候補素材池。",
     };
   }
 
@@ -5464,11 +5486,12 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       lines.push("", `${index + 1}. ${getPublicationChapterLabel(gap.chapter)}`);
       gap.titlePool.forEach((item) => {
         const manualReview = getManualReviewStatus(item);
+        const badgeLabel = getRecommendationBadgeLabel(item);
         lines.push(
           `- 子章節：${item.subchapter}`,
           `  主標題：${item.primaryTitle}`,
           `  備選標題：${item.backupTitles.join(" / ") || "無"}`,
-          `  狀態：${getTitlePoolStatusLabel(item.status, item.statusTag)}｜${getTitlePoolConfidenceLabel(item.confidence)}${item.isRecommended ? "｜最推薦" : ""}`,
+          `  狀態：${getTitlePoolStatusLabel(item.status, item.statusTag)}｜${getTitlePoolConfidenceLabel(item.confidence)}${badgeLabel ? `｜${badgeLabel}` : ""}`,
           `  工作流：${item.workflowAction}｜${getWorkflowActionLabel(item.workflowAction)}`,
           `  資產預判：${item.workflowAction === "Merge_into_Asset" ? "Asset Ready（資產掛載預備）" : "一般節點"}`,
           `  人工覆核：${getManualReviewLabel(manualReview)}`,
@@ -5499,7 +5522,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
               <div class="bookshelf-review-title-pool-copy">
                 <div class="bookshelf-review-title-pool-meta">
                   <span>${escapeHtml(item.subchapter)}</span>
-                  <em>${escapeHtml(getTitlePoolStatusLabel(item.status, item.statusTag))}｜${escapeHtml(getTitlePoolConfidenceLabel(item.confidence))}${item.isRecommended ? "｜最推薦" : ""}｜${escapeHtml(getWorkflowActionLabel(item.workflowAction))}</em>
+                  <em>${escapeHtml(getTitlePoolStatusLabel(item.status, item.statusTag))}｜${escapeHtml(getTitlePoolConfidenceLabel(item.confidence))}${getRecommendationBadgeLabel(item) ? `｜${escapeHtml(getRecommendationBadgeLabel(item))}` : ""}｜${escapeHtml(getWorkflowActionLabel(item.workflowAction))}</em>
                 </div>
                 <strong>${escapeHtml(item.primaryTitle)}</strong>
                 <small>${escapeHtml(item.note)}</small>
@@ -5648,7 +5671,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       `主攻書系：${focusTrack.title}`,
       `主書完成度：${focusTrack.coverageRate}%`,
       `距離出版基線：還差 ${focusTrack.remainingToBaseline} 篇`,
-      `本輪送審候選：${getDisplayTitle(recommendation)}`,
+      `本輪送審候選：${getPublishingReviewCandidateDisplayTitle(recommendation)}`,
     ];
 
     if (recommendation) {
@@ -5683,7 +5706,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       }
       if (gap.recommendedTopic?.primaryTitle) {
         lines.push(
-          `- 本章暫列候選：${getDisplayTitle(gap.recommendedTopic)}｜子章節：${gap.recommendedTopic.subchapter}`,
+          `- ${getChapterCandidateLead(gap.recommendedTopic)}：${getDisplayTitle(gap.recommendedTopic)}｜子章節：${gap.recommendedTopic.subchapter}｜工作流：${gap.recommendedTopic.workflowAction}`,
         );
       }
       if (publishedPosts.length) {
@@ -5750,10 +5773,10 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- [待覆核_資產化] 可視為工具位參考，但不得單獨視為該章已完成出版體量；理論位與工序硬知識仍須分開成立。",
       "",
       "C. 本輪候選是否應留在新文章池",
-      `- 目前規則層送審的純新文章候選為：${getDisplayTitle(recommendation)}`,
+      `- 目前規則層送審的純新文章候選為：${getPublishingReviewCandidateDisplayTitle(recommendation)}`,
       "- 網站文章標題與書籍標題視為同一套，不做雙標題分流。",
-      "- 若目前純新文章候選為「尚未產生」，請直接判定「目前純新文章池是否為空」，並參考本文附帶的『純新文章空窗候補素材池』決定下一步應優先補同章案例、專案節點，或推進下一章主幹理論；候補素材池只是送審參考，不是系統層已決定好的順位。",
-      "- 當本輪送審候選為「尚未產生」時，不代表系統無可用素材；請直接轉讀『純新文章空窗候補素材池』與出版缺口，重建本輪純 New_Publish 排序。",
+      "- 若目前純新文章候選顯示為「待 Gemini Pro 由候補素材池裁定」，請直接判定「目前純新文章池是否為空」，並參考本文附帶的『純新文章空窗候補素材池』決定下一步應優先補同章案例、專案節點，或推進下一章主幹理論；候補素材池只是送審參考，不是系統層已決定好的順位。",
+      "- 當本輪送審候選顯示為「待 Gemini Pro 由候補素材池裁定」時，不代表系統無可用素材；請直接轉讀『純新文章空窗候補素材池』與出版缺口，重建本輪純 New_Publish 排序。",
       "- 若目前純新文章候選不是空值，請判斷這一篇是否真的應該留在新文章池；若不是，請給出更好的優先順序與原因。",
       "- 若你判定目前 Top 1 其實不該存在於新文章池，請直接明寫「應移出新文章順位」，不得只用模糊語句帶過。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
