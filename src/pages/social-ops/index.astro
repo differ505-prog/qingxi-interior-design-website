@@ -4971,7 +4971,12 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
   function buildTopPriorityText(mode = currentTopicMode, limit = 3) {
     const candidates = getTopPriorityRecommendations(mode, limit);
-    if (!candidates.length) return ["目前尚無可用的純新文章軌道 Top 3。", "", buildPureNewPublishFallbackText(mode, limit)].join("\n");
+    if (!candidates.length) {
+      return [
+        "目前純新文章軌道 Top 3 為空。",
+        "這不代表系統沒有可用素材；請改看下方『純新文章空窗候補素材池』，並依章節缺口與時間軸重建本輪純新文章排序。",
+      ].join("\n");
+    }
     return [
       "【純新文章軌道 Top 3】",
       "以下 3 題已先排除 Merge_and_Update 與 Merge_into_Asset；若高階 LLM 判定其中任一題仍應整併或資產化，必須先移出新文章軌道再重排。",
@@ -5631,6 +5636,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const modeState = getCurrentTopicModeState(mode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
     const recommendation = getPrimaryReviewRecommendation(mode);
+    const topCandidates = getTopPriorityRecommendations(mode, 3);
     const bookProposal = getBookProposal(mode);
     if (!focusTrack) return "目前尚無可用的出版補位清單。";
 
@@ -5658,7 +5664,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
     lines.push("", buildPublicationBaselinePlanText(mode));
     lines.push("", buildTopPriorityText(mode));
-    if (!recommendation) {
+    if (!topCandidates.length) {
       lines.push("", buildPureNewPublishFallbackText(mode));
     }
     lines.push("", "【目前出版清單】");
@@ -5717,6 +5723,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "整併／資產化屬於「舊文修復軌道」；New_Publish 屬於「純新文章軌道」。兩條軌道必須分開判讀，不得混排。",
       "若候選帶有表單、清單、Checklist、試算表等操作型資產特徵，且該章已有可整併成立的理論主幹，預設應優先檢查是否改判為 Merge_into_Asset。",
       "網站內顯示的下一篇候選、Top 3 候選、相近題與工作流建議，都只是規則層送審素材，不是最終判決。",
+      "若某候選被標成 Revise_Angle，只代表規則層認為此題仍需拉開差異，不等於它已具備可直接發布資格。",
       "你的任務不是直接改稿，而是站在『最終要出版成書』的角度，檢查這份安排是否已足夠成熟，並指出最值得立即修正的地方。",
       "若你認為規則層有誤判、過度保守、排序失真或文案誤導，必須直接在給 IDE 的提示詞中寫出規則層該怎麼改。",
       "請用繁體中文回覆。",
@@ -5740,17 +5747,20 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 請一併檢查『完整未來出版標題池』是否有缺章、冗題、撞題或標題體例不穩的問題。",
       "- 每一大章至少要有一個實務節點；若某章只有 [待補_正規]、沒有 [待補_案例] / [待補_QA] / [待補_表單]，請直接判定為體量不足。",
       "- 每一大章至少要有 1 篇觀念建立、1 篇表單／工具、以及 1 篇工序／發包／介面協調的硬知識；若只有 QA 與案例，仍判定為出版體量不足。",
+      "- [待覆核_資產化] 可視為工具位參考，但不得單獨視為該章已完成出版體量；理論位與工序硬知識仍須分開成立。",
       "",
       "C. 本輪候選是否應留在新文章池",
       `- 目前規則層送審的純新文章候選為：${getDisplayTitle(recommendation)}`,
       "- 網站文章標題與書籍標題視為同一套，不做雙標題分流。",
       "- 若目前純新文章候選為「尚未產生」，請直接判定「目前純新文章池是否為空」，並參考本文附帶的『純新文章空窗候補素材池』決定下一步應優先補同章案例、專案節點，或推進下一章主幹理論；候補素材池只是送審參考，不是系統層已決定好的順位。",
+      "- 當本輪送審候選為「尚未產生」時，不代表系統無可用素材；請直接轉讀『純新文章空窗候補素材池』與出版缺口，重建本輪純 New_Publish 排序。",
       "- 若目前純新文章候選不是空值，請判斷這一篇是否真的應該留在新文章池；若不是，請給出更好的優先順序與原因。",
       "- 若你判定目前 Top 1 其實不該存在於新文章池，請直接明寫「應移出新文章順位」，不得只用模糊語句帶過。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
       "- 若主問題已被 Merge_and_Update 軌道完美命中，New_Publish 軌道必須切換為補充模式；若同章表單已改判為 Merge_into_Asset，則優先推薦同章案例或專案節點，不可讓後段流程文搶主導權。",
       "- 若表單、清單、檢查表、Checklist 或試算表只是把既有主文操作化，請直接改判為 Merge_into_Asset，不得保留在 New_Publish 池。",
       "- 一旦某題被你改判為 Merge_and_Update 或 Merge_into_Asset，後續純新文章排序必須完全排除該題，不得再把它列入 Top 3。",
+      "- 若某候選目前僅被標示為 Revise_Angle，這只代表規則層要求拉開切角；若你認為它仍值得保留在純新文章池，必須明確改寫成可直接發布的新標題，否則應移出順位。",
       "- 同一主章節內也必須遵守微觀時序：theory > tool/form > process/contract > case；但若該章已有已上線舊文可透過整併成立理論主幹，不可再用『理論未發布』當成硬性阻擋新文章的理由。",
       "- 若已整併下架轉向的舊文標題已足以支撐該章理論主幹，請直接視為理論位可由整併成立，而非未發布。",
       "- 判斷章節前置是否成立時，請優先看官網已上線舊文是否足以支撐整併，不要把整本書誤當成從零開始的空白書稿。",
@@ -5767,9 +5777,9 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 請列出接下來最值得先做的 3 篇純新文章，依優先順序排序；此處只允許 New_Publish，不得混入 Merge_and_Update 或 Merge_into_Asset。",
       "- 若你在 C 區已判定本輪候選應移出新文章池，這裡必須改用剩餘的純 New_Publish 候選重新排序。",
       "- 若目前合格的純 New_Publish 候選不足 3 篇，請明確寫出「目前純新文章池為空」或「不足 3 篇」，不得硬湊。",
-      "- 若本文附帶『純新文章空窗候補素材池』，請把它視為遞補素材來源，而不是既定答案；最終哪些題目正式進入純新文章池，仍由你裁定。",
+      "- 若本文附帶『純新文章軌道 Top 3』，請先以 Top 3 作為主審對象；若 Top 3 為空，則改以『純新文章空窗候補素材池』作為遞補素材來源。候補素材池不是既定答案，最終哪些題目正式進入純新文章池，仍由你裁定。",
       "- 每一篇都要附 1-2 句原因。",
-      "- 請直接參考本文附帶的送審 Top 3 候選，必要時可以推翻並重排。",
+      "- 若本文有送審 Top 3，必要時可以推翻並重排；若 Top 3 為空，不可假設系統已決定答案，必須自行從候補素材池與出版缺口重排。",
       "- 此處優先順序必須先扣除應整併或應資產化的題目，不可把已判定應整併者繼續列入新文章 Top 3。",
       "",
       "F. 給 IDE 的修改提示詞 1：內容修改與增補 / 刪除",
