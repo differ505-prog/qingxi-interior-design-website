@@ -38,8 +38,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     chapter: "現況判讀",
     subchapter: "水電安全",
     tags: ["老屋翻新", "水電更新", "迴路重整", "隱蔽工程", "用電安全", "基礎工程"],
-    coverImage:
-      "https://core-normal.trae.ai/api/ide/v1/text_to_image?prompt=editorial%20cover%20illustration%20of%20an%20aged%20Taiwan%20apartment%20wall%20opened%20to%20reveal%20electrical%20conduits%2C%20circuit%20breaker%20panel%2C%20copper%20wiring%20and%20water%20pipes%2C%20warm%20neutral%20palette%2C%20premium%20interior%20design%20magazine%20style%2C%20realistic%20architectural%20rendering&image_size=landscape_16_9",
+    coverImage: "/images/blog/old-house-condition-assessment-cover.png",
   },
   {
     slug: "old-house-renovation-scope-guide",
