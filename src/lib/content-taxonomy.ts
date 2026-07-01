@@ -164,7 +164,7 @@ export const publicationMergeDirectives: PublicationMergeDirective[] = [
   {
     trackTitle: publishingFocusTrackTitle,
     chapterTitle: "現況判讀",
-    targetTitle: "老屋翻新起手式：屋況盤點與範圍界定總表",
+    targetTitle: "翻新起手式：屋況盤點與範圍界定總表",
     targetSubchapter: "翻新起手式",
     sourceTitles: [
       "老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南",
@@ -238,13 +238,19 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "翻新起手式",
             keywords: ["屋況盤點", "翻新範圍", "先做什麼", "第一步", "從哪開始", "翻新前", "準備階段"],
             nodeKind: "core",
-            titleOverride: "屋況盤點與範圍界定總表",
+            titleOverride: "翻新起手式：屋況盤點與範圍界定總表",
           },
           {
             title: "案例解析",
             keywords: ["before after", "漏水", "結構老化", "血淚案例", "翻車案例", "案例解析"],
             nodeKind: "case",
             titleOverride: "血淚 Before/After：沒看懂漏水與結構老化的慘痛代價",
+          },
+          {
+            title: "QA迷思",
+            keywords: ["初勘", "屋況判讀", "漏看", "風險訊號", "常見迷思", "判斷失準"],
+            nodeKind: "qa",
+            titleOverride: "常見迷思：屋況初勘最容易漏看的風險訊號",
           },
           {
             title: "附錄表單",
@@ -276,6 +282,18 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             keywords: ["追加", "超支", "爆預算", "變更多", "加價"],
             nodeKind: "core",
             titleOverride: "追加風險：變更、漏項與超支的預防策略",
+          },
+          {
+            title: "案例解析",
+            keywords: ["超支", "報價單", "漏項", "追加失控", "翻車案例", "案例解析"],
+            nodeKind: "case",
+            titleOverride: "超支翻車：報價單沒拆細項的追加失控實錄",
+          },
+          {
+            title: "QA迷思",
+            keywords: ["低總價", "省錢", "漏項", "報價迷思", "常見迷思"],
+            nodeKind: "qa",
+            titleOverride: "常見迷思：低總價不等於省錢的報價漏項判讀",
           },
           {
             title: "附錄表單",
@@ -312,7 +330,13 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "QA迷思",
             keywords: ["qa", "迷思", "管線一定要全換", "預算黑洞", "常見問題"],
             nodeKind: "qa",
-            titleOverride: "常見迷思：老屋管線一定要全換？水電泥作常見預算黑洞",
+            titleOverride: "常見迷思：老屋管線全換迷思與水電泥作預算黑洞",
+          },
+          {
+            title: "案例解析",
+            keywords: ["返工", "拆除順序", "管線重拉", "施工翻車", "案例解析"],
+            nodeKind: "case",
+            titleOverride: "施工翻車：拆除與管線重拉順序錯置的返工代價",
           },
         ],
       },
@@ -352,6 +376,18 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             titleOverride: "整理計畫：全室收納與組織的實際演練",
             assetSlotLabel: "全室收納與組織的實際演練",
           },
+          {
+            title: "案例解析",
+            keywords: ["格局重整", "採光回正", "動線回正", "收納改善", "案例解析"],
+            nodeKind: "case",
+            titleOverride: "改造案例：格局重整後的採光、收納與動線回正紀錄",
+          },
+          {
+            title: "QA迷思",
+            keywords: ["收納做滿", "櫃體深度", "動線取捨", "常見迷思", "機能過量"],
+            nodeKind: "qa",
+            titleOverride: "常見迷思：收納做滿不等於好住的櫃體與動線取捨",
+          },
         ],
       },
       {
@@ -381,6 +417,12 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             keywords: ["成功下莊", "點交", "保固期", "糾紛化解", "案例解析"],
             nodeKind: "case",
             titleOverride: "成功下莊：點交與保固期的糾紛化解實錄",
+          },
+          {
+            title: "QA迷思",
+            keywords: ["保固不是萬靈丹", "點交責任", "責任邊界", "常見迷思", "完工迷思"],
+            nodeKind: "qa",
+            titleOverride: "常見迷思：保固不是萬靈丹的點交責任邊界",
           },
         ],
       },
@@ -1473,6 +1515,14 @@ function buildRecommendationCandidates(
           ? weights.chapterSaturationPenalty
           : 0;
         const collisionPenalty = subchapterEntries.length > 0 ? 90 : 0;
+        const forceOldHouseNextTopicBoost = (
+          track.title === publishingFocusTrackTitle &&
+          chapter.title === "預算拆解" &&
+          subchapter.title === "報價拆讀" &&
+          subchapterEntries.length === 0
+        )
+          ? 160
+          : 0;
         const score =
           focusBoost +
           emptyChapterBoost +
@@ -1481,6 +1531,7 @@ function buildRecommendationCandidates(
           seededSubchapterBoost +
           multiTrackDiversityBoost +
           structuralVacuumBoost +
+          forceOldHouseNextTopicBoost +
           macroPriorityBoost -
           recentPenalty -
           chapterSaturationPenalty -

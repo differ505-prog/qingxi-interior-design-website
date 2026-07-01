@@ -4307,6 +4307,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const titlePoolItems = Array.isArray(focusTrack.titlePool)
       ? focusTrack.titlePool
       : focusTrack.chapterGaps.flatMap((gap) => gap.titlePool || []);
+    const wordWeightMap = {
+      core: 3200,
+      case: 2400,
+      qa: 1800,
+      form: 900,
+      project: 2200,
+    };
     const dimensionMetrics = [
       {
         label: "核心理論",
@@ -4327,6 +4334,17 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         total: titlePoolItems.filter((item) => item.nodeKind === "form").length,
       },
     ];
+    const practicalCompleted = dimensionMetrics[1].completed + dimensionMetrics[2].completed;
+    const practicalTotal = dimensionMetrics[1].total + dimensionMetrics[2].total;
+    const practicalRate = practicalTotal ? Math.round((practicalCompleted / practicalTotal) * 100) : 0;
+    const estimatedTotalWords = titlePoolItems.reduce(
+      (sum, item) => sum + (wordWeightMap[item.nodeKind] || 1600),
+      0,
+    );
+    const estimatedCompletedWords = titlePoolItems.reduce(
+      (sum, item) => sum + (item.status === "published" ? (wordWeightMap[item.nodeKind] || 1600) : 0),
+      0,
+    );
     const dimensionMarkup = dimensionMetrics.map((item) => {
       const total = item.total || 1;
       const rate = Math.round((item.completed / total) * 100);
@@ -4344,6 +4362,30 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         </article>
       `;
     }).join("");
+    const summaryMarkup = `
+      <article class="bookshelf-review-progress-card bookshelf-review-progress-card-dimension ${practicalRate === 100 ? "is-complete" : practicalRate === 0 ? "is-empty" : ""}">
+        <div class="bookshelf-review-progress-head">
+          <span>實務節點達成率</span>
+          <strong>${practicalCompleted} / ${practicalTotal}</strong>
+          <em>${practicalRate}%</em>
+        </div>
+        <div class="bookshelf-review-progress-bar">
+          <i style="width: ${Math.max(practicalRate, practicalCompleted > 0 ? 12 : 0)}%"></i>
+        </div>
+        <small>案例、QA、表單與專案節點的補位進度</small>
+      </article>
+      <article class="bookshelf-review-progress-card bookshelf-review-progress-card-dimension ${estimatedCompletedWords >= estimatedTotalWords && estimatedTotalWords > 0 ? "is-complete" : ""}">
+        <div class="bookshelf-review-progress-head">
+          <span>預估書籍字數</span>
+          <strong>${Math.round(estimatedCompletedWords / 1000)}k / ${Math.round(estimatedTotalWords / 1000)}k</strong>
+          <em>${estimatedTotalWords ? Math.round((estimatedCompletedWords / estimatedTotalWords) * 100) : 0}%</em>
+        </div>
+        <div class="bookshelf-review-progress-bar">
+          <i style="width: ${estimatedTotalWords ? Math.max(Math.round((estimatedCompletedWords / estimatedTotalWords) * 100), estimatedCompletedWords > 0 ? 12 : 0) : 0}%"></i>
+        </div>
+        <small>依節點類型估算全書體量，不只看文章篇數。</small>
+      </article>
+    `;
     const chapterMarkup = focusTrack.chapterGaps.map((gap, index) => {
       const completed = gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length;
       const total = gap.subchapters.length || 1;
@@ -4364,6 +4406,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     }).join("");
     return `
       <div class="bookshelf-review-progress-dimensions">
+        ${summaryMarkup}
         ${dimensionMarkup}
       </div>
       <div class="bookshelf-review-progress-chapters">
@@ -4603,6 +4646,82 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     return crossSeriesForbiddenKeywords.find((keyword) => text.includes(keyword)) || "";
   }
 
+  function shouldEnforceOldHouseIsolation(mode = currentTopicMode) {
+    const proposal = getBookProposal(mode);
+    const focusTrackTitle = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack?.title || "";
+    return (proposal?.bookTitle || "").includes("老屋") || focusTrackTitle === publishingFocusTrackTitle;
+  }
+
+  function getOldHouseFallbackConfirmData() {
+    return {
+      category: "裝修預算",
+      track: publishingFocusTrackTitle,
+      chapter: "預算拆解",
+      title: "報價拆讀：全室預算拆解與避險指南",
+    };
+  }
+
+  function getOldHouseFallbackTopicDecision(mode = currentTopicMode, question = articleSourceQuestion, conflictKeyword = "") {
+    const modeState = getCurrentTopicModeState(mode);
+    return {
+      question,
+      mode,
+      modeLabel: modeState?.label || mode,
+      candidateIndex: 0,
+      summary: conflictKeyword
+        ? `偵測到互斥詞彙「${conflictKeyword}」，已回退到老屋主線的安全題目。`
+        : "已回退到老屋主線的安全題目。",
+      track: publishingFocusTrackTitle,
+      chapter: "預算拆解",
+      subchapter: "報價拆讀",
+      title: "報價拆讀：全室預算拆解與避險指南",
+      reason: "老屋主書模式下偵測到預售屋／客變污染，系統已強制回退到老屋主線的預算拆解題目。",
+      questionLink: "",
+      bookLink: "",
+      invalid: true,
+      conflictKeyword,
+    };
+  }
+
+  function sanitizeArticleConfirmData(data, sourceText = "", mode = currentTopicMode) {
+    const safeData = {
+      category: data?.category || "尚未判定",
+      track: data?.track || "尚未判定",
+      chapter: data?.chapter || "尚未判定",
+      title: data?.title || "尚未判定",
+    };
+    if (!shouldEnforceOldHouseIsolation(mode)) {
+      return {
+        ...safeData,
+        invalid: false,
+        conflictKeyword: "",
+      };
+    }
+    const conflictKeyword = hasCrossSeriesConflict(
+      safeData.category,
+      safeData.track,
+      safeData.chapter,
+      safeData.title,
+      sourceText,
+    );
+    if (!conflictKeyword) {
+      return {
+        ...safeData,
+        invalid: false,
+        conflictKeyword: "",
+      };
+    }
+    return {
+      ...getOldHouseFallbackConfirmData(),
+      invalid: true,
+      conflictKeyword,
+    };
+  }
+
+  function getPublishedStatusLabel(post) {
+    return isMergeRequiredPublishedPost(post) ? "官網已上線｜已整併下架轉向" : "官網已上線";
+  }
+
   function buildPublishingTitlePoolText(mode = currentTopicMode) {
     const modeState = getCurrentTopicModeState(mode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
@@ -4833,7 +4952,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         );
       }
       if (publishedPosts.length) {
-        lines.push(`- 官網已上線：${publishedPosts.map((post) => `[已上線${isMergeRequiredPublishedPost(post) ? "｜需整併" : ""}] ${getPublishedPostDisplayTitle(post)}`).join(" / ")}`);
+        lines.push(`- 官網已上線：${publishedPosts.map((post) => `[${isMergeRequiredPublishedPost(post) ? "已整併下架轉向" : "已上線"}] ${getPublishedPostDisplayTitle(post)}`).join(" / ")}`);
       } else {
         lines.push("- 官網已上線：目前無");
       }
@@ -5176,7 +5295,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 ${publishedPosts.map((post) => `
                   <li class="bookshelf-review-article-item is-published ${isMergeRequiredPublishedPost(post) ? "is-merge-needed" : ""}">
                     <div class="bookshelf-review-article-copy">
-                      <span>${isMergeRequiredPublishedPost(post) ? "官網已上線｜需整併" : "官網已上線"}</span>
+                      <span>${getPublishedStatusLabel(post)}</span>
                       <strong>${escapeHtml(getPublishedPostDisplayTitle(post))}</strong>
                       <small>${escapeHtml(post.siteCategory || post.category || "已發布文章")}</small>
                     </div>
@@ -5344,6 +5463,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "3. 標題要能回答這次問題，也要能自然收進未來書稿章名。",
       "4. 若多個候選都可用，優先選最能兼顧真實回覆價值與出版補位效率者。",
       "5. 除非原始問題明顯不適合，否則不要偏離這次模式的前段候選。",
+      "6. 若本輪前置包屬於老屋主線，只要落位、標題或理由出現「預售屋 / 客變 / 新成屋 / 商空」等互斥詞，整題就視為 Invalid，必須退回老屋主線重新選題。",
+      "7. 標題禁止使用 SEO 問句、全攻略、大公開等農場字眼。",
+      "8. 建議標題請強制寫成「2-4 字子概念：實務操作說明」的書稿體例。",
       "",
       `【本次決題模式】${modeState?.label || mode}`,
       modeState?.modeRationale || "目前先沿用既有模式。",
@@ -5403,6 +5525,20 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
     if (!parsed.track || !parsed.chapter || !parsed.subchapter || !parsed.title) {
       return null;
+    }
+
+    if (shouldEnforceOldHouseIsolation(mode)) {
+      const conflictKeyword = hasCrossSeriesConflict(
+        parsed.track,
+        parsed.chapter,
+        parsed.subchapter,
+        parsed.title,
+        parsed.reason,
+        question,
+      );
+      if (conflictKeyword) {
+        return getOldHouseFallbackTopicDecision(mode, question, conflictKeyword);
+      }
     }
 
     return parsed;
@@ -6625,6 +6761,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
           "若原始問題已帶有足夠情境，就沿用原始問題，不必額外補太多假設。",
           "若牽涉預算、費用、單價或報價，請優先寫成保守區間、條件差異與常見變動因子，不要寫成固定價格承諾。",
         ].join("\n");
+    const hardGuardText = [
+      "硬性規則：",
+      "- 若本輪前置包或動態決題屬於老屋主線，只要主書系、標題、章節、網站分類或內文出現「預售屋 / 客變 / 新成屋 / 商空」等互斥詞，必須立即判定為 Invalid，不可沿用，也不可進入下一步。",
+      "- 標題禁止使用 SEO 問句、全攻略、大公開等農場字眼。",
+      "- 標題格式嚴格綁定為「2-4 字子概念：實務操作說明」。",
+      "- 在評估章節成熟度時，若該章缺少案例、QA 或表單任一實務節點，不得把章節完成度視為成熟完成，應優先補齊非理論節點。",
+    ].join("\n");
 
     if (mode === "metadata") {
       return [
@@ -6658,12 +6801,15 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         "【固定網站分類】",
         siteCategoryText,
         "",
+        hardGuardText,
+        "",
         "請只輸出以下 3 段，不要多寫任何其他內容：",
         "0. 【判題結論】",
         "- 只輸出一行結論，四選一：優先補舊文 / 可做同章延伸 / 值得另開新文 / 先改寫舊文。",
         "",
         "1. 【文章標題】",
         "- 請固定輸出：文章標題：",
+        "- 標題必須使用「2-4 字子概念：實務操作說明」格式。",
         "",
         "2. 【章節名稱】",
         "- 請固定輸出：章節名稱：",
@@ -6707,6 +6853,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         "",
         "【相似題處理規則】",
         overlapRuleText,
+        "",
+        hardGuardText,
         "",
       "優先判斷規則：",
       "- 先沿用【本題動態決題】提供的主書系、章節、子章節與標題方向。",
@@ -6774,6 +6922,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "相似題處理規則：",
       overlapRuleText,
       "",
+      hardGuardText,
+      "",
       modeInstruction,
       "",
       contextInstruction,
@@ -6787,9 +6937,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "- 這一段只能保留單行結論，不可補理由，不可加第二句。",
       "",
       "1. 【文章標題】",
-      "- 目標：符合我們「一魚多吃」出書計畫的標題風格，並兼顧 SEO。",
-      "- 格式要求：主標題（感性/痛點）——副標題（理性/SEO關鍵字）。",
-      "- 建議分類：請建議這篇文章應該歸類在哪一個主題（如：預算篇、格局篇、水電篇、軟裝篇、驗屋篇、客變篇）。",
+      "- 目標：符合未來實體書稿與官網同步使用的標題風格。",
+      "- 格式要求：嚴格使用「2-4 字子概念：實務操作說明」，不得使用問句、全攻略、大公開。",
+      "- 不要輸出『建議分類』這種額外說明，只輸出正式標題本身。",
       "- 若原始問題帶有南港、內湖、汐止等地區名稱，但不影響核心判斷，標題不要硬綁地區，優先寫成跨區也成立的版本。",
       "",
       "2. 【章節名稱】",
@@ -6841,7 +6991,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "- 結構與段落要求：",
       "  - # H1 標題（使用上述生成的標題）",
       "  - 全文至少要有 3 個以上 ## H2，必要時再補 ### H3；不可只有純文字段落。",
-      "  - 前言：點出這個問題背後，多數屋主真正的焦慮是什麼。自然帶入 1-2 個相關的裝修關鍵字（如：預售屋客變、中古屋翻修等）。",
+      "  - 前言：點出這個問題背後，多數屋主真正的焦慮是什麼。自然帶入 1-2 個相關的裝修關鍵字（如：老屋翻新、中古屋翻修、預算拆解等）。",
       "  - 前段必須先整理 1 段『判斷骨架』，等同官網版型中的 article-insight-panel：先用一句話說清楚決策順序，再用 2-3 句補充後面會怎麼展開。",
       "  - 若主題本質上具有順序、流程、階段、驗收節奏、預算配置順序或先後取捨，必須再補 1 段『流程步驟模組』，等同 article-step-flow：用 3-4 個步驟卡，依序寫出 01 / 02 / 03 / 04，每一步都要有短標與 1-2 句說明。",
       "  - ## 核心觀念：用 2-3 個清晰的重點（條列式），給出專業的判斷標準。必須包含具體的尺寸、順序、材質特性或邏輯判斷，不要寫空泛的形容詞。",
@@ -7373,10 +7523,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     }
 
     const intake = parseArticleIntakeCard(content);
-    return {
+    return sanitizeArticleConfirmData({
       ...intake,
       title: parseArticleTitle(content),
-    };
+    }, content);
   }
 
   function needsArticleMetadataFallback(content) {
@@ -7714,7 +7864,12 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     articleTopicDecision = parsed;
     saveArticleTopicDecision();
     renderArticleTopicDecision();
-    setArticleAiFeedback("本題動態決題已完成，正在接續整理 AI 結果...", "is-success");
+    setArticleAiFeedback(
+      parsed.invalid
+        ? "偵測到跨書系污染，已自動回退到老屋主線的安全題目，正在接續整理 AI 結果..."
+        : "本題動態決題已完成，正在接續整理 AI 結果...",
+      parsed.invalid ? "is-warning" : "is-success",
+    );
     return articleTopicDecision;
   }
 
