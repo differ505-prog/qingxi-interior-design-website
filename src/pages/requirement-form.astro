@@ -58,7 +58,44 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
             其餘細節可後補。
           </p>
         </div>
-        
+
+        <div class="form-steps-overview">
+          <div class="form-steps-heading">
+            <p class="form-steps-label">FILLING STEPS</p>
+            <h2>填寫只需 4 步</h2>
+          </div>
+          <div class="form-steps-grid">
+            <div class="form-step-card">
+              <div class="form-step-index">01</div>
+              <div>
+                <h3>快速聯絡資訊</h3>
+                <p>留下姓名、電話或 LINE</p>
+              </div>
+            </div>
+            <div class="form-step-card">
+              <div class="form-step-index">02</div>
+              <div>
+                <h3>案件基本條件</h3>
+                <p>地址、坪數、預算與時程</p>
+              </div>
+            </div>
+            <div class="form-step-card">
+              <div class="form-step-index">03</div>
+              <div>
+                <h3>空間與方向</h3>
+                <p>需求配置與生活重點</p>
+              </div>
+            </div>
+            <div class="form-step-card">
+              <div class="form-step-index">04</div>
+              <div>
+                <h3>智慧家庭（選填）</h3>
+                <p>若有興趣可以先告訴我們</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Progress Bar -->
         <div class="progress-container">
           <div class="progress-bar">
@@ -1111,6 +1148,80 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
     font-family: var(--font-sans);
     line-height: 1.8;
     font-size: 0.95rem;
+  }
+
+  .form-steps-overview {
+    max-width: 760px;
+    margin: 1.5rem auto 0;
+    padding: 1.4rem 1.5rem;
+    border-radius: 24px;
+    background: rgba(255, 252, 247);
+    border: 1px solid rgba(115, 103, 94, 0.14);
+    box-shadow: 0 16px 34px rgba(88, 62, 39, 0.04);
+  }
+
+  .form-steps-heading {
+    display: grid;
+    gap: 0.55rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .form-steps-label {
+    margin: 0;
+    color: #8b6a4d;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .form-steps-heading h2 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    color: #2f241d;
+    letter-spacing: 0.02em;
+  }
+
+  .form-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+  .form-step-card {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 1rem 1rem;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid rgba(109, 82, 58, 0.12);
+  }
+
+  .form-step-index {
+    color: #8b6a4d;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+  }
+
+  .form-step-card h3 {
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.45;
+    letter-spacing: 0.03em;
+    font-family: var(--font-serif);
+    color: #2f241d;
+  }
+
+  .form-step-card p {
+    margin: 0.45rem 0 0;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+    color: rgba(47, 36, 29, 0.8);
+    font-size: 0.88rem;
   }
 
   .progress-container {

@@ -849,6 +849,26 @@ const processStructuredData = [
         </div>
       </header>
 
+      <section class="process-stage-overview" aria-label="流程階段總覽">
+        <div class="section-heading">
+          <p class="section-eyebrow">Flow Overview</p>
+          <h2>從接洽到交屋的 6 大階段</h2>
+          <p>先理解整體階段的脈絡，再進入甘特圖看細節時程。</p>
+        </div>
+        <div class="flow-grid">
+          {toneLegend.map((item, index) => (
+            <article class="flow-card">
+              <div class="flow-stage-row">
+                <span class="flow-stage">{`0${index + 1}`}</span>
+                <span class="flow-tag">{item.label}</span>
+              </div>
+              <h3>{item.label}</h3>
+              <p>{item.note}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section class="schedule-tools" aria-label="日期換算工具">
         <article class="schedule-card schedule-card-primary">
           <p class="schedule-eyebrow">時程視角</p>
@@ -1235,6 +1255,128 @@ const processStructuredData = [
     color: var(--gray-darkest);
     border: 1px solid rgba(101, 91, 84, 0.22);
     box-shadow: 0 12px 22px rgba(47, 47, 47, 0.05);
+  }
+
+  .process-stage-overview {
+    margin-top: 3rem;
+    padding: 2rem;
+    border-radius: 26px;
+    border: 1px solid rgba(115, 103, 94, 0.12);
+    background: rgba(255, 252, 247, 0.98);
+    box-shadow: 0 18px 34px rgba(88, 62, 39, 0.05);
+  }
+
+  .section-heading {
+    display: grid;
+    gap: 0.85rem;
+    margin-bottom: 1.8rem;
+    max-width: 56rem;
+  }
+
+  .section-eyebrow {
+    margin: 0 0 0.85rem;
+    color: #8b6a4d;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .section-heading h2 {
+    font-family: var(--font-serif);
+    font-size: 1.7rem;
+    color: #2f241d;
+    margin: 0;
+    line-height: 1.24;
+    letter-spacing: 0.02em;
+  }
+
+  .section-heading p {
+    margin: 0;
+    line-height: 1.78;
+    letter-spacing: 0.05em;
+    color: rgba(47, 36, 29, 0.82);
+  }
+
+  .flow-grid {
+    position: relative;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding-top: 1.65rem;
+  }
+
+  .flow-grid::before {
+    content: "";
+    position: absolute;
+    top: 0.45rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(139, 106, 77, 0.12) 0%, rgba(139, 106, 77, 0.42) 16%, rgba(139, 106, 77, 0.42) 84%, rgba(139, 106, 77, 0.12) 100%);
+  }
+
+  .flow-card {
+    position: relative;
+    border-radius: 24px;
+    border: 1px solid rgba(109, 82, 58, 0.12);
+    background: #fffdf8;
+    padding: 2rem 1.5rem 1.5rem;
+    display: grid;
+    gap: 0.95rem;
+    box-shadow: 0 18px 34px rgba(88, 62, 39, 0.05);
+  }
+
+  .flow-card::before {
+    content: "";
+    position: absolute;
+    top: -1.2rem;
+    left: 1.5rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: #6b4d36;
+    box-shadow: 0 0 0 7px rgba(245, 239, 231, 0.95);
+  }
+
+  .flow-stage-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .flow-stage {
+    color: #8b6a4d;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    font-size: 0.82rem;
+  }
+
+  .flow-tag {
+    border-radius: 999px;
+    background: rgba(139, 106, 77, 0.1);
+    color: #7a5a3f;
+    padding: 0.36rem 0.72rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .flow-card h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    line-height: 1.4;
+    letter-spacing: 0.03em;
+    font-family: var(--font-serif);
+    color: #2f241d;
+  }
+
+  .flow-card p {
+    margin: 0;
+    line-height: 1.78;
+    letter-spacing: 0.05em;
+    color: rgba(47, 36, 29, 0.82);
   }
 
   .process-highlights,
