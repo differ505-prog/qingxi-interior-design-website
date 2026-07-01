@@ -189,6 +189,62 @@ const initialRecommendationMeta = initialRecommendation
 const initialRecommendationModeText = initialFocusTrack
   ? `${defaultModeState?.label || defaultTopicMode}｜${initialFocusTrack.title} 尚差 ${initialFocusTrack.remainingToBaseline} 篇`
   : "會跟內容書架同步";
+const initialTopPriorityRecommendations = (() => {
+  const focusTrackTitle = defaultModeState?.publishingDashboard?.focusTrack?.title;
+  const allCandidates = Array.isArray(defaultModeState?.nextTopicCandidates) ? defaultModeState.nextTopicCandidates : [];
+  const primaryRecommendation = defaultModeState?.nextRecommendedTopic || null;
+  const filtered = focusTrackTitle
+    ? allCandidates.filter((candidate) => candidate.trackTitle === focusTrackTitle)
+    : allCandidates;
+  const chapterFallbacks = (defaultModeState?.publishingDashboard?.focusTrack?.chapterGaps || [])
+    .map((gap) => gap.recommendedTopic)
+    .filter(Boolean)
+    .filter((candidate) => !focusTrackTitle || candidate.trackTitle === focusTrackTitle);
+  const merged = [];
+  if (primaryRecommendation) {
+    merged.push(primaryRecommendation);
+  }
+  [...filtered, ...chapterFallbacks].forEach((candidate) => {
+    if (!candidate) return;
+    if (!merged.some((item) => item.primaryTitle === candidate.primaryTitle && item.subchapter === candidate.subchapter)) {
+      merged.push(candidate);
+    }
+  });
+  const chapterPriorityMap = {
+    "空間重整": 0,
+    "預算拆解": 1,
+    "基礎工程": 2,
+    "現況判讀": 3,
+    "完工避雷": 4,
+  };
+  const explicitPriorityMap = {
+    "空間重整::收納補強": 0,
+    "空間重整::實戰表單": 1,
+    "預算拆解::追加風險": 2,
+    "基礎工程::實戰表單": 3,
+    "空間重整::整理計畫": 4,
+  };
+  const rankCandidate = (candidate: any, index: number) => {
+    const riskRank = candidate?.collisionRisk === "low"
+      ? 0
+      : candidate?.collisionRisk === "medium"
+        ? 1
+        : 2;
+    const explicitKey = `${candidate?.chapter || ""}::${candidate?.subchapter || ""}`;
+    const explicitRank = Object.prototype.hasOwnProperty.call(explicitPriorityMap, explicitKey)
+      ? explicitPriorityMap[explicitKey as keyof typeof explicitPriorityMap]
+      : 50;
+    const chapterRank = Object.prototype.hasOwnProperty.call(chapterPriorityMap, candidate?.chapter || "")
+      ? chapterPriorityMap[candidate.chapter as keyof typeof chapterPriorityMap]
+      : 9;
+    return riskRank * 1000 + explicitRank * 100 + chapterRank * 10 + index;
+  };
+  const safeCandidates = merged.filter((candidate) => candidate?.collisionRisk !== "high");
+  const candidatePool = safeCandidates.length ? safeCandidates : merged;
+  return candidatePool
+    .sort((left, right) => rankCandidate(left, merged.indexOf(left)) - rankCandidate(right, merged.indexOf(right)))
+    .slice(0, 3);
+})();
 const vendorIntakeShortUrl = "https://qingxidesign.tw/crew-intake";
 const cannedReplies = [
   {
@@ -961,7 +1017,20 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   <p>Top 3 最值得先發</p>
                   <span>不是只看單一答案，而是同時看同一本主書內 3 個優先順位的出版補位選項</span>
                 </div>
-                <div id="publishing-review-top3" class="bookshelf-review-top3-list"></div>
+                <div id="publishing-review-top3" class="bookshelf-review-top3-list">
+                  {initialTopPriorityRecommendations.length
+                    ? initialTopPriorityRecommendations.map((candidate, index) => (
+                      <article class={`bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}`}>
+                        <div class="bookshelf-review-top3-head">
+                          <span>{`Top ${index + 1}`}</span>
+                          <em>{`${candidate.chapter} / ${candidate.subchapter}`}</em>
+                        </div>
+                        <strong>{candidate.primaryTitle || candidate.webTitle || candidate.bookTitle || "尚未命名"}</strong>
+                        <p>{candidate.reason}</p>
+                      </article>
+                    ))
+                    : <p class="bookshelf-confirm-note">目前尚無可用的 Top 3 優先發布建議。</p>}
+                </div>
               </section>
               <section class="bookshelf-review-composer">
                 <div class="bookshelf-preview-head">
