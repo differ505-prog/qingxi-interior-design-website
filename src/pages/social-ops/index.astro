@@ -3418,8 +3418,24 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const rawValue = String(sourceMedium || "").trim();
     const normalized = rawValue.toLowerCase();
 
+    if (normalized === "(not set)") {
+      return "來源未標記";
+    }
+
+    if (normalized === "(data not available)") {
+      return "來源資料暫時不足";
+    }
+
     if (!normalized || normalized === "(direct) / (none)") {
       return "直接進站";
+    }
+
+    if (normalized.includes("ig_text_post_permalink_recent")) {
+      return "Instagram 貼文導流（近期貼文）";
+    }
+
+    if (normalized.includes("ig_text_post_permalink")) {
+      return "Instagram 貼文導流";
     }
 
     if (normalized.includes("instagram")) {
