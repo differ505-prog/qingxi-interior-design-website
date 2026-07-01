@@ -334,6 +334,11 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
     transition: transform 0.7s ease;
   }
 
+  .post-image img.post-image-media--rewiring {
+    transform: scale(1.12);
+    transform-origin: center center;
+  }
+
   .post-image-badge {
     position: absolute;
     left: 1.2rem;
@@ -353,6 +358,10 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
 
   .post-card:hover .post-image img {
     transform: scale(1.05);
+  }
+
+  .post-card:hover .post-image img.post-image-media--rewiring {
+    transform: scale(1.16);
   }
 
   .post-content {
@@ -618,7 +627,11 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
                   data-post-track={post.track}
                 >
                   <div class="post-image">
-                    <img src={post.coverImage} alt={post.title} />
+                    <img
+                      src={post.coverImage}
+                      alt={post.title}
+                      class={post.slug === "old-house-rewiring-and-electrical-safety" ? "post-image-media--rewiring" : undefined}
+                    />
                     <span class="post-image-badge">{post.siteCategory}</span>
                   </div>
                   <div class="post-content">
