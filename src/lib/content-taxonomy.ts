@@ -7,6 +7,9 @@ export interface BookshelfTrack {
 export interface BookshelfSubchapterPlan {
   title: string;
   keywords: string[];
+  nodeKind?: PublicationNodeKind;
+  titleOverride?: string;
+  assetSlotLabel?: string;
 }
 
 export interface BookshelfChapterPlan {
@@ -59,6 +62,8 @@ export interface PublicationBookProposal {
   positioning: string;
 }
 
+export type PublicationNodeKind = "core" | "case" | "qa" | "form" | "project";
+
 export interface PublishingChapterGap {
   chapter: string;
   articleCount: number;
@@ -94,6 +99,9 @@ export interface PublicationTitlePoolItem {
   confidence: "high" | "medium" | "low";
   isRecommended: boolean;
   note: string;
+  nodeKind: PublicationNodeKind;
+  statusTag: string;
+  assetSlotLabel?: string;
 }
 
 export interface SimilarArticleMatch {
@@ -141,6 +149,7 @@ export interface PublishingTopicModeOption {
 
 export const publishingFocusTrackTitle = "老屋翻新系";
 export const publicationChapterOrder = ["現況判讀", "預算拆解", "基礎工程", "空間重整", "完工避雷"] as const;
+export const crossSeriesForbiddenKeywords = ["預售屋", "客變", "新成屋", "商空"] as const;
 
 export interface PublicationMergeDirective {
   trackTitle: string;
@@ -168,9 +177,9 @@ export const publicationMergeDirectives: PublicationMergeDirective[] = [
 const publicationBookProposalOverrides: Record<string, PublicationBookProposal> = {
   [publishingFocusTrackTitle]: {
     trackTitle: publishingFocusTrackTitle,
-    bookTitle: "老屋翻新起手式",
-    subtitle: "從屋況盤點、預算拆解到完工避雷的實戰指南",
-    positioning: "先用前期判讀立穩決策，再把預算、工程、空間與驗收串成一本可落地的老屋翻新工具書。",
+    bookTitle: "老屋翻新全拆解",
+    subtitle: "從屋況盤點、預算控管到完工避雷的實戰指南",
+    positioning: "把屋況判讀、預算控管、基礎工程、空間重整與完工避雷整成一本可支撐 6-8 萬字出版體量的老屋翻新實戰指南。",
   },
   "預售屋客變系": {
     trackTitle: "預售屋客變系",
@@ -225,43 +234,154 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
         title: "現況判讀",
         keywords: ["屋況", "老屋", "中古屋", "翻新前", "現況", "評估"],
         subchapters: [
-          { title: "翻新起手式", keywords: ["屋況盤點", "翻新範圍", "先做什麼", "第一步", "從哪開始", "翻新前", "準備階段"] },
+          {
+            title: "翻新起手式",
+            keywords: ["屋況盤點", "翻新範圍", "先做什麼", "第一步", "從哪開始", "翻新前", "準備階段"],
+            nodeKind: "core",
+            titleOverride: "屋況盤點與範圍界定總表",
+          },
+          {
+            title: "案例解析",
+            keywords: ["before after", "漏水", "結構老化", "血淚案例", "翻車案例", "案例解析"],
+            nodeKind: "case",
+            titleOverride: "血淚 Before/After：沒看懂漏水與結構老化的慘痛代價",
+          },
+          {
+            title: "附錄表單",
+            keywords: ["checklist", "表單", "健檢", "初勘", "清單", "附錄"],
+            nodeKind: "form",
+            titleOverride: "附錄表單：老屋初勘健檢 Check-list",
+            assetSlotLabel: "老屋初勘健檢 Check-list",
+          },
         ],
       },
       {
         title: "預算拆解",
         keywords: ["預算", "費用", "報價", "單價", "怎麼抓", "追加", "取捨"],
         subchapters: [
-          { title: "預算分級", keywords: ["預算", "費用", "多少錢", "怎麼抓", "抓多少"] },
-          { title: "報價拆讀", keywords: ["報價", "單價", "估價", "報價單", "費用拆解"] },
-          { title: "追加風險", keywords: ["追加", "超支", "爆預算", "變更多", "加價"] },
+          {
+            title: "預算分級",
+            keywords: ["預算", "費用", "多少錢", "怎麼抓", "抓多少", "天地壁", "家具"],
+            nodeKind: "core",
+            titleOverride: "預算分級：客廳天地壁與家具的費用拆解",
+          },
+          {
+            title: "報價拆讀",
+            keywords: ["報價", "單價", "估價", "報價單", "費用拆解"],
+            nodeKind: "core",
+            titleOverride: "報價拆讀：全室預算拆解與避險指南",
+          },
+          {
+            title: "追加風險",
+            keywords: ["追加", "超支", "爆預算", "變更多", "加價"],
+            nodeKind: "core",
+            titleOverride: "追加風險：變更、漏項與超支的預防策略",
+          },
+          {
+            title: "附錄表單",
+            keywords: ["預算表", "比例試算", "試算表", "表單", "分配比例"],
+            nodeKind: "form",
+            titleOverride: "附錄表單：全室預算分配比例試算表",
+            assetSlotLabel: "全室預算分配比例試算表",
+          },
         ],
       },
       {
         title: "基礎工程",
         keywords: ["天花板", "輕鋼架", "地板", "磁磚", "水電", "泥作", "拆除", "工法"],
         subchapters: [
-          { title: "拆除泥作", keywords: ["拆除", "泥作", "砌牆", "打底"] },
-          { title: "水電更新", keywords: ["水電", "配線", "配管", "電路", "管線"] },
-          { title: "防水地坪", keywords: ["防水", "地坪", "找平", "浴室", "漏水"] },
+          {
+            title: "拆除泥作",
+            keywords: ["拆除", "泥作", "砌牆", "打底"],
+            nodeKind: "core",
+            titleOverride: "拆除泥作：老屋翻新基礎工程的施作順序與驗收重點",
+          },
+          {
+            title: "水電更新",
+            keywords: ["水電", "配線", "配管", "電路", "管線"],
+            nodeKind: "core",
+            titleOverride: "水電更新：老屋基礎工程的迴路重整與用電安全",
+          },
+          {
+            title: "防水地坪",
+            keywords: ["防水", "地坪", "找平", "浴室", "漏水"],
+            nodeKind: "core",
+            titleOverride: "防水地坪：老屋防水修復與地坪施作基準",
+          },
+          {
+            title: "QA迷思",
+            keywords: ["qa", "迷思", "管線一定要全換", "預算黑洞", "常見問題"],
+            nodeKind: "qa",
+            titleOverride: "常見迷思：老屋管線一定要全換？水電泥作常見預算黑洞",
+          },
         ],
       },
       {
         title: "空間重整",
         keywords: ["客廳", "格局", "動線", "家具", "收納", "配置", "空間", "改造"],
         subchapters: [
-          { title: "格局調整", keywords: ["格局", "隔間", "空間重整", "動線重整"] },
-          { title: "收納補強", keywords: ["收納", "櫃體", "儲物", "機能"] },
-          { title: "家具配置", keywords: ["家具", "沙發", "餐桌", "床架", "配置"] },
+          {
+            title: "格局調整",
+            keywords: ["格局", "隔間", "空間重整", "動線重整", "採光"],
+            nodeKind: "core",
+            titleOverride: "格局調整：結構、採光與動線的空間重整邏輯",
+          },
+          {
+            title: "收納補強",
+            keywords: ["收納", "櫃體", "儲物", "機能"],
+            nodeKind: "core",
+            titleOverride: "收納補強：老屋機能配置與櫃體整合策略",
+          },
+          {
+            title: "家具配置",
+            keywords: ["家具", "沙發", "餐桌", "床架", "配置"],
+            nodeKind: "core",
+            titleOverride: "家具配置：老屋尺度配置與起居動線校準",
+          },
+          {
+            title: "附錄表單",
+            keywords: ["系統櫃", "配件", "清單", "規格確認", "表單"],
+            nodeKind: "form",
+            titleOverride: "櫃體細節：系統櫃配件清單與規格確認表",
+            assetSlotLabel: "系統櫃配件清單與規格確認表",
+          },
+          {
+            title: "整理計畫",
+            keywords: ["整理", "收納整理", "組織", "專案", "演練"],
+            nodeKind: "project",
+            titleOverride: "整理計畫：全室收納與組織的實際演練",
+            assetSlotLabel: "全室收納與組織的實際演練",
+          },
         ],
       },
       {
         title: "完工避雷",
         keywords: ["驗收", "完工", "缺失", "避雷", "糾紛", "保固"],
         subchapters: [
-          { title: "驗收重點", keywords: ["驗收", "完工", "缺失"] },
-          { title: "保固界線", keywords: ["保固", "責任", "保修"] },
-          { title: "糾紛預防", keywords: ["糾紛", "避雷", "爭議", "扯皮"] },
+          {
+            title: "驗收重點",
+            keywords: ["驗收", "完工", "缺失"],
+            nodeKind: "core",
+            titleOverride: "驗收重點：老屋完工檢核與缺失排查清單",
+          },
+          {
+            title: "保固界線",
+            keywords: ["保固", "責任", "保修"],
+            nodeKind: "core",
+            titleOverride: "保固界線：老屋修繕責任與保固邊界",
+          },
+          {
+            title: "糾紛預防",
+            keywords: ["糾紛", "避雷", "爭議", "扯皮"],
+            nodeKind: "core",
+            titleOverride: "糾紛預防：老屋裝修爭議的溝通節點與證據留存",
+          },
+          {
+            title: "案例解析",
+            keywords: ["成功下莊", "點交", "保固期", "糾紛化解", "案例解析"],
+            nodeKind: "case",
+            titleOverride: "成功下莊：點交與保固期的糾紛化解實錄",
+          },
         ],
       },
     ],
@@ -517,19 +637,14 @@ function resolveTrackRootLabel(trackTitle = "") {
 }
 
 function getBookTitleOverride(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
+  const subchapterPlan = getTrackPlan(trackTitle)?.chapters
+    .find((chapter) => chapter.title === chapterTitle)
+    ?.subchapters.find((subchapter) => subchapter.title === subchapterTitle);
+  if (subchapterPlan?.titleOverride) {
+    return subchapterPlan.titleOverride;
+  }
   const overrides: Record<string, string> = {
-    [`${publishingFocusTrackTitle}|現況判讀|翻新起手式`]: "老屋翻新起手式：屋況盤點與範圍界定總表",
-    [`${publishingFocusTrackTitle}|預算拆解|預算分級`]: "預算分級：全室裝修的預算配置框架",
-    [`${publishingFocusTrackTitle}|預算拆解|報價拆讀`]: "報價識讀：全室預算拆解與避險指南",
-    [`${publishingFocusTrackTitle}|預算拆解|追加風險`]: "追加風險：變更、漏項與超支的預防策略",
-    [`${publishingFocusTrackTitle}|基礎工程|水電更新`]: "水電更新：老屋基礎工程的迴路重整與用電安全",
-    [`${publishingFocusTrackTitle}|基礎工程|防水地坪`]: "防水地坪：老屋防水修復與地坪施作基準",
-    [`${publishingFocusTrackTitle}|空間重整|格局調整`]: "格局調整：老屋空間重整與生活動線規劃",
-    [`${publishingFocusTrackTitle}|空間重整|收納補強`]: "收納補強：老屋機能配置與櫃體整合策略",
-    [`${publishingFocusTrackTitle}|空間重整|家具配置`]: "家具配置：老屋尺度配置與起居動線校準",
-    [`${publishingFocusTrackTitle}|完工避雷|驗收重點`]: "驗收重點：老屋完工檢核與缺失排查清單",
-    [`${publishingFocusTrackTitle}|完工避雷|保固界線`]: "保固界線：老屋修繕責任與保固邊界",
-    [`${publishingFocusTrackTitle}|完工避雷|糾紛預防`]: "糾紛預防：老屋裝修爭議的溝通節點與證據留存",
+    [`${publishingFocusTrackTitle}|預算拆解|報價拆讀`]: "報價拆讀：全室預算拆解與避險指南",
   };
   return overrides[`${trackTitle}|${chapterTitle}|${subchapterTitle}`] || "";
 }
@@ -640,6 +755,9 @@ function buildTitlePoolItem(
   recommendedTopic: NextTopicRecommendation | null,
 ): PublicationTitlePoolItem {
   const titleSet = getTopicTitleSet(trackTitle, chapterTitle, subchapterTitle);
+  const subchapterPlan = getTrackPlan(trackTitle)?.chapters
+    .find((chapter) => chapter.title === chapterTitle)
+    ?.subchapters.find((subchapter) => subchapter.title === subchapterTitle);
   const mergeDirective = getPublicationMergeDirective(trackTitle, chapterTitle);
   const hasPublishedEntry = entries.some((entry) => (
     entry.trackTitle === trackTitle &&
@@ -657,6 +775,7 @@ function buildTitlePoolItem(
     : hasPublishedEntry
       ? "published"
       : "pending";
+  const nodeKind = subchapterPlan?.nodeKind || "core";
   const confidence: PublicationTitlePoolItem["confidence"] = isRecommended
     ? "high"
     : mergeNeeded
@@ -664,13 +783,28 @@ function buildTitlePoolItem(
       : hasPublishedEntry
         ? "medium"
         : "medium";
+  const statusTag = mergeNeeded
+    ? "整併執行中"
+    : hasPublishedEntry
+      ? "已上線"
+      : nodeKind === "case"
+        ? "待補_案例"
+        : nodeKind === "qa"
+          ? "待補_QA"
+          : nodeKind === "form"
+            ? "待補_表單"
+            : nodeKind === "project"
+              ? "待補_專案"
+              : "待補_正規";
   const note = mergeNeeded
     ? mergeDirective?.note || "此子章目前應先整併既有文章，不建議另開新標題。"
     : hasPublishedEntry
       ? "此子章已有已上線文章，標題池保留作為整體出版視角參考。"
       : isRecommended
         ? "這是目前系統最推薦優先補位的標題。"
-        : "這是未來待補的候選標題，可交由高階 LLM 進一步覆核、重排與刪修。";
+        : nodeKind === "form" || nodeKind === "project"
+          ? "這是可掛載實體資產的節點，後續可綁定試算表、PDF 或專案附件。"
+          : "這是未來待補的候選標題，可交由高階 LLM 進一步覆核、重排與刪修。";
   return {
     trackTitle,
     chapter: chapterTitle,
@@ -682,6 +816,9 @@ function buildTitlePoolItem(
     confidence,
     isRecommended,
     note,
+    nodeKind,
+    statusTag,
+    assetSlotLabel: subchapterPlan?.assetSlotLabel,
   } satisfies PublicationTitlePoolItem;
 }
 
@@ -707,6 +844,11 @@ export function getPublicationBookProposal(trackTitle = "") {
     subtitle: `${resolveTrackRootLabel(trackTitle) || trackTitle}的章節化出版規劃`,
     positioning: "以既有文章骨架為基礎，持續補齊章節、標題池與出版閉環。",
   };
+}
+
+export function hasCrossSeriesForbiddenKeyword(...values: string[]) {
+  const text = values.join(" ").replace(/\s+/g, "");
+  return crossSeriesForbiddenKeywords.some((keyword) => text.includes(keyword));
 }
 
 export function getPublicationMergeDirective(trackTitle = "", chapterTitle = "") {
@@ -1269,7 +1411,9 @@ function buildRecommendationCandidates(
     .slice(0, 3);
   const weights = getRecommendationScoreWeights(mode);
 
+  const strictIsolation = focusTrackTitle === publishingFocusTrackTitle;
   const candidates = bookshelfTrackPlans.flatMap((track) =>
+    (strictIsolation && track.title !== focusTrackTitle ? [] :
     (filters.trackTitle && track.title !== filters.trackTitle ? [] : track.chapters).flatMap((chapter) =>
       (filters.chapterTitle && chapter.title !== filters.chapterTitle ? [] : chapter.subchapters).map((subchapter) => {
         const trackEntries = entries.filter((entry) => entry.trackTitle === track.title);
@@ -1342,6 +1486,10 @@ function buildRecommendationCandidates(
           chapterSaturationPenalty -
           collisionPenalty;
 
+        const titleSet = getTopicTitleSet(track.title, chapter.title, subchapter.title);
+        if (strictIsolation && hasCrossSeriesForbiddenKeyword(titleSet.webTitle, titleSet.backupTitles.join(" "))) {
+          return null;
+        }
         return {
           trackTitle: track.title,
           chapter: chapter.title,
@@ -1355,7 +1503,7 @@ function buildRecommendationCandidates(
           score,
         };
       }),
-    ),
+    )),
   );
 
   return candidates
