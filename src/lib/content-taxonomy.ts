@@ -982,6 +982,7 @@ function buildRecommendationFromCandidate(
   mode: PublishingTopicMode,
 ) {
   const titleSet = getTopicTitleSet(candidate.trackTitle, candidate.chapter, candidate.subchapter);
+  const unifiedTitle = titleSet.webTitle;
   const reason = buildRecommendationReason(
     candidate.trackTitle,
     candidate.subchapter,
@@ -1022,9 +1023,9 @@ function buildRecommendationFromCandidate(
     articleCountInSubchapter: candidate.articleCountInSubchapter,
     coverageBefore: candidate.coverageBefore,
     coverageAfter: candidate.coverageAfter,
-    webTitle: titleSet.webTitle,
-    bookTitle: titleSet.bookTitle,
-    primaryTitle: titleSet.webTitle,
+    webTitle: unifiedTitle,
+    bookTitle: unifiedTitle,
+    primaryTitle: unifiedTitle,
     backupTitles: titleSet.backupTitles,
     reason,
     ...existingArticleContext,

@@ -863,6 +863,73 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
               <p>主線只留判題、生文與名錄。</p>
             </div>
 
+            <section id="publishing-review-board" class="bookshelf-confirm bookshelf-review-board">
+              <div class="bookshelf-preview-head">
+                <p>出版閉環覆核</p>
+                <span>高頻區：貼新文章前先確認出版補位、已上線狀態與下一篇優先順序</span>
+              </div>
+              <div class="bookshelf-confirm-grid">
+                <article class="bookshelf-confirm-card">
+                  <span>目前決題模式</span>
+                  <strong id="publishing-review-mode">尚未判定</strong>
+                </article>
+                <article class="bookshelf-confirm-card">
+                  <span>主攻書系</span>
+                  <strong id="publishing-review-track">尚未判定</strong>
+                </article>
+                <article class="bookshelf-confirm-card">
+                  <span>距離出版基線</span>
+                  <strong id="publishing-review-baseline">尚未計算</strong>
+                </article>
+                <article class="bookshelf-confirm-card">
+                  <span>主書完成度</span>
+                  <strong id="publishing-review-coverage">尚未計算</strong>
+                </article>
+              </div>
+              <article class="bookshelf-review-next">
+                <div class="bookshelf-review-next-head">
+                  <span>最推薦下一篇</span>
+                  <strong id="publishing-review-next-title">尚未產生</strong>
+                </div>
+                <p id="publishing-review-next-meta" class="bookshelf-confirm-note">會依目前決題模式與出版缺口自動更新。</p>
+                <div class="bookshelf-review-risk-row">
+                  <strong id="publishing-review-risk-badge" class="bookshelf-review-risk-badge is-low">撞題風險低</strong>
+                  <span id="publishing-review-risk-note" class="bookshelf-confirm-note">會根據已上線文章自動比對。</span>
+                </div>
+                <ul id="publishing-review-similar-list" class="bookshelf-review-similar-list">
+                  <li>相似舊文比對後顯示</li>
+                </ul>
+              </article>
+              <div class="bookshelf-actions bookshelf-confirm-actions">
+                <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
+                <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製給高階 LLM 覆核</button>
+                <button type="button" id="copy-publishing-review-outline" class="bookshelf-action">複製出版清單摘要</button>
+              </div>
+              <p id="publishing-review-filter-note" class="bookshelf-confirm-note">目前顯示全部章節與已上線文章。</p>
+              <div class="bookshelf-review-legend" aria-label="出版進度圖例">
+                <span><i class="is-covered"></i>已上線</span>
+                <span><i class="is-draft"></i>草稿中</span>
+                <span><i class="is-pending"></i>待補</span>
+              </div>
+              <div id="publishing-review-plan" class="bookshelf-review-plan"></div>
+              <details class="bookshelf-mini-fold">
+                <summary>
+                  <span>查看閉環覆核稿</span>
+                  <small>手動複製備援</small>
+                </summary>
+                <div class="bookshelf-pro-prompt-body">
+                  <textarea
+                    id="publishing-review-prompt-content"
+                    class="bookshelf-pro-prompt-content"
+                    rows="18"
+                    readonly
+                    placeholder="這裡會顯示可直接貼給高階 LLM 的出版閉環覆核稿"
+                  ></textarea>
+                </div>
+              </details>
+              <p class="bookshelf-confirm-note">清單中已上線官網文章會自動以橫線與降低透明度標示；未劃線者代表仍屬待補或下一篇候選。</p>
+            </section>
+
             <div class="bookshelf-prompt-tool">
               <label class="gemini-field bookshelf-prompt-field">
                 <span>真實社團問題</span>
@@ -1088,73 +1155,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                 <PublishingModePanel modeOption={modeOption} modeState={topicModeMap[modeOption.value]} />
               </template>
             ))}
-
-            <section id="publishing-review-board" class="bookshelf-confirm bookshelf-review-board">
-              <div class="bookshelf-preview-head">
-                <p>出版閉環覆核</p>
-                <span>貼新文章前，先用這份清單看書稿補位是否還需要調整</span>
-              </div>
-              <div class="bookshelf-confirm-grid">
-                <article class="bookshelf-confirm-card">
-                  <span>目前決題模式</span>
-                  <strong id="publishing-review-mode">尚未判定</strong>
-                </article>
-                <article class="bookshelf-confirm-card">
-                  <span>主攻書系</span>
-                  <strong id="publishing-review-track">尚未判定</strong>
-                </article>
-                <article class="bookshelf-confirm-card">
-                  <span>距離出版基線</span>
-                  <strong id="publishing-review-baseline">尚未計算</strong>
-                </article>
-                <article class="bookshelf-confirm-card">
-                  <span>主書完成度</span>
-                  <strong id="publishing-review-coverage">尚未計算</strong>
-                </article>
-              </div>
-              <article class="bookshelf-review-next">
-                <div class="bookshelf-review-next-head">
-                  <span>最推薦下一篇</span>
-                  <strong id="publishing-review-next-title">尚未產生</strong>
-                </div>
-                <p id="publishing-review-next-meta" class="bookshelf-confirm-note">會依目前決題模式與出版缺口自動更新。</p>
-                <div class="bookshelf-review-risk-row">
-                  <strong id="publishing-review-risk-badge" class="bookshelf-review-risk-badge is-low">撞題風險低</strong>
-                  <span id="publishing-review-risk-note" class="bookshelf-confirm-note">會根據已上線文章自動比對。</span>
-                </div>
-                <ul id="publishing-review-similar-list" class="bookshelf-review-similar-list">
-                  <li>相似舊文比對後顯示</li>
-                </ul>
-              </article>
-              <div class="bookshelf-actions bookshelf-confirm-actions">
-                <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
-                <button type="button" id="toggle-publishing-title-view" class="bookshelf-action">看網站標題</button>
-                <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製閉環覆核稿</button>
-                <button type="button" id="copy-publishing-review-outline" class="bookshelf-action">複製出版清單摘要</button>
-              </div>
-              <div class="bookshelf-review-legend" aria-label="出版進度圖例">
-                <span><i class="is-covered"></i>已上線</span>
-                <span><i class="is-draft"></i>草稿中</span>
-                <span><i class="is-pending"></i>待補</span>
-              </div>
-              <div id="publishing-review-plan" class="bookshelf-review-plan"></div>
-              <details class="bookshelf-mini-fold">
-                <summary>
-                  <span>查看閉環覆核稿</span>
-                  <small>手動複製備援</small>
-                </summary>
-                <div class="bookshelf-pro-prompt-body">
-                  <textarea
-                    id="publishing-review-prompt-content"
-                    class="bookshelf-pro-prompt-content"
-                    rows="18"
-                    readonly
-                    placeholder="這裡會顯示可直接貼給高階 LLM 的出版閉環覆核稿"
-                  ></textarea>
-                </div>
-              </details>
-              <p class="bookshelf-confirm-note">清單中已上線官網文章會自動以橫線與降低透明度標示；未劃線者代表仍屬待補或下一篇候選。</p>
-            </section>
 
           </section>
 
@@ -1834,7 +1834,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   const GEMINI_BACKUPS_KEY = "qingxi-gemini-canvas-backups-v1";
   const PUBLISHING_CHECKLIST_KEY = "qingxi-publishing-checklist-v1";
   const PUBLISHING_REVIEW_FILTER_KEY = "qingxi-publishing-review-filter-v1";
-  const PUBLISHING_TITLE_VIEW_KEY = "qingxi-publishing-title-view-v1";
   const TOPIC_MODE_KEY = "qingxi-topic-mode-v1";
   const WORKSPACE_PANE_KEY = "qingxi-workspace-pane-v1";
   const GEMINI_RECENT_LIMIT = 10;
@@ -1918,7 +1917,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   let geminiBackups = [];
   let publishingChecklistOverrides = {};
   let publishingReviewShowUnpublishedOnly = false;
-  let publishingTitleViewMode = "book";
   let currentTopicMode = topicModeOptions?.[0]?.value || "publishing";
   let currentWorkspacePane = "operations";
   let vendorNoteEditingId = "";
@@ -4160,22 +4158,20 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   }
 
   function getPublishedPostBookTitle(post) {
-    return buildBookTopicTitle(post.track || "", post.chapter || "", getPublishedPostSubchapter(post));
+    return post.title || buildBookTopicTitle(post.track || "", post.chapter || "", getPublishedPostSubchapter(post));
   }
 
   function getDisplayTitle(recommendation) {
     if (!recommendation) return "尚未產生";
-    return publishingTitleViewMode === "book"
-      ? (recommendation.bookTitle || recommendation.primaryTitle || recommendation.webTitle || "尚未產生")
-      : (recommendation.webTitle || recommendation.primaryTitle || recommendation.bookTitle || "尚未產生");
+    return recommendation.primaryTitle || recommendation.webTitle || recommendation.bookTitle || "尚未產生";
   }
 
   function getPublishedPostDisplayTitle(post) {
-    return publishingTitleViewMode === "book" ? getPublishedPostBookTitle(post) : post.title;
+    return post.title || getPublishedPostBookTitle(post);
   }
 
   function getTitleViewLabel() {
-    return publishingTitleViewMode === "book" ? "書籍收錄標題" : "網站發布標題";
+    return "統一標題";
   }
 
   function getCurrentDraftState() {
@@ -4245,9 +4241,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       `主攻書系：${focusTrack.title}`,
       `主書完成度：${focusTrack.coverageRate}%`,
       `距離出版基線：還差 ${focusTrack.remainingToBaseline} 篇`,
-      `標題檢視：${getTitleViewLabel()}`,
-      `最推薦下一篇（Web）：${recommendation?.webTitle || "尚未產生"}`,
-      `最推薦下一篇（Book）：${recommendation?.bookTitle || "尚未產生"}`,
+      `最推薦下一篇：${getDisplayTitle(recommendation)}`,
     ];
 
     if (recommendation) {
@@ -4270,12 +4264,11 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       );
       if (gap.recommendedTopic?.primaryTitle) {
         lines.push(
-          `- 本章下一篇（Web）：${gap.recommendedTopic.webTitle}｜子章節：${gap.recommendedTopic.subchapter}`,
-          `- 本章下一篇（Book）：${gap.recommendedTopic.bookTitle}`,
+          `- 本章下一篇：${getDisplayTitle(gap.recommendedTopic)}｜子章節：${gap.recommendedTopic.subchapter}`,
         );
       }
       if (publishedPosts.length) {
-        lines.push(`- 官網已上線：${publishedPosts.map((post) => `[已上線] ${post.title}｜Book：${getPublishedPostBookTitle(post)}`).join(" / ")}`);
+        lines.push(`- 官網已上線：${publishedPosts.map((post) => `[已上線] ${getPublishedPostDisplayTitle(post)}`).join(" / ")}`);
       } else {
         lines.push("- 官網已上線：目前無");
       }
@@ -4335,8 +4328,8 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       "- 請指出哪些章節仍明顯過薄，哪些題目應延後，哪些缺口最值得優先補。",
       "",
       "C. 下一篇是否真的是最佳選擇",
-      `- 目前最推薦下一篇 Web 標題為：${recommendation?.webTitle || "尚未產生"}`,
-      `- 目前最推薦下一篇 Book 標題為：${recommendation?.bookTitle || "尚未產生"}`,
+      `- 目前最推薦下一篇標題為：${getDisplayTitle(recommendation)}`,
+      "- 網站文章標題與書籍標題視為同一套，不做雙標題分流。",
       "- 請判斷這一篇是否真的應該先發；若不是，請給出更好的優先順序與原因。",
       "",
       "D. 書名、章節、文章標題的微調建議",
@@ -4429,22 +4422,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     }
   }
 
-  function savePublishingTitleView() {
-    localStorage.setItem(PUBLISHING_TITLE_VIEW_KEY, publishingTitleViewMode);
-  }
-
-  function loadPublishingTitleView() {
-    try {
-      const saved = localStorage.getItem(PUBLISHING_TITLE_VIEW_KEY);
-      if (saved === "book" || saved === "web") {
-        publishingTitleViewMode = saved;
-      }
-    } catch (error) {
-      console.error("讀取標題檢視模式失敗：", error);
-      publishingTitleViewMode = "book";
-    }
-  }
-
   function renderPublishingReviewBoard() {
     const modeState = getCurrentTopicModeState(currentTopicMode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
@@ -4462,7 +4439,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const plan = document.getElementById("publishing-review-plan");
     const promptContent = document.getElementById("publishing-review-prompt-content");
     const toggleButton = document.getElementById("toggle-publishing-review-unpublished");
-    const titleViewButton = document.getElementById("toggle-publishing-title-view");
+    const filterNote = document.getElementById("publishing-review-filter-note");
     if (
       !(mode instanceof HTMLElement) ||
       !(track instanceof HTMLElement) ||
@@ -4476,7 +4453,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       !(plan instanceof HTMLElement) ||
       !(promptContent instanceof HTMLTextAreaElement) ||
       !(toggleButton instanceof HTMLButtonElement) ||
-      !(titleViewButton instanceof HTMLButtonElement)
+      !(filterNote instanceof HTMLElement)
     ) {
       return;
     }
@@ -4484,9 +4461,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     toggleButton.textContent = publishingReviewShowUnpublishedOnly ? "顯示全部" : "只看未發佈";
     toggleButton.setAttribute("aria-pressed", publishingReviewShowUnpublishedOnly ? "true" : "false");
     toggleButton.classList.toggle("is-active", publishingReviewShowUnpublishedOnly);
-    titleViewButton.textContent = publishingTitleViewMode === "book" ? "看網站標題" : "看書籍標題";
-    titleViewButton.setAttribute("aria-pressed", publishingTitleViewMode === "book" ? "true" : "false");
-    titleViewButton.classList.toggle("is-active", publishingTitleViewMode === "book");
 
     if (!focusTrack) {
       mode.textContent = "尚未判定";
@@ -4500,6 +4474,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       renderSimilarArticleList(similarList, null);
       plan.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版清單。</p>';
       promptContent.value = "目前尚無可用的出版閉環覆核稿。";
+      filterNote.textContent = "目前尚無可用的出版清單。";
       renderReviewNextTopicPanel(modeState);
       return;
     }
@@ -4553,9 +4528,9 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
           const recommendationMarkup = subchapterRecommendation && (!publishingReviewShowUnpublishedOnly || !recommendationPublished)
             ? `
               <div class="bookshelf-review-subchapter-article ${recommendationPublished ? "is-published" : ""} ${isPrimaryRecommendation ? "is-next" : ""}">
-                <span>${isPrimaryRecommendation ? "最推薦下一篇" : "本章下一篇"}｜${getTitleViewLabel()}</span>
+                <span>${isPrimaryRecommendation ? "最推薦下一篇" : "本章下一篇"}</span>
                 <strong>${escapeHtml(getDisplayTitle(subchapterRecommendation))}</strong>
-                <small>${escapeHtml(subchapterRecommendation.category)}｜Web：${escapeHtml(subchapterRecommendation.webTitle)}｜Book：${escapeHtml(subchapterRecommendation.bookTitle)}</small>
+                <small>${escapeHtml(subchapterRecommendation.category)}</small>
               </div>
             `
             : "";
@@ -4584,7 +4559,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                     <div class="bookshelf-review-article-copy">
                       <span>官網已上線</span>
                       <strong>${escapeHtml(getPublishedPostDisplayTitle(post))}</strong>
-                      <small>${escapeHtml(post.siteCategory || post.category || "已發布文章")}｜Web：${escapeHtml(post.title)}｜Book：${escapeHtml(getPublishedPostBookTitle(post))}</small>
+                      <small>${escapeHtml(post.siteCategory || post.category || "已發布文章")}</small>
                     </div>
                   </li>
                 `).join("")}
@@ -4614,6 +4589,18 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       .join("");
 
     plan.innerHTML = chapterCards || '<p class="bookshelf-confirm-note">目前沒有待補子章；可先切回顯示全部，檢查整體出版目錄。</p>';
+    const totalPublishedCount = focusTrack.chapterGaps.reduce(
+      (sum, gap) => sum + getPublishedPostsForChapter(focusTrack.title, gap.chapter).length,
+      0,
+    );
+    const totalSubchapterCount = focusTrack.chapterGaps.reduce((sum, gap) => sum + gap.subchapters.length, 0);
+    const uncoveredSubchapterCount = focusTrack.chapterGaps.reduce(
+      (sum, gap) => sum + gap.subchapters.filter((subchapter) => !subchapter.coveredByArticle).length,
+      0,
+    );
+    filterNote.textContent = publishingReviewShowUnpublishedOnly
+      ? `目前只看未發佈：顯示 ${uncoveredSubchapterCount} 個待補子章，已隱藏 ${totalPublishedCount} 篇已上線文章。`
+      : `目前顯示全部：共 ${totalSubchapterCount} 個子章、${totalPublishedCount} 篇已上線文章。`;
 
     promptContent.value = buildPublishingReviewPrompt(currentTopicMode);
     renderReviewNextTopicPanel(modeState);
@@ -4637,12 +4624,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   function handlePublishingReviewFilterToggle() {
     publishingReviewShowUnpublishedOnly = !publishingReviewShowUnpublishedOnly;
     savePublishingReviewFilter();
-    renderPublishingReviewBoard();
-  }
-
-  function handlePublishingTitleViewToggle() {
-    publishingTitleViewMode = publishingTitleViewMode === "book" ? "web" : "book";
-    savePublishingTitleView();
     renderPublishingReviewBoard();
   }
 
@@ -4684,8 +4665,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       `章節：${recommendation.chapter}`,
       `子章節：${recommendation.subchapter}`,
       `網站分類：${recommendation.category}`,
-      `Web 標題：${recommendation.webTitle}`,
-      `Book 標題：${recommendation.bookTitle}`,
+      `統一標題：${getDisplayTitle(recommendation)}`,
       `備選 1：${recommendation.backupTitles?.[0] || "無"}`,
       `備選 2：${recommendation.backupTitles?.[1] || "無"}`,
       `推薦原因：${recommendation.reason}`,
@@ -4712,8 +4692,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         `章節：${candidate.chapter}`,
         `子章節：${candidate.subchapter}`,
         `網站分類：${candidate.category}`,
-        `Web 標題：${candidate.webTitle}`,
-        `Book 標題：${candidate.bookTitle}`,
+        `統一標題：${getDisplayTitle(candidate)}`,
         `備選標題：${candidate.backupTitles?.slice(0, 2).join(" / ") || "無"}`,
         `系統理由：${candidate.reason}`,
         `補前完成度：${candidate.coverageBefore}%`,
@@ -7031,6 +7010,26 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       console.error("自動複製失敗：", error);
     }
 
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.top = "-9999px";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      const copied = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      if (copied) {
+        setFeedback(successMessage, "is-success");
+        return "clipboard";
+      }
+    } catch (error) {
+      console.error("備援複製失敗：", error);
+    }
+
     if (fallbackToPrompt) {
       try {
         window.prompt("請手動複製以下內容", text);
@@ -7520,10 +7519,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     handlePublishingReviewFilterToggle();
   });
 
-  document.getElementById("toggle-publishing-title-view")?.addEventListener("click", () => {
-    handlePublishingTitleViewToggle();
-  });
-
   document.getElementById("copy-publishing-review-outline")?.addEventListener("click", async () => {
     const result = await copyText(
       buildPublishingReviewOutline(),
@@ -8008,7 +8003,6 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   loadGeminiBackupState();
   loadPublishingChecklist();
   loadPublishingReviewFilter();
-  loadPublishingTitleView();
   loadTopicMode();
   loadWorkspacePane();
   loadState();
