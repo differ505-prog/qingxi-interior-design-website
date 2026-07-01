@@ -18,6 +18,9 @@ function normalizeArticleAssistContent(content: string) {
     "0. 【決題摘要】",
     "0.【決題摘要】",
     "【決題摘要】",
+    "0. 【決策摘要】",
+    "0.【決策摘要】",
+    "【決策摘要】",
     "0. 【判題結論】",
     "0.【判題結論】",
     "【判題結論】",
@@ -33,6 +36,13 @@ function normalizeArticleAssistContent(content: string) {
   if (!offsets.length) return trimmed;
 
   return trimmed.slice(Math.min(...offsets)).trim();
+}
+
+function resolveArticleAssistModel(mode: string, env: Record<string, string | undefined>) {
+  if (mode === "topic") {
+    return env.GEMINI_TOPIC_MODEL || env.GEMINI_PRO_MODEL || "gemini-2.5-pro";
+  }
+  return env.GEMINI_FLASH_MODEL || "gemini-2.5-flash";
 }
 
 function parseGeminiRetryAfterSeconds(message: string) {
@@ -70,7 +80,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const model = import.meta.env.GEMINI_FLASH_MODEL || "gemini-2.5-flash";
+    const model = resolveArticleAssistModel(mode, import.meta.env);
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`,
       {
@@ -86,9 +96,9 @@ export const POST: APIRoute = async ({ request }) => {
             },
           ],
           generationConfig: {
-            temperature: mode === "metadata" ? 0.1 : mode === "quick" ? 0.2 : mode === "topic" ? 0.3 : 0.6,
+            temperature: mode === "metadata" ? 0.1 : mode === "quick" ? 0.2 : mode === "topic" ? 0.2 : 0.6,
             topP: 0.9,
-            maxOutputTokens: mode === "metadata" ? 900 : mode === "topic" ? 1200 : mode === "quick" ? 1800 : 6000,
+            maxOutputTokens: mode === "metadata" ? 900 : mode === "topic" ? 2200 : mode === "quick" ? 1800 : 6000,
           },
         }),
       },

@@ -1206,10 +1206,10 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
                   </article>
                   <article class="bookshelf-confirm-card bookshelf-confirm-card-wide">
                     <span>決題理由</span>
-                    <strong id="article-topic-reason">先理解本輪前置包，再由 Flash 在出版候選裡選最適合的切角。</strong>
+                    <strong id="article-topic-reason">先理解本輪前置包，再由 Gemini Pro 依完整出版上下文決定整併池與本輪採用題目。</strong>
                   </article>
                 </div>
-                <p id="article-topic-note" class="bookshelf-confirm-note">這一步會先依本輪前置包理解痛點，再從系統候選缺口內挑最適合落進書稿的題目。</p>
+                <p id="article-topic-note" class="bookshelf-confirm-note">這一步會先整理書名、章節、既有文章、候選題與本輪私訊情境，再交由 Gemini Pro 決定誰進整併池，以及扣掉整併題後剩哪些優先文章。</p>
             </div>
             <div id="article-pro-prompt-shell" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
@@ -2124,6 +2124,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   const BLOG_INDEX_URL = `${SITE_ORIGIN}/blog`;
   const THREADS_PROFILE_URL = "https://www.threads.com/@qingxi.ds?hl=zh-tw";
   const ARTICLE_AI_TIMEOUT_MS = 45000;
+  const ARTICLE_TOPIC_TIMEOUT_MS = 70000;
   const ARTICLE_AI_METADATA_TIMEOUT_MS = 18000;
   const CONTENT_ANALYTICS_URL = "/api/social-ops/analytics";
   const VENDOR_NOTES_API_URL = "/api/social-ops/vendor-notes";
@@ -6053,6 +6054,58 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     return merged;
   }
 
+  function getTopicReviewCandidates(mode = currentTopicMode, limit = 10) {
+    const ranked = getRankedTopicCandidates(mode, Math.max(limit, 8));
+    const mergeCandidates = getMergeTaskRecommendations(mode, 4);
+    const newCandidates = getTopPriorityRecommendations(mode, 6);
+    const reviseCandidates = ranked.filter((candidate) => candidate?.workflowAction === "Revise_Angle").slice(0, 3);
+    const merged = [];
+
+    [...mergeCandidates, ...newCandidates, ...reviseCandidates, ...ranked].forEach((candidate) => {
+      if (!candidate) return;
+      if (!merged.some((item) => item.primaryTitle === candidate.primaryTitle && item.subchapter === candidate.subchapter)) {
+        merged.push(candidate);
+      }
+    });
+
+    return merged.slice(0, Math.max(1, limit)).map((candidate, index) => ({
+      ...candidate,
+      reviewIndex: index + 1,
+    }));
+  }
+
+  function formatTopicReviewCandidateNotes(candidate, focusTrack) {
+    const similarTitles = candidate?.similarArticles?.slice(0, 3).map((article) => `${article.title}（${article.score}）`).join(" / ") || "目前沒有明確相近舊文";
+    const sameChapter = candidate?.sameChapterArticles?.join(" / ") || "目前沒有";
+    const dependency = getDependencyLockMessage(candidate, focusTrack) || "目前無前置依賴阻斷";
+    return [
+      `規則層提名：${getWorkflowActionLabel(candidate?.workflowAction || "New_Publish")}`,
+      `系統理由：${candidate?.reason || "尚未提供"}`,
+      `規則初篩：${candidate?.collisionRisk || "unknown"}｜${candidate?.collisionReason || "尚未比對"}`,
+      `相近舊文：${similarTitles}`,
+      `同章既有文章：${sameChapter}`,
+      `依賴鎖：${dependency}`,
+    ].join("\n");
+  }
+
+  function buildTopicReviewCandidateText(mode = currentTopicMode) {
+    const modeState = getCurrentTopicModeState(mode);
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    const candidates = getTopicReviewCandidates(mode, 10);
+    return candidates
+      .map((candidate) => [
+        `候選 ${candidate.reviewIndex}`,
+        `主書系：${candidate.trackTitle}`,
+        `章節：${candidate.chapter}`,
+        `子章節：${candidate.subchapter}`,
+        `網站分類：${candidate.category}`,
+        `統一標題：${getDisplayTitle(candidate)}`,
+        `備選標題：${candidate.backupTitles?.slice(0, 2).join(" / ") || "無"}`,
+        formatTopicReviewCandidateNotes(candidate, focusTrack),
+      ].join("\n"))
+      .join("\n\n");
+  }
+
   function buildArticleTopicCandidateText(mode = currentTopicMode) {
     const candidates = getCurrentTopicCandidates(mode);
     return candidates
@@ -6077,50 +6130,69 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   function buildArticleTopicPrompt(question = "", mode = currentTopicMode) {
     const questionBlock = question.trim() || "（請在此貼上本輪生文前置包）";
     const modeState = getCurrentTopicModeState(mode);
-    const candidateText = buildArticleTopicCandidateText(mode);
-    const mergeTask = getPrimaryMergeTaskRecommendation(mode);
-    const candidateCount = getCurrentTopicCandidates(mode).length;
+    const candidateText = buildTopicReviewCandidateText(mode);
+    const candidateCount = getTopicReviewCandidates(mode, 10).length;
+    const bookProposal = getBookProposal(mode);
 
     return [
       "你是青曦空間設計的內容總編、出版策劃與第一線接案設計師。",
       "現在只做『本題動態決題』，不是直接寫文章。",
-      "你的任務是先理解本輪生文前置包，再從系統提供的出版候選裡，挑出最適合落進書稿的一個題目。",
-      "你不能跳出候選清單自創新的主書系、章節或子章節。",
-      "但你必須讓最後選出的標題，更貼近這次輸入情境，而不是只複誦系統模板。",
+      "網站端只負責把完整出版上下文、既有文章、規則層提名候選與本輪私訊情境整理給你。",
+      "你要親自決定誰正式進入整併池，並在扣掉整併題後，重排剩餘優先文章。",
+      "規則層提名不是最終判決；若你認為它漏抓、誤抓、排序失真，都可以直接推翻。",
+      "你不能跳出候選清單自創新的主書系、章節或子章節，但你可以重排候選、改判工作流，並決定哪些題目應先整併再談新發文。",
       "",
       "決策原則：",
       "1. 先抓這次前置包真正描述的痛點、情境與決策點。",
-      "2. 最終只能從候選清單中擇一落位。",
-      "3. 標題要能回答這次問題，也要能自然收進未來書稿章名。",
-      "4. 若多個候選都可用，優先選最能兼顧真實回覆價值與出版補位效率者。",
-      "5. 除非原始問題明顯不適合，否則不要偏離這次模式的前段候選。",
-      "6. 若本輪前置包屬於老屋主線，只要落位、標題或理由出現「預售屋 / 客變 / 新成屋 / 商空」等互斥詞，整題就視為 Invalid，必須退回老屋主線重新選題。",
-      "7. 標題禁止使用 SEO 問句、全攻略、大公開等農場字眼。",
-      "8. 建議標題請強制寫成「2-4 字子概念：實務操作說明」的書稿體例。",
+      "2. 你必須先判斷哪些候選該進整併池，再決定本輪真正採用的題目。",
+      "3. 若某候選與既有文章核心解法重疊度高，優先轉入 Merge_and_Update，不要硬留在 New_Publish。",
+      "4. 扣掉已進整併池的題目後，請再重排剩餘優先文章，避免把本來該整併的題目繼續列進新文章順位。",
+      "5. 本輪最終仍只能從候選清單中擇一作為實際採用落位。",
+      "6. 標題要能回答這次問題，也要能自然收進未來書稿章名。",
+      "7. 若多個候選都可用，優先選最能兼顧真實回覆價值、出版補位效率與章節平衡者。",
+      "8. 若本輪前置包屬於老屋主線，只要落位、標題或理由出現「預售屋 / 客變 / 新成屋 / 商空」等互斥詞，整題就視為 Invalid，必須退回老屋主線重新選題。",
+      "9. 標題禁止使用 SEO 問句、全攻略、大公開等農場字眼。",
+      "10. 建議標題請強制寫成「2-4 字子概念：實務操作說明」的書稿體例。",
       "",
       `【本次決題模式】${modeState?.label || mode}`,
       modeState?.modeRationale || "目前先沿用既有模式。",
       "",
-      "【需先處理的整併任務】",
-      mergeTask
-        ? `${getDisplayTitle(mergeTask)}｜${getMergeTaskNote(mergeTask)}`
-        : "目前尚無需優先整併的舊文任務，請直接從新文章候選裡選題。",
+      "【本次覆核書名】",
+      bookProposal?.bookTitle || modeState?.publishingDashboard?.focusTrack?.title || "尚未定義",
+      "",
+      "【完整出版上下文】",
+      buildPublishingReviewOutline(mode),
       "",
       "【本輪生文前置包】",
       questionBlock,
       "",
-      `【新文章候選清單】共 ${candidateCount} 個`,
+      `【規則層送審候選】共 ${candidateCount} 個`,
       candidateText || "目前沒有可用候選，請沿用固定出版骨架做最保守的判斷。",
       "",
-      "請固定輸出以下 4 段，不要多寫任何其他內容：",
-      "0. 【決題摘要】",
+      "請固定輸出以下 6 段，不要多寫任何其他內容：",
+      "0. 【決策摘要】",
       "- 只輸出一行，摘要這次為什麼這樣落位。",
       "",
-      "1. 【採用候選】",
-      "- 請固定輸出：候選編號：",
-      "- 請固定輸出：決題模式：",
+      "1. 【整併池判定】",
+      "- 請逐行固定輸出：",
+      "正式入池：",
+      "跳過優先序的文章：",
+      "暫不入池：",
+      "判定理由：",
       "",
-      "2. 【落位決策】",
+      "2. 【剩餘優先文章】",
+      "- 請逐行固定輸出：",
+      "第 1 優先：",
+      "第 2 優先：",
+      "第 3 優先：",
+      "",
+      "3. 【本輪採用題目】",
+      "- 請逐行固定輸出：",
+      "最終動作：",
+      "候選編號：",
+      "決題模式：",
+      "",
+      "4. 【落位決策】",
       "- 請逐行固定輸出：",
       "主書系：",
       "章節：",
@@ -6128,28 +6200,55 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "建議標題：",
       "決策理由：",
       "",
-      "3. 【保留說明】",
+      "5. 【保留說明】",
       "- 請逐行固定輸出：",
       "問題連結：",
       "書稿連結：",
     ].join("\n");
   }
 
+  function splitTopicDecisionList(value = "") {
+    return String(value)
+      .split(/\s*(?:\/|／|、|；|;|\||\n)\s*/)
+      .map((item) => item.replace(/^\d+[.)、]\s*/, "").trim())
+      .filter((item) => item && item !== "無" && item !== "目前無" && item !== "無需跳過");
+  }
+
+  function extractPriorityTitles(section = "") {
+    const lines = normalizeSectionLines(section);
+    return lines
+      .filter((line) => /第\s*\d+\s*優先/i.test(line))
+      .map((line) => line.replace(/^第\s*\d+\s*優先[:：]\s*/i, "").trim())
+      .filter(Boolean);
+  }
+
   function parseArticleTopicDecision(content, mode = currentTopicMode, question = articleSourceQuestion) {
-    const summary = extractSectionText(content, "決題摘要");
-    const picked = extractSectionText(content, "採用候選");
+    const summary = extractSectionText(content, "決策摘要") || extractSectionText(content, "決題摘要");
+    const mergeDecision = extractSectionText(content, "整併池判定");
+    const prioritySection = extractSectionText(content, "剩餘優先文章");
+    const picked = extractSectionText(content, "本輪採用題目") || extractSectionText(content, "採用候選");
     const decision = extractSectionText(content, "落位決策");
     const note = extractSectionText(content, "保留說明");
     const candidateIndex = Number.parseInt(extractFieldValueFromText(picked, ["候選編號"]), 10);
     const modeState = getCurrentTopicModeState(mode);
     const noteLines = normalizeSectionLines(note);
+    const mergePool = splitTopicDecisionList(extractFieldValueFromText(mergeDecision, ["正式入池"]));
+    const skippedTitles = splitTopicDecisionList(extractFieldValueFromText(mergeDecision, ["跳過優先序的文章"]));
+    const deferredMergeTitles = splitTopicDecisionList(extractFieldValueFromText(mergeDecision, ["暫不入池"]));
+    const remainingPriorityArticles = extractPriorityTitles(prioritySection);
 
     const parsed = {
       question,
       mode,
       modeLabel: extractFieldValueFromText(picked, ["決題模式"]) || modeState?.label || mode,
+      finalAction: extractFieldValueFromText(picked, ["最終動作"]) || "New_Publish",
       candidateIndex: Number.isFinite(candidateIndex) ? candidateIndex : 0,
       summary: summary || "已完成本題動態決題。",
+      mergePool,
+      skippedTitles,
+      deferredMergeTitles,
+      mergeReason: extractFieldValueFromText(mergeDecision, ["判定理由"]),
+      remainingPriorityArticles,
       track: extractFieldValueFromText(decision, ["主書系"]),
       chapter: extractFieldValueFromText(decision, ["章節"]),
       subchapter: extractFieldValueFromText(decision, ["子章節"]),
@@ -7039,7 +7138,13 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     }
 
     const modeState = getCurrentTopicModeState(articleTopicDecision.mode);
-    const candidateCount = getCurrentTopicCandidates(articleTopicDecision.mode).length;
+    const candidateCount = getTopicReviewCandidates(articleTopicDecision.mode, 10).length;
+    const mergePoolText = articleTopicDecision.mergePool?.length
+      ? `Gemini Pro 已正式納入整併池：${articleTopicDecision.mergePool.join(" / ")}`
+      : "";
+    const remainingPriorityText = articleTopicDecision.remainingPriorityArticles?.length
+      ? `扣掉整併題後，剩餘優先文章為：${articleTopicDecision.remainingPriorityArticles.slice(0, 3).join(" / ")}`
+      : "";
     shell.hidden = false;
     label.textContent = articleTopicDecision.summary || "已完成本題動態決題";
     mode.textContent = articleTopicDecision.modeLabel || modeState?.label || articleTopicDecision.mode || "尚未決題";
@@ -7049,8 +7154,13 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     title.textContent = articleTopicDecision.title || "尚未決題";
     reason.textContent = articleTopicDecision.reason || articleTopicDecision.questionLink || "已完成動態決題。";
     note.textContent =
-      articleTopicDecision.bookLink ||
-      `這一步會先依本輪生文前置包理解痛點，再從 ${candidateCount || "目前"} 個出版候選裡挑最適合落進書稿的題目。`;
+      [
+        articleTopicDecision.bookLink || "",
+        articleTopicDecision.mergeReason || "",
+        mergePoolText,
+        remainingPriorityText,
+      ].filter(Boolean).join("｜") ||
+      `這一步會先整理書名、章節、既有文章與私訊情境，再交由 Gemini Pro 從 ${candidateCount || "目前"} 個送審候選中決定整併池與本輪採用題目。`;
     renderPublishingReviewBoard();
   }
 
@@ -7233,12 +7343,13 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   }
 
   function getArticleAiTimeoutMs(mode) {
+    if (mode === "topic") return ARTICLE_TOPIC_TIMEOUT_MS;
     return mode === "metadata" ? ARTICLE_AI_METADATA_TIMEOUT_MS : ARTICLE_AI_TIMEOUT_MS;
   }
 
   function buildArticleAiTimeoutMessage(mode) {
     if (mode === "topic") {
-      return "本題動態決題逾時，請再試一次。";
+      return "Gemini Pro 本題動態決題逾時，請再試一次。";
     }
     if (mode === "metadata") {
       return "主書系、章節與標題補齊逾時，已保留目前判題結果。";
@@ -7335,10 +7446,14 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     if (!decision) return "（尚未產生本題動態決題，請先依本輪前置包與固定骨架保守判斷。）";
     return [
       `決題模式：${decision.modeLabel || decision.mode || currentTopicMode}`,
+      `最終動作：${decision.finalAction || "New_Publish"}`,
       `主書系：${decision.track}`,
       `章節：${decision.chapter}`,
       `子章節：${decision.subchapter}`,
       `建議標題：${decision.title}`,
+      `正式入池：${decision.mergePool?.join(" / ") || "目前無"}`,
+      `跳過優先序的文章：${decision.skippedTitles?.join(" / ") || "目前無"}`,
+      `剩餘優先文章：${decision.remainingPriorityArticles?.join(" / ") || "目前無"}`,
       `決題理由：${decision.reason || decision.summary || "已先完成動態決題。"}`,
       `問題連結：${decision.questionLink || "請沿用本輪前置包的核心痛點"}`,
       `書稿連結：${decision.bookLink || "請維持在這個書稿骨架內落位"}`,
@@ -8579,8 +8694,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
         const errorMessage = result?.error === "GEMINI_API_KEY_MISSING"
           ? "尚未設定 GEMINI_API_KEY，暫時無法做本題動態決題。"
           : result?.error === "GEMINI_RATE_LIMITED"
-            ? `Gemini Flash 目前達到額度上限${Number.isFinite(result?.retryAfterSeconds) ? `，約 ${result.retryAfterSeconds} 秒後再試。` : "，請稍後再試。"}`
-            : "Gemini Flash 目前無法完成本題動態決題，請稍後再試。";
+            ? `Gemini Pro 目前達到額度上限${Number.isFinite(result?.retryAfterSeconds) ? `，約 ${result.retryAfterSeconds} 秒後再試。` : "，請稍後再試。"}`
+            : "Gemini Pro 目前無法完成本題動態決題，請稍後再試。";
         setFeedback(errorMessage, "is-warning");
         setArticleAiFeedback(errorMessage, "is-warning");
         return null;
@@ -8594,9 +8709,9 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
         setArticleAiFeedback(timeoutMessage, "is-warning");
         return null;
       }
-      console.error("Gemini Flash 本題動態決題失敗：", error);
-      setFeedback("Gemini Flash 連線失敗，暫時無法完成本題動態決題。", "is-warning");
-      setArticleAiFeedback("Gemini Flash 連線失敗，暫時無法完成本題動態決題。", "is-warning");
+      console.error("Gemini Pro 本題動態決題失敗：", error);
+      setFeedback("Gemini Pro 連線失敗，暫時無法完成本題動態決題。", "is-warning");
+      setArticleAiFeedback("Gemini Pro 連線失敗，暫時無法完成本題動態決題。", "is-warning");
       return null;
     }
   }
@@ -8610,7 +8725,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       return articleTopicDecision;
     }
 
-    setArticleAiFeedback("第 1 步進行中：正在依高頻區前置包做本題動態決題...", "is-success");
+    setArticleAiFeedback("第 1 步進行中：正在整理完整出版上下文並送交 Gemini Pro 做本題動態決題...", "is-success");
     const content = await requestArticleTopicDecision(mode);
     if (!content) return null;
 
@@ -8626,7 +8741,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     setArticleAiFeedback(
       parsed.invalid
         ? "偵測到跨書系污染，已自動回退到老屋主線的安全題目，正在接續整理 AI 結果..."
-        : "本題動態決題已完成，正在接續整理 AI 結果...",
+        : "Gemini Pro 已完成整併池與採用題目判定，正在接續整理 AI 結果...",
       parsed.invalid ? "is-warning" : "is-success",
     );
     return articleTopicDecision;
