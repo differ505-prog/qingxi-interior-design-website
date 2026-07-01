@@ -4427,13 +4427,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       },
       {
         label: "實務案例",
-        helper: "案例、QA 與專案演練",
+        helper: "案例、QA、工序協調與專案演練",
         completed: titlePoolItems.filter((item) => ["case", "qa", "project"].includes(item.nodeKind) && item.status === "published").length,
         total: titlePoolItems.filter((item) => ["case", "qa", "project"].includes(item.nodeKind)).length,
       },
       {
         label: "圖表配件",
-        helper: "附錄表單與掛載資產",
+        helper: "Check-list、試算表、規格表與互動工具",
         completed: titlePoolItems.filter((item) => item.nodeKind === "form" && item.status === "published").length,
         total: titlePoolItems.filter((item) => item.nodeKind === "form").length,
       },
@@ -4476,7 +4476,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         <div class="bookshelf-review-progress-bar">
           <i style="width: ${Math.max(practicalRate, practicalCompleted > 0 ? 12 : 0)}%"></i>
         </div>
-        <small>案例、QA、表單與專案節點的補位進度</small>
+        <small>內容配比視角：理論 / 表單工具 / 案例演練的補位進度</small>
       </article>
       <article class="bookshelf-review-progress-card bookshelf-review-progress-card-dimension ${estimatedCompletedWords >= estimatedTotalWords && estimatedTotalWords > 0 ? "is-complete" : ""}">
         <div class="bookshelf-review-progress-head">
@@ -4531,6 +4531,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     if (confidence === "high") return "高信心";
     if (confidence === "low") return "低信心";
     return "中信心";
+  }
+
+  function getWorkflowActionLabel(action = "") {
+    if (action === "Merge_and_Update") return "整併升級";
+    if (action === "Revise_Angle") return "改切角";
+    if (action === "New_Publish") return "新發佈";
+    return "待判定";
   }
 
   function getTitlePoolReviewKey(item) {
@@ -4828,7 +4835,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function getRecommendationBlockerMessage(recommendation) {
     if (!recommendation || recommendation.collisionRisk !== "high") return "";
     const similarTitles = recommendation.similarArticles?.slice(0, 2).map((article) => `${article.title}（${article.score}）`).join(" / ");
-    return `Blocker：此題為高撞題候選，請先比對 ${similarTitles || "相似舊文"}，並改走「確認整併」或「另建新切角」，暫不建議直接推進。`;
+    return `Blocker：此題為高撞題候選，已鎖定 New_Publish；請先比對 ${similarTitles || "相似舊文"}，並改走「Merge_and_Update」或「更改切角」。`;
   }
 
   function sanitizeArticleConfirmData(data, sourceText = "", mode = currentTopicMode) {
@@ -4894,6 +4901,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
           `  主標題：${item.primaryTitle}`,
           `  備選標題：${item.backupTitles.join(" / ") || "無"}`,
           `  狀態：${getTitlePoolStatusLabel(item.status, item.statusTag)}｜${getTitlePoolConfidenceLabel(item.confidence)}${item.isRecommended ? "｜最推薦" : ""}`,
+          `  工作流：${item.workflowAction}｜${getWorkflowActionLabel(item.workflowAction)}`,
           `  人工覆核：${getManualReviewLabel(manualReview)}`,
           `${item.assetSlotLabel ? `  資產掛載：${item.assetSlotLabel}` : "  資產掛載：無"}`,
           `  備註：${item.note}`,
@@ -4922,7 +4930,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               <div class="bookshelf-review-title-pool-copy">
                 <div class="bookshelf-review-title-pool-meta">
                   <span>${escapeHtml(item.subchapter)}</span>
-                  <em>${escapeHtml(getTitlePoolStatusLabel(item.status, item.statusTag))}｜${escapeHtml(getTitlePoolConfidenceLabel(item.confidence))}${item.isRecommended ? "｜最推薦" : ""}</em>
+                  <em>${escapeHtml(getTitlePoolStatusLabel(item.status, item.statusTag))}｜${escapeHtml(getTitlePoolConfidenceLabel(item.confidence))}${item.isRecommended ? "｜最推薦" : ""}｜${escapeHtml(getWorkflowActionLabel(item.workflowAction))}</em>
                 </div>
                 <strong>${escapeHtml(item.primaryTitle)}</strong>
                 <small>${escapeHtml(item.note)}</small>
@@ -5166,11 +5174,14 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "- 請指出哪些章節仍明顯過薄，哪些題目應延後，哪些缺口最值得優先補。",
       "- 請一併檢查『完整未來出版標題池』是否有缺章、冗題、撞題或標題體例不穩的問題。",
       "- 每一大章至少要有一個實務節點；若某章只有 [待補_正規]、沒有 [待補_案例] / [待補_QA] / [待補_表單]，請直接判定為體量不足。",
+      "- 每一大章至少要有 1 篇觀念建立、1 篇表單／工具、以及 1 篇工序／發包／介面協調的硬知識；若只有 QA 與案例，仍判定為出版體量不足。",
       "",
       "C. 下一篇是否真的是最佳選擇",
       `- 目前最推薦下一篇標題為：${getDisplayTitle(recommendation)}`,
       "- 網站文章標題與書籍標題視為同一套，不做雙標題分流。",
       "- 請判斷這一篇是否真的應該先發；若不是，請給出更好的優先順序與原因。",
+      "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
+      "- 若前段章節仍為 0% 或基礎明顯不足，不可優先推薦後段章節的細部表單與配件節點，書稿推進必須符合裝修工程時間軸。",
       "- 若候選標題、章節或補位理由出現「預售屋 / 客變 / 新成屋 / 商空」等非老屋詞彙，直接判 Invalid，不得納入本書。",
       "",
       "D. 書名、章節、文章標題的微調建議",
@@ -5195,7 +5206,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "- 只提供『IDE 給高階 LLM 的母提示詞』該怎麼改的建議，不要重寫整份母提示詞全文。",
       "- 重點放在規則缺漏、排序衝突、判斷條件不夠硬或輸出格式不夠穩。",
       "- 請特別檢查撞題語意判定、書籍標題體例、章節平衡硬限制是否夠強。",
-      "- 請加入實體出版體量檢核、書名與章節邏輯綁定、跨書系絕對隔離三項硬規則。",
+      "- 請加入實體出版體量檢核、書名與章節邏輯綁定、前後章節時間軸綁定、跨書系絕對隔離四項硬規則。",
       "",
       "H. 給 IDE 的修改提示詞 3：網站結構設計的優化建議",
       "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
@@ -6434,14 +6445,14 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   </li>
                 `).join("")}
               </ul>
-            ` : '<p class="bookshelf-confirm-note">尚未掛載資產，可拖入 Spreadsheet 或 PDF。</p>'}
+            ` : '<p class="bookshelf-confirm-note">尚未掛載資產，可拖入 Spreadsheet、PDF，或後續串接互動工具下載點。</p>'}
           </article>
         `;
       }).join("")
       : '<p class="bookshelf-confirm-note">目前尚無可掛載的附錄節點。</p>';
     note.textContent = totalAssets
-      ? `目前已掛載 ${totalAssets} 份資產；出版視角會同步顯示附錄節點與資產數量。`
-      : "目前尚未掛載附錄資產；可先把表單、規格表與整理專案掛進對應節點。";
+      ? `目前已掛載 ${totalAssets} 份資產；出版視角會同步顯示文章、章節總覽與附錄掛載數量。`
+      : "目前尚未掛載附錄資產；可先把表單、規格表、Excel 或 PDF 掛進對應節點。";
   }
 
   function attachAssetsToSelectedSlot(fileList) {

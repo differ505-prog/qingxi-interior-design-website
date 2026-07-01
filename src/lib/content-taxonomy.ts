@@ -101,6 +101,7 @@ export interface PublicationTitlePoolItem {
   note: string;
   nodeKind: PublicationNodeKind;
   statusTag: string;
+  workflowAction: "New_Publish" | "Merge_and_Update" | "Revise_Angle";
   assetSlotLabel?: string;
 }
 
@@ -136,6 +137,7 @@ export interface NextTopicRecommendation {
   collisionRisk: "low" | "medium" | "high";
   collisionReason: string;
   actionHint: string;
+  workflowAction: "New_Publish" | "Merge_and_Update" | "Revise_Angle";
   flashPrompt: string;
 }
 
@@ -250,13 +252,13 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "迷思破解",
             keywords: ["初勘", "屋況判讀", "漏看", "風險訊號", "常見迷思", "判斷失準"],
             nodeKind: "qa",
-            titleOverride: "迷思破解：屋況初勘最容易漏看的風險訊號",
+            titleOverride: "屋況初勘：你最容易漏看的 5 個風險訊號",
           },
           {
             title: "實戰表單",
             keywords: ["checklist", "表單", "健檢", "初勘", "清單", "附錄"],
             nodeKind: "form",
-            titleOverride: "實戰表單：老屋初勘健檢 Check-list",
+            titleOverride: "初勘健檢：老屋第一輪現場檢查清單",
             assetSlotLabel: "老屋初勘健檢 Check-list",
           },
         ],
@@ -293,14 +295,27 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "迷思破解",
             keywords: ["低總價", "省錢", "漏項", "報價迷思", "常見迷思"],
             nodeKind: "qa",
-            titleOverride: "迷思破解：低總價不等於省錢的報價漏項判讀",
+            titleOverride: "低總價陷阱：看似省錢其實最容易漏項的報價判讀",
           },
           {
             title: "實戰表單",
             keywords: ["預算表", "比例試算", "試算表", "表單", "分配比例"],
             nodeKind: "form",
-            titleOverride: "實戰表單：全室預算分配比例試算表",
+            titleOverride: "預算分配：全室比例試算與付款節奏表",
             assetSlotLabel: "全室預算分配比例試算表",
+          },
+          {
+            title: "發包合約",
+            keywords: ["發包", "工班", "合約", "責任界線", "付款條款", "報價比較"],
+            nodeKind: "core",
+            titleOverride: "發包合約：工班比價、責任界線與付款條款",
+          },
+          {
+            title: "合約檢核",
+            keywords: ["合約", "檢核", "工班比價", "付款節點", "責任範圍", "表單"],
+            nodeKind: "form",
+            titleOverride: "合約檢核：工班報價比較與責任條款確認表",
+            assetSlotLabel: "工班報價比較與責任條款確認表",
           },
         ],
       },
@@ -330,7 +345,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "迷思破解",
             keywords: ["qa", "迷思", "管線一定要全換", "預算黑洞", "常見問題"],
             nodeKind: "qa",
-            titleOverride: "迷思破解：管線全換的必要性與預算黑洞",
+            titleOverride: "管線重做：哪些必須全換，哪些其實該先判讀",
           },
           {
             title: "案例解析",
@@ -342,8 +357,15 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "實戰表單",
             keywords: ["進場前", "泥作", "水電", "檢核表", "進場檢查", "表單"],
             nodeKind: "form",
-            titleOverride: "實戰表單：泥作水電進場前檢核表",
+            titleOverride: "進場前檢核：泥作、水電與保護工程確認表",
             assetSlotLabel: "泥作水電進場前檢核表",
+          },
+          {
+            title: "工序銜接",
+            keywords: ["工序", "銜接", "介面", "交接", "進場順序", "表單"],
+            nodeKind: "project",
+            titleOverride: "工序銜接：泥作、水電、防水與木作的進場交接表",
+            assetSlotLabel: "工序銜接表與介面交接清單",
           },
         ],
       },
@@ -373,27 +395,34 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "實戰表單",
             keywords: ["系統櫃", "配件", "清單", "規格確認", "表單"],
             nodeKind: "form",
-            titleOverride: "實戰表單：系統櫃配件清單與規格確認表",
+            titleOverride: "配件規格：系統櫃五金、抽屜與收納模組對照表",
             assetSlotLabel: "系統櫃配件清單與規格確認表",
           },
           {
             title: "整理計畫",
             keywords: ["整理", "收納整理", "組織", "專案", "演練"],
             nodeKind: "project",
-            titleOverride: "整理計畫：全室收納與組織的實際演練",
+            titleOverride: "收納組織：全室物品分區、回位與補貨演練",
             assetSlotLabel: "全室收納與組織的實際演練",
           },
           {
             title: "案例解析",
             keywords: ["格局重整", "採光回正", "動線回正", "收納改善", "案例解析"],
             nodeKind: "case",
-            titleOverride: "改造案例：格局重整後的採光、收納與動線回正紀錄",
+            titleOverride: "採光回正：格局重整後的收納與動線修正紀錄",
           },
           {
             title: "迷思破解",
             keywords: ["收納做滿", "櫃體深度", "動線取捨", "常見迷思", "機能過量"],
             nodeKind: "qa",
-            titleOverride: "迷思破解：收納做滿不等於好住的櫃體與動線取捨",
+            titleOverride: "櫃體動線：收納做滿不等於好住的取捨邏輯",
+          },
+          {
+            title: "配件檢核",
+            keywords: ["收納組織", "配件規格", "五金", "盒件", "分隔", "檢核"],
+            nodeKind: "form",
+            titleOverride: "配件檢核：收納組織與櫃體配件規格總表",
+            assetSlotLabel: "收納組織與櫃體配件規格總表",
           },
         ],
       },
@@ -429,7 +458,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "迷思破解",
             keywords: ["保固不是萬靈丹", "點交責任", "責任邊界", "常見迷思", "完工迷思"],
             nodeKind: "qa",
-            titleOverride: "迷思破解：保固不是萬靈丹的點交責任邊界",
+            titleOverride: "點交責任：保固不是萬靈丹的邊界與證據留存",
           },
         ],
       },
@@ -724,6 +753,9 @@ export function buildBookTopicTitle(trackTitle = "", chapterTitle = "", subchapt
 }
 
 function buildTitleBackups(trackTitle = "", chapterTitle = "", subchapterTitle = "", bookTitle = "") {
+  if (trackTitle === publishingFocusTrackTitle) {
+    return [];
+  }
   const root = resolveTrackRootLabel(trackTitle);
   const base = bookTitle || buildBookTopicTitle(trackTitle, chapterTitle, subchapterTitle);
   return Array.from(new Set([
@@ -797,13 +829,17 @@ function getOldHouseRecommendationPriorityBoost(
     "完工避雷": 16,
   };
   const chapterSubchapterBoostMap: Record<string, number> = {
+    "預算拆解::發包合約": 126,
+    "預算拆解::合約檢核": 98,
     "空間重整::收納補強": 150,
     "空間重整::實戰表單": 132,
+    "空間重整::配件檢核": 124,
     "空間重整::整理計畫": 110,
     "空間重整::案例解析": 82,
     "空間重整::迷思破解": 54,
     "預算拆解::追加風險": 118,
     "基礎工程::實戰表單": 48,
+    "基礎工程::工序銜接": 116,
     "預算拆解::報價拆讀": -160,
   };
   const nodeKindBoostMap: Record<PublicationNodeKind, number> = {
@@ -818,6 +854,30 @@ function getOldHouseRecommendationPriorityBoost(
     (chapterSubchapterBoostMap[`${chapterTitle}::${subchapterTitle}`] || 0) +
     (nodeKindBoostMap[nodeKind] || 0)
   );
+}
+
+function getOldHouseTimelinePenalty(
+  trackTitle: string,
+  chapterTitle: string,
+  nodeKind: PublicationNodeKind,
+  trackEntries: BookshelfEntry[],
+) {
+  if (trackTitle !== publishingFocusTrackTitle) return 0;
+  const chapterIndex = publicationChapterOrder.indexOf(chapterTitle as typeof publicationChapterOrder[number]);
+  const diagnosisCount = trackEntries.filter((entry) => entry.chapter === "現況判讀").length;
+  const budgetCount = trackEntries.filter((entry) => entry.chapter === "預算拆解").length;
+  const foundationCount = trackEntries.filter((entry) => ["現況判讀", "預算拆解"].includes(entry.chapter)).length;
+  let penalty = 0;
+  if (diagnosisCount === 0 && chapterIndex >= 3 && (nodeKind === "form" || nodeKind === "project")) {
+    penalty += 260;
+  }
+  if (foundationCount <= 1 && chapterTitle === "空間重整" && nodeKind === "form") {
+    penalty += 140;
+  }
+  if (budgetCount === 0 && chapterTitle === "基礎工程" && nodeKind === "project") {
+    penalty += 90;
+  }
+  return penalty;
 }
 
 function isMicroCoverageTitle(title = "") {
@@ -901,6 +961,11 @@ function buildTitlePoolItem(
       : hasPublishedEntry
         ? "medium"
         : "medium";
+  const workflowAction: PublicationTitlePoolItem["workflowAction"] = mergeNeeded || collisionMergeNeeded
+    ? "Merge_and_Update"
+    : topSemanticScore > 35
+      ? "Revise_Angle"
+      : "New_Publish";
   const statusTag = mergeNeeded
     ? "整併執行中"
     : collisionMergeNeeded
@@ -940,6 +1005,7 @@ function buildTitlePoolItem(
     note,
     nodeKind,
     statusTag,
+    workflowAction,
     assetSlotLabel: subchapterPlan?.assetSlotLabel,
   } satisfies PublicationTitlePoolItem;
 }
@@ -1430,12 +1496,17 @@ function buildRecommendationFromCandidate(
         ? "同章已有相近解法，需強化差異與補位角度。"
         : "目前未發現明顯語意撞題，可優先補齊此缺口。";
   const actionHint = mergeTriggered
-    ? "應合併舊文"
+    ? "Merge_and_Update｜先整併舊文"
     : collisionRisk === "high"
-      ? "需整併舊文"
+      ? "Merge_and_Update｜先整併舊文"
       : collisionRisk === "medium"
-        ? "需拉開差異"
-        : "可直接推進";
+        ? "Revise_Angle｜需拉開差異"
+        : "New_Publish｜可直接推進";
+  const workflowAction: NextTopicRecommendation["workflowAction"] = mergeTriggered || topSemanticScore > 50
+    ? "Merge_and_Update"
+    : collisionRisk === "medium"
+      ? "Revise_Angle"
+      : "New_Publish";
   const recommendationBase = {
     mode,
     focusTrackTitle,
@@ -1458,6 +1529,7 @@ function buildRecommendationFromCandidate(
     collisionRisk,
     collisionReason,
     actionHint,
+    workflowAction,
   };
 
   return {
@@ -1611,6 +1683,7 @@ function buildRecommendationCandidates(
         const oldHousePriorityBoost = track.title === publishingFocusTrackTitle
           ? getOldHouseRecommendationPriorityBoost(chapter.title, subchapter.title, nodeKind)
           : 0;
+        const timelinePenalty = getOldHouseTimelinePenalty(track.title, chapter.title, nodeKind, trackEntries);
         const score =
           focusBoost +
           emptyChapterBoost +
@@ -1622,6 +1695,7 @@ function buildRecommendationCandidates(
           oldHousePriorityBoost +
           macroPriorityBoost -
           recentPenalty -
+          timelinePenalty -
           chapterSaturationPenalty -
           collisionPenalty;
         return {
