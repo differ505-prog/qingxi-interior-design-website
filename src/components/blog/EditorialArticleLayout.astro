@@ -18,6 +18,7 @@ interface Props {
   backHref?: string;
   backLabel?: string;
   htmlContent?: string;
+  editorialRefreshStamp?: string;
 }
 
 const {
@@ -37,7 +38,12 @@ const {
   backHref = "/blog",
   backLabel = "← 返回知識分享",
   htmlContent,
+  editorialRefreshStamp,
 } = Astro.props;
+
+const articleShellClass = editorialRefreshStamp
+  ? "article-shell article-shell-refined"
+  : "article-shell";
 ---
 
 <style>
@@ -51,6 +57,23 @@ const {
     max-width: 860px;
     margin: 0 auto 3.1rem;
     text-align: center;
+  }
+
+  .article-shell-refined .article-header {
+    position: relative;
+  }
+
+  .article-shell-refined .article-header::after {
+    content: "";
+    position: absolute;
+    top: 0.45rem;
+    right: 0.25rem;
+    width: 5px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(51, 46, 41, 0.14);
+    box-shadow: 0 0 0 3px rgba(255, 252, 248, 0.72);
+    pointer-events: none;
   }
 
   .article-kicker {
@@ -455,6 +478,74 @@ const {
     margin-bottom: 0;
   }
 
+  .article-content :global(.article-reference-table-wrap) {
+    margin: 2.2rem 0 2.55rem;
+    border-radius: 24px;
+    border: 1px solid rgba(164, 171, 160, 0.2);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.95),
+      rgba(247, 244, 238, 0.94)
+    );
+    box-shadow: 0 18px 40px rgba(58, 52, 46, 0.06);
+    overflow: hidden;
+  }
+
+  .article-content :global(.article-reference-table-scroll) {
+    overflow-x: auto;
+  }
+
+  .article-content :global(.article-reference-table) {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+    font-size: 0.94rem;
+    line-height: 1.72;
+  }
+
+  .article-content :global(.article-reference-table thead) {
+    background: rgba(244, 240, 234, 0.88);
+  }
+
+  .article-content :global(.article-reference-table th) {
+    padding: 1rem 1rem 0.95rem;
+    text-align: left;
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6f685f;
+    border-bottom: 1px solid rgba(164, 171, 160, 0.2);
+  }
+
+  .article-content :global(.article-reference-table td) {
+    padding: 1rem;
+    vertical-align: top;
+    color: #4a433d;
+    border-bottom: 1px solid rgba(164, 171, 160, 0.14);
+  }
+
+  .article-content :global(.article-reference-table tbody tr:last-child td) {
+    border-bottom: 0;
+  }
+
+  .article-content :global(.article-reference-table td:first-child) {
+    font-weight: 600;
+    color: #352f2a;
+    white-space: nowrap;
+  }
+
+  .article-content :global(.article-reference-table-note) {
+    margin: 0;
+    padding: 0.95rem 1rem 1rem;
+    border-top: 1px solid rgba(164, 171, 160, 0.14);
+    font-family: var(--font-sans);
+    font-size: 0.86rem;
+    line-height: 1.68;
+    color: #7c746c;
+    background: rgba(255, 255, 255, 0.55);
+  }
+
   .back-link {
     display: inline-block;
     margin-top: 4rem;
@@ -557,7 +648,10 @@ const {
   modifiedTime={modifiedTime}
   structuredData={structuredData}
 >
-  <article class="article-shell">
+  <article
+    class={articleShellClass}
+    data-qingxi-refresh={editorialRefreshStamp}
+  >
     <header class="article-header">
       <p class="article-kicker">{kicker}</p>
       <div class="article-meta">

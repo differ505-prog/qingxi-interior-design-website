@@ -309,6 +309,20 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
     isolation: isolate;
   }
 
+  .post-card[data-qingxi-refresh] .post-image::before {
+    content: "";
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+    z-index: 2;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 252, 248, 0.44);
+    box-shadow: 0 0 0 3px rgba(34, 34, 34, 0.08);
+    pointer-events: none;
+  }
+
   .post-image::after {
     content: "";
     position: absolute;
@@ -603,6 +617,7 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
                   href={`/blog/${post.slug}`}
                   class="post-card"
                   data-post-track={post.track}
+                  data-qingxi-refresh={post.editorialRefreshStamp}
                 >
                   <div class="post-image">
                     <img src={post.coverImage} alt={post.title} />

@@ -43,6 +43,7 @@ const articleStructuredData = [
   chapter={articleMeta.chapter}
   siteCategory={articleMeta.siteCategory}
   tags={articleMeta.tags}
+  editorialRefreshStamp={articleMeta.editorialRefreshStamp}
 >
   <p class="article-lead">
     面對老屋翻新，多數屋主最先浮現的疑問往往不是風格，而是範圍與預算。真正成熟的判斷，從來不只看表面有沒有老舊，而是先看空間最核心的基礎系統，是否還能安全承接未來十年到二十年的生活。
@@ -151,48 +152,63 @@ const articleStructuredData = [
     水電更新絕非只是「換新電線」，而是建立符合現代生活的迴路邏輯。高功率設備不應與其他插座共用迴路，而應依設備條件、電壓需求與使用情境分別規劃。以下是老屋翻新時較常見的基礎配置基準：
   </p>
 
-  <table>
-    <thead>
-      <tr>
-        <th>設備項目</th>
-        <th>電壓需求</th>
-        <th>建議線徑規格</th>
-        <th>迴路配置重點</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>IH 爐</td>
-        <td>220V</td>
-        <td>5.5mm²</td>
-        <td>瞬間功率高，建議獨立專用迴路與 30A 無熔絲開關。</td>
-      </tr>
-      <tr>
-        <td>洗碗機</td>
-        <td>110V / 220V</td>
-        <td>2.0mm² 或 5.5mm²</td>
-        <td>依機型而定，建議設獨立迴路，並同步評估漏電斷路器配置。</td>
-      </tr>
-      <tr>
-        <td>蒸烤爐 / 烤箱</td>
-        <td>110V / 220V</td>
-        <td>5.5mm²</td>
-        <td>加熱設備耗電量大，不宜與微波爐或電鍋共用同一迴路。</td>
-      </tr>
-      <tr>
-        <td>浴室暖風機</td>
-        <td>110V / 220V</td>
-        <td>2.0mm² 或 5.5mm²</td>
-        <td>建議具備獨立迴路與漏電斷路器，不應與一般照明直接串連。</td>
-      </tr>
-      <tr>
-        <td>空調設備</td>
-        <td>220V</td>
-        <td>5.5mm²</td>
-        <td>每台室外機宜有獨立迴路，降低啟動電流對全屋電力的干擾。</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="article-insight-panel article-insight-panel-secondary">
+    <p class="article-insight-label">配置基準</p>
+    <h3 class="article-insight-title">以下不是保證報價或單一法規答案，而是老屋翻新時用來建立尺度感的保守配置原則。</h3>
+    <p>
+      實際仍要依設備額定功率、110V / 220V 條件、迴路分配與屋內總電量回推。若設備型號尚未定案，也應先預留專用迴路與管徑彈性，避免完工後再拆改。
+    </p>
+  </div>
+
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <thead>
+          <tr>
+            <th>設備項目</th>
+            <th>電壓需求</th>
+            <th>建議線徑規格</th>
+            <th>迴路配置重點</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>IH 爐</td>
+            <td>220V</td>
+            <td>5.5mm²</td>
+            <td>瞬間功率高，建議獨立專用迴路，並搭配 30A 無熔絲開關，避免與烤箱共用。</td>
+          </tr>
+          <tr>
+            <td>洗碗機</td>
+            <td>110V / 220V</td>
+            <td>2.0mm² 或 5.5mm²</td>
+            <td>依機型回推，但原則上不與廚房檯面插座混接，並同步評估漏電斷路器配置。</td>
+          </tr>
+          <tr>
+            <td>蒸烤爐 / 烤箱</td>
+            <td>110V / 220V</td>
+            <td>5.5mm²</td>
+            <td>加熱設備耗電量大，不宜與微波爐或電鍋共用同一迴路，嵌入式設備也要預留散熱。</td>
+          </tr>
+          <tr>
+            <td>浴室暖風機</td>
+            <td>110V / 220V</td>
+            <td>2.0mm² 或 5.5mm²</td>
+            <td>建議具備獨立迴路與漏電斷路器，不應與一般照明直接串連，插座位置也須避開噴濺區。</td>
+          </tr>
+          <tr>
+            <td>空調設備</td>
+            <td>220V</td>
+            <td>5.5mm²</td>
+            <td>每台室外機宜有獨立迴路，降低啟動電流對全屋電力的干擾，多聯機則須先回推總功率。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="article-reference-table-note">
+      基礎原則：先決定設備，再回推電壓、線徑與專用迴路；不要等木作、廚具與衛浴定位完才發現配電邏輯跟不上。
+    </p>
+  </div>
 
   <p>
     這些數字不是把所有住宅都寫成同一套固定公式，而是幫助屋主建立尺度感：哪些設備必須被當成獨立負載看待，哪些地方不能再沿用「反正先共用」的舊思維。

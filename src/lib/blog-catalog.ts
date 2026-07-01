@@ -20,6 +20,7 @@ export interface BlogCatalogPost {
   subchapter?: string;
   tags: string[];
   coverImage: string;
+  editorialRefreshStamp?: string;
 }
 
 export const DEFAULT_BLOG_COVER_IMAGE =
@@ -27,11 +28,11 @@ export const DEFAULT_BLOG_COVER_IMAGE =
 
 export const staticBlogPosts: BlogCatalogPost[] = [
   {
-    title: "老屋翻新｜水電翻新注意事項：現代用電迴路重整、規格標準與安全防護圖解",
+    title: "水電更新：老屋基礎工程的迴路重整與用電安全",
     slug: "old-house-rewiring-and-electrical-safety",
     date: "2026-07-02",
     summary:
-      "老屋翻新真正不能妥協的，往往不是表面材質，而是牆內的水電系統是否還能安全承接現代生活。本文從總電量升級、專用迴路、線徑配置到漏電保護與弱電佈局，整理老屋水電翻新的核心判斷基準。",
+      "面對老屋翻新，判斷翻新範圍最關鍵的指標往往是看不見的水電管線。隨著生活型態改變與高功率家電普及，20 年前的電路早已無法負荷現今的用電需求。本文拆解水電更新與迴路重整的必要性，帶您看懂隱蔽工程為何是居住安全的基石。",
     siteCategory: "老屋翻新",
     category: "老屋翻新",
     track: "老屋翻新系",
@@ -39,6 +40,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     subchapter: "水電更新",
     tags: ["老屋翻新", "水電翻新", "迴路重整", "專用迴路", "漏電斷路器", "用電安全"],
     coverImage: "/images/blog/old-house-rewiring-and-electrical-safety-cover.png",
+    editorialRefreshStamp: "2026-07-02",
   },
   {
     slug: "old-house-renovation-scope-guide",

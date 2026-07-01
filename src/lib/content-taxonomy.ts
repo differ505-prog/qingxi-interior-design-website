@@ -351,7 +351,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "水電更新",
             keywords: ["水電", "配線", "配管", "電路", "管線"],
             nodeKind: "core",
-            titleOverride: "老屋翻新｜水電翻新注意事項：現代用電迴路重整、規格標準與安全防護圖解",
+            titleOverride: "水電更新：老屋基礎工程的迴路重整與用電安全",
           },
           {
             title: "防水地坪",
