@@ -218,8 +218,10 @@ const initialRankedCandidates = (() => {
     "現況判讀::翻新起手式": 0,
     "現況判讀::實戰表單": 1,
     "現況判讀::專案節點": 2,
-    "預算拆解::發包合約": 3,
-    "預算拆解::報價拆讀": 4,
+    "現況判讀::案例解析": 3,
+    "現況判讀::迷思破解": 4,
+    "預算拆解::發包合約": 5,
+    "預算拆解::報價拆讀": 6,
   };
   const rankCandidate = (candidate: any, index: number) => {
     const riskRank = candidate?.collisionRisk === "low"
@@ -252,6 +254,9 @@ const initialMergeRule = initialMergeTask
 const initialTopPriorityRecommendations = initialRankedCandidates
   .filter((candidate) => candidate?.workflowAction === "New_Publish")
   .slice(0, 3);
+const initialCrossTrackSyncNote = initialMergeTask
+  ? "注意：本題主要解法已分配至 [Merge_and_Update] 軌道處理。當前推薦的新文章僅作為配套工具發布。"
+  : "";
 const initialDisplayRecommendation = initialTopPriorityRecommendations[0] || initialRecommendation;
 const initialRecommendationTitle = initialDisplayRecommendation?.primaryTitle || initialDisplayRecommendation?.webTitle || initialDisplayRecommendation?.bookTitle || "收納補強：老屋機能配置與櫃體整合策略";
 const initialRecommendationMeta = initialDisplayRecommendation
@@ -1004,6 +1009,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 </p>
               </article>
               <article class="bookshelf-review-next">
+                <p id="publishing-review-cross-track-note" class={`bookshelf-review-sync-banner ${initialCrossTrackSyncNote ? "is-visible" : ""}`}>
+                  {initialCrossTrackSyncNote}
+                </p>
                 <div class="bookshelf-review-next-head">
                   <span>下一篇最優先新文章（規則初排）</span>
                   <strong id="publishing-review-next-title">{initialRecommendationTitle}</strong>
@@ -4734,8 +4742,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "現況判讀::翻新起手式": 0,
       "現況判讀::實戰表單": 1,
       "現況判讀::專案節點": 2,
-      "預算拆解::發包合約": 3,
-      "預算拆解::報價拆讀": 4,
+      "現況判讀::案例解析": 3,
+      "現況判讀::迷思破解": 4,
+      "預算拆解::發包合約": 5,
+      "預算拆解::報價拆讀": 6,
     };
     const rankCandidate = (candidate, index) => {
       const riskRank = candidate?.collisionRisk === "low"
@@ -4754,7 +4764,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       const mergeIntentOverride = articleSourceQuestion.trim() && candidate?.workflowAction === "Merge_and_Update" && semanticScore >= 0.5
         ? -5000 - Math.round(semanticScore * 100)
         : 0;
-      const dependencyPenalty = isDependencyLocked(focusTrack, candidate?.chapter, candidate?.subchapter) ? 1500 : 0;
+      const dependencyPenalty = getDependencyLockState(focusTrack, candidate?.chapter, candidate?.subchapter).locked ? 40 : 0;
       const riskPenalty = candidate?.workflowAction === "Merge_and_Update" && explicitRank < 10 ? 0 : riskRank * 1000;
       return mergeIntentOverride + riskPenalty + dependencyPenalty + explicitRank * 100 + chapterRank * 10 + index;
     };
@@ -4800,6 +4810,12 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     return similarTitles
       ? `先檢查並整併相近舊文：${similarTitles}`
       : "此題與既有文章核心解法靠近，建議先出整併升級稿，不要直接另開新文。";
+  }
+
+  function getCrossTrackSyncMessage(mode = currentTopicMode) {
+    const mergeTask = getPrimaryMergeTaskRecommendation(mode);
+    if (!mergeTask) return "";
+    return "注意：本題主要解法已分配至 [Merge_and_Update] 軌道處理。當前推薦的新文章僅作為配套工具發布。";
   }
 
   function getPublicationBaselinePlan(mode = currentTopicMode, articleLimit = 3) {
@@ -4931,7 +4947,12 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         <strong>${escapeHtml(getDisplayTitle(candidate))}</strong>
         <div class="bookshelf-review-top3-meta">
           <span class="bookshelf-review-semantic-badge is-${getSemanticMatchBadgeData(candidate).state}">${escapeHtml(getSemanticMatchBadgeData(candidate).label)}</span>
-          ${isDependencyLocked(focusTrack, candidate.chapter, candidate.subchapter) ? '<span class="bookshelf-dependency-lock" title="需先完成前置觀念文章" aria-label="需先完成前置觀念文章">&#128274; 前置觀念未完成</span>' : ""}
+          ${(() => {
+            const lockState = getDependencyLockState(focusTrack, candidate.chapter, candidate.subchapter);
+            return lockState.locked
+              ? `<span class="bookshelf-dependency-lock" title="${escapeHtml(lockState.message)}" aria-label="${escapeHtml(lockState.message)}">&#128274; ${escapeHtml(lockState.shortLabel || "依賴鎖定")}</span>`
+              : "";
+          })()}
         </div>
         <p>${escapeHtml(candidate.reason)}</p>
       </article>
@@ -5039,19 +5060,53 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     };
   }
 
-  function isDependencyLocked(focusTrack, chapterTitle = "", subchapterTitle = "") {
-    if (!focusTrack?.chapterGaps?.length) return false;
+  function getDependencyLockState(focusTrack, chapterTitle = "", subchapterTitle = "") {
+    if (!focusTrack?.chapterGaps?.length) {
+      return { locked: false, message: "", shortLabel: "" };
+    }
     const chapterGap = focusTrack.chapterGaps.find((gap) => gap.chapter === chapterTitle);
     const titlePoolItem = chapterGap?.titlePool?.find((item) => item.subchapter === subchapterTitle) || null;
-    if (titlePoolItem?.nodeKind !== "form") return false;
-    const hasTheoryPublished = Boolean(
-      chapterGap?.titlePool?.some((item) => item.nodeKind === "core" && item.status === "published")
-    );
-    return !hasTheoryPublished;
+    if (!titlePoolItem) {
+      return { locked: false, message: "", shortLabel: "" };
+    }
+    if (titlePoolItem.nodeKind === "form") {
+      const hasTheoryReady = Boolean(
+        chapterGap?.titlePool?.some((item) => item.nodeKind === "core" && ["published", "merge_needed"].includes(item.status))
+      );
+      return hasTheoryReady
+        ? { locked: false, message: "", shortLabel: "" }
+        : { locked: true, message: "需先完成前置觀念文章：翻新起手式", shortLabel: "前置觀念未完成" };
+    }
+    if (titlePoolItem.nodeKind === "project") {
+      const formItem = chapterGap?.titlePool?.find((item) => item.nodeKind === "form");
+      const formReady = Boolean(formItem?.status === "published");
+      return formReady
+        ? { locked: false, message: "", shortLabel: "" }
+        : { locked: true, message: `必須先發布前置表單：${formItem?.primaryTitle || "初勘健檢：老屋第一輪現場檢查清單"}`, shortLabel: "前置表單未發布" };
+    }
+    if (titlePoolItem.nodeKind === "case") {
+      const processItem = chapterGap?.titlePool?.find((item) => item.nodeKind === "project");
+      const processReady = Boolean(processItem?.status === "published");
+      return processReady
+        ? { locked: false, message: "", shortLabel: "" }
+        : { locked: true, message: `必須先完成前置專案節點：${processItem?.primaryTitle || "專案節點：初勘至開工的決策沙盤推演"}`, shortLabel: "前置專案未完成" };
+    }
+    return { locked: false, message: "", shortLabel: "" };
+  }
+
+  function isDependencyLocked(focusTrack, chapterTitle = "", subchapterTitle = "") {
+    return getDependencyLockState(focusTrack, chapterTitle, subchapterTitle).locked;
+  }
+
+  function getDependencyLockMessage(recommendation, focusTrack) {
+    if (!recommendation || !focusTrack) return "";
+    return getDependencyLockState(focusTrack, recommendation.chapter, recommendation.subchapter).message;
   }
 
   function getPrimaryReviewRecommendation(mode = currentTopicMode) {
-    return getTopPriorityRecommendations(mode, 1)[0] || null;
+    const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
+    const topCandidates = getTopPriorityRecommendations(mode, 3);
+    return topCandidates.find((candidate) => !isDependencyLocked(focusTrack, candidate.chapter, candidate.subchapter)) || topCandidates[0] || null;
   }
 
   function getExpectedCandidate(mode = currentTopicMode) {
@@ -5527,6 +5582,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "- 網站文章標題與書籍標題視為同一套，不做雙標題分流。",
       "- 請判斷這一篇是否真的應該先發；若不是，請給出更好的優先順序與原因。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
+      "- 若主問題已被 Merge_and_Update 軌道完美命中，New_Publish 軌道必須切換為補充模式，優先推薦同章的表單或案例，不可讓後段流程文搶主導權。",
+      "- 同一主章節內也必須遵守微觀時序：theory > tool/form > process/contract > case；若前置 type 尚未完成，不得把後續 type 當成第一優先新文章。",
       "- 若前段章節仍為 0% 或基礎明顯不足，不可優先推薦後段章節的細部表單與配件節點，書稿推進必須符合裝修工程時間軸。",
       "- 若候選標題、章節或補位理由出現「預售屋 / 客變 / 新成屋 / 商空」等非老屋詞彙，直接判 Invalid，不得納入本書。",
       "",
@@ -5613,6 +5670,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     riskNote.textContent = recommendation.collisionReason;
     blocker.textContent =
       getChronologyWarningMessage(recommendation, focusTrack) ||
+      getDependencyLockMessage(recommendation, focusTrack) ||
       getStateSyncWarningMessage(articleAiResult, currentTopicMode) ||
       getRecommendationBlockerMessage(recommendation);
     blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
@@ -5654,6 +5712,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const mergeTitle = document.getElementById("publishing-review-merge-title");
     const mergeMeta = document.getElementById("publishing-review-merge-meta");
     const mergeNote = document.getElementById("publishing-review-merge-note");
+    const crossTrackNote = document.getElementById("publishing-review-cross-track-note");
     const nextTitle = document.getElementById("publishing-review-next-title");
     const nextMeta = document.getElementById("publishing-review-next-meta");
     const riskBadge = document.getElementById("publishing-review-risk-badge");
@@ -5682,6 +5741,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       !(mergeTitle instanceof HTMLElement) ||
       !(mergeMeta instanceof HTMLElement) ||
       !(mergeNote instanceof HTMLElement) ||
+      !(crossTrackNote instanceof HTMLElement) ||
       !(nextTitle instanceof HTMLElement) ||
       !(nextMeta instanceof HTMLElement) ||
       !(riskBadge instanceof HTMLElement) ||
@@ -5718,6 +5778,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       mergeTitle.textContent = "目前尚無需優先整併的舊文任務";
       mergeMeta.textContent = "若規則層判定與舊文高度重疊，這裡會先列出整併任務與修改方向。";
       mergeNote.textContent = "整併任務會先顯示需合併的既有文章，避免把舊文改寫誤當成下一篇新文章。";
+      crossTrackNote.textContent = "";
+      crossTrackNote.classList.remove("is-visible");
       nextTitle.textContent = "尚未產生";
       nextMeta.textContent = "目前資料不足，暫時無法建立出版閉環覆核。";
       applyRiskBadge(riskBadge, "low", "規則初篩低相近");
@@ -5753,6 +5815,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       ? `${mergeTask.chapter} / ${mergeTask.subchapter} / ${mergeTask.category}｜${mergeTask.reason}`
       : "若規則層判定與舊文高度重疊，這裡會先列出整併任務與修改方向。";
     mergeNote.textContent = getMergeTaskNote(mergeTask);
+    crossTrackNote.textContent = getCrossTrackSyncMessage(currentTopicMode);
+    crossTrackNote.classList.toggle("is-visible", Boolean(crossTrackNote.textContent));
     nextTitle.textContent = recommendation ? getDisplayTitle(recommendation) : "尚未產生";
     nextMeta.textContent = recommendation
       ? `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜補前 ${recommendation.coverageBefore}% → 補後 ${recommendation.coverageAfter}%`
@@ -5766,6 +5830,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     actionHint.textContent = recommendation?.actionHint ? `${recommendation.actionHint}｜待高階 LLM 裁定` : "待高階 LLM 裁定";
     blocker.textContent =
       getChronologyWarningMessage(recommendation, focusTrack) ||
+      getDependencyLockMessage(recommendation, focusTrack) ||
       getStateSyncWarningMessage(articleAiResult, currentTopicMode) ||
       getRecommendationBlockerMessage(recommendation);
     blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
@@ -5801,7 +5866,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         const subchapterMarkup = visibleSubchapters.map((subchapter) => {
           const subchapterRecommendation = gap.recommendedTopic?.subchapter === subchapter.title ? gap.recommendedTopic : null;
           const titlePoolItem = (gap.titlePool || []).find((item) => item.subchapter === subchapter.title);
-          const dependencyLocked = isDependencyLocked(focusTrack, gap.chapter, subchapter.title);
+          const dependencyLockState = getDependencyLockState(focusTrack, gap.chapter, subchapter.title);
+          const dependencyLocked = dependencyLockState.locked;
           const recommendationPublished = subchapterRecommendation
             ? isPublishedArticleTitle(subchapterRecommendation.primaryTitle)
             : false;
@@ -5833,7 +5899,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 <em>${subchapter.coveredByArticle ? `已有 ${subchapter.articleCount} 篇` : isDraft ? "草稿中" : dependencyLocked ? "依賴鎖定" : "待補"}</em>
               </div>
               ${titlePoolItem?.assetSlotLabel ? `<small class="bookshelf-review-subchapter-asset">附錄掛載：${escapeHtml(titlePoolItem.assetSlotLabel)}</small>` : ""}
-              ${dependencyLocked ? '<small class="bookshelf-dependency-lock" title="需先完成前置觀念文章" aria-label="需先完成前置觀念文章">&#128274; 需先完成前置觀念文章</small>' : ""}
+              ${dependencyLocked ? `<small class="bookshelf-dependency-lock" title="${escapeHtml(dependencyLockState.message)}" aria-label="${escapeHtml(dependencyLockState.message)}">&#128274; ${escapeHtml(dependencyLockState.message)}</small>` : ""}
               ${recommendationMarkup}
             </li>
           `;
@@ -8283,7 +8349,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
     const syncState = getTopicStateSyncState(content, currentTopicMode);
     const chronologyMessage = getChronologyWarningMessage(syncState.expectedCandidate, focusTrack);
-    const isLocked = Boolean(chronologyMessage || syncState.fatal);
+    const dependencyMessage = getDependencyLockMessage(syncState.expectedCandidate, focusTrack);
+    const isLocked = Boolean(chronologyMessage || dependencyMessage || syncState.fatal);
     if (shell instanceof HTMLElement) {
       shell.hidden = !content.trim();
       shell.classList.toggle("is-alert", isLocked);
@@ -8291,12 +8358,14 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     if (title instanceof HTMLElement) {
       title.textContent = chronologyMessage
         ? "前置工程章節尚未穩固，禁止跳躍發布"
+        : dependencyMessage
+          ? "章節內依賴順序未滿足，已鎖定確認動作"
         : syncState.fatal
           ? "候選、問題與落地資訊不同步，已鎖定確認動作"
           : "本輪送審候選與落地資訊已同步";
     }
     if (note instanceof HTMLElement) {
-      note.textContent = chronologyMessage || syncState.message;
+      note.textContent = chronologyMessage || dependencyMessage || syncState.message;
     }
     return isLocked;
   }

@@ -244,18 +244,6 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             titleOverride: "翻新起手式：屋況盤點與範圍界定總表",
           },
           {
-            title: "案例解析",
-            keywords: ["before after", "漏水", "結構老化", "血淚案例", "翻車案例", "案例解析"],
-            nodeKind: "case",
-            titleOverride: "案例解析：忽視漏水與結構老化的翻車代價",
-          },
-          {
-            title: "迷思破解",
-            keywords: ["初勘", "屋況判讀", "漏看", "風險訊號", "常見迷思", "判斷失準"],
-            nodeKind: "qa",
-            titleOverride: "屋況初勘：你最容易漏看的 5 個風險訊號",
-          },
-          {
             title: "實戰表單",
             keywords: ["checklist", "表單", "健檢", "初勘", "清單", "附錄"],
             nodeKind: "form",
@@ -267,6 +255,18 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             keywords: ["初勘流程", "估價前", "決策順序", "判讀流程", "是否開工", "專案節點", "開工前"],
             nodeKind: "project",
             titleOverride: "專案節點：初勘至開工的決策沙盤推演",
+          },
+          {
+            title: "案例解析",
+            keywords: ["before after", "漏水", "結構老化", "血淚案例", "翻車案例", "案例解析"],
+            nodeKind: "case",
+            titleOverride: "案例解析：忽視漏水與結構老化的翻車代價",
+          },
+          {
+            title: "迷思破解",
+            keywords: ["初勘", "屋況判讀", "漏看", "風險訊號", "常見迷思", "判斷失準"],
+            nodeKind: "qa",
+            titleOverride: "屋況初勘：你最容易漏看的 5 個風險訊號",
           },
         ],
       },
@@ -985,18 +985,51 @@ function getIncompleteCoreBoost(
   return boost;
 }
 
-function getToolBeforeTheoryPenalty(
+function hasHandledChapterNodeKind(
+  trackTitle: string,
+  chapterTitle: string,
+  nodeKind: PublicationNodeKind,
+  chapterEntries: BookshelfEntry[],
+  rawTrackEntries: BookshelfEntry[],
+) {
+  const hasPublishedNode = nodeKind === "project"
+    ? chapterEntries.some((entry) => isProcessKnowledgeSubchapter(trackTitle, chapterTitle, entry.subchapter))
+    : chapterEntries.some((entry) => getSubchapterPlan(trackTitle, chapterTitle, entry.subchapter)?.nodeKind === nodeKind);
+  if (hasPublishedNode) return true;
+  const mergeDirective = getPublicationMergeDirective(trackTitle, chapterTitle);
+  if (!mergeDirective) return false;
+  const targetPlan = getSubchapterPlan(trackTitle, chapterTitle, mergeDirective.targetSubchapter);
+  if (!targetPlan || targetPlan.nodeKind !== nodeKind) return false;
+  return rawTrackEntries
+    .filter((entry) => entry.chapter === chapterTitle && entry.subchapter === mergeDirective.targetSubchapter)
+    .some((entry) => mergeDirective.sourceTitles.includes(entry.title));
+}
+
+function getIntraChapterSequencePenalty(
   trackTitle: string,
   chapterTitle: string,
   subchapterTitle: string,
   chapterEntries: BookshelfEntry[],
+  rawTrackEntries: BookshelfEntry[],
 ) {
   const candidatePlan = getSubchapterPlan(trackTitle, chapterTitle, subchapterTitle);
-  if (candidatePlan?.nodeKind !== "form") return 0;
-  const hasTheory = chapterEntries.some((entry) => (
-    getSubchapterPlan(trackTitle, chapterTitle, entry.subchapter)?.nodeKind === "core"
-  ));
-  return hasTheory ? 0 : 260;
+  if (!candidatePlan) return 0;
+  const hasTheory = hasHandledChapterNodeKind(trackTitle, chapterTitle, "core", chapterEntries, rawTrackEntries);
+  const hasForm = hasHandledChapterNodeKind(trackTitle, chapterTitle, "form", chapterEntries, rawTrackEntries);
+  const hasProcess = hasHandledChapterNodeKind(trackTitle, chapterTitle, "project", chapterEntries, rawTrackEntries);
+  if (candidatePlan.nodeKind === "form") {
+    return hasTheory ? 0 : 260;
+  }
+  if (candidatePlan.nodeKind === "project") {
+    return hasForm ? 0 : 560;
+  }
+  if (candidatePlan.nodeKind === "case") {
+    return hasProcess ? 0 : 780;
+  }
+  if (candidatePlan.nodeKind === "qa") {
+    return hasForm ? 0 : 240;
+  }
+  return 0;
 }
 
 function isMicroCoverageTitle(title = "") {
@@ -1892,7 +1925,13 @@ function buildRecommendationCandidates(
         const incompleteCoreBoost = track.title === publishingFocusTrackTitle
           ? getIncompleteCoreBoost(track.title, chapter.title, subchapter.title, chapterEntries)
           : 0;
-        const toolBeforeTheoryPenalty = getToolBeforeTheoryPenalty(track.title, chapter.title, subchapter.title, chapterEntries);
+        const intraChapterSequencePenalty = getIntraChapterSequencePenalty(
+          track.title,
+          chapter.title,
+          subchapter.title,
+          chapterEntries,
+          rawTrackEntries,
+        );
         const mergeTargetBoost = allowCoveredMergeCandidate ? 320 : 0;
         const timelinePenalty = getOldHouseTimelinePenalty(track.title, chapter.title, nodeKind, trackEntries);
         const score =
@@ -1908,7 +1947,7 @@ function buildRecommendationCandidates(
           incompleteCoreBoost +
           macroPriorityBoost -
           recentPenalty -
-          toolBeforeTheoryPenalty -
+          intraChapterSequencePenalty -
           timelinePenalty -
           chapterSaturationPenalty -
           collisionPenalty;
