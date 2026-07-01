@@ -5017,6 +5017,16 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     return Math.round((gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length / gap.subchapters.length) * 100);
   }
 
+  function hasMergeBackedTheoryCoverage(trackTitle = "", chapterTitle = "") {
+    const mergeRule = getPublicationMergeRule(trackTitle, chapterTitle);
+    if (!mergeRule?.sourceTitles?.length) return false;
+    return articleLibrary.some((post) => (
+      post.track === trackTitle &&
+      post.chapter === chapterTitle &&
+      mergeRule.sourceTitles.includes(post.title)
+    ));
+  }
+
   function getChronologyWarningMessage(recommendation, focusTrack) {
     if (!recommendation || !focusTrack) return "";
     const chapterIndex = publicationChapterOrder.indexOf(recommendation.chapter);
@@ -5079,7 +5089,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       const hasTheoryReady = Boolean(
         chapterGap?.titlePool?.some((item) => item.nodeKind === "core" && ["published", "merge_needed"].includes(item.status))
       );
-      return hasTheoryReady
+      const hasMergeBackedTheory = hasMergeBackedTheoryCoverage(focusTrack.title, chapterTitle);
+      return (hasTheoryReady || hasMergeBackedTheory)
         ? { locked: false, message: "", shortLabel: "" }
         : { locked: true, message: "需先完成前置觀念文章：翻新起手式", shortLabel: "前置觀念未完成" };
     }
@@ -5589,7 +5600,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 請判斷這一篇是否真的應該先發；若不是，請給出更好的優先順序與原因。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
       "- 若主問題已被 Merge_and_Update 軌道完美命中，New_Publish 軌道必須切換為補充模式，優先推薦同章的表單或案例，不可讓後段流程文搶主導權。",
-      "- 同一主章節內也必須遵守微觀時序：theory > tool/form > process/contract > case；若前置 type 尚未完成，不得把後續 type 當成第一優先新文章。",
+      "- 同一主章節內也必須遵守微觀時序：theory > tool/form > process/contract > case；但若該章已有已上線舊文可透過整併成立理論主幹，不可再用『理論未發布』當成硬性阻擋新文章的理由。",
+      "- 判斷章節前置是否成立時，請優先看官網已上線舊文是否足以支撐整併，不要把整本書誤當成從零開始的空白書稿。",
       "- 若前段章節仍為 0% 或基礎明顯不足，不可優先推薦後段章節的細部表單與配件節點，書稿推進必須符合裝修工程時間軸。",
       "- 若候選標題、章節或補位理由出現「預售屋 / 客變 / 新成屋 / 商空」等非老屋詞彙，直接判 Invalid，不得納入本書。",
       "",

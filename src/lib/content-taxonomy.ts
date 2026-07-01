@@ -865,6 +865,16 @@ function isEntryPendingMerge(entry: BookshelfEntry) {
   return Boolean(mergeDirective?.sourceTitles.includes(entry.title));
 }
 
+function hasMergeSourceCoverage(
+  rawTrackEntries: BookshelfEntry[],
+  mergeDirective: PublicationMergeDirective | null | undefined,
+) {
+  if (!mergeDirective?.sourceTitles?.length) return false;
+  return rawTrackEntries
+    .filter((entry) => entry.chapter === mergeDirective.chapterTitle)
+    .some((entry) => mergeDirective.sourceTitles.includes(entry.title));
+}
+
 function getEffectiveTrackEntries(trackEntries: BookshelfEntry[]) {
   return trackEntries.filter((entry) => !isEntryPendingMerge(entry));
 }
@@ -1000,9 +1010,7 @@ function hasHandledChapterNodeKind(
   if (!mergeDirective) return false;
   const targetPlan = getSubchapterPlan(trackTitle, chapterTitle, mergeDirective.targetSubchapter);
   if (!targetPlan || targetPlan.nodeKind !== nodeKind) return false;
-  return rawTrackEntries
-    .filter((entry) => entry.chapter === chapterTitle && entry.subchapter === mergeDirective.targetSubchapter)
-    .some((entry) => mergeDirective.sourceTitles.includes(entry.title));
+  return hasMergeSourceCoverage(rawTrackEntries, mergeDirective);
 }
 
 function getIntraChapterSequencePenalty(
@@ -1845,9 +1853,7 @@ function buildRecommendationCandidates(
         )).length;
         const allowCoveredMergeCandidate = Boolean(
           mergeDirective?.targetSubchapter === subchapter.title &&
-          rawTrackEntries
-            .filter((entry) => entry.chapter === chapter.title && entry.subchapter === subchapter.title)
-            .some((entry) => mergeDirective.sourceTitles.includes(entry.title)),
+          hasMergeSourceCoverage(rawTrackEntries, mergeDirective),
         );
         if (subchapterEntries.length > 0 && missingSubchapterCount > 0 && !allowCoveredMergeCandidate) {
           return null;
