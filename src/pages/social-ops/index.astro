@@ -1026,6 +1026,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製給高階 LLM 覆核</button>
                 <button type="button" id="copy-publishing-review-outline" class="bookshelf-action">複製出版清單摘要</button>
               </div>
+              <p id="publishing-review-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <p id="publishing-review-filter-note" class="bookshelf-confirm-note">目前顯示全部章節與已上線文章。</p>
               <div class="bookshelf-review-legend" aria-label="出版進度圖例">
                 <span><i class="is-covered"></i>已上線</span>
@@ -6483,6 +6484,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     });
   }
 
+  function setPublishingReviewFeedback(message, mode = "") {
+    const shell = document.getElementById("publishing-review-feedback");
+    if (!(shell instanceof HTMLElement)) return;
+    shell.className = `bookshelf-ai-feedback ${mode}`.trim();
+    shell.textContent = message;
+  }
+
   function spotlightActionButton(id) {
     const button = document.getElementById(id);
     if (!(button instanceof HTMLButtonElement)) return;
@@ -8631,6 +8639,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     );
     const feedback = getCopyFeedbackState(result, "已複製出版清單摘要。", "已開啟手動複製視窗，可直接複製出版清單摘要。");
     setFeedback(feedback.message, feedback.mode);
+    setPublishingReviewFeedback(feedback.message, feedback.mode);
   });
 
   document.getElementById("copy-publishing-title-pool")?.addEventListener("click", async () => {
@@ -8641,6 +8650,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     );
     const feedback = getCopyFeedbackState(result, "已複製完整出版標題池。", "已開啟手動複製視窗，可直接複製完整出版標題池。");
     setFeedback(feedback.message, feedback.mode);
+    setPublishingReviewFeedback(feedback.message, feedback.mode);
   });
 
   document.getElementById("copy-publishing-review-prompt")?.addEventListener("click", async () => {
@@ -8651,9 +8661,11 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     );
     if (result !== "clipboard") {
       revealPublishingReviewPrompt();
+      document.getElementById("publishing-review-prompt-content")?.scrollIntoView({ behavior: "smooth", block: "center" });
     }
     const feedback = getCopyFeedbackState(result, "已複製出版閉環覆核稿。", "已開啟手動複製視窗，可直接複製出版閉環覆核稿。");
     setFeedback(feedback.message, feedback.mode);
+    setPublishingReviewFeedback(feedback.message, feedback.mode);
   });
 
   document.getElementById("run-article-ai-flow-highfreq")?.addEventListener("click", async () => {
