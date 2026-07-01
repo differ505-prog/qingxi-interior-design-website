@@ -6875,6 +6875,62 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }) || null;
   }
 
+  function buildConditionalToolModuleRules(confirmData = {}, resolvedChapter = "", focusPack = null, problemText = "", aiDraftBlock = "") {
+    const haystack = [
+      confirmData?.title,
+      confirmData?.chapter,
+      confirmData?.track,
+      resolvedChapter,
+      focusPack?.name,
+      focusPack?.summary,
+      problemText,
+      aiDraftBlock,
+    ].filter(Boolean).join("\n");
+
+    const matchedThemes = [];
+    const tableKeywords = /設備|家電|規格|電壓|線徑|瓦數|安培|迴路|型號|配件|報價|報價單|單價|費用|預算|追加|漏項|驗收|檢查|清單|材料|配置|尺寸|尺度/;
+    const flowKeywords = /流程|步驟|順序|時序|階段|進場|施工|配置順序|先後|驗收節奏|排程|重整/;
+    const compareKeywords = /比較|差異|取捨|必做|可延後|先做|後做|分區|回位|盤點|對照|Need|Want|範圍|格局|收納|動線/;
+    const checkKeywords = /驗收|檢查|盤點|清單|避雷|重點|缺失|漏項|確認|檢核/;
+
+    if (tableKeywords.test(haystack)) matchedThemes.push("設備/規格/預算/驗收");
+    if (flowKeywords.test(haystack)) matchedThemes.push("流程/時序");
+    if (compareKeywords.test(haystack)) matchedThemes.push("分區/對照/取捨");
+    if (checkKeywords.test(haystack) && !matchedThemes.includes("驗收/檢核")) matchedThemes.push("驗收/檢核");
+
+    const ruleLines = [
+      "1. 正文至少要落實 1 至 2 組工具書模組，不可只靠散文段落撐完整篇。",
+    ];
+
+    if (tableKeywords.test(haystack)) {
+      ruleLines.push("2. 本題命中設備、規格、預算、驗收或配置類主題，至少 1 組模組必須使用『短說明段 + 對照表 + 備註提醒』的表格型工具書模組。");
+    } else {
+      ruleLines.push("2. 若本題未明確命中表格型題材，也要至少補 1 組清單、對照、分區或檢查點模組。");
+    }
+
+    if (flowKeywords.test(haystack)) {
+      ruleLines.push("3. 本題具有先後順序、階段或施工節奏，正文必須再補 1 組『流程步驟模組』，用 3 至 4 步寫出判斷或施作順序。");
+    }
+
+    if (compareKeywords.test(haystack)) {
+      ruleLines.push("4. 本題具有分區、對照、取捨或回位邏輯，請再補 1 組『雙欄對照 / 分區卡片 / 回位清單』模組，不可只在段落裡口頭帶過。");
+    }
+
+    if (checkKeywords.test(haystack)) {
+      ruleLines.push("5. 若正文談到驗收、檢查、缺失或避雷，請整理成可直接拿來核對的檢查點模組，不可只停留在提醒句。");
+    }
+
+    if (ruleLines.length === 2) {
+      ruleLines.push("3. 若題型偏判斷、迷思或策略，優先用判斷骨架 + 對照卡片或檢查點模組，不要強塞表格。");
+    }
+
+    return [
+      `主題模組判定：${matchedThemes.length ? matchedThemes.join(" / ") : "判斷 / 觀念型"}`,
+      "工具書模組落地規則：",
+      ...ruleLines,
+    ].join("\n");
+  }
+
   function buildStructuredBookDataContext(confirmData = {}, problemText = "", aiDraftBlock = "") {
     const resolvedTrack = resolveStructuredBookDataTrack(confirmData, problemText, aiDraftBlock);
     const trackPack = resolvedTrack ? structuredBookDataPacks[resolvedTrack] : null;
@@ -6915,6 +6971,13 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       ...(Array.isArray(chapterPack?.outputPreferences) ? chapterPack.outputPreferences : []),
       ...(Array.isArray(focusPack?.outputPreferences) ? focusPack.outputPreferences : []),
     ];
+    const toolModuleRuleText = buildConditionalToolModuleRules(
+      confirmData,
+      resolvedChapter,
+      focusPack,
+      problemText,
+      aiDraftBlock,
+    );
     const recommendedDataMix = allDataPoints.length
       ? [
           "1. 優先挑 1 個『門檻 / 區間型』數據，放在前段建立尺度感。",
@@ -6956,6 +7019,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       outputPreferenceLines.length
         ? outputPreferenceLines.map((rule, index) => `${index + 1}. ${rule}`).join("\n")
         : "1. 若題目涉及清單、比較、流程、驗收或配置，至少整理 1 組可視化模組。",
+      "",
+      "本篇工具書模組落地規則：",
+      toolModuleRuleText,
     ].filter(Boolean).join("\n");
   }
 
@@ -7005,6 +7071,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "每個數字都要交代前提條件、適用情境與變動因子；若無法給單一數字，請優先寫保守區間。",
       "請優先挑出最有用的 3 個數據點來支撐本文，不要把數據包整份照抄；重點是讓數字服務判斷，不是堆砌資訊。",
       "若上方數據包已給出『版型與工具書模組偏好』，正文至少要落實其中 1 至 2 項，不可只引用數字卻仍寫成散文長文。",
+      "若上方已列出『本篇工具書模組落地規則』，請視為硬性要求；命中設備、規格、預算、驗收或配置類主題時，至少 1 組必須做成表格型工具書模組。",
       "結尾不要只用平鋪直敘收掉；請用一句更有收束感的總結，讓整篇像可收進書稿的完整章節。",
       "請固定依序輸出：",
       "A. 文章策略確認",
@@ -7213,6 +7280,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "9. 每個數字都要寫清楚前提條件與適用情境；若無法給單一數字，請優先寫區間，不要退回空泛形容詞。",
       "10. 請優先挑出最適合本題的 3 至 4 個數據點來寫，不要整包照貼；至少要有 1 個區間型、1 個數量型、1 個風險或流程型數據。",
       "11. 若上方數據包已給出『版型與工具書模組偏好』，正文至少要落實 1 至 2 項，例如分區對照、必做 / 可延後、先做 / 後做或回位清單。",
+      "12. 若上方已列出『本篇工具書模組落地規則』，請視為硬性要求；命中設備、規格、預算、驗收或配置類主題時，至少 1 組必須做成表格型工具書模組。",
       "",
       "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下所有段落都必須寫在同一份 Markdown 文件內。",
       "除這份文件本體外，不要在前後額外補操作說明、註解或對話式補充。",
@@ -7312,6 +7380,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "10. 每個數字都要標明前提條件、適用情境與變動因子；若無法給單一數字，請優先寫區間、門檻與尺度感，不可只寫『多、少、通常、容易』。",
       "11. 請先從數據包挑出最適合本題的 3 至 5 個數據點，再決定放在哪一段；至少包含 1 個區間型、1 個數量或流程型、1 個風險或驗收型數據。",
       "12. 若上方數據包已給出『版型與工具書模組偏好』，正文至少要落實其中 2 項；尤其命中空間重整或收納補強時，優先做分區、對照、流程或回位模組。",
+      "13. 若上方已列出『本篇工具書模組落地規則』，請視為硬性要求；命中設備、規格、預算、驗收或配置類主題時，至少 1 組必須做成表格型工具書模組，不可只用條列帶過。",
       "",
       "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下 A 到 R 全部都必須寫在同一份 Markdown 文件內。",
       "除這份文件本體外，不要在前後額外補操作說明、註解、摘要前言或對話式補充。",
@@ -7356,6 +7425,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "- 內文至少要安排 1 段『數據補強段』，把本篇最關鍵的 2-3 個數字或區間集中整理，讓讀者能直接拿來判斷尺度。",
       "- 若命中上方數據包，請讓至少 1 個數字出現在前段判斷骨架、1 個數字出現在正文分析、1 個數字出現在數據補強段或結尾提醒，不可全部擠在同一段。",
       "- 若命中空間重整或收納補強焦點，正文至少要出現 1 組『分區 / 對照 / 回位 / 先後順序』模組，避免內容只停留在概念描述。",
+      "- 若上方已列出『本篇工具書模組落地規則』，請逐條落實；命中設備、規格、預算、驗收或配置類主題時，正文至少要有 1 組『短說明段 + 對照表 + 備註提醒』表格模組。",
       "- 內文請自然安排 1-3 個可延伸閱讀的位置，優先參照上方既有文章清單，指出適合互鏈的文章方向，但不要硬塞推銷句。",
       "- 絕對不要出現推銷腔、口號腔、空泛形容詞堆砌。",
       "- 若文中提到預算或費用，請以區間、條件式差異、材料層級與施工範圍變動來表達；不要給過度精準的數字，不要像正式報價，也不要寫成讀者可直接拿來對價的承諾句。",
@@ -7490,6 +7560,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "每個數字都要交代前提條件與適用情境；若無法給單一數字，請優先寫區間，不可退回空泛形容詞。",
       "請先挑出最適合本題的 3 個數據點，不要把數據包整份照貼。",
       "若上方數據包已給出『版型與工具書模組偏好』，正文至少落實 1 項。",
+      "若上方已列出『本篇工具書模組落地規則』，請視為硬性要求；命中設備、規格、預算、驗收或配置類主題時，至少 1 組必須做成表格型工具書模組。",
       "",
       "【本輪生文前置包】",
       questionBlock,
@@ -8533,6 +8604,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "  - 前言：點出這個問題背後，多數屋主真正的焦慮是什麼。自然帶入 1-2 個相關的裝修關鍵字（如：老屋翻新、中古屋翻修、預算拆解等）。",
       "  - 前段必須先整理 1 段『判斷骨架』，等同官網版型中的 article-insight-panel：先用一句話說清楚決策順序，再用 2-3 句補充後面會怎麼展開。",
       "  - 若主題本質上具有順序、流程、階段、驗收節奏、預算配置順序或先後取捨，必須再補 1 段『流程步驟模組』，等同 article-step-flow：用 3-4 個步驟卡，依序寫出 01 / 02 / 03 / 04，每一步都要有短標與 1-2 句說明。",
+      "  - 若主題命中設備、規格、預算、驗收、清單或配置，至少再補 1 段『表格型工具書模組』：先用短說明段定義前提，再整理 3-5 列對照欄位，最後補 1 段備註提醒，不可只寫條列。",
       "  - ## 核心觀念：用 2-3 個清晰的重點（條列式），給出專業的判斷標準。必須包含具體的尺寸、順序、材質特性或邏輯判斷，不要寫空泛的形容詞。",
       "  - ## 常見迷思與避雷：點出一般人 DIY 或找單一工班容易忽略的盲點與隱藏成本。",
       "  - 中段至少再補 1 種資訊模組，視題型選擇：Need/Want 或 必做/可延後 用雙欄卡；檢查點、盤點、驗收重點用三欄 check grid。",
