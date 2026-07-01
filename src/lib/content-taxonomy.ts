@@ -277,7 +277,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "迷思破解",
             keywords: ["初勘", "屋況判讀", "漏看", "風險訊號", "常見迷思", "判斷失準"],
             nodeKind: "qa",
-            titleOverride: "屋況初勘避雷：最容易忽略的 5 個隱蔽風險",
+            titleOverride: "屋況初勘避雷：隱蔽風險排查與檢測要點",
           },
         ],
       },
