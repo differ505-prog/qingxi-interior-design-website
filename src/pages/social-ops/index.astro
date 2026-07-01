@@ -153,6 +153,56 @@ function buildTopicModeRationale(modeValue: string, modeDashboard: any, modeReco
     : `先用 Flash 找新切角，但不離開 ${modeRecommendation.trackTitle} 的固定骨架。`;
 }
 
+function buildLegacyArticleScoreReviewPrompt() {
+  return [
+    "你是青曦空間設計的內容總編、正式書稿統稿者與舊文體質覆核者。",
+    "請不要重寫文章，先專注做『舊文章正式書稿自評』，判斷這篇舊文目前距離正式收錄水準還差多少。",
+    "評分標準請固定採用以下權重：書稿成熟度 22%、內容判斷力 20%、數據與硬資訊密度 20%、章節定位與補位正確性 15%、工具書可用性 13%、品牌與文氣穩定度 5%、SEO 與發布完整度 5%。",
+    "若出現以下任一情況，總分上限直接壓到 6.5/10 以下：章節錯置、與既有文章高度撞題、幾乎沒有定量支點、標題明顯網路化、整篇沒有工具書模組、把費用寫成保證報價。",
+    "請誠實保守評分，不可因文氣順或排版好看就灌高分。",
+    "本次任務重點是幫我判斷：這篇舊文是否值得立即修、最該補哪裡、是否已接近可收進《老屋翻新全拆解》的正式文章水準。",
+    "",
+    "請固定依序輸出：",
+    "1. 整體評分：格式固定為 X/10，可帶 0.5 分。",
+    "2. 是否建議立即修改：只能回答 是 或 否。",
+    "3. 修改急迫度：只能回答 高、中、低。",
+    "4. 判定理由：用 3-6 句說明這篇舊文目前最大的優點與風險。",
+    "5. 分項評分：請依序列出 書稿成熟度 / 內容判斷力 / 數據與硬資訊密度 / 章節定位與補位正確性 / 工具書可用性 / 品牌與文氣穩定度 / SEO 與發布完整度，各自給 X/10。",
+    "6. 扣分主因 Top 3：只列最影響總分的 1-3 點。",
+    "7. 若只改 1 件事：指出最值得優先修改的單一項目。",
+    "8. 是否建議納入舊文修復排程：回答 建議優先 / 建議排隊 / 暫不處理，並補 1-2 句理由。",
+    "9. 若要修成正式書稿版本，最適合歸位到哪個章節 / 子題：請明寫。",
+    "",
+    "若你判斷這篇文章其實應改判為：",
+    "- Merge_and_Update",
+    "- Merge_into_Asset",
+    "- Published_Reference",
+    "也請在判定理由內直接寫明，不要只給分數。",
+    "",
+    "以下是待檢舊文章資料，請直接開始評分：",
+    "",
+    "【待檢文章標題】",
+    "（請貼在這裡）",
+    "",
+    "【待檢文章摘要】",
+    "（若沒有可留空）",
+    "",
+    "【待檢文章正文】",
+    "（請貼在這裡）",
+  ].join("\n");
+}
+
+const promptLibraryEntries = [
+  {
+    id: "legacy-article-score-review",
+    category: "文章覆核",
+    title: "舊文章正式書稿自評",
+    hint: "先用這份 prompt 檢視既有舊文分數，判斷是否值得立即進舊文修復排程。",
+    note: "適合貼現有官網舊文章，快速看出是否有章節錯置、數據偏弱、工具書密度不足或其實該進整併軌道。",
+    prompt: buildLegacyArticleScoreReviewPrompt(),
+  },
+] as const;
+
 const publishingCoverage = getPublishingCoverageSummary(blogPosts, publishingFocusTrackTitle);
 const topicModeMap = Object.fromEntries(
   publishingTopicModeOptions.map((modeOption) => {
@@ -1161,6 +1211,45 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     <p class="bookshelf-prompt-note">高頻主路徑只保留情境摘要與一鍵生文；完整前置包與備援操作在需要時再展開。</p>
                   </div>
                 </details>
+              </section>
+              <section class="bookshelf-prompt-library">
+                <div class="bookshelf-preview-head">
+                  <p>提示詞專區</p>
+                  <span>把常用高階 prompt 收進工作台，先從舊文章正式書稿自評開始，之後可繼續擴充成提示詞庫。</span>
+                </div>
+                <div class="bookshelf-prompt-library-grid">
+                  {promptLibraryEntries.map((entry) => (
+                    <article class="bookshelf-prompt-library-card">
+                      <div class="bookshelf-prompt-library-meta">
+                        <span>{entry.category}</span>
+                        <strong>{entry.title}</strong>
+                        <em>{entry.hint}</em>
+                        <p>{entry.note}</p>
+                      </div>
+                      <div class="bookshelf-pro-prompt-body">
+                        <label class="gemini-field bookshelf-prompt-field">
+                          <span>可直接送高階 LLM 的 prompt</span>
+                          <textarea
+                            id={`prompt-library-content-${entry.id}`}
+                            class="bookshelf-pro-prompt-content bookshelf-prompt-library-content"
+                            rows="16"
+                            readonly
+                          >{entry.prompt}</textarea>
+                        </label>
+                        <div class="bookshelf-actions bookshelf-confirm-actions">
+                          <button
+                            type="button"
+                            id={`copy-prompt-library-${entry.id}`}
+                            class="bookshelf-action bookshelp-action-primary"
+                          >
+                            複製這份提示詞
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <p id="prompt-library-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               </section>
               <div class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
@@ -7814,6 +7903,13 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     });
   }
 
+  function setPromptLibraryFeedback(message, mode = "") {
+    const shell = document.getElementById("prompt-library-feedback");
+    if (!(shell instanceof HTMLElement)) return;
+    shell.className = `bookshelf-ai-feedback ${mode}`.trim();
+    shell.textContent = message;
+  }
+
   function setPublishingReviewFeedback(message, mode = "") {
     const shell = document.getElementById("publishing-review-feedback");
     if (!(shell instanceof HTMLElement)) return;
@@ -10178,6 +10274,23 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const feedback = getCopyFeedbackState(result, "已複製完整生文前置包。", "已開啟手動複製視窗，可直接複製完整生文前置包。");
     setFeedback(feedback.message, feedback.mode);
     setArticleAiFeedback(feedback.message, feedback.mode);
+  });
+
+  document.getElementById("copy-prompt-library-legacy-article-score-review")?.addEventListener("click", async () => {
+    const textarea = document.getElementById("prompt-library-content-legacy-article-score-review");
+    const promptText = textarea instanceof HTMLTextAreaElement ? textarea.value.trim() : "";
+    if (!promptText) {
+      setPromptLibraryFeedback("目前沒有可複製的提示詞。", "is-warning");
+      return;
+    }
+    const result = await copyText(promptText, "已複製「舊文章正式書稿自評」提示詞。");
+    const feedback = getCopyFeedbackState(
+      result,
+      "已複製「舊文章正式書稿自評」提示詞。",
+      "已開啟手動複製視窗，可直接複製這份提示詞。",
+    );
+    setFeedback(feedback.message, feedback.mode);
+    setPromptLibraryFeedback(feedback.message, feedback.mode);
   });
 
   document.getElementById("copy-pro-finalize-prompt-inline")?.addEventListener("click", async () => {

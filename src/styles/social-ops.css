@@ -1479,6 +1479,69 @@
     padding: 1rem;
   }
 
+  .bookshelf-prompt-library {
+    display: grid;
+    gap: 0.9rem;
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: linear-gradient(180deg, rgba(251, 250, 246, 0.06), rgba(214, 210, 200, 0.025));
+  }
+
+  .bookshelf-prompt-library-grid {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .bookshelf-prompt-library-card {
+    display: grid;
+    gap: 0.75rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(57, 57, 56, 0.58), rgba(28, 28, 28, 0.82));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 10px 22px rgba(0, 0, 0, 0.1);
+  }
+
+  .bookshelf-prompt-library-meta {
+    display: grid;
+    gap: 0.28rem;
+    padding: 1rem 1rem 0;
+  }
+
+  .bookshelf-prompt-library-meta span {
+    color: rgba(224, 221, 214, 0.56);
+    font-size: 0.77rem;
+    letter-spacing: 0.08em;
+  }
+
+  .bookshelf-prompt-library-meta strong {
+    color: #f7f6f2;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .bookshelf-prompt-library-meta em,
+  .bookshelf-prompt-library-meta p {
+    margin: 0;
+    font-style: normal;
+    color: rgba(232, 228, 220, 0.68);
+    line-height: 1.72;
+  }
+
+  .bookshelf-prompt-library-meta em {
+    font-size: 0.86rem;
+  }
+
+  .bookshelf-prompt-library-meta p {
+    font-size: 0.83rem;
+  }
+
+  .bookshelf-prompt-library-content {
+    min-height: 360px;
+  }
+
   .bookshelf-review-board .bookshelf-action.is-active {
     border-color: rgba(214, 210, 200, 0.18);
     background: linear-gradient(180deg, rgba(251, 250, 246, 0.07), rgba(214, 210, 200, 0.02));
