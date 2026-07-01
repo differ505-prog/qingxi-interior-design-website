@@ -246,7 +246,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "案例解析",
             keywords: ["before after", "漏水", "結構老化", "血淚案例", "翻車案例", "案例解析"],
             nodeKind: "case",
-            titleOverride: "血淚 Before/After：沒看懂漏水與結構老化的慘痛代價",
+            titleOverride: "案例解析：忽視漏水與結構老化的翻車代價",
           },
           {
             title: "迷思破解",
@@ -260,6 +260,12 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             nodeKind: "form",
             titleOverride: "初勘健檢：老屋第一輪現場檢查清單",
             assetSlotLabel: "老屋初勘健檢 Check-list",
+          },
+          {
+            title: "判讀流程",
+            keywords: ["初勘流程", "估價前", "決策順序", "判讀流程", "是否開工"],
+            nodeKind: "project",
+            titleOverride: "判讀流程：初勘、估價與是否開工的決策順序",
           },
         ],
       },
@@ -395,7 +401,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "實戰表單",
             keywords: ["系統櫃", "配件", "清單", "規格確認", "表單"],
             nodeKind: "form",
-            titleOverride: "配件規格：系統櫃五金、抽屜與收納模組對照表",
+            titleOverride: "實戰表單：系統櫃配件清單與規格確認表",
             assetSlotLabel: "系統櫃配件清單與規格確認表",
           },
           {
@@ -416,13 +422,6 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             keywords: ["收納做滿", "櫃體深度", "動線取捨", "常見迷思", "機能過量"],
             nodeKind: "qa",
             titleOverride: "櫃體動線：收納做滿不等於好住的取捨邏輯",
-          },
-          {
-            title: "配件檢核",
-            keywords: ["收納組織", "配件規格", "五金", "盒件", "分隔", "檢核"],
-            nodeKind: "form",
-            titleOverride: "配件檢核：收納組織與櫃體配件規格總表",
-            assetSlotLabel: "收納組織與櫃體配件規格總表",
           },
         ],
       },
@@ -459,6 +458,13 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             keywords: ["保固不是萬靈丹", "點交責任", "責任邊界", "常見迷思", "完工迷思"],
             nodeKind: "qa",
             titleOverride: "點交責任：保固不是萬靈丹的邊界與證據留存",
+          },
+          {
+            title: "點交流程",
+            keywords: ["點交流程", "複驗", "保固起算", "追蹤表", "修繕追蹤"],
+            nodeKind: "project",
+            titleOverride: "點交流程：複驗、保固起算與修繕追蹤表",
+            assetSlotLabel: "點交與保固追蹤表",
           },
         ],
       },
@@ -822,25 +828,22 @@ function getOldHouseRecommendationPriorityBoost(
   nodeKind: PublicationNodeKind,
 ) {
   const chapterBoostMap: Record<string, number> = {
-    "空間重整": 110,
-    "預算拆解": 42,
+    "現況判讀": 120,
+    "預算拆解": 88,
     "基礎工程": 30,
-    "現況判讀": 18,
+    "空間重整": 18,
     "完工避雷": 16,
   };
   const chapterSubchapterBoostMap: Record<string, number> = {
+    "現況判讀::翻新起手式": 280,
+    "現況判讀::實戰表單": 220,
+    "現況判讀::判讀流程": 154,
     "預算拆解::發包合約": 126,
     "預算拆解::合約檢核": 98,
-    "空間重整::收納補強": 150,
-    "空間重整::實戰表單": 132,
-    "空間重整::配件檢核": 124,
-    "空間重整::整理計畫": 110,
-    "空間重整::案例解析": 82,
-    "空間重整::迷思破解": 54,
+    "預算拆解::報價拆讀": 104,
     "預算拆解::追加風險": 118,
     "基礎工程::實戰表單": 48,
     "基礎工程::工序銜接": 116,
-    "預算拆解::報價拆讀": -160,
   };
   const nodeKindBoostMap: Record<PublicationNodeKind, number> = {
     core: 0,
@@ -856,6 +859,20 @@ function getOldHouseRecommendationPriorityBoost(
   );
 }
 
+function getChapterCompletionRateFromEntries(
+  trackTitle: string,
+  chapterTitle: string,
+  trackEntries: BookshelfEntry[],
+) {
+  const chapterPlan = getTrackPlan(trackTitle)?.chapters.find((chapter) => chapter.title === chapterTitle);
+  if (!chapterPlan) return 0;
+  const total = chapterPlan.subchapters.length || 1;
+  const completed = chapterPlan.subchapters.filter((subchapter) => (
+    trackEntries.some((entry) => entry.chapter === chapterTitle && entry.subchapter === subchapter.title)
+  )).length;
+  return Math.round((completed / total) * 100);
+}
+
 function getOldHouseTimelinePenalty(
   trackTitle: string,
   chapterTitle: string,
@@ -868,6 +885,13 @@ function getOldHouseTimelinePenalty(
   const budgetCount = trackEntries.filter((entry) => entry.chapter === "預算拆解").length;
   const foundationCount = trackEntries.filter((entry) => ["現況判讀", "預算拆解"].includes(entry.chapter)).length;
   let penalty = 0;
+  const hasChronologyBlock = publicationChapterOrder.some((orderedChapter, orderedIndex) => (
+    orderedIndex <= chapterIndex - 2 &&
+    getChapterCompletionRateFromEntries(trackTitle, orderedChapter, trackEntries) < 30
+  ));
+  if (hasChronologyBlock) {
+    penalty += 420;
+  }
   if (diagnosisCount === 0 && chapterIndex >= 3 && (nodeKind === "form" || nodeKind === "project")) {
     penalty += 260;
   }
@@ -878,6 +902,37 @@ function getOldHouseTimelinePenalty(
     penalty += 90;
   }
   return penalty;
+}
+
+function isProcessKnowledgeSubchapter(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
+  const plan = getSubchapterPlan(trackTitle, chapterTitle, subchapterTitle);
+  if (plan?.nodeKind === "project") return true;
+  const text = `${chapterTitle} ${subchapterTitle} ${plan?.titleOverride || ""}`;
+  return ["流程", "工序", "發包", "合約", "介面", "點交"].some((keyword) => text.includes(keyword));
+}
+
+function getIncompleteCoreBoost(
+  trackTitle: string,
+  chapterTitle: string,
+  subchapterTitle: string,
+  chapterEntries: BookshelfEntry[],
+) {
+  const candidatePlan = getSubchapterPlan(trackTitle, chapterTitle, subchapterTitle);
+  if (!candidatePlan) return 0;
+  const entryPlans = chapterEntries
+    .map((entry) => getSubchapterPlan(trackTitle, chapterTitle, entry.subchapter))
+    .filter((plan): plan is NonNullable<typeof plan> => Boolean(plan));
+  const hasTheory = entryPlans.some((plan) => plan.nodeKind === "core");
+  const hasToolForm = entryPlans.some((plan) => plan.nodeKind === "form");
+  const hasProcess = chapterEntries.some((entry) => isProcessKnowledgeSubchapter(trackTitle, chapterTitle, entry.subchapter));
+  const candidateIsTheory = candidatePlan.nodeKind === "core";
+  const candidateIsToolForm = candidatePlan.nodeKind === "form";
+  const candidateIsProcess = isProcessKnowledgeSubchapter(trackTitle, chapterTitle, subchapterTitle);
+  let boost = 0;
+  if (!hasTheory && candidateIsTheory) boost += 160;
+  if (!hasToolForm && candidateIsToolForm) boost += 140;
+  if (!hasProcess && candidateIsProcess) boost += 150;
+  return boost;
 }
 
 function isMicroCoverageTitle(title = "") {
@@ -1025,6 +1080,12 @@ export function getTrackPlan(trackTitle = "") {
   return bookshelfTrackPlans.find((track) => track.title === trackTitle) || null;
 }
 
+function getSubchapterPlan(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
+  return getTrackPlan(trackTitle)?.chapters
+    .find((chapter) => chapter.title === chapterTitle)
+    ?.subchapters.find((subchapter) => subchapter.title === subchapterTitle) || null;
+}
+
 export function getPublicationBookProposal(trackTitle = "") {
   return publicationBookProposalOverrides[trackTitle] || {
     trackTitle,
@@ -1159,6 +1220,40 @@ function normalizeSemanticText(...values: string[]) {
   return values.join(" ").replace(/[：:？?、，,。！!（）()「」『』《》\-\s]/g, "").trim();
 }
 
+function isMountedFormDuplicate(
+  trackTitle: string,
+  chapterTitle: string,
+  subchapterTitle: string,
+  entry: BookshelfEntry,
+) {
+  const candidatePlan = getSubchapterPlan(trackTitle, chapterTitle, subchapterTitle);
+  const entryPlan = getSubchapterPlan(entry.trackTitle, entry.chapter, entry.subchapter);
+  if (candidatePlan?.nodeKind !== "form" || entryPlan?.nodeKind !== "form") {
+    return false;
+  }
+  const candidateText = normalizeSemanticText(
+    candidatePlan.titleOverride || "",
+    candidatePlan.assetSlotLabel || "",
+    candidatePlan.title || "",
+    ...(candidatePlan.keywords || []),
+  );
+  const entryText = normalizeSemanticText(
+    entry.title || "",
+    entryPlan.titleOverride || "",
+    entryPlan.assetSlotLabel || "",
+    entryPlan.title || "",
+    ...(entryPlan.keywords || []),
+  );
+  const duplicateAnchors = ["系統櫃", "五金", "收納", "配件", "抽屜", "模組", "規格"];
+  const sharedAnchors = duplicateAnchors.filter((keyword) => candidateText.includes(keyword) && entryText.includes(keyword));
+  const candidateAsset = normalizeSemanticText(candidatePlan.assetSlotLabel || "");
+  const entryAsset = normalizeSemanticText(entryPlan.assetSlotLabel || "");
+  return Boolean(
+    (candidateAsset && entryAsset && candidateAsset === entryAsset) ||
+    sharedAnchors.length >= 3
+  );
+}
+
 function buildCandidateSemanticTerms(trackTitle = "", chapterTitle = "", subchapterTitle = "") {
   const trackPlan = getTrackPlan(trackTitle);
   const chapterPlan = trackPlan?.chapters.find((chapter) => chapter.title === chapterTitle);
@@ -1191,6 +1286,10 @@ function getSemanticOverlapScore(
     ? Math.round((matchedTerms.length / candidateTerms.length) * 100)
     : 0;
 
+  if (isMountedFormDuplicate(trackTitle, chapterTitle, subchapterTitle, entry)) {
+    return 92;
+  }
+
   // 同書系與同章節只能作為「需要人工覆核」的弱訊號，不能直接把不同解法題目打成高撞題。
   const sameTrackBoost = entry.trackTitle === trackTitle ? 8 : 0;
   const sameChapterBoost = entry.chapter === chapterTitle ? 8 : 0;
@@ -1211,6 +1310,9 @@ function buildSimilarityReason(
 ) {
   if (mergeDirective?.targetSubchapter === subchapterTitle && mergeDirective.sourceTitles.includes(entry.title)) {
     return "這篇已屬同一組前置決策內容，較適合整併而不是另開新題。";
+  }
+  if (isMountedFormDuplicate(entry.trackTitle, chapterTitle, subchapterTitle, entry)) {
+    return "這組表單與掛載資產高度重複，應合併為同一份附錄工具，不宜拆成兩篇新題。";
   }
   if (entry.subchapter === subchapterTitle) {
     return "同子章內容重疊度高，容易形成直接撞題。";
@@ -1488,8 +1590,21 @@ function buildRecommendationFromCandidate(
     similarArticles.some((article) => mergeDirective.sourceTitles.includes(article.title)),
   );
   const topSimilarArticle = similarArticles[0] || null;
+  const topSimilarEntry = topSimilarArticle
+    ? entries.find((entry) => (
+      entry.trackTitle === candidate.trackTitle &&
+      entry.chapter === topSimilarArticle.chapter &&
+      entry.subchapter === topSimilarArticle.subchapter &&
+      entry.title === topSimilarArticle.title
+    )) || null
+    : null;
+  const duplicateFormAssetTriggered = Boolean(
+    topSimilarEntry &&
+    isMountedFormDuplicate(candidate.trackTitle, candidate.chapter, candidate.subchapter, topSimilarEntry),
+  );
   const canBeHighRisk = Boolean(
     mergeTriggered ||
+    duplicateFormAssetTriggered ||
     topSimilarArticle?.subchapter === candidate.subchapter,
   );
   const collisionRisk: NextTopicRecommendation["collisionRisk"] = canBeHighRisk && topSemanticScore >= 60
@@ -1499,6 +1614,8 @@ function buildRecommendationFromCandidate(
       : "low";
   const collisionReason = mergeTriggered
     ? mergeDirective?.note || "這個主題已與既有文章形成整併關係，較適合合併而非另開新題。"
+    : duplicateFormAssetTriggered
+      ? "這組實戰表單與既有掛載資產高度重複，應直接併入同一份工具資產，不宜拆成兩篇送審。"
     : collisionRisk === "high"
       ? "核心解法與既有文章重疊度超過 60%，應優先改子章節或直接整併舊文。"
       : collisionRisk === "medium"
@@ -1506,12 +1623,14 @@ function buildRecommendationFromCandidate(
         : "目前未發現明顯語意撞題，可優先補齊此缺口。";
   const actionHint = mergeTriggered
     ? "Merge_and_Update｜先整併舊文"
+    : duplicateFormAssetTriggered
+      ? "Merge_and_Update｜先整併同資產表單"
     : collisionRisk === "high"
       ? "Merge_and_Update｜先整併舊文"
       : collisionRisk === "medium"
         ? "Revise_Angle｜需拉開差異"
         : "New_Publish｜可直接推進";
-  const workflowAction: NextTopicRecommendation["workflowAction"] = mergeTriggered || topSemanticScore > 50
+  const workflowAction: NextTopicRecommendation["workflowAction"] = mergeTriggered || duplicateFormAssetTriggered || (topSimilarArticle?.subchapter === candidate.subchapter && topSemanticScore > 50)
     ? "Merge_and_Update"
     : collisionRisk === "medium"
       ? "Revise_Angle"
@@ -1622,10 +1741,15 @@ function buildRecommendationCandidates(
         const trackEntries = entries.filter((entry) => entry.trackTitle === track.title);
         const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter.title);
         const subchapterEntries = chapterEntries.filter((entry) => entry.subchapter === subchapter.title);
+        const mergeDirective = getPublicationMergeDirective(track.title, chapter.title);
         const missingSubchapterCount = chapter.subchapters.filter((child) => (
           !chapterEntries.some((entry) => entry.subchapter === child.title)
         )).length;
-        if (subchapterEntries.length > 0 && missingSubchapterCount > 0) {
+        const allowCoveredMergeCandidate = Boolean(
+          mergeDirective?.targetSubchapter === subchapter.title &&
+          subchapterEntries.some((entry) => mergeDirective.sourceTitles.includes(entry.title)),
+        );
+        if (subchapterEntries.length > 0 && missingSubchapterCount > 0 && !allowCoveredMergeCandidate) {
           return null;
         }
         const totalSubchapters = track.chapters.reduce((sum, item) => sum + item.subchapters.length, 0);
@@ -1692,6 +1816,9 @@ function buildRecommendationCandidates(
         const oldHousePriorityBoost = track.title === publishingFocusTrackTitle
           ? getOldHouseRecommendationPriorityBoost(chapter.title, subchapter.title, nodeKind)
           : 0;
+        const incompleteCoreBoost = track.title === publishingFocusTrackTitle
+          ? getIncompleteCoreBoost(track.title, chapter.title, subchapter.title, chapterEntries)
+          : 0;
         const timelinePenalty = getOldHouseTimelinePenalty(track.title, chapter.title, nodeKind, trackEntries);
         const score =
           focusBoost +
@@ -1702,6 +1829,7 @@ function buildRecommendationCandidates(
           multiTrackDiversityBoost +
           structuralVacuumBoost +
           oldHousePriorityBoost +
+          incompleteCoreBoost +
           macroPriorityBoost -
           recentPenalty -
           timelinePenalty -

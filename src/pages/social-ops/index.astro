@@ -15,6 +15,7 @@ import {
   getPublicationBookProposal,
   getNextRecommendedTopic,
   getNextRecommendedTopics,
+  publicationChapterOrder,
   publicationMergeDirectives,
   getTrackRecommendedTopics,
   getPublishingCoverageSummary,
@@ -198,31 +199,30 @@ const initialTopPriorityRecommendations = (() => {
     : allCandidates;
   const chapterFallbacks = (defaultModeState?.publishingDashboard?.focusTrack?.chapterGaps || [])
     .map((gap) => gap.recommendedTopic)
-    .filter(Boolean)
+    .filter((candidate): candidate is NonNullable<typeof primaryRecommendation> => Boolean(candidate))
     .filter((candidate) => !focusTrackTitle || candidate.trackTitle === focusTrackTitle);
-  const merged = [];
+  const merged: NonNullable<typeof primaryRecommendation>[] = [];
   if (primaryRecommendation) {
     merged.push(primaryRecommendation);
   }
   [...filtered, ...chapterFallbacks].forEach((candidate) => {
-    if (!candidate) return;
     if (!merged.some((item) => item.primaryTitle === candidate.primaryTitle && item.subchapter === candidate.subchapter)) {
       merged.push(candidate);
     }
   });
   const chapterPriorityMap = {
-    "空間重整": 0,
+    "現況判讀": 0,
     "預算拆解": 1,
     "基礎工程": 2,
-    "現況判讀": 3,
+    "空間重整": 3,
     "完工避雷": 4,
   };
   const explicitPriorityMap = {
-    "空間重整::收納補強": 0,
-    "空間重整::實戰表單": 1,
-    "預算拆解::追加風險": 2,
-    "基礎工程::實戰表單": 3,
-    "空間重整::整理計畫": 4,
+    "現況判讀::翻新起手式": 0,
+    "現況判讀::實戰表單": 1,
+    "預算拆解::報價拆讀": 2,
+    "預算拆解::發包合約": 3,
+    "預算拆解::合約檢核": 4,
   };
   const rankCandidate = (candidate: any, index: number) => {
     const riskRank = candidate?.collisionRisk === "low"
@@ -237,9 +237,12 @@ const initialTopPriorityRecommendations = (() => {
     const chapterRank = Object.prototype.hasOwnProperty.call(chapterPriorityMap, candidate?.chapter || "")
       ? chapterPriorityMap[candidate.chapter as keyof typeof chapterPriorityMap]
       : 9;
-    return riskRank * 1000 + explicitRank * 100 + chapterRank * 10 + index;
+    const riskPenalty = candidate?.workflowAction === "Merge_and_Update" && explicitRank < 10 ? 0 : riskRank * 1000;
+    return riskPenalty + explicitRank * 100 + chapterRank * 10 + index;
   };
-  const safeCandidates = merged.filter((candidate) => candidate?.collisionRisk !== "high");
+  const safeCandidates = merged.filter((candidate) => (
+    candidate?.collisionRisk !== "high" || candidate?.workflowAction === "Merge_and_Update"
+  ));
   const candidatePool = safeCandidates.length ? safeCandidates : merged;
   return candidatePool
     .sort((left, right) => rankCandidate(left, merged.indexOf(left)) - rankCandidate(right, merged.indexOf(right)))
@@ -4411,6 +4414,19 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const titlePoolItems = Array.isArray(focusTrack.titlePool)
       ? focusTrack.titlePool
       : focusTrack.chapterGaps.flatMap((gap) => gap.titlePool || []);
+    const chapterProgressMetrics = focusTrack.chapterGaps.map((gap) => {
+      const total = gap.subchapters.length || 1;
+      const completed = gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length;
+      const rate = Math.round((completed / total) * 100);
+      return { chapter: gap.chapter, completed, total, rate };
+    });
+    const contiguousTimelineCovered = chapterProgressMetrics.reduce((count, item, index) => {
+      if (count !== index) return count;
+      return item.rate >= 30 ? count + 1 : count;
+    }, 0);
+    const timelineRate = chapterProgressMetrics.length
+      ? Math.round((contiguousTimelineCovered / chapterProgressMetrics.length) * 100)
+      : 0;
     const wordWeightMap = {
       core: 3200,
       case: 2400,
@@ -4467,16 +4483,27 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       `;
     }).join("");
     const summaryMarkup = `
+      <article class="bookshelf-review-progress-card bookshelf-review-progress-card-dimension ${timelineRate === 100 ? "is-complete" : timelineRate === 0 ? "is-empty" : ""}">
+        <div class="bookshelf-review-progress-head">
+          <span>時間軸覆蓋率</span>
+          <strong>${contiguousTimelineCovered} / ${chapterProgressMetrics.length}</strong>
+          <em>${timelineRate}%</em>
+        </div>
+        <div class="bookshelf-review-progress-bar">
+          <i style="width: ${Math.max(timelineRate, contiguousTimelineCovered > 0 ? 12 : 0)}%"></i>
+        </div>
+        <small>以前段章節是否至少達 30% 為基準，避免後段工程排程早於前置決策。</small>
+      </article>
       <article class="bookshelf-review-progress-card bookshelf-review-progress-card-dimension ${practicalRate === 100 ? "is-complete" : practicalRate === 0 ? "is-empty" : ""}">
         <div class="bookshelf-review-progress-head">
-          <span>實務節點達成率</span>
+          <span>內容配比</span>
           <strong>${practicalCompleted} / ${practicalTotal}</strong>
           <em>${practicalRate}%</em>
         </div>
         <div class="bookshelf-review-progress-bar">
           <i style="width: ${Math.max(practicalRate, practicalCompleted > 0 ? 12 : 0)}%"></i>
         </div>
-        <small>內容配比視角：理論 / 表單工具 / 案例演練的補位進度</small>
+        <small>觀念 ${dimensionMetrics[0].completed}/${dimensionMetrics[0].total}｜表單 ${dimensionMetrics[2].completed}/${dimensionMetrics[2].total}｜案例/硬知識 ${dimensionMetrics[1].completed}/${dimensionMetrics[1].total}</small>
       </article>
       <article class="bookshelf-review-progress-card bookshelf-review-progress-card-dimension ${estimatedCompletedWords >= estimatedTotalWords && estimatedTotalWords > 0 ? "is-complete" : ""}">
         <div class="bookshelf-review-progress-head">
@@ -4490,10 +4517,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         <small>依節點類型估算全書體量，不只看文章篇數。</small>
       </article>
     `;
-    const chapterMarkup = focusTrack.chapterGaps.map((gap, index) => {
-      const completed = gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length;
-      const total = gap.subchapters.length || 1;
-      const rate = Math.round((completed / total) * 100);
+    const chapterMarkup = chapterProgressMetrics.map((gap, index) => {
+      const completed = gap.completed;
+      const total = gap.total || 1;
+      const rate = gap.rate;
       return `
         <article class="bookshelf-review-progress-card ${rate === 100 ? "is-complete" : rate === 0 ? "is-empty" : ""}">
           <div class="bookshelf-review-progress-head">
@@ -4620,18 +4647,18 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       }
     });
     const chapterPriorityMap = {
-      "空間重整": 0,
+      "現況判讀": 0,
       "預算拆解": 1,
       "基礎工程": 2,
-      "現況判讀": 3,
+      "空間重整": 3,
       "完工避雷": 4,
     };
     const explicitPriorityMap = {
-      "空間重整::收納補強": 0,
-      "空間重整::實戰表單": 1,
-      "預算拆解::追加風險": 2,
-      "基礎工程::實戰表單": 3,
-      "空間重整::整理計畫": 4,
+      "現況判讀::翻新起手式": 0,
+      "現況判讀::實戰表單": 1,
+      "預算拆解::報價拆讀": 2,
+      "預算拆解::發包合約": 3,
+      "預算拆解::合約檢核": 4,
     };
     const rankCandidate = (candidate, index) => {
       const riskRank = candidate?.collisionRisk === "low"
@@ -4646,9 +4673,12 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       const chapterRank = Object.prototype.hasOwnProperty.call(chapterPriorityMap, candidate?.chapter || "")
         ? chapterPriorityMap[candidate.chapter]
         : 9;
-      return riskRank * 1000 + explicitRank * 100 + chapterRank * 10 + index;
+      const riskPenalty = candidate?.workflowAction === "Merge_and_Update" && explicitRank < 10 ? 0 : riskRank * 1000;
+      return riskPenalty + explicitRank * 100 + chapterRank * 10 + index;
     };
-    const safeCandidates = merged.filter((candidate) => candidate?.collisionRisk !== "high");
+    const safeCandidates = merged.filter((candidate) => (
+      candidate?.collisionRisk !== "high" || candidate?.workflowAction === "Merge_and_Update"
+    ));
     const candidatePool = safeCandidates.length ? safeCandidates : merged;
     return candidatePool
       .sort((left, right) => rankCandidate(left, merged.indexOf(left)) - rankCandidate(right, merged.indexOf(right)))
@@ -4830,6 +4860,23 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       invalid: true,
       conflictKeyword,
     };
+  }
+
+  function getFocusTrackChapterCoverageRate(focusTrack, chapterTitle = "") {
+    const gap = focusTrack?.chapterGaps?.find((item) => item.chapter === chapterTitle);
+    if (!gap?.subchapters?.length) return 0;
+    return Math.round((gap.subchapters.filter((subchapter) => subchapter.coveredByArticle).length / gap.subchapters.length) * 100);
+  }
+
+  function getChronologyWarningMessage(recommendation, focusTrack) {
+    if (!recommendation || !focusTrack) return "";
+    const chapterIndex = publicationChapterOrder.indexOf(recommendation.chapter);
+    if (chapterIndex < 2) return "";
+    const blockingChapter = publicationChapterOrder.find((chapterTitle, index) => (
+      index <= chapterIndex - 2 && getFocusTrackChapterCoverageRate(focusTrack, chapterTitle) < 30
+    ));
+    if (!blockingChapter) return "";
+    return `Warning: Chronological Violation｜${blockingChapter} 目前完成度仍低於 30%，不建議先排 ${recommendation.chapter} 的後段工程題；若要特例推進，請先在高階 LLM 覆核報告中寫明理由。`;
   }
 
   function getRecommendationBlockerMessage(recommendation) {
@@ -5268,7 +5315,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     meta.textContent = `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜${recommendation.reason}`;
     applyRiskBadge(riskBadge, recommendation.collisionRisk, "規則初篩低相近");
     riskNote.textContent = recommendation.collisionReason;
-    blocker.textContent = getRecommendationBlockerMessage(recommendation);
+    blocker.textContent = getChronologyWarningMessage(recommendation, focusTrack) || getRecommendationBlockerMessage(recommendation);
     blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
     renderSimilarArticleList(similarList, recommendation);
   }
@@ -5392,7 +5439,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     applyRiskBadge(riskBadge, recommendation?.collisionRisk || "low", "規則初篩低相近");
     riskNote.textContent = recommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。";
     actionHint.textContent = recommendation?.actionHint ? `${recommendation.actionHint}｜待高階 LLM 裁定` : "待高階 LLM 裁定";
-    blocker.textContent = getRecommendationBlockerMessage(recommendation);
+    blocker.textContent = getChronologyWarningMessage(recommendation, focusTrack) || getRecommendationBlockerMessage(recommendation);
     blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
     renderSimilarArticleList(similarList, recommendation);
     top3.innerHTML = buildTopPriorityMarkup(currentTopicMode);
@@ -6429,6 +6476,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       ? assetSlots.map((item) => {
         const key = getPublishingAssetSlotKey(item);
         const assets = Array.isArray(publishingAssetSlotsState[key]) ? publishingAssetSlotsState[key] : [];
+        const latestAssetUpdate = assets[assets.length - 1]?.updatedAt || "";
         return `
           <article class="bookshelf-asset-slot-card ${key === activeKey ? "is-active" : ""}">
             <div class="bookshelf-asset-slot-head">
@@ -6437,6 +6485,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               <em>${assets.length} 份資產</em>
             </div>
             <small>${escapeHtml(item.chapter)} / ${escapeHtml(item.subchapter)}</small>
+            ${latestAssetUpdate ? `<p class="bookshelf-confirm-note">最後更新：${escapeHtml(latestAssetUpdate)}｜若 Google Sheets / PDF 已更新，請同步檢查文章是否需要改版。</p>` : ""}
             ${assets.length ? `
               <ul class="bookshelf-asset-slot-assets">
                 ${assets.map((asset, index) => `
@@ -6455,7 +6504,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       }).join("")
       : '<p class="bookshelf-confirm-note">目前尚無可掛載的附錄節點。</p>';
     note.textContent = totalAssets
-      ? `目前已掛載 ${totalAssets} 份資產；出版視角會同步顯示文章、章節總覽與附錄掛載數量。`
+      ? `目前已掛載 ${totalAssets} 份資產；若試算表或 PDF 更新，工作台會提示你回頭檢查文章是否同步改版。`
       : "目前尚未掛載附錄資產；可先把表單、規格表、Excel 或 PDF 掛進對應節點。";
   }
 
