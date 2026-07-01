@@ -4651,6 +4651,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
   function getWorkflowActionLabel(action = "") {
     if (action === "Merge_and_Update") return "整併升級";
+    if (action === "Merge_into_Asset") return "整併為資產";
     if (action === "Revise_Angle") return "改切角";
     if (action === "New_Publish") return "新發佈";
     return "待判定";
@@ -6146,13 +6147,16 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "1. 先抓這次前置包真正描述的痛點、情境與決策點。",
       "2. 你必須先判斷哪些候選該進整併池，再決定本輪真正採用的題目。",
       "3. 若某候選與既有文章核心解法重疊度高，優先轉入 Merge_and_Update，不要硬留在 New_Publish。",
-      "4. 扣掉已進整併池的題目後，請再重排剩餘優先文章，避免把本來該整併的題目繼續列進新文章順位。",
-      "5. 本輪最終仍只能從候選清單中擇一作為實際採用落位。",
-      "6. 標題要能回答這次問題，也要能自然收進未來書稿章名。",
-      "7. 若多個候選都可用，優先選最能兼顧真實回覆價值、出版補位效率與章節平衡者。",
-      "8. 若本輪前置包屬於老屋主線，只要落位、標題或理由出現「預售屋 / 客變 / 新成屋 / 商空」等互斥詞，整題就視為 Invalid，必須退回老屋主線重新選題。",
-      "9. 標題禁止使用 SEO 問句、全攻略、大公開等農場字眼。",
-      "10. 建議標題請強制寫成「2-4 字子概念：實務操作說明」的書稿體例。",
+      "4. 若候選是表單、清單、檢查表或工具資產，但其核心任務只是把既有主文操作化，優先判為 Merge_into_Asset，不得只因文型不同就保留成新文章。",
+      "5. 請強制做『同任務檢查』：即使一篇是 theory、一篇是 form，只要兩者解的是同一個核心任務、同一個判斷流程、同一個使用時機，就必須評估整併，而不是自動視為互補。",
+      "6. 若你最後仍不把 Top 1 候選納入整併池，必須明確說出『不進整併池理由』，不能省略。",
+      "7. 扣掉已進整併池的題目後，請再重排剩餘優先文章，避免把本來該整併的題目繼續列進新文章順位。",
+      "8. 本輪最終仍只能從候選清單中擇一作為實際採用落位。",
+      "9. 標題要能回答這次問題，也要能自然收進未來書稿章名。",
+      "10. 若多個候選都可用，優先選最能兼顧真實回覆價值、出版補位效率與章節平衡者。",
+      "11. 若本輪前置包屬於老屋主線，只要落位、標題或理由出現「預售屋 / 客變 / 新成屋 / 商空」等互斥詞，整題就視為 Invalid，必須退回老屋主線重新選題。",
+      "12. 標題禁止使用 SEO 問句、全攻略、大公開等農場字眼。",
+      "13. 建議標題請強制寫成「2-4 字子概念：實務操作說明」的書稿體例。",
       "",
       `【本次決題模式】${modeState?.label || mode}`,
       modeState?.modeRationale || "目前先沿用既有模式。",
@@ -6169,30 +6173,38 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       `【規則層送審候選】共 ${candidateCount} 個`,
       candidateText || "目前沒有可用候選，請沿用固定出版骨架做最保守的判斷。",
       "",
-      "請固定輸出以下 6 段，不要多寫任何其他內容：",
+      "請固定輸出以下 7 段，不要多寫任何其他內容：",
       "0. 【決策摘要】",
       "- 只輸出一行，摘要這次為什麼這樣落位。",
       "",
       "1. 【整併池判定】",
       "- 請逐行固定輸出：",
       "正式入池：",
+      "資產整併：",
       "跳過優先序的文章：",
       "暫不入池：",
       "判定理由：",
       "",
-      "2. 【剩餘優先文章】",
+      "2. 【同任務檢查】",
+      "- 請逐行固定輸出：",
+      "Top 1 候選：",
+      "同任務判定：",
+      "不進整併池理由：",
+      "資產掛載建議：",
+      "",
+      "3. 【剩餘優先文章】",
       "- 請逐行固定輸出：",
       "第 1 優先：",
       "第 2 優先：",
       "第 3 優先：",
       "",
-      "3. 【本輪採用題目】",
+      "4. 【本輪採用題目】",
       "- 請逐行固定輸出：",
       "最終動作：",
       "候選編號：",
       "決題模式：",
       "",
-      "4. 【落位決策】",
+      "5. 【落位決策】",
       "- 請逐行固定輸出：",
       "主書系：",
       "章節：",
@@ -6200,7 +6212,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "建議標題：",
       "決策理由：",
       "",
-      "5. 【保留說明】",
+      "6. 【保留說明】",
       "- 請逐行固定輸出：",
       "問題連結：",
       "書稿連結：",
@@ -6225,6 +6237,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   function parseArticleTopicDecision(content, mode = currentTopicMode, question = articleSourceQuestion) {
     const summary = extractSectionText(content, "決策摘要") || extractSectionText(content, "決題摘要");
     const mergeDecision = extractSectionText(content, "整併池判定");
+    const sameMissionSection = extractSectionText(content, "同任務檢查");
     const prioritySection = extractSectionText(content, "剩餘優先文章");
     const picked = extractSectionText(content, "本輪採用題目") || extractSectionText(content, "採用候選");
     const decision = extractSectionText(content, "落位決策");
@@ -6233,6 +6246,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const modeState = getCurrentTopicModeState(mode);
     const noteLines = normalizeSectionLines(note);
     const mergePool = splitTopicDecisionList(extractFieldValueFromText(mergeDecision, ["正式入池"]));
+    const assetMergePool = splitTopicDecisionList(extractFieldValueFromText(mergeDecision, ["資產整併"]));
     const skippedTitles = splitTopicDecisionList(extractFieldValueFromText(mergeDecision, ["跳過優先序的文章"]));
     const deferredMergeTitles = splitTopicDecisionList(extractFieldValueFromText(mergeDecision, ["暫不入池"]));
     const remainingPriorityArticles = extractPriorityTitles(prioritySection);
@@ -6245,9 +6259,14 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       candidateIndex: Number.isFinite(candidateIndex) ? candidateIndex : 0,
       summary: summary || "已完成本題動態決題。",
       mergePool,
+      assetMergePool,
       skippedTitles,
       deferredMergeTitles,
       mergeReason: extractFieldValueFromText(mergeDecision, ["判定理由"]),
+      topCandidateTitle: extractFieldValueFromText(sameMissionSection, ["Top 1 候選"]),
+      sameMissionVerdict: extractFieldValueFromText(sameMissionSection, ["同任務判定"]),
+      noMergeReason: extractFieldValueFromText(sameMissionSection, ["不進整併池理由"]),
+      assetMergeTarget: extractFieldValueFromText(sameMissionSection, ["資產掛載建議"]),
       remainingPriorityArticles,
       track: extractFieldValueFromText(decision, ["主書系"]),
       chapter: extractFieldValueFromText(decision, ["章節"]),
@@ -7142,6 +7161,12 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const mergePoolText = articleTopicDecision.mergePool?.length
       ? `Gemini Pro 已正式納入整併池：${articleTopicDecision.mergePool.join(" / ")}`
       : "";
+    const assetMergeText = articleTopicDecision.assetMergePool?.length
+      ? `Gemini Pro 已判定資產整併：${articleTopicDecision.assetMergePool.join(" / ")}`
+      : "";
+    const noMergeReasonText = articleTopicDecision.noMergeReason
+      ? `Top 1 不進整併池理由：${articleTopicDecision.noMergeReason}`
+      : "";
     const remainingPriorityText = articleTopicDecision.remainingPriorityArticles?.length
       ? `扣掉整併題後，剩餘優先文章為：${articleTopicDecision.remainingPriorityArticles.slice(0, 3).join(" / ")}`
       : "";
@@ -7158,10 +7183,34 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
         articleTopicDecision.bookLink || "",
         articleTopicDecision.mergeReason || "",
         mergePoolText,
+        assetMergeText,
+        noMergeReasonText,
         remainingPriorityText,
+        articleTopicDecision.assetMergeTarget ? `資產掛載建議：${articleTopicDecision.assetMergeTarget}` : "",
       ].filter(Boolean).join("｜") ||
       `這一步會先整理書名、章節、既有文章與私訊情境，再交由 Gemini Pro 從 ${candidateCount || "目前"} 個送審候選中決定整併池與本輪採用題目。`;
     renderPublishingReviewBoard();
+  }
+
+  function isAssetMergeAction(action = "") {
+    return action === "Merge_into_Asset";
+  }
+
+  function getArticleTopicAssetMergeMessage(decision = articleTopicDecision) {
+    if (!decision || !isAssetMergeAction(decision.finalAction)) return "";
+    const title = decision.title || decision.topCandidateTitle || "本題";
+    const target = decision.assetMergeTarget ? `建議掛載：${decision.assetMergeTarget}` : "請改回既有文章或資產槽處理，不另開新文。";
+    return `Gemini Pro 判定「${title}」應整併為既有文章資產。${target}`;
+  }
+
+  function handleArticleTopicAssetMergeStop(decision = articleTopicDecision) {
+    const message = getArticleTopicAssetMergeMessage(decision);
+    if (!message) return false;
+    clearArticleAiResultState();
+    clearArticleProFinalizePrompt();
+    setFeedback(message, "is-warning");
+    setArticleAiFeedback(message, "is-warning");
+    return true;
   }
 
   function loadArticleAiResult() {
@@ -7192,6 +7241,17 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       console.error("儲存 AI 結果失敗：", error);
       return false;
     }
+  }
+
+  function clearArticleAiResultState() {
+    articleAiResult = "";
+    articleAiMode = "";
+    try {
+      localStorage.removeItem(ARTICLE_AI_RESULT_KEY);
+    } catch (error) {
+      console.error("清除 AI 結果失敗：", error);
+    }
+    renderArticleAiResult();
   }
 
   function loadArticleProFinalizePrompt() {
@@ -7452,7 +7512,12 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       `子章節：${decision.subchapter}`,
       `建議標題：${decision.title}`,
       `正式入池：${decision.mergePool?.join(" / ") || "目前無"}`,
+      `資產整併：${decision.assetMergePool?.join(" / ") || "目前無"}`,
       `跳過優先序的文章：${decision.skippedTitles?.join(" / ") || "目前無"}`,
+      `Top 1 候選：${decision.topCandidateTitle || "尚未標註"}`,
+      `同任務判定：${decision.sameMissionVerdict || "尚未標註"}`,
+      `不進整併池理由：${decision.noMergeReason || "尚未提供"}`,
+      `資產掛載建議：${decision.assetMergeTarget || "尚未提供"}`,
       `剩餘優先文章：${decision.remainingPriorityArticles?.join(" / ") || "目前無"}`,
       `決題理由：${decision.reason || decision.summary || "已先完成動態決題。"}`,
       `問題連結：${decision.questionLink || "請沿用本輪前置包的核心痛點"}`,
@@ -8738,11 +8803,14 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     articleTopicDecision = parsed;
     saveArticleTopicDecision();
     renderArticleTopicDecision();
+    const topicDecisionFeedbackMode = parsed.invalid || isAssetMergeAction(parsed.finalAction) ? "is-warning" : "is-success";
     setArticleAiFeedback(
       parsed.invalid
         ? "偵測到跨書系污染，已自動回退到老屋主線的安全題目，正在接續整理 AI 結果..."
-        : "Gemini Pro 已完成整併池與採用題目判定，正在接續整理 AI 結果...",
-      parsed.invalid ? "is-warning" : "is-success",
+        : isAssetMergeAction(parsed.finalAction)
+          ? getArticleTopicAssetMergeMessage(parsed)
+          : "Gemini Pro 已完成整併池與採用題目判定，正在接續整理 AI 結果...",
+      topicDecisionFeedbackMode,
     );
     return articleTopicDecision;
   }
@@ -8837,7 +8905,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     setArticleAiFeedback(mode === "quick" ? "Gemini Flash 判題中..." : "Gemini Flash 長稿備援生成中...");
 
     try {
-      await ensureArticleTopicDecision(currentTopicMode);
+      const decision = await ensureArticleTopicDecision(currentTopicMode);
+      if (handleArticleTopicAssetMergeStop(decision)) return false;
       const content = await requestArticleAi(mode);
       if (!content) return false;
       articleAiResult = await enrichArticleMetadataIfNeeded(content, mode);
@@ -8871,7 +8940,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
     try {
       flowStage = "topic-decision";
-      await ensureArticleTopicDecision(currentTopicMode);
+      const decision = await ensureArticleTopicDecision(currentTopicMode);
+      if (handleArticleTopicAssetMergeStop(decision)) return;
       flowStage = "flash-quick";
       const quickContent = await requestArticleAi("quick");
       if (!quickContent) return;
