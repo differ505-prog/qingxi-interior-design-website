@@ -56,6 +56,14 @@ const articleStructuredData = [
         高級的智能，不是把技術堆滿，而是讓技術退到背景，讓生活本身變得更順。
       </blockquote>
 
+      <div class="article-insight-panel">
+        <p class="article-insight-label">決策順序</p>
+        <h3 class="article-insight-title">先定生活場景，再看底層條件，最後才選平台與介面。</h3>
+        <p>
+          若一開始就陷入品牌與協定比較，往往會把真正影響體驗的優先順序打亂。智能系統好不好用，通常在配電、網路與日常習慣那一層就已經決定七成。
+        </p>
+      </div>
+
       <h2>先定場景，再選平台</h2>
 
       <p>
@@ -74,6 +82,21 @@ const articleStructuredData = [
       <p>
         若你只是希望進門一句話就能連動燈光與窗簾，和你想做到多條件感測、自動切換氛圍場景，所需要的系統層級完全不同。真正應該先回答的不是「哪個平台比較強」，而是「我希望家怎麼運作」。
       </p>
+
+      <div class="article-check-grid">
+        <div class="article-check-item">
+          <strong>先問場景</strong>
+          <p>你要的是簡單控制，還是多條件自動化與情境切換？</p>
+        </div>
+        <div class="article-check-item">
+          <strong>再看底盤</strong>
+          <p>零線、網路、弱電與設備分布，是否真的能承接你想做的深度？</p>
+        </div>
+        <div class="article-check-item">
+          <strong>最後選介面</strong>
+          <p>App、語音與實體開關，哪一個才是家人最常接觸的入口？</p>
+        </div>
+      </div>
 
       <figure class="article-figure">
         <img src={articleDetailImage} alt="智能居家系統規劃中從生活場景回推平台選擇的手繪示意" />
@@ -108,6 +131,23 @@ const articleStructuredData = [
         相對地，它的代價是容易形成品牌綁定。介面學習成本較高，未來若想跨品牌擴充，也會遇到產品支援度與橋接限制。對某些使用者來說，這不是問題；但若你期待未來保留更多彈性，就要在前期先理解這件事。
       </p>
 
+      <div class="article-card-grid">
+        <div class="article-card">
+          <p class="article-card-kicker">跨平台</p>
+          <h3>介面一致、共享自然，但深層自動化較有限</h3>
+          <p>
+            適合重視操作直覺、家庭共享與語音控制的人，尤其當你希望不同品牌設備都能收進同一個入口時，這條路會更順手。
+          </p>
+        </div>
+        <div class="article-card">
+          <p class="article-card-kicker">單品牌</p>
+          <h3>底層更穩、邏輯更深，但綁定與擴充要先想清楚</h3>
+          <p>
+            適合重視自動化細節與系統穩定度的人，但前提是你願意接受較高的品牌依賴與架構規劃門檻。
+          </p>
+        </div>
+      </div>
+
       <h2>最推薦的折衷：底層交給品牌，表層交給 Apple Home</h2>
 
       <p>
@@ -121,6 +161,14 @@ const articleStructuredData = [
       <p>
         對屋主而言，這類折衷不是妥協，而是把穩定與好用拆成兩層來處理。你日常看到的是簡單與自然，真正撐住系統的則是背後被安排好的網關、協定與自動化規則。
       </p>
+
+      <div class="article-insight-panel">
+        <p class="article-insight-label">最常見解法</p>
+        <h3 class="article-insight-title">底層穩定交給品牌，表層操作交給 Apple Home，通常是住宅最平衡的做法。</h3>
+        <p>
+          這種做法不是模糊折衷，而是把複雜邏輯藏在底層，把日常接觸面保持乾淨。對大多數屋主來說，這反而是最接近「高級感」的智能體驗。
+        </p>
+      </div>
 
       <h2>藏在牆裡的真正關鍵：零線、網關與通訊協定</h2>
 
@@ -146,6 +194,23 @@ const articleStructuredData = [
         對於燈控、開關與大量低功耗設備來說，我們通常會更偏向 Zigbee 或 Thread。它們的優勢在於耗電低、設備可形成網狀網路，且不會把所有終端都擠進家裡的 Wi-Fi 路由器。對於追求穩定、長期與可維護的住宅系統來說，這是非常關鍵的底層差異。
       </p>
 
+      <div class="article-card-grid">
+        <div class="article-card">
+          <p class="article-card-kicker">牆裡的關鍵</p>
+          <h3>零線與網關位置，往往比 App 畫面更重要</h3>
+          <p>
+            若這些底層條件沒有先規劃好，後面再好的介面也只是在不穩定的系統上疊加包裝，實際體驗很難真正成熟。
+          </p>
+        </div>
+        <div class="article-card">
+          <p class="article-card-kicker">長期維運</p>
+          <h3>選協定，不只是看現在能不能用，更要看未來是否好擴充</h3>
+          <p>
+            Zigbee 與 Thread 的價值，不只在當下穩定，也在於日後設備增加時，系統仍有機會維持一致與可維護。
+          </p>
+        </div>
+      </div>
+
       <div class="article-gallery">
         <figure class="article-figure">
           <img src={articleSequenceImage} alt="智能居家設備、網關與 App 從屬關係的手繪示意" />
@@ -163,11 +228,7 @@ const articleStructuredData = [
 
       <h2>結語：最好的智能，是退到背景的存在</h2>
 
-      <p>
-        回到最初的問題，Apple Home 與品牌 App 並不是非得二選一。比起平台名單本身，更重要的是先把生活場景想清楚，把基礎配電與通訊底盤做扎實，再決定哪些邏輯該交給系統自動完成。
-      </p>
-
-      <p>
-        當零線、網關、感測與自動化條件都被安排得足夠成熟，最好的控制介面其實不只是手機上的家庭 App，而是牆上手感安定的實體開關，以及你一句自然說出口的日常指令。那時候，技術就真正回到了它最好的位置: 不搶眼，卻可靠地撐住生活。
-      </p>
+      <blockquote>
+        回到最初的問題，Apple Home 與品牌 App 並不是非得二選一。真正成熟的智能規劃，是先把生活場景、配電條件與通訊底盤整理穩，再決定哪些邏輯該交給系統默默完成。當零線、網關、感測與自動化條件都安排得夠成熟，技術就會回到它最好的位置：不搶眼，卻可靠地撐住生活。
+      </blockquote>
 </EditorialArticleLayout>
