@@ -116,13 +116,15 @@ const backupTitles = Array.isArray(modeRecommendation?.backupTitles) ? modeRecom
                         <span class="bookshelf-publishing-subchapter-copy">
                           <strong>{subchapter.title}</strong>
                           <small>
-                            {subchapter.coveredByArticle
-                              ? `已有 ${subchapter.articleCount} 篇文章`
-                              : "目前仍待補"}
+                            {subchapter.coveredByMergeBacked
+                              ? "整併成立理論位"
+                              : subchapter.coveredByArticle
+                                ? `已有 ${subchapter.articleCount} 篇文章`
+                                : "目前仍待補"}
                           </small>
                         </span>
                         <em data-publishing-subchapter-status>
-                          {subchapter.coveredByArticle ? "已有文章" : "待補"}
+                          {subchapter.coveredByMergeBacked ? "整併成立" : subchapter.coveredByArticle ? "已有文章" : "待補"}
                         </em>
                       </label>
                     ))}
@@ -202,13 +204,15 @@ const backupTitles = Array.isArray(modeRecommendation?.backupTitles) ? modeRecom
                                 <span class="bookshelf-publishing-subchapter-copy">
                                   <strong>{subchapter.title}</strong>
                                   <small>
-                                    {subchapter.coveredByArticle
-                                      ? `已有 ${subchapter.articleCount} 篇文章`
-                                      : "目前仍待補"}
+                                    {subchapter.coveredByMergeBacked
+                                      ? "整併成立理論位"
+                                      : subchapter.coveredByArticle
+                                        ? `已有 ${subchapter.articleCount} 篇文章`
+                                        : "目前仍待補"}
                                   </small>
                                 </span>
                                 <em data-publishing-subchapter-status>
-                                  {subchapter.coveredByArticle ? "已有文章" : "待補"}
+                                  {subchapter.coveredByMergeBacked ? "整併成立" : subchapter.coveredByArticle ? "已有文章" : "待補"}
                                 </em>
                               </label>
                             ))}

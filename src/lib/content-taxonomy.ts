@@ -86,6 +86,7 @@ export interface PublishingSubchapterStatus {
   title: string;
   articleCount: number;
   coveredByArticle: boolean;
+  coveredByMergeBacked?: boolean;
 }
 
 export interface PublicationTitlePoolItem {
@@ -101,7 +102,7 @@ export interface PublicationTitlePoolItem {
   note: string;
   nodeKind: PublicationNodeKind;
   statusTag: string;
-  workflowAction: "New_Publish" | "Merge_and_Update" | "Merge_into_Asset" | "Revise_Angle";
+  workflowAction: "New_Publish" | "Merge_and_Update" | "Merge_into_Asset" | "Revise_Angle" | "Published_Reference";
   assetSlotLabel?: string;
 }
 
@@ -910,12 +911,18 @@ function getChapterCompletionRateFromEntries(
   trackTitle: string,
   chapterTitle: string,
   trackEntries: BookshelfEntry[],
+  rawTrackEntries: BookshelfEntry[] = trackEntries,
 ) {
   const chapterPlan = getTrackPlan(trackTitle)?.chapters.find((chapter) => chapter.title === chapterTitle);
   if (!chapterPlan) return 0;
+  const mergeDirective = getPublicationMergeDirective(trackTitle, chapterTitle);
+  const mergeBackedSubchapter = mergeDirective && hasMergeSourceCoverage(rawTrackEntries, mergeDirective)
+    ? mergeDirective.targetSubchapter
+    : "";
   const total = chapterPlan.subchapters.length || 1;
   const completed = chapterPlan.subchapters.filter((subchapter) => (
-    trackEntries.some((entry) => entry.chapter === chapterTitle && entry.subchapter === subchapter.title)
+    trackEntries.some((entry) => entry.chapter === chapterTitle && entry.subchapter === subchapter.title) ||
+    subchapter.title === mergeBackedSubchapter
   )).length;
   return Math.round((completed / total) * 100);
 }
@@ -923,9 +930,9 @@ function getChapterCompletionRateFromEntries(
 function getEffectiveChapterCompletionRateFromEntries(
   trackTitle: string,
   chapterTitle: string,
-  trackEntries: BookshelfEntry[],
+  rawTrackEntries: BookshelfEntry[],
 ) {
-  return getChapterCompletionRateFromEntries(trackTitle, chapterTitle, getEffectiveTrackEntries(trackEntries));
+  return getChapterCompletionRateFromEntries(trackTitle, chapterTitle, getEffectiveTrackEntries(rawTrackEntries), rawTrackEntries);
 }
 
 function isCandidateBlockedByChronology(
@@ -1156,6 +1163,8 @@ function buildTitlePoolItem(
         : "medium";
   const workflowAction: PublicationTitlePoolItem["workflowAction"] = mergeNeeded || collisionMergeNeeded
     ? "Merge_and_Update"
+    : hasPublishedEntry
+      ? "Published_Reference"
     : assetIntentTriggered || mergeBackedTheoryReady
       ? "Merge_into_Asset"
     : topSemanticScore > 35
@@ -1516,17 +1525,23 @@ export function buildBookshelfEntries(posts: PublishingCatalogPost[] = []): Book
 export function getPublishingCoverageSummary(posts: PublishingCatalogPost[] = [], focusTrackTitle = publishingFocusTrackTitle) {
   const entries = buildBookshelfEntries(posts);
   const tracks = bookshelfTrackPlans.map((track) => {
-    const trackEntries = getEffectiveTrackEntries(entries.filter((entry) => entry.trackTitle === track.title));
+    const rawTrackEntries = entries.filter((entry) => entry.trackTitle === track.title);
+    const trackEntries = getEffectiveTrackEntries(rawTrackEntries);
     const totalChapters = track.chapters.length;
     const completedChapters = track.chapters.filter((chapter) =>
-      trackEntries.some((entry) => entry.chapter === chapter.title),
+      getChapterCompletionRateFromEntries(track.title, chapter.title, trackEntries, rawTrackEntries) > 0,
     ).length;
     const totalSubchapters = track.chapters.reduce((sum, chapter) => sum + chapter.subchapters.length, 0);
     const completedSubchapters = track.chapters.reduce(
-      (sum, chapter) =>
-        sum + chapter.subchapters.filter((subchapter) =>
-          trackEntries.some((entry) => entry.chapter === chapter.title && entry.subchapter === subchapter.title),
-        ).length,
+      (sum, chapter) => (
+        sum + chapter.subchapters.filter((subchapter) => {
+          const mergeDirective = getPublicationMergeDirective(track.title, chapter.title);
+          const mergeBackedSubchapter = mergeDirective && hasMergeSourceCoverage(rawTrackEntries, mergeDirective)
+            ? mergeDirective.targetSubchapter
+            : "";
+          return trackEntries.some((entry) => entry.chapter === chapter.title && entry.subchapter === subchapter.title) || subchapter.title === mergeBackedSubchapter;
+        }).length
+      ),
       0,
     );
 
@@ -1555,19 +1570,26 @@ export function getPublishingDashboard(
 ) {
   const entries = buildBookshelfEntries(posts);
   const tracks = bookshelfTrackPlans.map((track) => {
-    const trackEntries = getEffectiveTrackEntries(entries.filter((entry) => entry.trackTitle === track.title));
+    const rawTrackEntries = entries.filter((entry) => entry.trackTitle === track.title);
+    const trackEntries = getEffectiveTrackEntries(rawTrackEntries);
     const chapterGaps = track.chapters.map((chapter) => {
       const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter.title);
+      const mergeDirective = getPublicationMergeDirective(track.title, chapter.title);
+      const mergeBackedSubchapter = mergeDirective && hasMergeSourceCoverage(rawTrackEntries, mergeDirective)
+        ? mergeDirective.targetSubchapter
+        : "";
       const subchapters = chapter.subchapters.map((subchapter) => {
         const articleCount = chapterEntries.filter((entry) => entry.subchapter === subchapter.title).length;
+        const coveredByMergeBacked = !articleCount && subchapter.title === mergeBackedSubchapter;
         return {
           title: subchapter.title,
           articleCount,
-          coveredByArticle: articleCount > 0,
+          coveredByArticle: articleCount > 0 || coveredByMergeBacked,
+          coveredByMergeBacked,
         } satisfies PublishingSubchapterStatus;
       });
-      const missingSubchapters = chapter.subchapters
-        .filter((subchapter) => !chapterEntries.some((entry) => entry.subchapter === subchapter.title))
+      const missingSubchapters = subchapters
+        .filter((subchapter) => !subchapter.coveredByArticle)
         .map((subchapter) => subchapter.title);
 
       const recommendedTopic = getChapterRecommendedTopicFromEntries(entries, track.title, chapter.title, focusTrackTitle, mode);
@@ -1584,11 +1606,11 @@ export function getPublishingDashboard(
     });
 
     const totalChapters = track.chapters.length;
-    const completedChapters = chapterGaps.filter((gap) => gap.articleCount > 0).length;
+    const completedChapters = chapterGaps.filter((gap) => gap.subchapters.some((subchapter) => subchapter.coveredByArticle)).length;
     const totalSubchapters = track.chapters.reduce((sum, chapter) => sum + chapter.subchapters.length, 0);
     const completedSubchapters = totalSubchapters - chapterGaps.reduce((sum, gap) => sum + gap.remainingToBaseline, 0);
     const remainingToBaseline = chapterGaps.reduce((sum, gap) => sum + gap.remainingToBaseline, 0);
-    const missingChapterTitles = chapterGaps.filter((gap) => gap.articleCount === 0).map((gap) => gap.chapter);
+    const missingChapterTitles = chapterGaps.filter((gap) => !gap.subchapters.some((subchapter) => subchapter.coveredByArticle)).map((gap) => gap.chapter);
 
     return {
       title: track.title,

@@ -4679,6 +4679,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   }
 
   function getWorkflowActionLabel(action = "") {
+    if (action === "Published_Reference") return "已上線參考";
     if (action === "Merge_and_Update") return "整併升級";
     if (action === "Merge_into_Asset") return "整併為資產";
     if (action === "Revise_Angle") return "改切角";
@@ -4688,6 +4689,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
   function getRecommendationBadgeLabel(item) {
     if (!item?.isRecommended) return "";
+    if (item.workflowAction === "Published_Reference") return "";
     if (item.workflowAction === "New_Publish") return "最推薦";
     if (item.workflowAction === "Revise_Angle") return "優先覆核";
     if (item.workflowAction === "Merge_into_Asset") return "優先審資產";
@@ -4697,6 +4699,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
   function getChapterCandidateLead(recommendation) {
     if (!recommendation) return "本章候選";
+    if (recommendation.workflowAction === "Published_Reference") return "本章已上線參考";
     if (recommendation.workflowAction === "New_Publish") return "本章純新候選";
     if (recommendation.workflowAction === "Revise_Angle") return "本章待覆核候選";
     if (recommendation.workflowAction === "Merge_into_Asset") return "本章資產候選";
@@ -5313,11 +5316,33 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
     const scored = ranked.map((candidate) => {
       const chapterIndex = publicationChapterOrder.indexOf(candidate.chapter);
+      const chapterGap = focusTrack.chapterGaps.find((gap) => gap.chapter === candidate.chapter);
+      const titlePoolItem = chapterGap?.titlePool?.find((item) => item.subchapter === candidate.subchapter) || null;
+      const nodeKind = titlePoolItem?.nodeKind || "core";
       const sameChapterSupplement = candidate.chapter === mergeChapter && ["案例解析", "專案節點", "迷思破解"].includes(candidate.subchapter);
       const nextChapterTheory = chapterIndex === mergeChapterIndex + 1 && !["實戰表單", "案例解析", "迷思破解", "專案節點"].includes(candidate.subchapter);
+      const pendingCoreChapters = publicationChapterOrder.filter((chapterTitle) => {
+        const chapterTitlePool = focusTrack.chapterGaps.find((gap) => gap.chapter === chapterTitle)?.titlePool || [];
+        return chapterTitlePool.some((item) => (
+          item.nodeKind === "core" &&
+          !["published", "merge_needed"].includes(item.status) &&
+          item.workflowAction !== "Merge_into_Asset"
+        ));
+      });
+      const pendingCoreChapterRank = pendingCoreChapters.indexOf(candidate.chapter);
+      const coreCatchupBoost = nodeKind === "core" && pendingCoreChapterRank >= 0
+        ? Math.max(0, 260 - pendingCoreChapterRank * 90)
+        : 0;
+      const foundationCatchupBoost = candidate.chapter === "基礎工程" && nodeKind === "core" ? 110 : 0;
+      const laterSpacePenalty = candidate.chapter === "空間重整" && nodeKind === "core" && pendingCoreChapters.includes("基礎工程")
+        ? 120
+        : 0;
       const fallbackScore =
         (sameChapterSupplement ? 300 : 0) +
         (nextChapterTheory ? 220 : 0) +
+        coreCatchupBoost +
+        foundationCatchupBoost -
+        laterSpacePenalty +
         (candidate.workflowAction === "New_Publish" ? 120 : 0) +
         Math.max(0, 100 - chapterIndex * 10);
       return { candidate, fallbackScore };
@@ -6155,7 +6180,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
                   <span>${escapeHtml(titlePoolItem?.statusTag || "子章節")}</span>
                   <strong>${escapeHtml(subchapter.title)}</strong>
                 </div>
-                <em>${subchapter.coveredByArticle ? `已有 ${subchapter.articleCount} 篇` : isDraft ? "草稿中" : dependencyLocked ? "依賴鎖定" : "待補"}</em>
+                <em>${subchapter.coveredByMergeBacked ? "整併成立" : subchapter.coveredByArticle ? `已有 ${subchapter.articleCount} 篇` : isDraft ? "草稿中" : dependencyLocked ? "依賴鎖定" : "待補"}</em>
               </div>
               ${titlePoolItem?.assetSlotLabel ? `<small class="bookshelf-review-subchapter-asset">附錄掛載：${escapeHtml(titlePoolItem.assetSlotLabel)}</small>` : ""}
               ${dependencyLocked ? `<small class="bookshelf-dependency-lock" title="${escapeHtml(dependencyLockState.message)}" aria-label="${escapeHtml(dependencyLockState.message)}">&#128274; ${escapeHtml(dependencyLockState.message)}</small>` : ""}
