@@ -182,10 +182,10 @@ const publishingDashboard = topicModeMap[defaultTopicMode].publishingDashboard;
 const initialFocusTrack = defaultModeState?.publishingDashboard?.focusTrack || null;
 const initialBookProposal = defaultModeState?.bookProposal || null;
 const initialRecommendation = defaultModeState?.nextRecommendedTopic || null;
-const initialRecommendationTitle = initialRecommendation?.primaryTitle || initialRecommendation?.webTitle || initialRecommendation?.bookTitle || "報價拆讀：全室預算拆解與避險指南";
+const initialRecommendationTitle = initialRecommendation?.primaryTitle || initialRecommendation?.webTitle || initialRecommendation?.bookTitle || "收納補強：老屋機能配置與櫃體整合策略";
 const initialRecommendationMeta = initialRecommendation
   ? `${initialRecommendation.chapter} / ${initialRecommendation.subchapter} / ${initialRecommendation.category}｜補前 ${initialRecommendation.coverageBefore}% → 補後 ${initialRecommendation.coverageAfter}%`
-  : "預算拆解 / 報價拆讀 / 裝修預算｜補前 0% → 補後 0%";
+  : "空間重整 / 收納補強 / 收納機能｜補前 0% → 補後 0%";
 const initialRecommendationModeText = initialFocusTrack
   ? `${defaultModeState?.label || defaultTopicMode}｜${initialFocusTrack.title} 尚差 ${initialFocusTrack.remainingToBaseline} 篇`
   : "會跟內容書架同步";
@@ -930,6 +930,11 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   <span id="publishing-review-risk-note" class="bookshelf-confirm-note">{initialRecommendation?.collisionReason || "會根據已上線文章自動比對。"}</span>
                 </div>
                 <p id="publishing-review-action-hint" class="bookshelf-review-action-hint">{initialRecommendation?.actionHint || "可直接推進"}</p>
+                <div id="publishing-review-blocker" class={`bookshelf-review-blocker ${initialRecommendation?.collisionRisk === "high" ? "is-visible" : ""}`}>
+                  {initialRecommendation?.collisionRisk === "high"
+                    ? `Blocker：此題與既有舊文相似度過高，請先比對 ${initialRecommendation.similarArticles?.[0]?.title || "相似舊文"}，改走整併或另建新切角。`
+                    : ""}
+                </div>
                 <ul id="publishing-review-similar-list" class="bookshelf-review-similar-list">
                   {initialRecommendation?.similarArticles?.length
                     ? initialRecommendation.similarArticles.slice(0, 2).map((article) => (
@@ -1844,6 +1849,11 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   <div class="bookshelf-review-risk-row">
                     <strong id="review-next-topic-risk-badge" class={`bookshelf-review-risk-badge is-${initialRecommendation?.collisionRisk || "low"}`}>{initialRecommendation?.collisionRisk === "high" ? "撞題風險高" : initialRecommendation?.collisionRisk === "medium" ? "撞題風險中" : "撞題風險低"}</strong>
                     <span id="review-next-topic-risk-note" class="bookshelf-confirm-note">{initialRecommendation?.collisionReason || "會根據已上線文章自動比對。"}</span>
+                  </div>
+                  <div id="review-next-topic-blocker" class={`bookshelf-review-blocker ${initialRecommendation?.collisionRisk === "high" ? "is-visible" : ""}`}>
+                    {initialRecommendation?.collisionRisk === "high"
+                      ? `Blocker：請先比對 ${initialRecommendation.similarArticles?.[0]?.title || "相似舊文"}，確認整併或重切角後再推進。`
+                      : ""}
                   </div>
                   <ul id="review-next-topic-similar-list" class="bookshelf-review-similar-list">
                     {initialRecommendation?.similarArticles?.length
@@ -4515,6 +4525,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const modeState = getCurrentTopicModeState(mode);
     const focusTrackTitle = modeState?.publishingDashboard?.focusTrack?.title;
     const allCandidates = Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates : [];
+    const primaryRecommendation = modeState?.nextRecommendedTopic || null;
     const filtered = focusTrackTitle
       ? allCandidates.filter((candidate) => candidate.trackTitle === focusTrackTitle)
       : allCandidates;
@@ -4522,13 +4533,50 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       .map((gap) => gap.recommendedTopic)
       .filter(Boolean)
       .filter((candidate) => !focusTrackTitle || candidate.trackTitle === focusTrackTitle);
-    const merged = [...filtered];
-    chapterFallbacks.forEach((candidate) => {
+    const merged = [];
+    if (primaryRecommendation) {
+      merged.push(primaryRecommendation);
+    }
+    [...filtered, ...chapterFallbacks].forEach((candidate) => {
+      if (!candidate) return;
       if (!merged.some((item) => item.primaryTitle === candidate.primaryTitle && item.subchapter === candidate.subchapter)) {
         merged.push(candidate);
       }
     });
-    return merged.slice(0, Math.max(1, limit));
+    const chapterPriorityMap = {
+      "空間重整": 0,
+      "預算拆解": 1,
+      "基礎工程": 2,
+      "現況判讀": 3,
+      "完工避雷": 4,
+    };
+    const explicitPriorityMap = {
+      "空間重整::收納補強": 0,
+      "空間重整::實戰表單": 1,
+      "預算拆解::追加風險": 2,
+      "基礎工程::實戰表單": 3,
+      "空間重整::整理計畫": 4,
+    };
+    const rankCandidate = (candidate, index) => {
+      const riskRank = candidate?.collisionRisk === "low"
+        ? 0
+        : candidate?.collisionRisk === "medium"
+          ? 1
+          : 2;
+      const explicitKey = `${candidate?.chapter || ""}::${candidate?.subchapter || ""}`;
+      const explicitRank = Object.prototype.hasOwnProperty.call(explicitPriorityMap, explicitKey)
+        ? explicitPriorityMap[explicitKey]
+        : 50;
+      const chapterRank = Object.prototype.hasOwnProperty.call(chapterPriorityMap, candidate?.chapter || "")
+        ? chapterPriorityMap[candidate.chapter]
+        : 9;
+      return riskRank * 1000 + explicitRank * 100 + chapterRank * 10 + index;
+    };
+    const safeCandidates = merged.filter((candidate) => candidate?.collisionRisk !== "high");
+    const candidatePool = safeCandidates.length ? safeCandidates : merged;
+    return candidatePool
+      .sort((left, right) => rankCandidate(left, merged.indexOf(left)) - rankCandidate(right, merged.indexOf(right)))
+      .slice(0, Math.max(1, limit));
   }
 
   function getPublicationBaselinePlan(mode = currentTopicMode, articleLimit = 3) {
@@ -4679,10 +4727,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function getOldHouseFallbackConfirmData() {
     return {
-      category: "裝修預算",
+      category: "收納機能",
       track: publishingFocusTrackTitle,
-      chapter: "預算拆解",
-      title: "報價拆讀：全室預算拆解與避險指南",
+      chapter: "空間重整",
+      title: "收納補強：老屋機能配置與櫃體整合策略",
     };
   }
 
@@ -4697,15 +4745,21 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         ? `偵測到互斥詞彙「${conflictKeyword}」，已回退到老屋主線的安全題目。`
         : "已回退到老屋主線的安全題目。",
       track: publishingFocusTrackTitle,
-      chapter: "預算拆解",
-      subchapter: "報價拆讀",
-      title: "報價拆讀：全室預算拆解與避險指南",
-      reason: "老屋主書模式下偵測到預售屋／客變污染，系統已強制回退到老屋主線的預算拆解題目。",
+      chapter: "空間重整",
+      subchapter: "收納補強",
+      title: "收納補強：老屋機能配置與櫃體整合策略",
+      reason: "老屋主書模式下偵測到預售屋／客變污染，系統已強制回退到老屋主線的空間重整補位題目。",
       questionLink: "",
       bookLink: "",
       invalid: true,
       conflictKeyword,
     };
+  }
+
+  function getRecommendationBlockerMessage(recommendation) {
+    if (!recommendation || recommendation.collisionRisk !== "high") return "";
+    const similarTitles = recommendation.similarArticles?.slice(0, 2).map((article) => `${article.title}（${article.score}）`).join(" / ");
+    return `Blocker：此題為高撞題候選，請先比對 ${similarTitles || "相似舊文"}，並改走「確認整併」或「另建新切角」，暫不建議直接推進。`;
   }
 
   function sanitizeArticleConfirmData(data, sourceText = "", mode = currentTopicMode) {
@@ -5097,6 +5151,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const riskBadge = document.getElementById("review-next-topic-risk-badge");
     const riskNote = document.getElementById("review-next-topic-risk-note");
     const similarList = document.getElementById("review-next-topic-similar-list");
+    const blocker = document.getElementById("review-next-topic-blocker");
     if (
       !(panel instanceof HTMLElement) ||
       !(mode instanceof HTMLElement) ||
@@ -5104,7 +5159,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       !(meta instanceof HTMLElement) ||
       !(riskBadge instanceof HTMLElement) ||
       !(riskNote instanceof HTMLElement) ||
-      !(similarList instanceof HTMLElement)
+      !(similarList instanceof HTMLElement) ||
+      !(blocker instanceof HTMLElement)
     ) {
       return;
     }
@@ -5117,6 +5173,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       meta.textContent = "切換決題模式後，這裡會同步更新下一篇建議。";
       applyRiskBadge(riskBadge, "low", "撞題風險低");
       riskNote.textContent = "會根據已上線文章自動比對。";
+      blocker.textContent = "";
+      blocker.classList.remove("is-visible");
       renderSimilarArticleList(similarList, null);
       return;
     }
@@ -5126,6 +5184,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     meta.textContent = `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜${recommendation.reason}`;
     applyRiskBadge(riskBadge, recommendation.collisionRisk, "撞題風險低");
     riskNote.textContent = recommendation.collisionReason;
+    blocker.textContent = getRecommendationBlockerMessage(recommendation);
+    blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
     renderSimilarArticleList(similarList, recommendation);
   }
 
@@ -5165,6 +5225,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const riskBadge = document.getElementById("publishing-review-risk-badge");
     const riskNote = document.getElementById("publishing-review-risk-note");
     const actionHint = document.getElementById("publishing-review-action-hint");
+    const blocker = document.getElementById("publishing-review-blocker");
     const similarList = document.getElementById("publishing-review-similar-list");
     const top3 = document.getElementById("publishing-review-top3");
     const progress = document.getElementById("publishing-review-progress");
@@ -5187,6 +5248,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       !(riskBadge instanceof HTMLElement) ||
       !(riskNote instanceof HTMLElement) ||
       !(actionHint instanceof HTMLElement) ||
+      !(blocker instanceof HTMLElement) ||
       !(similarList instanceof HTMLElement) ||
       !(top3 instanceof HTMLElement) ||
       !(progress instanceof HTMLElement) ||
@@ -5217,6 +5279,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       applyRiskBadge(riskBadge, "low", "撞題風險低");
       riskNote.textContent = "會根據已上線文章自動比對。";
       actionHint.textContent = "可直接推進";
+      blocker.textContent = "";
+      blocker.classList.remove("is-visible");
       renderSimilarArticleList(similarList, null);
       top3.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的 Top 3 優先發布建議。</p>';
       baselinePath.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版基線達標路徑。</p>';
@@ -5244,6 +5308,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     applyRiskBadge(riskBadge, recommendation?.collisionRisk || "low", "撞題風險低");
     riskNote.textContent = recommendation?.collisionReason || "會根據已上線文章自動比對。";
     actionHint.textContent = recommendation?.actionHint || "可直接推進";
+    blocker.textContent = getRecommendationBlockerMessage(recommendation);
+    blocker.classList.toggle("is-visible", Boolean(blocker.textContent));
     renderSimilarArticleList(similarList, recommendation);
     top3.innerHTML = buildTopPriorityMarkup(currentTopicMode);
     renderSimilarityDiffAnalysis(diffContent, recommendation);

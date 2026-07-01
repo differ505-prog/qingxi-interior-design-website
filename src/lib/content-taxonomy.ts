@@ -247,16 +247,16 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             titleOverride: "血淚 Before/After：沒看懂漏水與結構老化的慘痛代價",
           },
           {
-            title: "QA迷思",
+            title: "迷思破解",
             keywords: ["初勘", "屋況判讀", "漏看", "風險訊號", "常見迷思", "判斷失準"],
             nodeKind: "qa",
-            titleOverride: "常見迷思：屋況初勘最容易漏看的風險訊號",
+            titleOverride: "迷思破解：屋況初勘最容易漏看的風險訊號",
           },
           {
-            title: "附錄表單",
+            title: "實戰表單",
             keywords: ["checklist", "表單", "健檢", "初勘", "清單", "附錄"],
             nodeKind: "form",
-            titleOverride: "附錄表單：老屋初勘健檢 Check-list",
+            titleOverride: "實戰表單：老屋初勘健檢 Check-list",
             assetSlotLabel: "老屋初勘健檢 Check-list",
           },
         ],
@@ -290,16 +290,16 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             titleOverride: "超支翻車：報價單沒拆細項的追加失控實錄",
           },
           {
-            title: "QA迷思",
+            title: "迷思破解",
             keywords: ["低總價", "省錢", "漏項", "報價迷思", "常見迷思"],
             nodeKind: "qa",
-            titleOverride: "常見迷思：低總價不等於省錢的報價漏項判讀",
+            titleOverride: "迷思破解：低總價不等於省錢的報價漏項判讀",
           },
           {
-            title: "附錄表單",
+            title: "實戰表單",
             keywords: ["預算表", "比例試算", "試算表", "表單", "分配比例"],
             nodeKind: "form",
-            titleOverride: "附錄表單：全室預算分配比例試算表",
+            titleOverride: "實戰表單：全室預算分配比例試算表",
             assetSlotLabel: "全室預算分配比例試算表",
           },
         ],
@@ -327,16 +327,23 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             titleOverride: "防水地坪：老屋防水修復與地坪施作基準",
           },
           {
-            title: "QA迷思",
+            title: "迷思破解",
             keywords: ["qa", "迷思", "管線一定要全換", "預算黑洞", "常見問題"],
             nodeKind: "qa",
-            titleOverride: "常見迷思：老屋管線全換迷思與水電泥作預算黑洞",
+            titleOverride: "迷思破解：管線全換的必要性與預算黑洞",
           },
           {
             title: "案例解析",
             keywords: ["返工", "拆除順序", "管線重拉", "施工翻車", "案例解析"],
             nodeKind: "case",
             titleOverride: "施工翻車：拆除與管線重拉順序錯置的返工代價",
+          },
+          {
+            title: "實戰表單",
+            keywords: ["進場前", "泥作", "水電", "檢核表", "進場檢查", "表單"],
+            nodeKind: "form",
+            titleOverride: "實戰表單：泥作水電進場前檢核表",
+            assetSlotLabel: "泥作水電進場前檢核表",
           },
         ],
       },
@@ -363,10 +370,10 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             titleOverride: "家具配置：老屋尺度配置與起居動線校準",
           },
           {
-            title: "附錄表單",
+            title: "實戰表單",
             keywords: ["系統櫃", "配件", "清單", "規格確認", "表單"],
             nodeKind: "form",
-            titleOverride: "櫃體細節：系統櫃配件清單與規格確認表",
+            titleOverride: "實戰表單：系統櫃配件清單與規格確認表",
             assetSlotLabel: "系統櫃配件清單與規格確認表",
           },
           {
@@ -383,10 +390,10 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             titleOverride: "改造案例：格局重整後的採光、收納與動線回正紀錄",
           },
           {
-            title: "QA迷思",
+            title: "迷思破解",
             keywords: ["收納做滿", "櫃體深度", "動線取捨", "常見迷思", "機能過量"],
             nodeKind: "qa",
-            titleOverride: "常見迷思：收納做滿不等於好住的櫃體與動線取捨",
+            titleOverride: "迷思破解：收納做滿不等於好住的櫃體與動線取捨",
           },
         ],
       },
@@ -419,10 +426,10 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             titleOverride: "成功下莊：點交與保固期的糾紛化解實錄",
           },
           {
-            title: "QA迷思",
+            title: "迷思破解",
             keywords: ["保固不是萬靈丹", "點交責任", "責任邊界", "常見迷思", "完工迷思"],
             nodeKind: "qa",
-            titleOverride: "常見迷思：保固不是萬靈丹的點交責任邊界",
+            titleOverride: "迷思破解：保固不是萬靈丹的點交責任邊界",
           },
         ],
       },
@@ -746,6 +753,73 @@ function getMacroPrioritySubchapters(chapterTitle = "") {
   return priorityMap[chapterTitle] || [];
 }
 
+function getOldHouseFallbackCandidateConfig(chapterTitle = "") {
+  const configMap: Record<string, { chapterTitle: string; subchapterTitle: string; category: string }> = {
+    "現況判讀": {
+      chapterTitle: "現況判讀",
+      subchapterTitle: "翻新起手式",
+      category: "老屋翻新",
+    },
+    "預算拆解": {
+      chapterTitle: "預算拆解",
+      subchapterTitle: "追加風險",
+      category: "裝修預算",
+    },
+    "基礎工程": {
+      chapterTitle: "基礎工程",
+      subchapterTitle: "實戰表單",
+      category: "老屋翻新",
+    },
+    "空間重整": {
+      chapterTitle: "空間重整",
+      subchapterTitle: "收納補強",
+      category: "收納機能",
+    },
+    "完工避雷": {
+      chapterTitle: "完工避雷",
+      subchapterTitle: "保固界線",
+      category: "老屋翻新",
+    },
+  };
+  return configMap[chapterTitle] || configMap["空間重整"];
+}
+
+function getOldHouseRecommendationPriorityBoost(
+  chapterTitle: string,
+  subchapterTitle: string,
+  nodeKind: PublicationNodeKind,
+) {
+  const chapterBoostMap: Record<string, number> = {
+    "空間重整": 110,
+    "預算拆解": 42,
+    "基礎工程": 30,
+    "現況判讀": 18,
+    "完工避雷": 16,
+  };
+  const chapterSubchapterBoostMap: Record<string, number> = {
+    "空間重整::收納補強": 150,
+    "空間重整::實戰表單": 132,
+    "空間重整::整理計畫": 110,
+    "空間重整::案例解析": 82,
+    "空間重整::迷思破解": 54,
+    "預算拆解::追加風險": 118,
+    "基礎工程::實戰表單": 48,
+    "預算拆解::報價拆讀": -160,
+  };
+  const nodeKindBoostMap: Record<PublicationNodeKind, number> = {
+    core: 0,
+    case: 18,
+    qa: 14,
+    form: 36,
+    project: 32,
+  };
+  return (
+    (chapterBoostMap[chapterTitle] || 0) +
+    (chapterSubchapterBoostMap[`${chapterTitle}::${subchapterTitle}`] || 0) +
+    (nodeKindBoostMap[nodeKind] || 0)
+  );
+}
+
 function isMicroCoverageTitle(title = "") {
   const microKeywords = ["客廳", "餐廳", "臥室", "浴室", "廚房", "玄關", "陽台", "局部", "單區", "單一空間"];
   return microKeywords.some((keyword) => title.includes(keyword));
@@ -806,13 +880,15 @@ function buildTitlePoolItem(
     entry.chapter === chapterTitle &&
     entry.subchapter === subchapterTitle
   ));
+  const topSemanticScore = buildSimilarArticleMatches(entries, trackTitle, chapterTitle, subchapterTitle)[0]?.score || 0;
+  const collisionMergeNeeded = !hasPublishedEntry && topSemanticScore >= 60;
   const mergeNeeded = Boolean(
     mergeDirective &&
     mergeDirective.targetSubchapter === subchapterTitle &&
     mergeDirective.sourceTitles.length > 0
   );
   const isRecommended = recommendedTopic?.subchapter === subchapterTitle;
-  const status: PublicationTitlePoolItem["status"] = mergeNeeded
+  const status: PublicationTitlePoolItem["status"] = mergeNeeded || collisionMergeNeeded
     ? "merge_needed"
     : hasPublishedEntry
       ? "published"
@@ -827,6 +903,8 @@ function buildTitlePoolItem(
         : "medium";
   const statusTag = mergeNeeded
     ? "整併執行中"
+    : collisionMergeNeeded
+      ? "需整併舊文"
     : hasPublishedEntry
       ? "已上線"
       : nodeKind === "case"
@@ -840,6 +918,8 @@ function buildTitlePoolItem(
               : "待補_正規";
   const note = mergeNeeded
     ? mergeDirective?.note || "此子章目前應先整併既有文章，不建議另開新標題。"
+    : collisionMergeNeeded
+      ? "此子章與既有文章的核心解法重疊度過高，應先整併舊文或改切角，不建議直接發布。"
     : hasPublishedEntry
       ? "此子章已有已上線文章，標題池保留作為整體出版視角參考。"
       : isRecommended
@@ -1352,7 +1432,7 @@ function buildRecommendationFromCandidate(
   const actionHint = mergeTriggered
     ? "應合併舊文"
     : collisionRisk === "high"
-      ? "需改子章節"
+      ? "需整併舊文"
       : collisionRisk === "medium"
         ? "需拉開差異"
         : "可直接推進";
@@ -1514,14 +1594,22 @@ function buildRecommendationCandidates(
         const chapterSaturationPenalty = trackHasStructuralVacuum && chapterEntries.length >= 2
           ? weights.chapterSaturationPenalty
           : 0;
-        const collisionPenalty = subchapterEntries.length > 0 ? 90 : 0;
-        const forceOldHouseNextTopicBoost = (
-          track.title === publishingFocusTrackTitle &&
-          chapter.title === "預算拆解" &&
-          subchapter.title === "報價拆讀" &&
-          subchapterEntries.length === 0
-        )
-          ? 160
+        const subchapterPlan = chapter.subchapters.find((item) => item.title === subchapter.title);
+        const nodeKind = subchapterPlan?.nodeKind || "core";
+        const titleSet = getTopicTitleSet(track.title, chapter.title, subchapter.title);
+        if (strictIsolation && hasCrossSeriesForbiddenKeyword(titleSet.webTitle, titleSet.backupTitles.join(" "))) {
+          return null;
+        }
+        const topSemanticScore = buildSimilarArticleMatches(entries, track.title, chapter.title, subchapter.title)[0]?.score || 0;
+        const collisionPenalty = subchapterEntries.length > 0
+          ? 90
+          : topSemanticScore >= 60
+            ? 240
+            : topSemanticScore >= 35
+              ? 76
+              : 0;
+        const oldHousePriorityBoost = track.title === publishingFocusTrackTitle
+          ? getOldHouseRecommendationPriorityBoost(chapter.title, subchapter.title, nodeKind)
           : 0;
         const score =
           focusBoost +
@@ -1531,16 +1619,11 @@ function buildRecommendationCandidates(
           seededSubchapterBoost +
           multiTrackDiversityBoost +
           structuralVacuumBoost +
-          forceOldHouseNextTopicBoost +
+          oldHousePriorityBoost +
           macroPriorityBoost -
           recentPenalty -
           chapterSaturationPenalty -
           collisionPenalty;
-
-        const titleSet = getTopicTitleSet(track.title, chapter.title, subchapter.title);
-        if (strictIsolation && hasCrossSeriesForbiddenKeyword(titleSet.webTitle, titleSet.backupTitles.join(" "))) {
-          return null;
-        }
         return {
           trackTitle: track.title,
           chapter: chapter.title,
@@ -1566,11 +1649,15 @@ function buildForcedFallbackCandidate(
   entries: BookshelfEntry[],
   focusTrackTitle: string,
   mode: PublishingTopicMode,
-  fallbackTrackTitle = publishingFocusTrackTitle,
-  fallbackChapterTitle = "預算拆解",
-  fallbackSubchapterTitle = "報價拆讀",
+  fallbackConfig = getOldHouseFallbackCandidateConfig(),
 ) {
   if (focusTrackTitle !== publishingFocusTrackTitle) return null;
+  const {
+    chapterTitle: fallbackChapterTitle,
+    subchapterTitle: fallbackSubchapterTitle,
+    category: fallbackCategory,
+  } = fallbackConfig;
+  const fallbackTrackTitle = publishingFocusTrackTitle;
   const track = getTrackPlan(fallbackTrackTitle);
   const chapter = track?.chapters.find((item) => item.title === fallbackChapterTitle);
   const subchapter = chapter?.subchapters.find((item) => item.title === fallbackSubchapterTitle);
@@ -1598,7 +1685,7 @@ function buildForcedFallbackCandidate(
       trackTitle: fallbackTrackTitle,
       chapter: fallbackChapterTitle,
       subchapter: fallbackSubchapterTitle,
-      category: "裝修預算",
+      category: fallbackCategory,
       articleCountInTrack: trackEntries.length,
       articleCountInChapter: chapterEntries.length,
       articleCountInSubchapter: subchapterEntries.length,
@@ -1619,8 +1706,8 @@ function getChapterRecommendedTopicFromEntries(
 ) {
   const best = buildRecommendationCandidates(entries, focusTrackTitle, mode, { trackTitle, chapterTitle })[0];
   if (!best) {
-    return trackTitle === publishingFocusTrackTitle && chapterTitle === "預算拆解"
-      ? buildForcedFallbackCandidate(entries, focusTrackTitle, mode)
+    return trackTitle === publishingFocusTrackTitle
+      ? buildForcedFallbackCandidate(entries, focusTrackTitle, mode, getOldHouseFallbackCandidateConfig(chapterTitle))
       : null;
   }
   return buildRecommendationFromCandidate(entries, best, focusTrackTitle, mode);

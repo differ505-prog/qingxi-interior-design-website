@@ -1545,6 +1545,21 @@
     background: rgba(180, 101, 91, 0.14);
   }
 
+  .bookshelf-review-blocker {
+    display: none;
+    padding: 0.72rem 0.85rem;
+    border-radius: 14px;
+    border: 1px solid rgba(180, 101, 91, 0.26);
+    background: linear-gradient(180deg, rgba(180, 101, 91, 0.12), rgba(255, 255, 255, 0.02));
+    color: rgba(248, 221, 221, 0.9);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .bookshelf-review-blocker.is-visible {
+    display: block;
+  }
+
   .bookshelf-review-similar-list {
     display: grid;
     gap: 0.45rem;
