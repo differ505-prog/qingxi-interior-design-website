@@ -8142,6 +8142,41 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     return "failed";
   }
 
+  async function copyPublishingReviewPromptWithFallback() {
+    const text = buildPublishingReviewPrompt();
+    const textarea = document.getElementById("publishing-review-prompt-content");
+    if (textarea instanceof HTMLTextAreaElement) {
+      textarea.value = text;
+    }
+    revealPublishingReviewPrompt();
+    textarea?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return "clipboard";
+      }
+    } catch (error) {
+      console.error("出版閉環覆核稿自動複製失敗：", error);
+    }
+
+    try {
+      if (textarea instanceof HTMLTextAreaElement) {
+        textarea.focus();
+        textarea.select();
+        textarea.setSelectionRange(0, textarea.value.length);
+        const copied = document.execCommand("copy");
+        if (copied) {
+          return "clipboard";
+        }
+      }
+    } catch (error) {
+      console.error("出版閉環覆核稿備援複製失敗：", error);
+    }
+
+    return "manual";
+  }
+
   function createGeminiDraftFromMaster() {
     return {
       title: geminiCanvasMasterData.title,
@@ -8654,16 +8689,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   });
 
   document.getElementById("copy-publishing-review-prompt")?.addEventListener("click", async () => {
-    const result = await copyText(
-      buildPublishingReviewPrompt(),
+    const result = await copyPublishingReviewPromptWithFallback();
+    const feedback = getCopyFeedbackState(
+      result,
       "已複製出版閉環覆核稿。",
-      { manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。" },
+      "已展開並選取閉環覆核稿；若瀏覽器未完成自動複製，直接按 Cmd + C 即可。",
+      "複製失敗，已展開閉環覆核稿，請直接手動複製。",
     );
-    if (result !== "clipboard") {
-      revealPublishingReviewPrompt();
-      document.getElementById("publishing-review-prompt-content")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    const feedback = getCopyFeedbackState(result, "已複製出版閉環覆核稿。", "已開啟手動複製視窗，可直接複製出版閉環覆核稿。");
     setFeedback(feedback.message, feedback.mode);
     setPublishingReviewFeedback(feedback.message, feedback.mode);
   });
