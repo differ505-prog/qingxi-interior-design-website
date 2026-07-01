@@ -38,7 +38,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     chapter: "現況判讀",
     subchapter: "水電安全",
     tags: ["老屋翻新", "水電更新", "迴路重整", "隱蔽工程", "用電安全", "基礎工程"],
-    coverImage: "/images/blog/old-house-condition-assessment-cover.png",
+    coverImage: "/images/blog/old-house-rewiring-and-electrical-safety-cover.png",
   },
   {
     slug: "old-house-renovation-scope-guide",
