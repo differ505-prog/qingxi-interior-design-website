@@ -6925,7 +6925,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "E. 最終發布欄位確認",
       "F. 出書收錄備註",
       "G. Google 商家最新動態版",
-      "H. 給 IDE 的提示詞優化建議",
+      "H. 正式文章自評",
+      "I. 給 IDE 的提示詞優化建議",
       "",
       "G. Google 商家最新動態版",
       "- 請固定分成『更新標題』、『最新動態內文』、『CTA 收尾句』三段。",
@@ -6933,7 +6934,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "- 內容必須視為官網文章的摘要分支，不可另寫成新的社群長文。",
       "- 若需附連結，請不要把完整裸網址寫進文案句子裡。",
       "",
-      buildIdePromptOptimizationSection("H. 給 IDE 的提示詞優化建議"),
+      buildArticleSelfReviewSection("H. 正式文章自評"),
+      "",
+      buildIdePromptOptimizationSection("I. 給 IDE 的提示詞優化建議"),
     ].join("\n");
   }
 
@@ -6954,6 +6957,32 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "3. 建議改寫：只寫最應重寫的 1-3 條原指令，並說明應如何改寫；若沒有，寫「無」。",
       "4. 本次觸發原因：用 2-4 句說明這些建議是因為本次哪裡不夠清楚、過度、衝突或缺漏。",
       "5. 是否建議立即修改：只能回答「是」或「否」，並補 1 句原因。",
+    ].join("\n");
+  }
+
+  function buildArticleSelfReviewSection(sectionTitle = "P. 【正式文章自評】") {
+    return [
+      `${sectionTitle}`,
+      "- 這一段是針對你剛完成的正式文章做自評，不是評提示詞，也不是評原始題目。",
+      "- 請用『是否已達正式發布與書稿收錄標準』來評，不可因為文氣順就給高分。",
+      "- 綜合評分滿分 10 分，請依下列權重綜合計算：",
+      "- 書稿成熟度 22%：是否像可直接收進書中的正式章節，而不是臨時部落格文。",
+      "- 內容判斷力 20%：是否真正回答核心問題，且判斷順序清楚、有幫助讀者決策。",
+      "- 數據與硬資訊密度 20%：是否至少有 3 個定量支點，且數據有前提、區間與適用情境。",
+      "- 章節定位與補位正確性 15%：是否寫在對的章節、補到對的缺口，沒有時序錯位。",
+      "- 工具書可用性 13%：是否有清單、對照、流程、分區、檢查點或回位邏輯可供實際使用。",
+      "- 品牌與文氣穩定度 5%：是否維持青曦的一致語氣，不浮誇、不網路化。",
+      "- SEO 與發布完整度 5%：標題、摘要、slug 與發布欄位是否成熟完整。",
+      "- 若出現以下任一情況，總分上限直接壓到 6.5/10 以下：章節錯置、與既有文章高度撞題、幾乎沒有定量支點、標題明顯網路化、整篇沒有工具書模組、把費用寫成保證報價。",
+      "- 分數請誠實保守，不可為了看起來厲害而灌水；8.6 分以上代表已可正式發布且接近可收書水準，9.3 分以上才代表非常成熟。",
+      "- 請固定依序輸出：",
+      "1. 整體評分：格式固定為 `X/10`，可帶 0.5 分。",
+      "2. 是否建議立即修改：只能回答 `是` 或 `否`。",
+      "3. 修改急迫度：只能回答 `高`、`中` 或 `低`。",
+      "4. 判定理由：用 3-6 句說明本篇強項與主要風險。",
+      "5. 分項評分：請依序列出 書稿成熟度 / 內容判斷力 / 數據與硬資訊密度 / 章節定位與補位正確性 / 工具書可用性 / 品牌與文氣穩定度 / SEO 與發布完整度，各自給 `X/10`。",
+      "6. 扣分主因 Top 3：只列最影響總分的 1-3 點。",
+      "7. 若只改 1 件事：指出最值得優先修改的單一項目。",
     ].join("\n");
   }
 
@@ -7113,6 +7142,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "L. 小紅書版",
       "M. Copilot 生圖提示詞（封面主圖 / 內文輔圖 / 延伸情境圖，各含正向提示詞與負面提示詞，必須為色鉛筆或麥克筆手繪、線條主導、局部著色點綴、莫蘭迪或低飽和配色，禁止寫實攝影語彙）",
       "N. 最後人工檢查清單",
+      "O. 正式文章自評",
+      "P. 給 IDE 的提示詞優化建議",
       "",
       buildSocialPlatformToneGuardSection("社群平台版統一護欄"),
       "",
@@ -7131,7 +7162,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "",
       buildCopilotImagePromptSection("M. Copilot 生圖提示詞補充限制"),
       "",
-      buildIdePromptOptimizationSection("O. 給 IDE 的提示詞優化建議"),
+      buildArticleSelfReviewSection("O. 正式文章自評"),
+      "",
+      buildIdePromptOptimizationSection("P. 給 IDE 的提示詞優化建議"),
     ].join("\n");
   }
 
@@ -7191,9 +7224,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "11. 請先從數據包挑出最適合本題的 3 至 5 個數據點，再決定放在哪一段；至少包含 1 個區間型、1 個數量或流程型、1 個風險或驗收型數據。",
       "12. 若上方數據包已給出『版型與工具書模組偏好』，正文至少要落實其中 2 項；尤其命中空間重整或收納補強時，優先做分區、對照、流程或回位模組。",
       "",
-      "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下 A 到 P 全部都必須寫在同一份 Markdown 文件內。",
+      "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下 A 到 R 全部都必須寫在同一份 Markdown 文件內。",
       "除這份文件本體外，不要在前後額外補操作說明、註解、摘要前言或對話式補充。",
-      "A 到 Q 每一段都是必填，不可自行省略、合併、跳號或只挑部分輸出；若缺少任何一段，代表整份回覆不合格，請先補齊再結束。",
+      "A 到 R 每一段都是必填，不可自行省略、合併、跳號或只挑部分輸出；若缺少任何一段，代表整份回覆不合格，請先補齊再結束。",
       "尤其 J. 【Google 商家最新動態版】是必填段落，不可因為你判斷篇幅不足、平台不重要、內容重複或任何其他理由省略。",
       "請你輸出以下內容，並嚴格依照順序：",
       "",
@@ -7277,7 +7310,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "- CTA 請以『閱讀官網文章』、『加入 LINE 諮詢』或『了解免費格局健檢』這類低壓導流為主，不要像強推銷。",
       "- 若需附連結，請不要把完整裸網址寫進文案句子裡，保留給實際發布時手動掛在 Google 商家欄位即可。",
       "- 請固定分成『更新標題』、『最新動態內文』、『CTA 收尾句』三段。",
-      "- 若你完成 J 段後，請再繼續輸出 K、L、M、N、O、P、Q，不可在 J 段後提早結束。",
+      "- 若你完成 J 段後，請再繼續輸出 K、L、M、N、O、P、Q、R，不可在 J 段後提早結束。",
       "",
       "K. 【FB 粉專版】",
       "- 請輸出適合 FB 粉專的完整貼文。",
@@ -7334,7 +7367,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "- 請列出 3-5 條發布前應人工確認的地方。",
       "- 例如：是否與既有文章重複、是否需要補真實案例、是否需要調整分類、是否適合收進既定書稿章節等。",
       "",
-      buildIdePromptOptimizationSection("Q. 【給 IDE 的提示詞優化建議】"),
+      buildArticleSelfReviewSection("Q. 【正式文章自評】"),
+      "",
+      buildIdePromptOptimizationSection("R. 【給 IDE 的提示詞優化建議】"),
     ].join("\n");
   }
 
@@ -7375,12 +7410,15 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "",
       structuredDataContext,
       "",
+      buildArticleSelfReviewSection("【正式文章自評規則】"),
+      "",
       "請依序輸出：",
       "1. 文章標題",
       "2. Lead 與核心引言",
       "3. 正文主體（分節清楚）",
       "4. 結尾總結",
       "5. SEO 標題與 meta description",
+      "6. 正式文章自評（含整體評分、是否建議立即修改、修改急迫度、分項評分、扣分主因與若只改 1 件事）",
     ].join("\n");
   }
 
