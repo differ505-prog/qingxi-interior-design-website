@@ -12,6 +12,7 @@ import {
   bookshelfSubchapterPools,
   bookshelfTracks,
   getPublishingDashboard,
+  getPublicationBookProposal,
   getNextRecommendedTopic,
   getNextRecommendedTopics,
   publicationMergeDirectives,
@@ -164,6 +165,7 @@ const topicModeMap = Object.fromEntries(
       modeOption.value,
       {
         ...modeOption,
+        bookProposal: getPublicationBookProposal(publishingDashboard.focusTrack?.title || publishingFocusTrackTitle),
         publishingDashboard,
         nextRecommendedTopic,
         nextTopicCandidates,
@@ -877,8 +879,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   <strong id="publishing-review-mode">尚未判定</strong>
                 </article>
                 <article class="bookshelf-confirm-card">
-                  <span>主攻書系</span>
-                  <strong id="publishing-review-track">尚未判定</strong>
+                  <span>正式書名</span>
+                  <strong id="publishing-review-book-title">尚未判定</strong>
                 </article>
                 <article class="bookshelf-confirm-card">
                   <span>距離出版基線</span>
@@ -887,6 +889,16 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 <article class="bookshelf-confirm-card">
                   <span>主書完成度</span>
                   <strong id="publishing-review-coverage">尚未計算</strong>
+                </article>
+              </div>
+              <div class="bookshelf-review-book-unit">
+                <article class="bookshelf-review-book-card">
+                  <span>副標定位</span>
+                  <strong id="publishing-review-book-subtitle">尚未判定</strong>
+                </article>
+                <article class="bookshelf-review-book-card bookshelf-review-book-card-wide">
+                  <span>一句話定位</span>
+                  <strong id="publishing-review-book-positioning">尚未判定</strong>
                 </article>
               </div>
               <div id="publishing-review-progress" class="bookshelf-review-progress-list"></div>
@@ -915,6 +927,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                   </div>
                 </details>
               </article>
+              <section class="bookshelf-review-top3">
+                <div class="bookshelf-preview-head">
+                  <p>Top 3 最值得先發</p>
+                  <span>不是只看單一答案，而是同時看 3 個優先順位的出版補位選項</span>
+                </div>
+                <div id="publishing-review-top3" class="bookshelf-review-top3-list"></div>
+              </section>
               <div class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
                 <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製給高階 LLM 覆核</button>
@@ -1859,6 +1878,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   const GEMINI_BACKUPS_KEY = "qingxi-gemini-canvas-backups-v1";
   const PUBLISHING_CHECKLIST_KEY = "qingxi-publishing-checklist-v1";
   const PUBLISHING_REVIEW_FILTER_KEY = "qingxi-publishing-review-filter-v1";
+  const PUBLISHING_TITLE_POOL_REVIEW_KEY = "qingxi-publishing-title-pool-review-v1";
   const TOPIC_MODE_KEY = "qingxi-topic-mode-v1";
   const WORKSPACE_PANE_KEY = "qingxi-workspace-pane-v1";
   const GEMINI_RECENT_LIMIT = 10;
@@ -1943,6 +1963,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   let geminiBackups = [];
   let publishingChecklistOverrides = {};
   let publishingReviewShowUnpublishedOnly = false;
+  let publishingTitlePoolReviewState = {};
   let currentTopicMode = topicModeOptions?.[0]?.value || "publishing";
   let currentWorkspacePane = "operations";
   let vendorNoteEditingId = "";
@@ -4233,12 +4254,110 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     return "中信心";
   }
 
+  function getTitlePoolReviewKey(item) {
+    return [
+      item.trackTitle || "",
+      item.chapter || "",
+      item.subchapter || "",
+      item.primaryTitle || "",
+    ].join("::");
+  }
+
+  function getManualReviewLabel(status = "") {
+    if (status === "approved") return "已核准";
+    if (status === "revise") return "待修改";
+    if (status === "snoozed") return "暫緩";
+    if (status === "rejected") return "已淘汰";
+    return "未覆核";
+  }
+
+  function getManualReviewOptions() {
+    return [
+      { value: "approved", label: "已核准" },
+      { value: "revise", label: "待修改" },
+      { value: "snoozed", label: "暫緩" },
+      { value: "rejected", label: "已淘汰" },
+    ];
+  }
+
+  function getManualReviewStatus(item) {
+    return publishingTitlePoolReviewState[getTitlePoolReviewKey(item)] || "";
+  }
+
+  function savePublishingTitlePoolReviewState() {
+    localStorage.setItem(PUBLISHING_TITLE_POOL_REVIEW_KEY, JSON.stringify(publishingTitlePoolReviewState));
+  }
+
+  function loadPublishingTitlePoolReviewState() {
+    try {
+      const raw = localStorage.getItem(PUBLISHING_TITLE_POOL_REVIEW_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      publishingTitlePoolReviewState = parsed && typeof parsed === "object" ? parsed : {};
+    } catch (error) {
+      console.error("讀取標題池人工覆核狀態失敗：", error);
+      publishingTitlePoolReviewState = {};
+    }
+  }
+
+  function updatePublishingTitlePoolReviewState(itemKey, status) {
+    if (!itemKey) return;
+    if (!status) {
+      delete publishingTitlePoolReviewState[itemKey];
+    } else {
+      publishingTitlePoolReviewState[itemKey] = status;
+    }
+    savePublishingTitlePoolReviewState();
+    renderPublishingReviewBoard();
+  }
+
+  function getTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
+    const modeState = getCurrentTopicModeState(mode);
+    return Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates.slice(0, Math.max(1, limit)) : [];
+  }
+
+  function buildTopPriorityText(mode = currentTopicMode, limit = 3) {
+    const candidates = getTopPriorityRecommendations(mode, limit);
+    if (!candidates.length) return "目前尚無可用的 Top 3 優先發布建議。";
+    return [
+      "【Top 3 最值得先發】",
+      ...candidates.map((candidate, index) => (
+        `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${candidate.reason}`
+      )),
+    ].join("\n");
+  }
+
+  function buildTopPriorityMarkup(mode = currentTopicMode, limit = 3) {
+    const candidates = getTopPriorityRecommendations(mode, limit);
+    if (!candidates.length) {
+      return '<p class="bookshelf-confirm-note">目前尚無可用的 Top 3 優先發布建議。</p>';
+    }
+    return candidates.map((candidate, index) => `
+      <article class="bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}">
+        <div class="bookshelf-review-top3-head">
+          <span>Top ${index + 1}</span>
+          <em>${escapeHtml(candidate.chapter)} / ${escapeHtml(candidate.subchapter)}</em>
+        </div>
+        <strong>${escapeHtml(getDisplayTitle(candidate))}</strong>
+        <p>${escapeHtml(candidate.reason)}</p>
+      </article>
+    `).join("");
+  }
+
+  function getBookProposal(mode = currentTopicMode) {
+    return getCurrentTopicModeState(mode)?.bookProposal || null;
+  }
+
   function buildPublishingTitlePoolText(mode = currentTopicMode) {
     const modeState = getCurrentTopicModeState(mode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
     if (!focusTrack?.chapterGaps?.length) return "目前尚無可用的未來出版標題池。";
+    const bookProposal = getBookProposal(mode);
 
     const lines = [
+      `正式書名：${bookProposal?.bookTitle || focusTrack.title}`,
+      `副標定位：${bookProposal?.subtitle || "尚未定義"}`,
+      `一句話定位：${bookProposal?.positioning || "尚未定義"}`,
       `主攻書系：${focusTrack.title}`,
       `主書完成度：${focusTrack.coverageRate}%`,
       "【完整未來出版標題池】",
@@ -4247,11 +4366,13 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     focusTrack.chapterGaps.forEach((gap, index) => {
       lines.push("", `${index + 1}. ${gap.chapter}`);
       gap.titlePool.forEach((item) => {
+        const manualReview = getManualReviewStatus(item);
         lines.push(
           `- 子章節：${item.subchapter}`,
           `  主標題：${item.primaryTitle}`,
           `  備選標題：${item.backupTitles.join(" / ") || "無"}`,
           `  狀態：${getTitlePoolStatusLabel(item.status)}｜${getTitlePoolConfidenceLabel(item.confidence)}${item.isRecommended ? "｜最推薦" : ""}`,
+          `  人工覆核：${getManualReviewLabel(manualReview)}`,
           `  備註：${item.note}`,
         );
       });
@@ -4274,7 +4395,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         </div>
         <ul class="bookshelf-review-title-pool-items">
           ${gap.titlePool.map((item) => `
-            <li class="bookshelf-review-title-pool-item is-${item.status} ${item.isRecommended ? "is-recommended" : ""}">
+            <li class="bookshelf-review-title-pool-item is-${item.status} is-review-${getManualReviewStatus(item) || "none"} ${item.isRecommended ? "is-recommended" : ""}">
               <div class="bookshelf-review-title-pool-copy">
                 <div class="bookshelf-review-title-pool-meta">
                   <span>${escapeHtml(item.subchapter)}</span>
@@ -4283,6 +4404,25 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 <strong>${escapeHtml(item.primaryTitle)}</strong>
                 <small>${escapeHtml(item.note)}</small>
                 ${item.backupTitles?.length ? `<p>備選：${escapeHtml(item.backupTitles.join(" / "))}</p>` : ""}
+                <div class="bookshelf-review-title-pool-review">
+                  <span>人工覆核：${escapeHtml(getManualReviewLabel(getManualReviewStatus(item)))}</span>
+                  <div class="bookshelf-review-title-pool-review-actions">
+                    ${getManualReviewOptions().map((option) => `
+                      <button
+                        type="button"
+                        class="bookshelf-review-mini-btn ${getManualReviewStatus(item) === option.value ? "is-active" : ""}"
+                        data-title-pool-review-key="${escapeHtml(getTitlePoolReviewKey(item))}"
+                        data-title-pool-review-status="${escapeHtml(option.value)}"
+                      >${escapeHtml(option.label)}</button>
+                    `).join("")}
+                    <button
+                      type="button"
+                      class="bookshelf-review-mini-btn ${!getManualReviewStatus(item) ? "is-active" : ""}"
+                      data-title-pool-review-key="${escapeHtml(getTitlePoolReviewKey(item))}"
+                      data-title-pool-review-status=""
+                    >清除</button>
+                  </div>
+                </div>
               </div>
             </li>
           `).join("")}
@@ -4389,10 +4529,14 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const modeState = getCurrentTopicModeState(mode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
     const recommendation = modeState?.nextRecommendedTopic;
+    const bookProposal = getBookProposal(mode);
     if (!focusTrack) return "目前尚無可用的出版補位清單。";
 
     const lines = [
       `決題模式：${modeState?.label || mode}`,
+      `正式書名：${bookProposal?.bookTitle || focusTrack.title}`,
+      `副標定位：${bookProposal?.subtitle || "尚未定義"}`,
+      `一句話定位：${bookProposal?.positioning || "尚未定義"}`,
       `主攻書系：${focusTrack.title}`,
       `主書完成度：${focusTrack.coverageRate}%`,
       `距離出版基線：還差 ${focusTrack.remainingToBaseline} 篇`,
@@ -4410,6 +4554,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       }
     }
 
+    lines.push("", buildTopPriorityText(mode));
     lines.push("", "【目前出版清單】");
 
     focusTrack.chapterGaps.forEach((gap, index) => {
@@ -4469,6 +4614,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function buildPublishingReviewPrompt(mode = currentTopicMode) {
     const modeState = getCurrentTopicModeState(mode);
     const recommendation = modeState?.nextRecommendedTopic;
+    const bookProposal = getBookProposal(mode);
     const questionBlock = articleSourceQuestion.trim() || "（本輪尚未貼入新的社團原始問題，可先針對長線出版清單做覆核。）";
 
     return [
@@ -4486,6 +4632,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "A. 出版結構總判斷",
       "- 判斷目前書名、章節與文章標題安排是否夠穩，是否能支撐後續集結成書。",
       "- 若有結構性問題，請先指出最上游的問題，不要只談表面措辭。",
+      `- 本次覆核以書名「${bookProposal?.bookTitle || modeState?.publishingDashboard?.focusTrack?.title || "尚未定義"}」為單位，不是只看書系代稱。`,
       "",
       "B. 重複與缺口覆核",
       "- 已標示 [已上線] 的文章代表官網已有內容，請檢查是否有重複、撞題或章節失衡。",
@@ -4504,6 +4651,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       "E. 最終優先順序建議",
       "- 請列出接下來最值得先做的 3 篇，依優先順序排序。",
       "- 每一篇都要附 1-2 句原因。",
+      "- 請直接參考本文附帶的 Top 3 最值得先發清單，必要時可以推翻並重排。",
       "",
       "F. 給 IDE 的修改提示詞 1：內容修改與增補 / 刪除",
       "- 請輸出 1 段可直接貼給 IDE 的提示詞。",
@@ -4595,9 +4743,12 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const modeState = getCurrentTopicModeState(currentTopicMode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
     const recommendation = modeState?.nextRecommendedTopic;
+    const bookProposal = getBookProposal(currentTopicMode);
     const draftState = getCurrentDraftState();
     const mode = document.getElementById("publishing-review-mode");
-    const track = document.getElementById("publishing-review-track");
+    const bookTitle = document.getElementById("publishing-review-book-title");
+    const bookSubtitle = document.getElementById("publishing-review-book-subtitle");
+    const bookPositioning = document.getElementById("publishing-review-book-positioning");
     const baseline = document.getElementById("publishing-review-baseline");
     const coverage = document.getElementById("publishing-review-coverage");
     const nextTitle = document.getElementById("publishing-review-next-title");
@@ -4606,6 +4757,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const riskNote = document.getElementById("publishing-review-risk-note");
     const actionHint = document.getElementById("publishing-review-action-hint");
     const similarList = document.getElementById("publishing-review-similar-list");
+    const top3 = document.getElementById("publishing-review-top3");
     const progress = document.getElementById("publishing-review-progress");
     const diffContent = document.getElementById("publishing-review-diff-content");
     const plan = document.getElementById("publishing-review-plan");
@@ -4615,7 +4767,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const filterNote = document.getElementById("publishing-review-filter-note");
     if (
       !(mode instanceof HTMLElement) ||
-      !(track instanceof HTMLElement) ||
+      !(bookTitle instanceof HTMLElement) ||
+      !(bookSubtitle instanceof HTMLElement) ||
+      !(bookPositioning instanceof HTMLElement) ||
       !(baseline instanceof HTMLElement) ||
       !(coverage instanceof HTMLElement) ||
       !(nextTitle instanceof HTMLElement) ||
@@ -4624,6 +4778,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       !(riskNote instanceof HTMLElement) ||
       !(actionHint instanceof HTMLElement) ||
       !(similarList instanceof HTMLElement) ||
+      !(top3 instanceof HTMLElement) ||
       !(progress instanceof HTMLElement) ||
       !(diffContent instanceof HTMLElement) ||
       !(plan instanceof HTMLElement) ||
@@ -4641,7 +4796,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
     if (!focusTrack) {
       mode.textContent = "尚未判定";
-      track.textContent = "尚未判定";
+      bookTitle.textContent = "尚未判定";
+      bookSubtitle.textContent = "尚未判定";
+      bookPositioning.textContent = "尚未判定";
       baseline.textContent = "尚未計算";
       coverage.textContent = "尚未計算";
       nextTitle.textContent = "尚未產生";
@@ -4650,6 +4807,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       riskNote.textContent = "會根據已上線文章自動比對。";
       actionHint.textContent = "可直接推進";
       renderSimilarArticleList(similarList, null);
+      top3.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的 Top 3 優先發布建議。</p>';
       renderSimilarityDiffAnalysis(diffContent, null);
       progress.innerHTML = "";
       plan.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版清單。</p>';
@@ -4661,7 +4819,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     }
 
     mode.textContent = modeState?.label || currentTopicMode;
-    track.textContent = focusTrack.title;
+    bookTitle.textContent = bookProposal?.bookTitle || focusTrack.title;
+    bookSubtitle.textContent = bookProposal?.subtitle || "尚未定義";
+    bookPositioning.textContent = bookProposal?.positioning || "尚未定義";
     baseline.textContent = `還差 ${focusTrack.remainingToBaseline} 篇`;
     coverage.textContent = `${focusTrack.coverageRate}%`;
     nextTitle.textContent = recommendation ? getDisplayTitle(recommendation) : "尚未產生";
@@ -4672,6 +4832,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     riskNote.textContent = recommendation?.collisionReason || "會根據已上線文章自動比對。";
     actionHint.textContent = recommendation?.actionHint || "可直接推進";
     renderSimilarArticleList(similarList, recommendation);
+    top3.innerHTML = buildTopPriorityMarkup(currentTopicMode);
     renderSimilarityDiffAnalysis(diffContent, recommendation);
     progress.innerHTML = buildChapterProgressMarkup(focusTrack);
     titlePool.innerHTML = buildPublishingTitlePoolMarkup(focusTrack);
@@ -7687,6 +7848,18 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     }
   });
 
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof HTMLElement
+      ? event.target.closest("[data-title-pool-review-key]")
+      : null;
+    if (!(target instanceof HTMLButtonElement)) return;
+    updatePublishingTitlePoolReviewState(
+      target.dataset.titlePoolReviewKey || "",
+      target.dataset.titlePoolReviewStatus || "",
+    );
+    setFeedback(`已更新人工覆核狀態為「${target.textContent?.trim() || "未覆核"}」。`, "is-success");
+  });
+
   document.getElementById("copy-book-plan")?.addEventListener("click", async () => {
     await copyText(buildBookshelfLlmPrompt(), "已複製 LLM 書系整理稿。");
   });
@@ -8204,6 +8377,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   loadGeminiBackupState();
   loadPublishingChecklist();
   loadPublishingReviewFilter();
+  loadPublishingTitlePoolReviewState();
   loadTopicMode();
   loadWorkspacePane();
   loadState();

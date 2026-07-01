@@ -52,6 +52,13 @@ export interface PublishingTrackCoverage {
   coverageRate: number;
 }
 
+export interface PublicationBookProposal {
+  trackTitle: string;
+  bookTitle: string;
+  subtitle: string;
+  positioning: string;
+}
+
 export interface PublishingChapterGap {
   chapter: string;
   articleCount: number;
@@ -157,6 +164,39 @@ export const publicationMergeDirectives: PublicationMergeDirective[] = [
     note: "這兩篇屬同一組前置決策內容，應整併為單一的翻新起手式條目，而不是繼續拆成分散子題。",
   },
 ];
+
+const publicationBookProposalOverrides: Record<string, PublicationBookProposal> = {
+  [publishingFocusTrackTitle]: {
+    trackTitle: publishingFocusTrackTitle,
+    bookTitle: "老屋翻新起手式",
+    subtitle: "從屋況盤點、預算拆解到完工避雷的實戰指南",
+    positioning: "先用前期判讀立穩決策，再把預算、工程、空間與驗收串成一本可落地的老屋翻新工具書。",
+  },
+  "預售屋客變系": {
+    trackTitle: "預售屋客變系",
+    bookTitle: "預售屋客變決策手冊",
+    subtitle: "從配置預留到交屋銜接的規劃框架",
+    positioning: "把客變、設備預留與交屋前後的決策節點整成一套可直接執行的準備清單。",
+  },
+  "驗屋交屋系": {
+    trackTitle: "驗屋交屋系",
+    bookTitle: "驗屋交屋判讀指南",
+    subtitle: "缺失排序、點交策略與交屋後進場的實務框架",
+    positioning: "將驗屋缺失、點交節奏與進場銜接整成一套可實際判讀與追蹤的交屋工具書。",
+  },
+  "格局動線系": {
+    trackTitle: "格局動線系",
+    bookTitle: "家的動線配置學",
+    subtitle: "從尺度、收納到家具配置的生活邏輯",
+    positioning: "用生活情境與空間尺度重新梳理家的動線，建立真正能住得順的配置方法。",
+  },
+  "水電照明系": {
+    trackTitle: "水電照明系",
+    bookTitle: "住家的水電照明基礎課",
+    subtitle: "插座、迴路、照明與設備整合的規劃手冊",
+    positioning: "把最容易後悔的隱蔽工程與照明決策，整理成入住前就能用的規劃基準。",
+  },
+};
 
 export const publishingTopicModeOptions: PublishingTopicModeOption[] = [
   {
@@ -658,6 +698,15 @@ function buildChapterTitlePool(
 
 export function getTrackPlan(trackTitle = "") {
   return bookshelfTrackPlans.find((track) => track.title === trackTitle) || null;
+}
+
+export function getPublicationBookProposal(trackTitle = "") {
+  return publicationBookProposalOverrides[trackTitle] || {
+    trackTitle,
+    bookTitle: resolveTrackRootLabel(trackTitle) || trackTitle || "未命名出版企劃",
+    subtitle: `${resolveTrackRootLabel(trackTitle) || trackTitle}的章節化出版規劃`,
+    positioning: "以既有文章骨架為基礎，持續補齊章節、標題池與出版閉環。",
+  };
 }
 
 export function getPublicationMergeDirective(trackTitle = "", chapterTitle = "") {

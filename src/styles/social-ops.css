@@ -1722,10 +1722,94 @@
     font-weight: 600;
   }
 
+  .bookshelf-review-title-pool-review {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 0.25rem;
+  }
+
+  .bookshelf-review-title-pool-review-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .bookshelf-review-mini-btn {
+    appearance: none;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(236, 233, 227, 0.82);
+    padding: 0.42rem 0.62rem;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .bookshelf-review-mini-btn:hover,
+  .bookshelf-review-mini-btn.is-active {
+    border-color: rgba(231, 198, 126, 0.24);
+    background: rgba(231, 198, 126, 0.12);
+    color: #f7f3eb;
+  }
+
+  .bookshelf-review-title-pool-item.is-review-approved {
+    border-color: rgba(106, 151, 117, 0.22);
+  }
+
+  .bookshelf-review-title-pool-item.is-review-revise {
+    border-color: rgba(231, 198, 126, 0.24);
+  }
+
+  .bookshelf-review-title-pool-item.is-review-snoozed {
+    border-color: rgba(145, 138, 127, 0.18);
+    opacity: 0.84;
+  }
+
+  .bookshelf-review-title-pool-item.is-review-rejected {
+    border-color: rgba(196, 113, 113, 0.24);
+    background: linear-gradient(180deg, rgba(196, 113, 113, 0.08), rgba(255, 255, 255, 0.014));
+  }
+
   .bookshelf-review-progress-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 0.75rem;
+  }
+
+  .bookshelf-review-book-unit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .bookshelf-review-book-card {
+    display: grid;
+    gap: 0.28rem;
+    padding: 0.9rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-review-book-card-wide {
+    grid-column: span 2;
+  }
+
+  .bookshelf-review-book-card span {
+    color: rgba(230, 228, 222, 0.58);
+    font-size: 0.78rem;
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-review-book-card strong {
+    color: #f4f2ed;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    font-weight: 600;
   }
 
   .bookshelf-review-progress-card {
@@ -1799,6 +1883,55 @@
 
   .bookshelf-review-diff-panel {
     margin-top: 0.1rem;
+  }
+
+  .bookshelf-review-top3 {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .bookshelf-review-top3-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .bookshelf-review-top3-card {
+    display: grid;
+    gap: 0.34rem;
+    padding: 0.95rem 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .bookshelf-review-top3-card.is-primary {
+    border-color: rgba(231, 198, 126, 0.22);
+    background: linear-gradient(180deg, rgba(231, 198, 126, 0.08), rgba(255, 255, 255, 0.018));
+  }
+
+  .bookshelf-review-top3-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .bookshelf-review-top3-head span,
+  .bookshelf-review-top3-head em,
+  .bookshelf-review-top3-card p {
+    color: rgba(233, 231, 225, 0.62);
+    font-size: 0.8rem;
+    line-height: 1.7;
+    font-style: normal;
+    margin: 0;
+  }
+
+  .bookshelf-review-top3-card strong {
+    color: #f4f2ed;
+    font-size: 0.94rem;
+    line-height: 1.7;
+    font-weight: 600;
   }
 
   .bookshelf-review-diff-content {
