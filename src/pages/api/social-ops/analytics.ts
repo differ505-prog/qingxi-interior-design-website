@@ -2,6 +2,16 @@ import type { APIRoute } from "astro";
 import { createSign } from "node:crypto";
 
 type GaMetricMap = Record<string, number>;
+type TrafficTrendPoint = {
+  date: string;
+  label: string;
+  sessions: number;
+};
+
+const REPORT_RANGE_DAYS = 7;
+const CURRENT_RANGE_START_DAYS_AGO = REPORT_RANGE_DAYS - 1;
+const PREVIOUS_RANGE_START_DAYS_AGO = CURRENT_RANGE_START_DAYS_AGO + REPORT_RANGE_DAYS;
+const PREVIOUS_RANGE_END_DAYS_AGO = REPORT_RANGE_DAYS;
 const SOCIAL_SOURCE_HINTS = [
   "facebook",
   "instagram",
@@ -159,6 +169,57 @@ function parseReportMetricValue(report: any) {
   );
 }
 
+function getUtcIsoDateDaysAgo(daysAgo: number) {
+  const value = new Date();
+  value.setUTCHours(0, 0, 0, 0);
+  value.setUTCDate(value.getUTCDate() - daysAgo);
+  return value.toISOString().slice(0, 10);
+}
+
+function formatGaDateValue(rawValue: string) {
+  if (!/^\d{8}$/.test(rawValue)) return "";
+  return `${rawValue.slice(0, 4)}-${rawValue.slice(4, 6)}-${rawValue.slice(6, 8)}`;
+}
+
+function formatTrendLabel(dateValue: string) {
+  if (!dateValue) return "";
+  const [year, month, day] = dateValue.split("-").map((value) => Number(value));
+  if (!year || !month || !day) return dateValue;
+  return `${month}/${day}`;
+}
+
+function createDateRangePoints(startDate: string, endDate: string, totals: Map<string, number>) {
+  const points: TrafficTrendPoint[] = [];
+  const cursor = new Date(`${startDate}T00:00:00Z`);
+  const boundary = new Date(`${endDate}T00:00:00Z`);
+  if (Number.isNaN(cursor.getTime()) || Number.isNaN(boundary.getTime())) {
+    return points;
+  }
+
+  while (cursor <= boundary) {
+    const date = cursor.toISOString().slice(0, 10);
+    points.push({
+      date,
+      label: formatTrendLabel(date),
+      sessions: totals.get(date) || 0,
+    });
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+
+  return points;
+}
+
+function buildTrafficTrendPoints(report: any, startDate: string, endDate: string) {
+  const totals = new Map<string, number>();
+  for (const row of report?.rows || []) {
+    const date = formatGaDateValue(String(row?.dimensionValues?.[0]?.value || ""));
+    if (!date) continue;
+    totals.set(date, parseMetricValue(row?.metricValues?.[0]?.value));
+  }
+
+  return createDateRangePoints(startDate, endDate, totals);
+}
+
 function getRetryableGaStartDate(error: unknown) {
   const message = error instanceof Error ? error.message : String(error || "");
   const matched = message.match(/must be greater than (\d{4}-\d{2}-\d{2})/);
@@ -185,6 +246,11 @@ function isSocialSourceMedium(value: string) {
 }
 
 export const GET: APIRoute = async () => {
+  const currentStartDate = getUtcIsoDateDaysAgo(CURRENT_RANGE_START_DAYS_AGO);
+  const currentEndDate = getUtcIsoDateDaysAgo(0);
+  const previousStartDate = getUtcIsoDateDaysAgo(PREVIOUS_RANGE_START_DAYS_AGO);
+  const previousEndDate = getUtcIsoDateDaysAgo(PREVIOUS_RANGE_END_DAYS_AGO);
+
   const propertyId =
     import.meta.env.GA4_PROPERTY_ID?.trim() ||
     import.meta.env.GOOGLE_ANALYTICS_PROPERTY_ID?.trim() ||
@@ -236,6 +302,8 @@ export const GET: APIRoute = async () => {
       socialLandingReport,
       todaySessionsReport,
       totalSessionsReport,
+      trafficTrendReport,
+      previousTrafficTrendReport,
     ] = await Promise.all([
       runGaRealtimeReport(accessToken, propertyId, {
         metrics: [{ name: "activeUsers" }],
@@ -243,7 +311,7 @@ export const GET: APIRoute = async () => {
         limit: 1,
       }),
       runGaReport(accessToken, propertyId, {
-        dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+        dateRanges: [{ startDate: currentStartDate, endDate: currentEndDate }],
         dimensions: [{ name: "pagePath" }],
         metrics: [{ name: "screenPageViews" }],
         dimensionFilter: {
@@ -260,7 +328,7 @@ export const GET: APIRoute = async () => {
         limit: 5,
       }),
       runGaReport(accessToken, propertyId, {
-        dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+        dateRanges: [{ startDate: currentStartDate, endDate: currentEndDate }],
         dimensions: [{ name: "eventName" }],
         metrics: [{ name: "eventCount" }],
         dimensionFilter: {
@@ -278,14 +346,14 @@ export const GET: APIRoute = async () => {
         },
       }),
       runGaReport(accessToken, propertyId, {
-        dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+        dateRanges: [{ startDate: currentStartDate, endDate: currentEndDate }],
         dimensions: [{ name: "sessionSourceMedium" }],
         metrics: [{ name: "sessions" }],
         orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
         limit: 25,
       }),
       runGaReport(accessToken, propertyId, {
-        dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+        dateRanges: [{ startDate: currentStartDate, endDate: currentEndDate }],
         dimensions: [{ name: "landingPagePlusQueryString" }, { name: "sessionSourceMedium" }],
         metrics: [{ name: "sessions" }],
         dimensionFilter: {
@@ -305,6 +373,20 @@ export const GET: APIRoute = async () => {
         dateRanges: [{ startDate: "2005-01-01", endDate: "today" }],
         metrics: [{ name: "sessions" }],
         metricAggregations: ["TOTAL"],
+      }),
+      runGaReport(accessToken, propertyId, {
+        dateRanges: [{ startDate: currentStartDate, endDate: currentEndDate }],
+        dimensions: [{ name: "date" }],
+        metrics: [{ name: "sessions" }],
+        orderBys: [{ dimension: { dimensionName: "date" } }],
+        limit: REPORT_RANGE_DAYS,
+      }),
+      runGaReport(accessToken, propertyId, {
+        dateRanges: [{ startDate: previousStartDate, endDate: previousEndDate }],
+        dimensions: [{ name: "date" }],
+        metrics: [{ name: "sessions" }],
+        orderBys: [{ dimension: { dimensionName: "date" } }],
+        limit: REPORT_RANGE_DAYS,
       }),
     ]);
 
@@ -355,6 +437,30 @@ export const GET: APIRoute = async () => {
     const realtimeActiveUsers = parseMetricValue(
       realtimeReport?.rows?.[0]?.metricValues?.[0]?.value,
     );
+    const trafficTrendPoints = buildTrafficTrendPoints(
+      trafficTrendReport,
+      currentStartDate,
+      currentEndDate,
+    );
+    const previousTrafficTrendPoints = buildTrafficTrendPoints(
+      previousTrafficTrendReport,
+      previousStartDate,
+      previousEndDate,
+    );
+    const trafficTrendCurrentTotal = trafficTrendPoints.reduce(
+      (sum, item) => sum + item.sessions,
+      0,
+    );
+    const trafficTrendPreviousTotal = previousTrafficTrendPoints.reduce(
+      (sum, item) => sum + item.sessions,
+      0,
+    );
+    const trafficTrendChange = trafficTrendCurrentTotal - trafficTrendPreviousTotal;
+    const trafficTrendChangePercent = trafficTrendPreviousTotal > 0
+      ? Number(((trafficTrendChange / trafficTrendPreviousTotal) * 100).toFixed(1))
+      : trafficTrendCurrentTotal > 0
+        ? 100
+        : 0;
     const socialSessions = topSources.reduce(
       (sum: number, item: { isSocial: boolean; sessions: number }) =>
         item.isSocial ? sum + item.sessions : sum,
@@ -381,6 +487,13 @@ export const GET: APIRoute = async () => {
         topPosts,
         topSources: topSources.slice(0, 8),
         socialLandingPages,
+        trafficTrend: {
+          points: trafficTrendPoints,
+          currentTotal: trafficTrendCurrentTotal,
+          previousTotal: trafficTrendPreviousTotal,
+          change: trafficTrendChange,
+          changePercent: trafficTrendChangePercent,
+        },
       }),
       {
         status: 200,

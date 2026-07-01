@@ -1624,6 +1624,19 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                       <strong id="content-analytics-requirement-success">-</strong>
                     </article>
                   </div>
+                  <div class="bookshelf-analytics-trend-card">
+                    <div class="bookshelf-preview-head">
+                      <p>近 7 天流量趨勢</p>
+                      <span id="content-analytics-trend-summary">同步後顯示</span>
+                    </div>
+                    <div id="content-analytics-trend-chart" class="bookshelf-analytics-chart">
+                      <div class="bookshelf-analytics-chart-empty">正在準備趨勢圖...</div>
+                    </div>
+                    <div class="bookshelf-analytics-trend-footer">
+                      <span id="content-analytics-trend-period">近 7 天 sessions</span>
+                      <strong id="content-analytics-trend-total">-</strong>
+                    </div>
+                  </div>
                   <div class="bookshelf-analytics-top">
                     <div class="bookshelf-preview-head">
                       <p>近 7 天熱門文章</p>
@@ -1805,6 +1818,13 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     topPosts: [],
     topSources: [],
     socialLandingPages: [],
+    trafficTrend: {
+      points: [],
+      currentTotal: 0,
+      previousTotal: 0,
+      change: 0,
+      changePercent: 0,
+    },
     note: "",
   };
   let vendorNotesState = {
@@ -3257,6 +3277,93 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return parsed.toLocaleString("zh-TW");
   }
 
+  function formatDeltaPercent(value) {
+    const parsed = Number(value || 0);
+    if (!Number.isFinite(parsed)) return "0%";
+    const rounded = Math.abs(parsed) >= 10 ? parsed.toFixed(1) : parsed.toFixed(1);
+    return `${rounded}%`;
+  }
+
+  function getTrafficTrendSummary(trend) {
+    const change = Number(trend?.change || 0);
+    const percent = Number(trend?.changePercent || 0);
+    if (change > 0) return `較前 7 天成長 ${formatDeltaPercent(percent)}`;
+    if (change < 0) return `較前 7 天下降 ${formatDeltaPercent(Math.abs(percent))}`;
+    return "與前 7 天持平";
+  }
+
+  function buildTrafficTrendSvg(points = []) {
+    if (!Array.isArray(points) || !points.length) {
+      return '<div class="bookshelf-analytics-chart-empty">近 7 天尚無流量資料。</div>';
+    }
+
+    const width = 560;
+    const height = 220;
+    const paddingLeft = 18;
+    const paddingRight = 18;
+    const paddingTop = 18;
+    const paddingBottom = 34;
+    const values = points.map((point) => Number(point?.sessions || 0));
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const valueSpan = Math.max(maxValue - minValue, 1);
+    const yMin = Math.max(0, minValue - valueSpan * 0.2);
+    const yMax = Math.max(maxValue, yMin + 1);
+    const chartWidth = width - paddingLeft - paddingRight;
+    const chartHeight = height - paddingTop - paddingBottom;
+    const xStep = points.length > 1 ? chartWidth / (points.length - 1) : 0;
+    const toX = (index) => paddingLeft + index * xStep;
+    const toY = (value) => {
+      const normalized = (Number(value || 0) - yMin) / (yMax - yMin || 1);
+      return paddingTop + chartHeight - normalized * chartHeight;
+    };
+
+    const pointPairs = points.map((point, index) => [toX(index), toY(point.sessions)]);
+    const polylinePoints = pointPairs.map(([x, y]) => `${x},${y}`).join(" ");
+    const areaPath = [
+      `M ${pointPairs[0][0]} ${height - paddingBottom}`,
+      ...pointPairs.map(([x, y]) => `L ${x} ${y}`),
+      `L ${pointPairs[pointPairs.length - 1][0]} ${height - paddingBottom}`,
+      "Z",
+    ].join(" ");
+    const gridLevels = [0, 0.5, 1];
+    const gridLines = gridLevels.map((level) => {
+      const y = paddingTop + chartHeight * level;
+      const value = Math.round(yMax - (yMax - yMin) * level);
+      return `
+        <g>
+          <line x1="${paddingLeft}" y1="${y}" x2="${width - paddingRight}" y2="${y}" />
+          <text x="${width - paddingRight}" y="${y - 6}">${formatCount(value)}</text>
+        </g>
+      `;
+    }).join("");
+    const pointDots = points.map((point, index) => `
+      <g>
+        <circle cx="${toX(index)}" cy="${toY(point.sessions)}" r="4" />
+        <title>${point.label}：${formatCount(point.sessions)} sessions</title>
+      </g>
+    `).join("");
+    const axisLabels = points.map((point, index) => `
+      <text x="${toX(index)}" y="${height - 10}" text-anchor="middle">${point.label}</text>
+    `).join("");
+
+    return `
+      <svg class="bookshelf-analytics-chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="近 7 天流量折線圖">
+        <defs>
+          <linearGradient id="analyticsTrendFill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="rgba(231, 198, 126, 0.38)" />
+            <stop offset="100%" stop-color="rgba(231, 198, 126, 0.04)" />
+          </linearGradient>
+        </defs>
+        <g class="bookshelf-analytics-chart-grid">${gridLines}</g>
+        <path class="bookshelf-analytics-chart-area" d="${areaPath}" />
+        <polyline class="bookshelf-analytics-chart-line" points="${polylinePoints}" />
+        <g class="bookshelf-analytics-chart-dots">${pointDots}</g>
+        <g class="bookshelf-analytics-chart-axis">${axisLabels}</g>
+      </svg>
+    `;
+  }
+
   function getArticleTitleFromPagePath(pagePath = "") {
     const slug = pagePath
       .replace(/^\/blog\//, "")
@@ -3293,6 +3400,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     const estimateGeneratedNode = document.getElementById("content-analytics-estimate-generated");
     const estimateCtaNode = document.getElementById("content-analytics-estimate-cta");
     const requirementSuccessNode = document.getElementById("content-analytics-requirement-success");
+    const trendSummaryNode = document.getElementById("content-analytics-trend-summary");
+    const trendChartNode = document.getElementById("content-analytics-trend-chart");
+    const trendPeriodNode = document.getElementById("content-analytics-trend-period");
+    const trendTotalNode = document.getElementById("content-analytics-trend-total");
 
     // 即使找不到一些元素，也继续处理能找到的元素
     if (realtimeUsersNode) realtimeUsersNode.textContent = formatCount(contentAnalyticsState.metrics.realtimeActiveUsers);
@@ -3308,6 +3419,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       if (statusNode) statusNode.textContent = "讀取中";
       if (updatedAtNode) updatedAtNode.textContent = "同步中";
       if (noteNode) noteNode.textContent = "正在向 GA4 讀取即時活躍使用者、近 7 天內容、來源與轉換成效。";
+      if (trendSummaryNode) trendSummaryNode.textContent = "同步中";
+      if (trendPeriodNode) trendPeriodNode.textContent = "近 7 天 sessions";
+      if (trendTotalNode) trendTotalNode.textContent = "-";
+      if (trendChartNode) trendChartNode.innerHTML = '<div class="bookshelf-analytics-chart-empty">正在讀取每日流量資料...</div>';
       if (topPostsNode) topPostsNode.innerHTML = "<li>正在讀取內容成效...</li>";
       if (topSourcesNode) topSourcesNode.innerHTML = "<li>正在讀取來源資料...</li>";
       if (socialLandingsNode) socialLandingsNode.innerHTML = "<li>正在讀取社群落地頁...</li>";
@@ -3320,6 +3435,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       if (noteNode) noteNode.textContent =
         contentAnalyticsState.note ||
         "設定好 GA4 權限後，這裡會自動顯示即時活躍使用者、內容、來源與落地頁成效。";
+      if (trendSummaryNode) trendSummaryNode.textContent = "待接 GA4";
+      if (trendPeriodNode) trendPeriodNode.textContent = "近 7 天 sessions";
+      if (trendTotalNode) trendTotalNode.textContent = "-";
+      if (trendChartNode) trendChartNode.innerHTML = '<div class="bookshelf-analytics-chart-empty">接通 GA4 後會顯示近 7 天流量走勢。</div>';
       if (topPostsNode) topPostsNode.innerHTML = "<li>目前尚未接通 GA4 Data API。</li>";
       if (topSourcesNode) topSourcesNode.innerHTML = "<li>接通後可直接看到來源 / 媒介排行。</li>";
       if (socialLandingsNode) socialLandingsNode.innerHTML = "<li>接通後可直接看到社群帶進站的頁面。</li>";
@@ -3330,6 +3449,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       if (statusNode) statusNode.textContent = "讀取失敗";
       if (updatedAtNode) updatedAtNode.textContent = contentAnalyticsState.rangeLabel;
       if (noteNode) noteNode.textContent = contentAnalyticsState.note || "GA4 報表暫時讀取失敗，請稍後再試。";
+      if (trendSummaryNode) trendSummaryNode.textContent = "讀取失敗";
+      if (trendPeriodNode) trendPeriodNode.textContent = "近 7 天 sessions";
+      if (trendTotalNode) trendTotalNode.textContent = "-";
+      if (trendChartNode) trendChartNode.innerHTML = '<div class="bookshelf-analytics-chart-empty">目前無法產生流量趨勢圖。</div>';
       if (topPostsNode) topPostsNode.innerHTML = "<li>目前無法取得熱門文章排行。</li>";
       if (topSourcesNode) topSourcesNode.innerHTML = "<li>目前無法取得來源排行。</li>";
       if (socialLandingsNode) socialLandingsNode.innerHTML = "<li>目前無法取得社群落地頁排行。</li>";
@@ -3349,6 +3472,20 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     if (noteNode) noteNode.textContent =
       contentAnalyticsState.note ||
       `即時活躍使用者顯示近 30 分鐘 active users；今日人次與總人次顯示整站 sessions；${contentAnalyticsState.rangeLabel} 內則集中回看內容、來源與官網轉換事件。`;
+
+    const trendPoints = Array.isArray(contentAnalyticsState.trafficTrend?.points)
+      ? contentAnalyticsState.trafficTrend.points
+      : [];
+    if (trendSummaryNode) trendSummaryNode.textContent = getTrafficTrendSummary(contentAnalyticsState.trafficTrend);
+    if (trendPeriodNode) {
+      const firstPoint = trendPoints[0];
+      const lastPoint = trendPoints[trendPoints.length - 1];
+      trendPeriodNode.textContent = firstPoint && lastPoint
+        ? `${firstPoint.label} - ${lastPoint.label} sessions`
+        : "近 7 天 sessions";
+    }
+    if (trendTotalNode) trendTotalNode.textContent = formatCount(contentAnalyticsState.trafficTrend?.currentTotal || 0);
+    if (trendChartNode) trendChartNode.innerHTML = buildTrafficTrendSvg(trendPoints);
 
     const topPosts = Array.isArray(contentAnalyticsState.topPosts)
       ? contentAnalyticsState.topPosts
@@ -3630,6 +3767,13 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
         topPosts: Array.isArray(result?.topPosts) ? result.topPosts : [],
         topSources: Array.isArray(result?.topSources) ? result.topSources : [],
         socialLandingPages: Array.isArray(result?.socialLandingPages) ? result.socialLandingPages : [],
+      trafficTrend: {
+        points: Array.isArray(result?.trafficTrend?.points) ? result.trafficTrend.points : [],
+        currentTotal: Number(result?.trafficTrend?.currentTotal || 0),
+        previousTotal: Number(result?.trafficTrend?.previousTotal || 0),
+        change: Number(result?.trafficTrend?.change || 0),
+        changePercent: Number(result?.trafficTrend?.changePercent || 0),
+      },
         note: typeof result?.note === "string" ? result.note : "",
       };
     } catch (error) {

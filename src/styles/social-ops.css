@@ -1472,6 +1472,90 @@
     gap: 0.8rem;
   }
 
+  .bookshelf-analytics-trend-card {
+    display: grid;
+    gap: 0.85rem;
+    padding: 1rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(62, 58, 50, 0.34), rgba(24, 24, 24, 0.62));
+  }
+
+  .bookshelf-analytics-chart {
+    min-height: 220px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(20, 20, 20, 0.92), rgba(38, 38, 37, 0.74));
+    overflow: hidden;
+  }
+
+  .bookshelf-analytics-chart-empty {
+    min-height: 220px;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    color: rgba(230, 228, 222, 0.56);
+    font-size: 0.84rem;
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+
+  .bookshelf-analytics-chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .bookshelf-analytics-chart-grid line {
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-dasharray: 4 6;
+  }
+
+  .bookshelf-analytics-chart-grid text,
+  .bookshelf-analytics-chart-axis text {
+    fill: rgba(230, 228, 222, 0.54);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  .bookshelf-analytics-chart-area {
+    fill: url(#analyticsTrendFill);
+  }
+
+  .bookshelf-analytics-chart-line {
+    fill: none;
+    stroke: #e7c67e;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .bookshelf-analytics-chart-dots circle {
+    fill: #f7f4ef;
+    stroke: rgba(231, 198, 126, 0.88);
+    stroke-width: 2;
+  }
+
+  .bookshelf-analytics-trend-footer {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.8rem;
+  }
+
+  .bookshelf-analytics-trend-footer span {
+    color: rgba(239, 236, 230, 0.68);
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  .bookshelf-analytics-trend-footer strong {
+    color: #f7f4ef;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
   .bookshelf-analytics-list {
     margin: 0;
     padding: 0;
