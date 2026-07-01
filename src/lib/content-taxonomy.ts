@@ -1191,11 +1191,15 @@ function getSemanticOverlapScore(
     ? Math.round((matchedTerms.length / candidateTerms.length) * 100)
     : 0;
 
-  const sameTrackBoost = entry.trackTitle === trackTitle ? 16 : 0;
-  const sameChapterBoost = entry.chapter === chapterTitle ? 22 : 0;
+  // 同書系與同章節只能作為「需要人工覆核」的弱訊號，不能直接把不同解法題目打成高撞題。
+  const sameTrackBoost = entry.trackTitle === trackTitle ? 8 : 0;
+  const sameChapterBoost = entry.chapter === chapterTitle ? 8 : 0;
   const sameSubchapterBoost = entry.subchapter === subchapterTitle ? 24 : 0;
+  const sameChapterCap = entry.chapter === chapterTitle && entry.subchapter !== subchapterTitle
+    ? 59
+    : 100;
 
-  return Math.min(100, termScore + sameTrackBoost + sameChapterBoost + sameSubchapterBoost);
+  return Math.min(sameChapterCap, termScore + sameTrackBoost + sameChapterBoost + sameSubchapterBoost);
 }
 
 function buildSimilarityReason(
@@ -1483,7 +1487,12 @@ function buildRecommendationFromCandidate(
     mergeDirective.targetSubchapter === candidate.subchapter &&
     similarArticles.some((article) => mergeDirective.sourceTitles.includes(article.title)),
   );
-  const collisionRisk: NextTopicRecommendation["collisionRisk"] = topSemanticScore >= 60
+  const topSimilarArticle = similarArticles[0] || null;
+  const canBeHighRisk = Boolean(
+    mergeTriggered ||
+    topSimilarArticle?.subchapter === candidate.subchapter,
+  );
+  const collisionRisk: NextTopicRecommendation["collisionRisk"] = canBeHighRisk && topSemanticScore >= 60
     ? "high"
     : topSemanticScore >= 35
       ? "medium"
@@ -1493,7 +1502,7 @@ function buildRecommendationFromCandidate(
     : collisionRisk === "high"
       ? "核心解法與既有文章重疊度超過 60%，應優先改子章節或直接整併舊文。"
       : collisionRisk === "medium"
-        ? "同章已有相近解法，需強化差異與補位角度。"
+        ? "目前僅屬語意相近或同章相鄰主題，建議交由 LLM 或人工覆核是否真的撞題。"
         : "目前未發現明顯語意撞題，可優先補齊此缺口。";
   const actionHint = mergeTriggered
     ? "Merge_and_Update｜先整併舊文"
