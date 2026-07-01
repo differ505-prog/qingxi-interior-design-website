@@ -187,7 +187,7 @@ const initialRecommendation = defaultModeState?.nextRecommendedTopic || null;
 const initialRecommendationModeText = initialFocusTrack
   ? `${defaultModeState?.label || defaultTopicMode}｜${initialFocusTrack.title} 尚差 ${initialFocusTrack.remainingToBaseline} 篇`
   : "會跟內容書架同步";
-const initialTopPriorityRecommendations = (() => {
+const initialRankedCandidates = (() => {
   const focusTrackTitle = defaultModeState?.publishingDashboard?.focusTrack?.title;
   const allCandidates = Array.isArray(defaultModeState?.nextTopicCandidates) ? defaultModeState.nextTopicCandidates : [];
   const primaryRecommendation = defaultModeState?.nextRecommendedTopic || null;
@@ -243,8 +243,15 @@ const initialTopPriorityRecommendations = (() => {
   const candidatePool = safeCandidates.length ? safeCandidates : merged;
   return candidatePool
     .sort((left, right) => rankCandidate(left, merged.indexOf(left)) - rankCandidate(right, merged.indexOf(right)))
-    .slice(0, 3);
+    .slice(0, 6);
 })();
+const initialMergeTask = initialRankedCandidates.find((candidate) => candidate?.workflowAction === "Merge_and_Update") || null;
+const initialMergeRule = initialMergeTask
+  ? publicationMergeDirectives.find((rule) => rule.trackTitle === initialMergeTask.trackTitle && rule.chapterTitle === initialMergeTask.chapter) || null
+  : null;
+const initialTopPriorityRecommendations = initialRankedCandidates
+  .filter((candidate) => candidate?.workflowAction === "New_Publish")
+  .slice(0, 3);
 const initialDisplayRecommendation = initialTopPriorityRecommendations[0] || initialRecommendation;
 const initialRecommendationTitle = initialDisplayRecommendation?.primaryTitle || initialDisplayRecommendation?.webTitle || initialDisplayRecommendation?.bookTitle || "收納補強：老屋機能配置與櫃體整合策略";
 const initialRecommendationMeta = initialDisplayRecommendation
@@ -980,9 +987,25 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
                 </div>
                 <div id="publishing-review-baseline-path" class="bookshelf-review-baseline-path"></div>
               </section>
+              <article class="bookshelf-review-next bookshelf-review-next-merge">
+                <div class="bookshelf-review-next-head">
+                  <span>優先整併任務</span>
+                  <strong id="publishing-review-merge-title">{initialMergeTask?.primaryTitle || "目前尚無需優先整併的舊文任務"}</strong>
+                </div>
+                <p id="publishing-review-merge-meta" class="bookshelf-confirm-note">
+                  {initialMergeTask
+                    ? `${initialMergeTask.chapter} / ${initialMergeTask.subchapter} / ${initialMergeTask.category}｜${initialMergeTask.reason}`
+                    : "若規則層判定與舊文高度重疊，這裡會先列出整併任務與修改方向。"}
+                </p>
+                <p id="publishing-review-merge-note" class="bookshelf-review-action-hint">
+                  {initialMergeRule
+                    ? `先整併舊文：${initialMergeRule.sourceTitles.join(" / ")}`
+                    : "整併任務會先顯示需合併的既有文章，避免把舊文改寫誤當成下一篇新文章。"}
+                </p>
+              </article>
               <article class="bookshelf-review-next">
                 <div class="bookshelf-review-next-head">
-                  <span>本輪送審候選（規則初排）</span>
+                  <span>下一篇最優先新文章（規則初排）</span>
                   <strong id="publishing-review-next-title">{initialRecommendationTitle}</strong>
                 </div>
                 <p id="publishing-review-next-meta" class="bookshelf-confirm-note">{initialRecommendationMeta}</p>
@@ -1023,8 +1046,8 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
               </article>
               <section class="bookshelf-review-top3">
                 <div class="bookshelf-preview-head">
-                  <p>本輪送審 Top 3 候選（規則初排）</p>
-                  <span>這裡只提供同一本主書內的候選順位，最終排序與取捨交由高階 LLM 覆核後裁定</span>
+                  <p>下一篇新文章 Top 3 候選（規則初排）</p>
+                  <span>這裡只列 New_Publish 候選；整併舊文任務已獨立上移，不再混在下一篇新文章順位裡</span>
                 </div>
                 <div id="publishing-review-top3" class="bookshelf-review-top3-list">
                   {initialTopPriorityRecommendations.length
@@ -4677,7 +4700,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     renderPublishingReviewBoard();
   }
 
-  function getTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
+  function getRankedTopicCandidates(mode = currentTopicMode, limit = 6) {
     const modeState = getCurrentTopicModeState(mode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
     const focusTrackTitle = modeState?.publishingDashboard?.focusTrack?.title;
@@ -4742,6 +4765,41 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     return candidatePool
       .sort((left, right) => rankCandidate(left, merged.indexOf(left)) - rankCandidate(right, merged.indexOf(right)))
       .slice(0, Math.max(1, limit));
+  }
+
+  function getMergeTaskRecommendations(mode = currentTopicMode, limit = 3) {
+    return getRankedTopicCandidates(mode, 8)
+      .filter((candidate) => candidate?.workflowAction === "Merge_and_Update")
+      .slice(0, Math.max(1, limit));
+  }
+
+  function getTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
+    const newPublishCandidates = getRankedTopicCandidates(mode, 8)
+      .filter((candidate) => candidate?.workflowAction === "New_Publish");
+    if (newPublishCandidates.length) {
+      return newPublishCandidates.slice(0, Math.max(1, limit));
+    }
+    return getRankedTopicCandidates(mode, 8)
+      .filter((candidate) => candidate?.workflowAction === "Revise_Angle")
+      .slice(0, Math.max(1, limit));
+  }
+
+  function getPrimaryMergeTaskRecommendation(mode = currentTopicMode) {
+    return getMergeTaskRecommendations(mode, 1)[0] || null;
+  }
+
+  function getMergeTaskNote(recommendation) {
+    if (!recommendation) {
+      return "整併任務會先顯示需合併的既有文章，避免把舊文改寫誤當成下一篇新文章。";
+    }
+    const mergeRule = getPublicationMergeRule(recommendation.trackTitle, recommendation.chapter);
+    if (mergeRule?.sourceTitles?.length) {
+      return `先整併舊文：${mergeRule.sourceTitles.join(" / ")}`;
+    }
+    const similarTitles = recommendation.similarArticles?.slice(0, 2).map((article) => article.title).join(" / ");
+    return similarTitles
+      ? `先檢查並整併相近舊文：${similarTitles}`
+      : "此題與既有文章核心解法靠近，建議先出整併升級稿，不要直接另開新文。";
   }
 
   function getPublicationBaselinePlan(mode = currentTopicMode, articleLimit = 3) {
@@ -4848,10 +4906,10 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
 
   function buildTopPriorityText(mode = currentTopicMode, limit = 3) {
     const candidates = getTopPriorityRecommendations(mode, limit);
-    if (!candidates.length) return "目前尚無可用的送審 Top 3 候選。";
+    if (!candidates.length) return "目前尚無可用的下一篇新文章 Top 3 候選。";
     return [
-      "【本輪送審 Top 3 候選】",
-      "以下 3 題為規則層初排，已限制在同一本主書內排序，不跨到其他書系；最終排序以高階 LLM 覆核為準。",
+      "【下一篇新文章 Top 3 候選】",
+      "以下 3 題僅列 New_Publish / Revise_Angle 候選；整併舊文任務已獨立處理，不再混入新文章順位。",
       ...candidates.map((candidate, index) => (
         `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${candidate.reason}`
       )),
@@ -4862,7 +4920,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const candidates = getTopPriorityRecommendations(mode, limit);
     const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
     if (!candidates.length) {
-      return '<p class="bookshelf-confirm-note">目前尚無可用的 Top 3 優先發布建議。</p>';
+      return '<p class="bookshelf-confirm-note">目前尚無可用的下一篇新文章優先建議。</p>';
     }
     return candidates.map((candidate, index) => `
       <article class="bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}">
@@ -4993,7 +5051,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function getPrimaryReviewRecommendation(mode = currentTopicMode) {
-    return getTopPriorityRecommendations(mode, 1)[0] || getCurrentTopicModeState(mode)?.nextRecommendedTopic || null;
+    return getTopPriorityRecommendations(mode, 1)[0] || null;
   }
 
   function getExpectedCandidate(mode = currentTopicMode) {
@@ -5008,7 +5066,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         reason: articleTopicDecision.reason || articleTopicDecision.summary || "",
       };
     }
-    return modeState?.nextRecommendedTopic || null;
+    return getPrimaryReviewRecommendation(mode);
   }
 
   function getRawArticleConfirmData(content) {
@@ -5583,6 +5641,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   function renderPublishingReviewBoard() {
     const modeState = getCurrentTopicModeState(currentTopicMode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    const mergeTask = getPrimaryMergeTaskRecommendation(currentTopicMode);
     const recommendation = getPrimaryReviewRecommendation(currentTopicMode);
     const bookProposal = getBookProposal(currentTopicMode);
     const draftState = getCurrentDraftState();
@@ -5592,6 +5651,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const bookPositioning = document.getElementById("publishing-review-book-positioning");
     const baseline = document.getElementById("publishing-review-baseline");
     const coverage = document.getElementById("publishing-review-coverage");
+    const mergeTitle = document.getElementById("publishing-review-merge-title");
+    const mergeMeta = document.getElementById("publishing-review-merge-meta");
+    const mergeNote = document.getElementById("publishing-review-merge-note");
     const nextTitle = document.getElementById("publishing-review-next-title");
     const nextMeta = document.getElementById("publishing-review-next-meta");
     const riskBadge = document.getElementById("publishing-review-risk-badge");
@@ -5617,6 +5679,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       !(bookPositioning instanceof HTMLElement) ||
       !(baseline instanceof HTMLElement) ||
       !(coverage instanceof HTMLElement) ||
+      !(mergeTitle instanceof HTMLElement) ||
+      !(mergeMeta instanceof HTMLElement) ||
+      !(mergeNote instanceof HTMLElement) ||
       !(nextTitle instanceof HTMLElement) ||
       !(nextMeta instanceof HTMLElement) ||
       !(riskBadge instanceof HTMLElement) ||
@@ -5650,6 +5715,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       bookPositioning.textContent = "尚未判定";
       baseline.textContent = "尚未計算";
       coverage.textContent = "尚未計算";
+      mergeTitle.textContent = "目前尚無需優先整併的舊文任務";
+      mergeMeta.textContent = "若規則層判定與舊文高度重疊，這裡會先列出整併任務與修改方向。";
+      mergeNote.textContent = "整併任務會先顯示需合併的既有文章，避免把舊文改寫誤當成下一篇新文章。";
       nextTitle.textContent = "尚未產生";
       nextMeta.textContent = "目前資料不足，暫時無法建立出版閉環覆核。";
       applyRiskBadge(riskBadge, "low", "規則初篩低相近");
@@ -5661,7 +5729,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       blocker.textContent = "";
       blocker.classList.remove("is-visible");
       renderSimilarArticleList(similarList, null);
-      top3.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的送審 Top 3 候選。</p>';
+      top3.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的下一篇新文章候選。</p>';
       baselinePath.innerHTML = '<p class="bookshelf-confirm-note">目前尚無可用的出版基線達標路徑。</p>';
       renderSimilarityDiffAnalysis(diffContent, null);
       progress.innerHTML = "";
@@ -5680,10 +5748,15 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     bookPositioning.textContent = bookProposal?.positioning || "尚未定義";
     baseline.textContent = `還差 ${focusTrack.remainingToBaseline} 篇`;
     coverage.textContent = `${focusTrack.coverageRate}%`;
+    mergeTitle.textContent = mergeTask ? getDisplayTitle(mergeTask) : "目前尚無需優先整併的舊文任務";
+    mergeMeta.textContent = mergeTask
+      ? `${mergeTask.chapter} / ${mergeTask.subchapter} / ${mergeTask.category}｜${mergeTask.reason}`
+      : "若規則層判定與舊文高度重疊，這裡會先列出整併任務與修改方向。";
+    mergeNote.textContent = getMergeTaskNote(mergeTask);
     nextTitle.textContent = recommendation ? getDisplayTitle(recommendation) : "尚未產生";
     nextMeta.textContent = recommendation
       ? `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜補前 ${recommendation.coverageBefore}% → 補後 ${recommendation.coverageAfter}%`
-      : "目前尚未產生送審候選。";
+      : "目前尚未產生下一篇新文章候選。";
     applyRiskBadge(riskBadge, recommendation?.collisionRisk || "low", "規則初篩低相近");
     riskNote.textContent = recommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。";
     const semanticData = getSemanticMatchBadgeData(recommendation);
@@ -5898,9 +5971,9 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   }
 
   function getCurrentTopicCandidates(mode = currentTopicMode) {
-    const modeState = getCurrentTopicModeState(mode);
     const topCandidates = getTopPriorityRecommendations(mode, 3);
-    const rawCandidates = Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates : [];
+    const rawCandidates = getRankedTopicCandidates(mode, 8)
+      .filter((candidate) => ["New_Publish", "Revise_Angle"].includes(candidate?.workflowAction));
     const merged = [...topCandidates];
     rawCandidates.forEach((candidate) => {
       if (!merged.some((item) => item.primaryTitle === candidate.primaryTitle && item.subchapter === candidate.subchapter)) {
@@ -5935,6 +6008,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const questionBlock = question.trim() || "（請在此貼上本輪生文前置包）";
     const modeState = getCurrentTopicModeState(mode);
     const candidateText = buildArticleTopicCandidateText(mode);
+    const mergeTask = getPrimaryMergeTaskRecommendation(mode);
     const candidateCount = getCurrentTopicCandidates(mode).length;
 
     return [
@@ -5957,10 +6031,15 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
       `【本次決題模式】${modeState?.label || mode}`,
       modeState?.modeRationale || "目前先沿用既有模式。",
       "",
+      "【需先處理的整併任務】",
+      mergeTask
+        ? `${getDisplayTitle(mergeTask)}｜${getMergeTaskNote(mergeTask)}`
+        : "目前尚無需優先整併的舊文任務，請直接從新文章候選裡選題。",
+      "",
       "【本輪生文前置包】",
       questionBlock,
       "",
-      `【系統候選清單】共 ${candidateCount} 個`,
+      `【新文章候選清單】共 ${candidateCount} 個`,
       candidateText || "目前沒有可用候選，請沿用固定出版骨架做最保守的判斷。",
       "",
       "請固定輸出以下 4 段，不要多寫任何其他內容：",
