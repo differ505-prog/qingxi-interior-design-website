@@ -7128,8 +7128,6 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     const hasResult = Boolean(articleAiResult.trim());
     const decision = getArticleAiDecision(articleAiResult);
     const confirmData = getArticleConfirmData(articleAiResult);
-    renderArticleConfirm(articleAiResult);
-    renderArticleSocialReplies(articleAiResult);
     label.textContent = hasResult
       ? articleAiMode === "quick"
         ? "快速判題"
@@ -7145,8 +7143,26 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
     decisionArticleTitle.textContent = confirmData.title;
     content.textContent = articleAiResult;
     shell.open = hasResult;
-    renderPublishingReviewBoard();
-    renderArticleComposerPanel();
+    try {
+      renderArticleConfirm(articleAiResult);
+    } catch (error) {
+      console.error("渲染文章確認卡失敗：", error);
+    }
+    try {
+      renderArticleSocialReplies(articleAiResult);
+    } catch (error) {
+      console.error("渲染社群回覆卡失敗：", error);
+    }
+    try {
+      renderPublishingReviewBoard();
+    } catch (error) {
+      console.error("渲染出版覆核看板失敗：", error);
+    }
+    try {
+      renderArticleComposerPanel();
+    } catch (error) {
+      console.error("渲染生文前置包區塊失敗：", error);
+    }
   }
 
   function setArticleAiBusy(isBusy) {
@@ -8584,27 +8600,36 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
   async function runArticleAiFlow() {
     setArticleAiBusy(true);
     setArticleAiFeedback("一鍵流程啟動中：先做本題動態決題，再判題並備好 Pro 生文提示詞...", "is-success");
+    let flowStage = "topic-decision";
 
     try {
+      flowStage = "topic-decision";
       await ensureArticleTopicDecision(currentTopicMode);
+      flowStage = "flash-quick";
       const quickContent = await requestArticleAi("quick");
       if (!quickContent) return;
 
+      flowStage = "metadata-enrich";
       articleAiResult = await enrichArticleMetadataIfNeeded(quickContent, "quick");
       articleAiMode = "quick";
       clearArticleProFinalizePrompt();
       setArticleAiFeedback("結果整理完成，正在寫入工作台...", "is-success");
+      flowStage = "save-ai-result";
       const saved = saveArticleAiResult();
+      flowStage = "render-ai-result";
       renderArticleAiResult();
 
+      flowStage = "build-source-package";
       const sourceState = getSafeResolvedArticleSourcePackage();
       setArticleAiFeedback("結果已整理，正在備好 Pro 生文提示詞...", "is-success");
+      flowStage = "prepare-pro-prompt";
       const promptState = prepareProFinalizePrompt(sourceState.packageText);
       const storageOk = saved && promptState.saved;
       setArticleAiFeedback(
         promptState.usedFallback ? "Pro 生文提示詞已用穩定版備好，正在嘗試自動複製..." : "Pro 生文提示詞已備好，正在嘗試自動複製...",
         storageOk ? "is-success" : "is-warning",
       );
+      flowStage = "copy-pro-prompt";
       const copyState = await copyText(promptState.prompt, "已完成判題並複製 Pro 生文提示詞。", {
         fallbackToPrompt: false,
       });
@@ -8631,7 +8656,7 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         setArticleAiFeedback(fallbackMessage, "is-warning");
       }
     } catch (error) {
-      console.error("一鍵流程整理失敗：", error);
+      console.error(`一鍵流程整理失敗（stage: ${flowStage}）：`, error);
       if (articleProFinalizePrompt.trim()) {
         renderArticleProPrompt();
         revealArticleProPrompt();
@@ -8641,8 +8666,15 @@ const publicationMergeDirectivesJson = JSON.stringify(publicationMergeDirectives
         setArticleAiFeedback("判題已完成，Pro 生文提示詞也已備好，但後續流程中斷；可直接展開下方內容手動複製。", "is-warning");
         return;
       }
-      setFeedback("判題已完成，但備好 Pro 生文提示詞時發生問題，請重試一次。", "is-warning");
-      setArticleAiFeedback("判題已完成，但備好 Pro 生文提示詞時發生問題，請重試一次。", "is-warning");
+      const stageMessageMap = {
+        "render-ai-result": "判題已完成，但回寫工作台結果時發生問題；已保留判題內容，請重試一次。",
+        "build-source-package": "判題已完成，但整理生文前置包時發生問題；已保留判題內容，請重試一次。",
+        "prepare-pro-prompt": "判題已完成，但備好 Pro 生文提示詞時發生問題，請重試一次。",
+        "copy-pro-prompt": "判題與 Pro 生文提示詞都已完成，但自動複製時發生問題；請改用手動複製。",
+      };
+      const fallbackMessage = stageMessageMap[flowStage] || "判題已完成，但備好 Pro 生文提示詞時發生問題，請重試一次。";
+      setFeedback(fallbackMessage, "is-warning");
+      setArticleAiFeedback(fallbackMessage, "is-warning");
     } finally {
       setArticleAiBusy(false);
     }
