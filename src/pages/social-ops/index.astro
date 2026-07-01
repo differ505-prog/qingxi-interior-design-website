@@ -956,7 +956,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
             <section id="publishing-review-board" class="bookshelf-confirm bookshelf-review-board">
               <div class="bookshelf-preview-head">
                 <p>出版閉環覆核</p>
-                <span>高頻區：貼新文章前先確認出版補位、已上線狀態與下一篇優先順序</span>
+                <span>高頻區：舊文修復軌道與純新文章軌道分流檢查，避免整併任務混入新文順位</span>
               </div>
               <div class="bookshelf-confirm-grid">
                 <article class="bookshelf-confirm-card">
@@ -1015,7 +1015,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
                   {initialCrossTrackSyncNote}
                 </p>
                 <div class="bookshelf-review-next-head">
-                  <span>下一篇最優先新文章（規則初排）</span>
+                  <span>純新文章軌道 Top 1（規則初排）</span>
                   <strong id="publishing-review-next-title">{initialRecommendationTitle}</strong>
                 </div>
                 <p id="publishing-review-next-meta" class="bookshelf-confirm-note">{initialRecommendationMeta}</p>
@@ -1056,8 +1056,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
               </article>
               <section class="bookshelf-review-top3">
                 <div class="bookshelf-preview-head">
-                  <p>待覆核候選 Top 3（規則暫列）</p>
-                  <span>這裡只列暫時仍留在候選池的動作素材；若高階 LLM 判定應整併或資產化，必須先改寫整體優先順序</span>
+                  <p>純新文章軌道 Top 3（已排除整併／資產化）</p>
+                  <span>這裡只列暫時仍留在 New_Publish 池的候選；若高階 LLM 判定應整併或資產化，必須先移出新文章軌道再重排</span>
                 </div>
                 <div id="publishing-review-top3" class="bookshelf-review-top3-list">
                   {initialTopPriorityRecommendations.length
@@ -4821,7 +4821,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   function getCrossTrackSyncMessage(mode = currentTopicMode) {
     const mergeTask = getPrimaryMergeTaskRecommendation(mode);
     if (!mergeTask) return "";
-    return "注意：本題主要解法已分配至 [Merge_and_Update] 軌道處理。當前推薦的新文章僅作為配套工具發布。";
+    return "注意：本題主要解法已分配至 [Merge_and_Update] 軌道處理。舊文修復軌道與純新文章軌道可並行，當前新文章順位不應被整併任務佔位。";
   }
 
   function getPublicationBaselinePlan(mode = currentTopicMode, articleLimit = 3) {
@@ -4862,13 +4862,14 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
   function buildPublicationBaselinePlanText(mode = currentTopicMode, articleLimit = 3) {
     const plan = getPublicationBaselinePlan(mode, articleLimit);
-    if (!plan) return "目前尚無可用的出版結構修復路徑。";
+    if (!plan) return "目前尚無可用的純新文章推進路徑。";
     const lines = [
       "【出版基線達標路徑】",
+      "以下路徑僅統計純新文章軌道，不混入 Merge_and_Update 或 Merge_into_Asset。",
       `距離出版基線：還差 ${plan.remainingToBaseline} 篇`,
       `目前最短板章節：${plan.weakestChapter?.chapter || "尚未判定"}｜缺口 ${plan.weakestChapter?.missingCount ?? 0} 篇｜完成度 ${plan.weakestChapter?.completionRate ?? 0}%`,
-      `目前最快改善出版結構的 3 個動作：${plan.fastTrackLabel}`,
-      `若先完成 3 個優先動作：主書完成度可由現況推進至 ${plan.projectedCoverage}%`,
+      `純新文章軌道最快推進路徑：${plan.fastTrackLabel}`,
+      `若先完成 3 篇新文章：主書完成度可由現況推進至 ${plan.projectedCoverage}%`,
       "章節缺口排序：",
       ...plan.chapterBreakdown.map((item, index) => `${index + 1}. ${item.chapter}｜缺口 ${item.missingCount} 篇｜完成度 ${item.completionRate}%`),
     ];
@@ -4878,7 +4879,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   function buildPublicationBaselinePlanMarkup(mode = currentTopicMode, articleLimit = 3) {
     const plan = getPublicationBaselinePlan(mode, articleLimit);
     if (!plan) {
-      return '<p class="bookshelf-confirm-note">目前尚無可用的出版結構修復路徑。</p>';
+      return '<p class="bookshelf-confirm-note">目前尚無可用的純新文章推進路徑。</p>';
     }
     const recommendationList = plan.topRecommendations.length
       ? plan.topRecommendations.map((item, index) => `
@@ -4901,14 +4902,14 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
           <small>缺口 ${plan.weakestChapter?.missingCount ?? 0} 篇｜完成度 ${plan.weakestChapter?.completionRate ?? 0}%</small>
         </article>
         <article class="bookshelf-review-baseline-card">
-          <span>完成 3 個動作後預估</span>
+          <span>完成 3 篇新文章後預估</span>
           <strong>${plan.projectedCoverage}%</strong>
-          <small>以同一本主書優先修復結構推估，不跨到其他書。</small>
+          <small>以同一本主書的純新文章軌道推估，不混入舊文修復任務。</small>
         </article>
       </div>
       <div class="bookshelf-review-baseline-route">
         <article class="bookshelf-review-baseline-route-card">
-          <span>優先動作路徑</span>
+          <span>純新文章推進路徑</span>
           <ul>${recommendationList}</ul>
         </article>
         <article class="bookshelf-review-baseline-route-card">
@@ -4928,10 +4929,10 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
   function buildTopPriorityText(mode = currentTopicMode, limit = 3) {
     const candidates = getTopPriorityRecommendations(mode, limit);
-    if (!candidates.length) return "目前尚無可用的待覆核候選 Top 3。";
+    if (!candidates.length) return "目前尚無可用的純新文章軌道 Top 3。";
     return [
-      "【待覆核候選 Top 3】",
-      "以下 3 題僅列暫時仍留在候選池的動作素材；若高階 LLM 判定應整併或資產化，必須先從新文章順位移除並重排整體動作順序。",
+      "【純新文章軌道 Top 3】",
+      "以下 3 題已先排除 Merge_and_Update 與 Merge_into_Asset；若高階 LLM 判定其中任一題仍應整併或資產化，必須先移出新文章軌道再重排。",
       ...candidates.map((candidate, index) => (
         `${index + 1}. ${getDisplayTitle(candidate)}｜${candidate.chapter} / ${candidate.subchapter}｜${getPublishingReviewCandidateReason(candidate)}`
       )),
@@ -4942,7 +4943,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const candidates = getTopPriorityRecommendations(mode, limit);
     const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
     if (!candidates.length) {
-      return '<p class="bookshelf-confirm-note">目前尚無可用的待覆核候選。</p>';
+      return '<p class="bookshelf-confirm-note">目前尚無可用的純新文章候選。</p>';
     }
     return candidates.map((candidate, index) => `
       <article class="bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}">
@@ -5573,6 +5574,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     return [
       "你是青曦空間設計的高階內容總編、出版統稿者與閉環優化覆核者。",
       "以下是 social-ops 目前的出版補位清單、官網已上線文章，以及本輪規則層送審候選。",
+      "整併／資產化屬於「舊文修復軌道」；New_Publish 屬於「純新文章軌道」。兩條軌道必須分開判讀，不得混排。",
       "網站內顯示的下一篇候選、Top 3 候選、相近題與工作流建議，都只是規則層送審素材，不是最終判決。",
       "你的任務不是直接改稿，而是站在『最終要出版成書』的角度，檢查這份安排是否已足夠成熟，並指出最值得立即修正的地方。",
       "若你認為規則層有誤判、過度保守、排序失真或文案誤導，必須直接在給 IDE 的提示詞中寫出規則層該怎麼改。",
@@ -5599,13 +5601,14 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 每一大章至少要有 1 篇觀念建立、1 篇表單／工具、以及 1 篇工序／發包／介面協調的硬知識；若只有 QA 與案例，仍判定為出版體量不足。",
       "",
       "C. 本輪候選是否應留在新文章池",
-      `- 目前規則層送審的下一篇候選為：${getDisplayTitle(recommendation)}`,
+      `- 目前規則層送審的純新文章候選為：${getDisplayTitle(recommendation)}`,
       "- 網站文章標題與書籍標題視為同一套，不做雙標題分流。",
       "- 請判斷這一篇是否真的應該留在新文章池；若不是，請給出更好的優先順序與原因。",
       "- 若你判定目前 Top 1 其實不該存在於新文章池，請直接明寫「應移出新文章順位」，不得只用模糊語句帶過。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
       "- 若主問題已被 Merge_and_Update 軌道完美命中，New_Publish 軌道必須切換為補充模式，優先推薦同章的表單或案例，不可讓後段流程文搶主導權。",
       "- 若表單、清單、檢查表或工具資產只是把既有主文操作化，請直接改判為 Merge_into_Asset，不得保留在 New_Publish 池。",
+      "- 一旦某題被你改判為 Merge_and_Update 或 Merge_into_Asset，後續純新文章排序必須完全排除該題，不得再把它列入 Top 3。",
       "- 同一主章節內也必須遵守微觀時序：theory > tool/form > process/contract > case；但若該章已有已上線舊文可透過整併成立理論主幹，不可再用『理論未發布』當成硬性阻擋新文章的理由。",
       "- 若已整併下架轉向的舊文標題已足以支撐該章理論主幹，請直接視為理論位可由整併成立，而非未發布。",
       "- 判斷章節前置是否成立時，請優先看官網已上線舊文是否足以支撐整併，不要把整本書誤當成從零開始的空白書稿。",
@@ -5619,8 +5622,8 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 若書名仍帶有過窄的階段性限制，卻無法對稱覆蓋後段章節，請直接提示需要升級主書名。",
       "",
       "E. 最終優先順序建議",
-      "- 請列出接下來最值得先做的 3 個動作，依優先順序排序；可包含 Merge_and_Update、Merge_into_Asset、New_Publish，不限於新文章。",
-      "- 此處排序的是下一步最值得先執行的 3 個出版動作，而非單純補篇數。",
+      "- 請列出接下來最值得先做的 3 篇純新文章，依優先順序排序；此處只允許 New_Publish，不得混入 Merge_and_Update 或 Merge_into_Asset。",
+      "- 若你在 C 區已判定本輪候選應移出新文章池，這裡必須改用剩餘的純 New_Publish 候選重新排序。",
       "- 每一篇都要附 1-2 句原因。",
       "- 請直接參考本文附帶的送審 Top 3 候選，必要時可以推翻並重排。",
       "- 此處優先順序必須先扣除應整併或應資產化的題目，不可把已判定應整併者繼續列入新文章 Top 3。",
