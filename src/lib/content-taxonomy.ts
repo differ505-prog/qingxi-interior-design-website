@@ -277,7 +277,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "迷思破解",
             keywords: ["初勘", "屋況判讀", "漏看", "風險訊號", "常見迷思", "判斷失準"],
             nodeKind: "qa",
-            titleOverride: "屋況初勘：你最容易漏看的 5 個風險訊號",
+            titleOverride: "屋況初勘避雷：最容易忽略的 5 個隱蔽風險",
           },
         ],
       },
@@ -295,7 +295,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "報價拆讀",
             keywords: ["報價", "單價", "估價", "報價單", "費用拆解"],
             nodeKind: "core",
-            titleOverride: "全室預算拆解與避險指南",
+            titleOverride: "全室預算拆解：報價單判讀與超支預防指南",
           },
           {
             title: "追加風險",
@@ -740,7 +740,7 @@ function getBookTitleOverride(trackTitle = "", chapterTitle = "", subchapterTitl
     return subchapterPlan.titleOverride;
   }
   const overrides: Record<string, string> = {
-    [`${publishingFocusTrackTitle}|預算拆解|報價拆讀`]: "全室預算拆解與避險指南",
+    [`${publishingFocusTrackTitle}|預算拆解|報價拆讀`]: "全室預算拆解：報價單判讀與超支預防指南",
   };
   return overrides[`${trackTitle}|${chapterTitle}|${subchapterTitle}`] || "";
 }
