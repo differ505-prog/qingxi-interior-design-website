@@ -758,6 +758,12 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                       <h2>主動獵殺</h2>
                       <p id="daily-panel-note" class="panel-inline-note">今日還差 3 個完成條件</p>
                     </div>
+                    <div class="panel-heading-actions">
+                      <button type="button" id="force-refresh-daily-ops" class="bookshelf-action ops-inline-action">
+                        強制刷新今日任務
+                      </button>
+                      <p>若昨天任務已完成但今天沒有解鎖，可手動刷新。</p>
+                    </div>
                   </div>
                   <div id="daily-quest-grid" class="quest-grid"></div>
                 </section>
@@ -2828,6 +2834,12 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
           : "已進入新的一週，本週任務已刷新。",
       nextStreak >= 2 ? "is-success" : carryoverCount > 0 ? "is-warning" : "is-success",
     );
+  }
+
+  function resetDailyOpsState(message = "今日主動獵殺任務已刷新。", mode = "is-warning") {
+    state.daily = createDailyOps();
+    rerender();
+    setFeedback(message, mode);
   }
 
   function normalizeDailyState() {
@@ -6794,6 +6806,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
     run.linkStash[linkKey] = target.value.trim();
     saveState();
+  });
+
+  document.getElementById("force-refresh-daily-ops")?.addEventListener("click", () => {
+    resetDailyOpsState("已強制刷新今日主動獵殺任務，現在可重新勾選。", "is-warning");
   });
 
   document.getElementById("reset-social-ops")?.addEventListener("click", () => {

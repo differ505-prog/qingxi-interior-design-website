@@ -525,6 +525,20 @@
     margin-bottom: 1rem;
   }
 
+  .panel-heading-actions {
+    display: grid;
+    justify-items: end;
+    gap: 0.45rem;
+  }
+
+  .panel-heading-actions p {
+    max-width: 240px;
+    text-align: right;
+    color: rgba(232, 227, 218, 0.7);
+    font-size: 0.78rem;
+    line-height: 1.65;
+  }
+
   .panel-heading h2 {
     margin: 0.2rem 0 0;
     font-family: "Noto Sans TC", "PingFang TC", sans-serif;
@@ -2638,6 +2652,13 @@
     box-shadow: 0 18px 28px rgba(0, 0, 0, 0.16);
   }
 
+  .ops-inline-action {
+    min-height: 40px;
+    padding: 0.68rem 0.9rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
   .bookshelf-action.is-guided {
     border-color: rgba(245, 243, 236, 0.34);
     background: linear-gradient(180deg, rgba(251, 250, 246, 0.18), rgba(214, 210, 200, 0.08));
@@ -3779,6 +3800,15 @@
     .panel-heading-compact {
       flex-direction: column;
       align-items: stretch;
+    }
+
+    .panel-heading-actions {
+      justify-items: start;
+    }
+
+    .panel-heading-actions p {
+      max-width: none;
+      text-align: left;
     }
 
     .command-metrics {
