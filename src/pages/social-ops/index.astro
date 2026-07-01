@@ -775,6 +775,12 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                       <h2>高意圖社群回覆與低成本分發</h2>
                       <p id="weekly-panel-note" class="panel-inline-note">本週還差 3 輪主任務</p>
                     </div>
+                    <div class="panel-heading-actions">
+                      <button type="button" id="force-refresh-weekly-ops" class="bookshelf-action ops-inline-action">
+                        強制刷新本週任務
+                      </button>
+                      <p>若上週已完成、這週想補按重跑，可手動刷新本週主任務。</p>
+                    </div>
                   </div>
                   <div id="quest-grid" class="quest-grid"></div>
                 </section>
@@ -2838,6 +2844,16 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   function resetDailyOpsState(message = "今日主動獵殺任務已刷新。", mode = "is-warning") {
     state.daily = createDailyOps();
+    rerender();
+    setFeedback(message, mode);
+  }
+
+  function resetWeeklyOpsState(message = "本週主任務已刷新。", mode = "is-warning") {
+    state.weekly = {
+      weekKey: getWeekKey(),
+      bonusClaimed: false,
+      runs: createWeeklyRuns(),
+    };
     rerender();
     setFeedback(message, mode);
   }
@@ -6810,6 +6826,10 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
 
   document.getElementById("force-refresh-daily-ops")?.addEventListener("click", () => {
     resetDailyOpsState("已強制刷新今日主動獵殺任務，現在可重新勾選。", "is-warning");
+  });
+
+  document.getElementById("force-refresh-weekly-ops")?.addEventListener("click", () => {
+    resetWeeklyOpsState("已強制刷新本週主任務，現在可重新補按。", "is-warning");
   });
 
   document.getElementById("reset-social-ops")?.addEventListener("click", () => {
