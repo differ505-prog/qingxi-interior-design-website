@@ -6762,6 +6762,30 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     return fallback?.chapter || "";
   }
 
+  function resolveStructuredBookDataFocusPack(trackPack, resolvedChapter = "", confirmData = {}, problemText = "", aiDraftBlock = "") {
+    const focusPacks = Array.isArray(trackPack?.focusPacks) ? trackPack.focusPacks : [];
+    if (!focusPacks.length) return null;
+    const haystack = [confirmData?.title, problemText, aiDraftBlock].filter(Boolean).join("\n");
+    return focusPacks.find((pack) => {
+      const chapterMatched = !pack?.chapter || !resolvedChapter || pack.chapter === resolvedChapter;
+      const keywordsMatched = Array.isArray(pack?.dataPoints) && haystack
+        ? [
+            pack?.name,
+            ...(Array.isArray(pack?.mandatoryUseHints) ? pack.mandatoryUseHints : []),
+            ...(Array.isArray(pack?.outputPreferences) ? pack.outputPreferences : []),
+            ...(Array.isArray(pack?.dataPoints) ? pack.dataPoints.flatMap((point) => [point?.label, point?.value]) : []),
+          ]
+            .filter(Boolean)
+            .some((text) => {
+              if (typeof text !== "string") return false;
+              return haystack.includes(pack?.name || "") ||
+                /收納|櫃體|系統櫃|抽屜|回位|配件|格局|隔間|採光|動線/.test(haystack) && /收納|櫃體|格局|動線|採光/.test(text);
+            })
+        : false;
+      return chapterMatched && keywordsMatched;
+    }) || null;
+  }
+
   function buildStructuredBookDataContext(confirmData = {}, problemText = "", aiDraftBlock = "") {
     const resolvedTrack = resolveStructuredBookDataTrack(confirmData, problemText, aiDraftBlock);
     const trackPack = resolvedTrack ? structuredBookDataPacks[resolvedTrack] : null;
@@ -6774,14 +6798,22 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
     const resolvedChapter = resolveStructuredBookDataChapter(trackPack, confirmData, problemText, aiDraftBlock);
     const chapterPack = resolvedChapter ? trackPack.chapterPacks?.[resolvedChapter] : null;
+    const focusPack = resolveStructuredBookDataFocusPack(trackPack, resolvedChapter, confirmData, problemText, aiDraftBlock);
     const globalRuleLines = Array.isArray(trackPack.globalRules)
       ? trackPack.globalRules.map((rule, index) => `${index + 1}. ${rule}`)
       : [];
-    const hintLines = Array.isArray(chapterPack?.mandatoryUseHints)
+    const chapterHintLines = Array.isArray(chapterPack?.mandatoryUseHints)
       ? chapterPack.mandatoryUseHints.map((rule, index) => `${index + 1}. ${rule}`)
       : [];
-    const dataPointLines = Array.isArray(chapterPack?.dataPoints)
-      ? chapterPack.dataPoints.map((point, index) => {
+    const focusHintLines = Array.isArray(focusPack?.mandatoryUseHints)
+      ? focusPack.mandatoryUseHints.map((rule, index) => `${chapterHintLines.length + index + 1}. ${rule}`)
+      : [];
+    const allDataPoints = [
+      ...(Array.isArray(chapterPack?.dataPoints) ? chapterPack.dataPoints : []),
+      ...(Array.isArray(focusPack?.dataPoints) ? focusPack.dataPoints : []),
+    ];
+    const dataPointLines = allDataPoints.length
+      ? allDataPoints.map((point, index) => {
           return [
             `${index + 1}. ${point.label}｜${point.type}`,
             `   - 建議寫法：${point.value}`,
@@ -6790,12 +6822,18 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
           ].join("\n");
         })
       : [];
-    const recommendedDataMix = chapterPack?.dataPoints?.length
+    const outputPreferenceLines = [
+      ...(Array.isArray(chapterPack?.outputPreferences) ? chapterPack.outputPreferences : []),
+      ...(Array.isArray(focusPack?.outputPreferences) ? focusPack.outputPreferences : []),
+    ];
+    const recommendedDataMix = allDataPoints.length
       ? [
           "1. 優先挑 1 個『門檻 / 區間型』數據，放在前段建立尺度感。",
           "2. 再挑 1 個『數量 / 流程型』數據，放在正文中段建立判斷步驟。",
           "3. 最後挑 1 個『風險 / 驗收型』數據，放在結尾提醒或數據補強段。",
-          "4. 若文章篇幅夠，再補第 4 個數據點，但不要把所有數字硬塞進同一篇文。",
+          focusPack?.name
+            ? `4. 若已命中「${focusPack.name}」焦點，優先再挑 1 個能支撐配置或回位判斷的數據點。`
+            : "4. 若文章篇幅夠，再補第 4 個數據點，但不要把所有數字硬塞進同一篇文。",
         ]
       : [
           "1. 目前沒有明確命中章節數據點，請自行補出 3 個最有用的定量支點。",
@@ -6807,22 +6845,29 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       `數據包版本：${trackPack.version || "未標示"}`,
       `主書系：${resolvedTrack}`,
       `命中章節：${resolvedChapter || "尚未命中特定章節，請至少沿用全域規則補強正文數據密度"}`,
+      `命中焦點：${focusPack?.name || "未命中特定焦點模組"}`,
       `數據包定位：${trackPack.summary || "未提供"}`,
       "",
       "全域數據寫作硬規則：",
       globalRuleLines.join("\n") || "1. 正文至少補 3 個定量支點。",
       "",
       chapterPack?.chapterSummary ? `本章補強方向：${chapterPack.chapterSummary}` : "本章補強方向：請優先建立尺度感、門檻感與情境差異。",
+      focusPack?.summary ? `焦點補強方向：${focusPack.summary}` : null,
       "",
       "本章數據使用提醒：",
-      hintLines.join("\n") || "1. 若無法命中特定章節，請至少補出合理區間、風險門檻與前提條件。",
+      [...chapterHintLines, ...focusHintLines].join("\n") || "1. 若無法命中特定章節，請至少補出合理區間、風險門檻與前提條件。",
       "",
       "建議優先引用的定量支點：",
       dataPointLines.join("\n\n") || "1. 目前沒有對應章節數據點，請自行補足至少 3 個定量支點。",
       "",
       "本篇建議採用順序：",
       recommendedDataMix.join("\n"),
-    ].join("\n");
+      "",
+      "本篇版型與工具書模組偏好：",
+      outputPreferenceLines.length
+        ? outputPreferenceLines.map((rule, index) => `${index + 1}. ${rule}`).join("\n")
+        : "1. 若題目涉及清單、比較、流程、驗收或配置，至少整理 1 組可視化模組。",
+    ].filter(Boolean).join("\n");
   }
 
   function buildEmergencyProFinalizePrompt(problemText = "", aiDraft = "") {
@@ -6870,6 +6915,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "正文至少要帶出 3 個定量支點；若有命中上方數據包，至少 2 個定量支點必須來自該數據包或以其為基礎改寫。",
       "每個數字都要交代前提條件、適用情境與變動因子；若無法給單一數字，請優先寫保守區間。",
       "請優先挑出最有用的 3 個數據點來支撐本文，不要把數據包整份照抄；重點是讓數字服務判斷，不是堆砌資訊。",
+      "若上方數據包已給出『版型與工具書模組偏好』，正文至少要落實其中 1 至 2 項，不可只引用數字卻仍寫成散文長文。",
       "結尾不要只用平鋪直敘收掉；請用一句更有收束感的總結，讓整篇像可收進書稿的完整章節。",
       "請固定依序輸出：",
       "A. 文章策略確認",
@@ -7048,6 +7094,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "8. 正文至少要有 3 個定量支點；若命中上方數據包，至少 2 個定量支點必須來自數據包或依其改寫成保守區間。",
       "9. 每個數字都要寫清楚前提條件與適用情境；若無法給單一數字，請優先寫區間，不要退回空泛形容詞。",
       "10. 請優先挑出最適合本題的 3 至 4 個數據點來寫，不要整包照貼；至少要有 1 個區間型、1 個數量型、1 個風險或流程型數據。",
+      "11. 若上方數據包已給出『版型與工具書模組偏好』，正文至少要落實 1 至 2 項，例如分區對照、必做 / 可延後、先做 / 後做或回位清單。",
       "",
       "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下所有段落都必須寫在同一份 Markdown 文件內。",
       "除這份文件本體外，不要在前後額外補操作說明、註解或對話式補充。",
@@ -7142,6 +7189,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "9. 正文至少要有 3 個定量支點；若命中上方數據包，至少 2 個定量支點必須來自數據包或依其改寫成保守區間。",
       "10. 每個數字都要標明前提條件、適用情境與變動因子；若無法給單一數字，請優先寫區間、門檻與尺度感，不可只寫『多、少、通常、容易』。",
       "11. 請先從數據包挑出最適合本題的 3 至 5 個數據點，再決定放在哪一段；至少包含 1 個區間型、1 個數量或流程型、1 個風險或驗收型數據。",
+      "12. 若上方數據包已給出『版型與工具書模組偏好』，正文至少要落實其中 2 項；尤其命中空間重整或收納補強時，優先做分區、對照、流程或回位模組。",
       "",
       "整份回覆本身就是同一份 Gemini Canvas 文件，不要只有文章正文進 Canvas；以下 A 到 P 全部都必須寫在同一份 Markdown 文件內。",
       "除這份文件本體外，不要在前後額外補操作說明、註解、摘要前言或對話式補充。",
@@ -7185,6 +7233,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "- 若某些段落屬於補舊文邏輯，請整理成可直接回填舊文的段落版本，不要無謂重複。",
       "- 內文至少要安排 1 段『數據補強段』，把本篇最關鍵的 2-3 個數字或區間集中整理，讓讀者能直接拿來判斷尺度。",
       "- 若命中上方數據包，請讓至少 1 個數字出現在前段判斷骨架、1 個數字出現在正文分析、1 個數字出現在數據補強段或結尾提醒，不可全部擠在同一段。",
+      "- 若命中空間重整或收納補強焦點，正文至少要出現 1 組『分區 / 對照 / 回位 / 先後順序』模組，避免內容只停留在概念描述。",
       "- 內文請自然安排 1-3 個可延伸閱讀的位置，優先參照上方既有文章清單，指出適合互鏈的文章方向，但不要硬塞推銷句。",
       "- 絕對不要出現推銷腔、口號腔、空泛形容詞堆砌。",
       "- 若文中提到預算或費用，請以區間、條件式差異、材料層級與施工範圍變動來表達；不要給過度精準的數字，不要像正式報價，也不要寫成讀者可直接拿來對價的承諾句。",
@@ -7316,6 +7365,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "正文至少要有 3 個定量支點；若命中上方數據包，至少 2 個定量支點必須來自數據包或依其改寫成保守區間。",
       "每個數字都要交代前提條件與適用情境；若無法給單一數字，請優先寫區間，不可退回空泛形容詞。",
       "請先挑出最適合本題的 3 個數據點，不要把數據包整份照貼。",
+      "若上方數據包已給出『版型與工具書模組偏好』，正文至少落實 1 項。",
       "",
       "【本輪生文前置包】",
       questionBlock,
