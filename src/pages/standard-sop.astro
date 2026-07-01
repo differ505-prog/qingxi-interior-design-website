@@ -1,0 +1,693 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { contractDefaultPaymentStages } from "../lib/contract-studio";
+import { quoteCategories } from "../lib/quote-studio";
+
+const collaborationSteps = [
+  {
+    stage: "01",
+    title: "需求快篩與預算定錨",
+    description:
+      "先用估價器與需求表把空間條件、預算帶與是否適合進一步丈量先收斂，不讓第一次溝通停在空話。",
+    outputs: ["初步預算區間", "案件適配度判斷", "是否安排丈量"],
+    actionLabel: "先做估價",
+    actionHref: "/tools",
+  },
+  {
+    stage: "02",
+    title: "現況盤點與風險拆解",
+    description:
+      "丈量前後會先盤點結構、水電、防水、收納與動線問題，把後續最容易失控的地方先講清楚。",
+    outputs: ["現況紀錄", "風險節點", "優先順序建議"],
+    actionLabel: "填需求表",
+    actionHref: "/requirement-form",
+  },
+  {
+    stage: "03",
+    title: "提案說明與合作流程圖",
+    description:
+      "把合作節奏、責任分工、排程邏輯與常見變動點整理成同一頁，讓屋主知道每一步為什麼要這樣走。",
+    outputs: ["合作流程圖", "排程說明", "面談重點摘要"],
+    actionLabel: "看甘特圖",
+    actionHref: "/renovation-process",
+  },
+  {
+    stage: "04",
+    title: "報價校正與付款節點確認",
+    description:
+      "報價不只列價格，也會對齊隱蔽工程、設備進場與驗收節點，避免簽完才發現雙方理解不同。",
+    outputs: ["報價邏輯", "付款節點", "查驗里程碑"],
+    actionLabel: "預約諮詢",
+    actionHref: "/contact",
+  },
+  {
+    stage: "05",
+    title: "施工追蹤與完工交付",
+    description:
+      "施工階段依照公開版甘特圖與查驗節點推進，完工後才進入驗收、修正與正式點交。",
+    outputs: ["進場排程", "查驗節點", "點交與保固資訊"],
+    actionLabel: "直接聊需求",
+    actionHref: "/contact",
+  },
+];
+
+const proposalModules = [
+  {
+    title: "合作流程圖",
+    label: "公開版",
+    description: "第一次接洽就能先看懂從需求盤點到完工交付的五大步驟。",
+    bullets: ["適合初談使用", "對齊雙方節奏", "可直接搭配需求表"],
+    href: "#collaboration-flow",
+    actionLabel: "看流程圖",
+  },
+  {
+    title: "公版老屋翻新甘特圖",
+    label: "公開版",
+    description: "把前期提案、簽約、拆除、隱蔽工程到驗收交屋的排程邏輯公開化。",
+    bullets: ["用週次解釋工序", "降低時程誤解", "建立專業形象"],
+    href: "/renovation-process",
+    actionLabel: "開啟甘特圖",
+  },
+  {
+    title: "隱蔽工程解剖圖",
+    label: "提案版",
+    description: "把水電、泥作、防水、木作與設備節點拆成可對照的說明框架，用來支撐報價價值。",
+    bullets: ["對齊報價類別", "適合面談解說", "避免只比總價"],
+    href: "#hidden-work-tree",
+    actionLabel: "看解剖圖",
+  },
+  {
+    title: "需求與格局健檢入口",
+    label: "導流版",
+    description: "讓高意圖屋主先完成需求整理，再進入諮詢與丈量安排。",
+    bullets: ["直接蒐集條件", "利於前置判斷", "提升諮詢效率"],
+    href: "/requirement-form",
+    actionLabel: "填需求表",
+  },
+];
+
+const hiddenWorkModules = [
+  {
+    title: "前置保護與拆除",
+    tag: "公開流程",
+    categoryIds: ["preparation"],
+    summary: "先把保護、拆除、清運與基礎復位講清楚，避免屋主只看到後面的表面材。",
+    points: ["公共區與室內保護", "拆除清運與社區規範", "基礎素地整理"],
+  },
+  {
+    title: "管線、弱電與設備預留",
+    tag: "隱蔽工程",
+    categoryIds: ["electrical", "hvac", "smart-home"],
+    summary: "把強弱電、給排水、空調與智慧控制的預埋節點整合在同一層說明。",
+    points: ["插座與迴路調整", "給排水與設備移位", "空調、網路與監控預留"],
+  },
+  {
+    title: "泥作、防水與基礎修補",
+    tag: "隱蔽工程",
+    categoryIds: ["masonry"],
+    summary: "泥作與防水不是零碎加項，而是影響耐用度與返工成本的核心節點。",
+    points: ["牆地面打底與修補", "衛浴與濕區防水", "貼磚前基準面校正"],
+  },
+  {
+    title: "木作、櫃體與封板整合",
+    tag: "中段整合",
+    categoryIds: ["cabinet", "finish"],
+    summary: "把天花、櫃體、封板與表面完成的關係先說清楚，才能避免現場互卡。",
+    points: ["木作與天花基礎", "系統櫃量測與下單", "油漆與表面收邊"],
+  },
+  {
+    title: "設備、衛浴與門窗收邊",
+    tag: "完工前段",
+    categoryIds: ["fixtures", "doors-windows"],
+    summary: "最後一層不是單純安裝，而是把設備、五金、玻璃與門窗一起整合到可驗收狀態。",
+    points: ["衛浴與家電安裝", "五金玻璃與門窗", "功能測試與缺失修正"],
+  },
+];
+
+const hiddenWorkModulesWithLabels = hiddenWorkModules.map((module) => ({
+  ...module,
+  categoryLabels: module.categoryIds
+    .map((categoryId) => quoteCategories.find((category) => category.id === categoryId)?.label)
+    .filter(Boolean),
+}));
+
+const milestoneAlignment = [
+  {
+    step: "簽約訂金",
+    flow: "需求確認完成後，進入合作與檔期保留。",
+    note: "對應流程圖第 03-04 步，避免尚未確認合作就進入備料與排程。",
+  },
+  {
+    step: "工程開工 / 中期款",
+    flow: "建議以水電管線配置完成、主要隱蔽工程查驗通過作為預設里程碑。",
+    note: "直接對齊老屋翻新最容易追加與返工的關鍵節點。",
+  },
+  {
+    step: "設備 / 櫃體進場款",
+    flow: "對應現場尺寸穩定、系統櫃與設備排產或進場施作前。",
+    note: "與甘特圖中的複丈、下單與安裝整合節點一致。",
+  },
+  {
+    step: "完工尾款",
+    flow: "工程完工並通知點交後支付，保留小瑕疵保留款的處理空間。",
+    note: "與驗收、複驗與正式交屋節點一致，不提前把交付與尾款混在一起。",
+  },
+];
+
+const faqItems = [
+  {
+    question: "第一次接洽前，屋主最少要先準備什麼？",
+    answer:
+      "先做估價或填需求表即可，至少把空間類型、屋況、想改善的問題與預算帶交代清楚。這樣第一次溝通就能直接進入判斷，而不是先花時間互相猜。",
+  },
+  {
+    question: "為什麼青曦會一直強調隱蔽工程與樹狀解剖圖？",
+    answer:
+      "因為真正容易失控的常常不是表面材，而是水電、防水、泥作、設備預留與工序銜接。把這些節點講清楚，報價才不是只剩下一個總價比較。",
+  },
+  {
+    question: "付款節點為什麼不是只分訂金與尾款？",
+    answer:
+      "住宅裝修的現場成本會在不同階段集中發生，像是備料、隱蔽工程、設備排產與安裝。把付款節點綁定查驗里程碑，能同時保護屋主與施工方。",
+  },
+  {
+    question: "公開版 SOP 和面談版提案有什麼差別？",
+    answer:
+      "公開版先讓你理解流程、節奏與判斷邏輯；面談版則會更深入拆解個案的風險點、排程變數與解剖圖層級，用來支撐正式提案與報價說明。",
+  },
+];
+
+const faqStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title="青曦標準 SOP - 青曦空間設計"
+  description="把需求快篩、合作流程圖、隱蔽工程解剖與老屋翻新甘特圖整理成同一頁，幫助屋主先看懂裝修合作的節奏與判斷邏輯。"
+  ogImage="/images/portfolio/xizhi-1.jpg"
+  pageType="service"
+  structuredData={[faqStructuredData]}
+>
+  <section class="sop-page">
+    <div class="sop-shell">
+      <header class="sop-hero">
+        <div class="hero-copy">
+          <p class="hero-eyebrow">Qing Hsi Standard SOP</p>
+          <h1>先把流程、排程與隱蔽工程講清楚，再談報價與施工。</h1>
+          <p class="hero-description">
+            這一頁把青曦對接案最重要的三件事整合在一起：需求快篩、合作流程圖，以及公開版老屋翻新甘特圖。你可以先看懂合作節奏，再決定是否進一步丈量與諮詢。
+          </p>
+          <div class="hero-actions">
+            <a href="/tools" class="hero-button hero-button-primary">先做估價</a>
+            <a href="/requirement-form" class="hero-button hero-button-secondary">填需求表</a>
+            <a href="/contact" class="hero-button hero-button-secondary">預約諮詢</a>
+          </div>
+        </div>
+        <aside class="hero-panel">
+          <p class="panel-eyebrow">面談前先看這三件事</p>
+          <ul class="hero-checks">
+            <li>先用合作流程圖理解從初談到交屋的五大步驟。</li>
+            <li>再用公開版甘特圖掌握排程邏輯與常見變動點。</li>
+            <li>最後用隱蔽工程解剖圖對照報價，不只比較總價。</li>
+          </ul>
+        </aside>
+      </header>
+
+      <section class="sop-section" id="collaboration-flow" aria-labelledby="flow-heading">
+        <div class="section-heading">
+          <p class="section-eyebrow">Collaboration Flow</p>
+          <h2 id="flow-heading">合作流程圖</h2>
+          <p>
+            先用五個步驟把雙方合作節奏講清楚，避免還沒確認需求與風險，就直接跳進報價與施工。
+          </p>
+        </div>
+        <div class="flow-grid">
+          {collaborationSteps.map((step) => (
+            <article class="flow-card">
+              <div class="flow-stage-row">
+                <span class="flow-stage">{step.stage}</span>
+                <span class="flow-tag">可公開說明</span>
+              </div>
+              <h3>{step.title}</h3>
+              <p>{step.description}</p>
+              <ul class="flow-output-list">
+                {step.outputs.map((output) => (
+                  <li>{output}</li>
+                ))}
+              </ul>
+              <a href={step.actionHref} class="inline-link">{step.actionLabel}</a>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="sop-section" aria-labelledby="module-heading">
+        <div class="section-heading">
+          <p class="section-eyebrow">Preview Modules</p>
+          <h2 id="module-heading">提案模組預覽</h2>
+          <p>
+            公開版先讓屋主看懂方法論；需要進一步提案時，再把更細的解剖圖與個案盤點帶進面談。
+          </p>
+        </div>
+        <div class="module-grid">
+          {proposalModules.map((module) => (
+            <article class="module-card">
+              <div class="module-head">
+                <h3>{module.title}</h3>
+                <span class="module-label">{module.label}</span>
+              </div>
+              <p>{module.description}</p>
+              <ul class="module-list">
+                {module.bullets.map((bullet) => (
+                  <li>{bullet}</li>
+                ))}
+              </ul>
+              <a href={module.href} class="inline-link">{module.actionLabel}</a>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="sop-section" id="hidden-work-tree" aria-labelledby="tree-heading">
+        <div class="section-heading">
+          <p class="section-eyebrow">Hidden Work Breakdown</p>
+          <h2 id="tree-heading">隱蔽工程解剖圖</h2>
+          <p>
+            這一層的目的不是把內容講得更複雜，而是把真正影響耐用度、返工率與預算波動的節點拆出來。
+          </p>
+        </div>
+        <div class="tree-grid">
+          {hiddenWorkModulesWithLabels.map((module) => (
+            <article class="tree-card">
+              <div class="tree-head">
+                <h3>{module.title}</h3>
+                <span class="tree-tag">{module.tag}</span>
+              </div>
+              <p>{module.summary}</p>
+              <p class="tree-mapping">
+                對應報價類別：
+                <strong>{module.categoryLabels.join(" / ")}</strong>
+              </p>
+              <ul class="tree-points">
+                {module.points.map((point) => (
+                  <li>{point}</li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="sop-section" aria-labelledby="payment-heading">
+        <div class="section-heading">
+          <p class="section-eyebrow">Milestone Alignment</p>
+          <h2 id="payment-heading">付款節點如何對齊施工節奏</h2>
+          <p>
+            付款不是單獨存在的收款表，而是跟查驗里程碑綁在一起。這樣屋主看得懂，施工端也能照節點推進。
+          </p>
+        </div>
+        <div class="payment-grid">
+          {contractDefaultPaymentStages.map((stage, index) => (
+            <article class="payment-card">
+              <div class="payment-top">
+                <span class="payment-order">0{index + 1}</span>
+                <strong>{stage.percent}%</strong>
+              </div>
+              <h3>{stage.label}</h3>
+              <p>{stage.note}</p>
+              <p class="payment-alignment">
+                <strong>對齊方式：</strong>
+                {milestoneAlignment[index]?.flow}
+              </p>
+              <p class="payment-note">{milestoneAlignment[index]?.note}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="sop-section" aria-labelledby="faq-heading">
+        <div class="section-heading">
+          <p class="section-eyebrow">Common Questions</p>
+          <h2 id="faq-heading">常見問題</h2>
+          <p>先把最容易卡住的問題講明白，後面諮詢與面談才會更有效率。</p>
+        </div>
+        <div class="faq-stack">
+          {faqItems.map((item) => (
+            <details class="faq-item">
+              <summary>{item.question}</summary>
+              <p>{item.answer}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section class="cta-strip" aria-label="下一步行動">
+        <div>
+          <p class="section-eyebrow">Next Step</p>
+          <h2>先把需求收斂，再安排更有效的討論。</h2>
+          <p>
+            如果你現在還在評估範圍，先做估價或填需求表最有效；若已經有平面圖、屋況照片或預計時程，也可以直接預約諮詢。
+          </p>
+        </div>
+        <div class="cta-actions">
+          <a href="/tools" class="hero-button hero-button-primary">先做估價</a>
+          <a href="/requirement-form" class="hero-button hero-button-secondary">填需求表</a>
+          <a href="/renovation-process" class="hero-button hero-button-secondary">看甘特圖</a>
+        </div>
+      </section>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .sop-page {
+    background:
+      radial-gradient(circle at top left, rgba(217, 190, 162, 0.18), transparent 34%),
+      linear-gradient(180deg, #fbf7f1 0%, #f5efe7 100%);
+    color: #2f241d;
+    min-height: 100vh;
+  }
+
+  .sop-shell {
+    width: min(1180px, calc(100% - 2rem));
+    margin: 0 auto;
+    padding: 96px 0 120px;
+  }
+
+  .sop-hero,
+  .sop-section,
+  .cta-strip {
+    border: 1px solid rgba(109, 82, 58, 0.12);
+    background: rgba(255, 252, 247, 0.88);
+    box-shadow: 0 22px 60px rgba(88, 62, 39, 0.08);
+  }
+
+  .sop-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.85fr);
+    gap: 2rem;
+    border-radius: 32px;
+    padding: 48px;
+    margin-bottom: 96px;
+  }
+
+  .hero-copy h1,
+  .section-heading h2,
+  .cta-strip h2 {
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2.3rem, 4vw, 3.8rem);
+    max-width: 12ch;
+  }
+
+  .hero-eyebrow,
+  .section-eyebrow,
+  .panel-eyebrow {
+    margin: 0 0 0.85rem;
+    color: #8b6a4d;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .hero-description,
+  .section-heading p,
+  .flow-card p,
+  .module-card p,
+  .tree-card p,
+  .payment-card p,
+  .faq-item p,
+  .cta-strip p {
+    margin: 0;
+    line-height: 1.78;
+    letter-spacing: 0.05em;
+    color: rgba(47, 36, 29, 0.82);
+  }
+
+  .hero-description {
+    max-width: 62ch;
+    margin-top: 1.25rem;
+  }
+
+  .hero-actions,
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 1.75rem;
+  }
+
+  .hero-button,
+  .inline-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .hero-button {
+    min-height: 48px;
+    padding: 0 1.2rem;
+    border: 1px solid rgba(109, 82, 58, 0.16);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .hero-button-primary {
+    background: #6b4d36;
+    color: #fff9f3;
+    box-shadow: 0 18px 34px rgba(107, 77, 54, 0.2);
+  }
+
+  .hero-button-secondary {
+    background: rgba(255, 252, 247, 0.9);
+    color: #6b4d36;
+  }
+
+  .hero-button:hover,
+  .inline-link:hover {
+    transform: translateY(-1px);
+  }
+
+  .hero-panel {
+    border-radius: 24px;
+    padding: 24px;
+    background: linear-gradient(180deg, rgba(109, 82, 58, 0.08), rgba(139, 106, 77, 0.04));
+  }
+
+  .hero-checks {
+    margin: 0;
+    padding-left: 1.15rem;
+    display: grid;
+    gap: 0.85rem;
+    line-height: 1.75;
+    letter-spacing: 0.05em;
+    color: rgba(47, 36, 29, 0.84);
+  }
+
+  .sop-section,
+  .cta-strip {
+    border-radius: 28px;
+    padding: 40px;
+  }
+
+  .sop-section + .sop-section,
+  .sop-section + .cta-strip {
+    margin-top: 32px;
+  }
+
+  .section-heading {
+    display: grid;
+    gap: 0.8rem;
+    margin-bottom: 1.8rem;
+    max-width: 70ch;
+  }
+
+  .flow-grid,
+  .module-grid,
+  .tree-grid,
+  .payment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .flow-card,
+  .module-card,
+  .tree-card,
+  .payment-card {
+    border-radius: 24px;
+    border: 1px solid rgba(109, 82, 58, 0.12);
+    background: #fffdf8;
+    padding: 24px;
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .flow-stage-row,
+  .module-head,
+  .tree-head,
+  .payment-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .flow-stage,
+  .payment-order {
+    color: #8b6a4d;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+  }
+
+  .flow-tag,
+  .module-label,
+  .tree-tag {
+    border-radius: 999px;
+    background: rgba(139, 106, 77, 0.1);
+    color: #7a5a3f;
+    padding: 0.36rem 0.72rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .flow-card h3,
+  .module-card h3,
+  .tree-card h3,
+  .payment-card h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    line-height: 1.4;
+    letter-spacing: 0.03em;
+  }
+
+  .flow-output-list,
+  .module-list,
+  .tree-points {
+    margin: 0;
+    padding-left: 1.15rem;
+    display: grid;
+    gap: 0.55rem;
+    line-height: 1.7;
+    letter-spacing: 0.05em;
+    color: rgba(47, 36, 29, 0.84);
+  }
+
+  .inline-link {
+    width: fit-content;
+    min-height: 40px;
+    padding: 0 0.9rem;
+    background: rgba(107, 77, 54, 0.08);
+    color: #6b4d36;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .tree-mapping,
+  .payment-alignment,
+  .payment-note {
+    font-size: 0.95rem;
+  }
+
+  .payment-card strong {
+    color: #6b4d36;
+    font-size: 1.6rem;
+  }
+
+  .faq-stack {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .faq-item {
+    border-radius: 20px;
+    border: 1px solid rgba(109, 82, 58, 0.12);
+    background: #fffdf8;
+    padding: 1rem 1.1rem;
+  }
+
+  .faq-item summary {
+    cursor: pointer;
+    list-style: none;
+    font-weight: 700;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    color: #3d2d22;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item p {
+    margin-top: 0.85rem;
+  }
+
+  .cta-strip {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.9fr);
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  @media (max-width: 960px) {
+    .sop-shell {
+      width: min(100% - 1.25rem, 1000px);
+      padding: 72px 0 96px;
+    }
+
+    .sop-hero,
+    .cta-strip,
+    .flow-grid,
+    .module-grid,
+    .tree-grid,
+    .payment-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .sop-hero,
+    .sop-section,
+    .cta-strip {
+      padding: 28px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-copy h1 {
+      max-width: none;
+      font-size: 2.2rem;
+    }
+
+    .sop-shell {
+      width: min(100% - 1rem, 1000px);
+      padding-top: 64px;
+    }
+
+    .sop-hero,
+    .sop-section,
+    .cta-strip {
+      border-radius: 22px;
+      padding: 22px;
+    }
+  }
+</style>
