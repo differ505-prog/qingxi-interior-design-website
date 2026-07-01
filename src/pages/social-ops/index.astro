@@ -4785,18 +4785,13 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
 
   function getMergeTaskRecommendations(mode = currentTopicMode, limit = 3) {
     return getRankedTopicCandidates(mode, 8)
-      .filter((candidate) => candidate?.workflowAction === "Merge_and_Update")
+      .filter((candidate) => ["Merge_and_Update", "Merge_into_Asset"].includes(candidate?.workflowAction))
       .slice(0, Math.max(1, limit));
   }
 
   function getTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
-    const newPublishCandidates = getRankedTopicCandidates(mode, 8)
-      .filter((candidate) => candidate?.workflowAction === "New_Publish");
-    if (newPublishCandidates.length) {
-      return newPublishCandidates.slice(0, Math.max(1, limit));
-    }
     return getRankedTopicCandidates(mode, 8)
-      .filter((candidate) => candidate?.workflowAction === "Revise_Angle")
+      .filter((candidate) => candidate?.workflowAction === "New_Publish")
       .slice(0, Math.max(1, limit));
   }
 
@@ -4807,6 +4802,11 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   function getMergeTaskNote(recommendation) {
     if (!recommendation) {
       return "整併任務會先顯示需合併的既有文章，避免把舊文改寫誤當成新的獨立題目。";
+    }
+    if (recommendation.workflowAction === "Merge_into_Asset") {
+      return recommendation.similarArticles?.length
+        ? `先掛回主文資產槽：${recommendation.similarArticles.slice(0, 2).map((article) => article.title).join(" / ")}`
+        : "這題屬操作型資產，請直接掛回既有主文，不另開新文章。";
     }
     const mergeRule = getPublicationMergeRule(recommendation.trackTitle, recommendation.chapter);
     if (mergeRule?.sourceTitles?.length) {
@@ -4821,7 +4821,9 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   function getCrossTrackSyncMessage(mode = currentTopicMode) {
     const mergeTask = getPrimaryMergeTaskRecommendation(mode);
     if (!mergeTask) return "";
-    return "注意：本題主要解法已分配至 [Merge_and_Update] 軌道處理。舊文修復軌道與純新文章軌道可並行，當前新文章順位不應被整併任務佔位。";
+    return mergeTask.workflowAction === "Merge_into_Asset"
+      ? "注意：本題主要解法已分配至 [Merge_into_Asset] 軌道處理。操作型資產需掛回主文，純新文章軌道不得再把它列入 Top 3。"
+      : "注意：本題主要解法已分配至 [Merge_and_Update] 軌道處理。舊文修復軌道與純新文章軌道可並行，當前新文章順位不應被整併任務佔位。";
   }
 
   function getPublicationBaselinePlan(mode = currentTopicMode, articleLimit = 3) {
@@ -5575,6 +5577,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "你是青曦空間設計的高階內容總編、出版統稿者與閉環優化覆核者。",
       "以下是 social-ops 目前的出版補位清單、官網已上線文章，以及本輪規則層送審候選。",
       "整併／資產化屬於「舊文修復軌道」；New_Publish 屬於「純新文章軌道」。兩條軌道必須分開判讀，不得混排。",
+      "若候選帶有表單、清單、Checklist、試算表等操作型資產特徵，且該章已有可整併成立的理論主幹，預設應優先檢查是否改判為 Merge_into_Asset。",
       "網站內顯示的下一篇候選、Top 3 候選、相近題與工作流建議，都只是規則層送審素材，不是最終判決。",
       "你的任務不是直接改稿，而是站在『最終要出版成書』的角度，檢查這份安排是否已足夠成熟，並指出最值得立即修正的地方。",
       "若你認為規則層有誤判、過度保守、排序失真或文案誤導，必須直接在給 IDE 的提示詞中寫出規則層該怎麼改。",
@@ -5607,7 +5610,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "- 若你判定目前 Top 1 其實不該存在於新文章池，請直接明寫「應移出新文章順位」，不得只用模糊語句帶過。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
       "- 若主問題已被 Merge_and_Update 軌道完美命中，New_Publish 軌道必須切換為補充模式，優先推薦同章的表單或案例，不可讓後段流程文搶主導權。",
-      "- 若表單、清單、檢查表或工具資產只是把既有主文操作化，請直接改判為 Merge_into_Asset，不得保留在 New_Publish 池。",
+      "- 若表單、清單、檢查表、Checklist 或試算表只是把既有主文操作化，請直接改判為 Merge_into_Asset，不得保留在 New_Publish 池。",
       "- 一旦某題被你改判為 Merge_and_Update 或 Merge_into_Asset，後續純新文章排序必須完全排除該題，不得再把它列入 Top 3。",
       "- 同一主章節內也必須遵守微觀時序：theory > tool/form > process/contract > case；但若該章已有已上線舊文可透過整併成立理論主幹，不可再用『理論未發布』當成硬性阻擋新文章的理由。",
       "- 若已整併下架轉向的舊文標題已足以支撐該章理論主幹，請直接視為理論位可由整併成立，而非未發布。",
@@ -6070,7 +6073,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
   function getCurrentTopicCandidates(mode = currentTopicMode) {
     const topCandidates = getTopPriorityRecommendations(mode, 3);
     const rawCandidates = getRankedTopicCandidates(mode, 8)
-      .filter((candidate) => ["New_Publish", "Revise_Angle"].includes(candidate?.workflowAction));
+      .filter((candidate) => ["New_Publish", "Revise_Angle", "Merge_into_Asset"].includes(candidate?.workflowAction));
     const merged = [...topCandidates];
     rawCandidates.forEach((candidate) => {
       if (!merged.some((item) => item.primaryTitle === candidate.primaryTitle && item.subchapter === candidate.subchapter)) {
@@ -6172,7 +6175,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "1. 先抓這次前置包真正描述的痛點、情境與決策點。",
       "2. 你必須先判斷哪些候選該進整併池，再決定本輪真正採用的題目。",
       "3. 若某候選與既有文章核心解法重疊度高，優先轉入 Merge_and_Update，不要硬留在 New_Publish。",
-      "4. 若候選是表單、清單、檢查表或工具資產，但其核心任務只是把既有主文操作化，優先判為 Merge_into_Asset，不得只因文型不同就保留成新文章。",
+      "4. 若候選是表單、清單、檢查表、Checklist 或試算表，但其核心任務只是把既有主文操作化，優先判為 Merge_into_Asset，不得只因文型不同就保留成新文章。",
       "5. 請強制做『同任務檢查』：即使一篇是 theory、一篇是 form，只要兩者解的是同一個核心任務、同一個判斷流程、同一個使用時機，就必須評估整併，而不是自動視為互補。",
       "6. 若你最後仍不把 Top 1 候選納入整併池，必須明確說出『不進整併池理由』，不能省略。",
       "7. 扣掉已進整併池的題目後，請再重排剩餘優先文章，避免把本來該整併的題目繼續列進新文章順位。",

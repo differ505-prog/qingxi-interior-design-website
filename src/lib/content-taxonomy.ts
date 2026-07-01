@@ -101,7 +101,7 @@ export interface PublicationTitlePoolItem {
   note: string;
   nodeKind: PublicationNodeKind;
   statusTag: string;
-  workflowAction: "New_Publish" | "Merge_and_Update" | "Revise_Angle";
+  workflowAction: "New_Publish" | "Merge_and_Update" | "Merge_into_Asset" | "Revise_Angle";
   assetSlotLabel?: string;
 }
 
@@ -137,7 +137,7 @@ export interface NextTopicRecommendation {
   collisionRisk: "low" | "medium" | "high";
   collisionReason: string;
   actionHint: string;
-  workflowAction: "New_Publish" | "Merge_and_Update" | "Revise_Angle";
+  workflowAction: "New_Publish" | "Merge_and_Update" | "Merge_into_Asset" | "Revise_Angle";
   flashPrompt: string;
 }
 
@@ -1095,6 +1095,11 @@ function buildTitlePoolItem(
     .find((chapter) => chapter.title === chapterTitle)
     ?.subchapters.find((subchapter) => subchapter.title === subchapterTitle);
   const mergeDirective = getPublicationMergeDirective(trackTitle, chapterTitle);
+  const mergeBackedTheoryReady = Boolean(
+    subchapterPlan?.nodeKind === "form" &&
+    mergeDirective &&
+    hasMergeSourceCoverage(entries.filter((entry) => entry.trackTitle === trackTitle), mergeDirective)
+  );
   const hasPublishedEntry = entries.some((entry) => (
     entry.trackTitle === trackTitle &&
     entry.chapter === chapterTitle &&
@@ -1123,6 +1128,8 @@ function buildTitlePoolItem(
         : "medium";
   const workflowAction: PublicationTitlePoolItem["workflowAction"] = mergeNeeded || collisionMergeNeeded
     ? "Merge_and_Update"
+    : mergeBackedTheoryReady
+      ? "Merge_into_Asset"
     : topSemanticScore > 35
       ? "Revise_Angle"
       : "New_Publish";
@@ -1130,6 +1137,8 @@ function buildTitlePoolItem(
     ? "整併執行中"
     : collisionMergeNeeded
       ? "需整併舊文"
+    : mergeBackedTheoryReady
+      ? "待覆核_資產化"
     : hasPublishedEntry
       ? "已上線"
       : nodeKind === "case"
@@ -1145,6 +1154,8 @@ function buildTitlePoolItem(
     ? mergeDirective?.note || "此子章目前應先整併既有文章，不建議另開新標題。"
     : collisionMergeNeeded
       ? "此子章與既有文章的核心解法重疊度過高，應先整併舊文或改切角，不建議直接發布。"
+    : mergeBackedTheoryReady
+      ? "此節點較適合作為整併主文的附屬資產，待高階 LLM 覆核是否直接掛載，不建議佔用純新文章額度。"
     : hasPublishedEntry
       ? "此子章已有已上線文章，標題池保留作為整體出版視角參考。"
       : isRecommended
@@ -1689,6 +1700,11 @@ function buildRecommendationFromCandidate(
   );
   const topSemanticScore = similarArticles[0]?.score || 0;
   const mergeDirective = getPublicationMergeDirective(candidate.trackTitle, candidate.chapter);
+  const mergeBackedAssetTriggered = Boolean(
+    getSubchapterPlan(candidate.trackTitle, candidate.chapter, candidate.subchapter)?.nodeKind === "form" &&
+    mergeDirective &&
+    hasMergeSourceCoverage(entries.filter((entry) => entry.trackTitle === candidate.trackTitle), mergeDirective)
+  );
   const mergeTriggered = Boolean(
     mergeDirective &&
     mergeDirective.targetSubchapter === candidate.subchapter &&
@@ -1709,6 +1725,7 @@ function buildRecommendationFromCandidate(
   );
   const canBeHighRisk = Boolean(
     mergeTriggered ||
+    mergeBackedAssetTriggered ||
     duplicateFormAssetTriggered ||
     topSimilarArticle?.subchapter === candidate.subchapter,
   );
@@ -1719,6 +1736,8 @@ function buildRecommendationFromCandidate(
       : "low";
   const collisionReason = mergeTriggered
     ? mergeDirective?.note || "這個主題已與既有文章形成整併關係，較適合合併而非另開新題。"
+    : mergeBackedAssetTriggered
+      ? "本章理論主幹已可由舊文整併成立，這組表單更適合作為附屬資產掛載，不宜佔用純新文章發布額度。"
     : duplicateFormAssetTriggered
       ? "這組實戰表單與既有掛載資產高度重複，應直接併入同一份工具資產，不宜拆成兩篇送審。"
     : collisionRisk === "high"
@@ -1728,15 +1747,19 @@ function buildRecommendationFromCandidate(
         : "目前未發現明顯語意撞題，可優先補齊此缺口。";
   const actionHint = mergeTriggered
     ? "Merge_and_Update｜先整併舊文"
+    : mergeBackedAssetTriggered
+      ? "Merge_into_Asset｜掛回主文資產槽"
     : duplicateFormAssetTriggered
-      ? "Merge_and_Update｜先整併同資產表單"
+      ? "Merge_into_Asset｜先整併同資產表單"
     : collisionRisk === "high"
       ? "Merge_and_Update｜先整併舊文"
       : collisionRisk === "medium"
         ? "Revise_Angle｜需拉開差異"
         : "New_Publish｜可直接推進";
-  const workflowAction: NextTopicRecommendation["workflowAction"] = mergeTriggered || duplicateFormAssetTriggered || (topSimilarArticle?.subchapter === candidate.subchapter && topSemanticScore > 50)
+  const workflowAction: NextTopicRecommendation["workflowAction"] = mergeTriggered || (topSimilarArticle?.subchapter === candidate.subchapter && topSemanticScore > 50)
     ? "Merge_and_Update"
+    : mergeBackedAssetTriggered || duplicateFormAssetTriggered
+      ? "Merge_into_Asset"
     : collisionRisk === "medium"
       ? "Revise_Angle"
       : "New_Publish";
