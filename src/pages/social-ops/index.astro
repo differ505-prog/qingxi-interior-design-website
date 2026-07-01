@@ -779,7 +779,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
                       <button type="button" id="force-refresh-weekly-ops" class="bookshelf-action ops-inline-action">
                         強制刷新本週任務
                       </button>
-                      <p>若上週已完成、這週想補按重跑，可手動刷新本週主任務。</p>
+                      <p>保留既有進度，只解鎖下一輪主任務，方便手動補按。</p>
                     </div>
                   </div>
                   <div id="quest-grid" class="quest-grid"></div>
@@ -2848,11 +2848,21 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     setFeedback(message, mode);
   }
 
-  function resetWeeklyOpsState(message = "本週主任務已刷新。", mode = "is-warning") {
-    state.weekly = {
-      weekKey: getWeekKey(),
-      bonusClaimed: false,
-      runs: createWeeklyRuns(),
+  function resetWeeklyOpsState(message = "已保留本週進度並解鎖下一輪主任務。", mode = "is-warning") {
+    const lockedRunIndex = state.weekly.runs.findIndex((run) => isRunLockedUntilNextDay(run));
+    if (lockedRunIndex === -1) {
+      setFeedback(
+        getCompletedRunCount() >= WEEKLY_TARGET
+          ? "本週已經 3 / 3 全部完成，這顆按鈕不會重置既有進度。"
+          : "目前本週任務已是可操作狀態，不需要另外刷新。",
+        getCompletedRunCount() >= WEEKLY_TARGET ? "is-success" : "is-warning",
+      );
+      return;
+    }
+
+    state.weekly.runs[lockedRunIndex] = {
+      ...state.weekly.runs[lockedRunIndex],
+      completedAt: "",
     };
     rerender();
     setFeedback(message, mode);
@@ -6829,7 +6839,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
   });
 
   document.getElementById("force-refresh-weekly-ops")?.addEventListener("click", () => {
-    resetWeeklyOpsState("已強制刷新本週主任務，現在可重新補按。", "is-warning");
+    resetWeeklyOpsState("已保留本週進度，並解鎖下一輪主任務，現在可繼續補按。", "is-warning");
   });
 
   document.getElementById("reset-social-ops")?.addEventListener("click", () => {
