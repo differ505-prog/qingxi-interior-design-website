@@ -1,16 +1,23 @@
 ---
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogPost } from "../../lib/blog-catalog";
 
+const articleMeta = getStaticBlogPost("old-house-renovation-scope-guide");
+const articleTitle = articleMeta.title;
+const articleDescription = articleMeta.summary;
 const articlePublishedTime = "2026-06-29T22:30:00.000Z";
-const articleModifiedTime = "2026-06-29T22:30:00.000Z";
+const articleModifiedTime = "2026-07-02T00:00:00+08:00";
+const articleImage = articleMeta.coverImage;
+const articleDetailImage = "/images/blog/old-house-renovation-scope-guide-detail.png";
+const articleSceneImage = "/images/blog/old-house-renovation-scope-guide-scene.png";
 
 const articleStructuredData = [
   {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: "老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南",
-    description: "老屋翻新宛如一場資源分配的考驗，面對有限的預算與修繕項目，該如何界定翻新範圍？本文帶您梳理「基礎工程優先」、「生活軌跡盤點」與「預算收斂」三大核心判斷點，幫助您釐清必做與選做項目，找回面對老屋改造的安定感。",
-    image: ["https://qingxidesign.tw/images/blog/old-house-renovation-scope-guide-cover.png"],
+    headline: articleTitle,
+    description: articleDescription,
+    image: [`https://qingxidesign.tw${articleImage}`],
     datePublished: articlePublishedTime,
     dateModified: articleModifiedTime,
     author: {
@@ -25,156 +32,148 @@ const articleStructuredData = [
         url: "https://qingxidesign.tw/images/logo.png",
       },
     },
-    articleSection: "老屋翻新系",
-    keywords: "老屋翻新, 範圍評估, 基礎工程, 預算分配, 格局更動",
+    articleSection: articleMeta.track,
+    keywords: articleMeta.tags.join(", "),
     mainEntityOfPage: "https://qingxidesign.tw/blog/old-house-renovation-scope-guide",
   },
 ];
 ---
 
 <EditorialArticleLayout
-  title="老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南"
-  description="老屋翻新宛如一場資源分配的考驗，面對有限的預算與修繕項目，該如何界定翻新範圍？本文帶您梳理「基礎工程優先」、「生活軌跡盤點」與「預算收斂」三大核心判斷點，幫助您釐清必做與選做項目，找回面對老屋改造的安定感。"
-  ogImage="/images/blog/old-house-renovation-scope-guide-cover.png"
+  title={articleTitle}
+  description={articleDescription}
+  ogImage={articleImage}
   publishedTime={articlePublishedTime}
   modifiedTime={articleModifiedTime}
   structuredData={articleStructuredData}
-  track="老屋翻新系"
-  chapter="現況判讀"
-  siteCategory="老屋翻新"
-  tags={["範圍評估", "基礎工程", "預算分配", "格局更動"]}
+  track={articleMeta.track}
+  chapter={articleMeta.chapter}
+  siteCategory={articleMeta.siteCategory}
+  tags={articleMeta.tags}
+  editorialRefreshStamp={articleMeta.editorialRefreshStamp}
 >
   <p class="article-lead">
-    老屋翻新，往往是一場理想與現實的拉鋸。當終於擁有一處屬於自己的空間，腦海中常會浮現許多對未來生活的想像：開放式的中島廚房、採光極佳的閱讀角落、或是擁有大片留白的極簡客廳。然而，當目光拉回現實的老屋況——壁癌、老舊管線、不符現代需求的封閉格局，許多屋主在裝修前期的第一個難題往往是：「範圍到底該怎麼抓？我該全室翻新，還是局部微調？」
+    老屋翻新是一場資源分配的精準考驗。面對有限的預算，真正需要被先確認的，不是想做多少，而是哪些問題若不先處理，未來會直接影響安全、返工成本與生活安定度。
   </p>
 
   <p>
-    缺乏評估框架的翻新，容易在基礎工程與視覺裝修間迷失，最終可能導致預算超支，或是妥協了最重要的居住品質。要精準界定老屋翻新的範圍，我們建議從以下三個關鍵判斷點依序盤點。
+    缺乏評估框架的翻新，最容易在基礎工程與視覺裝修之間失焦，最後不是預算超支，就是把真正關鍵的問題留到入住後才面對。界定老屋翻新範圍，更成熟的做法是從「基礎工程優先」、「生活軌跡盤點」與「預算收斂」三層機制逐步減法，而不是一開始就把所有想像全部塞進施工清單。
   </p>
-
-  <blockquote>
-    老屋翻新的範圍，不是從「想做多少」開始，而是先回答「哪些不做，未來會更麻煩」。
-  </blockquote>
 
   <div class="article-insight-panel">
     <p class="article-insight-label">判斷骨架</p>
-    <h3 class="article-insight-title">先穩定基礎體質，再對焦生活軌跡，最後才談預算收斂。</h3>
+    <h3 class="article-insight-title">先穩定基礎體質，再回看生活軌跡，最後才用 Need vs Want 收斂預算。</h3>
     <p>
-      若順序顛倒，最常見的結果就是把預算花在表面更新，卻把真正影響安全、耐久與日常使用感的問題留到入住後才面對。
+      只要順序顛倒，最常見的後果就是把預算花在表面更新，卻把真正影響未來二十年安定度的基礎問題留到入住後才返工。
     </p>
   </div>
 
-  <h2>關鍵一：基礎工程不可妥協，鞏固空間的「健康體質」</h2>
+  <div class="article-step-flow">
+    <article class="article-step-card">
+      <p class="article-step-index">01</p>
+      <h3>先看屋況體質</h3>
+      <p>先把屋齡、管線、防水與結構風險分清楚，確認哪些是必做的基礎工程。</p>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">02</p>
+      <h3>再看生活軌跡</h3>
+      <p>確認公領域互動、收納使用率與未來家庭變化，再決定格局與機能的增減。</p>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">03</p>
+      <h3>最後收斂清單</h3>
+      <p>把項目拆成 Need 與 Want，讓有限預算先保安全、再補機能，最後才加分美感。</p>
+    </article>
+  </div>
+
+  <h2>關鍵一：基礎工程檢核點與屋齡預算配比矩陣</h2>
   <p>
-    老屋就像是年邁的軀體，比起穿上華麗的外衣，更重要的是確保內在器官的健康運作。在評估翻新範圍時，<strong>基礎工程永遠是優先順序最高的一層</strong>，因為這牽涉到日後的安全、耐久與維護成本。
+    老屋的內在體質，直接決定未來二十年的居住安定度。不同屋齡代表不同程度的衰退風險，因此翻新範圍不應只憑感覺，而要先回到屋齡、基礎工程深度與預算佔比之間的對應關係。
   </p>
 
-  <h3>水電管線：先確認屋齡與負載，不要讓現代生活住進舊系統裡</h3>
-  <p>
-    若房屋屋齡已超過 15 到 20 年，且前次裝修未曾全面更新，冷熱水管、電線迴路與無熔絲開關都值得重新盤點。現代家庭的用電密度，早已不是二、三十年前的配置能穩定承接，若前期沒有先處理好，之後再漂亮的設計，也可能被跳電、漏水與維修打斷生活節奏。
-  </p>
-
-  <h3>防水與漏水：只要出現疑慮，就不該被排除在翻新範圍之外</h3>
-  <p>
-    窗框周邊、衛浴共用牆、天花角落若已有水漬、壁癌或粉化痕跡，通常代表問題不是表面清潔就能解決。漏水與回滲是老屋最容易拖垮後續預算的隱患，只要懷疑防水層失效，就應把防水工程與泥作修補列入必做清單，而不是想著先裝修看看、之後再補。
-  </p>
-
-  <h3>結構與拆牆：想打開格局之前，先確認那面牆能不能碰</h3>
-  <p>
-    任何牽涉牆面拆除的格局變更，都必須先確認是否為承重牆、剪力牆，或是否涉及建物安全。若安全上有疑慮，應優先保留原結構，必要時再尋求結構技師協助。好的翻新，不是盲目追求開闊，而是在安全前提下重新整理空間秩序。
-  </p>
-
-  <div class="article-card-grid">
-    <div class="article-card">
-      <p class="article-card-kicker">Base First</p>
-      <h3>這一層預算，看不見，但最不該省</h3>
-      <p>
-        基礎工程通常無法立刻換來視覺驚豔感，卻直接決定未來十年、二十年的安定度。若預算有限，也該先把風險最高的水電、防水與結構安全處理完。
-      </p>
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <thead>
+          <tr>
+            <th>屋齡級距</th>
+            <th>基礎工程預算佔比</th>
+            <th>重點檢核與必做項目</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10-15 年</td>
+            <td>20%-30%</td>
+            <td>局部防水補強、廚衛設備更新、特定五金與耗材汰換。</td>
+          </tr>
+          <tr>
+            <td>16-30 年</td>
+            <td>40%-50%</td>
+            <td>冷熱水管全室汰換、總電箱升級、衛浴防水重作與高負載迴路重整。</td>
+          </tr>
+          <tr>
+            <td>30 年以上</td>
+            <td>50%-65%</td>
+            <td>結構補強評估、外牆與窗框滲水處理、全室泥作見底重做與大範圍配線更新。</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div class="article-card">
-      <p class="article-card-kicker">先盤點</p>
-      <h3>真正該問的是「不做會怎樣」</h3>
-      <p>
-        若某一項目不做，會影響安全、耐久或後續返工成本，它就不只是選配，而是需要優先面對的範圍判斷。
-      </p>
+    <p class="article-reference-table-note">
+      這不是固定報價表，而是幫助界定翻新深度的預算配比矩陣。真正要看的，是屋況風險與必做工程到底落在哪一層。
+    </p>
+  </div>
+
+  <div class="article-check-grid">
+    <div class="article-check-item">
+      <strong>水電管線</strong>
+      <p>屋齡跨過 15 年門檻後，應優先盤點冷熱水管、總電箱與高負載專用迴路是否重整。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>泥作與防水</strong>
+      <p>窗框、衛浴共牆或天花若有粉化與水漬，防水通常不能只補表面，需回到見底重做思維。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>結構判讀</strong>
+      <p>格局想打開之前，必須先調閱圖面，確認承重牆與剪力牆位置，不能直接用拆牆換開闊。</p>
     </div>
   </div>
 
   <figure class="article-figure">
-    <img
-      src="/images/blog/old-house-renovation-scope-guide-detail.png"
-      alt="老屋翻新基礎工程評估"
-      loading="lazy"
-    />
-    <figcaption>基礎工程可能不會立刻變好看，卻是後續所有收納、動線與美感得以成立的底子。</figcaption>
+    <img src={articleDetailImage} alt="老屋翻新基礎工程與屋況體質盤點示意" loading="lazy" />
+    <figcaption>基礎工程預算可能不會立刻變好看，卻決定後續所有收納、動線與風格是否有穩定底子。</figcaption>
   </figure>
 
-  <h2>關鍵二：梳理生活軌跡，用「核心使用率」決定格局更動</h2>
+  <h2>關鍵二：導入 Storage and Organization 原則收斂機能</h2>
   <p>
-    當基礎工程的範圍大致確認後，接下來才輪到格局與機能的取捨。老屋常見的問題是隔間過多、採光受阻、走道狹窄，但這不代表一定要全部打掉重練。真正該拿來判斷的標準，是<strong>家人每天怎麼使用空間</strong>。
-  </p>
-
-  <div class="article-check-grid">
-    <div class="article-check-item">
-      <strong>共處習慣</strong>
-      <p>你們更常待在公領域，還是各自在房間獨立活動？</p>
-    </div>
-    <div class="article-check-item">
-      <strong>開伙頻率</strong>
-      <p>廚房是每天使用的重鎮，還是偶爾煮簡單餐點的角落？</p>
-    </div>
-    <div class="article-check-item">
-      <strong>未來變化</strong>
-      <p>五到十年內，家庭成員與收納需求是否可能出現明顯改變？</p>
-    </div>
-  </div>
-
-  <h3>公領域是否值得重整，要看互動習慣，而不是流行不流行</h3>
-  <p>
-    若你們重視家人互動、喜歡在餐桌、客廳與廚房之間自然切換，而現有格局卻把公領域切得零碎封閉，那麼拆除部分隔牆、重整視線與動線，通常會是值得的投資。反之，若全家人本來就偏好各自獨立使用空間，硬把格局打開，未必真的提升生活品質。
-  </p>
-
-  <h3>收納與廚房，不一定要大改，但要對準真正高頻使用的區域</h3>
-  <p>
-    很多屋主會直覺地覺得老屋翻新就該整套重做，但若現有格局已經能滿足八成生活，只是收納配置不夠順、檯面不足或櫃體深度不合理，透過系統櫃重新佈局與局部更新，往往就能比全面拆改更精準地改善使用感。
-  </p>
-
-  <h3>長期生活情境有變化，格局才有理由被重新定義</h3>
-  <p>
-    若未來幾年內可能有孩子成長、長輩同住、遠端工作增加或生活型態改變，現在的翻新就應預留彈性。這時候值得思考的，不只是眼前好不好看，而是空間是否能承接未來的生活節奏。
+    當基礎體質穩定後，格局與機能的取捨就應回到家人的核心使用率，而不是盲目全室拆除。若現有空間骨架仍具合理性，很多時候真正有效的，不是大破大立，而是更精準的機能盤點與收納重組。
   </p>
 
   <div class="article-card-grid">
     <div class="article-card">
-      <p class="article-card-kicker">適合大改</p>
-      <h3>當現有動線與生活習慣差太多</h3>
+      <p class="article-card-kicker">公領域動線</p>
+      <h3>互動頻率高，才值得把採光與視線打開</h3>
       <p>
-        若採光、走道、收納與家人互動模式彼此牴觸，格局重整就不只是風格選擇，而是改善日常使用效率的必要工程。
+        若每日有大量時間在公領域互動，拆除局部非承重隔間以換取採光與動線，通常是高投報率工程；反之，偏好獨立作息時，預算應優先轉向隔音與私領域機能。
       </p>
     </div>
     <div class="article-card">
-      <p class="article-card-kicker">適合微調</p>
-      <h3>當八成需求已滿足，只差配置更精準</h3>
+      <p class="article-card-kicker">收納模組</p>
+      <h3>櫃體桶身完好時，先盤點配件與回位邏輯</h3>
       <p>
-        若空間骨架本身仍合理，先用材質更新、櫃體重組與局部機能補強，通常會比全面拆改更省預算，也更符合比例原則。
+        若原有櫃體桶身結構仍穩定，先盤點鉸鏈、滑軌、抽拉籃與下拉五金，往往能用遠低於全面拆改的預算，明顯改善收納效率與使用流暢度。
       </p>
     </div>
   </div>
 
-  <h2>關鍵三：預算與範圍的收斂，釐清「想要」與「需要」</h2>
   <p>
-    經過前兩階段的盤點後，你手上應該已經有一份初步清單。最後一步，才是讓這份清單與實際預算對焦。在健康的裝修決策裡，我們不追求不切實際的保證價，而是先把項目分清楚：哪些是不可妥協的需要，哪些是可以被替代的想要。
+    這也是為什麼 Storage and Organization 不只是整理觀念，而是範圍評估工具。當高頻使用區、回位邏輯與物品分區先被盤點清楚，就更容易判斷哪些地方值得大改，哪些地方其實用局部重整就能得到足夠改善。
   </p>
 
-  <h3>先保留不可妥協的需要，讓風險最高的地方先被處理</h3>
+  <h2>關鍵三：預算收斂的 Need vs Want 矩陣</h2>
   <p>
-    管線更新、防水工程、結構安全與嚴重不良的採光動線，通常都屬於需要優先保留預算的範圍。這些項目一旦延後，未來返工成本往往更高，也更容易打斷生活。
-  </p>
-
-  <h3>把想要拆成可替代方案，設計的價值往往來自減法</h3>
-  <p>
-    預算緊繃時，並不代表只能放棄美感，而是需要重新排序。特定進口建材、複雜天花造型、過度訂製的五金與飾面，未必都是此刻最重要的投資。若老屋原有磨石子地仍保有條件，或某些材質還有保留價值，透過線條整理、油漆跳色與家具軟裝搭配，常常就能換回更成熟、也更耐看的空間表情。
+    到了最後一步，才是把清單與預算真正對焦。設計的價值，不是讓願望無限擴張，而是建立理性的減法邏輯，先把不可妥協的需要留下，再把可被替代的想要重新排序。
   </p>
 
   <div class="article-card-grid">
@@ -182,51 +181,43 @@ const articleStructuredData = [
       <p class="article-card-kicker">Need</p>
       <h3>不可妥協的需要</h3>
       <ul>
-        <li>管線更新與防水修補</li>
-        <li>安全疑慮明確的格局修正</li>
-        <li>真正影響日常使用的收納與動線</li>
+        <li>老舊冷熱水管汰換與高風險水電重整</li>
+        <li>壁癌見底根治、防水失效與結構安全問題</li>
+        <li>真正影響生活品質的動線拓寬與收納重組</li>
       </ul>
     </div>
     <div class="article-card">
       <p class="article-card-kicker">Want</p>
       <h3>可被替代的想要</h3>
       <ul>
-        <li>高單價進口飾材與特殊五金</li>
-        <li>為了好看而過度複雜的造型</li>
-        <li>短期內不影響生活品質的裝飾升級</li>
+        <li>高單價進口飾材與過度複雜的造型天花</li>
+        <li>訂製比例過高的木作櫃體與昂貴飾面</li>
+        <li>可用油漆、家具與系統櫃平替的視覺加分項</li>
       </ul>
     </div>
   </div>
 
   <div class="article-insight-panel">
     <p class="article-insight-label">預算收斂順序</p>
-    <h3 class="article-insight-title">先保安全，再補機能，最後才留給風格加分。</h3>
+    <h3 class="article-insight-title">先保安全，再補機能，最後才把剩餘預算留給風格加分。</h3>
     <p>
-      當預算不夠一次完成所有理想時，真正成熟的做法不是勉強全做，而是讓每一筆支出都對應清楚的生活價值與風險等級。
+      當預算不夠一次完成所有理想時，真正成熟的做法不是勉強全做，而是讓每一筆支出都對應清楚的生活價值與返工風險。
     </p>
   </div>
 
   <div class="article-gallery">
     <figure class="article-figure">
-      <img
-        src="/images/blog/old-house-renovation-scope-guide-scene.png"
-        alt="老屋翻新預算收斂與設計減法"
-        loading="lazy"
-      />
-      <figcaption>範圍收得好，預算就不會被零碎願望稀釋，整體空間也更容易保有完整氣質。</figcaption>
+      <img src={articleSceneImage} alt="老屋翻新預算收斂與設計減法情境示意" loading="lazy" />
+      <figcaption>範圍收得準，預算就不會被零碎願望稀釋，整體空間也更容易保有完整秩序。</figcaption>
     </figure>
     <figure class="article-figure">
-      <img
-        src="/images/blog/old-house-renovation-scope-guide-cover.png"
-        alt="老屋翻新範圍評估指南封面示意"
-        loading="lazy"
-      />
-      <figcaption>真正讓人安心的翻新，不是什麼都做，而是知道什麼該先做、什麼可以晚一點做。</figcaption>
+      <img src={articleImage} alt="老屋翻新範圍與預算分配準則封面示意" loading="lazy" />
+      <figcaption>真正讓人安心的翻新，不是什麼都做，而是知道什麼必須先做、什麼可以延後處理。</figcaption>
     </figure>
   </div>
 
-  <h2>結語：找到屬於自己的裝修安定感</h2>
+  <h2>結語：翻新範圍不是做加法，而是先學會做對減法</h2>
   <blockquote>
-    老屋翻新的範圍評估，不是盲目跟從網路上的必做清單，而是一場對自我生活需求的深度審視。從基礎體質的鞏固，到生活軌跡的對焦，最後透過理性的預算收斂，你會慢慢描繪出最適合自己的翻新藍圖。當方向清晰了，面對老屋的焦慮便會消散，取而代之的，將是迎接嶄新生活的從容與安定。
+    老屋翻新的範圍評估，不是盲目跟從網路上的必做清單，而是先用基礎體質、生活軌跡與預算收斂三層機制，把真正重要的事情留下。當減法做對了，預算不只更穩，空間也更容易在安全、機能與美感之間取得長久成立的平衡。
   </blockquote>
 </EditorialArticleLayout>

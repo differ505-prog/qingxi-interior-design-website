@@ -181,7 +181,7 @@ export const publicationMergeDirectives: PublicationMergeDirective[] = [
     targetTitle: "屋況盤點與範圍界定總表",
     targetSubchapter: "翻新起手式",
     sourceTitles: [
-      "老屋翻新範圍怎麼抓？從屋況盤點到關鍵判斷點的完整評估指南",
+      "翻新範圍：減法評估與預算分配準則",
       "啟動老屋翻新之前：精準盤點屋況的 5 個核心判斷點",
     ],
     note: "這兩篇屬同一組前置決策內容，應整併為單一的翻新起手式條目，而不是繼續拆成分散子題。",
@@ -252,7 +252,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "翻新起手式",
             keywords: ["屋況盤點", "翻新範圍", "先做什麼", "第一步", "從哪開始", "翻新前", "準備階段"],
             nodeKind: "core",
-            titleOverride: "屋況盤點與範圍界定總表",
+            titleOverride: "翻新範圍：減法評估與預算分配準則",
           },
           {
             title: "實戰表單",
