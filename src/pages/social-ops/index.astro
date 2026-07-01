@@ -4868,10 +4868,11 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const lines = [
       "【出版基線達標路徑】",
       "以下路徑僅統計純新文章軌道，不混入 Merge_and_Update 或 Merge_into_Asset。",
+      "以下為理想推估，不代表目前已存在 3 篇可立即發布的純新文章。",
       `距離出版基線：還差 ${plan.remainingToBaseline} 篇`,
       `目前最短板章節：${plan.weakestChapter?.chapter || "尚未判定"}｜缺口 ${plan.weakestChapter?.missingCount ?? 0} 篇｜完成度 ${plan.weakestChapter?.completionRate ?? 0}%`,
       `純新文章軌道最快推進路徑：${plan.fastTrackLabel}`,
-      `若先完成 3 篇新文章：主書完成度可由現況推進至 ${plan.projectedCoverage}%`,
+      `若後續補足 3 篇合格的純新文章：主書完成度可由現況推進至 ${plan.projectedCoverage}%`,
       "章節缺口排序：",
       ...plan.chapterBreakdown.map((item, index) => `${index + 1}. ${item.chapter}｜缺口 ${item.missingCount} 篇｜完成度 ${item.completionRate}%`),
     ];
@@ -4890,7 +4891,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
           <span>${escapeHtml(getDisplayTitle(item))}</span>
         </li>
       `).join("")
-      : "<li><span>目前尚無可用的優先補位題目。</span></li>";
+      : `<li><span>${escapeHtml(getPureNewPublishEmptyStateGuidance(mode))}</span></li>`;
     return `
       <div class="bookshelf-review-baseline-summary">
         <article class="bookshelf-review-baseline-card">
@@ -4904,9 +4905,9 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
           <small>缺口 ${plan.weakestChapter?.missingCount ?? 0} 篇｜完成度 ${plan.weakestChapter?.completionRate ?? 0}%</small>
         </article>
         <article class="bookshelf-review-baseline-card">
-          <span>完成 3 篇新文章後預估</span>
+          <span>補足 3 篇合格新文章後預估</span>
           <strong>${plan.projectedCoverage}%</strong>
-          <small>以同一本主書的純新文章軌道推估，不混入舊文修復任務。</small>
+          <small>此為理想推估，不代表目前已存在 3 篇可立即發布的純新文章。</small>
         </article>
       </div>
       <div class="bookshelf-review-baseline-route">
@@ -4945,7 +4946,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const candidates = getTopPriorityRecommendations(mode, limit);
     const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
     if (!candidates.length) {
-      return '<p class="bookshelf-confirm-note">目前尚無可用的純新文章候選。</p>';
+      return `<p class="bookshelf-confirm-note">${escapeHtml(getPureNewPublishEmptyStateGuidance(mode))}</p>`;
     }
     return candidates.map((candidate, index) => `
       <article class="bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}">
@@ -5143,6 +5144,29 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
     const topCandidates = getTopPriorityRecommendations(mode, 3);
     return topCandidates.find((candidate) => !isDependencyLocked(focusTrack, candidate.chapter, candidate.subchapter)) || topCandidates[0] || null;
+  }
+
+  function getPureNewPublishEmptyStateGuidance(mode = currentTopicMode) {
+    const focusTrack = getCurrentTopicModeState(mode)?.publishingDashboard?.focusTrack;
+    if (!focusTrack?.title) {
+      return "目前純新文章池為空，請先判定是否應補同章案例／專案節點，或直接推進下一章主幹理論。";
+    }
+    const reviewCandidates = getCurrentTopicCandidates(mode)
+      .filter((candidate) => candidate?.workflowAction === "Revise_Angle");
+    const sameChapterSupplement = reviewCandidates.find((candidate) => (
+      candidate.chapter === "現況判讀" && ["案例解析", "專案節點", "迷思破解"].includes(candidate.subchapter)
+    ));
+    if (sameChapterSupplement) {
+      return `目前純新文章池為空，建議先覆核同章補充節點，例如「${getDisplayTitle(sameChapterSupplement)}」；若仍不成立，再推進下一章主幹理論。`;
+    }
+    const nextChapterTheory = reviewCandidates.find((candidate) => (
+      publicationChapterOrder.indexOf(candidate.chapter) >= 1 &&
+      !["實戰表單", "案例解析", "迷思破解", "專案節點"].includes(candidate.subchapter)
+    ));
+    if (nextChapterTheory) {
+      return `目前純新文章池為空，建議優先推進下一章主幹理論，例如「${getDisplayTitle(nextChapterTheory)}」。`;
+    }
+    return "目前純新文章池為空，請先判定是否應補同章案例／專案節點，或直接推進下一章主幹理論。";
   }
 
   function getExpectedCandidate(mode = currentTopicMode) {
@@ -5606,10 +5630,11 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "C. 本輪候選是否應留在新文章池",
       `- 目前規則層送審的純新文章候選為：${getDisplayTitle(recommendation)}`,
       "- 網站文章標題與書籍標題視為同一套，不做雙標題分流。",
-      "- 請判斷這一篇是否真的應該留在新文章池；若不是，請給出更好的優先順序與原因。",
+      "- 若目前純新文章候選為「尚未產生」，請直接判定「目前純新文章池是否為空」，並說明下一步應優先補同章案例、專案節點，或推進下一章主幹理論。",
+      "- 若目前純新文章候選不是空值，請判斷這一篇是否真的應該留在新文章池；若不是，請給出更好的優先順序與原因。",
       "- 若你判定目前 Top 1 其實不該存在於新文章池，請直接明寫「應移出新文章順位」，不得只用模糊語句帶過。",
       "- 若某候選與既有文章核心解法重疊度 >50%，不可列入 New_Publish，必須轉入 Merge_and_Update 工作流。",
-      "- 若主問題已被 Merge_and_Update 軌道完美命中，New_Publish 軌道必須切換為補充模式，優先推薦同章的表單或案例，不可讓後段流程文搶主導權。",
+      "- 若主問題已被 Merge_and_Update 軌道完美命中，New_Publish 軌道必須切換為補充模式；若同章表單已改判為 Merge_into_Asset，則優先推薦同章案例或專案節點，不可讓後段流程文搶主導權。",
       "- 若表單、清單、檢查表、Checklist 或試算表只是把既有主文操作化，請直接改判為 Merge_into_Asset，不得保留在 New_Publish 池。",
       "- 一旦某題被你改判為 Merge_and_Update 或 Merge_into_Asset，後續純新文章排序必須完全排除該題，不得再把它列入 Top 3。",
       "- 同一主章節內也必須遵守微觀時序：theory > tool/form > process/contract > case；但若該章已有已上線舊文可透過整併成立理論主幹，不可再用『理論未發布』當成硬性阻擋新文章的理由。",
@@ -5627,6 +5652,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
       "E. 最終優先順序建議",
       "- 請列出接下來最值得先做的 3 篇純新文章，依優先順序排序；此處只允許 New_Publish，不得混入 Merge_and_Update 或 Merge_into_Asset。",
       "- 若你在 C 區已判定本輪候選應移出新文章池，這裡必須改用剩餘的純 New_Publish 候選重新排序。",
+      "- 若目前合格的純 New_Publish 候選不足 3 篇，請明確寫出「目前純新文章池為空」或「不足 3 篇」，不得硬湊。",
       "- 每一篇都要附 1-2 句原因。",
       "- 請直接參考本文附帶的送審 Top 3 候選，必要時可以推翻並重排。",
       "- 此處優先順序必須先扣除應整併或應資產化的題目，不可把已判定應整併者繼續列入新文章 Top 3。",
@@ -5854,7 +5880,7 @@ const publishingFocusTrackTitleJson = JSON.stringify(publishingFocusTrackTitle);
     nextTitle.textContent = recommendation ? getDisplayTitle(recommendation) : "尚未產生";
     nextMeta.textContent = recommendation
       ? `${recommendation.chapter} / ${recommendation.subchapter} / ${recommendation.category}｜完成前 ${recommendation.coverageBefore}% → 完成後 ${recommendation.coverageAfter}%`
-      : "目前尚未產生待覆核候選。";
+      : getPureNewPublishEmptyStateGuidance(currentTopicMode);
     applyRiskBadge(riskBadge, recommendation?.collisionRisk || "low", "規則初篩低相近");
     riskNote.textContent = recommendation?.collisionReason || "以下僅為規則層送審前初篩，最終以高階 LLM 覆核為準。";
     const semanticData = getSemanticMatchBadgeData(recommendation);
