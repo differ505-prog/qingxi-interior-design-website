@@ -3414,6 +3414,69 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
     return normalizedPath;
   }
 
+  function getReadableSourceLabel(sourceMedium = "") {
+    const rawValue = String(sourceMedium || "").trim();
+    const normalized = rawValue.toLowerCase();
+
+    if (!normalized || normalized === "(direct) / (none)") {
+      return "直接進站";
+    }
+
+    if (normalized.includes("instagram")) {
+      return "Instagram 導流";
+    }
+
+    if (normalized.includes("threads")) {
+      return "Threads 導流";
+    }
+
+    if (normalized.includes("facebook") || normalized.includes("m.facebook") || normalized.includes("l.facebook")) {
+      return "Facebook 導流";
+    }
+
+    if (normalized.includes("line")) {
+      return "LINE 導流";
+    }
+
+    if (normalized.includes("google") && normalized.includes("/ organic")) {
+      return "Google 自然搜尋";
+    }
+
+    if (normalized.includes("google") && normalized.includes("/ cpc")) {
+      return "Google 廣告";
+    }
+
+    if (normalized.includes("yahoo") && normalized.includes("/ organic")) {
+      return "Yahoo 自然搜尋";
+    }
+
+    if (normalized.includes("bing") && normalized.includes("/ organic")) {
+      return "Bing 自然搜尋";
+    }
+
+    if (normalized.includes("/ referral")) {
+      const sourceName = rawValue.split("/")[0]?.trim() || "其他網站";
+      return `${sourceName} 轉介`;
+    }
+
+    if (normalized.includes("/ organic")) {
+      const sourceName = rawValue.split("/")[0]?.trim() || "搜尋引擎";
+      return `${sourceName} 自然搜尋`;
+    }
+
+    if (normalized.includes("/ social")) {
+      const sourceName = rawValue.split("/")[0]?.trim() || "社群";
+      return `${sourceName} 社群導流`;
+    }
+
+    if (normalized.includes("/ cpc") || normalized.includes("/ paid")) {
+      const sourceName = rawValue.split("/")[0]?.trim() || "廣告";
+      return `${sourceName} 廣告流量`;
+    }
+
+    return rawValue;
+  }
+
   function renderContentAnalytics() {
     const statusNode = document.getElementById("content-analytics-status");
     const updatedAtNode = document.getElementById("content-analytics-updated-at");
@@ -3542,7 +3605,7 @@ const topicModeMapJson = JSON.stringify(topicModeMap);
       ? topSources
           .map((source) => `
             <li>
-              <span>${escapeHtml(source.sourceMedium || "(direct) / (none)")}</span>
+              <span>${escapeHtml(getReadableSourceLabel(source.sourceMedium || "(direct) / (none)"))}</span>
               <strong>${formatCount(source.sessions)}</strong>
             </li>
           `)
