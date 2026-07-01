@@ -6,6 +6,7 @@ const articleMeta = getStaticBlogPost("old-house-renovation-acceptance-checklist
 const articleTitle = articleMeta.title;
 const articleDescription = articleMeta.summary;
 const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
+const articleModifiedTime = "2026-07-02T00:00:00+08:00";
 const articleImage = articleMeta.coverImage;
 const articleDetailImage = "/images/blog/old-house-renovation-acceptance-checklist-detail.png";
 const articleSceneImage = "/images/blog/old-house-renovation-acceptance-checklist-scene.png";
@@ -15,9 +16,9 @@ const articleStructuredData = [
     "@type": "Article",
     headline: articleTitle,
     description: articleDescription,
-    image: [articleImage],
+    image: [`https://qingxidesign.tw${articleImage}`],
     datePublished: articlePublishedTime,
-    dateModified: articlePublishedTime,
+    dateModified: articleModifiedTime,
     articleSection: articleMeta.track,
     keywords: articleMeta.tags.join(", "),
     author: {
@@ -37,215 +38,307 @@ const articleStructuredData = [
   description={articleDescription}
   ogImage={articleImage}
   publishedTime={articlePublishedTime}
-  modifiedTime={articlePublishedTime}
+  modifiedTime={articleModifiedTime}
   structuredData={articleStructuredData}
   track={articleMeta.track}
   chapter={articleMeta.chapter}
   siteCategory={articleMeta.siteCategory}
   tags={articleMeta.tags}
+  editorialRefreshStamp={articleMeta.editorialRefreshStamp}
 >
   <p class="article-lead">
-    當老屋翻新的工程逐漸走到尾聲，空間也從粗獷工地慢慢轉向理想中的家，屋主最容易把注意力放在表面的完成度，例如漆面夠不夠平、燈光夠不夠美、櫃體是不是俐落。但真正決定入住後能否安穩生活的，往往不是第一眼看見的漂亮，而是那些藏在牆體、地坪與五金運作裡的基礎工程。
+    老屋翻新的完工驗收，不僅是檢查空間有沒有做完，更是確認未來十年能否住得穩、住得安心的最後一道關卡。和新成屋偏重外觀瑕疵不同，老屋更需要用量化標準去檢核水電、防水、泥作與櫃體是否真的落地。
   </p>
 
   <p>
-    和新成屋驗收多半著重外觀瑕疵不同，老屋翻新的驗收核心，更在於確認重整過後的安全性、穩定度與耐久度。畢竟老屋的體質已經歷歲月耗損，若在完工前沒有把關好，很多問題會在入住後才慢慢浮現，屆時修補的成本與干擾都會更高。
+    真正麻煩的風險，往往不在第一眼看見的表面，而是藏在閉水測試、絕緣電阻、牆面平整度與門片公差這些細節裡。若驗收時沒有把數字抓清楚，入住後才發現漏水、跳電、空鼓或櫃體偏移，返工成本通常遠高於當下多花半天做完整檢查。
   </p>
 
   <p>
-    以下整理老屋翻新驗收時，最容易被忽略卻最值得優先檢查的幾個核心重點，幫助你建立一套更清楚的驗收邏輯。若你目前還在翻新前期，也可以先搭配
+    這篇把驗收拆成四個核心模組，並補入老屋現場常見的順平特例與尾款撥付原則。若你目前仍在翻新前期，也建議先搭配
     <a href="/blog/old-house-condition-assessment-guide">屋況盤點重點</a>
     與
     <a href="/blog/old-house-renovation-demolition-and-masonry-sequence">基礎工程順序</a>
-    一起閱讀，對整體節奏會更有感。
+    一起閱讀，會更容易理解哪些驗收項目其實要在施工前就先寫進合約與圖面。
   </p>
 
   <blockquote>
-    老屋翻新的驗收，不是在雞蛋裡挑骨頭，而是在入住之前，替未來十幾年的生活把最後一道關。
+    老屋翻新的驗收，不是在挑表面小毛病，而是在交屋之前，把最難返工的風險先降到可控範圍。
   </blockquote>
 
   <div class="article-insight-panel">
     <p class="article-insight-label">驗收主軸</p>
-    <h3 class="article-insight-title">先檢查那些一旦出問題就最難返工的基礎工程，再回頭看表面細節。</h3>
+    <h3 class="article-insight-title">先驗水路、防水與電工，再驗泥作與櫃體，最後才處理表面細節與尾款撥付。</h3>
     <p>
-      只要驗收順序對了，很多原本容易被忽略的風險都能提早浮現，也能讓現場溝通更聚焦，而不是被零碎瑕疵牽著走。
+      驗收順序一旦排對，現場討論就會從模糊感受回到具體標準，也更容易釐清哪些問題必須立即返修、哪些屬於老屋條件下的合理容許。
     </p>
   </div>
 
   <div class="article-step-flow">
-    <div class="article-step-card">
-      <span class="article-step-index">01</span>
+    <article class="article-step-card">
+      <p class="article-step-index">01</p>
       <div>
         <h3>水路與防水</h3>
-        <p>最容易返工、最該優先確認的部分</p>
+        <p>閉水、水壓、洩水坡度，全部都要有數字。</p>
       </div>
-    </div>
-    <div class="article-step-card">
-      <span class="article-step-index">02</span>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">02</p>
       <div>
         <h3>基礎電工</h3>
-        <p>迴路獨立、插座通電、開關順手</p>
+        <p>確認絕緣電阻、專用迴路與接地沒有被省略。</p>
       </div>
-    </div>
-    <div class="article-step-card">
-      <span class="article-step-index">03</span>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">03</p>
       <div>
         <h3>泥作與平整度</h3>
-        <p>磁磚空鼓、牆面平整、垂直度</p>
+        <p>用靠尺與打診，不用肉眼猜測。</p>
       </div>
-    </div>
-    <div class="article-step-card">
-      <span class="article-step-index">04</span>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">04</p>
       <div>
         <h3>木作與系統櫃</h3>
-        <p>五金運作、抽拉、開闔、收邊</p>
+        <p>核對五金規格、公差與尾款條件。</p>
       </div>
-    </div>
+    </article>
   </div>
 
-  <h2>1. 水路與防水：看不見的隱憂，最需要被確認</h2>
+  <h2>關鍵一：水路與防水先用閉水與水壓測試說話</h2>
 
   <p>
-    老屋翻新最怕的問題之一，就是漏水與回滲。因為水路與防水層大多藏在地坪與牆體裡，完工後表面再怎麼乾淨，也不能只靠肉眼判斷一切正常。驗收時必須透過實際測試，才能確認這些隱蔽工程是否真的到位。
+    老屋最怕的問題之一，就是交屋後才發現回滲、漏水與排水不順。因為水路與防水層都藏在地坪與牆體裡，完工後就算表面再整齊，也不能只靠乾燥外觀判斷工程無誤。真正可靠的驗收，必須回到測試時間、壓力值與坡度三個量化支點。
   </p>
 
-  <h3>給水與排水：不要只看會不會出水，要看穩不穩、順不順</h3>
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>量化基準</th>
+            <th>驗收重點</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>給水管壓測試</td>
+            <td>5-6 kg/cm²，持壓 1 小時</td>
+            <td>壓力表不得明顯掉壓，所有接頭不得滲漏。</td>
+          </tr>
+          <tr>
+            <td>防水層閉水測試</td>
+            <td>蓄水 3-5 公分，靜置 48 小時</td>
+            <td>樓下天花與共牆不得出現水痕，水位不得異常下降。</td>
+          </tr>
+          <tr>
+            <td>衛浴洩水坡度</td>
+            <td>1%-2%</td>
+            <td>每 100 公分落差約 1-2 公分，水流能自然回到地漏。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="article-reference-table-note">
+      閉水與壓測的價值，在於把「應該沒問題」變成「有測過而且數字成立」。
+    </p>
+  </div>
 
   <p>
-    驗收時可將各處水龍頭同時開啟，觀察水壓是否穩定，是否出現忽大忽小的狀況。接著再檢查面盆、淋浴區、浴缸與地漏的排水速度，確認排水是否順暢、是否有積水停留，並同步查看排水管接點周邊是否出現滲漏或滲水痕跡。對老屋來說，這是檢查管路重拉品質與坡度是否合理的最直接方式。
-  </p>
-
-  <h3>防水與洩水坡度：真正麻煩的，往往不是當下，而是入住後</h3>
-
-  <p>
-    衛浴、陽台與其他用水區域，應重點檢查牆角、門檻、管線穿牆位置與收邊接縫。若條件允許，建議實際做潑水測試，觀察水流能否自然導向地漏，而不是在角落形成局部積水。很多使用上的不適感，並不是因為防水完全失效，而是因為坡度與細部收邊處理不夠成熟，導致日常清潔與使用時總覺得哪裡不對勁。
-  </p>
-
-  <h3>窗框嵌縫與外牆接點：老屋邊界最常見的滲水弱點</h3>
-
-  <p>
-    若老屋有更換鋁窗或調整開口，窗框與牆體的接縫就是驗收時不能忽略的重點。請仔細檢查窗框四周的矽利康是否平整、飽滿且無裂縫，並留意接縫邊緣是否有毛細現象、水痕或粉化情況。若剛好遇到下雨天，更是觀察窗框邊界是否有滲水跡象的好時機。
+    給水管壓測試完成後，建議同步開啟多處出水點，確認水壓在實際使用情境下仍然穩定。排水端則要觀察面盆、淋浴區、浴缸與地漏的退水速度，並檢查存水彎、接頭與牆角邊界是否有滲漏痕跡。這些位置一旦在入住後出問題，通常都需要拆除局部飾面才能處理。
   </p>
 
   <div class="article-card-grid">
     <div class="article-card">
-      <p class="article-card-kicker">先驗</p>
-      <h3>水路與防水，是最該在空屋時先確認的部分</h3>
+      <p class="article-card-kicker">閉水測試</p>
+      <h3>衛浴與陽台要把時間留滿，不要只測幾小時就交屋</h3>
       <p>
-        因為一旦入住後才發現問題，往往不只是局部修補，而會連動拆除、乾燥、清潔與重新安排生活節奏，成本最高也最干擾。
+        48 小時是為了讓微量滲漏有足夠時間浮現。測試做得太短，最容易把慢性問題帶進入住後的日常。
       </p>
     </div>
     <div class="article-card">
-      <p class="article-card-kicker">別漏看</p>
-      <h3>真正麻煩的地方，常常藏在接縫、坡度與節點</h3>
+      <p class="article-card-kicker">坡度判讀</p>
+      <h3>真正麻煩的不是有沒有地漏，而是水能不能穩定回到地漏</h3>
       <p>
-        很多問題不是完全失效，而是細部不夠成熟。這類小缺失若放著不處理，入住後會最明顯地反覆干擾日常使用感。
+        局部積水與門檻回流，很多時候不是防水失效，而是洩水坡度與細部收邊沒有做好。
       </p>
     </div>
   </div>
 
   <figure class="article-figure">
-    <img src={articleDetailImage} alt="老屋翻新驗收時檢查衛浴防水與水電節點的手繪示意" />
+    <img src={articleDetailImage} alt="老屋翻新完工驗收時檢查水壓、防水與節點細部的示意" loading="lazy" />
     <figcaption>
-      老屋驗收最值得花時間的，不是表面的光澤，而是那些未來一旦出問題就最難返工的水電與防水節點。
+      老屋驗收最值得花時間的，通常不是表面光澤，而是那些未來一旦出問題就最難返工的水路與防水節點。
     </figcaption>
   </figure>
 
-  <h2>2. 基礎電工：承載現代生活的穩定度</h2>
+  <h2>關鍵二：基礎電工要確認迴路獨立與絕緣電阻</h2>
 
   <p>
-    老屋原有的配電規劃，往往無法負荷現代家庭的使用節奏，因此翻新時電箱與迴路的重整幾乎是基本盤。到了驗收階段，重點已經不是「有沒有做」，而是「做得是否清楚、穩定、可維護」。
-  </p>
-
-  <h3>電箱標示與迴路獨立性：看得懂，日後才真的好用</h3>
-
-  <p>
-    打開總開關箱後，應確認每一個無熔絲開關都有清晰、正確且能對應現場的標示。對於廚房高耗電設備、冷暖空調與衛浴暖風機等，則要確認是否設有獨立迴路。這不只是為了避免跳電，也關係到未來維修時是否能快速判斷問題來源，不會一遇到異常就整屋一起摸索。
-  </p>
-
-  <h3>插座與開關：位置只是第一步，通電與手感才是日常品質</h3>
-
-  <p>
-    除了確認位置與數量符合圖面外，也建議實際用驗電筆或小型電器逐一測試插座是否確實通電。開關則可反覆切換，確認按壓回饋是否俐落、對應燈具是否正常反應，且不會出現延遲、閃爍或接觸不良的情況。這些小細節看似簡單，卻最直接影響入住後每天的使用感。
+    老屋配電更新的價值，不只是換新線材，而是讓現代高耗電生活有足夠承載能力。到了驗收階段，重點不是「看起來像有做」，而是每個專用迴路、接地與絕緣電阻都有沒有真的達標。
   </p>
 
   <div class="article-check-grid">
     <div class="article-check-item">
-      <strong>看標示</strong>
-      <p>每一個迴路是否都對得上現場與設備位置？</p>
+      <strong>絕緣電阻</strong>
+      <p>使用高阻計量測，數值應大於 1 MΩ，才代表線路沒有顯著漏電風險。</p>
     </div>
     <div class="article-check-item">
-      <strong>看獨立性</strong>
-      <p>高耗電設備是否各自擁有獨立迴路，而非共用模糊分配？</p>
+      <strong>專用迴路</strong>
+      <p>IH 爐、烤箱、冷暖空調與暖風機等高耗電設備，應使用獨立迴路並清楚標示 breaker。</p>
     </div>
     <div class="article-check-item">
-      <strong>看日常感</strong>
-      <p>插座真的通電、開關真的順手，才算完成驗收，而不是只在圖面上存在。</p>
+      <strong>線徑與接地</strong>
+      <p>常見專用迴路需配置 2.0mm 或 5.5mm² 單芯線，插座也要逐點確認水火線與接地正確。</p>
     </div>
   </div>
 
-  <h2>3. 泥作與平整度：空間安定感的幾何基礎</h2>
-
   <p>
-    泥作工程奠定的是空間最底層的幾何秩序。牆面、地坪與轉角若沒有處理好，後續就算木作、油漆與家具都到位，整體質感仍容易顯得鬆散、不夠俐落。老屋現場原本就可能存在尺寸誤差，因此完工驗收時更該留意「允許範圍內的誤差」是否被控制得宜。
+    打開總開關箱時，除了確認標示清楚，也要把每一回路對回實際空間與設備。插座端則建議用相位檢測器逐一確認水火線沒有接反，並用小型電器或負載測試確認通電穩定。這些動作看似瑣碎，卻直接關係到日後是不是一遇到異常就整屋摸黑排查。
   </p>
 
-  <h3>磁磚空鼓：不是每一塊都要完美無聲，但要看位置與比例</h3>
+  <h2>關鍵三：泥作平整度與磁磚空鼓要回到容許誤差</h2>
 
   <p>
-    可使用打診棒或硬幣，輕敲地磚與壁磚的四角及中央，判斷是否出現明顯空洞聲。老屋牆面若原始條件不夠完美，局部微小空鼓未必立即影響結構，但若大面積出現在主要動線、衛浴牆面或後續受力區域，就應請施工團隊進一步評估與處理，避免日後膨拱或脫落。
+    泥作工程奠定的是空間最底層的幾何秩序。對老屋來說，現場原始條件本來就可能有牆面傾斜、轉角跑位與高度差，因此驗收時真正重要的，不是追求不切實際的完全零誤差，而是確認誤差是否被控制在可接受範圍內。
   </p>
 
-  <h3>牆面平整與垂直度：系統櫃與家具會把問題放大</h3>
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <thead>
+          <tr>
+            <th>泥作項目</th>
+            <th>量化基準</th>
+            <th>驗收說明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>牆面平整度</td>
+            <td>2M 靠尺最大縫隙 &lt; 3mm</td>
+            <td>靠牆櫃體、門框與收邊處要優先檢查。</td>
+          </tr>
+          <tr>
+            <td>磁磚空鼓率</td>
+            <td>單片空鼓面積 &lt; 15%</td>
+            <td>主要動線、衛浴牆面與受力區要求更嚴格，原則上不得有明顯空鼓。</td>
+          </tr>
+          <tr>
+            <td>老屋順平特例</td>
+            <td>原牆高低差超過 5cm 時可改採順平</td>
+            <td>須於施工前確認，避免過厚打底吃掉坪效或增加結構負擔。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="article-reference-table-note">
+      老屋驗收要分清楚「可接受的順平」與「會影響櫃體安裝的失控誤差」。
+    </p>
+  </div>
 
   <p>
-    驗收時可從光線側向照射牆面，觀察是否有明顯波浪起伏，也要留意陰陽角是否筆直、轉折是否乾淨。尤其未來要安裝系統櫃、收納櫃或靠牆家具的位置，牆面的平整度會直接影響貼合度與收邊效果，很多看似是櫃體問題，其實根源出在泥作底面沒有先做穩。
+    驗收時可用 2M 靠尺貼齊牆面與地坪，確認最大縫隙是否超過 3mm；磁磚則用打診棒或硬幣檢查四角與中心共 5 點，辨識是否有大面積空鼓。若原牆體本身傾斜嚴重，實務上可以採取順平而不是絕對垂直，但前提是這個特例已經在施工前說清楚，並且不影響後續櫃體貼合、門片收邊與家具定位。
   </p>
 
   <div class="article-gallery">
     <figure class="article-figure">
-      <img src={articleSceneImage} alt="老屋翻新驗收時觀察牆面平整與櫃體收邊的手繪示意" />
+      <img src={articleSceneImage} alt="老屋翻新驗收時觀察牆面平整度與櫃體收邊的示意" loading="lazy" />
       <figcaption>
         平整度與垂直度的差異，在空屋時也許不明顯，但一旦進入櫃體、燈光與家具配置，就會被成倍放大。
       </figcaption>
     </figure>
     <figure class="article-figure">
-      <img src={articleImage} alt="老屋翻新驗收重點封面主圖手繪示意" />
+      <img src={articleImage} alt="老屋翻新完工驗收量化檢核封面示意" loading="lazy" />
       <figcaption>
-        驗收的核心，不是挑出所有不完美，而是先辨識哪些缺失會在未來真正影響安全、耐久與使用品質。
+        驗收的核心，不是把所有不完美都當成同一層級，而是先辨識哪些缺失會真正影響安全、耐久與使用品質。
       </figcaption>
     </figure>
   </div>
 
-  <h2>4. 木作與系統櫃：日常互動最頻繁，也最容易被輕忽</h2>
+  <h2>關鍵四：木作與系統櫃要核對配件、公差與尾款條件</h2>
 
   <p>
-    木作與系統櫃通常是入住後最常被開關、抽拉與碰觸的部分，因此驗收不該只看表面好不好看，而要檢查五金運作是否順暢、貼皮是否穩定、邊角是否細緻。真正好的收納，不是剛完工拍照好看，而是使用一兩年後仍然順手、耐用且不容易出狀況。
+    木作與系統櫃是入住後最常被開關、抽拉與碰觸的模組，因此驗收不能只看門片有沒有對齊，而要回到合約規格、五金品牌與公差控制。好的收納，不是拍照時整齊，而是使用一年後仍然順手、不鬆脫、不偏移。
   </p>
 
-  <h3>鉸鏈與滑軌：多開幾次，比只看一次更準</h3>
-
-  <p>
-    驗收時建議反覆開闔每一扇門片、抽拉每一個抽屜，確認鉸鏈與滑軌是否滑順、是否有偏移或金屬摩擦聲。若有緩衝功能，也應確認其閉合速度是否均勻，門片關閉後能否準確貼合，不會出現高低錯位或局部卡住的情況。
-  </p>
-
-  <h3>收邊與貼皮：越常碰到的地方，越能看出細節成熟度</h3>
-
-  <p>
-    可用手指輕觸櫃體邊緣、層板轉角與木作接縫處，確認是否有毛邊、扎手感或貼皮翹起。表面貼皮也應留意是否平整、是否有氣泡、脫膠或轉角吃膠不均的狀況。這些細節除了影響視覺，也會直接關係到後續的耐用度與清潔維護。
-  </p>
+  <div class="article-check-grid">
+    <div class="article-check-item">
+      <strong>五金核對</strong>
+      <p>現場逐一對照配件清單，確認鉸鏈、滑軌與抽拉籃品牌、規格、數量與合約一致。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>門片公差</strong>
+      <p>門片縫隙應均勻，常用控制值為 1.5mm-2mm 以內，避免高低錯位與磨擦。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>連續操作</strong>
+      <p>每一扇門片與抽屜至少連續開闔 5 次，確認無異音、卡頓、回彈失準或緩衝失效。</p>
+    </div>
+  </div>
 
   <div class="article-insight-panel">
-    <p class="article-insight-label">使用角度</p>
-    <h3 class="article-insight-title">驗收不只看「做完了沒」，更要看「住進去後順不順」。</h3>
+    <p class="article-insight-label">尾款原則</p>
+    <h3 class="article-insight-title">缺失沒有修完，就不要把驗收與尾款撥付切開處理。</h3>
     <p>
-      真正成熟的驗收標準，是把每一個細節都拉回日常使用去檢查。只要某個問題會持續干擾清潔、收納、開闔或維修，它就值得在交屋前先被處理。
+      驗收發現瑕疵很正常，關鍵在於要把缺失拍照造冊、註明修繕期限，並在複驗完成前保留 5% 至 10% 的工程尾款。
     </p>
   </div>
 
-  <h2>結語：驗收是一場理性的過渡</h2>
+  <div class="article-card-grid">
+    <div class="article-card">
+      <p class="article-card-kicker">Punch List</p>
+      <h3>缺失要用標籤、照片與期限管理</h3>
+      <p>
+        口頭提醒最容易失焦。把每一個缺失位置、照片、責任工種與修繕期限寫清楚，後續複驗才有依據。
+      </p>
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">尾款保留</p>
+      <h3>5% 至 10% 的尾款，是驗收階段最重要的談判槓桿</h3>
+      <p>
+        只要實體功能與合約規格尚未完全吻合，就不建議過早撥付尾款，否則後續返修主導權通常會快速下滑。
+      </p>
+    </div>
+  </div>
+
+  <h2>隨身驗收工具書模組：老屋完工量化檢核表</h2>
+
+  <div class="article-check-grid">
+    <div class="article-check-item">
+      <strong>水路</strong>
+      <p>水壓測試達 5-6 kg/cm²，持壓 1 小時無掉壓，接頭無滲漏。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>防水</strong>
+      <p>衛浴蓄水 3-5 公分，閉水 48 小時無滲漏，樓下與共牆無水痕。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>電工</strong>
+      <p>絕緣電阻大於 1 MΩ，插座水火線與接地正確，高耗電設備具獨立迴路。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>泥作</strong>
+      <p>2M 靠尺檢驗牆面與地坪，平整度誤差小於 3mm，主要區域不得有明顯空鼓。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>老屋特例</strong>
+      <p>若採順平處理，已事前確認且不影響櫃體、門框與家具貼合。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>櫃體</strong>
+      <p>配件清單核對無誤，門片縫隙控制在 2mm 內，抽拉五金連續操作無異音。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>點交</strong>
+      <p>缺失清單已修復完畢並完成複驗後，再撥付最後 5%-10% 尾款。</p>
+    </div>
+  </div>
+
+  <h2>結語：驗收的目的，是讓交屋回到可被保障的標準</h2>
 
   <blockquote>
-    老屋翻新的驗收，不是為了把現場變成攻防戰，而是用一套更清楚的標準，把真正重要的基礎條件先確認到位。與其急著入住，不如在最後這一刻把水路、防水、電工、泥作與木作的隱性風險先降到最低。因為真正值得被驗收的，從來不只是表面是否漂亮，而是這個重整後的空間，是否真的準備好陪你長久生活。
+    老屋翻新的驗收，不是把現場變成攻防戰，而是用一套可量化、可複驗、可連動尾款的標準，把真正重要的基礎條件確認到位。與其急著入住，不如在最後這一刻把水路、防水、電工、泥作與櫃體的風險先降到最低，讓交屋真正成為可以放心開始生活的節點。
   </blockquote>
 </EditorialArticleLayout>

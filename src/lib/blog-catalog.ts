@@ -57,18 +57,19 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     editorialRefreshStamp: "2026-07-02",
   },
   {
-    title: "完工驗收：老屋翻新的檢核重點整理",
+    title: "老屋翻新完工驗收：水電、泥作與系統櫃的量化檢核表（附尾款撥付原則）",
     slug: "old-house-renovation-acceptance-checklist",
     date: "2026-06-29",
     summary:
-      "老屋翻新的完工驗收，不僅是檢視視覺美感，更是確認未來居住安全的關鍵防線。本文整理水路、防水、電工、泥作與木作驗收時最容易忽略的重點，幫助建立清晰的檢視邏輯。",
+      "老屋翻新的完工驗收，不僅是檢視視覺美感，更是確認未來居住安全的關鍵防線。本文整理水路、電工、泥作與木作驗收的核心量化標準，並補入老屋特例與尾款撥付原則，幫助建立客觀的檢視與保障機制。",
     siteCategory: "老屋翻新",
     category: "老屋翻新",
     track: "老屋翻新系",
     chapter: "完工避雷",
     subchapter: "驗收重點",
-    tags: ["老屋翻新", "完工驗收", "防水測試", "電箱迴路", "泥作平整", "系統櫃五金"],
+    tags: ["老屋翻新", "完工驗收", "閉水測試", "絕緣電阻", "泥作平整度", "系統櫃公差", "尾款撥付"],
     coverImage: "/images/blog/old-house-renovation-acceptance-checklist-cover.png",
+    editorialRefreshStamp: "2026-07-02",
   },
   {
     title: "格局重整：結構、採光與動線的空間配置邏輯",

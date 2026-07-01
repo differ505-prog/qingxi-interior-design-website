@@ -445,7 +445,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "驗收重點",
             keywords: ["驗收", "完工", "缺失"],
             nodeKind: "core",
-            titleOverride: "驗收重點：老屋完工檢核與缺失排查清單",
+            titleOverride: "老屋翻新完工驗收：水電、泥作與系統櫃的量化檢核表",
           },
           {
             title: "保固界線",
