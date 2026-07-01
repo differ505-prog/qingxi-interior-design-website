@@ -306,8 +306,15 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
   .post-image {
     position: relative;
     overflow: hidden;
-    min-height: 300px;
-    background: var(--gray-bg);
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+    background:
+      linear-gradient(180deg, rgba(237, 231, 224, 0.92), rgba(226, 219, 211, 0.94));
+    isolation: isolate;
+  }
+
+  .post-card:first-child .post-image {
+    aspect-ratio: 5 / 4;
   }
 
   .post-image::after {
@@ -323,6 +330,7 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center center;
     transition: transform 0.7s ease;
   }
 
@@ -528,7 +536,7 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
     }
 
     .post-image {
-      min-height: 240px;
+      aspect-ratio: 16 / 10;
     }
 
     .post-topline,
