@@ -315,7 +315,7 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   <div class="article-question-box-head">
     <p>文章延伸提問</p>
     <h2>看完這篇，還有卡住的地方？</h2>
-    <small>直接留問題就好。青曦會收進這篇文章的內部提問池，作為後續補充與修訂參考。</small>
+    <small>請直接留下疑問，內容將做為青曦後續補充與修訂文章的參考。</small>
   </div>
 
   <div class="article-question-trust-row" aria-label="提問說明">
@@ -336,13 +336,13 @@ const publicArticleQuestionApiUrl = "/api/article-question";
       <span>你的問題</span>
       <textarea name="question" minlength="8" required placeholder="例如：局部翻新如果先不動天花板，預算與工序要注意哪些風險？"></textarea>
     </label>
-    <p class="article-question-hint">一句話也可以，不需要整理成完整需求。</p>
+    <p class="article-question-hint">無須整理成完整需求，簡單一句話即可。</p>
 
     <details class="article-question-meta">
       <summary>
         <span class="article-question-meta-summary-copy">
-          <strong>如果方便，再補充背景或聯絡方式</strong>
-          <small>不是必填；只有需要青曦更精準理解情境時再補就好。</small>
+          <strong>補充背景或聯絡方式</strong>
+          <small>協助青曦更精準理解你的發問情境。</small>
         </span>
         <span class="article-question-meta-summary-toggle">選填</span>
       </summary>
@@ -354,12 +354,12 @@ const publicArticleQuestionApiUrl = "/api/article-question";
 
         <label class="article-question-field">
           <span>稱呼</span>
-          <input type="text" name="submitterName" maxlength="40" placeholder="方便青曦辨識即可，可不填" />
+          <input type="text" name="submitterName" maxlength="40" placeholder="方便青曦辨識（選填）" />
         </label>
 
         <label class="article-question-field">
           <span>聯絡方式</span>
-          <input type="text" name="contactInfo" maxlength="120" placeholder="Line、Email 或手機，可不填" />
+          <input type="text" name="contactInfo" maxlength="120" placeholder="Line、Email 或手機（選填）" />
         </label>
       </div>
     </details>
