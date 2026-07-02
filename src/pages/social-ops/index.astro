@@ -100,6 +100,19 @@ const vendorCraftLevelOptions = [
   "很細",
 ];
 
+const articleQuestionSourceOptions = [
+  { value: "self_note", label: "自己雜記" },
+  { value: "client_question", label: "客戶提問" },
+  { value: "follow_up", label: "後續補問" },
+];
+
+const articleQuestionStatusOptions = [
+  { value: "pending", label: "待整理" },
+  { value: "expand", label: "待補文" },
+  { value: "integrated", label: "已吸收進正文" },
+  { value: "ignored", label: "不採用" },
+];
+
 let blogPosts = staticBlogPosts.map(({ coverImage, ...post }) => post);
 let blogSyncLabel = "目前先顯示已存在文章。";
 
@@ -1962,6 +1975,100 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
               </div>
             </details>
 
+            <details id="article-question-pool" class="bookshelf-fold" open>
+              <summary>
+                <span>文章私有提問池</span>
+                <small><span id="article-note-count">0</span> 筆</small>
+              </summary>
+              <div class="bookshelf-preview bookshelf-fold-body">
+                <div class="vendor-board-layout article-note-board-layout">
+                  <section class="vendor-panel">
+                    <div class="bookshelf-preview-head">
+                      <p>快速登記</p>
+                      <span id="article-note-form-mode">新增模式</span>
+                    </div>
+                    <p class="vendor-form-note">把自己想到的補強點、客戶真實問題、之後要補進正文的段落方向，都先綁到對應文章。</p>
+                    <div class="vendor-form-grid">
+                      <label class="gemini-field gemini-field-full">
+                        <span>對應文章</span>
+                        <select id="article-note-article">
+                          <option value="">選擇文章</option>
+                          {blogPosts.map((post) => (
+                            <option value={post.slug}>{post.title}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label class="gemini-field">
+                        <span>來源</span>
+                        <select id="article-note-source-type">
+                          {articleQuestionSourceOptions.map((option) => (
+                            <option value={option.value}>{option.label}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label class="gemini-field">
+                        <span>狀態</span>
+                        <select id="article-note-status">
+                          {articleQuestionStatusOptions.map((option) => (
+                            <option value={option.value}>{option.label}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label class="gemini-field gemini-field-full">
+                        <span>提問 / 補文題眼</span>
+                        <input id="article-note-question" type="text" placeholder="例如：局部翻新若不動水電，預算表要補哪一層風險註記？" />
+                      </label>
+                      <label class="gemini-field gemini-field-full">
+                        <span>補充內容</span>
+                        <textarea id="article-note-body" rows="6" placeholder="記錄客戶原話、你自己的判斷、後續要補的表格、FAQ 或正文切角。"></textarea>
+                      </label>
+                    </div>
+                    <div class="bookshelf-actions vendor-form-actions">
+                      <button type="button" id="save-article-note" class="bookshelf-action bookshelp-action-primary">儲存提問</button>
+                      <button type="button" id="clear-article-note-form" class="bookshelf-action">清空</button>
+                    </div>
+                    <p id="article-note-feedback" class="vendor-note-feedback" aria-live="polite"></p>
+                  </section>
+
+                  <section class="vendor-panel">
+                    <div class="vendor-list-head">
+                      <div class="bookshelf-preview-head">
+                        <p>文章索引</p>
+                        <span id="article-note-summary">先按文章看</span>
+                      </div>
+                      <div class="vendor-list-tools">
+                        <label class="gemini-field vendor-search-field">
+                          <span>文章</span>
+                          <select id="article-note-article-filter">
+                            <option value="">全部文章</option>
+                            {blogPosts.map((post) => (
+                              <option value={post.slug}>{post.title}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label class="gemini-field vendor-sort-field">
+                          <span>狀態</span>
+                          <select id="article-note-status-filter">
+                            <option value="">全部狀態</option>
+                            {articleQuestionStatusOptions.map((option) => (
+                              <option value={option.value}>{option.label}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label class="gemini-field vendor-search-field">
+                          <span>搜尋</span>
+                          <input id="article-note-search" type="search" placeholder="搜尋文章、提問內容或補充備註" />
+                        </label>
+                      </div>
+                    </div>
+                    <div id="article-note-list" class="vendor-note-list">
+                      <div class="vendor-note-empty">尚未建立文章私有提問。</div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </details>
+
             <details id="vendor-notes-board" class="bookshelf-fold" open>
               <summary>
                 <span>優質廠商筆記</span>
@@ -2252,6 +2359,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   const ARTICLE_TOPIC_TIMEOUT_MS = 70000;
   const ARTICLE_AI_METADATA_TIMEOUT_MS = 18000;
   const CONTENT_ANALYTICS_URL = "/api/social-ops/analytics";
+  const ARTICLE_NOTES_API_URL = "/api/social-ops/article-notes";
   const VENDOR_NOTES_API_URL = "/api/social-ops/vendor-notes";
   const VENDOR_INTAKE_API_URL = "/api/social-ops/vendor-intake";
   const VENDOR_INTAKE_PUBLIC_URL = `${SITE_ORIGIN}/crew-intake`;
@@ -2265,6 +2373,17 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   const bookshelfTracks = JSON.parse(bookshelfTracksJson);
   const bookshelfSubchapterPools = JSON.parse(bookshelfSubchapterPoolsJson);
   const geminiCanvasMasterData = JSON.parse(geminiCanvasMasterJson);
+  const articleQuestionSourceOptions = [
+    { value: "self_note", label: "自己雜記" },
+    { value: "client_question", label: "客戶提問" },
+    { value: "follow_up", label: "後續補問" },
+  ];
+  const articleQuestionStatusOptions = [
+    { value: "pending", label: "待整理" },
+    { value: "expand", label: "待補文" },
+    { value: "integrated", label: "已吸收進正文" },
+    { value: "ignored", label: "不採用" },
+  ];
   const vendorTradeOptions = JSON.parse(vendorTradeOptionsJson);
   const topicModeOptions = JSON.parse(topicModeOptionsJson);
   const topicModeDataMap = topicModeMapJson ? JSON.parse(topicModeMapJson) : {};
@@ -2341,6 +2460,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   let vendorNoteSearch = "";
   let vendorNoteTradeFilter = "";
   let vendorNoteSort = "default";
+  let articleNoteEditingId = "";
+  let articleNoteSearch = "";
+  let articleNoteArticleFilter = "";
+  let articleNoteStatusFilter = "";
   let vendorIntakeSearch = "";
   let vendorIntakeTradeFilter = "";
   let vendorIntakeStatusFilter = "";
@@ -2378,6 +2501,12 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     items: [],
     note: "",
   };
+  let articleNotesState = {
+    status: "idle",
+    configured: false,
+    items: [],
+    note: "",
+  };
   let vendorIntakeState = {
     status: "idle",
     configured: false,
@@ -2392,6 +2521,373 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     { value: "promoted", label: "已轉成筆記" },
     { value: "hold", label: "暫不合作" },
   ];
+
+  function createArticleNoteId() {
+    return `article-note-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  function createArticleNoteTemplate() {
+    return {
+      id: "",
+      articleSlug: "",
+      articleTitle: "",
+      articleUrl: "",
+      question: "",
+      note: "",
+      sourceType: "self_note",
+      status: "pending",
+      isPinned: false,
+      createdAt: "",
+      updatedAt: "",
+    };
+  }
+
+  function getArticleQuestionPresetSlug() {
+    const presetSlug = new URL(window.location.href).searchParams.get("article")?.trim() || "";
+    return articleLibrary.some((post) => post.slug === presetSlug) ? presetSlug : "";
+  }
+
+  function getArticleLibraryEntry(slug = "") {
+    return articleLibrary.find((post) => post.slug === slug) || null;
+  }
+
+  function getArticleNoteSourceLabel(value = "") {
+    return articleQuestionSourceOptions.find((option) => option.value === value)?.label || "未分類";
+  }
+
+  function getArticleNoteStatusLabel(value = "") {
+    return articleQuestionStatusOptions.find((option) => option.value === value)?.label || "待整理";
+  }
+
+  function setArticleNoteFeedback(message, mode = "") {
+    const shell = document.getElementById("article-note-feedback");
+    if (!(shell instanceof HTMLElement)) return;
+    shell.className = `vendor-note-feedback ${mode}`.trim();
+    shell.textContent = message;
+  }
+
+  function getArticleNoteFormFields() {
+    return {
+      article: document.getElementById("article-note-article"),
+      sourceType: document.getElementById("article-note-source-type"),
+      status: document.getElementById("article-note-status"),
+      question: document.getElementById("article-note-question"),
+      note: document.getElementById("article-note-body"),
+      mode: document.getElementById("article-note-form-mode"),
+      save: document.getElementById("save-article-note"),
+    };
+  }
+
+  function readArticleNoteForm() {
+    const fields = getArticleNoteFormFields();
+    const articleSlug = fields.article instanceof HTMLSelectElement ? fields.article.value.trim() : "";
+    const articleMeta = getArticleLibraryEntry(articleSlug);
+    return {
+      id: articleNoteEditingId,
+      articleSlug,
+      articleTitle: articleMeta?.title || "",
+      articleUrl: articleMeta?.slug ? `/blog/${articleMeta.slug}` : "",
+      question: fields.question instanceof HTMLInputElement ? fields.question.value.trim() : "",
+      note: fields.note instanceof HTMLTextAreaElement ? fields.note.value.trim() : "",
+      sourceType: fields.sourceType instanceof HTMLSelectElement ? fields.sourceType.value.trim() : "self_note",
+      status: fields.status instanceof HTMLSelectElement ? fields.status.value.trim() : "pending",
+    };
+  }
+
+  function applyArticleNoteToForm(note = createArticleNoteTemplate()) {
+    const fields = getArticleNoteFormFields();
+    articleNoteEditingId = note.id || "";
+    if (fields.article instanceof HTMLSelectElement) fields.article.value = note.articleSlug || "";
+    if (fields.sourceType instanceof HTMLSelectElement) fields.sourceType.value = note.sourceType || "self_note";
+    if (fields.status instanceof HTMLSelectElement) fields.status.value = note.status || "pending";
+    if (fields.question instanceof HTMLInputElement) fields.question.value = note.question || "";
+    if (fields.note instanceof HTMLTextAreaElement) fields.note.value = note.note || "";
+    if (fields.mode instanceof HTMLElement) {
+      fields.mode.textContent = articleNoteEditingId ? "編輯模式" : "新增模式";
+    }
+    if (fields.save instanceof HTMLButtonElement) {
+      fields.save.textContent = articleNoteEditingId ? "更新提問" : "儲存提問";
+    }
+  }
+
+  function resetArticleNoteForm(preselectedSlug = articleNoteArticleFilter || getArticleQuestionPresetSlug()) {
+    applyArticleNoteToForm({
+      ...createArticleNoteTemplate(),
+      articleSlug: preselectedSlug,
+      articleTitle: getArticleLibraryEntry(preselectedSlug)?.title || "",
+      articleUrl: preselectedSlug ? `/blog/${preselectedSlug}` : "",
+    });
+  }
+
+  function sortArticleNotes(notes = []) {
+    return [...notes].sort((left, right) => {
+      const pinnedDelta = Number(Boolean(right.isPinned)) - Number(Boolean(left.isPinned));
+      if (pinnedDelta !== 0) return pinnedDelta;
+      const rightTime = new Date(right.updatedAt || right.createdAt || 0).getTime();
+      const leftTime = new Date(left.updatedAt || left.createdAt || 0).getTime();
+      return rightTime - leftTime;
+    });
+  }
+
+  function getFilteredArticleNotes() {
+    const query = articleNoteSearch.trim().toLowerCase();
+    const items = sortArticleNotes(articleNotesState.items || []).filter((note) => {
+      if (articleNoteArticleFilter && note.articleSlug !== articleNoteArticleFilter) return false;
+      if (articleNoteStatusFilter && note.status !== articleNoteStatusFilter) return false;
+      return true;
+    });
+    if (!query) return items;
+    return items.filter((note) =>
+      [
+        note.articleTitle,
+        note.question,
+        note.note,
+        getArticleNoteSourceLabel(note.sourceType),
+        getArticleNoteStatusLabel(note.status),
+      ]
+        .join("\n")
+        .toLowerCase()
+        .includes(query),
+    );
+  }
+
+  function groupArticleNotesByArticle(notes = []) {
+    const groups = new Map();
+    notes.forEach((note) => {
+      const articleSlug = note.articleSlug || "unassigned";
+      if (!groups.has(articleSlug)) {
+        groups.set(articleSlug, []);
+      }
+      groups.get(articleSlug).push(note);
+    });
+
+    return [...groups.entries()]
+      .map(([articleSlug, items]) => {
+        const articleMeta = getArticleLibraryEntry(articleSlug);
+        const leadItem = items[0] || createArticleNoteTemplate();
+        return {
+          articleSlug,
+          articleTitle: articleMeta?.title || leadItem.articleTitle || "未指定文章",
+          articleUrl: articleMeta?.slug ? `/blog/${articleMeta.slug}` : (leadItem.articleUrl || ""),
+          articleTaxonomy: articleMeta ? formatArticleLibraryTaxonomy(articleMeta) : "尚未帶入文章分類",
+          items,
+        };
+      })
+      .sort((left, right) => {
+        const leftIndex = articleLibrary.findIndex((post) => post.slug === left.articleSlug);
+        const rightIndex = articleLibrary.findIndex((post) => post.slug === right.articleSlug);
+        if (leftIndex === -1 && rightIndex === -1) return 0;
+        if (leftIndex === -1) return 1;
+        if (rightIndex === -1) return -1;
+        return leftIndex - rightIndex;
+      });
+  }
+
+  function formatArticleNoteTimestamp(value = "") {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("zh-TW", {
+      month: "2-digit",
+      day: "2-digit",
+    });
+  }
+
+  function renderArticleNotes() {
+    const countNode = document.getElementById("article-note-count");
+    const summaryNode = document.getElementById("article-note-summary");
+    const articleFilterNode = document.getElementById("article-note-article-filter");
+    const statusFilterNode = document.getElementById("article-note-status-filter");
+    const searchNode = document.getElementById("article-note-search");
+    const listNode = document.getElementById("article-note-list");
+    if (
+      !(countNode instanceof HTMLElement) ||
+      !(summaryNode instanceof HTMLElement) ||
+      !(articleFilterNode instanceof HTMLSelectElement) ||
+      !(statusFilterNode instanceof HTMLSelectElement) ||
+      !(searchNode instanceof HTMLInputElement) ||
+      !(listNode instanceof HTMLElement)
+    ) {
+      return;
+    }
+
+    if (articleFilterNode.value !== articleNoteArticleFilter) {
+      articleFilterNode.value = articleNoteArticleFilter;
+    }
+    if (statusFilterNode.value !== articleNoteStatusFilter) {
+      statusFilterNode.value = articleNoteStatusFilter;
+    }
+    if (searchNode.value !== articleNoteSearch) {
+      searchNode.value = articleNoteSearch;
+    }
+
+    const items = getFilteredArticleNotes();
+    const groups = groupArticleNotesByArticle(items);
+    countNode.textContent = String(articleNotesState.items.length || 0);
+
+    if (articleNotesState.status === "loading") {
+      summaryNode.textContent = "同步中";
+      listNode.innerHTML = '<div class="vendor-note-empty">正在讀取文章提問池...</div>';
+      return;
+    }
+
+    if (articleNotesState.status === "setup_required") {
+      summaryNode.textContent = "待接共享儲存";
+      listNode.innerHTML = `<div class="vendor-note-empty">${escapeHtml(articleNotesState.note || "尚未接通共享儲存。")}</div>`;
+      return;
+    }
+
+    if (articleNotesState.status === "error") {
+      summaryNode.textContent = "讀取失敗";
+      listNode.innerHTML = `<div class="vendor-note-empty">${escapeHtml(articleNotesState.note || "文章提問池暫時讀取失敗。")}</div>`;
+      return;
+    }
+
+    const articleTitle = getArticleLibraryEntry(articleNoteArticleFilter)?.title || "";
+    summaryNode.textContent = articleNoteSearch
+      ? `符合搜尋 ${items.length} 筆`
+      : articleTitle
+        ? `${articleTitle} 共 ${items.length} 筆`
+        : articleNoteStatusFilter
+          ? `${getArticleNoteStatusLabel(articleNoteStatusFilter)} ${items.length} 筆`
+          : articleNotesState.items.length
+            ? `已綁定 ${groups.length} 篇文章`
+            : "尚未建立提問";
+
+    if (!items.length) {
+      listNode.innerHTML = articleNoteSearch
+        ? '<div class="vendor-note-empty">目前沒有符合搜尋的文章提問。</div>'
+        : '<div class="vendor-note-empty">尚未建立文章私有提問。</div>';
+      return;
+    }
+
+    listNode.innerHTML = groups
+      .map((group) => `
+        <section class="vendor-trade-group article-note-group">
+          <div class="vendor-trade-group-head article-note-group-head">
+            <div class="vendor-trade-group-title">
+              <strong>${escapeHtml(group.articleTitle)}</strong>
+              <span>${escapeHtml(group.articleTaxonomy)}｜${group.items.length} 筆</span>
+            </div>
+            ${group.articleUrl
+              ? `<a class="vendor-note-action-link" href="${escapeHtml(group.articleUrl)}" target="_blank" rel="noreferrer">開啟文章</a>`
+              : ""}
+          </div>
+          <div class="vendor-trade-group-list">
+            ${group.items.map((note) => `
+              <article class="vendor-note-card article-note-card ${note.isPinned ? "is-pinned" : ""}">
+                <div class="vendor-note-card-head">
+                  <div class="vendor-note-card-main">
+                    <div class="vendor-note-badges">
+                      <span class="vendor-note-badge">${escapeHtml(getArticleNoteSourceLabel(note.sourceType))}</span>
+                      <span class="vendor-note-badge">${escapeHtml(getArticleNoteStatusLabel(note.status))}</span>
+                      ${note.isPinned ? '<span class="vendor-note-badge vendor-note-badge-star">優先</span>' : ""}
+                    </div>
+                    <strong>${escapeHtml(note.question || "未命名提問")}</strong>
+                    <p>${escapeHtml(note.note || "尚未補充背景內容")}</p>
+                    <div class="vendor-note-meta">
+                      ${note.updatedAt ? `<span>更新 ${escapeHtml(formatArticleNoteTimestamp(note.updatedAt))}</span>` : "<span>尚未更新</span>"}
+                    </div>
+                  </div>
+                  <div class="vendor-note-card-actions">
+                    ${note.articleUrl
+                      ? `<a class="vendor-note-action-link" href="${escapeHtml(note.articleUrl)}" target="_blank" rel="noreferrer">前往文章</a>`
+                      : '<span class="vendor-note-action-link is-disabled">無文章</span>'}
+                    <button type="button" class="vendor-note-mini-btn" data-article-note-action="edit" data-article-note-id="${escapeHtml(note.id)}">編輯</button>
+                    <button type="button" class="vendor-note-mini-btn" data-article-note-action="pin" data-article-note-id="${escapeHtml(note.id)}">${note.isPinned ? "取消優先" : "優先"}</button>
+                    <button type="button" class="vendor-note-mini-btn vendor-note-mini-btn-danger" data-article-note-action="delete" data-article-note-id="${escapeHtml(note.id)}">刪除</button>
+                  </div>
+                </div>
+                ${note.note ? `<div class="vendor-note-card-body"><p class="vendor-note-memo article-note-memo">${escapeHtml(note.note)}</p></div>` : ""}
+              </article>
+            `).join("")}
+          </div>
+        </section>
+      `)
+      .join("");
+  }
+
+  function updateArticleNotesState(result, fallbackItems = []) {
+    articleNotesState = {
+      status: typeof result?.status === "string" ? result.status : "error",
+      configured: Boolean(result?.configured),
+      items: Array.isArray(result?.items) ? result.items : fallbackItems,
+      note: typeof result?.note === "string" ? result.note : "",
+    };
+  }
+
+  async function loadArticleNotes() {
+    articleNotesState = {
+      ...articleNotesState,
+      status: "loading",
+    };
+    renderArticleNotes();
+
+    try {
+      const response = await fetch(ARTICLE_NOTES_API_URL, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      const result = await response.json();
+      updateArticleNotesState(result, []);
+    } catch (error) {
+      console.error("讀取文章提問池失敗：", error);
+      articleNotesState = {
+        ...articleNotesState,
+        status: "error",
+        configured: false,
+        note: "文章提問池暫時讀取失敗，請稍後再試。",
+      };
+    }
+
+    renderArticleNotes();
+  }
+
+  async function saveArticleNote(note) {
+    const response = await fetch(ARTICLE_NOTES_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ note }),
+    });
+    const result = await response.json();
+    updateArticleNotesState(result, articleNotesState.items || []);
+    renderArticleNotes();
+    if (!response.ok || result?.status !== "ok") {
+      throw new Error(result?.note || `SAVE_ARTICLE_NOTE_FAILED:${response.status}`);
+    }
+  }
+
+  async function removeArticleNote(noteId) {
+    const response = await fetch(`${ARTICLE_NOTES_API_URL}?id=${encodeURIComponent(noteId)}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    const result = await response.json();
+    updateArticleNotesState(result, articleNotesState.items || []);
+    renderArticleNotes();
+    if (!response.ok || result?.status !== "ok") {
+      throw new Error(result?.note || `DELETE_ARTICLE_NOTE_FAILED:${response.status}`);
+    }
+  }
+
+  function hydrateArticleNotePresetFromUrl() {
+    const presetSlug = getArticleQuestionPresetSlug();
+    if (!presetSlug) return;
+    articleNoteArticleFilter = presetSlug;
+    resetArticleNoteForm(presetSlug);
+    renderArticleNotes();
+    const pool = document.getElementById("article-question-pool");
+    if (pool instanceof HTMLDetailsElement) {
+      pool.open = true;
+      pool.scrollIntoView({ block: "start" });
+    }
+  }
 
   function createVendorNoteId() {
     return `vendor-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -10159,6 +10655,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     renderDailyOps();
     renderQuests();
     renderPortals();
+    renderArticleNotes();
     renderVendorNotes();
     renderGeminiHistory();
     saveState();
@@ -10738,6 +11235,113 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     renderVendorNotes();
   });
 
+  document.getElementById("article-note-search")?.addEventListener("input", (event) => {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    articleNoteSearch = event.target.value.trim();
+    renderArticleNotes();
+  });
+
+  document.getElementById("article-note-article-filter")?.addEventListener("change", (event) => {
+    if (!(event.target instanceof HTMLSelectElement)) return;
+    articleNoteArticleFilter = event.target.value.trim();
+    renderArticleNotes();
+    resetArticleNoteForm();
+  });
+
+  document.getElementById("article-note-status-filter")?.addEventListener("change", (event) => {
+    if (!(event.target instanceof HTMLSelectElement)) return;
+    articleNoteStatusFilter = event.target.value.trim();
+    renderArticleNotes();
+  });
+
+  document.getElementById("clear-article-note-form")?.addEventListener("click", () => {
+    resetArticleNoteForm();
+    setArticleNoteFeedback("已清空文章提問表單。", "is-warning");
+  });
+
+  document.getElementById("save-article-note")?.addEventListener("click", async () => {
+    const formNote = readArticleNoteForm();
+    if (!formNote.articleSlug || !formNote.articleTitle) {
+      setArticleNoteFeedback("請先選擇要綁定的文章。", "is-warning");
+      return;
+    }
+    if (!formNote.question) {
+      setArticleNoteFeedback("至少請填一條提問或補文題眼。", "is-warning");
+      return;
+    }
+
+    const existingNote = (articleNotesState.items || []).find((entry) => entry.id === formNote.id);
+    const now = new Date().toISOString();
+    const payload = {
+      ...createArticleNoteTemplate(),
+      ...existingNote,
+      ...formNote,
+      id: formNote.id || createArticleNoteId(),
+      createdAt: existingNote?.createdAt || now,
+      updatedAt: now,
+      isPinned: Boolean(existingNote?.isPinned),
+    };
+
+    try {
+      await saveArticleNote(payload);
+      articleNoteArticleFilter = payload.articleSlug || articleNoteArticleFilter;
+      resetArticleNoteForm(payload.articleSlug);
+      renderArticleNotes();
+      setArticleNoteFeedback(existingNote ? "已更新文章私有提問。" : "已新增文章私有提問。", "is-success");
+    } catch (error) {
+      console.error("儲存文章私有提問失敗：", error);
+      setArticleNoteFeedback(error instanceof Error ? error.message : "文章私有提問儲存失敗，請稍後再試。", "is-warning");
+    }
+  });
+
+  document.getElementById("article-note-list")?.addEventListener("click", async (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    const actionButton = target.closest("[data-article-note-action]");
+    if (!(actionButton instanceof HTMLButtonElement)) return;
+
+    const noteId = actionButton.dataset.articleNoteId;
+    const action = actionButton.dataset.articleNoteAction;
+    const currentNote = (articleNotesState.items || []).find((entry) => entry.id === noteId);
+    if (!noteId || !action || !currentNote) return;
+
+    if (action === "edit") {
+      applyArticleNoteToForm(currentNote);
+      setArticleNoteFeedback("已載入這筆文章提問，可直接修改。", "is-success");
+      return;
+    }
+
+    if (action === "pin") {
+      try {
+        await saveArticleNote({
+          ...currentNote,
+          isPinned: !currentNote.isPinned,
+          updatedAt: new Date().toISOString(),
+        });
+        setArticleNoteFeedback(currentNote.isPinned ? "已取消優先標記。" : "已標記為優先補文。", "is-success");
+      } catch (error) {
+        console.error("更新文章提問優先標記失敗：", error);
+        setArticleNoteFeedback(error instanceof Error ? error.message : "更新優先標記失敗，請稍後再試。", "is-warning");
+      }
+      return;
+    }
+
+    if (action === "delete") {
+      if (!window.confirm(`確定要刪除這筆提問「${currentNote.question}」嗎？`)) return;
+      try {
+        await removeArticleNote(noteId);
+        if (articleNoteEditingId === noteId) {
+          resetArticleNoteForm();
+        }
+        setArticleNoteFeedback("已刪除這筆文章私有提問。", "is-success");
+      } catch (error) {
+        console.error("刪除文章私有提問失敗：", error);
+        setArticleNoteFeedback(error instanceof Error ? error.message : "刪除失敗，請稍後再試。", "is-warning");
+      }
+    }
+  });
+
   document.getElementById("vendor-note-sort")?.addEventListener("change", (event) => {
     if (!(event.target instanceof HTMLSelectElement)) return;
     vendorNoteSort = event.target.value || "default";
@@ -10953,6 +11557,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   loadVendorIntakes();
   renderContentAnalytics();
   loadContentAnalytics();
+  resetArticleNoteForm();
+  renderArticleNotes();
+  hydrateArticleNotePresetFromUrl();
+  loadArticleNotes();
   resetVendorNoteForm();
   loadVendorNotes();
 </script>

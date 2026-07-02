@@ -3108,6 +3108,19 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 14px 26px rgba(0, 0, 0, 0.14);
   }
 
+  .article-note-group-head {
+    align-items: center;
+  }
+
+  .article-note-card .vendor-note-card-main p {
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
+  }
+
+  .article-note-memo {
+    white-space: pre-wrap;
+  }
+
   .vendor-note-card-head,
   .vendor-note-card-main,
   .vendor-note-card-actions,
@@ -3155,6 +3168,7 @@
 
   .vendor-note-card-main p {
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
