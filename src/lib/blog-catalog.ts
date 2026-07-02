@@ -86,18 +86,19 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     coverImage: "/images/blog/old-house-layout-strategy-cover.png",
   },
   {
-    title: "智能居家系統：從平台生態到設備協定，回歸生活場景的決策心法",
+    title: "智能居家系統：從平台生態到配電協定，回歸生活場景的決策心法與預算評估",
     slug: "smart-home-system-ecosystem-guide",
     date: "2026-06-23",
     summary:
-      "整理智能居家規劃中平台生態、設備協定與底層配電的決策重點，從跨平台整合到單一品牌深度生態，幫助回到真正的生活場景判斷。",
+      "整理全屋智能居家規劃中，平台生態、設備協定與底層配電的決策重點。本文補入零線、底盒深度、網關拓樸、費用區間與智能前置檢核表，幫助建立穩定、好用且符合預算的雙層智能架構。",
     siteCategory: "智能家居",
     category: "智能家居",
     track: "水電照明系",
     chapter: "智能控制",
     subchapter: "語音整合",
-    tags: ["智能家居", "Apple Home", "Aqara", "Zigbee", "Thread", "智能控制"],
+    tags: ["智能家居", "Apple Home", "Aqara", "Zigbee", "Thread", "零線預留", "智能預算"],
     coverImage: "/images/blog/smart-home-system-ecosystem-guide-cover.png",
+    editorialRefreshStamp: "2026-07-02",
   },
   {
     title: "奠定老屋重生的基礎：拆除與泥作的進場順序與施作細節",

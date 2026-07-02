@@ -6,6 +6,7 @@ const articleMeta = getStaticBlogPost("smart-home-system-ecosystem-guide");
 const articleTitle = articleMeta.title;
 const articleDescription = articleMeta.summary;
 const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
+const articleModifiedTime = "2026-07-02T00:00:00+08:00";
 const articleImage = articleMeta.coverImage;
 const articleDetailImage = "/images/blog/smart-home-system-ecosystem-guide-detail.png";
 const articleSequenceImage = "/images/blog/smart-home-system-ecosystem-guide-sequence.png";
@@ -15,9 +16,9 @@ const articleStructuredData = [
     "@type": "Article",
     headline: articleTitle,
     description: articleDescription,
-    image: [articleImage],
+    image: [`https://qingxidesign.tw${articleImage}`],
     datePublished: articlePublishedTime,
-    dateModified: articlePublishedTime,
+    dateModified: articleModifiedTime,
     articleSection: articleMeta.track,
     keywords: articleMeta.tags.join(", "),
     author: {
@@ -37,198 +38,275 @@ const articleStructuredData = [
   description={articleDescription}
   ogImage={articleImage}
   publishedTime={articlePublishedTime}
-  modifiedTime={articlePublishedTime}
+  modifiedTime={articleModifiedTime}
   structuredData={articleStructuredData}
   track={articleMeta.track}
   chapter={articleMeta.chapter}
   siteCategory={articleMeta.siteCategory}
   tags={articleMeta.tags}
+  editorialRefreshStamp={articleMeta.editorialRefreshStamp}
 >
-      <p class="article-lead">
-        在著手規劃全屋智能時，多數屋主面臨的第一道難關，往往不是預算，而是海量的技術名詞。當 Apple Home、品牌 App、Zigbee、Wi-Fi、Matter 同時出現在眼前，原本應該讓生活更從容的系統，往往在起點就變成一場複雜的 IT 工程。
-      </p>
+  <p class="article-lead">
+    在著手規劃全屋智能時，多數屋主面臨的第一道難關，往往不是預算，而是海量的技術名詞。當 Apple Home、Aqara、Home Assistant、Zigbee 與 Matter 同時出現在眼前，原本應該讓生活更從容的系統，往往在起點就變成一場複雜的 IT 工程。
+  </p>
 
+  <p>
+    但從空間設計與全屋統籌的視角來看，智能居家真正要解決的，從來不是規格本身，而是生活的安定感。高級的智能，不是把技術堆滿，而是讓技術退到背景，讓生活本身變得更順。
+  </p>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">決策順序</p>
+    <h3 class="article-insight-title">先定場景，再看底盤，最後選平台，智能體驗才不會從一開始就走偏。</h3>
+    <p>
+      若一開始就陷入品牌與協定比較，往往會把真正影響體驗的優先順序打亂。智能系統好不好用，通常在配電、網路與日常習慣那一層就已經決定七成。
+    </p>
+  </div>
+
+  <div class="article-step-flow">
+    <article class="article-step-card">
+      <p class="article-step-index">01</p>
+      <h3>先定需求場景</h3>
+      <p>先分清楚你要的是簡單控制，還是多條件自動化。</p>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">02</p>
+      <h3>再看硬體底盤</h3>
+      <p>零線、底盒、網路節點與弱電空間，才是真正的基礎。</p>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">03</p>
+      <h3>最後選生態平台</h3>
+      <p>跨平台、單品牌或開源系統，應建立在前兩步完成之後。</p>
+    </article>
+  </div>
+
+  <h2>決策順序：先定場景，再看底盤，最後選平台</h2>
+
+  <p>
+    若一開始就陷入品牌與協定比較，往往會把真正影響體驗的優先順序打亂。智能系統好不好用，通常在配電、網路與日常習慣那一層就已經決定七成。我們更建議把決策順序整理成四步：先確認需求場景、再評估硬體基礎、接著決定生態系路徑，最後才挑選 App、語音助理或實體開關。
+  </p>
+
+  <div class="article-check-grid">
+    <div class="article-check-item">
+      <strong>需求場景</strong>
+      <p>是單純語音與手機控制，還是結合時間、人感與亮度的多條件自動化？</p>
+    </div>
+    <div class="article-check-item">
+      <strong>硬體基礎</strong>
+      <p>全屋配電是否有預留零線、弱電箱空間與網路節點分佈？</p>
+    </div>
+    <div class="article-check-item">
+      <strong>操作介面</strong>
+      <p>最後才決定家人最常接觸的 App、語音助理或實體開關。</p>
+    </div>
+  </div>
+
+  <figure class="article-figure">
+    <img src={articleDetailImage} alt="智能居家系統規劃中從生活場景回推平台選擇的示意" loading="lazy" />
+    <figcaption>
+      先定義日常場景，再回推平台、生態與操作介面，會比一開始就陷入規格比較更穩定。
+    </figcaption>
+  </figure>
+
+  <h2>系統路徑與最佳折衷方案</h2>
+
+  <p>
+    目前多數住宅的智能系統，實際上會落在跨平台聚合、單一品牌生態、開源深度控制與雙層混和架構之間。對多數重視生活質感與系統穩定的住宅而言，最值得優先考慮的往往不是最複雜的玩法，而是底層穩定、表層直覺的雙層混和做法。
+  </p>
+
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <thead>
+          <tr>
+            <th>系統路徑</th>
+            <th>核心邏輯</th>
+            <th>優勢</th>
+            <th>限制與代價</th>
+            <th>適用對象</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>跨平台聚合</td>
+            <td>不同品牌設備接入同一平台統一管理</td>
+            <td>介面直覺、家庭共享容易、語音控制自然</td>
+            <td>深層自動化條件較弱，較依賴 Wi-Fi 穩定度</td>
+            <td>重視操作直覺與品牌彈性的輕度使用者</td>
+          </tr>
+          <tr>
+            <td>單一品牌生態</td>
+            <td>開關、感測與電機全採同品牌與專屬網關</td>
+            <td>整合極深、自動化細膩、系統穩定度高</td>
+            <td>品牌綁定深、擴充性受限、學習成本較高</td>
+            <td>重視系統穩定與細節控制的中重度使用者</td>
+          </tr>
+          <tr>
+            <td>開源深度控制</td>
+            <td>所有設備接入在地伺服器進行極度自定義</td>
+            <td>無品牌限制、反應速度快、隱私性高</td>
+            <td>架設與維護門檻高，需要程式與網路底層能力</td>
+            <td>具備 IT 背景的科技愛好者</td>
+          </tr>
+          <tr>
+            <td>雙層混和架構</td>
+            <td>底層交給單一品牌，表層操作交給 Apple Home</td>
+            <td>兼具底層穩定性與表層操作直覺</td>
+            <td>前期架構規劃門檻較高，需仰賴圖面整合</td>
+            <td>追求高級感、穩定度與極簡操作的住宅屋主</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="article-reference-table-note">
+      對多數住宅來說，最常見的甜蜜點不是完全開源或完全封閉，而是把底層穩定與表層直覺拆成兩層管理。
+    </p>
+  </div>
+
+  <div class="article-card-grid">
+    <div class="article-card">
+      <p class="article-card-kicker">推薦架構</p>
+      <h3>底層穩定交給品牌，表層體驗交給 Apple Home</h3>
       <p>
-        但從空間設計與全屋統籌的視角來看，智能居家真正要解決的，從來不是規格本身，而是生活的安定感。進門時燈光是否自然亮起、夜裡起身時動線是否柔和、家人是否願意長期使用，這些才是系統成熟與否的真正答案。
+        日常開關、語音與家庭共享可用 Apple Home，複雜的自動化場景則在品牌 App 裡默默運作，減少把所有邏輯都壓在單一聚合平台上的風險。
       </p>
-
-      <blockquote>
-        高級的智能，不是把技術堆滿，而是讓技術退到背景，讓生活本身變得更順。
-      </blockquote>
-
-      <div class="article-insight-panel">
-        <p class="article-insight-label">決策順序</p>
-        <h3 class="article-insight-title">先定生活場景，再看底層條件，最後才選平台與介面。</h3>
-        <p>
-          若一開始就陷入品牌與協定比較，往往會把真正影響體驗的優先順序打亂。智能系統好不好用，通常在配電、網路與日常習慣那一層就已經決定七成。
-        </p>
-      </div>
-
-      <h2>先定場景，再選平台</h2>
-
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">規劃關鍵</p>
+      <h3>真正影響體驗的，不是品牌名稱，而是你有沒有先把底盤規格講清楚</h3>
       <p>
-        規劃順序若一開始就陷入 Apple Home 與品牌 App 的比較，往往很容易本末倒置。比較穩定的做法是先確認生活場景，再回頭檢查硬體基礎，最後才決定要把哪個平台當作主要操作介面。
+        若水電與弱電圖面沒有把零線、網關位置與通訊拓樸先確認好，再漂亮的 App 介面也只是蓋在不穩的底盤上。
       </p>
+    </div>
+  </div>
 
-      <p>實務上，我們建議把決策順序整理成四步：</p>
+  <h2>藏在牆裡的真正關鍵：零線、網關與通訊協定</h2>
 
-      <ol>
-        <li>先確認需求場景，例如燈光、窗簾、冷氣、感測、自動化的深度。</li>
-        <li>再評估硬體基礎，例如配電、零線、弱電位置與網路條件。</li>
-        <li>再決定生態系要走跨平台聚合或單一品牌深度生態。</li>
-        <li>最後才選擇日常最常接觸的 App、語音助理或實體開關。</li>
-      </ol>
+  <p>
+    無論最後選哪一個平台，支撐全屋智能的基石其實不在手機裡，而在牆裡。若基礎配電沒有先處理好，後面再漂亮的 App 介面都只是漂浮在不穩定的底盤上。
+  </p>
 
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <thead>
+          <tr>
+            <th>底層項目</th>
+            <th>建議規格</th>
+            <th>作用</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>開關零線</td>
+            <td>所有開關迴路預留 2.0mm 單芯線作為零線</td>
+            <td>避免單火線造成燈具微亮、閃爍、斷線與主機板提早老化。</td>
+          </tr>
+          <tr>
+            <td>底盒深度</td>
+            <td>至少 50mm，佈線複雜時建議 55mm</td>
+            <td>預留智能開關體積與配線轉折空間，避免後續塞不進牆內。</td>
+          </tr>
+          <tr>
+            <td>Zigbee 網關半徑</td>
+            <td>約 10-15 公尺</td>
+            <td>作為單一網關的有效訊號參考，協助判斷是否需要子網關。</td>
+          </tr>
+          <tr>
+            <td>單網關設備數</td>
+            <td>建議控制在 30-50 個以內</td>
+            <td>避免設備過多造成延遲與穩定度下降。</td>
+          </tr>
+          <tr>
+            <td>協定選擇</td>
+            <td>Zigbee / Thread 優先於大量 Wi-Fi 末端</td>
+            <td>減少路由器 IP 壓力，維持燈控與感測設備長期穩定。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="article-reference-table-note">
+      真正撐住智能體驗的，通常不是手機介面，而是牆內配電、底盒尺寸與通訊拓樸。
+    </p>
+  </div>
+
+  <p>
+    對於燈控與大量低功耗設備，我們通常更建議採用 Zigbee 或 Thread 協定。它們能避免家中 30-40 個智能開關與感測器全部擠佔 Wi-Fi 路由器的 IP 與頻寬，減少網路塞車與設備斷線。若空間超過 40 坪或為跨樓層住宅，則應在弱電圖面階段預留子網關或佈局具備路由功能的零線開關來延伸訊號網。
+  </p>
+
+  <div class="article-gallery">
+    <figure class="article-figure">
+      <img src={articleSequenceImage} alt="智能居家設備、網關與 App 從屬關係的示意" loading="lazy" />
+      <figcaption>
+        釐清設備、網關與 App 的層級關係後，平台選擇就不再只是品牌偏好，而是架構判斷。
+      </figcaption>
+    </figure>
+    <figure class="article-figure">
+      <img src={articleImage} alt="智能居家系統建置與配電協定封面示意" loading="lazy" />
+      <figcaption>
+        真正成熟的智能居家，不是每天盯著 App 點擊，而是讓光線、溫度與日常動作自然配合生活。
+      </figcaption>
+    </figure>
+  </div>
+
+  <h2>全屋智能設計費用與預算抓取</h2>
+
+  <p>
+    智能居家的花費並非無底洞，預算通常取決於控制深度與覆蓋範圍。以室內 30 坪的標準三房兩廳為例，可先用輕度體驗、中度全屋與重度極致三層級去抓預算，再依家中實際場景增減。
+  </p>
+
+  <div class="article-card-grid">
+    <div class="article-card">
+      <p class="article-card-kicker">輕度體驗</p>
+      <h3>約 NT$ 3 萬 - 5 萬</h3>
       <p>
-        若你只是希望進門一句話就能連動燈光與窗簾，和你想做到多條件感測、自動切換氛圍場景，所需要的系統層級完全不同。真正應該先回答的不是「哪個平台比較強」，而是「我希望家怎麼運作」。
+        以客餐廳燈控、單一電動窗簾與基礎感測為主，適合先在最常使用的公共區域體驗智能便利的屋主。
       </p>
-
-      <div class="article-check-grid">
-        <div class="article-check-item">
-          <strong>先問場景</strong>
-          <p>你要的是簡單控制，還是多條件自動化與情境切換？</p>
-        </div>
-        <div class="article-check-item">
-          <strong>再看底盤</strong>
-          <p>零線、網路、弱電與設備分布，是否真的能承接你想做的深度？</p>
-        </div>
-        <div class="article-check-item">
-          <strong>最後選介面</strong>
-          <p>App、語音與實體開關，哪一個才是家人最常接觸的入口？</p>
-        </div>
-      </div>
-
-      <figure class="article-figure">
-        <img src={articleDetailImage} alt="智能居家系統規劃中從生活場景回推平台選擇的手繪示意" />
-        <figcaption>
-          先定義日常場景，再回推平台、生態與操作介面，會比一開始就陷入規格比較更穩定。
-        </figcaption>
-      </figure>
-
-      <h2>兩條主路徑：跨平台整合與單一品牌深度生態</h2>
-
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">中度全屋</p>
+      <h3>約 NT$ 8 萬 - 15 萬</h3>
       <p>
-        目前多數住宅的智能系統，實際上會落在兩條主路徑之間。一條是以 Apple Home 或 Google Home 為核心的跨平台整合；另一條則是以 Aqara 等單一品牌為主的深度生態。兩者沒有絕對優劣，只有適不適合當下的生活方式與維運能力。
+        涵蓋全屋燈控、重點區域窗簾、人體感測、空調控制與智能門鎖接入，是一般住宅最常見的甜蜜點。
       </p>
-
-      <h3>路徑一：Apple Home / Google Home 為主的跨平台整合</h3>
-
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">重度極致</p>
+      <h3>NT$ 25 萬以上</h3>
       <p>
-        這種方式的優點，在於介面統一、日常操作直覺。對於蘋果或 Google 生態系使用者來說，家庭成員共享、語音控制與日常開關體驗都更自然，也較容易把不同品牌設備集中在同一個入口內管理。
+        進入高階品牌、全屋有線控制或劇院級聲光連動，適合預算充足且對系統穩定度有絕對要求的住宅。
       </p>
+    </div>
+  </div>
 
-      <p>
-        但它的限制在於，自動化邏輯通常比較基礎。若你需要非常細的條件判斷，例如結合時間、人感、亮度、電視狀態與區域動線去做多層判斷，聚合平台內建的自動化通常不夠深。
-      </p>
+  <h2>工具書模組：智能居家前置檢核表</h2>
 
-      <h3>路徑二：單一品牌為核心的深度生態</h3>
+  <div class="article-check-grid">
+    <div class="article-check-item">
+      <strong>開關零線</strong>
+      <p>確認所有開關迴路皆標註預留零線，避免單火線方案成為後續不穩定來源。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>底盒深度</strong>
+      <p>確認牆面預埋底盒深度達 50mm-55mm，避免智能開關安裝時空間不足。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>網路節點</strong>
+      <p>預定放置主網關的位置，已預留實體 RJ45 網路孔與獨立電源。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>電動窗簾</strong>
+      <p>窗簾盒側邊已預留 110V 或 220V 電源，並保留足夠機身隱藏空間。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>路由器避險</strong>
+      <p>Wi-Fi 路由器與智能網關避開金屬弱電箱內部封閉干擾，放在空間較居中的位置。</p>
+    </div>
+  </div>
 
-      <p>
-        另一條路徑，是把開關、感測器、窗簾電機與網關盡量放在同一品牌體系裡。這類做法最大的優勢，是設備之間的整合通常更深，自動化條件更細，系統穩定度也往往更高。
-      </p>
+  <h2>結語：最好的智能，是退到背景的存在</h2>
 
-      <p>
-        相對地，它的代價是容易形成品牌綁定。介面學習成本較高，未來若想跨品牌擴充，也會遇到產品支援度與橋接限制。對某些使用者來說，這不是問題；但若你期待未來保留更多彈性，就要在前期先理解這件事。
-      </p>
-
-      <div class="article-card-grid">
-        <div class="article-card">
-          <p class="article-card-kicker">跨平台</p>
-          <h3>介面一致、共享自然，但深層自動化較有限</h3>
-          <p>
-            適合重視操作直覺、家庭共享與語音控制的人，尤其當你希望不同品牌設備都能收進同一個入口時，這條路會更順手。
-          </p>
-        </div>
-        <div class="article-card">
-          <p class="article-card-kicker">單品牌</p>
-          <h3>底層更穩、邏輯更深，但綁定與擴充要先想清楚</h3>
-          <p>
-            適合重視自動化細節與系統穩定度的人，但前提是你願意接受較高的品牌依賴與架構規劃門檻。
-          </p>
-        </div>
-      </div>
-
-      <h2>最推薦的折衷：底層交給品牌，表層交給 Apple Home</h2>
-
-      <p>
-        實務上，我們最常建議的方式，不是非此即彼，而是把底層穩定性交給單一品牌，把表層體驗交給 Apple Home。也就是說，讓品牌網關、感測器、智能開關負責真正的自動化與通訊，再把設備橋接進 Apple Home 作為日常入口。
-      </p>
-
-      <p>
-        這樣的好處很直接。日常開關、語音與家庭共享可用 Apple Home，介面乾淨；複雜的自動化場景則在品牌 App 裡默默運作，減少把所有邏輯都壓在單一聚合平台上的風險。
-      </p>
-
-      <p>
-        對屋主而言，這類折衷不是妥協，而是把穩定與好用拆成兩層來處理。你日常看到的是簡單與自然，真正撐住系統的則是背後被安排好的網關、協定與自動化規則。
-      </p>
-
-      <div class="article-insight-panel">
-        <p class="article-insight-label">最常見解法</p>
-        <h3 class="article-insight-title">底層穩定交給品牌，表層操作交給 Apple Home，通常是住宅最平衡的做法。</h3>
-        <p>
-          這種做法不是模糊折衷，而是把複雜邏輯藏在底層，把日常接觸面保持乾淨。對大多數屋主來說，這反而是最接近「高級感」的智能體驗。
-        </p>
-      </div>
-
-      <h2>藏在牆裡的真正關鍵：零線、網關與通訊協定</h2>
-
-      <p>
-        無論最後選 Apple Home、Google Home 還是品牌 App，支撐全屋智能的基石其實不在手機裡，而在牆裡。若基礎配電沒有先處理好，後面再漂亮的 App 介面都只是漂浮在不穩定的底盤上。
-      </p>
-
-      <h3>1. 零線預留</h3>
-
-      <p>
-        在水電進場前，應盡量要求所有開關迴路預留零線。帶零線的智能開關通常供電更穩，也更能避免燈具微亮、閃爍或異常斷線等問題。對於之後的擴充與維護，也會更有餘裕。
-      </p>
-
-      <h3>2. 網關位置與底層拓樸</h3>
-
-      <p>
-        網關不只是配件，而是系統的神經中樞。網關位置、設備分布、空間大小與隔間材質，都會影響全屋感測與控制的穩定性。若一開始只顧著買單品，而沒有想整體拓樸，入住後常會發生局部延遲、訊號不穩或操作不一致的問題。
-      </p>
-
-      <h3>3. Zigbee / Thread 優先於 Wi-Fi 的燈控底盤</h3>
-
-      <p>
-        對於燈控、開關與大量低功耗設備來說，我們通常會更偏向 Zigbee 或 Thread。它們的優勢在於耗電低、設備可形成網狀網路，且不會把所有終端都擠進家裡的 Wi-Fi 路由器。對於追求穩定、長期與可維護的住宅系統來說，這是非常關鍵的底層差異。
-      </p>
-
-      <div class="article-card-grid">
-        <div class="article-card">
-          <p class="article-card-kicker">牆裡的關鍵</p>
-          <h3>零線與網關位置，往往比 App 畫面更重要</h3>
-          <p>
-            若這些底層條件沒有先規劃好，後面再好的介面也只是在不穩定的系統上疊加包裝，實際體驗很難真正成熟。
-          </p>
-        </div>
-        <div class="article-card">
-          <p class="article-card-kicker">長期維運</p>
-          <h3>選協定，不只是看現在能不能用，更要看未來是否好擴充</h3>
-          <p>
-            Zigbee 與 Thread 的價值，不只在當下穩定，也在於日後設備增加時，系統仍有機會維持一致與可維護。
-          </p>
-        </div>
-      </div>
-
-      <div class="article-gallery">
-        <figure class="article-figure">
-          <img src={articleSequenceImage} alt="智能居家設備、網關與 App 從屬關係的手繪示意" />
-          <figcaption>
-            釐清設備、網關與 App 的層級關係後，平台選擇就不再只是品牌偏好，而是架構判斷。
-          </figcaption>
-        </figure>
-        <figure class="article-figure">
-          <img src={articleImage} alt="智能居家系統建置指南封面主圖手繪示意" />
-          <figcaption>
-            真正成熟的智能居家，不是每天盯著 App 點擊，而是讓光線、溫度與日常動作自然配合生活。
-          </figcaption>
-        </figure>
-      </div>
-
-      <h2>結語：最好的智能，是退到背景的存在</h2>
-
-      <blockquote>
-        回到最初的問題，Apple Home 與品牌 App 並不是非得二選一。真正成熟的智能規劃，是先把生活場景、配電條件與通訊底盤整理穩，再決定哪些邏輯該交給系統默默完成。當零線、網關、感測與自動化條件都安排得夠成熟，技術就會回到它最好的位置：不搶眼，卻可靠地撐住生活。
-      </blockquote>
+  <blockquote>
+    當零線、預算、網關、感測與自動化條件都安排得夠成熟，技術就會回到它最好的位置：不搶眼，卻可靠地撐住生活。真正成熟的智能規劃，不是先問哪個品牌最強，而是先問你的家，想要怎麼運作。
+  </blockquote>
 </EditorialArticleLayout>

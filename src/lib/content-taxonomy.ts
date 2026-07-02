@@ -672,7 +672,11 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
         subchapters: [
           { title: "智能窗簾", keywords: ["窗簾", "自動", "情境"] },
           { title: "感應情境", keywords: ["感應", "人體感應", "情境"] },
-          { title: "語音整合", keywords: ["語音", "Home Assistant", "整合"] },
+          {
+            title: "語音整合",
+            keywords: ["語音", "Home Assistant", "整合"],
+            titleOverride: "智能居家系統：從平台生態到配電協定，回歸生活場景的決策心法與預算評估",
+          },
         ],
       },
     ],
