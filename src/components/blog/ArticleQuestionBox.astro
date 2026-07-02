@@ -1,0 +1,325 @@
+---
+interface Props {
+  articleSlug: string;
+  articleTitle: string;
+  articlePathname: string;
+}
+
+const {
+  articleSlug,
+  articleTitle,
+  articlePathname,
+} = Astro.props;
+
+const publicArticleQuestionApiUrl = "/api/article-question";
+---
+
+<style>
+  .article-question-box {
+    max-width: 720px;
+    margin: 3rem auto 0;
+    padding: 1.45rem 1.35rem 1.4rem;
+    border-radius: 24px;
+    border: 1px solid rgba(164, 171, 160, 0.2);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(249, 246, 241, 0.88));
+    box-shadow: 0 18px 34px rgba(58, 52, 46, 0.08);
+  }
+
+  .article-question-box-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .article-question-box-head p,
+  .article-question-box-head h2,
+  .article-question-box-head small,
+  .article-question-feedback {
+    margin: 0;
+  }
+
+  .article-question-box-head p {
+    color: #8a7f74;
+    font-family: var(--font-sans);
+    font-size: 0.74rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .article-question-box-head h2 {
+    color: #332e29;
+    font-family: var(--font-serif);
+    font-size: 1.52rem;
+    line-height: 1.45;
+  }
+
+  .article-question-box-head small {
+    color: #746c64;
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  .article-question-form {
+    display: grid;
+    gap: 0.95rem;
+  }
+
+  .article-question-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+
+  .article-question-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.42rem;
+    font-family: var(--font-sans);
+  }
+
+  .article-question-field.is-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .article-question-field span {
+    color: #5d554d;
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+  }
+
+  .article-question-field input,
+  .article-question-field textarea {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid rgba(164, 171, 160, 0.22);
+    background: rgba(255, 252, 248, 0.9);
+    color: #332e29;
+    font: inherit;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    padding: 0.85rem 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .article-question-field textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+
+  .article-question-field input:focus,
+  .article-question-field textarea:focus {
+    outline: none;
+    border-color: rgba(86, 97, 88, 0.34);
+    box-shadow: 0 0 0 4px rgba(244, 240, 234, 0.9);
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  .article-question-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .article-question-privacy {
+    color: #7a726a;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .article-question-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0.85rem 1.25rem;
+    border: 0;
+    border-radius: 999px;
+    background: #332e29;
+    color: #f7f3ed;
+    font-family: var(--font-sans);
+    font-size: 0.86rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .article-question-submit:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  .article-question-submit:disabled {
+    opacity: 0.56;
+    cursor: wait;
+    transform: none;
+  }
+
+  .article-question-feedback {
+    min-height: 1.45rem;
+    color: #746c64;
+    font-family: var(--font-sans);
+    font-size: 0.84rem;
+    line-height: 1.7;
+  }
+
+  .article-question-feedback.is-success {
+    color: #4f5a4f;
+  }
+
+  .article-question-feedback.is-error {
+    color: #8c5045;
+  }
+
+  @media (max-width: 768px) {
+    .article-question-box {
+      margin-top: 2.3rem;
+      padding: 1.15rem 1rem 1.05rem;
+      border-radius: 20px;
+    }
+
+    .article-question-grid {
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+    }
+
+    .article-question-actions {
+      align-items: stretch;
+    }
+
+    .article-question-submit {
+      width: 100%;
+    }
+  }
+</style>
+
+<section class="article-question-box" aria-label="文章提問表單">
+  <div class="article-question-box-head">
+    <p>Private Intake</p>
+    <h2>這篇文章若有延伸問題，可直接私下送出</h2>
+    <small>問題會綁定到這一篇文章，只供青曦內部整理、補充 FAQ 與後續內容修訂，不會公開顯示。</small>
+  </div>
+
+  <form
+    class="article-question-form"
+    data-article-question-form="true"
+    data-api-url={publicArticleQuestionApiUrl}
+    data-article-slug={articleSlug}
+    data-article-title={articleTitle}
+    data-article-url={articlePathname}
+  >
+    <div class="article-question-grid">
+      <label class="article-question-field">
+        <span>稱呼</span>
+        <input type="text" name="submitterName" maxlength="40" placeholder="方便青曦辨識即可，可不填" />
+      </label>
+
+      <label class="article-question-field">
+        <span>聯絡方式</span>
+        <input type="text" name="contactInfo" maxlength="120" placeholder="Line、Email 或手機，可不填" />
+      </label>
+    </div>
+
+    <label class="article-question-field">
+      <span>你的問題</span>
+      <textarea name="question" minlength="8" required placeholder="例如：局部翻新如果先不動天花板，預算與工序要注意哪些風險？"></textarea>
+    </label>
+
+    <label class="article-question-field">
+      <span>補充背景</span>
+      <textarea name="detail" rows="4" placeholder="可補充空間現況、預算範圍、家中成員，或你最卡住的判斷點。"></textarea>
+    </label>
+
+    <label class="article-question-field is-hidden" aria-hidden="true">
+      <span>公司</span>
+      <input type="text" name="company" tabindex="-1" autocomplete="off" />
+    </label>
+
+    <div class="article-question-actions">
+      <div class="article-question-privacy">送出後不會公開顯示，只會進入青曦內部文章提問池。</div>
+      <button type="submit" class="article-question-submit">送出這篇文章的問題</button>
+    </div>
+
+    <p class="article-question-feedback" data-article-question-feedback="true" aria-live="polite"></p>
+  </form>
+</section>
+
+<script is:inline>
+  (() => {
+    const form = document.querySelector('[data-article-question-form="true"]');
+    const feedback = document.querySelector('[data-article-question-feedback="true"]');
+    if (!(form instanceof HTMLFormElement) || !(feedback instanceof HTMLElement)) return;
+
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    const setFeedback = (message, mode = "") => {
+      feedback.className = `article-question-feedback ${mode}`.trim();
+      feedback.textContent = message;
+    };
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const apiUrl = form.dataset.apiUrl || "";
+      const question = String(new FormData(form).get("question") || "").trim();
+      if (!apiUrl) {
+        setFeedback("表單設定不完整，請稍後再試。", "is-error");
+        return;
+      }
+      if (question.length < 8) {
+        setFeedback("問題至少需要 8 個字，方便青曦判斷重點。", "is-error");
+        return;
+      }
+
+      if (submitButton instanceof HTMLButtonElement) submitButton.disabled = true;
+      setFeedback("正在送出問題...");
+
+      try {
+        const formData = new FormData(form);
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            articleSlug: form.dataset.articleSlug || "",
+            articleTitle: form.dataset.articleTitle || "",
+            articleUrl: form.dataset.articleUrl || "",
+            submitterName: String(formData.get("submitterName") || "").trim(),
+            contactInfo: String(formData.get("contactInfo") || "").trim(),
+            question,
+            detail: String(formData.get("detail") || "").trim(),
+            company: String(formData.get("company") || "").trim(),
+          }),
+        });
+
+        const result = await response.json();
+        if (!response.ok || result?.status !== "ok") {
+          throw new Error(result?.note || `ARTICLE_QUESTION_SUBMIT_FAILED:${response.status}`);
+        }
+
+        form.reset();
+        setFeedback(result?.note || "問題已送出，青曦會留作後續整理參考。", "is-success");
+      } catch (error) {
+        console.error("文章提問送出失敗：", error);
+        setFeedback(error instanceof Error ? error.message : "問題送出失敗，請稍後再試。", "is-error");
+      } finally {
+        if (submitButton instanceof HTMLButtonElement) submitButton.disabled = false;
+      }
+    });
+  })();
+</script>
