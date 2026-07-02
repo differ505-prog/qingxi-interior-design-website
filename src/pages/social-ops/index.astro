@@ -3967,6 +3967,13 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     return normalizedPath.startsWith("/blog/") ? normalizedPath : "";
   }
 
+  function getInternalHrefFromPagePath(pagePath = "") {
+    const normalizedPath = String(pagePath || "").split("?")[0].trim();
+    if (!normalizedPath || normalizedPath === "(not set)") return "";
+    if (!normalizedPath.startsWith("/")) return "";
+    return normalizedPath;
+  }
+
   function getReadableLandingLabel(pagePath = "") {
     const normalizedPath = String(pagePath || "").split("?")[0].trim();
     if (!normalizedPath || normalizedPath === "(not set)") return "未提供落地頁";
@@ -4203,12 +4210,18 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       : [];
     if (socialLandingsNode) socialLandingsNode.innerHTML = socialLandingPages.length
       ? socialLandingPages
-          .map((page) => `
+          .map((page) => {
+            const landingLabel = getReadableLandingLabel(page.pagePath);
+            const landingHref = getInternalHrefFromPagePath(page.pagePath);
+            return `
             <li>
-              <span>${escapeHtml(getReadableLandingLabel(page.pagePath))}</span>
+              ${landingHref
+                ? `<a class="bookshelf-analytics-link" href="${escapeHtml(landingHref)}">${escapeHtml(landingLabel)}</a>`
+                : `<span>${escapeHtml(landingLabel)}</span>`}
               <strong>${formatCount(page.sessions)}</strong>
             </li>
-          `)
+          `;
+          })
           .join("")
       : "<li>近 7 天尚無社群導流資料。</li>";
   }
