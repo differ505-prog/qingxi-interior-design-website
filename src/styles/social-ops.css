@@ -2851,6 +2851,23 @@
     margin: 0;
   }
 
+  .bookshelf-analytics-link {
+    color: rgba(239, 236, 230, 0.88);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    text-decoration: none;
+    transition:
+      color 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  .bookshelf-analytics-link:hover,
+  .bookshelf-analytics-link:focus-visible {
+    color: #f7f4ef;
+    text-decoration: underline;
+    text-underline-offset: 0.14em;
+  }
+
   .bookshelf-analytics-list span {
     color: rgba(239, 236, 230, 0.82);
     font-size: 0.88rem;

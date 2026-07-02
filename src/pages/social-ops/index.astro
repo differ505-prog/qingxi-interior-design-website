@@ -1149,6 +1149,45 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     : <p class="bookshelf-confirm-note">目前尚無可用的送審 Top 3 候選。</p>}
                 </div>
               </section>
+              <section class="bookshelf-prompt-library">
+                <div class="bookshelf-preview-head">
+                  <p>提示詞專區</p>
+                  <span>已上移到高頻區，進入內容台後可先做舊文審計、自評或複製常用高階 prompt，再直接接續生文。</span>
+                </div>
+                <div class="bookshelf-prompt-library-grid">
+                  {promptLibraryEntries.map((entry) => (
+                    <article class="bookshelf-prompt-library-card">
+                      <div class="bookshelf-prompt-library-meta">
+                        <span>{entry.category}</span>
+                        <strong>{entry.title}</strong>
+                        <em>{entry.hint}</em>
+                        <p>{entry.note}</p>
+                      </div>
+                      <div class="bookshelf-pro-prompt-body">
+                        <label class="gemini-field bookshelf-prompt-field">
+                          <span>可直接送高階 LLM 的 prompt</span>
+                          <textarea
+                            id={`prompt-library-content-${entry.id}`}
+                            class="bookshelf-pro-prompt-content bookshelf-prompt-library-content"
+                            rows="16"
+                            readonly
+                          >{entry.prompt}</textarea>
+                        </label>
+                        <div class="bookshelf-actions bookshelf-confirm-actions">
+                          <button
+                            type="button"
+                            id={`copy-prompt-library-${entry.id}`}
+                            class="bookshelf-action bookshelp-action-primary"
+                          >
+                            複製這份提示詞
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+                <p id="prompt-library-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
+              </section>
               <section class="bookshelf-review-composer">
                 <div class="bookshelf-preview-head">
                   <p>高頻生文起稿台</p>
@@ -1211,45 +1250,6 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     <p class="bookshelf-prompt-note">高頻主路徑只保留情境摘要與一鍵生文；完整前置包與備援操作在需要時再展開。</p>
                   </div>
                 </details>
-              </section>
-              <section class="bookshelf-prompt-library">
-                <div class="bookshelf-preview-head">
-                  <p>提示詞專區</p>
-                  <span>把常用高階 prompt 收進工作台，先從舊文章正式書稿自評開始，之後可繼續擴充成提示詞庫。</span>
-                </div>
-                <div class="bookshelf-prompt-library-grid">
-                  {promptLibraryEntries.map((entry) => (
-                    <article class="bookshelf-prompt-library-card">
-                      <div class="bookshelf-prompt-library-meta">
-                        <span>{entry.category}</span>
-                        <strong>{entry.title}</strong>
-                        <em>{entry.hint}</em>
-                        <p>{entry.note}</p>
-                      </div>
-                      <div class="bookshelf-pro-prompt-body">
-                        <label class="gemini-field bookshelf-prompt-field">
-                          <span>可直接送高階 LLM 的 prompt</span>
-                          <textarea
-                            id={`prompt-library-content-${entry.id}`}
-                            class="bookshelf-pro-prompt-content bookshelf-prompt-library-content"
-                            rows="16"
-                            readonly
-                          >{entry.prompt}</textarea>
-                        </label>
-                        <div class="bookshelf-actions bookshelf-confirm-actions">
-                          <button
-                            type="button"
-                            id={`copy-prompt-library-${entry.id}`}
-                            class="bookshelf-action bookshelp-action-primary"
-                          >
-                            複製這份提示詞
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-                <p id="prompt-library-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               </section>
               <div class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
@@ -3962,6 +3962,11 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     return matched?.title || slug;
   }
 
+  function getBlogHrefFromPagePath(pagePath = "") {
+    const normalizedPath = String(pagePath || "").split("?")[0].trim().replace(/\/$/, "");
+    return normalizedPath.startsWith("/blog/") ? normalizedPath : "";
+  }
+
   function getReadableLandingLabel(pagePath = "") {
     const normalizedPath = String(pagePath || "").split("?")[0].trim();
     if (!normalizedPath || normalizedPath === "(not set)") return "未提供落地頁";
@@ -4164,12 +4169,18 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       : [];
     if (topPostsNode) topPostsNode.innerHTML = topPosts.length
       ? topPosts
-          .map((post) => `
+          .map((post) => {
+            const postTitle = getArticleTitleFromPagePath(post.pagePath);
+            const postHref = getBlogHrefFromPagePath(post.pagePath);
+            return `
             <li>
-              <span>${escapeHtml(getArticleTitleFromPagePath(post.pagePath))}</span>
+              ${postHref
+                ? `<a class="bookshelf-analytics-link" href="${escapeHtml(postHref)}">${escapeHtml(postTitle)}</a>`
+                : `<span>${escapeHtml(postTitle)}</span>`}
               <strong>${formatCount(post.views)}</strong>
             </li>
-          `)
+          `;
+          })
           .join("")
       : "<li>近 7 天尚無文章瀏覽資料。</li>";
 
