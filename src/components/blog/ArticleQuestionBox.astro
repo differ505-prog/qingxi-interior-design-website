@@ -18,7 +18,7 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   .article-question-box {
     max-width: 720px;
     margin: 3rem auto 0;
-    padding: 1.45rem 1.35rem 1.4rem;
+    padding: 1.4rem 1.4rem 1.25rem;
     border-radius: 24px;
     border: 1px solid rgba(164, 171, 160, 0.2);
     background:
@@ -29,8 +29,8 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   .article-question-box-head {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 0.42rem;
+    margin-bottom: 0.9rem;
   }
 
   .article-question-box-head p,
@@ -51,25 +51,19 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   .article-question-box-head h2 {
     color: #332e29;
     font-family: var(--font-serif);
-    font-size: 1.52rem;
+    font-size: 1.42rem;
     line-height: 1.45;
   }
 
   .article-question-box-head small {
     color: #746c64;
     font-family: var(--font-sans);
-    font-size: 0.88rem;
-    line-height: 1.7;
+    font-size: 0.84rem;
+    line-height: 1.65;
   }
 
   .article-question-form {
     display: grid;
-    gap: 0.95rem;
-  }
-
-  .article-question-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.85rem;
   }
 
@@ -101,6 +95,9 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   .article-question-field input,
   .article-question-field textarea {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     border-radius: 16px;
     border: 1px solid rgba(164, 171, 160, 0.22);
     background: rgba(255, 252, 248, 0.9);
@@ -113,8 +110,8 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   }
 
   .article-question-field textarea {
-    min-height: 150px;
-    resize: vertical;
+    min-height: 112px;
+    resize: none;
   }
 
   .article-question-field input:focus,
@@ -125,12 +122,56 @@ const publicArticleQuestionApiUrl = "/api/article-question";
     background: rgba(255, 255, 255, 0.98);
   }
 
+  .article-question-field--primary textarea {
+    min-height: 128px;
+  }
+
+  .article-question-hint {
+    margin: 0;
+    color: #8a7f74;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    line-height: 1.65;
+  }
+
+  .article-question-meta {
+    border-radius: 18px;
+    border: 1px solid rgba(164, 171, 160, 0.16);
+    background: rgba(255, 255, 255, 0.38);
+    overflow: hidden;
+  }
+
+  .article-question-meta summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.9rem 1rem;
+    color: #5d554d;
+    font-family: var(--font-sans);
+    font-size: 0.84rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .article-question-meta summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .article-question-meta[open] summary {
+    border-bottom: 1px solid rgba(164, 171, 160, 0.14);
+    background: rgba(255, 255, 255, 0.32);
+  }
+
+  .article-question-meta-body {
+    display: grid;
+    gap: 0.8rem;
+    padding: 0.95rem 1rem 1rem;
+  }
+
   .article-question-actions {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    gap: 0.9rem;
-    flex-wrap: wrap;
+    gap: 0.85rem;
   }
 
   .article-question-privacy {
@@ -138,6 +179,7 @@ const publicArticleQuestionApiUrl = "/api/article-question";
     font-family: var(--font-sans);
     font-size: 0.82rem;
     line-height: 1.7;
+    max-width: 28rem;
   }
 
   .article-question-submit {
@@ -145,7 +187,8 @@ const publicArticleQuestionApiUrl = "/api/article-question";
     align-items: center;
     justify-content: center;
     min-height: 48px;
-    padding: 0.85rem 1.25rem;
+    flex-shrink: 0;
+    padding: 0.82rem 1.15rem;
     border: 0;
     border-radius: 999px;
     background: #332e29;
@@ -188,21 +231,27 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   @media (max-width: 768px) {
     .article-question-box {
       margin-top: 2.3rem;
-      padding: 1.15rem 1rem 1.05rem;
+      padding: 1.1rem 0.95rem 1rem;
       border-radius: 20px;
     }
 
-    .article-question-grid {
-      grid-template-columns: 1fr;
-      gap: 0.7rem;
+    .article-question-box-head h2 {
+      font-size: 1.2rem;
     }
 
     .article-question-actions {
       align-items: stretch;
+      flex-direction: column;
     }
 
     .article-question-submit {
       width: 100%;
+    }
+
+    .article-question-meta summary,
+    .article-question-meta-body {
+      padding-left: 0.9rem;
+      padding-right: 0.9rem;
     }
   }
 </style>
@@ -210,8 +259,8 @@ const publicArticleQuestionApiUrl = "/api/article-question";
 <section class="article-question-box" aria-label="文章提問表單">
   <div class="article-question-box-head">
     <p>Private Intake</p>
-    <h2>這篇文章若有延伸問題，可直接私下送出</h2>
-    <small>問題會綁定到這一篇文章，只供青曦內部整理、補充 FAQ 與後續內容修訂，不會公開顯示。</small>
+    <h2>看完這篇，還有卡住的地方？</h2>
+    <small>直接留問題就好。青曦會收進這篇文章的內部提問池，作為後續補充與修訂參考，不會公開顯示。</small>
   </div>
 
   <form
@@ -222,27 +271,31 @@ const publicArticleQuestionApiUrl = "/api/article-question";
     data-article-title={articleTitle}
     data-article-url={articlePathname}
   >
-    <div class="article-question-grid">
-      <label class="article-question-field">
-        <span>稱呼</span>
-        <input type="text" name="submitterName" maxlength="40" placeholder="方便青曦辨識即可，可不填" />
-      </label>
-
-      <label class="article-question-field">
-        <span>聯絡方式</span>
-        <input type="text" name="contactInfo" maxlength="120" placeholder="Line、Email 或手機，可不填" />
-      </label>
-    </div>
-
-    <label class="article-question-field">
+    <label class="article-question-field article-question-field--primary">
       <span>你的問題</span>
       <textarea name="question" minlength="8" required placeholder="例如：局部翻新如果先不動天花板，預算與工序要注意哪些風險？"></textarea>
     </label>
+    <p class="article-question-hint">一句話也可以，不需要整理成完整需求。</p>
 
-    <label class="article-question-field">
-      <span>補充背景</span>
-      <textarea name="detail" rows="4" placeholder="可補充空間現況、預算範圍、家中成員，或你最卡住的判斷點。"></textarea>
-    </label>
+    <details class="article-question-meta">
+      <summary>補充背景或聯絡方式（選填）</summary>
+      <div class="article-question-meta-body">
+        <label class="article-question-field">
+          <span>補充背景</span>
+          <textarea name="detail" rows="3" placeholder="可補充空間現況、預算範圍、家中成員，或你最卡住的判斷點。"></textarea>
+        </label>
+
+        <label class="article-question-field">
+          <span>稱呼</span>
+          <input type="text" name="submitterName" maxlength="40" placeholder="方便青曦辨識即可，可不填" />
+        </label>
+
+        <label class="article-question-field">
+          <span>聯絡方式</span>
+          <input type="text" name="contactInfo" maxlength="120" placeholder="Line、Email 或手機，可不填" />
+        </label>
+      </div>
+    </details>
 
     <label class="article-question-field is-hidden" aria-hidden="true">
       <span>公司</span>
@@ -251,7 +304,7 @@ const publicArticleQuestionApiUrl = "/api/article-question";
 
     <div class="article-question-actions">
       <div class="article-question-privacy">送出後不會公開顯示，只會進入青曦內部文章提問池。</div>
-      <button type="submit" class="article-question-submit">送出這篇文章的問題</button>
+      <button type="submit" class="article-question-submit">送出問題</button>
     </div>
 
     <p class="article-question-feedback" data-article-question-feedback="true" aria-live="polite"></p>
