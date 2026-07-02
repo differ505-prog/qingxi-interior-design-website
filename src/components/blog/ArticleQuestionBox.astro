@@ -43,9 +43,10 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   .article-question-box-head p {
     color: #8a7f74;
     font-family: var(--font-sans);
-    font-size: 0.74rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: none;
+    font-weight: 600;
   }
 
   .article-question-box-head h2 {
@@ -65,6 +66,27 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   .article-question-form {
     display: grid;
     gap: 0.85rem;
+  }
+
+  .article-question-trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .article-question-trust-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0.38rem 0.72rem;
+    border-radius: 999px;
+    border: 1px solid rgba(164, 171, 160, 0.16);
+    background: rgba(255, 255, 255, 0.56);
+    color: #6c645d;
+    font-family: var(--font-sans);
+    font-size: 0.76rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
   }
 
   .article-question-field {
@@ -137,14 +159,18 @@ const publicArticleQuestionApiUrl = "/api/article-question";
   .article-question-meta {
     border-radius: 18px;
     border: 1px solid rgba(164, 171, 160, 0.16);
-    background: rgba(255, 255, 255, 0.38);
+    background: rgba(255, 255, 255, 0.52);
     overflow: hidden;
   }
 
   .article-question-meta summary {
     list-style: none;
     cursor: pointer;
-    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.9rem;
+    padding: 0.92rem 1rem;
     color: #5d554d;
     font-family: var(--font-sans);
     font-size: 0.84rem;
@@ -156,9 +182,34 @@ const publicArticleQuestionApiUrl = "/api/article-question";
     display: none;
   }
 
+  .article-question-meta-summary-copy {
+    display: grid;
+    gap: 0.22rem;
+  }
+
+  .article-question-meta-summary-copy strong,
+  .article-question-meta-summary-copy small {
+    margin: 0;
+    font: inherit;
+  }
+
+  .article-question-meta-summary-copy small {
+    color: #82786f;
+    font-size: 0.76rem;
+    font-weight: 400;
+    line-height: 1.55;
+  }
+
+  .article-question-meta-summary-toggle {
+    flex-shrink: 0;
+    color: #8a7f74;
+    font-size: 0.76rem;
+    font-weight: 500;
+  }
+
   .article-question-meta[open] summary {
     border-bottom: 1px solid rgba(164, 171, 160, 0.14);
-    background: rgba(255, 255, 255, 0.32);
+    background: rgba(255, 255, 255, 0.62);
   }
 
   .article-question-meta-body {
@@ -244,6 +295,10 @@ const publicArticleQuestionApiUrl = "/api/article-question";
       flex-direction: column;
     }
 
+    .article-question-trust-row {
+      gap: 0.45rem;
+    }
+
     .article-question-submit {
       width: 100%;
     }
@@ -258,9 +313,15 @@ const publicArticleQuestionApiUrl = "/api/article-question";
 
 <section class="article-question-box" aria-label="文章提問表單">
   <div class="article-question-box-head">
-    <p>Private Intake</p>
+    <p>文章延伸提問</p>
     <h2>看完這篇，還有卡住的地方？</h2>
-    <small>直接留問題就好。青曦會收進這篇文章的內部提問池，作為後續補充與修訂參考，不會公開顯示。</small>
+    <small>直接留問題就好。青曦會收進這篇文章的內部提問池，作為後續補充與修訂參考。</small>
+  </div>
+
+  <div class="article-question-trust-row" aria-label="提問說明">
+    <span class="article-question-trust-chip">一句話也可以</span>
+    <span class="article-question-trust-chip">可不留聯絡方式</span>
+    <span class="article-question-trust-chip">不會公開顯示</span>
   </div>
 
   <form
@@ -278,7 +339,13 @@ const publicArticleQuestionApiUrl = "/api/article-question";
     <p class="article-question-hint">一句話也可以，不需要整理成完整需求。</p>
 
     <details class="article-question-meta">
-      <summary>補充背景或聯絡方式（選填）</summary>
+      <summary>
+        <span class="article-question-meta-summary-copy">
+          <strong>如果方便，再補充背景或聯絡方式</strong>
+          <small>不是必填；只有需要青曦更精準理解情境時再補就好。</small>
+        </span>
+        <span class="article-question-meta-summary-toggle">選填</span>
+      </summary>
       <div class="article-question-meta-body">
         <label class="article-question-field">
           <span>補充背景</span>
@@ -303,7 +370,7 @@ const publicArticleQuestionApiUrl = "/api/article-question";
     </label>
 
     <div class="article-question-actions">
-      <div class="article-question-privacy">送出後不會公開顯示，只會進入青曦內部文章提問池。</div>
+      <div class="article-question-privacy">送出後只會進入青曦內部提問池，不會在網站上公開。</div>
       <button type="submit" class="article-question-submit">送出問題</button>
     </div>
 
