@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { get, put } from "@vercel/blob";
+import { isSameOriginRequest } from "../../../lib/request-security";
 
 const VENDOR_NOTES_BLOB_ACCESS = "private" as const;
 
@@ -123,7 +124,7 @@ export const GET: APIRoute = async () => {
   }
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, url }) => {
   const token = getBlobToken();
   if (!token) {
     return jsonResponse({
@@ -132,6 +133,14 @@ export const POST: APIRoute = async ({ request }) => {
       items: [],
       note: "目前尚未接通共享儲存，請先設定 Vercel Blob。",
     });
+  }
+
+  if (!isSameOriginRequest(request, url)) {
+    return jsonResponse({
+      status: "forbidden",
+      configured: true,
+      note: "此請求來源無效，請回到工作面板重新操作。",
+    }, 403);
   }
 
   try {
@@ -176,7 +185,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ url }) => {
+export const DELETE: APIRoute = async ({ request, url }) => {
   const token = getBlobToken();
   if (!token) {
     return jsonResponse({
@@ -185,6 +194,14 @@ export const DELETE: APIRoute = async ({ url }) => {
       items: [],
       note: "目前尚未接通共享儲存，請先設定 Vercel Blob。",
     });
+  }
+
+  if (!isSameOriginRequest(request, url)) {
+    return jsonResponse({
+      status: "forbidden",
+      configured: true,
+      note: "此請求來源無效，請回到工作面板重新操作。",
+    }, 403);
   }
 
   const noteId = url.searchParams.get("id")?.trim() || "";

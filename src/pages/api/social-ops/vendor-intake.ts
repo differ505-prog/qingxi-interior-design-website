@@ -5,6 +5,7 @@ import {
   readVendorIntakes,
   updateVendorIntake,
 } from "../../../lib/vendor-intake-store";
+import { isSameOriginRequest } from "../../../lib/request-security";
 
 function jsonResponse(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -48,7 +49,7 @@ export const GET: APIRoute = async () => {
   }
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, url }) => {
   const token = getBlobToken();
   if (!token) {
     return jsonResponse({
@@ -57,6 +58,14 @@ export const POST: APIRoute = async ({ request }) => {
       items: [],
       note: "需要先接通 Vercel Blob，工班登錄池才會跨裝置同步。",
     });
+  }
+
+  if (!isSameOriginRequest(request, url)) {
+    return jsonResponse({
+      status: "forbidden",
+      configured: true,
+      note: "此請求來源無效，請回到工作面板重新操作。",
+    }, 403);
   }
 
   try {

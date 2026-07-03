@@ -5,10 +5,13 @@ import {
   readArticleNotes,
   writeArticleNotes,
 } from "../../lib/article-note-store";
+import {
+  applyMemoryRateLimit,
+  isSameOriginRequest,
+} from "../../lib/request-security";
 
 const ARTICLE_QUESTION_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const ARTICLE_QUESTION_RATE_LIMIT_MAX_REQUESTS = 5;
-const articleQuestionRateLimitStore = new Map<string, number[]>();
 
 function jsonResponse(
   body: Record<string, unknown>,
@@ -33,61 +36,6 @@ function normalizeArticleUrl(articleSlug: string, value: unknown) {
   const normalized = normalizeText(value);
   if (normalized) return normalized;
   return articleSlug ? `/blog/${articleSlug}` : "";
-}
-
-function getClientRateLimitKey(request: Request) {
-  const forwardedFor = normalizeText(request.headers.get("x-forwarded-for"));
-  const ip = forwardedFor.split(",")[0]?.trim() || "unknown";
-  const userAgent = normalizeText(request.headers.get("user-agent")) || "unknown";
-  return `${ip}:${userAgent.slice(0, 120)}`;
-}
-
-function applyArticleQuestionRateLimit(request: Request) {
-  const now = Date.now();
-  const windowStart = now - ARTICLE_QUESTION_RATE_LIMIT_WINDOW_MS;
-  const clientKey = getClientRateLimitKey(request);
-  const attempts = (articleQuestionRateLimitStore.get(clientKey) || []).filter(
-    (timestamp) => timestamp > windowStart,
-  );
-
-  if (attempts.length >= ARTICLE_QUESTION_RATE_LIMIT_MAX_REQUESTS) {
-    const retryAfterSeconds = Math.max(
-      1,
-      Math.ceil((attempts[0] + ARTICLE_QUESTION_RATE_LIMIT_WINDOW_MS - now) / 1000),
-    );
-    articleQuestionRateLimitStore.set(clientKey, attempts);
-    return {
-      limited: true,
-      retryAfterSeconds,
-    };
-  }
-
-  attempts.push(now);
-  articleQuestionRateLimitStore.set(clientKey, attempts);
-  return {
-    limited: false,
-    retryAfterSeconds: 0,
-  };
-}
-
-function isAllowedArticleQuestionRequest(request: Request, requestUrl: URL) {
-  const expectedOrigin = requestUrl.origin;
-  const originHeader = normalizeText(request.headers.get("origin"));
-  const refererHeader = normalizeText(request.headers.get("referer"));
-
-  try {
-    if (originHeader && new URL(originHeader).origin !== expectedOrigin) {
-      return false;
-    }
-
-    if (refererHeader && new URL(refererHeader).origin !== expectedOrigin) {
-      return false;
-    }
-
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 function buildInternalNote(input: {
@@ -119,7 +67,7 @@ export const POST: APIRoute = async ({ request, url }) => {
     );
   }
 
-  if (!isAllowedArticleQuestionRequest(request, url)) {
+  if (!isSameOriginRequest(request, url)) {
     return jsonResponse(
       {
         status: "forbidden",
@@ -130,7 +78,12 @@ export const POST: APIRoute = async ({ request, url }) => {
     );
   }
 
-  const rateLimitResult = applyArticleQuestionRateLimit(request);
+  const rateLimitResult = applyMemoryRateLimit({
+    namespace: "article-question",
+    request,
+    windowMs: ARTICLE_QUESTION_RATE_LIMIT_WINDOW_MS,
+    maxRequests: ARTICLE_QUESTION_RATE_LIMIT_MAX_REQUESTS,
+  });
   if (rateLimitResult.limited) {
     return jsonResponse(
       {
