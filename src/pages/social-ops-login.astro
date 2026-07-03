@@ -1,6 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { SOCIAL_OPS_AUTH_CONFIG } from "../lib/social-ops-auth";
+import {
+  createSocialOpsSessionToken,
+  SOCIAL_OPS_AUTH_CONFIG,
+  verifySocialOpsPassword,
+} from "../lib/social-ops-auth";
 
 if (!SOCIAL_OPS_AUTH_CONFIG.enabled) {
   return Astro.redirect(SOCIAL_OPS_AUTH_CONFIG.defaultNextPath);
@@ -15,8 +19,8 @@ if (Astro.request.method === "POST") {
   const formData = await Astro.request.formData();
   const password = String(formData.get("password") || "").trim();
 
-  if (password === SOCIAL_OPS_AUTH_CONFIG.password) {
-    Astro.cookies.set(SOCIAL_OPS_AUTH_CONFIG.cookieName, "true", {
+  if (verifySocialOpsPassword(password)) {
+    Astro.cookies.set(SOCIAL_OPS_AUTH_CONFIG.cookieName, createSocialOpsSessionToken(), {
       path: "/",
       httpOnly: true,
       sameSite: "strict",

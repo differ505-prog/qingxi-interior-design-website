@@ -1,6 +1,10 @@
 import type { MiddlewareHandler } from 'astro';
 import { PASSWORD_PROTECTION_CONFIG, isLocalDevelopment } from './lib/password-config';
-import { SOCIAL_OPS_AUTH_CONFIG, isProtectedSocialOpsPath } from './lib/social-ops-auth';
+import {
+  isProtectedSocialOpsPath,
+  isValidSocialOpsSessionToken,
+  SOCIAL_OPS_AUTH_CONFIG,
+} from './lib/social-ops-auth';
 
 // ==================== 預覽密碼保護 ====================
 // 密碼保護邏輯
@@ -38,7 +42,7 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
 
     if (isProtectedSocialOpsPath(pathname)) {
       const authCookie = context.cookies.get(SOCIAL_OPS_AUTH_CONFIG.cookieName);
-      if (!authCookie || authCookie.value !== 'true') {
+      if (!authCookie || !isValidSocialOpsSessionToken(authCookie.value)) {
         if (pathname.startsWith('/api/social-ops/')) {
           return new Response(
             JSON.stringify({
