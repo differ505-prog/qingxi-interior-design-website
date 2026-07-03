@@ -620,7 +620,15 @@ const siteCategoryCount = new Set(mergedPosts.map((post) => post.siteCategory)).
                   data-qingxi-refresh={post.editorialRefreshStamp}
                 >
                   <div class="post-image">
-                    <img src={post.coverImage} alt={post.title} />
+                    <img
+                      src={post.coverImage}
+                      alt={post.title}
+                      width="960"
+                      height="640"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1180px) 50vw, 360px"
+                      loading="lazy"
+                      decoding="async"
+                    />
                     <span class="post-image-badge">{post.siteCategory}</span>
                   </div>
                   <div class="post-content">

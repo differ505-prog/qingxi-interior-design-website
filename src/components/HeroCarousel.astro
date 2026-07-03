@@ -54,6 +54,12 @@ const slides = fallbackSlides.map((item) => ({
             src={item.image.startsWith("http") ? item.image : item.image.startsWith("//") ? `https:${item.image}` : item.image}
             alt={item.title}
             class="carousel-image"
+            width="1600"
+            height="900"
+            sizes="100vw"
+            loading={index === 0 ? "eager" : "lazy"}
+            decoding="async"
+            fetchpriority={index === 0 ? "high" : "low"}
           />
         </div>
       ))

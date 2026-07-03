@@ -558,7 +558,7 @@ const homeStructuredData = [
 
       <div class="faq-list">
         <div class="faq-item" data-animate="left">
-          <button class="faq-question">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-pricing" id="faq-question-pricing">
             <span>設計費用如何計算？</span>
             <svg
               class="faq-icon"
@@ -571,7 +571,7 @@ const homeStructuredData = [
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-pricing" role="region" aria-labelledby="faq-question-pricing" hidden>
             <p>
               一般住宅設計費約為每坪 NT$ 3,000-6,000 元。先聊需求後，才會給你對得上的報價。
             </p>
@@ -579,7 +579,7 @@ const homeStructuredData = [
         </div>
 
         <div class="faq-item" data-animate="right">
-          <button class="faq-question">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-timeline" id="faq-question-timeline">
             <span>從設計到完工需要多久時間？</span>
             <svg
               class="faq-icon"
@@ -592,7 +592,7 @@ const homeStructuredData = [
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-timeline" role="region" aria-labelledby="faq-question-timeline" hidden>
             <p>
               多數案子約 3 到 6 個月，還是會依空間大小與工程內容微調。
             </p>
@@ -600,7 +600,7 @@ const homeStructuredData = [
         </div>
 
         <div class="faq-item" data-animate="left">
-          <button class="faq-question">
+          <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-scope" id="faq-question-scope">
             <span>可以只做設計不做工程嗎？</span>
             <svg
               class="faq-icon"
@@ -613,7 +613,7 @@ const homeStructuredData = [
               <polyline points="6 9 12 15 18 9"></polyline>
             </svg>
           </button>
-          <div class="faq-answer">
+          <div class="faq-answer" id="faq-answer-scope" role="region" aria-labelledby="faq-question-scope" hidden>
             <p>
               可以。若一起做設計加工程，整體品質與時程通常更好掌握。
             </p>
@@ -2321,7 +2321,7 @@ const homeStructuredData = [
       observeElements(faqItems, 100);
 
       // FAQ Toggle
-      const faqQuestions = document.querySelectorAll(".faq-question");
+      const faqQuestions = document.querySelectorAll<HTMLButtonElement>(".faq-question");
       faqQuestions.forEach((question) => {
         question.addEventListener("click", () => {
           const faqItem = question.parentElement;
@@ -2332,13 +2332,20 @@ const homeStructuredData = [
           const isActive = faqItem.classList.contains("active");
 
           // Close all FAQ items
-          document.querySelectorAll(".faq-item").forEach((item) => {
+          document.querySelectorAll<HTMLElement>(".faq-item").forEach((item) => {
             item.classList.remove("active");
+            const button = item.querySelector<HTMLButtonElement>(".faq-question");
+            const answer = item.querySelector<HTMLElement>(".faq-answer");
+            button?.setAttribute("aria-expanded", "false");
+            if (answer) answer.hidden = true;
           });
 
           // Toggle current item
           if (!isActive) {
             faqItem.classList.add("active");
+            question.setAttribute("aria-expanded", "true");
+            const answer = faqItem.querySelector<HTMLElement>(".faq-answer");
+            if (answer) answer.hidden = false;
           }
         });
       });

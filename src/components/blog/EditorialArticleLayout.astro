@@ -714,7 +714,16 @@ const privateQuestionPoolHref = articleSlug
     </header>
 
     <figure class="article-cover">
-      <img src={ogImage} alt={coverAlt} />
+      <img
+        src={ogImage}
+        alt={coverAlt}
+        width="1600"
+        height="900"
+        sizes="(max-width: 900px) 100vw, 960px"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+      />
     </figure>
 
     {
