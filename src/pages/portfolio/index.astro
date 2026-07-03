@@ -562,7 +562,16 @@ const secondaryMoments = spatialMoments.slice(2);
     <div class="portfolio-container">
       <section class="featured-showcase">
         <figure class="featured-media">
-          <img src={featuredProject.coverImage} alt={featuredProject.title} />
+          <img
+            src={featuredProject.coverImage}
+            alt={featuredProject.title}
+            width="1600"
+            height="1000"
+            sizes="(max-width: 900px) 100vw, 56vw"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          />
         </figure>
 
         <div class="featured-copy">
@@ -593,7 +602,14 @@ const secondaryMoments = spatialMoments.slice(2);
           <div class="moments-row moments-row-primary">
             {primaryMoments.map((moment, index) => (
               <figure class={`moment-card ${index === 0 ? 'is-wide' : 'is-portrait'}`}>
-                <img src={moment.image} alt={moment.alt} loading="lazy" />
+                <img
+                  src={moment.image}
+                  alt={moment.alt}
+                  width="1200"
+                  height="900"
+                  loading="lazy"
+                  decoding="async"
+                />
               </figure>
             ))}
           </div>
@@ -601,7 +617,14 @@ const secondaryMoments = spatialMoments.slice(2);
           <div class="moments-row moments-row-secondary">
             {secondaryMoments.map((moment, index) => (
               <figure class={`moment-card ${index === 0 ? 'is-intimate' : 'is-balanced'}`}>
-                <img src={moment.image} alt={moment.alt} loading="lazy" />
+                <img
+                  src={moment.image}
+                  alt={moment.alt}
+                  width="1200"
+                  height="900"
+                  loading="lazy"
+                  decoding="async"
+                />
               </figure>
             ))}
           </div>
@@ -610,7 +633,14 @@ const secondaryMoments = spatialMoments.slice(2);
         <div class="capability-stack">
           <article class="pool-feature">
             <figure class="pool-feature-media">
-              <img src={poolFeature.image} alt={poolFeature.alt} loading="lazy" />
+              <img
+                src={poolFeature.image}
+                alt={poolFeature.alt}
+                width="1200"
+                height="900"
+                loading="lazy"
+                decoding="async"
+              />
               <span class="pool-feature-badge">POOL DESIGN</span>
             </figure>
             <div class="pool-feature-copy">
@@ -622,7 +652,14 @@ const secondaryMoments = spatialMoments.slice(2);
 
           <article class="pool-feature">
             <figure class="pool-feature-media">
-              <img src={commercialFeature.image} alt={commercialFeature.alt} loading="lazy" />
+              <img
+                src={commercialFeature.image}
+                alt={commercialFeature.alt}
+                width="1200"
+                height="900"
+                loading="lazy"
+                decoding="async"
+              />
               <span class="pool-feature-badge">COMMERCIAL SPACE</span>
             </figure>
             <div class="pool-feature-copy">

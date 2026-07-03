@@ -206,14 +206,17 @@ const MAINTENANCE_MODE =
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preload"
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap"
-      as="style"
-    />
-    <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
     <!-- Schema.org Structured Data -->
     {allStructuredData.map((schema) => (
@@ -805,7 +808,13 @@ const MAINTENANCE_MODE =
         <div class="nav-inner">
           <a href="/" class="brand-link" aria-label="青曦空間設計首頁">
             <span class="brand-mark" aria-hidden="true">
-              <img src="/images/brand/qingxi-logo.png" alt="" />
+              <img
+                src="/images/brand/qingxi-logo.png"
+                alt=""
+                width="72"
+                height="72"
+                decoding="async"
+              />
             </span>
             <span class="brand-copy">
               <span class="brand-title">青曦空間設計</span>
@@ -903,7 +912,10 @@ const MAINTENANCE_MODE =
                 class="footer-logo"
                 src="/images/brand/qingxi-logo-wordmark.png"
                 alt="青曦空間設計 Logo"
+                width="240"
+                height="80"
                 loading="lazy"
+                decoding="async"
               />
               <p>
                 專注於大台北住宅與商業空間規劃。從設計提案、系統櫃收納配置到工程落地整合，以安定、耐看的空間語言，精準回應每位屋主的生活方式。

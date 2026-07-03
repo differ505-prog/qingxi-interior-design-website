@@ -97,7 +97,14 @@ const { title, coverImage, summary, slug } = Astro.props;
 
 <a href={`/portfolio/${slug}`} class="card">
   <div class="card-media">
-    <img src={coverImage} alt={title} />
+    <img
+      src={coverImage}
+      alt={title}
+      width="1200"
+      height="900"
+      loading="lazy"
+      decoding="async"
+    />
     <span class="card-badge">CURATED SPACE</span>
   </div>
   <div class="card-content">
