@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 const DEFAULT_SOCIAL_OPS_PASSWORD = "05050505";
 const DEFAULT_SOCIAL_OPS_SESSION_SECRET = "qingxi-social-ops-session-secret";
+const IS_DEV_AUTH_FALLBACK = import.meta.env.DEV || process.env.NODE_ENV !== "production";
 
 export const SOCIAL_OPS_AUTH_CONFIG = {
   enabled: true,
@@ -17,23 +18,45 @@ function readEnvValue(key: string) {
   return import.meta.env[key]?.trim() || process.env[key]?.trim() || "";
 }
 
+export function getSocialOpsAuthSetupStatus() {
+  const passwordFromEnv = readEnvValue(SOCIAL_OPS_AUTH_CONFIG.passwordEnvName);
+  const sessionSecretFromEnv = readEnvValue(SOCIAL_OPS_AUTH_CONFIG.sessionSecretEnvName);
+  const usingDevFallback = IS_DEV_AUTH_FALLBACK && (!passwordFromEnv || !sessionSecretFromEnv);
+
+  return {
+    configured: Boolean(passwordFromEnv && sessionSecretFromEnv) || usingDevFallback,
+    passwordConfigured: Boolean(passwordFromEnv) || IS_DEV_AUTH_FALLBACK,
+    sessionSecretConfigured: Boolean(sessionSecretFromEnv) || IS_DEV_AUTH_FALLBACK,
+    usingDevFallback,
+  };
+}
+
+export function isSocialOpsAuthConfigured() {
+  return getSocialOpsAuthSetupStatus().configured;
+}
+
 export function getSocialOpsPassword() {
-  return readEnvValue(SOCIAL_OPS_AUTH_CONFIG.passwordEnvName) || DEFAULT_SOCIAL_OPS_PASSWORD;
+  const passwordFromEnv = readEnvValue(SOCIAL_OPS_AUTH_CONFIG.passwordEnvName);
+  if (passwordFromEnv) return passwordFromEnv;
+  if (IS_DEV_AUTH_FALLBACK) return DEFAULT_SOCIAL_OPS_PASSWORD;
+  return "";
 }
 
 function getSocialOpsSessionSecret() {
-  return (
-    readEnvValue(SOCIAL_OPS_AUTH_CONFIG.sessionSecretEnvName) ||
-    getSocialOpsPassword() ||
-    DEFAULT_SOCIAL_OPS_SESSION_SECRET
-  );
+  const sessionSecretFromEnv = readEnvValue(SOCIAL_OPS_AUTH_CONFIG.sessionSecretEnvName);
+  if (sessionSecretFromEnv) return sessionSecretFromEnv;
+  if (IS_DEV_AUTH_FALLBACK) return getSocialOpsPassword() || DEFAULT_SOCIAL_OPS_SESSION_SECRET;
+  return "";
 }
 
 function signSocialOpsPayload(payload: string) {
-  return createHmac("sha256", getSocialOpsSessionSecret()).update(payload).digest("base64url");
+  const secret = getSocialOpsSessionSecret();
+  if (!secret) return "";
+  return createHmac("sha256", secret).update(payload).digest("base64url");
 }
 
 export function createSocialOpsSessionToken() {
+  if (!isSocialOpsAuthConfigured()) return "";
   const expiresAt =
     Date.now() + SOCIAL_OPS_AUTH_CONFIG.cookieMaxAgeDays * 24 * 60 * 60 * 1000;
   const payload = Buffer.from(JSON.stringify({ exp: expiresAt, scope: "social-ops" })).toString(
@@ -43,7 +66,7 @@ export function createSocialOpsSessionToken() {
 }
 
 export function isValidSocialOpsSessionToken(token: string | undefined | null) {
-  if (!token) return false;
+  if (!token || !isSocialOpsAuthConfigured()) return false;
 
   const [payload, signature] = token.split(".");
   if (!payload || !signature) return false;
@@ -66,7 +89,8 @@ export function isValidSocialOpsSessionToken(token: string | undefined | null) {
 }
 
 export function verifySocialOpsPassword(password: string) {
-  return password === getSocialOpsPassword();
+  const configuredPassword = getSocialOpsPassword();
+  return Boolean(configuredPassword) && password === configuredPassword;
 }
 
 export function isProtectedSocialOpsPath(pathname: string) {

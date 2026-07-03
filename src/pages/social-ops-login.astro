@@ -1,10 +1,15 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { applyMemoryRateLimit } from "../lib/request-security";
 import {
   createSocialOpsSessionToken,
+  getSocialOpsAuthSetupStatus,
   SOCIAL_OPS_AUTH_CONFIG,
   verifySocialOpsPassword,
 } from "../lib/social-ops-auth";
+
+const SOCIAL_OPS_LOGIN_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const SOCIAL_OPS_LOGIN_RATE_LIMIT_MAX_REQUESTS = 5;
 
 if (!SOCIAL_OPS_AUTH_CONFIG.enabled) {
   return Astro.redirect(SOCIAL_OPS_AUTH_CONFIG.defaultNextPath);
@@ -13,24 +18,43 @@ if (!SOCIAL_OPS_AUTH_CONFIG.enabled) {
 const requestedNextPath = Astro.url.searchParams.get("next") || SOCIAL_OPS_AUTH_CONFIG.defaultNextPath;
 const nextPath = requestedNextPath.startsWith("/") ? requestedNextPath : SOCIAL_OPS_AUTH_CONFIG.defaultNextPath;
 const cookieMaxAge = SOCIAL_OPS_AUTH_CONFIG.cookieMaxAgeDays * 24 * 60 * 60;
-let errorMessage = "";
+const authSetupStatus = getSocialOpsAuthSetupStatus();
+const loginReason = Astro.url.searchParams.get("reason") || "";
+const setupRequiredMessage =
+  `正式環境需先設定 ${SOCIAL_OPS_AUTH_CONFIG.passwordEnvName} 與 ${SOCIAL_OPS_AUTH_CONFIG.sessionSecretEnvName}。`;
+let errorMessage = loginReason === "setup_required" ? setupRequiredMessage : "";
 
 if (Astro.request.method === "POST") {
-  const formData = await Astro.request.formData();
-  const password = String(formData.get("password") || "").trim();
-
-  if (verifySocialOpsPassword(password)) {
-    Astro.cookies.set(SOCIAL_OPS_AUTH_CONFIG.cookieName, createSocialOpsSessionToken(), {
-      path: "/",
-      httpOnly: true,
-      sameSite: "strict",
-      secure: !import.meta.env.DEV,
-      maxAge: cookieMaxAge,
+  if (!authSetupStatus.configured) {
+    errorMessage = setupRequiredMessage;
+  } else {
+    const rateLimitResult = applyMemoryRateLimit({
+      namespace: "social-ops-login",
+      request: Astro.request,
+      windowMs: SOCIAL_OPS_LOGIN_RATE_LIMIT_WINDOW_MS,
+      maxRequests: SOCIAL_OPS_LOGIN_RATE_LIMIT_MAX_REQUESTS,
     });
-    return Astro.redirect(nextPath);
-  }
 
-  errorMessage = "密碼不正確，請再試一次。";
+    if (rateLimitResult.limited) {
+      errorMessage = "登入嘗試過於頻繁，請稍後再試。";
+    } else {
+      const formData = await Astro.request.formData();
+      const password = String(formData.get("password") || "").trim();
+
+      if (verifySocialOpsPassword(password)) {
+        Astro.cookies.set(SOCIAL_OPS_AUTH_CONFIG.cookieName, createSocialOpsSessionToken(), {
+          path: "/",
+          httpOnly: true,
+          sameSite: "strict",
+          secure: !import.meta.env.DEV,
+          maxAge: cookieMaxAge,
+        });
+        return Astro.redirect(nextPath);
+      }
+
+      errorMessage = "密碼不正確，請再試一次。";
+    }
+  }
 }
 ---
 
@@ -45,12 +69,12 @@ if (Astro.request.method === "POST") {
         <input type="hidden" name="next" value={nextPath} />
         <label class="ops-login-field" for="password">
           <span>密碼</span>
-          <input id="password" name="password" type="password" placeholder="請輸入工作台密碼" autofocus required />
+          <input id="password" name="password" type="password" placeholder="請輸入工作台密碼" autofocus required disabled={!authSetupStatus.configured} />
         </label>
-        <button type="submit" class="ops-login-submit">進入工作台</button>
+        <button type="submit" class="ops-login-submit" disabled={!authSetupStatus.configured}>進入工作台</button>
       </form>
 
-      <p class={`ops-login-feedback ${errorMessage ? "is-error" : ""}`}>{errorMessage || "輸入一次後，七天內同裝置不需重複輸入。"}</p>
+      <p class={`ops-login-feedback ${errorMessage || !authSetupStatus.configured ? "is-error" : ""}`}>{errorMessage || (authSetupStatus.usingDevFallback ? "目前為本地開發 fallback 模式；正式環境請改用 env 憑證。" : "輸入一次後，七天內同裝置不需重複輸入。")}</p>
     </div>
   </section>
 </BaseLayout>
@@ -140,6 +164,12 @@ if (Astro.request.method === "POST") {
     color: #151515;
     background: linear-gradient(180deg, #f7f3ea, #dcd4c5);
     cursor: pointer;
+  }
+
+  .ops-login-field input:disabled,
+  .ops-login-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 
   .ops-login-feedback.is-error {

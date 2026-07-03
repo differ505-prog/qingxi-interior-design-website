@@ -1,6 +1,8 @@
 import type { MiddlewareHandler } from 'astro';
 import { PASSWORD_PROTECTION_CONFIG, isLocalDevelopment } from './lib/password-config';
 import {
+  getSocialOpsAuthSetupStatus,
+  isSocialOpsAuthConfigured,
   isProtectedSocialOpsPath,
   isValidSocialOpsSessionToken,
   SOCIAL_OPS_AUTH_CONFIG,
@@ -41,6 +43,28 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     }
 
     if (isProtectedSocialOpsPath(pathname)) {
+      if (!isSocialOpsAuthConfigured()) {
+        const authSetupStatus = getSocialOpsAuthSetupStatus();
+        if (pathname.startsWith('/api/social-ops/')) {
+          return new Response(
+            JSON.stringify({
+              status: 'setup_required',
+              configured: false,
+              note: `正式環境需先設定 ${SOCIAL_OPS_AUTH_CONFIG.passwordEnvName} 與 ${SOCIAL_OPS_AUTH_CONFIG.sessionSecretEnvName}。`,
+              usingDevFallback: authSetupStatus.usingDevFallback,
+            }),
+            {
+              status: 503,
+              headers: { 'Content-Type': 'application/json' },
+            },
+          );
+        }
+
+        return context.redirect(
+          `${SOCIAL_OPS_AUTH_CONFIG.loginPath}?reason=setup_required`,
+        );
+      }
+
       const authCookie = context.cookies.get(SOCIAL_OPS_AUTH_CONFIG.cookieName);
       if (!authCookie || !isValidSocialOpsSessionToken(authCookie.value)) {
         if (pathname.startsWith('/api/social-ops/')) {
