@@ -1,0 +1,117 @@
+---
+type BlogPostOption = {
+  slug: string;
+  title: string;
+};
+
+type QuestionOption = {
+  value: string;
+  label: string;
+};
+
+interface Props {
+  blogPosts: ReadonlyArray<BlogPostOption>;
+  sourceOptions: ReadonlyArray<QuestionOption>;
+  statusOptions: ReadonlyArray<QuestionOption>;
+}
+
+const {
+  blogPosts,
+  sourceOptions,
+  statusOptions,
+} = Astro.props;
+---
+
+<details id="article-question-pool" class="bookshelf-fold" open>
+  <summary>
+    <span>文章私有提問池</span>
+    <small><span id="article-note-count">0</span> 筆</small>
+  </summary>
+  <div class="bookshelf-preview bookshelf-fold-body">
+    <div class="vendor-board-layout article-note-board-layout">
+      <section class="vendor-panel">
+        <div class="bookshelf-preview-head">
+          <p>快速登記</p>
+          <span id="article-note-form-mode">新增模式</span>
+        </div>
+        <p class="vendor-form-note">把自己想到的補強點、客戶真實問題、之後要補進正文的段落方向，都先綁到對應文章。</p>
+        <div class="vendor-form-grid">
+          <label class="gemini-field gemini-field-full">
+            <span>對應文章</span>
+            <select id="article-note-article">
+              <option value="">選擇文章</option>
+              {blogPosts.map((post) => (
+                <option value={post.slug}>{post.title}</option>
+              ))}
+            </select>
+          </label>
+          <label class="gemini-field">
+            <span>來源</span>
+            <select id="article-note-source-type">
+              {sourceOptions.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+          <label class="gemini-field">
+            <span>狀態</span>
+            <select id="article-note-status">
+              {statusOptions.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+          <label class="gemini-field gemini-field-full">
+            <span>提問 / 補文題眼</span>
+            <input id="article-note-question" type="text" placeholder="例如：局部翻新若不動水電，預算表要補哪一層風險註記？" />
+          </label>
+          <label class="gemini-field gemini-field-full">
+            <span>補充內容</span>
+            <textarea id="article-note-body" rows="6" placeholder="記錄客戶原話、你自己的判斷、後續要補的表格、FAQ 或正文切角。"></textarea>
+          </label>
+        </div>
+        <div class="bookshelf-actions vendor-form-actions">
+          <button type="button" id="save-article-note" class="bookshelf-action bookshelp-action-primary">儲存提問</button>
+          <button type="button" id="clear-article-note-form" class="bookshelf-action">清空</button>
+        </div>
+        <p id="article-note-feedback" class="vendor-note-feedback" aria-live="polite"></p>
+      </section>
+
+      <section class="vendor-panel">
+        <div class="vendor-list-head">
+          <div class="bookshelf-preview-head">
+            <p>文章索引</p>
+            <span id="article-note-summary">先按文章看</span>
+          </div>
+          <div class="vendor-list-tools">
+            <label class="gemini-field vendor-search-field">
+              <span>文章</span>
+              <select id="article-note-article-filter">
+                <option value="">全部文章</option>
+                {blogPosts.map((post) => (
+                  <option value={post.slug}>{post.title}</option>
+                ))}
+              </select>
+            </label>
+            <label class="gemini-field vendor-sort-field">
+              <span>狀態</span>
+              <select id="article-note-status-filter">
+                <option value="">全部狀態</option>
+                {statusOptions.map((option) => (
+                  <option value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+            <label class="gemini-field vendor-search-field">
+              <span>搜尋</span>
+              <input id="article-note-search" type="search" placeholder="搜尋文章、提問內容或補充備註" />
+            </label>
+          </div>
+        </div>
+        <div id="article-note-list" class="vendor-note-list">
+          <div class="vendor-note-empty">尚未建立文章私有提問。</div>
+        </div>
+      </section>
+    </div>
+  </div>
+</details>
