@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PublishingModePanel from "../../components/PublishingModePanel.astro";
+import SocialOpsCannedReplies from "../../components/social-ops/SocialOpsCannedReplies.astro";
+import SocialOpsPromptLibrary from "../../components/social-ops/SocialOpsPromptLibrary.astro";
 import * as contentful from "contentful";
 import {
   mapContentfulBlogPosts,
@@ -978,36 +980,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
               </div>
 
               <aside class="ops-side ops-task-side">
-                <section class="ops-panel bookshelf-canned-replies bookshelf-canned-replies-priority ops-canned-sidebar">
-                  <div class="panel-heading panel-heading-compact">
-                    <div>
-                      <p class="panel-tag">快速工具</p>
-                      <h2>常見罐頭回覆</h2>
-                    </div>
-                    <p>方便直接複製貼上回覆貼文</p>
-                  </div>
-                  <div class="bookshelf-reply-grid bookshelf-canned-grid">
-                    {cannedReplies.map((reply) => (
-                      <article class="bookshelf-reply-card bookshelf-canned-card bookshelf-canned-card-priority">
-                        <span>{reply.category}</span>
-                        <strong>{reply.promptTitle}</strong>
-                        <em>{reply.promptHint}</em>
-                        <p>{reply.message}</p>
-                        <div class="bookshelf-actions bookshelf-canned-actions">
-                          <button
-                            type="button"
-                            class="bookshelf-action bookshelp-action-primary"
-                            data-canned-reply-copy-button
-                            data-canned-reply-copy={reply.message}
-                            data-canned-reply-label={reply.promptTitle}
-                          >
-                            複製這則
-                          </button>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </section>
+                <SocialOpsCannedReplies replies={cannedReplies} />
               </aside>
             </div>
 
@@ -1173,45 +1146,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     : <p class="bookshelf-confirm-note">目前尚無可用的送審 Top 3 候選。</p>}
                 </div>
               </section>
-              <section class="bookshelf-prompt-library">
-                <div class="bookshelf-preview-head">
-                  <p>提示詞專區</p>
-                  <span>已上移到高頻區，進入內容台後可先做舊文審計、自評或複製常用高階 prompt，再直接接續生文。</span>
-                </div>
-                <div class="bookshelf-prompt-library-grid">
-                  {promptLibraryEntries.map((entry) => (
-                    <article class="bookshelf-prompt-library-card">
-                      <div class="bookshelf-prompt-library-meta">
-                        <span>{entry.category}</span>
-                        <strong>{entry.title}</strong>
-                        <em>{entry.hint}</em>
-                        <p>{entry.note}</p>
-                      </div>
-                      <div class="bookshelf-pro-prompt-body">
-                        <label class="gemini-field bookshelf-prompt-field">
-                          <span>可直接送高階 LLM 的 prompt</span>
-                          <textarea
-                            id={`prompt-library-content-${entry.id}`}
-                            class="bookshelf-pro-prompt-content bookshelf-prompt-library-content"
-                            rows="16"
-                            readonly
-                          >{entry.prompt}</textarea>
-                        </label>
-                        <div class="bookshelf-actions bookshelf-confirm-actions">
-                          <button
-                            type="button"
-                            id={`copy-prompt-library-${entry.id}`}
-                            class="bookshelf-action bookshelp-action-primary"
-                          >
-                            複製這份提示詞
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-                <p id="prompt-library-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
-              </section>
+              <SocialOpsPromptLibrary entries={promptLibraryEntries} />
               <section class="bookshelf-review-composer">
                 <div class="bookshelf-preview-head">
                   <p>高頻生文起稿台</p>
@@ -2610,6 +2545,87 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
   }
 
+  function getArticleNoteMetaValue(noteText = "", label = "") {
+    if (!noteText || !label) return "";
+    const prefix = `${label}：`;
+    return noteText
+      .split("\n")
+      .map((line) => line.trim())
+      .find((line) => line.startsWith(prefix))
+      ?.slice(prefix.length)
+      .trim() || "";
+  }
+
+  function buildArticleNoteReplyTemplate(note = createArticleNoteTemplate()) {
+    const submitterName = getArticleNoteMetaValue(note.note, "稱呼");
+    const contactInfo = getArticleNoteMetaValue(note.note, "聯絡方式");
+    const detail = getArticleNoteMetaValue(note.note, "補充背景");
+    const salutation = submitterName ? `${submitterName} 您好：` : "您好：";
+    const lines = [
+      "【客戶提問回覆草稿】",
+      `文章：${note.articleTitle || "未綁定文章"}`,
+      `問題：${note.question || "未填寫問題"}`,
+      detail ? `補充背景：${detail}` : "補充背景：未提供",
+      contactInfo ? `聯絡方式：${contactInfo}` : "聯絡方式：未提供",
+      "",
+      salutation,
+      `收到你針對「${note.question || "這篇文章"}」的提問。`,
+      "青曦已先記下這個問題，會依情境評估是否補進文章、FAQ 或直接整理成回覆建議。",
+      "若這題已補充進文章內容，我也會再主動通知你。",
+      "",
+      "回覆重點：",
+      "1. ",
+      "2. ",
+      "3. ",
+    ];
+    return lines.join("\n");
+  }
+
+  async function copyArticleNoteReplyTemplate(note = createArticleNoteTemplate()) {
+    const text = buildArticleNoteReplyTemplate(note);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setArticleNoteFeedback("已複製回覆版型，原問題與聯絡資訊已自動帶入。", "is-success");
+        return "clipboard";
+      }
+    } catch (error) {
+      console.error("文章提問回覆版型自動複製失敗：", error);
+    }
+
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.top = "-9999px";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      const copied = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      if (copied) {
+        setArticleNoteFeedback("已複製回覆版型，原問題與聯絡資訊已自動帶入。", "is-success");
+        return "clipboard";
+      }
+    } catch (error) {
+      console.error("文章提問回覆版型備援複製失敗：", error);
+    }
+
+    try {
+      window.prompt("請手動複製以下回覆版型", text);
+      setArticleNoteFeedback("已開啟手動複製視窗，原問題與聯絡資訊已帶入。", "is-warning");
+      return "manual";
+    } catch (error) {
+      console.error("文章提問回覆版型手動複製視窗開啟失敗：", error);
+    }
+
+    setArticleNoteFeedback("複製回覆版型失敗，請稍後再試。", "is-warning");
+    return "failed";
+  }
+
   function resetArticleNoteForm(preselectedSlug = articleNoteArticleFilter || getArticleQuestionPresetSlug()) {
     applyArticleNoteToForm({
       ...createArticleNoteTemplate(),
@@ -2793,6 +2809,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     ${note.articleUrl
                       ? `<a class="vendor-note-action-link" href="${escapeHtml(note.articleUrl)}" target="_blank" rel="noreferrer">前往文章</a>`
                       : '<span class="vendor-note-action-link is-disabled">無文章</span>'}
+                    <button type="button" class="vendor-note-mini-btn" data-article-note-action="copy-reply" data-article-note-id="${escapeHtml(note.id)}">複製回覆版型</button>
                     <button type="button" class="vendor-note-mini-btn" data-article-note-action="edit" data-article-note-id="${escapeHtml(note.id)}">編輯</button>
                     <button type="button" class="vendor-note-mini-btn" data-article-note-action="pin" data-article-note-id="${escapeHtml(note.id)}">${note.isPinned ? "取消優先" : "優先"}</button>
                     <button type="button" class="vendor-note-mini-btn vendor-note-mini-btn-danger" data-article-note-action="delete" data-article-note-id="${escapeHtml(note.id)}">刪除</button>
@@ -11305,6 +11322,11 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const action = actionButton.dataset.articleNoteAction;
     const currentNote = (articleNotesState.items || []).find((entry) => entry.id === noteId);
     if (!noteId || !action || !currentNote) return;
+
+    if (action === "copy-reply") {
+      await copyArticleNoteReplyTemplate(currentNote);
+      return;
+    }
 
     if (action === "edit") {
       applyArticleNoteToForm(currentNote);
