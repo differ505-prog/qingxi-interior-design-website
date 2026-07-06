@@ -1,49 +1,19 @@
 ---
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
-import { getStaticBlogPost } from "../../lib/blog-catalog";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
 
-const articleMeta = getStaticBlogPost("old-house-rewiring-and-electrical-safety");
-const articleTitle = articleMeta.title;
-const articleDescription = articleMeta.summary;
-const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
-const articleImage = articleMeta.coverImage;
+const { articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "old-house-rewiring-and-electrical-safety",
+  {
+    includeEditorialRefreshStamp: true,
+  },
+);
 const articleDetailImage = "/images/blog/old-house-rewiring-and-electrical-safety-detail.png";
 const articleSceneImage = "/images/blog/old-house-rewiring-and-electrical-safety-scene.png";
-const articleStructuredData = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: articleTitle,
-    description: articleDescription,
-    image: [articleImage],
-    datePublished: articlePublishedTime,
-    dateModified: articlePublishedTime,
-    articleSection: articleMeta.track,
-    keywords: articleMeta.tags.join(", "),
-    author: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    mainEntityOfPage: "https://qingxidesign.tw/blog/old-house-rewiring-and-electrical-safety",
-  },
-];
 ---
 <EditorialArticleLayout
-  title={articleTitle}
-  description={articleDescription}
-  ogImage={articleImage}
-  publishedTime={articlePublishedTime}
-  modifiedTime={articlePublishedTime}
+  {...articleLayoutProps}
   structuredData={articleStructuredData}
-  track={articleMeta.track}
-  chapter={articleMeta.chapter}
-  siteCategory={articleMeta.siteCategory}
-  tags={articleMeta.tags}
-  editorialRefreshStamp={articleMeta.editorialRefreshStamp}
 >
   <p class="article-lead">
     面對老屋翻新，多數屋主最先浮現的疑問往往不是風格，而是範圍與預算。真正成熟的判斷，從來不只看表面有沒有老舊，而是先看空間最核心的基礎系統，是否還能安全承接未來十年到二十年的生活。
@@ -154,7 +124,7 @@ const articleStructuredData = [
 
   <div class="article-insight-panel article-insight-panel-secondary">
     <p class="article-insight-label">配置基準</p>
-    <h3 class="article-insight-title">以下不是保證報價或單一法規答案，而是老屋翻新時用來建立尺度感的保守配置原則。</h3>
+    <h3 class="article-insight-title">以下不是保證報價或單一法規答案，<br class="hidden md:block" />而是用來建立尺度感的保守配置原則</h3>
     <p>
       實際仍要依設備額定功率、110V / 220V 條件、迴路分配與屋內總電量回推。若設備型號尚未定案，也應先預留專用迴路與管徑彈性，避免完工後再拆改。
     </p>

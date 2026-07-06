@@ -1,56 +1,23 @@
 ---
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
-import { getStaticBlogPost } from "../../lib/blog-catalog";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
 
-const articleMeta = getStaticBlogPost("old-house-renovation-scope-guide");
-const articleTitle = articleMeta.title;
-const articleDescription = articleMeta.summary;
-const articlePublishedTime = "2026-06-29T22:30:00.000Z";
-const articleModifiedTime = "2026-07-02T00:00:00+08:00";
-const articleImage = articleMeta.coverImage;
+const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "old-house-renovation-scope-guide",
+  {
+    publishedTime: "2026-06-29T22:30:00.000Z",
+    modifiedTime: "2026-07-02T00:00:00+08:00",
+    includePublisherLogo: true,
+    includeEditorialRefreshStamp: true,
+  },
+);
 const articleDetailImage = "/images/blog/old-house-renovation-scope-guide-detail.png";
 const articleSceneImage = "/images/blog/old-house-renovation-scope-guide-scene.png";
-
-const articleStructuredData = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: articleTitle,
-    description: articleDescription,
-    image: [`https://qingxidesign.tw${articleImage}`],
-    datePublished: articlePublishedTime,
-    dateModified: articleModifiedTime,
-    author: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://qingxidesign.tw/images/logo.png",
-      },
-    },
-    articleSection: articleMeta.track,
-    keywords: articleMeta.tags.join(", "),
-    mainEntityOfPage: "https://qingxidesign.tw/blog/old-house-renovation-scope-guide",
-  },
-];
 ---
 
 <EditorialArticleLayout
-  title={articleTitle}
-  description={articleDescription}
-  ogImage={articleImage}
-  publishedTime={articlePublishedTime}
-  modifiedTime={articleModifiedTime}
+  {...articleLayoutProps}
   structuredData={articleStructuredData}
-  track={articleMeta.track}
-  chapter={articleMeta.chapter}
-  siteCategory={articleMeta.siteCategory}
-  tags={articleMeta.tags}
-  editorialRefreshStamp={articleMeta.editorialRefreshStamp}
 >
   <p class="article-lead">
     老屋翻新是一場資源分配的精準考驗。面對有限的預算，真正需要被先確認的，不是想做多少，而是哪些問題若不先處理，未來會直接影響安全、返工成本與生活安定度。
@@ -62,7 +29,7 @@ const articleStructuredData = [
 
   <div class="article-insight-panel">
     <p class="article-insight-label">判斷骨架</p>
-    <h3 class="article-insight-title">先穩定基礎體質，再回看生活軌跡，最後才用 Need vs Want 收斂預算。</h3>
+    <h3 class="article-insight-title">先穩定基礎體質，再回看生活軌跡，<br class="hidden md:block" />最後才用 Need vs Want 收斂預算</h3>
     <p>
       只要順序顛倒，最常見的後果就是把預算花在表面更新，卻把真正影響未來二十年安定度的基礎問題留到入住後才返工。
     </p>
