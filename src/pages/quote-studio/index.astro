@@ -844,23 +844,23 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
     }
 
     if (payload.assumptions.workMethod?.value === "concealed" && payload.assumptions.restorationScope?.value === "not_included") {
-      reminders.push("目前選擇暗管配置，但修補範圍設定為未含牆面修補，建議先與客戶確認是否接受後續另估。");
+      reminders.push("目前選擇暗管配置，但修補範圍設定為未含牆面修補，須與客戶確認後續另估。");
     }
 
     if ((itemIds.has("demolition-basic") || itemIds.has("waste-bag")) && payload.assumptions.cleanupScope?.value === "none") {
-      reminders.push("已有拆除或清運工項，但目前設定未含完工清潔，建議先與客戶說明粗清或細清是否另列。");
+      reminders.push("已有拆除或清運工項，但目前設定未含完工清潔，須與客戶說明粗清或細清是否另列。");
     }
 
     if (payload.assumptions.cleanupScope?.value === "basic_clean") {
-      reminders.push("目前設定為含基本粗清，建議在送客戶前明說『未達可直接入住之細清標準』，降低交屋期待落差。");
+      reminders.push("目前設定為含基本粗清，須說明『未達可直接入住之細清標準』。");
     }
 
     if (payload.assumptions.cleanupScope?.value === "fine_clean" && !itemIds.has("final-fine-clean")) {
-      reminders.push("目前設定為含細部清潔，但尚未列完工細部清潔工項，建議補列以免客戶版總價未反映交屋細清成本。");
+      reminders.push("目前設定為含細部清潔，但尚未列完工細部清潔工項，須補列以免客戶版總價未反映交屋細清成本。");
     }
 
     if (itemIds.has("floor-spc") && !itemIds.has("self-leveling") && !itemIds.has("floor-screed")) {
-      reminders.push("已有 SPC 地板，但尚未列自平泥或地坪整平工項；若現場高低差較大，建議先補列整平成本或提前註明另計。");
+      reminders.push("已有 SPC 地板，但尚未列自平泥或地坪整平工項；若現場高低差較大，須補列整平成本或提前註明另計。");
     }
 
     if (!parseNumber(state.fees.designFee) && !(payload.totals.managementFee > 0)) {

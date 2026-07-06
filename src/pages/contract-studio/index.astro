@@ -265,7 +265,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
               <li>客戶可在手機上手寫簽名</li>
               <li>簽署頁可列印或另存 PDF</li>
               <li>保留簽署時間與裝置摘要</li>
-              <li>可先防堵尾款未清就提前入住的風險</li>
+              <li>防堵尾款未清就提前入住的風險</li>
               <li>後續可再補 OTP 與更高證據力存證</li>
             </ul>
           </section>
@@ -900,9 +900,6 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
         <span>指定代理人</span>
         <strong>${state.meta.projectAgentName || "未填寫"}</strong>
       </div>
-      <p class="summary-note">
-        若付款比例未滿 100%，或完整身分識別、送達地址、緊急聯絡人、退款帳戶、附件版次與材料規格仍未補齊，簽署頁雖可開啟，但建議先補正後再分享給客戶。
-      </p>
     `;
     applyShareValidationState();
     if (!getShareReadinessIssues().length) {

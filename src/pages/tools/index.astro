@@ -516,7 +516,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               >
                 先帶著結果諮詢
               </a>
-              <p class="estimator-handoff-note">結果可先保留，稍後再繼續</p>
             </div>
           </div>
 
@@ -662,7 +661,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 {
                   !estimatorFeedbackEnabled && (
                     <div class="feedback-status" role="status">
-                      <p>問題回報收件尚未完成設定，目前可先透過下方聯絡方式或官方 LINE 告知青曦。</p>
+                      <p>問題回報收件尚未完成設定，請透過下方聯絡方式或官方 LINE 告知青曦。</p>
                     </div>
                   )
                 }
@@ -745,7 +744,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         <div class="faq-header">
           <div>
             <h2>常見問題</h2>
-            <p>使用前可先參考這幾個要點。</p>
           </div>
           <button
             type="button"
@@ -2778,9 +2776,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     }
 
     if (timeline.value === "urgent") {
-      adviceItems.push("預計時程較趕，建議盡快整理現場照片、尺寸與交屋時間，避免後續排程壓縮。");
+      adviceItems.push("預計時程較趕，須儘快整理現場照片、尺寸與交屋時間，避免後續排程壓縮。");
     } else {
-      adviceItems.push("時程仍有彈性，可先把需求表填完整，讓設計討論更聚焦也更容易抓準預算。");
+      adviceItems.push("時程仍有彈性，填寫完整需求表可讓設計討論更聚焦。");
     }
 
     if (hasSelectedItem("bathroom") && bathroomCount?.value === "two") {
