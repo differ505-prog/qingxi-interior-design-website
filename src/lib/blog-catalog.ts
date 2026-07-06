@@ -147,17 +147,17 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     coverImage: "/images/blog/old-house-demolition-masonry-cover.png",
   },
   {
-    title: "啟動老屋翻新之前：精準盤點屋況的 5 個核心判斷點",
+    title: "老屋翻新啟動前：精準盤點屋況的 5 個核心判斷點與硬指標",
     slug: "old-house-condition-assessment-guide",
     date: "2026-06-18",
     summary:
-      "整理老屋翻新啟動前最該優先確認的五個屋況判斷點，從結構、防水、水電到採光與隔音，幫助預算與設計決策更有依據。",
+      "老屋翻新決定成敗的是隱藏在牆體之下的體質。本文解析結構裂縫、台電申請安培數、專用迴路、鋁窗水密與樓板隔音地墊等五大核心硬指標，並附上工班初勘對話檢核表。",
     siteCategory: "老屋翻新",
     category: "老屋翻新",
     track: "老屋翻新系",
     chapter: "現況判讀",
     subchapter: "屋況盤點",
-    tags: ["老屋翻新", "屋況盤點", "結構防水", "水電管線", "採光通風", "隔音"],
+    tags: ["老屋翻新", "屋況盤點", "結構裂縫", "水電更新", "氣密窗", "樓板隔音", "檢核表"],
     coverImage: "/images/blog/old-house-condition-assessment-cover.png",
   },
   {
