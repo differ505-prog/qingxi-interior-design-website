@@ -1095,7 +1095,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
   function submitQuoteItems() {
     const payload = buildQuotePayload();
     if (!payload.items.length) {
-      window.alert("請先至少勾選一個工項，再提交送出。");
+      window.alert("請至少勾選一個工項再提交");
       return;
     }
 

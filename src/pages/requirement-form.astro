@@ -111,7 +111,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
       {
         submitError && (
           <div class="form-status-notice" role="alert">
-            <p>表單送出時沒有成功轉交，請稍後再試一次；若持續失敗，可先透過官方 LINE 聯絡青曦。</p>
+            <p>表單送出時沒有成功轉交，請稍後再試一次；持續失敗可透過官方 LINE 聯絡青曦。</p>
           </div>
         )
       }
@@ -126,7 +126,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
         {
           !requirementFormEnabled && (
             <div class="form-status-notice" role="status">
-              <p>表單收件尚未完成設定，目前請先透過官方 LINE 聯絡青曦，我們會協助你接續諮詢。</p>
+              <p>表單收件尚未完成設定，目前請透過官方 LINE 聯絡青曦。</p>
             </div>
           )
         }
@@ -1788,7 +1788,7 @@ const submitError = Astro.url.searchParams.get('submit_error') === '1';
       requirementForm?.addEventListener('submit', function(event) {
         if (!validatePrimaryContact(event)) return;
         event.preventDefault();
-        window.alert('表單收件尚未完成設定，請先透過官方 LINE 聯絡青曦。');
+        window.alert('表單收件尚未完成設定，請透過官方 LINE 聯絡青曦');
       });
     } else {
       requirementForm?.addEventListener('submit', function(event) {

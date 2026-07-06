@@ -101,7 +101,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       list.hidden = false;
     } catch (error) {
       console.error("讀取已簽合約清單失敗：", error);
-      empty.textContent = "目前無法讀取已簽合約清單，請稍後再試"
+      empty.textContent = "無法讀取已簽合約清單，請稍後再試";
       empty.hidden = false;
     }
   }
