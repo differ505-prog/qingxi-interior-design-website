@@ -13,7 +13,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <div>
           <p class="records-eyebrow">SIGNED CONTRACT ARCHIVE</p>
           <h1>已簽合約</h1>
-          <p>客戶完成簽署後，永久留存的合約會顯示在這裡。</p>
+          <p>客戶完成簽署後，永久留存的合約會顯示在這裡</p>
         </div>
         <div class="records-actions">
           <a href="/contract-studio" class="btn btn-secondary">返回合約工作台</a>
@@ -101,7 +101,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       list.hidden = false;
     } catch (error) {
       console.error("讀取已簽合約清單失敗：", error);
-      empty.textContent = "目前無法讀取已簽合約清單，請稍後再試。";
+      empty.textContent = "目前無法讀取已簽合約清單，請稍後再試"
       empty.hidden = false;
     }
   }

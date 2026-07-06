@@ -63,7 +63,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
           <section class="studio-card">
             <div class="section-heading">
               <h2>案件基本資訊</h2>
-              <p>這些內容會直接出現在客戶看到的估價頁。</p>
+              <p>直接出現在客戶看到的估價頁</p>
             </div>
             <div class="form-grid">
               <label class="field">
@@ -179,7 +179,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
           <section class="studio-card">
             <div class="section-heading">
               <h2>預設單價資料庫</h2>
-              <p>先依工種調整平常常用的基準值，下面案件工項會自動跟著更新。</p>
+              <p>依工種調整常用基準值，案件工項會自動更新</p>
             </div>
             <div class="default-trade-groups">
               {quoteCategories.map((category) => {
@@ -190,7 +190,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
                   <section class="default-trade-group">
                     <header class="trade-group-header">
                       <h3>{category.label}</h3>
-                      <p>這一區可集中調整此工種常用的預設單價。</p>
+                      <p>集中調整此工種常用的預設單價</p>
                     </header>
                     <div class="default-price-grid">
                       {items.map((item) => (
@@ -222,7 +222,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
             <div class="section-heading with-action">
               <div>
                 <h2>本案工項</h2>
-                <p>依工種分區整理要報給客戶的工項，需要特殊價格時直接填寫「本案改價」。</p>
+                <p>依工種分區整理要報給客戶的工項</p>
               </div>
               <div class="section-actions">
                 <button type="button" id="select-all-template-items" class="btn btn-secondary">全選工項</button>
@@ -240,7 +240,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
                   <section class="trade-group">
                     <header class="trade-group-header">
                       <h3>{category.label}</h3>
-                      <p>這一區可集中處理同工種項目與本案改價。</p>
+                      <p>集中處理同工種項目與本案改價</p>
                     </header>
                     <div class="table-shell">
                       <table class="quote-table">
@@ -300,7 +300,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
               <section class="trade-group">
                 <header class="trade-group-header">
                   <h3>自訂工項</h3>
-                  <p>若這案有模板外工項，可在這裡另外補上。</p>
+                  <p>模板外工項可在這裡另外補上</p>
                 </header>
                 <div class="table-shell">
                   <table class="quote-table">
@@ -325,7 +325,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
           <section class="studio-card">
             <div class="section-heading">
               <h2>附加費用與條款</h2>
-              <p>設計費、管理費、調整額與條款都可當案修改。</p>
+              <p>設計費、管理費、調整額與條款</p>
             </div>
 
             <div class="form-grid">

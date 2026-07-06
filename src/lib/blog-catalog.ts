@@ -7,6 +7,7 @@ import {
   normalizeTagList,
   normalizeTrack,
 } from "./content-taxonomy";
+import { SITE_NAME, SITE_ORIGIN } from "./site-metadata";
 
 export interface BlogCatalogPost {
   title: string;
@@ -21,6 +22,37 @@ export interface BlogCatalogPost {
   tags: string[];
   coverImage: string;
   editorialRefreshStamp?: string;
+}
+
+interface StaticBlogArticlePageOptions {
+  publishedTime?: string;
+  modifiedTime?: string;
+  includePublisherLogo?: boolean;
+  includeEditorialRefreshStamp?: boolean;
+}
+
+interface StaticBlogArticleLayoutProps {
+  title: string;
+  description: string;
+  ogImage: string;
+  publishedTime: string;
+  modifiedTime: string;
+  track: string;
+  chapter: string;
+  siteCategory: string;
+  tags: string[];
+  editorialRefreshStamp?: string;
+}
+
+export interface StaticBlogArticlePageData {
+  articleMeta: BlogCatalogPost;
+  articleTitle: string;
+  articleDescription: string;
+  articleImage: string;
+  articlePublishedTime: string;
+  articleModifiedTime: string;
+  articleStructuredData: Record<string, unknown>[];
+  articleLayoutProps: StaticBlogArticleLayoutProps;
 }
 
 export const DEFAULT_BLOG_COVER_IMAGE =
@@ -129,6 +161,21 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     coverImage: "/images/blog/old-house-condition-assessment-cover.png",
   },
   {
+    title: "全室預算拆解：報價單判讀與超支預防指南",
+    slug: "full-room-renovation-budget-breakdown-and-quote-guide",
+    date: "2026-07-04",
+    summary:
+      "老屋翻新最常見的超支，往往源於對屋況判讀的輕忽與看不懂報價單的細節。本文從 15 至 20 年屋齡基準出發，拆解全室預算、整理隱蔽工程檢核重點與報價單關鍵字，協助在前期精準把控資源。",
+    siteCategory: "老屋翻新",
+    category: "老屋翻新",
+    track: "老屋翻新系",
+    chapter: "現況判讀",
+    subchapter: "迷思破解",
+    tags: ["老屋翻新", "裝修預算", "報價單判讀", "超支預防", "屋況盤點", "隱蔽工程"],
+    coverImage: "/images/blog/full-room-renovation-budget-breakdown-cover.png",
+    editorialRefreshStamp: "2026-07-04",
+  },
+  {
     title: "局部預算拆解：客廳天地壁與家具配置費用",
     slug: "living-room-partial-renovation-budget",
     date: "2026-06-17",
@@ -218,4 +265,94 @@ export function getStaticBlogPost(slug: string): BlogCatalogPost {
     throw new Error(`找不到靜態文章資料：${slug}`);
   }
   return post;
+}
+
+function resolveArticleTimestamp(value: string) {
+  return value.includes("T") ? value : `${value}T00:00:00+08:00`;
+}
+
+function toAbsoluteUrl(value: string) {
+  return value.startsWith("http://") || value.startsWith("https://")
+    ? value
+    : new URL(value, SITE_ORIGIN).toString();
+}
+
+export function getStaticBlogArticlePage(
+  slug: string,
+  {
+    publishedTime,
+    modifiedTime,
+    includePublisherLogo = false,
+    includeEditorialRefreshStamp = false,
+  }: StaticBlogArticlePageOptions = {},
+): StaticBlogArticlePageData {
+  const articleMeta = getStaticBlogPost(slug);
+  const articleTitle = articleMeta.title;
+  const articleDescription = articleMeta.summary;
+  const articleImage = articleMeta.coverImage;
+  const articlePublishedTime = publishedTime || resolveArticleTimestamp(articleMeta.date);
+  const articleModifiedTime =
+    modifiedTime ||
+    (articleMeta.editorialRefreshStamp
+      ? resolveArticleTimestamp(articleMeta.editorialRefreshStamp)
+      : articlePublishedTime);
+
+  const publisher: Record<string, unknown> = {
+    "@type": "Organization",
+    name: SITE_NAME,
+  };
+
+  if (includePublisherLogo) {
+    publisher.logo = {
+      "@type": "ImageObject",
+      url: toAbsoluteUrl("/images/logo.png"),
+    };
+  }
+
+  const articleStructuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: articleTitle,
+      description: articleDescription,
+      image: [toAbsoluteUrl(articleImage)],
+      datePublished: articlePublishedTime,
+      dateModified: articleModifiedTime,
+      articleSection: articleMeta.track,
+      keywords: articleMeta.tags.join(", "),
+      author: {
+        "@type": "Organization",
+        name: SITE_NAME,
+      },
+      publisher,
+      mainEntityOfPage: toAbsoluteUrl(`/blog/${slug}`),
+    },
+  ];
+
+  const articleLayoutProps: StaticBlogArticleLayoutProps = {
+    title: articleTitle,
+    description: articleDescription,
+    ogImage: articleImage,
+    publishedTime: articlePublishedTime,
+    modifiedTime: articleModifiedTime,
+    track: articleMeta.track,
+    chapter: articleMeta.chapter,
+    siteCategory: articleMeta.siteCategory,
+    tags: articleMeta.tags,
+  };
+
+  if (includeEditorialRefreshStamp && articleMeta.editorialRefreshStamp) {
+    articleLayoutProps.editorialRefreshStamp = articleMeta.editorialRefreshStamp;
+  }
+
+  return {
+    articleMeta,
+    articleTitle,
+    articleDescription,
+    articleImage,
+    articlePublishedTime,
+    articleModifiedTime,
+    articleStructuredData,
+    articleLayoutProps,
+  };
 }

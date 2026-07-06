@@ -185,6 +185,7 @@ const slides = fallbackSlides.map((item) => ({
     will-change: transform;
     transition: none;
     transform: var(--image-start-transform, scale(1.08));
+    background-color: var(--gray-dark);
   }
 
   .carousel-slide[data-state="active"] .carousel-image {
@@ -257,11 +258,11 @@ const slides = fallbackSlides.map((item) => ({
 
   .hero-copy h1 {
     margin: 0;
-    font-family: "Noto Serif TC", serif;
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
-    line-height: 1.2;
-    font-weight: 500;
-    letter-spacing: 0.06em;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 5.2rem);
+    line-height: 1.08;
+    font-weight: 400;
+    letter-spacing: 0.1em;
   }
 
   .hero-description {
@@ -319,15 +320,13 @@ const slides = fallbackSlides.map((item) => ({
 
   .hero-button-secondary {
     background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.42);
     color: var(--white);
     backdrop-filter: blur(10px);
-    box-shadow: 0 12px 22px rgba(20, 20, 20, 0.14);
+    box-shadow: 0 12px 22px rgba(20, 20, 20, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.18);
   }
 
   .hero-button-secondary:hover {
     background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.6);
   }
 
   .hero-highlights {
@@ -360,20 +359,17 @@ const slides = fallbackSlides.map((item) => ({
     text-decoration: none;
     color: var(--white);
     background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 20px;
     backdrop-filter: blur(16px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
     transition:
       transform 0.25s ease,
-      background-color 0.25s ease,
-      border-color 0.25s ease;
+      background-color 0.25s ease;
   }
 
   .hero-featured-card:hover {
     transform: translateY(-4px);
     background: rgba(255, 255, 255, 0.14);
-    border-color: rgba(115, 103, 94, 0.28);
   }
 
   .featured-label {
@@ -400,7 +396,6 @@ const slides = fallbackSlides.map((item) => ({
     top: 50%;
     transform: translateY(-50%);
     background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.24);
     color: white;
     width: 56px;
     height: 56px;
@@ -412,11 +407,11 @@ const slides = fallbackSlides.map((item) => ({
     align-items: center;
     justify-content: center;
     backdrop-filter: blur(8px);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   }
 
   .carousel-btn:hover {
     background: rgba(255, 255, 255, 0.22);
-    border-color: rgba(255, 255, 255, 0.4);
     transform: translateY(-50%) scale(1.08);
   }
 

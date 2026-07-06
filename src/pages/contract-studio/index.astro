@@ -59,7 +59,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>合約基本資訊</h2>
-              <p>這些內容會直接顯示在客戶簽署頁，建議與本案報價或材料確認表一致。</p>
+              <p>直接顯示在客戶簽署頁</p>
             </div>
             <div class="form-grid">
               <label class="field">
@@ -207,7 +207,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>付款節點</h2>
-              <p>第一版先用百分比分配，客戶頁會同步換算成金額。</p>
+              <p>百分比分配，客戶頁同步換算成金額</p>
             </div>
             <div id="payment-stage-list" class="payment-stage-list"></div>
           </section>
@@ -215,7 +215,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>核心條款</h2>
-              <p>先用常見的合約骨架整理，再依案件需要微調。</p>
+              <p>常見合約骨架，可依案件需要微調</p>
             </div>
             <div id="contract-section-list" class="contract-section-list"></div>
           </section>
@@ -223,7 +223,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>材料規格確認表</h2>
-              <p>把本案最容易吵的板材、五金、磁磚、玻璃、衛浴與清潔交付標準先鎖在同一份附件裡。</p>
+              <p>板材、五金、磁磚、衛浴與清潔交付標準</p>
             </div>
             <div id="material-spec-list" class="material-spec-list"></div>
           </section>
@@ -231,7 +231,7 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card">
             <div class="section-heading">
               <h2>簽署與留證設定</h2>
-              <p>目前可整理線上簽署內容、手機手寫簽名與簽署摘要留證；若案件需要更高證據力，可再補 OTP 與額外存證機制。</p>
+              <p>線上簽署、手機手寫簽名與簽署摘要留證</p>
             </div>
             <label class="field field-full">
               <span>簽署完成提醒</span>
@@ -272,11 +272,11 @@ const shortLinkStorageConfiguredJson = JSON.stringify(shortLinkStorageConfigured
           <section class="studio-card summary-card">
             <div class="section-heading">
               <h2>LLM 合約覆核</h2>
-              <p>可一鍵提取這份合約架構，交給 LLM 評分、抓風險與給改寫建議。</p>
+              <p>提取合約架構，交給 LLM 評分與抓風險</p>
             </div>
             <div class="llm-review-card">
               <strong id="llm-review-label">給 LLM 的合約覆核文字</strong>
-              <p id="llm-review-note">這段會帶出合約摘要、付款節點、條款與簽署留證設定，讓 LLM 直接用 10 分制評分與覆核。</p>
+              <p id="llm-review-note">合約摘要、付款節點、條款與留證設定</p>
               <textarea id="llm-review-output" class="llm-review-output" rows="14" readonly></textarea>
             </div>
           </section>

@@ -170,7 +170,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       <div class="calculator-header">
         <p class="eyebrow">RENOVATION ESTIMATOR</p>
         <h1>裝修估價器</h1>
-        <p class="subtitle">先抓出預算帶，判斷下一步。</p>
+        <p class="subtitle">先抓出預算帶，判斷下一步</p>
         <div class="calculator-lead-note">
           <span>快速試算預算帶</span>
           <span>結果可直接帶入需求表</span>
@@ -185,7 +185,6 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         <section class="landing-card">
           <div class="landing-card-header">
             <h2>適合現在先判斷</h2>
-            <p>前期先試算就夠了。</p>
           </div>
           <div class="landing-points">
             <div class="landing-point">
@@ -338,7 +337,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
         <div class="form-section">
           <h2>細部條件</h2>
-          <p class="form-section-note">只補最影響第一層估價判讀的 6 個分支；若未勾對應工項，欄位會自動停用。</p>
+          <p>只補最影響估價判讀的 6 個分支</p>
 
           <div class="detail-grid">
             <div class="form-group detail-group" data-detail-for="bathroom">
@@ -462,7 +461,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="breakdown-card">
             <div class="breakdown-header">
               <h3>工程拆解</h3>
-                <p>目前工項比例。</p>
+                <p>目前工項比例</p>
             </div>
             <div class="breakdown-list" id="breakdown-list"></div>
           </div>
@@ -471,14 +470,14 @@ const renovationItemsJson = JSON.stringify(renovationItems);
             <div class="advice-card">
               <div class="advice-header">
                 <h3>估算判讀</h3>
-                <p>先看 2 個重點。</p>
+                <p>估算重點摘要</p>
               </div>
               <ul class="advice-list" id="advice-list"></ul>
             </div>
             <div class="advice-card advice-card-accent">
               <div class="advice-header">
                 <h3>建議下一步</h3>
-                <p id="next-step-intro">直接看下一步。</p>
+                <p id="next-step-intro">下一步參考</p>
               </div>
               <div class="next-step-points" id="next-step-points"></div>
             </div>
@@ -489,16 +488,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               <p class="estimator-handoff-eyebrow">BEST NEXT STEP</p>
               <h3 id="estimator-handoff-title">下一步：帶著估算填需求表</h3>
               <p id="estimator-handoff-description" class="estimator-handoff-description">
-                再補需求、照片與時程，青曦就能接著判斷。
+                再補需求、照片與時程，青曦就能接著判斷
               </p>
               <div class="estimator-handoff-points">
                 <div class="estimator-handoff-point">
                   <strong>不需要重填估算結果</strong>
-                  <span>這次試算摘要會一起帶進需求表。</span>
+                  <span>試算摘要會一起帶進需求表</span>
                 </div>
                 <div class="estimator-handoff-point">
                   <strong id="estimator-handoff-point-title">這一步最有效率</strong>
-                  <span id="estimator-handoff-point-description">有預算方向後，直接整理需求。</span>
+                  <span id="estimator-handoff-point-description">有預算方向後，直接整理需求</span>
                 </div>
               </div>
             </div>
@@ -517,33 +516,33 @@ const renovationItemsJson = JSON.stringify(renovationItems);
               >
                 先帶著結果諮詢
               </a>
-              <p class="estimator-handoff-note">只想先抓範圍，也可先保留結果。</p>
+              <p class="estimator-handoff-note">結果可先保留，稍後再繼續</p>
             </div>
           </div>
 
           <div class="report-offer-card">
             <div class="report-offer-copy">
               <p class="report-offer-eyebrow">ESTIMATE FOLLOW-UP</p>
-              <h3>想更看懂這次試算，可直接索取拆解報告。</h3>
+              <h3>索取這次試算的拆解報告</h3>
               <p class="report-offer-description">
-                青曦會接著整理這次試算的拆解方向。
+                預算帶、主要工項與初步判讀
               </p>
               <div class="report-offer-points">
                 <div class="report-offer-point">
                   <strong>這份報告會帶到的重點</strong>
-                  <span>預算帶、主要工項與初步判讀。</span>
+                  <span>預算帶、主要工項與初步判讀</span>
                 </div>
                 <div class="report-offer-point">
                   <strong>適合目前這種前期階段</strong>
-                  <span id="report-context">特別適合正在抓新成屋或住宅裝修預算方向的人。</span>
+                  <span id="report-context">適合正在抓新成屋或住宅裝修預算方向的人</span>
                 </div>
               </div>
             </div>
 
             <div class="report-offer-actions">
               <div class="report-form-intro">
-                <strong>想直接拿這次的拆解方向</strong>
-                <p>留下姓名與 Line / Email，青曦會接著整理。</p>
+                <strong>索取方式</strong>
+                <p>留下姓名與 Line / Email</p>
               </div>
               {
                 !estimatorLeadEnabled && (
@@ -627,10 +626,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="feedback-card" id="feedback-form">
             <div class="feedback-card-header">
               <div class="feedback-card-copy">
-                <p class="feedback-eyebrow">需要協助</p>
-                <h3>如果這次試算和你的預期有落差，我們可以再幫你看一次。</h3>
+                <p class="feedback-eyebrow">估價落差回報</p>
+                <h3>試算結果與預期有落差嗎</h3>
                 <p class="feedback-description">
-                  留下你覺得不確定的地方，我們會連同這次試算內容一起確認。
+                  留下不确定的地方，會连同试算内容一起确认
                 </p>
               </div>
               <button
@@ -746,7 +745,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
         <div class="faq-header">
           <div>
             <h2>常見問題</h2>
-            <p>如果你想先了解這份試算怎麼看，可以先看這幾個常見問題。</p>
+            <p>使用前可先參考這幾個要點。</p>
           </div>
           <button
             type="button"
@@ -779,20 +778,21 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
 <style>
   .calculator-container {
-    padding: 4.75rem 1.5rem 5rem;
+    padding: clamp(4.75rem, 7vw, 6.8rem) 1.5rem 5.75rem;
     background:
-      radial-gradient(circle at top left, rgba(159, 147, 136, 0.05), transparent 24%),
+      radial-gradient(circle at top left, rgba(159, 147, 136, 0.07), transparent 24%),
+      radial-gradient(circle at top right, rgba(164, 193, 191, 0.08), transparent 26%),
       linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(243, 237, 231, 1) 100%);
   }
 
   .calculator-wrapper {
-    max-width: 960px;
+    max-width: 1040px;
     margin: 0 auto;
   }
 
   .calculator-header {
     text-align: center;
-    margin-bottom: 2.4rem;
+    margin-bottom: 3rem;
   }
 
   .calculator-lead-note {
@@ -800,24 +800,25 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     justify-content: center;
     flex-wrap: wrap;
     gap: 0.8rem;
-    margin-top: 1.25rem;
+    margin-top: 1.35rem;
   }
 
   .calculator-lead-note span {
-    padding: 0.65rem 0.95rem;
+    padding: 0.6rem 0.95rem;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(115, 103, 94, 0.16);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(115, 103, 94, 0.12);
     color: var(--gray-dark);
-    box-shadow: 0 10px 20px rgba(47, 47, 47, 0.04);
-    font-size: 0.92rem;
+    box-shadow: 0 10px 20px rgba(47, 47, 47, 0.03);
+    font-size: 0.88rem;
+    letter-spacing: 0.04em;
   }
 
   .hero-actions {
     display: flex;
     justify-content: center;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: 1.8rem;
   }
 
   .eyebrow {
@@ -832,43 +833,44 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .calculator-header h1 {
     margin: 0;
     font-family: var(--font-serif);
-    font-size: clamp(2.3rem, 4vw, 4rem);
+    font-size: clamp(2.9rem, 6vw, 5.4rem);
     font-weight: 600;
     color: var(--gray-darkest);
-    line-height: 1.22;
-    letter-spacing: 0.022em;
+    line-height: 1.08;
+    letter-spacing: 0.01em;
   }
 
   .subtitle {
     max-width: 40rem;
-    margin: 1rem auto 0;
-    color: var(--gray-medium);
-    font-size: 1.01rem;
-    line-height: 1.84;
-    letter-spacing: 0.008em;
+    margin: 1.1rem auto 0;
+    color: color-mix(in srgb, var(--gray-dark) 62%, white 38%);
+    font-size: 1rem;
+    line-height: 1.92;
+    letter-spacing: 0.012em;
   }
 
   .calculator-form {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 32px;
-    padding: 2.1rem;
-    box-shadow: 0 28px 60px rgba(47, 47, 47, 0.06);
-    border: 1px solid rgba(115, 103, 94, 0.16);
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(24px);
+    border-radius: 34px;
+    padding: 2.35rem;
+    box-shadow: 0 30px 70px rgba(47, 47, 47, 0.06);
+    border: 1px solid rgba(115, 103, 94, 0.12);
   }
 
   .landing-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 1.1rem;
+    margin-bottom: 1.9rem;
   }
 
   .landing-card {
-    padding: 1.5rem;
-    border-radius: 26px;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(115, 103, 94, 0.16);
-    box-shadow: 0 20px 36px rgba(47, 47, 47, 0.05);
+    padding: 1.55rem;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.76);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+    box-shadow: 0 18px 34px rgba(47, 47, 47, 0.04);
   }
 
   .landing-card-accent {
@@ -903,8 +905,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .landing-point {
     padding: 1rem 1.05rem;
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.84);
-    border: 1px solid rgba(115, 103, 94, 0.12);
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(115, 103, 94, 0.1);
   }
 
   .landing-point strong,
@@ -924,11 +926,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .form-section {
-    margin-bottom: 1.5rem;
-    padding: 1.6rem;
-    border-radius: 24px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 249, 248, 1) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.12);
+    margin-bottom: 1.65rem;
+    padding: 1.7rem;
+    border-radius: 26px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 249, 248, 0.98) 100%);
+    border: 1px solid rgba(115, 103, 94, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
   }
 
   .form-section:last-child {
@@ -936,7 +939,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .form-section h2 {
-    margin: 0 0 1.25rem;
+    margin: 0 0 1.3rem;
+    padding-top: 0.95rem;
+    position: relative;
     font-family: var(--font-serif);
     font-size: 1.45rem;
     color: var(--gray-darkest);
@@ -945,15 +950,26 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     line-height: 1.42;
   }
 
+  .form-section h2::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3.25rem;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(115, 103, 94, 0.36), rgba(115, 103, 94, 0));
+  }
+
   .form-group {
-    margin-bottom: 1.1rem;
+    margin-bottom: 1.18rem;
   }
 
   .form-group label {
     display: block;
     margin-bottom: 0.55rem;
     font-weight: 500;
-    color: var(--gray-dark);
+    color: color-mix(in srgb, var(--gray-dark) 82%, white 18%);
+    letter-spacing: 0.015em;
   }
 
   .form-section-note {
@@ -965,9 +981,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .field-help {
     margin: 0.55rem 0 0;
-    color: var(--gray-medium);
-    line-height: 1.7;
-    font-size: 0.9rem;
+    color: color-mix(in srgb, var(--gray-medium) 88%, white 12%);
+    line-height: 1.76;
+    font-size: 0.89rem;
   }
 
   .detail-grid {
@@ -1083,39 +1099,53 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .result-section {
-    margin-top: 1.5rem;
-    padding: 2rem;
-    border-radius: 28px;
+    margin-top: 2rem;
+    padding: 2.35rem;
+    position: relative;
+    border-radius: 30px;
     background:
-      radial-gradient(circle at top right, rgba(159, 147, 136, 0.07), transparent 28%),
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.05), transparent 28%),
       linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.16);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+  }
+
+  .result-section::before {
+    content: "";
+    position: absolute;
+    top: 1.35rem;
+    left: 2.35rem;
+    width: 3.25rem;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(115, 103, 94, 0.34), rgba(115, 103, 94, 0));
   }
 
   .result-section h2 {
     margin-bottom: 1.2rem;
+    padding-top: 0.9rem;
   }
 
   .result-subtitle {
-    margin: -0.4rem 0 1.25rem;
-    color: var(--gray-medium);
-    line-height: 1.8;
+    margin: -0.35rem 0 1.55rem;
+    color: color-mix(in srgb, var(--gray-medium) 90%, white 10%);
+    line-height: 1.86;
+    max-width: 30rem;
   }
 
   .result-card {
     background: rgba(255, 255, 255, 0.92);
-    padding: 1.5rem;
-    border-radius: 22px;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
+    padding: 1.7rem;
+    border-radius: 26px;
+    margin-bottom: 1.7rem;
+    box-shadow: 0 18px 30px rgba(47, 47, 47, 0.03);
+    border: 1px solid rgba(115, 103, 94, 0.08);
   }
 
   .result-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(47, 47, 47, 0.08);
+    align-items: flex-end;
+    padding: 1.05rem 0;
+    border-bottom: 1px solid rgba(47, 47, 47, 0.07);
   }
 
   .result-row:last-child {
@@ -1123,33 +1153,39 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .result-label {
-    font-size: 1rem;
-    color: var(--gray-medium);
+    font-size: 0.92rem;
+    color: color-mix(in srgb, var(--gray-medium) 92%, white 8%);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .result-value {
-    font-size: 1.2rem;
+    font-size: 1.24rem;
     font-weight: 600;
     color: var(--tiffany-dark);
+    text-align: right;
+    line-height: 1.3;
   }
 
   .result-row:first-child .result-value {
-    font-size: 1.5rem;
+    font-size: clamp(1.75rem, 2.4vw, 2.3rem);
     color: var(--gray-darkest);
+    letter-spacing: 0.01em;
   }
 
   .result-highlights {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 1.1rem;
+    margin-bottom: 1.75rem;
   }
 
   .highlight-pill {
-    padding: 1rem 1.1rem;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(115, 103, 94, 0.16);
+    padding: 1rem 0 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.16);
   }
 
   .highlight-pill span,
@@ -1159,22 +1195,26 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .highlight-pill span {
     color: var(--gray-medium);
-    font-size: 0.9rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .highlight-pill strong {
-    margin-top: 0.35rem;
+    margin-top: 0.45rem;
     color: var(--gray-darkest);
-    line-height: 1.65;
+    line-height: 1.52;
+    font-size: 1.12rem;
   }
 
   .breakdown-card {
-    margin-bottom: 1.5rem;
-    padding: 1.4rem;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(115, 103, 94, 0.16);
-    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
+    margin-bottom: 1.75rem;
+    padding: 1.5rem 0 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.14);
+    box-shadow: none;
   }
 
   .breakdown-header h3 {
@@ -1185,24 +1225,25 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .breakdown-header p {
-    margin: 0.55rem 0 0;
+    margin: 0.6rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.75;
+    line-height: 1.82;
     font-size: 0.92rem;
+    max-width: 20rem;
   }
 
   .breakdown-list {
     display: grid;
-    gap: 0.9rem;
-    margin-top: 1.2rem;
+    gap: 0;
+    margin-top: 1.35rem;
   }
 
   .breakdown-item {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
-    padding-bottom: 0.9rem;
-    border-bottom: 1px solid rgba(47, 47, 47, 0.08);
+    gap: 1.2rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(47, 47, 47, 0.07);
   }
 
   .breakdown-item:last-child {
@@ -1220,51 +1261,53 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .breakdown-copy span {
-    margin-top: 0.28rem;
+    margin-top: 0.34rem;
     color: var(--gray-medium);
     font-size: 0.9rem;
-    line-height: 1.6;
+    line-height: 1.7;
+    max-width: 23rem;
   }
 
   .breakdown-value {
     color: var(--tiffany-dark);
     font-weight: 600;
     white-space: nowrap;
+    align-self: center;
   }
 
   .advice-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 1.2rem;
+    margin-bottom: 1.7rem;
   }
 
   .report-offer-card {
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-    gap: 1rem;
-    padding: 1.35rem;
-    border-radius: 24px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    gap: 1.2rem;
+    padding: 1.55rem;
+    border-radius: 28px;
     background:
-      radial-gradient(circle at top right, rgba(159, 147, 136, 0.04), transparent 34%),
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.03), transparent 34%),
       linear-gradient(135deg, rgba(247, 250, 250, 1) 0%, rgba(255, 255, 255, 1) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.16);
-    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.035);
   }
 
   .estimator-handoff-card {
     margin: 0 0 1.25rem;
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-    gap: 1rem;
-    padding: 1.35rem;
-    border-radius: 24px;
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+    gap: 1.2rem;
+    padding: 1.55rem;
+    border-radius: 28px;
     background:
-      radial-gradient(circle at top left, rgba(159, 147, 136, 0.09), transparent 34%),
+      radial-gradient(circle at top left, rgba(159, 147, 136, 0.08), transparent 34%),
       linear-gradient(135deg, rgba(243, 248, 248, 1) 0%, rgba(255, 255, 255, 1) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.22);
-    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.05);
+    border: 1px solid rgba(115, 103, 94, 0.14);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
   }
 
   .estimator-handoff-eyebrow {
@@ -1278,10 +1321,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .estimator-handoff-copy h3 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.5rem;
-    line-height: 1.55;
+    font-size: clamp(1.55rem, 2.2vw, 2.1rem);
+    line-height: 1.36;
     color: var(--gray-darkest);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
   }
 
   .estimator-handoff-description {
@@ -1297,10 +1340,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .estimator-handoff-point {
-    padding: 0.95rem 1rem;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(115, 103, 94, 0.14);
+    padding: 1rem 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.14);
   }
 
   .estimator-handoff-point strong,
@@ -1322,12 +1366,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .estimator-handoff-actions {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 0.9rem;
-    padding: 1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(115, 103, 94, 0.14);
+    justify-content: flex-start;
+    gap: 0.85rem;
+    padding: 1.15rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.66);
+    border: 1px solid rgba(115, 103, 94, 0.12);
   }
 
   .estimator-handoff-actions .btn {
@@ -1354,10 +1398,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .report-offer-copy h3 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.45rem;
-    line-height: 1.55;
+    font-size: clamp(1.45rem, 2vw, 1.95rem);
+    line-height: 1.38;
     color: var(--gray-darkest);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
   }
 
   .report-offer-description {
@@ -1373,10 +1417,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .report-offer-point {
-    padding: 0.95rem 1rem;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.86);
-    border: 1px solid rgba(115, 103, 94, 0.14);
+    padding: 1rem 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.14);
   }
 
   .report-offer-point strong,
@@ -1398,12 +1443,12 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .report-offer-actions {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 0.9rem;
-    padding: 1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(115, 103, 94, 0.14);
+    justify-content: flex-start;
+    gap: 0.85rem;
+    padding: 1.15rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(115, 103, 94, 0.12);
   }
 
   .report-offer-actions .btn {
@@ -1420,28 +1465,29 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .report-form-intro strong {
     color: var(--gray-darkest);
     font-size: 1rem;
+    letter-spacing: 0.018em;
   }
 
   .report-form-intro p {
-    margin: 0.45rem 0 0;
+    margin: 0.55rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.75;
+    line-height: 1.82;
     font-size: 0.92rem;
+    max-width: 24rem;
   }
 
   .report-form-notice {
-    padding: 0.9rem 1rem;
-    border-radius: 16px;
-    background:
-      radial-gradient(circle at top right, rgba(159, 147, 136, 0.07), transparent 34%),
-      linear-gradient(135deg, rgba(245, 240, 234, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.18);
+    padding: 0.95rem 0 0 1rem;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-left: 1px solid rgba(115, 103, 94, 0.2);
     color: var(--gray-dark);
   }
 
   .report-form-notice p {
     margin: 0;
-    line-height: 1.7;
+    line-height: 1.76;
     font-size: 0.9rem;
   }
 
@@ -1515,15 +1561,15 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .feedback-card {
     display: grid;
-    gap: 1rem;
-    margin-top: 1.3rem;
-    padding: 1.55rem;
-    border-radius: 24px;
+    gap: 1.15rem;
+    margin-top: 1.5rem;
+    padding: 1.65rem;
+    border-radius: 28px;
     background:
-      radial-gradient(circle at top right, rgba(159, 147, 136, 0.05), transparent 38%),
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.04), transparent 38%),
       rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(115, 103, 94, 0.16);
-    box-shadow: 0 20px 36px rgba(47, 47, 47, 0.05);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
   }
 
   .feedback-card-header,
@@ -1531,13 +1577,14 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 1.4rem;
   }
 
   .feedback-toggle,
   .faq-toggle {
     flex: 0 0 auto;
     align-self: center;
+    min-width: 11.5rem;
   }
 
   .feedback-card-panel.is-hidden,
@@ -1557,16 +1604,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .feedback-card-copy h3 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.45rem;
-    line-height: 1.55;
+    font-size: clamp(1.45rem, 2vw, 1.9rem);
+    line-height: 1.42;
     color: var(--gray-darkest);
-    letter-spacing: 0.04em;
+    letter-spacing: 0.025em;
   }
 
   .feedback-description {
-    margin: 0.8rem 0 0;
+    margin: 0.9rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.8;
+    line-height: 1.86;
+    max-width: 39rem;
   }
 
   .feedback-points {
@@ -1604,16 +1652,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .feedback-status {
-    padding: 0.95rem 1rem;
-    border-radius: 16px;
-    background: rgba(247, 250, 250, 0.9);
-    border: 1px solid rgba(115, 103, 94, 0.12);
+    padding: 0.95rem 0 0.95rem 1rem;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-left: 1px solid rgba(115, 103, 94, 0.16);
     color: var(--gray-medium);
   }
 
   .feedback-status p {
     margin: 0;
-    line-height: 1.72;
+    line-height: 1.78;
     font-size: 0.92rem;
   }
 
@@ -1622,14 +1671,14 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .feedback-status-success {
-    background: rgba(232, 243, 240, 0.95);
-    border-color: rgba(76, 125, 110, 0.22);
+    background: transparent;
+    border-left-color: rgba(76, 125, 110, 0.32);
     color: #35584d;
   }
 
   .feedback-status-error {
-    background: rgba(255, 244, 241, 0.95);
-    border-color: rgba(191, 106, 83, 0.2);
+    background: transparent;
+    border-left-color: rgba(191, 106, 83, 0.3);
     color: #8b4c3b;
   }
 
@@ -1708,8 +1757,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .feedback-note {
     margin: 0;
     color: var(--gray-medium);
-    line-height: 1.75;
+    line-height: 1.8;
     font-size: 0.9rem;
+    max-width: 26rem;
   }
 
   .feedback-honeypot {
@@ -1722,11 +1772,11 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .advice-card {
-    padding: 1.4rem;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(115, 103, 94, 0.16);
-    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
+    padding: 1.45rem;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.74);
+    border: 1px solid rgba(115, 103, 94, 0.1);
+    box-shadow: 0 14px 24px rgba(47, 47, 47, 0.03);
   }
 
   .advice-card-accent {
@@ -1738,22 +1788,23 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   .advice-header h3 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.2rem;
+    font-size: 1.24rem;
     color: var(--gray-darkest);
+    line-height: 1.45;
   }
 
   .advice-header p {
-    margin: 0.55rem 0 0;
+    margin: 0.65rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.75;
+    line-height: 1.8;
     font-size: 0.92rem;
   }
 
   .advice-list {
-    margin: 1rem 0 0;
-    padding-left: 1.15rem;
+    margin: 1.1rem 0 0;
+    padding-left: 1.05rem;
     color: var(--gray-dark);
-    line-height: 1.8;
+    line-height: 1.9;
   }
 
   .advice-list li + li {
@@ -1762,15 +1813,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
   .next-step-points {
     display: grid;
-    gap: 0.8rem;
-    margin-top: 1rem;
+    gap: 0;
+    margin-top: 1.15rem;
   }
 
   .next-step-item {
-    padding: 0.9rem 1rem;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.86);
-    border: 1px solid rgba(115, 103, 94, 0.14);
+    padding: 0.95rem 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.14);
   }
 
   .next-step-item strong,
@@ -1783,10 +1835,10 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .next-step-item span {
-    margin-top: 0.24rem;
+    margin-top: 0.34rem;
     color: var(--gray-medium);
     font-size: 0.9rem;
-    line-height: 1.65;
+    line-height: 1.72;
   }
 
   .disclaimer {
@@ -1809,7 +1861,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.95rem 1.5rem;
+    padding: 0.95rem 1.4rem;
     border-radius: 999px;
     box-sizing: border-box;
     text-decoration: none;
@@ -1818,7 +1870,8 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     line-height: 1.4;
     white-space: normal;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
-    font-size: 1rem;
+    font-size: 0.96rem;
+    letter-spacing: 0.02em;
   }
 
   .btn-primary {
@@ -1835,52 +1888,57 @@ const renovationItemsJson = JSON.stringify(renovationItems);
   }
 
   .btn-secondary {
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(255, 255, 255, 0.72);
     color: var(--gray-darkest);
-    border: 1px solid rgba(101, 91, 84, 0.22);
-    box-shadow: 0 12px 22px rgba(47, 47, 47, 0.06);
+    border: 1px solid rgba(101, 91, 84, 0.16);
+    box-shadow: 0 10px 18px rgba(47, 47, 47, 0.04);
   }
 
   .btn-secondary:hover {
-    background: rgba(243, 237, 231, 1);
-    border-color: rgba(103, 92, 84, 0.28);
+    background: rgba(243, 237, 231, 0.88);
+    border-color: rgba(103, 92, 84, 0.22);
     transform: translateY(-2px);
-    box-shadow: 0 14px 24px rgba(115, 103, 94, 0.12);
+    box-shadow: 0 12px 22px rgba(115, 103, 94, 0.08);
   }
 
   .faq-panel {
-    margin-top: 1.5rem;
-    padding: 1.8rem;
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(115, 103, 94, 0.16);
-    box-shadow: 0 20px 36px rgba(47, 47, 47, 0.05);
+    margin-top: 1.8rem;
+    padding: 1.9rem;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(115, 103, 94, 0.12);
+    box-shadow: 0 18px 32px rgba(47, 47, 47, 0.04);
   }
 
   .faq-header h2 {
     margin: 0;
     font-family: "Noto Serif TC", serif;
-    font-size: 1.5rem;
+    font-size: clamp(1.45rem, 2vw, 1.9rem);
     color: var(--gray-darkest);
+    line-height: 1.38;
+    letter-spacing: 0.02em;
   }
 
   .faq-header p {
-    margin: 0.65rem 0 0;
+    margin: 0.8rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.8;
+    line-height: 1.86;
+    max-width: 36rem;
   }
 
   .faq-list {
     display: grid;
-    gap: 0.9rem;
-    margin-top: 1.25rem;
+    gap: 0;
+    margin-top: 1.45rem;
+    border-top: 1px solid rgba(115, 103, 94, 0.14);
   }
 
   .faq-item {
-    padding: 1rem 1.1rem;
-    border-radius: 18px;
-    background: rgba(247, 250, 250, 0.9);
-    border: 1px solid rgba(115, 103, 94, 0.12);
+    padding: 1.05rem 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(115, 103, 94, 0.12);
   }
 
   .faq-item summary {
@@ -1888,25 +1946,61 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     color: var(--gray-darkest);
     font-weight: 600;
     list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    line-height: 1.65;
   }
 
   .faq-item summary::-webkit-details-marker {
     display: none;
   }
 
-  .faq-item p {
-    margin: 0.75rem 0 0;
+  .faq-item summary::after {
+    content: "+";
+    flex: 0 0 auto;
     color: var(--gray-medium);
-    line-height: 1.8;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .faq-item[open] summary::after {
+    content: "-";
+  }
+
+  .faq-item p {
+    margin: 0.85rem 0 0;
+    color: var(--gray-medium);
+    line-height: 1.84;
+    max-width: 48rem;
   }
 
   @media (max-width: 768px) {
     .calculator-container {
-      padding: 4rem 1.25rem 4rem;
+      padding: 4.3rem 1.15rem 4.25rem;
+    }
+
+    .calculator-header {
+      margin-bottom: 2.2rem;
+    }
+
+    .calculator-header h1 {
+      font-size: clamp(2.4rem, 11vw, 3.35rem);
+      line-height: 1.12;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      line-height: 1.82;
+    }
+
+    .form-section h2 {
+      padding-top: 0.8rem;
     }
 
     .calculator-form {
-      padding: 1.3rem;
+      padding: 1.15rem;
       border-radius: 24px;
     }
 
@@ -1920,9 +2014,17 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     .result-section,
     .result-card,
     .landing-card,
-    .faq-panel {
-      padding: 1.25rem;
+    .faq-panel,
+    .feedback-card,
+    .estimator-handoff-card,
+    .report-offer-card {
+      padding: 1.2rem;
       border-radius: 20px;
+    }
+
+    .result-section::before {
+      left: 1.2rem;
+      top: 1rem;
     }
 
     .checkbox-group {
@@ -1941,6 +2043,20 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       grid-template-columns: 1fr;
     }
 
+    .estimator-handoff-card,
+    .report-offer-card {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .estimator-handoff-actions,
+    .report-offer-actions {
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+    }
+
     .report-lead-grid,
     .feedback-form-grid {
       grid-template-columns: 1fr;
@@ -1950,15 +2066,23 @@ const renovationItemsJson = JSON.stringify(renovationItems);
     .faq-header {
       flex-direction: column;
       align-items: stretch;
+      gap: 1rem;
     }
 
     .feedback-toggle,
     .faq-toggle {
       width: 100%;
+      min-width: 0;
     }
 
     .breakdown-item {
       flex-direction: column;
+    }
+
+    .result-row {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.35rem;
     }
 
     .result-value {
@@ -1967,6 +2091,22 @@ const renovationItemsJson = JSON.stringify(renovationItems);
 
     .result-row:first-child .result-value {
       font-size: 1.3rem;
+    }
+
+    .result-label,
+    .result-value {
+      text-align: left;
+    }
+
+    .feedback-submit,
+    .report-offer-actions .btn,
+    .estimator-handoff-actions .btn {
+      width: 100%;
+      justify-self: stretch;
+    }
+
+    .faq-list {
+      margin-top: 1.15rem;
     }
   }
 </style>

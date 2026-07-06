@@ -344,12 +344,19 @@ const homeStructuredData = [
   <section id="workflow" class="workflow-section">
     <div class="workflow-container">
       <div class="workflow-header">
-        <h6 class="section-subtitle">合作流程</h6>
-        <h2 class="section-title">怎麼開始</h2>
-        <p class="workflow-mobile-note">8 個節點，一眼看完。</p>
-        <div class="workflow-actions">
-          <a href="/renovation-process" class="workflow-link">查看裝修全流程</a>
+        <div class="workflow-header-main">
+          <h6 class="section-subtitle">合作流程</h6>
+          <h2 class="section-title">怎麼開始</h2>
+          <p class="workflow-intro">把需求、預算與現場條件，慢慢收斂成真正能落地的空間節奏。</p>
+          <p class="workflow-mobile-note">8 個節點，一眼看完。</p>
+          <div class="workflow-actions">
+            <a href="/renovation-process" class="workflow-link">查看裝修全流程</a>
+          </div>
         </div>
+        <aside class="workflow-editor-note">
+          <p class="workflow-editor-label">Project Rhythm</p>
+          <p>青曦不把流程寫成制式 SOP，而是讓每一步都回到現場條件、生活方式與後續施工判斷。</p>
+        </aside>
       </div>
 
       <div class="workflow-summary">
@@ -465,65 +472,31 @@ const homeStructuredData = [
     <div class="testimonial-container">
       <div class="section-header">
         <h6 class="section-subtitle">服務承諾</h6>
-        <h2 class="section-title">我們的承諾</h2>
+        <h2 class="section-title">合作中的感受</h2>
       </div>
 
       <div class="testimonial-grid">
         <div class="testimonial-card" data-animate="scale">
-          <div class="promise-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-          </div>
+          <p class="testimonial-label">Listening First</p>
           <h3 class="promise-title">用心傾聽</h3>
           <p class="testimonial-text">
-            把生活需求整理成可執行的方案。
+            先把生活習慣、空間痛點與預算感整理清楚，再開始談風格與做法。
           </p>
         </div>
 
         <div class="testimonial-card" data-animate="scale">
-          <div class="promise-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
+          <p class="testimonial-label">Material Discipline</p>
           <h3 class="promise-title">品質保證</h3>
           <p class="testimonial-text">
-            從材料到施工都確實把關，並提供一年工程保固。
+            從材料、節點到施工交付都保持清楚標準，並提供一年工程保固。
           </p>
         </div>
 
         <div class="testimonial-card" data-animate="scale">
-          <div class="promise-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </div>
+          <p class="testimonial-label">Delivery Pace</p>
           <h3 class="promise-title">準時交付</h3>
           <p class="testimonial-text">
-            重視時程，也重視交付品質。
+            重視時程，也重視完成度，不讓交屋變成只剩進度表的終點。
           </p>
         </div>
       </div>
@@ -534,32 +507,67 @@ const homeStructuredData = [
     <div class="consult-shell">
       <div class="consult-copy">
         <p class="section-subtitle consult-subtitle">下一步</p>
-        <h2 class="consult-title">準備好打造理想空間了嗎？歡迎留下您的需求。</h2>
+        <p class="consult-kicker">Closing Edit</p>
+        <h2 class="consult-title">如果方向已經對了，就用最舒服的方式開始。</h2>
         <p class="consult-description">
-          需求、預算、時程一次整理。
+          不一定要立刻決定全部。先把目前的空間狀態、預算感與想改善的生活節奏整理清楚，下一步自然會更準。
         </p>
       </div>
-      <div class="consult-actions">
-        <a href="/contact" class="consult-button consult-button-primary">預約諮詢</a>
-        <a href="/tools" class="consult-button consult-button-secondary">開始估價</a>
-        <a href="/smart-home-quiz" class="consult-button consult-button-secondary">智能家居快篩</a>
-      </div>
+      <aside class="consult-note">
+        <p class="consult-note-label">Start Edit</p>
+        <p class="consult-note-text">青曦把開始分成三種節奏。想先聊方向、先估一輪，或先判斷智能整合是否需要，都可以各自開始。</p>
+        <div class="consult-actions">
+          <a href="/contact" class="consult-button consult-button-primary">
+            <span class="consult-button-index">01</span>
+            <span class="consult-button-copy">
+              <strong>先進聯絡頁</strong>
+              <small>適合想把需求、預算與時程一次整理清楚。</small>
+            </span>
+          </a>
+          <a href="/tools" class="consult-button consult-button-secondary">
+            <span class="consult-button-index">02</span>
+            <span class="consult-button-copy">
+              <strong>先做估價</strong>
+              <small>想先抓施工尺度與費用輪廓，可以從這裡開始。</small>
+            </span>
+          </a>
+          <a href="/smart-home-quiz" class="consult-button consult-button-secondary">
+            <span class="consult-button-index">03</span>
+            <span class="consult-button-copy">
+              <strong>智能家居快篩</strong>
+              <small>如果你也在想科技整合，先做一次快速判斷。</small>
+            </span>
+          </a>
+        </div>
+      </aside>
     </div>
   </section>
 
   <!-- FAQ Section -->
   <section class="faq-section">
     <div class="faq-container">
-      <div class="section-header">
-        <h6 class="section-subtitle">FAQ</h6>
-        <h2 class="section-title">常見問題</h2>
-        <p class="faq-intro">先看 3 個常見問題。</p>
+      <div class="faq-header">
+        <div class="section-header faq-header-main">
+          <h6 class="section-subtitle">FAQ</h6>
+          <h2 class="section-title">先把最常卡住的 3 件事看完。</h2>
+          <p class="faq-intro">費用、時程與合作範圍，先有輪廓，再決定要不要往下聊。</p>
+        </div>
+        <aside class="faq-home-note">
+          <p class="faq-home-note-label">Consult Notes</p>
+          <p>這裡不是完整說明書，而是正式諮詢前最常需要先對齊的三個起點。</p>
+        </aside>
+      </div>
+
+      <div class="faq-curation">
+        <p class="faq-curation-label">Quick Read</p>
+        <p>如果三題看完，大方向已經對得上，再進完整 FAQ 或直接聯絡就好。</p>
       </div>
 
       <div class="faq-list">
         <div class="faq-item" data-animate="left">
+          <p class="faq-item-label">Budget Rhythm</p>
           <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-pricing" id="faq-question-pricing">
-            <span>設計費用如何計算？</span>
+            <span class="faq-question-text">設計費用如何計算？</span>
             <svg
               class="faq-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -579,8 +587,9 @@ const homeStructuredData = [
         </div>
 
         <div class="faq-item" data-animate="right">
+          <p class="faq-item-label">Project Timing</p>
           <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-timeline" id="faq-question-timeline">
-            <span>從設計到完工需要多久時間？</span>
+            <span class="faq-question-text">從設計到完工需要多久時間？</span>
             <svg
               class="faq-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -600,8 +609,9 @@ const homeStructuredData = [
         </div>
 
         <div class="faq-item" data-animate="left">
+          <p class="faq-item-label">Work Scope</p>
           <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-scope" id="faq-question-scope">
-            <span>可以只做設計不做工程嗎？</span>
+            <span class="faq-question-text">可以只做設計不做工程嗎？</span>
             <svg
               class="faq-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -636,19 +646,19 @@ const homeStructuredData = [
     }
 
     .brand-strip-inner {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: clamp(2rem, 4vw, 3.5rem);
       display: grid;
       grid-template-columns: minmax(0, 1.4fr) minmax(320px, 440px);
-      gap: 2rem;
-      border-radius: 28px;
+      gap: clamp(1.6rem, 3vw, 3rem);
+      border-radius: 32px;
       background:
-        radial-gradient(circle at top right, rgba(159, 147, 136, 0.07), transparent 30%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(246, 241, 236, 0.96) 100%);
-      border: 1px solid rgba(115, 103, 94, 0.16);
-      box-shadow: 0 20px 44px rgba(47, 47, 47, 0.06);
-      backdrop-filter: blur(14px);
+        radial-gradient(circle at top right, rgba(159, 147, 136, 0.1), transparent 30%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(246, 241, 236, 0.54) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 28px 72px rgba(var(--brand-dark-rgb), 0.1);
+      backdrop-filter: blur(28px) saturate(140%);
     }
 
     .brand-strip-label {
@@ -661,20 +671,22 @@ const homeStructuredData = [
 
     .brand-strip-copy h2 {
       margin: 0;
-      font-size: clamp(1.9rem, 3vw, 2.8rem);
-      line-height: 1.24;
-      font-family: var(--font-serif);
-      font-weight: 600;
-      letter-spacing: 0.022em;
+      max-width: 10ch;
+      font-size: clamp(3.5rem, 7vw, 6.4rem);
+      line-height: 1.04;
+      font-family: var(--font-display);
+      font-weight: 400;
+      letter-spacing: 0.09em;
       color: var(--gray-darkest);
     }
 
     .brand-strip-intro {
-      margin: 1.1rem 0 0;
-      color: var(--gray-medium);
-      line-height: 1.84;
-      letter-spacing: 0.008em;
-      font-size: 1.01rem;
+      margin: 1.5rem 0 0;
+      max-width: 34rem;
+      color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
+      line-height: 1.82;
+      letter-spacing: 0.01em;
+      font-size: 1.05rem;
     }
 
     .brand-smart-home {
@@ -828,25 +840,30 @@ const homeStructuredData = [
 
     /* About Section Styles */
     .about-section {
-      padding: clamp(5rem, 9vw, 7.5rem) 2rem;
+      min-height: 100vh;
+      padding: clamp(6rem, 11vw, 9rem) 2rem;
       background:
         radial-gradient(circle at top left, rgba(159, 147, 136, 0.06), transparent 26%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(247, 242, 237, 1) 100%);
+      display: grid;
+      align-items: center;
     }
 
     .about-container {
-      max-width: 900px;
+      max-width: 1080px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 2.2rem;
+      gap: 3rem;
     }
 
     .about-header {
       text-align: center;
       opacity: 0;
       transform: translateY(30px);
-      transition: all 0.8s ease;
+      transition:
+        opacity 1s var(--motion-standard),
+        transform 1s var(--motion-standard);
     }
 
     .about-header.animate-in {
@@ -855,26 +872,28 @@ const homeStructuredData = [
     }
 
     .about-tagline {
-      font-size: 1.3rem;
-      color: var(--gray-dark);
-      margin: 0.5rem 0 1rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
+      font-size: clamp(1.45rem, 2.8vw, 2rem);
+      color: var(--gray-darkest);
+      margin: 1rem 0 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
     }
 
     .about-intro {
-      font-size: 1.05rem;
-      color: var(--gray-medium);
+      font-size: 1.08rem;
+      color: color-mix(in srgb, var(--gray-darkest) 60%, transparent);
       margin: 0;
       line-height: var(--type-body-line-height);
-      letter-spacing: var(--type-body-tracking);
+      letter-spacing: 0.01em;
     }
 
     /* Core Philosophy */
     .core-philosophy {
       opacity: 0;
       transform: translateY(30px);
-      transition: all 0.8s ease;
+      transition:
+        opacity 1s var(--motion-standard),
+        transform 1s var(--motion-standard);
     }
 
     .core-philosophy.animate-in {
@@ -884,14 +903,15 @@ const homeStructuredData = [
 
     .philosophy-quote {
       text-align: center;
-      padding: 2.5rem 2rem;
+      padding: clamp(2.5rem, 5vw, 4rem);
       background:
         radial-gradient(circle at top left, rgba(159, 147, 136, 0.04), transparent 30%),
         linear-gradient(135deg, #342f2b 0%, #292521 100%);
-      border-radius: 26px;
+      border-radius: 32px;
       color: var(--white);
       position: relative;
       overflow: hidden;
+      box-shadow: 0 28px 70px rgba(var(--brand-dark-rgb), 0.18);
     }
 
     .quote-mark {
@@ -903,12 +923,12 @@ const homeStructuredData = [
     }
 
     .philosophy-quote > p:first-of-type {
-      font-size: 1.4rem;
-      font-weight: 600;
-      line-height: 1.45;
-      letter-spacing: 0.04em;
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      font-weight: 500;
+      line-height: 1.18;
+      letter-spacing: 0.08em;
       margin: 0.5rem 0;
-      font-family: var(--font-serif);
+      font-family: var(--font-display);
     }
 
     .quote-dash {
@@ -918,11 +938,11 @@ const homeStructuredData = [
     }
 
     .quote-detail {
-      font-size: 0.95rem;
-      color: var(--gray-light);
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.62);
       margin: 0;
       line-height: var(--type-body-line-height);
-      letter-spacing: var(--type-body-tracking);
+      letter-spacing: 0.01em;
     }
 
     /* Stats Section Styles */
@@ -1034,11 +1054,11 @@ const homeStructuredData = [
     .site-proof-copy h2 {
       margin: 0;
       color: var(--gray-darkest);
-      font-family: var(--font-serif);
-      font-size: clamp(1.5rem, 2.5vw, 2rem);
-      line-height: 1.36;
-      letter-spacing: 0.02em;
-      font-weight: 600;
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 2.8vw, 2.4rem);
+      line-height: 1.26;
+      letter-spacing: 0.07em;
+      font-weight: 500;
     }
 
     .site-proof-copy p:last-child {
@@ -1054,15 +1074,15 @@ const homeStructuredData = [
       min-height: 100%;
     }
 
-    .site-proof-photo img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      min-height: 320px;
-      object-fit: cover;
-      object-position: center;
-      background: #f3f3f3;
-    }
+  .site-proof-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    object-fit: cover;
+    object-position: center;
+    background: var(--art-paper);
+  }
 
     .testimonial-container {
       max-width: 1200px;
@@ -1071,19 +1091,46 @@ const homeStructuredData = [
 
     .testimonial-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 1.6rem;
     }
 
     .testimonial-card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 249, 249, 1) 100%);
-      padding: 2rem;
-      border-radius: 22px;
-      box-shadow: 0 14px 28px rgba(47, 47, 47, 0.06);
-      border: 1px solid rgba(47, 47, 47, 0.08);
+      position: relative;
+      grid-column: span 4;
+      padding: 2rem 0 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      border: 0;
+      backdrop-filter: none;
       transition: all 0.3s ease;
       opacity: 0;
       transform: scale(0.9);
+    }
+
+    .testimonial-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: min(160px, 46%);
+      height: 1px;
+      background: linear-gradient(90deg, rgba(115, 103, 94, 0.5), rgba(115, 103, 94, 0.08));
+    }
+
+    .testimonial-card:nth-child(1) {
+      grid-column: 1 / span 5;
+    }
+
+    .testimonial-card:nth-child(2) {
+      grid-column: 6 / span 3;
+      margin-top: 3rem;
+    }
+
+    .testimonial-card:nth-child(3) {
+      grid-column: 9 / -1;
+      margin-top: 1rem;
     }
 
     .testimonial-card.animate-in {
@@ -1092,41 +1139,26 @@ const homeStructuredData = [
     }
 
     .testimonial-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(115, 103, 94, 0.12);
-      border-color: rgba(115, 103, 94, 0.2);
+      transform: translateY(-4px);
     }
 
-    .promise-icon {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(241, 234, 227, 1);
-      border-radius: 50%;
-      color: var(--gray-dark);
-      transition: all 0.3s ease;
-    }
-
-    .testimonial-card:hover .promise-icon {
-      background: var(--gray-darkest);
-      color: var(--white);
-      transform: scale(1.1) rotate(5deg);
-    }
-
-    .promise-icon svg {
-      width: 32px;
-      height: 32px;
+    .testimonial-label {
+      margin: 0 0 0.8rem;
+      font-size: 0.76rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray-medium);
     }
 
     .promise-title {
-      font-size: 1.3rem;
-      font-weight: 600;
+      font-size: clamp(1.5rem, 2vw, 2.2rem);
+      font-weight: 500;
       color: var(--gray-dark);
       margin-bottom: 1rem;
-      text-align: center;
+      text-align: left;
+      font-family: var(--font-display);
+      line-height: 1.22;
+      letter-spacing: 0.06em;
     }
 
     .testimonial-text {
@@ -1134,7 +1166,7 @@ const homeStructuredData = [
       line-height: var(--type-body-line-height);
       color: var(--gray-medium);
       margin-bottom: 0;
-      text-align: center;
+      text-align: left;
       letter-spacing: var(--type-body-tracking);
     }
 
@@ -1147,35 +1179,116 @@ const homeStructuredData = [
     }
 
     .faq-container {
-      max-width: 900px;
+      max-width: 1180px;
       margin: 0 auto;
     }
 
+    .faq-header {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 1.5rem;
+      align-items: end;
+      margin-bottom: 2.2rem;
+    }
+
+    .faq-header-main {
+      grid-column: 1 / span 7;
+    }
+
+    .faq-header-main.section-header {
+      text-align: left;
+      max-width: none;
+      margin: 0;
+    }
+
+    .faq-home-note {
+      grid-column: 9 / -1;
+      padding: 1.1rem 0 0 1.35rem;
+      border-left: 1px solid rgba(164, 171, 160, 0.2);
+    }
+
+    .faq-home-note-label {
+      margin: 0 0 0.65rem;
+      font-size: 0.76rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray-medium);
+    }
+
+    .faq-home-note p:last-child {
+      margin: 0;
+      color: color-mix(in srgb, var(--gray-darkest) 60%, transparent);
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
+    }
+
     .faq-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 1.35rem 1.15rem;
     }
 
     .faq-intro {
       max-width: 38rem;
-      margin: 1rem auto 0;
+      margin: 1rem 0 0;
       color: var(--gray-medium);
       line-height: var(--type-body-line-height);
       letter-spacing: var(--type-body-tracking);
     }
 
+    .faq-curation {
+      margin: 0 0 1.9rem;
+      max-width: 32rem;
+    }
+
+    .faq-curation-label {
+      margin: 0 0 0.55rem;
+      font-size: 0.76rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray-medium);
+    }
+
+    .faq-curation p:last-child {
+      margin: 0;
+      color: color-mix(in srgb, var(--gray-darkest) 58%, transparent);
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
+    }
+
     .faq-item {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 250, 250, 1) 100%);
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid rgba(115, 103, 94, 0.14);
-      box-shadow: 0 12px 26px rgba(47, 47, 47, 0.05);
-      transition: all 0.3s ease;
+      position: relative;
+      grid-column: span 12;
+      padding: 1.15rem 0 0;
+      background: transparent;
+      border-radius: 0;
+      overflow: visible;
+      border: 0;
+      box-shadow: none;
+      backdrop-filter: none;
       opacity: 0;
       transition:
         opacity 0.8s ease,
         transform 0.8s ease;
+    }
+
+    .faq-item::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: min(180px, 48%);
+      height: 1px;
+      background: linear-gradient(90deg, rgba(115, 103, 94, 0.46), rgba(115, 103, 94, 0.08));
+    }
+
+    .faq-item:nth-child(2),
+    .faq-item:nth-child(3) {
+      grid-column: span 6;
+    }
+
+    .faq-item:nth-child(2) {
+      margin-top: 1.2rem;
     }
 
     .faq-item[data-animate="left"] {
@@ -1192,27 +1305,48 @@ const homeStructuredData = [
     }
 
     .faq-item:hover {
-      border-color: rgba(115, 103, 94, 0.2);
+      transform: translateY(-2px);
     }
 
     .faq-item.active {
-      border-color: var(--gray-darkest);
+      transform: translateX(0);
+    }
+
+    .faq-item.active::before {
+      background: linear-gradient(90deg, rgba(79, 72, 66, 0.7), rgba(115, 103, 94, 0.14));
+    }
+
+    .faq-item-label {
+      margin: 0 0 0.75rem;
+      font-size: 0.76rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray-medium);
     }
 
     .faq-question {
       width: 100%;
-      padding: 1.5rem 2rem;
+      padding: 0 0 1rem;
       background: none;
       border: none;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
+      gap: 1rem;
       cursor: pointer;
-      font-size: 1.1rem;
+      font-size: clamp(1.3rem, 2vw, 1.8rem);
       font-weight: 500;
       color: var(--gray-dark);
       text-align: left;
       transition: all 0.3s ease;
+      font-family: var(--font-display);
+      line-height: 1.24;
+      letter-spacing: 0.05em;
+    }
+
+    .faq-question-text {
+      display: block;
+      max-width: 26ch;
     }
 
     .faq-question:hover {
@@ -1243,7 +1377,7 @@ const homeStructuredData = [
     }
 
     .faq-answer p {
-      padding: 0 2rem 1.5rem 2rem;
+      padding: 0 2rem 0 0;
       color: var(--gray-medium);
       line-height: var(--type-body-line-height);
       letter-spacing: var(--type-body-tracking);
@@ -1251,9 +1385,9 @@ const homeStructuredData = [
     }
 
     .faq-actions {
-      margin-top: 1.5rem;
+      margin-top: 2.3rem;
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
       flex-wrap: wrap;
       gap: 0.85rem;
     }
@@ -1268,8 +1402,7 @@ const homeStructuredData = [
       letter-spacing: 0.06em;
       transition:
         transform 0.25s ease,
-        background-color 0.25s ease,
-        border-color 0.25s ease;
+        background-color 0.25s ease;
     }
 
     .faq-link:hover {
@@ -1279,13 +1412,12 @@ const homeStructuredData = [
     .faq-link-primary {
       background: var(--gray-darkest);
       color: var(--white);
-      border: 1px solid var(--gray-darkest);
     }
 
     .faq-link-secondary {
       background: rgba(255, 255, 255, 0.96);
       color: var(--gray-darkest);
-      border: 1px solid rgba(115, 103, 94, 0.18);
+      box-shadow: inset 0 0 0 1px rgba(115, 103, 94, 0.14);
     }
 
     /* Responsive Styles */
@@ -1307,11 +1439,53 @@ const homeStructuredData = [
         grid-template-columns: 1fr;
       }
 
+      .faq-header {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .faq-header-main,
+      .faq-home-note {
+        grid-column: auto;
+      }
+
+      .faq-home-note,
+      .workflow-editor-note {
+        padding: 0.9rem 0 0 0;
+        border-left: 0;
+        border-top: 1px solid rgba(164, 171, 160, 0.2);
+      }
+
+      .testimonial-card,
+      .testimonial-card:nth-child(1),
+      .testimonial-card:nth-child(2),
+      .testimonial-card:nth-child(3),
+      .faq-item,
+      .faq-item:nth-child(2),
+      .faq-item:nth-child(3) {
+        grid-column: auto;
+        margin-top: 0;
+      }
+
       .site-proof-shell {
         grid-template-columns: 1fr;
       }
 
+      .workflow-header {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .workflow-header-main,
+      .workflow-editor-note {
+        grid-column: auto;
+      }
+
       .consult-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .faq-list {
         grid-template-columns: 1fr;
       }
 
@@ -1345,12 +1519,19 @@ const homeStructuredData = [
 
       .brand-strip-copy h2,
       .smart-case-summary h3,
-      .consult-title {
+      .consult-title,
+      .section-title {
         line-height: 1.38;
       }
 
       .brand-strip-copy h2 {
         font-size: clamp(2rem, 9vw, 2.6rem);
+      }
+
+      .section-title {
+        font-size: clamp(2.4rem, 10vw, 3.6rem);
+        line-height: 1.14;
+        letter-spacing: 0.06em;
       }
 
       .brand-strip-intro,
@@ -1411,6 +1592,7 @@ const homeStructuredData = [
       .service-section,
       .smart-case-section,
       .workflow-section {
+        min-height: auto;
         padding-left: 1.25rem;
         padding-right: 1.25rem;
       }
@@ -1507,8 +1689,21 @@ const homeStructuredData = [
       }
 
       .consult-shell {
+        grid-template-columns: 1fr;
         padding: 1.5rem;
         gap: 1.4rem;
+      }
+
+      .consult-title {
+        max-width: none;
+        font-size: clamp(2.5rem, 11vw, 3.7rem);
+        line-height: 1.12;
+        letter-spacing: 0.06em;
+      }
+
+      .consult-note {
+        padding: 1.25rem 1.2rem;
+        border-radius: 22px;
       }
 
       .consult-actions {
@@ -1532,33 +1727,35 @@ const homeStructuredData = [
 
     .section-header {
       text-align: center;
-      margin-bottom: 4rem;
+      max-width: 920px;
+      margin: 0 auto 5rem;
     }
 
     .service-intro {
-      max-width: 44rem;
-      margin: 1rem auto 0;
-      color: var(--gray-medium);
+      max-width: 34rem;
+      margin: 1.35rem auto 0;
+      color: color-mix(in srgb, var(--gray-darkest) 60%, transparent);
       line-height: var(--type-body-line-height);
-      letter-spacing: var(--type-body-tracking);
+      letter-spacing: 0.01em;
     }
 
     .section-subtitle {
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      letter-spacing: 0.18em;
-      color: var(--gray-medium);
-      margin-bottom: 0.75rem;
+      letter-spacing: 0.22em;
+      color: color-mix(in srgb, var(--gray-darkest) 54%, transparent);
+      margin-bottom: 1rem;
       text-transform: uppercase;
     }
 
     .section-title {
-      font-size: 2.5rem;
-      font-family: var(--font-serif);
-      font-weight: 600;
-      line-height: 1.24;
+      margin: 0;
+      font-size: clamp(3.6rem, 8vw, 6.8rem);
+      font-family: var(--font-display);
+      font-weight: 400;
+      line-height: 1.04;
       color: var(--gray-darkest);
-      letter-spacing: 0.022em;
+      letter-spacing: 0.1em;
     }
 
     .service-grid {
@@ -1652,17 +1849,16 @@ const homeStructuredData = [
 
     .service-title {
       font-size: 1.28rem;
-      font-family: var(--font-serif);
-      font-weight: 600;
+      font-family: var(--font-display);
+      font-weight: 500;
       color: var(--gray-darkest);
-      line-height: 1.34;
-      letter-spacing: 0.02em;
+      line-height: 1.28;
+      letter-spacing: 0.06em;
     }
 
     .service-title-compact {
       font-size: 1.14rem;
       line-height: 1.4;
-      white-space: nowrap;
     }
 
     .service-icon {
@@ -1740,10 +1936,13 @@ const homeStructuredData = [
     }
 
     .smart-case-section {
-      padding: clamp(5rem, 9vw, 7.5rem) 2rem;
+      min-height: 100vh;
+      padding: clamp(6rem, 11vw, 9rem) 2rem;
       background:
         radial-gradient(circle at top right, rgba(159, 147, 136, 0.06), transparent 22%),
         linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 241, 236, 1) 100%);
+      display: grid;
+      align-items: center;
     }
 
     .smart-case-container {
@@ -1778,11 +1977,14 @@ const homeStructuredData = [
     }
 
     .smart-case-summary {
-      padding: 1.8rem;
+      padding: clamp(1.8rem, 3vw, 2.8rem);
       background:
         radial-gradient(circle at top right, rgba(159, 147, 136, 0.09), transparent 30%),
         linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(73, 64, 57, 1) 100%);
       color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(24px) saturate(140%);
+      box-shadow: 0 28px 70px rgba(var(--brand-dark-rgb), 0.16);
     }
 
     .smart-case-label,
@@ -1799,19 +2001,19 @@ const homeStructuredData = [
     }
 
     .smart-case-summary h3 {
-      margin: 0.75rem 0 0;
-      font-family: var(--font-serif);
-      font-size: 1.7rem;
-      font-weight: 600;
-      line-height: 1.32;
-      letter-spacing: 0.022em;
+      margin: 0.95rem 0 0;
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 4vw, 4.2rem);
+      font-weight: 400;
+      line-height: 1.06;
+      letter-spacing: 0.08em;
     }
 
     .smart-case-description {
       margin: 1rem 0 0;
-      color: rgba(255, 255, 255, 0.76);
+      color: rgba(255, 255, 255, 0.64);
       line-height: var(--type-body-line-height);
-      letter-spacing: var(--type-body-tracking);
+      letter-spacing: 0.01em;
     }
 
     .smart-case-tags {
@@ -1822,10 +2024,12 @@ const homeStructuredData = [
     }
 
     .smart-case-tags span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
       padding: 0.65rem 0.9rem;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.14);
       color: rgba(255, 255, 255, 0.82);
       font-size: 0.9rem;
     }
@@ -1843,32 +2047,29 @@ const homeStructuredData = [
       justify-content: center;
       padding: 0.85rem 1.25rem;
       border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
       background: rgba(255, 255, 255, 0.1);
       color: var(--white);
       text-decoration: none;
       letter-spacing: 0.08em;
       transition:
         transform 0.25s ease,
-        background-color 0.25s ease,
-        border-color 0.25s ease;
+        background-color 0.25s ease;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
     }
 
     .smart-case-link:hover {
       transform: translateY(-2px);
       background: rgba(115, 103, 94, 0.22);
-      border-color: rgba(115, 103, 94, 0.42);
     }
 
     .smart-case-link-secondary {
       background: rgba(255, 255, 255, 0.92);
       color: var(--gray-darkest);
-      border-color: rgba(255, 255, 255, 0.32);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28), 0 0 0 1px rgba(115, 103, 94, 0.24);
     }
 
     .smart-case-link-secondary:hover {
       background: rgba(244, 246, 247, 1);
-      border-color: rgba(115, 103, 94, 0.3);
     }
 
     .smart-case-grid {
@@ -1893,12 +2094,12 @@ const homeStructuredData = [
 
     .smart-case-card h3 {
       margin: 0.7rem 0 0;
-      font-family: var(--font-serif);
-      font-size: 1.15rem;
-      line-height: 1.48;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      line-height: 1.4;
       color: var(--gray-darkest);
-      letter-spacing: 0.02em;
-      font-weight: 600;
+      letter-spacing: 0.05em;
+      font-weight: 500;
     }
 
     .smart-case-card p:last-child {
@@ -1910,25 +2111,62 @@ const homeStructuredData = [
 
     /* Workflow Section Styles */
     .workflow-section {
-      padding: clamp(5rem, 9vw, 7.5rem) 2rem;
+      min-height: 100vh;
+      padding: clamp(6rem, 11vw, 9rem) 2rem;
       background:
         linear-gradient(180deg, rgba(245, 245, 245, 1) 0%, rgba(251, 251, 251, 1) 100%);
+      display: grid;
+      align-items: center;
     }
 
     .workflow-container {
-      max-width: 1000px;
+      max-width: 1180px;
       margin: 0 auto;
     }
 
     .workflow-header {
-      text-align: center;
-      margin-bottom: 4rem;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 1.5rem;
+      align-items: end;
+      margin-bottom: 5rem;
+    }
+
+    .workflow-header-main {
+      grid-column: 1 / span 8;
+    }
+
+    .workflow-editor-note {
+      grid-column: 10 / -1;
+      padding: 1.2rem 0 0 1.4rem;
+      border-left: 1px solid rgba(164, 171, 160, 0.2);
+    }
+
+    .workflow-editor-label {
+      margin: 0 0 0.65rem;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray-medium);
+    }
+
+    .workflow-editor-note p:last-child,
+    .workflow-intro {
+      color: color-mix(in srgb, var(--gray-darkest) 60%, transparent);
+      line-height: var(--type-body-line-height);
+      letter-spacing: var(--type-body-tracking);
+    }
+
+    .workflow-intro {
+      max-width: 35rem;
+      margin: 1rem 0 0;
     }
 
     .workflow-actions {
       margin-top: 1.25rem;
       display: flex;
-      justify-content: center;
+      justify-content: flex-start;
     }
 
     .workflow-link {
@@ -1938,27 +2176,24 @@ const homeStructuredData = [
       padding: 0.9rem 1.3rem;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.96);
-      border: 1px solid rgba(115, 103, 94, 0.18);
-      box-shadow: 0 12px 22px rgba(47, 47, 47, 0.05);
+      box-shadow: 0 12px 22px rgba(47, 47, 47, 0.05), inset 0 0 0 1px rgba(115, 103, 94, 0.12);
       color: var(--gray-darkest);
       text-decoration: none;
       letter-spacing: 0.06em;
       transition:
         transform 0.25s ease,
-        background-color 0.25s ease,
-        border-color 0.25s ease;
+        background-color 0.25s ease;
     }
 
     .workflow-link:hover {
       transform: translateY(-2px);
       background: rgba(243, 237, 231, 1);
-      border-color: rgba(115, 103, 94, 0.24);
     }
 
     .workflow-summary {
       margin-bottom: 2.4rem;
-      padding: 1.35rem 1.45rem;
-      border-radius: 24px;
+      padding: 1.55rem 1.65rem;
+      border-radius: 28px;
       background:
         linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(244, 239, 232, 0.92) 100%);
       border: 1px solid rgba(115, 103, 94, 0.12);
@@ -1989,7 +2224,6 @@ const homeStructuredData = [
       padding: 0 0.9rem;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.8);
-      border: 1px solid rgba(115, 103, 94, 0.16);
       color: var(--gray-darkest);
       font-size: 0.88rem;
       letter-spacing: 0.05em;
@@ -2078,95 +2312,177 @@ const homeStructuredData = [
 
     .workflow-content {
       flex: 1;
-      padding: 1.4rem 1.5rem;
-      border-radius: 22px;
+      padding: 1.55rem 1.6rem;
+      border-radius: 28px;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(249, 246, 241, 0.9) 100%);
-      border: 1px solid rgba(115, 103, 94, 0.12);
-      box-shadow: 0 16px 30px rgba(47, 47, 47, 0.05);
+        linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(249, 246, 241, 0.68) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 18px 36px rgba(var(--brand-dark-rgb), 0.06);
+      backdrop-filter: blur(20px) saturate(132%);
     }
 
     .consult-section {
-      padding: clamp(5rem, 9vw, 7.5rem) 2rem;
+      min-height: 100vh;
+      padding: clamp(6rem, 11vw, 9rem) 2rem;
       background:
         radial-gradient(circle at top left, rgba(159, 147, 136, 0.04), transparent 24%),
         linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 241, 236, 1) 100%);
-    }
-
-    .consult-shell {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2.5rem;
-      border-radius: 28px;
-      background:
-        radial-gradient(circle at top right, rgba(159, 147, 136, 0.09), transparent 30%),
-        linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(73, 64, 57, 1) 100%);
-      color: var(--white);
       display: grid;
-      grid-template-columns: minmax(0, 1.5fr) auto;
-      gap: 2rem;
       align-items: center;
     }
 
+    .consult-shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: clamp(2.4rem, 5vw, 4rem);
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 30%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(244, 248, 248, 0.68) 100%);
+      color: var(--gray-darkest);
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+      gap: 2.5rem;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 30px 78px rgba(var(--brand-dark-rgb), 0.1);
+      backdrop-filter: blur(26px) saturate(140%);
+    }
+
     .consult-subtitle {
-      color: rgba(255, 255, 255, 0.62);
+      color: var(--tiffany-dark);
       margin-bottom: 1rem;
+    }
+
+    .consult-kicker {
+      margin: 0 0 1rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(115, 103, 94, 0.78);
     }
 
     .consult-title {
       margin: 0;
-      font-family: var(--font-serif);
-      font-size: clamp(1.9rem, 3vw, 3rem);
-      font-weight: 600;
-      line-height: 1.24;
-      letter-spacing: 0.022em;
+      max-width: 9.6ch;
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 5.4vw, 4.6rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: 0.07em;
     }
 
     .consult-description {
-      margin: 1rem 0 0;
-      max-width: 44rem;
+      margin: 1.35rem 0 0;
+      max-width: 32rem;
+      line-height: var(--type-body-line-height);
+      letter-spacing: 0.01em;
+      color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
+    }
+
+    .consult-note {
+      padding: 1.65rem 1.7rem;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at top right, rgba(159, 147, 136, 0.05), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(246, 241, 236, 0.58));
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 18px 40px rgba(var(--brand-dark-rgb), 0.07);
+      backdrop-filter: blur(22px) saturate(135%);
+    }
+
+    .consult-note-label {
+      margin: 0 0 0.65rem;
+      font-size: 0.76rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray-medium);
+    }
+
+    .consult-note-text {
+      margin: 0;
+      color: color-mix(in srgb, var(--gray-darkest) 60%, transparent);
       line-height: var(--type-body-line-height);
       letter-spacing: var(--type-body-tracking);
-      color: rgba(255, 255, 255, 0.76);
     }
 
     .consult-actions {
+      margin-top: 1.4rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      min-width: 240px;
+      gap: 0.85rem;
+      min-width: 0;
     }
 
     .consult-button {
-      display: inline-flex;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
+      gap: 1rem;
       text-decoration: none;
-      border-radius: 999px;
-      padding: 0.95rem 1.4rem;
-      letter-spacing: 0.08em;
+      border-radius: 24px;
+      padding: 1rem 1.05rem;
+      letter-spacing: 0.04em;
       transition:
         transform 0.25s ease,
         background-color 0.25s ease,
         border-color 0.25s ease,
-        color 0.25s ease;
+        color 0.25s ease,
+        box-shadow 0.25s ease;
     }
 
     .consult-button:hover {
       transform: translateY(-2px);
     }
 
+    .consult-button-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(115, 103, 94, 0.12);
+      color: rgba(79, 72, 66, 0.82);
+      flex-shrink: 0;
+    }
+
+    .consult-button-copy {
+      display: grid;
+      gap: 0.26rem;
+      min-width: 0;
+    }
+
+    .consult-button-copy strong {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-darkest);
+      line-height: 1.34;
+    }
+
+    .consult-button-copy small {
+      color: color-mix(in srgb, var(--gray-darkest) 60%, transparent);
+      line-height: 1.68;
+      font-size: 0.92rem;
+    }
+
     .consult-button-primary {
-      background: linear-gradient(135deg, var(--gray-darkest) 0%, #6a5f57 100%);
-      color: var(--white);
+      background:
+        radial-gradient(circle at top right, rgba(159, 147, 136, 0.06), transparent 36%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(245, 240, 234, 0.84));
+      color: var(--gray-darkest);
       border: 1px solid rgba(115, 103, 94, 0.18);
-      box-shadow: 0 16px 26px rgba(20, 20, 20, 0.2);
+      box-shadow: 0 14px 24px rgba(var(--brand-dark-rgb), 0.08);
     }
 
     .consult-button-secondary {
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--white);
-      border: 1px solid rgba(255, 255, 255, 0.36);
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--gray-darkest);
+      border: 1px solid rgba(115, 103, 94, 0.18);
       backdrop-filter: blur(12px);
     }
 
@@ -2189,9 +2505,48 @@ const homeStructuredData = [
       margin: 0;
     }
 
+    @media (max-width: 1024px) {
+      .workflow-header {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.1rem;
+        margin-bottom: 3.2rem;
+      }
+
+      .workflow-header-main,
+      .workflow-editor-note {
+        grid-column: 1 / -1;
+      }
+
+      .workflow-editor-note {
+        max-width: 38rem;
+        padding: 1rem 0 0;
+        border-left: 0;
+        border-top: 1px solid rgba(164, 171, 160, 0.2);
+      }
+
+      .consult-shell {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.75rem;
+        align-items: start;
+      }
+
+      .consult-copy,
+      .consult-note {
+        min-width: 0;
+      }
+
+      .consult-title {
+        max-width: 12ch;
+      }
+    }
+
     @media (max-width: 768px) {
       .workflow-section {
         padding: 3rem 1.5rem;
+      }
+
+      .workflow-header {
+        margin-bottom: 3rem;
       }
 
       .workflow-item {
@@ -2221,6 +2576,30 @@ const homeStructuredData = [
         font-size: 0.9rem;
       }
 
+      .consult-shell {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+        gap: 1.4rem;
+      }
+
+      .consult-title {
+        max-width: none;
+        font-size: clamp(2.3rem, 10.5vw, 3.4rem);
+        line-height: 1.12;
+        letter-spacing: 0.05em;
+      }
+
+      .consult-note {
+        padding: 1.25rem 1.2rem;
+        border-radius: 22px;
+      }
+
+      .consult-actions {
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+      }
+
       .smart-case-section {
         padding: 3rem 1.5rem;
       }
@@ -2239,6 +2618,11 @@ const homeStructuredData = [
         gap: 1rem;
       }
 
+      .workflow-actions,
+      .faq-actions {
+        justify-content: flex-start;
+      }
+
       .workflow-phase-list {
         justify-content: center;
       }
@@ -2249,6 +2633,19 @@ const homeStructuredData = [
 
       .workflow-content {
         padding-top: 0;
+      }
+
+      .consult-shell {
+        padding: 1.2rem;
+      }
+
+      .consult-title {
+        font-size: clamp(2rem, 9.5vw, 2.8rem);
+        line-height: 1.1;
+      }
+
+      .consult-note {
+        padding: 1.05rem 1rem;
       }
     }
   </style>

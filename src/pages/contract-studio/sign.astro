@@ -21,7 +21,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       </header>
 
       <div id="sign-empty" class="sign-empty">
-        目前沒有可顯示的合約資料，請先回到合約工作台建立內容後再開啟此頁。
+        <p>請先回到合約工作台建立內容後再開啟此頁</p>
       </div>
 
       <article id="contract-document" class="contract-document" hidden>
@@ -37,7 +37,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <section class="document-section">
           <div class="section-heading">
             <h3>付款節點</h3>
-            <p>以下付款比例與金額會以本次合約總額同步換算。</p>
+            <p>付款比例與金額會以合約總額同步換算</p>
           </div>
           <div id="payment-stage-groups" class="payment-stage-groups"></div>
         </section>
@@ -45,7 +45,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <section class="document-section">
           <div class="section-heading">
             <h3>核心條款</h3>
-            <p>簽署前請先完整閱讀以下約定內容。</p>
+            <p>請先完整閱讀以下約定內容</p>
           </div>
           <div id="section-list" class="section-list"></div>
         </section>
@@ -53,7 +53,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <section class="document-section">
           <div class="section-heading">
             <h3>材料規格確認表</h3>
-            <p>以下為本案約定的材料與交付標準基準，簽署前請一併確認。</p>
+            <p>約定的材料與交付標準基準</p>
           </div>
           <div id="material-spec-list" class="section-list"></div>
         </section>
@@ -61,7 +61,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <section class="document-section">
           <div class="section-heading">
             <h3>簽署確認</h3>
-            <p>請確認基本資料與勾選內容後，再用手機或平板手寫簽名。</p>
+            <p>用手機或平板手寫簽名</p>
           </div>
 
           <div class="signature-layout">
@@ -89,7 +89,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 </label>
               </div>
               <p class="signature-note">
-                簽署頁會先帶入合約中的客戶資料；請確認姓名、聯絡方式、完整身分識別、勾選確認項目並完成手寫簽名後再送出。
+                簽署頁會先帶入合約中的客戶資料；請完成基本資料填寫、勾選確認項目與手寫簽名後再送出。
               </p>
               <div id="signing-status" class="signing-status" aria-live="polite"></div>
 
@@ -101,7 +101,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                   <button type="button" id="clear-signature" class="btn btn-secondary btn-sm">清除簽名</button>
                 </div>
                 <canvas id="signature-canvas" class="signature-canvas"></canvas>
-                <p class="signature-note">可直接用手機手指或平板觸控筆簽名。</p>
+                <p>可直接用手機手指或平板觸控筆簽名</p>
               </div>
 
               <div class="signature-submit-row">
@@ -119,7 +119,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 <li>提前入住、分區點交與保固起算條款</li>
                 <li>簽後列印 / 另存 PDF 與已簽內容留存</li>
               </ul>
-              <p>若案件需要更高證據力，可再補 OTP、雙方分流簽署或後台不可竄改存證機制。</p>
+              <p>更高證據力需求，可再補 OTP、分流簽署或後台存證</p>
             </aside>
           </div>
         </section>
@@ -127,7 +127,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <section id="signed-record-section" class="document-section signed-record-section" hidden>
           <div class="section-heading">
             <h3>簽署完成紀錄</h3>
-            <p>簽署完成後，請從最下方開啟定稿頁並另存 PDF 留存。</p>
+            <p>簽署完成後，從最下方開啟定稿頁並另存 PDF 留存</p>
           </div>
           <p id="signed-record-note" class="signed-record-note"></p>
           <div class="signed-record-grid">

@@ -1,11 +1,11 @@
   .social-ops-page {
-    padding: 4.5rem 1.4rem 6rem;
+    padding: 5.25rem 1.4rem 6.5rem;
     background:
       radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 24%),
       radial-gradient(circle at right top, rgba(196, 196, 188, 0.05), transparent 28%),
       linear-gradient(180deg, #111111 0%, #151515 44%, #1a1a19 100%);
     color: #f1efea;
-    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -29,20 +29,20 @@
 
   .ops-hero,
   .ops-panel {
-    border-radius: 26px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     background:
-      linear-gradient(180deg, rgba(36, 36, 36, 0.92), rgba(22, 22, 23, 0.96));
+      linear-gradient(180deg, rgba(36, 36, 36, 0.84), rgba(22, 22, 23, 0.92));
     box-shadow:
-      0 20px 52px rgba(0, 0, 0, 0.22),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(18px);
+      0 24px 68px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(28px) saturate(140%);
   }
 
   .ops-hero {
-    padding: clamp(1.35rem, 2.7vw, 2.1rem);
+    padding: clamp(1.8rem, 3vw, 2.8rem);
     display: grid;
-    gap: 1.35rem;
+    gap: 1.6rem;
     grid-template-columns: minmax(0, 1.34fr) minmax(330px, 0.8fr);
   }
 
@@ -85,20 +85,20 @@
 
   .hero-copy h1 {
     margin: 0;
-    font-family: "Noto Sans TC", "PingFang TC", sans-serif;
-    font-size: clamp(2.15rem, 3.3vw, 3.35rem);
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: 0.01em;
+    font-family: var(--font-sans);
+    font-size: clamp(3.2rem, 6vw, 5.4rem);
+    font-weight: 780;
+    line-height: 0.92;
+    letter-spacing: -0.06em;
     color: #f7f6f2;
   }
 
   .ops-description {
-    margin: 0.62rem 0 0;
-    max-width: 320px;
-    color: rgba(233, 231, 225, 0.6);
-    font-size: 0.92rem;
-    line-height: 1.65;
+    margin: 1rem 0 0;
+    max-width: 30rem;
+    color: rgba(233, 231, 225, 0.62);
+    font-size: 0.98rem;
+    line-height: 1.72;
   }
 
   .hero-actions {
@@ -110,25 +110,30 @@
 
   .hero-actions .btn {
     min-height: 48px;
-    padding: 0.84rem 1.1rem;
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.9rem 1.15rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-width: 1px;
     font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0.02em;
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.14);
+    transition:
+      transform var(--motion-duration-fast) var(--motion-standard),
+      box-shadow var(--motion-duration-fast) var(--motion-standard),
+      border-color var(--motion-duration-fast) var(--motion-standard),
+      background var(--motion-duration-fast) var(--motion-standard);
   }
 
   .hero-actions .btn.btn-primary {
-    background: linear-gradient(180deg, rgba(247, 246, 241, 0.16), rgba(201, 197, 188, 0.1));
-    border-color: rgba(247, 246, 241, 0.18);
+    background: linear-gradient(180deg, rgba(247, 246, 241, 0.22), rgba(201, 197, 188, 0.12));
+    border-color: rgba(247, 246, 241, 0.22);
     color: #f7f6f2;
   }
 
   .hero-actions .btn.btn-secondary {
-    background: linear-gradient(180deg, rgba(248, 247, 243, 0.08), rgba(255, 255, 255, 0.03));
-    border-color: rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(248, 247, 243, 0.12), rgba(255, 255, 255, 0.04));
+    border-color: rgba(255, 255, 255, 0.12);
     color: #ece9e2;
   }
 
@@ -141,11 +146,11 @@
 
   .hero-actions .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 22px 36px rgba(0, 0, 0, 0.18);
   }
 
   .workspace-nav {
-    padding: 1.15rem 1.2rem 1.2rem;
+    padding: 1.35rem 1.4rem 1.4rem;
   }
 
   .workspace-nav-head {
@@ -163,8 +168,9 @@
 
   .workspace-nav-head h2 {
     color: #f7f6f2;
-    font-size: 1.1rem;
-    line-height: 1.35;
+    font-size: 1.28rem;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
   }
 
   .workspace-nav-head > p {
@@ -478,7 +484,7 @@
   }
 
   .ops-panel {
-    padding: 1.28rem;
+    padding: 1.4rem;
   }
 
   .ops-fold {
@@ -541,10 +547,10 @@
 
   .panel-heading h2 {
     margin: 0.2rem 0 0;
-    font-family: "Noto Sans TC", "PingFang TC", sans-serif;
-    font-size: 1.28rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
+    font-family: var(--font-sans);
+    font-size: 1.42rem;
+    font-weight: 720;
+    letter-spacing: -0.03em;
     color: #f5f3ef;
   }
 

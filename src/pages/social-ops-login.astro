@@ -84,7 +84,7 @@ if (Astro.request.method === "POST") {
     min-height: calc(100vh - 4rem);
     display: grid;
     place-items: center;
-    padding: 3rem 1.25rem 4rem;
+    padding: 4rem 1.25rem 5rem;
     background:
       radial-gradient(circle at top, rgba(255, 255, 255, 0.05), transparent 24%),
       linear-gradient(180deg, #111111 0%, #161616 48%, #1a1a19 100%);
@@ -93,15 +93,16 @@ if (Astro.request.method === "POST") {
   .ops-login-card {
     width: min(100%, 420px);
     display: grid;
-    gap: 1rem;
-    padding: 2rem;
-    border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: linear-gradient(180deg, rgba(36, 36, 36, 0.94), rgba(22, 22, 23, 0.98));
+    gap: 1.15rem;
+    padding: clamp(2rem, 4vw, 2.8rem);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(180deg, rgba(36, 36, 36, 0.84), rgba(22, 22, 23, 0.92));
     box-shadow:
-      0 20px 52px rgba(0, 0, 0, 0.22),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      0 24px 68px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
     color: #f1efea;
+    backdrop-filter: blur(28px) saturate(140%);
   }
 
   .ops-login-eyebrow {
@@ -113,15 +114,16 @@ if (Astro.request.method === "POST") {
 
   .ops-login-card h1 {
     margin: 0;
-    font-size: clamp(1.8rem, 4vw, 2.2rem);
-    line-height: 1.2;
+    font-size: clamp(2.8rem, 8vw, 4.6rem);
+    line-height: 0.94;
+    letter-spacing: -0.06em;
   }
 
   .ops-login-description,
   .ops-login-feedback {
     margin: 0;
-    color: rgba(233, 230, 224, 0.72);
-    line-height: 1.7;
+    color: rgba(233, 230, 224, 0.64);
+    line-height: 1.75;
   }
 
   .ops-login-form {
@@ -141,11 +143,11 @@ if (Astro.request.method === "POST") {
 
   .ops-login-field input {
     width: 100%;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.04);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
     color: #f7f3ea;
-    padding: 0.9rem 1rem;
+    padding: 0.96rem 1rem;
     font: inherit;
   }
 
@@ -158,12 +160,20 @@ if (Astro.request.method === "POST") {
   .ops-login-submit {
     border: 0;
     border-radius: 999px;
-    padding: 0.92rem 1.1rem;
+    padding: 0.98rem 1.1rem;
     font: inherit;
     font-weight: 600;
     color: #151515;
     background: linear-gradient(180deg, #f7f3ea, #dcd4c5);
     cursor: pointer;
+    transition:
+      transform var(--motion-duration-fast) var(--motion-standard),
+      box-shadow var(--motion-duration-fast) var(--motion-standard);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18);
+  }
+
+  .ops-login-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
   }
 
   .ops-login-field input:disabled,

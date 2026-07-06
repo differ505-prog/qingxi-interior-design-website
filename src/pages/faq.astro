@@ -3,26 +3,32 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 
 const faqItems = [
   {
+    label: "Fee Rhythm",
     question: "設計費用如何計算？",
     answer: "一般住宅設計費約為每坪 NT$ 3,000-6,000 元。先聊需求後，才會給你對得上的報價。",
   },
   {
+    label: "Project Timing",
     question: "從設計到完工需要多久時間？",
     answer: "整體時程約 3 到 6 個月，仍會依空間大小、工程內容與現場條件調整。",
   },
   {
+    label: "Service Scope",
     question: "可以只做設計不做工程嗎？",
     answer: "可以。若一起做設計加工程，品質與時程通常更好掌握。",
   },
   {
+    label: "Pre-Sale Edit",
     question: "預售屋可以提供客變服務嗎？",
     answer: "可以。青曦會先整理客變重點，再和建商對調整項目。",
   },
   {
+    label: "Aftercare",
     question: "工程保固期多久？",
     answer: "提供一年工程保固。保固期內若有施工瑕疵，會協助安排修復。",
   },
   {
+    label: "How To Begin",
     question: "第一次合作要怎麼開始？",
     answer: "先透過聯絡頁、官方 LINE 或需求表留下基本資訊，青曦會先釐清需求、預算與時程，再安排後續討論。",
   },
@@ -42,6 +48,7 @@ const faqStructuredData = [
     })),
   },
 ];
+const faqHeroImage = "/images/portfolio/xizhi-2.jpg";
 ---
 
 <BaseLayout
@@ -53,46 +60,155 @@ const faqStructuredData = [
   <section class="faq-page">
     <div class="faq-shell">
       <header class="faq-hero">
-        <p class="faq-eyebrow">FAQ</p>
-        <h1>先看常見問題，再決定要不要開始。</h1>
-        <p class="faq-description">
-          這裡整理設計費、時程、合作方式、客變與保固，讓你先快速判斷方向。
-        </p>
-        <div class="faq-hero-actions">
-          <a href="/contact" class="faq-button faq-button-primary">直接諮詢</a>
-          <a href="/tools" class="faq-button faq-button-secondary">先做估價</a>
+        <div class="faq-copy reveal-up" data-reveal-delay="0">
+          <p class="faq-eyebrow">FAQ</p>
+          <h1>把合作前最常卡住的事，先安靜看清楚。</h1>
+          <p class="faq-description">
+            比起把每件事講得很滿，青曦更想先把費用、時程、合作方式與保固節奏整理乾淨，讓你先判斷這是不是適合開始的合作方式。
+          </p>
+          <div class="faq-hero-actions">
+            <a href="/contact" class="faq-button faq-button-primary">直接諮詢</a>
+            <a href="/tools" class="faq-button faq-button-secondary">先做估價</a>
+          </div>
         </div>
+        <figure class="faq-hero-visual reveal-up" data-reveal-delay="120">
+          <img
+            src={faqHeroImage}
+            alt="室內設計空間案例照片"
+            width="1600"
+            height="1200"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          />
+          <figcaption>
+            <span>CONSULTATION NOTES</span>
+            <strong>先把疑問放回空間裡，再判斷要不要往下一步走。</strong>
+          </figcaption>
+        </figure>
       </header>
 
+      <section class="faq-curation reveal-up" data-reveal-delay="40">
+        <div class="faq-curation-copy">
+          <p class="faq-eyebrow">GUIDED START</p>
+          <h2>不是要你一次懂完，而是先知道合作節奏合不合。</h2>
+        </div>
+        <aside class="faq-curation-note">
+          <p class="faq-curation-label">Consultation Edit</p>
+          <p>以下六個問題，是正式聊設計前最常需要先對齊的地方。先把節奏、範圍與預算感看過一輪，後面的對話會更有效。</p>
+        </aside>
+      </section>
+
       <div class="faq-grid">
-        {faqItems.map((item) => (
-          <article class="faq-card">
+        {faqItems.map((item, index) => (
+          <article class="faq-card reveal-up" data-reveal-delay={String(80 + index * 30)}>
+            <p class="faq-card-label">{item.label}</p>
             <h2>{item.question}</h2>
             <p>{item.answer}</p>
           </article>
         ))}
       </div>
+
+      <section class="faq-closing reveal-up" data-reveal-delay="120">
+        <div class="faq-closing-copy">
+          <p class="faq-eyebrow">NEXT STEP</p>
+          <h2>如果大方向已經對得上，就往下一步吧。</h2>
+          <p>想先快速聊，直接進 LINE；想把需求整理完整，則從聯絡頁或需求表開始。</p>
+        </div>
+        <div class="faq-closing-actions">
+          <a href="/contact" class="faq-button faq-button-primary">前往聯絡頁</a>
+          <a href="https://lin.ee/U1HCeW4" target="_blank" rel="noreferrer" class="faq-button faq-button-secondary">加入官方 LINE</a>
+        </div>
+      </section>
     </div>
   </section>
 </BaseLayout>
 
 <style>
   .faq-page {
-    padding: 5rem 1.5rem;
+    padding: 6rem 1.5rem;
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.06), transparent 24%),
       linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(247, 248, 248, 1) 100%);
   }
 
   .faq-shell {
-    max-width: 1040px;
+    max-width: 1180px;
     margin: 0 auto;
   }
 
   .faq-hero {
-    text-align: center;
-    max-width: 44rem;
-    margin: 0 auto 2.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(320px, 0.88fr);
+    gap: 1.75rem;
+    align-items: center;
+    margin: 0 auto 4rem;
+    min-height: calc(100vh - 9rem);
+  }
+
+  .faq-copy {
+    max-width: 42rem;
+  }
+
+  .faq-hero-visual {
+    position: relative;
+    margin: 0;
+    min-height: 100%;
+    border-radius: 34px;
+    overflow: hidden;
+    box-shadow: 0 34px 82px rgba(var(--brand-dark-rgb), 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .faq-hero-visual::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(17, 17, 17, 0.08) 0%, rgba(17, 17, 17, 0.36) 100%),
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 34%);
+  }
+
+  .faq-hero-visual img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    object-fit: cover;
+  }
+
+  .faq-hero-visual figcaption {
+    position: absolute;
+    left: 1.6rem;
+    right: 1.6rem;
+    bottom: 1.6rem;
+    z-index: 1;
+    padding: 1.15rem 1.2rem 1.2rem;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: var(--white);
+    backdrop-filter: blur(18px) saturate(135%);
+  }
+
+  .faq-hero-visual span,
+  .faq-hero-visual strong {
+    display: block;
+  }
+
+  .faq-hero-visual span {
+    font-size: 0.76rem;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.74);
+  }
+
+  .faq-hero-visual strong {
+    margin-top: 0.55rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.2vw, 2.15rem);
+    font-weight: 500;
+    line-height: 1.24;
+    letter-spacing: 0.06em;
   }
 
   .faq-eyebrow {
@@ -106,27 +222,73 @@ const faqStructuredData = [
 
   .faq-hero h1 {
     margin: 0;
-    font-family: var(--font-serif);
-    font-size: clamp(2.2rem, 4vw, 3.6rem);
-    line-height: 1.24;
-    font-weight: 600;
-    letter-spacing: var(--type-title-tracking);
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 8vw, 6.4rem);
+    line-height: 1.04;
+    font-weight: 400;
+    letter-spacing: 0.1em;
     color: var(--gray-darkest);
   }
 
   .faq-description {
-    margin: 1.1rem auto 0;
-    color: var(--gray-medium);
+    margin: 1.4rem 0 0;
+    max-width: 34rem;
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
     line-height: 1.82;
-    letter-spacing: var(--type-body-tracking);
+    letter-spacing: 0.01em;
   }
 
   .faq-hero-actions {
     margin-top: 1.5rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     flex-wrap: wrap;
     gap: 0.85rem;
+  }
+
+  .faq-curation {
+    margin: 0 auto 3.5rem;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.4rem;
+    align-items: end;
+  }
+
+  .faq-curation-copy {
+    grid-column: 1 / span 7;
+  }
+
+  .faq-curation-copy h2,
+  .faq-closing-copy h2 {
+    margin: 0;
+    max-width: 9ch;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 5vw, 4.8rem);
+    line-height: 1.06;
+    letter-spacing: 0.08em;
+    font-weight: 400;
+    color: var(--gray-darkest);
+  }
+
+  .faq-curation-note {
+    grid-column: 9 / -1;
+    padding: 1.2rem 0 0 1.4rem;
+    border-left: 1px solid rgba(164, 171, 160, 0.2);
+  }
+
+  .faq-curation-label {
+    margin: 0 0 0.65rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8a837b;
+  }
+
+  .faq-curation-note p:last-child,
+  .faq-closing-copy p {
+    margin: 0;
+    line-height: 1.86;
+    color: color-mix(in srgb, var(--gray-darkest) 60%, transparent);
   }
 
   .faq-button {
@@ -141,8 +303,8 @@ const faqStructuredData = [
     letter-spacing: var(--type-cta-tracking);
     transition:
       transform 0.25s ease,
-      background-color 0.25s ease,
-      border-color 0.25s ease;
+      background-color var(--motion-duration-fast) var(--motion-standard),
+      border-color var(--motion-duration-fast) var(--motion-standard);
   }
 
   .faq-button:hover {
@@ -173,33 +335,103 @@ const faqStructuredData = [
 
   .faq-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.2rem;
   }
 
   .faq-card {
-    padding: 1.5rem;
-    border-radius: 24px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.14);
-    box-shadow: 0 18px 34px rgba(47, 47, 47, 0.05);
+    grid-column: span 6;
+    padding: 2.15rem 1.95rem 2.05rem;
+    border-radius: 30px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(249, 247, 243, 0.58) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 24px 56px rgba(var(--brand-dark-rgb), 0.08);
+    backdrop-filter: blur(22px) saturate(135%);
+    transition:
+      transform var(--motion-duration) var(--motion-standard),
+      box-shadow var(--motion-duration) var(--motion-standard),
+      border-color var(--motion-duration) var(--motion-standard);
+  }
+
+  .faq-card:nth-child(3n + 1) {
+    grid-column: 1 / span 7;
+  }
+
+  .faq-card:nth-child(3n + 2) {
+    grid-column: 8 / -1;
+    transform: translateY(1rem);
+  }
+
+  .faq-card:nth-child(3n) {
+    grid-column: 3 / span 8;
+  }
+
+  .faq-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 70px rgba(var(--brand-dark-rgb), 0.12);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .faq-card-label {
+    margin: 0 0 0.8rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8a837b;
   }
 
   .faq-card h2 {
     margin: 0;
-    font-family: var(--font-serif);
-    font-size: 1.18rem;
-    line-height: 1.42;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 2.5vw, 2.5rem);
+    line-height: 1.18;
     color: var(--gray-darkest);
-    letter-spacing: var(--type-title-tracking);
-    font-weight: 600;
+    letter-spacing: 0.06em;
+    font-weight: 500;
   }
 
   .faq-card p {
-    margin: 0.8rem 0 0;
-    color: var(--gray-medium);
+    margin: 1rem 0 0;
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
     line-height: 1.8;
-    letter-spacing: var(--type-body-tracking);
+    letter-spacing: 0.01em;
+  }
+
+  .faq-closing {
+    margin-top: 4rem;
+    min-height: clamp(320px, 56svh, 520px);
+    padding: clamp(2rem, 4vw, 3rem);
+    border-radius: 34px;
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.7fr);
+    gap: 1.5rem;
+    align-items: end;
+    background:
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 30%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(244, 248, 248, 0.68) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 30px 78px rgba(var(--brand-dark-rgb), 0.1);
+    backdrop-filter: blur(24px) saturate(135%);
+  }
+
+  .faq-closing-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.85rem;
+  }
+
+  .reveal-up {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+    transition:
+      opacity 1s var(--motion-standard),
+      transform 1s var(--motion-standard);
+  }
+
+  .reveal-up.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 
   @media (max-width: 768px) {
@@ -207,11 +439,76 @@ const faqStructuredData = [
       padding: 4rem 1.25rem;
     }
 
+    .faq-hero {
+      grid-template-columns: 1fr;
+      min-height: auto;
+      margin-bottom: 2.5rem;
+    }
+
+    .faq-curation,
+    .faq-closing {
+      grid-template-columns: 1fr;
+      min-height: auto;
+      gap: 1rem;
+    }
+
+    .faq-curation-copy,
+    .faq-curation-note {
+      grid-column: auto;
+    }
+
+    .faq-curation-note {
+      padding: 0.9rem 0 0 0;
+      border-left: 0;
+      border-top: 1px solid rgba(164, 171, 160, 0.2);
+    }
+
+    .faq-hero h1 {
+      font-size: clamp(2.35rem, 10vw, 3.3rem);
+      line-height: 1.18;
+      letter-spacing: 0.07em;
+    }
+
+    .faq-curation-copy h2,
+    .faq-closing-copy h2 {
+      font-size: clamp(2.1rem, 8.8vw, 2.9rem);
+      letter-spacing: 0.06em;
+      max-width: none;
+    }
+
+    .faq-hero-visual {
+      border-radius: 24px;
+    }
+
+    .faq-hero-visual img {
+      min-height: 320px;
+    }
+
+    .faq-hero-visual figcaption {
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      padding: 0.95rem 1rem 1rem;
+    }
+
     .faq-grid {
       grid-template-columns: 1fr;
     }
 
+    .faq-card,
+    .faq-card:nth-child(3n + 1),
+    .faq-card:nth-child(3n + 2),
+    .faq-card:nth-child(3n) {
+      grid-column: auto;
+      transform: none;
+    }
+
     .faq-hero-actions {
+      flex-direction: column;
+    }
+
+    .faq-closing-actions {
+      justify-content: flex-start;
       flex-direction: column;
     }
 
@@ -220,3 +517,32 @@ const faqStructuredData = [
     }
   }
 </style>
+
+<script is:inline>
+  const faqReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const faqRevealTargets = Array.from(document.querySelectorAll(".reveal-up"));
+
+  if (faqReducedMotion.matches) {
+    faqRevealTargets.forEach((node) => node.classList.add("is-visible"));
+  } else {
+    const faqObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const element = entry.target;
+          const delay = Number(element.getAttribute("data-reveal-delay") || "0");
+          window.setTimeout(() => {
+            element.classList.add("is-visible");
+          }, delay);
+          faqObserver.unobserve(element);
+        });
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -8% 0px",
+      },
+    );
+
+    faqRevealTargets.forEach((node) => faqObserver.observe(node));
+  }
+</script>

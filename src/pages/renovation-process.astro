@@ -1154,19 +1154,20 @@ const processStructuredData = [
 
 <style>
   .process-page {
-    padding: 5rem 1.5rem;
+    padding: clamp(5rem, 7vw, 6.8rem) 1.5rem 5.8rem;
     background:
-      radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 24%),
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.1), transparent 24%),
+      radial-gradient(circle at top left, rgba(164, 193, 191, 0.08), transparent 26%),
       linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(245, 240, 234, 1) 100%);
   }
 
   .process-shell {
-    max-width: 1320px;
+    max-width: 1280px;
     margin: 0 auto;
   }
 
   .process-hero {
-    max-width: 56rem;
+    max-width: 58rem;
     margin: 0 auto;
     text-align: center;
   }
@@ -1177,10 +1178,10 @@ const processStructuredData = [
   .notes-label,
   .schedule-eyebrow {
     margin: 0 0 0.85rem;
-    color: var(--gray-medium);
+    color: color-mix(in srgb, var(--gray-medium) 92%, white 8%);
     font-size: 0.8rem;
     font-weight: 600;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
   }
 
@@ -1197,28 +1198,30 @@ const processStructuredData = [
   }
 
   .process-hero h1 {
-    font-size: clamp(2.3rem, 4.4vw, 4rem);
+    font-size: clamp(2.85rem, 5.6vw, 5rem);
+    line-height: 1.08;
+    letter-spacing: 0.01em;
   }
 
   .process-description,
   .schedule-description {
-    margin: 1.1rem auto 0;
-    color: var(--gray-medium);
-    line-height: 1.9;
-    letter-spacing: 0.008em;
+    margin: 1.2rem auto 0;
+    color: color-mix(in srgb, var(--gray-dark) 62%, white 38%);
+    line-height: 1.96;
+    letter-spacing: 0.012em;
   }
 
   .process-description {
-    max-width: 48rem;
+    max-width: 44rem;
   }
 
   .process-actions,
   .notes-actions {
-    margin-top: 1.5rem;
+    margin-top: 1.9rem;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 0.85rem;
+    gap: 0.8rem;
   }
 
   .process-button {
@@ -1226,14 +1229,16 @@ const processStructuredData = [
     align-items: center;
     justify-content: center;
     min-height: 52px;
-    padding: 0.92rem 1.4rem;
+    padding: 0.92rem 1.35rem;
     border-radius: 999px;
     text-decoration: none;
-    letter-spacing: 0.06em;
+    font-size: 0.94rem;
+    letter-spacing: 0.04em;
     transition:
       transform 0.25s ease,
       background-color 0.25s ease,
-      border-color 0.25s ease;
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
   }
 
   .process-button:hover,
@@ -1246,31 +1251,31 @@ const processStructuredData = [
     background: linear-gradient(135deg, var(--gray-darkest) 0%, #6a5f57 100%);
     color: var(--white);
     border: 1px solid rgba(115, 103, 94, 0.18);
-    box-shadow: 0 16px 26px rgba(20, 20, 20, 0.14);
+    box-shadow: 0 14px 24px rgba(20, 20, 20, 0.12);
   }
 
   .process-button-secondary,
   .schedule-action {
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(255, 255, 255, 0.74);
     color: var(--gray-darkest);
-    border: 1px solid rgba(101, 91, 84, 0.22);
-    box-shadow: 0 12px 22px rgba(47, 47, 47, 0.05);
+    border: 1px solid rgba(101, 91, 84, 0.16);
+    box-shadow: 0 10px 18px rgba(47, 47, 47, 0.04);
   }
 
   .process-stage-overview {
-    margin-top: 3rem;
-    padding: 2rem;
-    border-radius: 26px;
-    border: 1px solid rgba(115, 103, 94, 0.12);
-    background: rgba(255, 252, 247, 0.98);
-    box-shadow: 0 18px 34px rgba(88, 62, 39, 0.05);
+    margin-top: 3.4rem;
+    padding: 2.2rem 0 0;
+    border-radius: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .section-heading {
     display: grid;
     gap: 0.85rem;
-    margin-bottom: 1.8rem;
-    max-width: 56rem;
+    margin-bottom: 2rem;
+    max-width: 52rem;
   }
 
   .section-eyebrow {
@@ -1278,32 +1283,32 @@ const processStructuredData = [
     color: #8b6a4d;
     font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
   }
 
   .section-heading h2 {
     font-family: var(--font-serif);
-    font-size: 1.7rem;
+    font-size: clamp(1.8rem, 3vw, 2.35rem);
     color: #2f241d;
     margin: 0;
-    line-height: 1.24;
-    letter-spacing: 0.02em;
+    line-height: 1.18;
+    letter-spacing: 0.015em;
   }
 
   .section-heading p {
     margin: 0;
-    line-height: 1.78;
-    letter-spacing: 0.05em;
+    line-height: 1.86;
+    letter-spacing: 0.015em;
     color: rgba(47, 36, 29, 0.82);
   }
 
   .flow-grid {
     position: relative;
     display: grid;
-    gap: 1rem;
+    gap: 1.15rem;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    padding-top: 1.65rem;
+    padding-top: 1.8rem;
   }
 
   .flow-grid::before {
@@ -1318,13 +1323,14 @@ const processStructuredData = [
 
   .flow-card {
     position: relative;
-    border-radius: 24px;
-    border: 1px solid rgba(109, 82, 58, 0.12);
-    background: #fffdf8;
-    padding: 2rem 1.5rem 1.5rem;
+    border-radius: 26px;
+    border: 1px solid rgba(109, 82, 58, 0.1);
+    background: rgba(255, 253, 248, 0.74);
+    backdrop-filter: blur(16px);
+    padding: 2rem 1.45rem 1.5rem;
     display: grid;
     gap: 0.95rem;
-    box-shadow: 0 18px 34px rgba(88, 62, 39, 0.05);
+    box-shadow: 0 16px 30px rgba(88, 62, 39, 0.04);
   }
 
   .flow-card::before {
@@ -1355,27 +1361,27 @@ const processStructuredData = [
 
   .flow-tag {
     border-radius: 999px;
-    background: rgba(139, 106, 77, 0.1);
+    background: rgba(139, 106, 77, 0.08);
     color: #7a5a3f;
     padding: 0.36rem 0.72rem;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
   }
 
   .flow-card h3 {
     margin: 0;
-    font-size: 1.15rem;
-    line-height: 1.4;
-    letter-spacing: 0.03em;
+    font-size: 1.18rem;
+    line-height: 1.36;
+    letter-spacing: 0.02em;
     font-family: var(--font-serif);
     color: #2f241d;
   }
 
   .flow-card p {
     margin: 0;
-    line-height: 1.78;
-    letter-spacing: 0.05em;
+    line-height: 1.84;
+    letter-spacing: 0.012em;
     color: rgba(47, 36, 29, 0.82);
   }
 
@@ -1383,10 +1389,10 @@ const processStructuredData = [
   .schedule-tools,
   .process-brief,
   .process-notes {
-    margin-top: 2rem;
+    margin-top: 2.35rem;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
+    gap: 1.15rem;
   }
 
   .schedule-tools,
@@ -1398,20 +1404,20 @@ const processStructuredData = [
   .brief-card,
   .notes-card,
   .schedule-card {
-    border-radius: 26px;
-    border: 1px solid rgba(115, 103, 94, 0.14);
-    box-shadow: 0 18px 34px rgba(47, 47, 47, 0.05);
+    border-radius: 28px;
+    border: 1px solid rgba(115, 103, 94, 0.12);
+    box-shadow: 0 16px 30px rgba(47, 47, 47, 0.04);
   }
 
   .brief-card,
   .notes-card,
   .schedule-card-secondary {
-    padding: 1.5rem;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(249, 250, 250, 1) 100%);
+    padding: 1.55rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(249, 250, 250, 0.98) 100%);
   }
 
   .schedule-card-primary {
-    padding: 1.6rem;
+    padding: 1.7rem;
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 28%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 239, 234, 1) 100%);
@@ -1459,10 +1465,10 @@ const processStructuredData = [
   }
 
   .project-type-copy {
-    margin: 0.7rem 0 0;
+    margin: 0.78rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.72;
-    letter-spacing: 0.008em;
+    line-height: 1.82;
+    letter-spacing: 0.012em;
   }
 
   .schedule-form {
@@ -1516,11 +1522,11 @@ const processStructuredData = [
   }
 
   .schedule-summary {
-    margin: 1rem 0 0;
+    margin: 1.15rem 0 0;
     min-height: 1.8rem;
     color: var(--gray-darkest);
-    line-height: 1.75;
-    letter-spacing: 0.008em;
+    line-height: 1.82;
+    letter-spacing: 0.012em;
   }
 
   .schedule-helper {
@@ -1531,11 +1537,12 @@ const processStructuredData = [
   }
 
   .schedule-mode-copy {
-    margin-top: 1rem;
-    padding: 1rem 1.05rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px solid rgba(115, 103, 94, 0.1);
+    margin-top: 1.1rem;
+    padding: 1rem 0 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.14);
   }
 
   .schedule-mode-title,
@@ -1550,10 +1557,10 @@ const processStructuredData = [
   }
 
   .schedule-mode-description {
-    margin-top: 0.45rem;
+    margin-top: 0.5rem;
     color: var(--gray-medium);
-    line-height: 1.75;
-    letter-spacing: 0.008em;
+    line-height: 1.82;
+    letter-spacing: 0.012em;
   }
 
   .schedule-mode-switch {
@@ -1590,8 +1597,8 @@ const processStructuredData = [
   .schedule-metrics {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem;
-    margin-top: 1rem;
+    gap: 1rem;
+    margin-top: 1.15rem;
   }
 
   .schedule-metrics-compact {
@@ -1599,32 +1606,36 @@ const processStructuredData = [
   }
 
   .schedule-metric {
-    padding: 1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(115, 103, 94, 0.12);
+    padding: 1rem 0 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.14);
   }
 
   .schedule-metric strong {
     display: block;
     font-family: var(--font-serif);
-    font-size: 1.8rem;
+    font-size: clamp(1.9rem, 3vw, 2.2rem);
     line-height: 1;
     color: var(--gray-darkest);
   }
 
   .schedule-metric span {
     display: block;
-    margin-top: 0.4rem;
+    margin-top: 0.45rem;
     color: var(--gray-medium);
-    line-height: 1.6;
+    line-height: 1.68;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
   }
 
   .brief-card h2 {
     margin: 0;
     font-family: var(--font-serif);
-    font-size: clamp(1.45rem, 2.6vw, 1.9rem);
-    line-height: 1.4;
+    font-size: clamp(1.55rem, 2.8vw, 2rem);
+    line-height: 1.32;
     color: var(--gray-darkest);
     font-weight: 600;
   }
@@ -1636,24 +1647,25 @@ const processStructuredData = [
   }
 
   .brief-inline-copy {
-    margin: 0.7rem 0 0;
+    margin: 0.85rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.75;
-    letter-spacing: 0.008em;
+    line-height: 1.82;
+    letter-spacing: 0.012em;
   }
 
   .brief-window-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem;
-    margin-top: 1rem;
+    gap: 1rem;
+    margin-top: 1.2rem;
   }
 
   .brief-window-item {
-    padding: 1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(115, 103, 94, 0.12);
+    padding: 1rem 0 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.14);
   }
 
   .brief-window-item span,
@@ -1663,61 +1675,71 @@ const processStructuredData = [
 
   .brief-window-item span {
     color: var(--gray-medium);
-    font-size: 0.8rem;
-    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
 
   .brief-window-item strong {
     display: block;
-    margin-top: 0.55rem;
+    margin-top: 0.6rem;
     color: var(--gray-darkest);
-    font-size: 1rem;
-    line-height: 1.7;
+    font-size: 1.02rem;
+    line-height: 1.72;
     letter-spacing: 0.01em;
   }
 
   .brief-window-item small {
-    margin-top: 0.55rem;
+    margin-top: 0.6rem;
     color: var(--gray-medium);
-    line-height: 1.7;
+    line-height: 1.78;
   }
 
   .brief-tag-list {
-    margin-top: 1rem;
+    margin-top: 1.1rem;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.65rem;
+    gap: 0.55rem;
   }
 
   .brief-tag {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem 0.8rem;
+    padding: 0.42rem 0.75rem;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(115, 103, 94, 0.14);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(115, 103, 94, 0.12);
     color: var(--gray-darkest);
-    font-size: 0.84rem;
-    letter-spacing: 0.02em;
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
   }
 
   .brief-card > p:last-of-type {
-    margin: 1rem 0 0;
+    margin: 1.05rem 0 0;
     color: var(--gray-medium);
-    line-height: 1.82;
-    letter-spacing: 0.008em;
+    line-height: 1.86;
+    letter-spacing: 0.012em;
   }
 
   .gantt-section {
+    position: relative;
     margin-top: 2rem;
-    padding: 1.4rem;
-    border-radius: 32px;
-    background:
-      radial-gradient(circle at top right, rgba(159, 147, 136, 0.06), transparent 28%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(247, 243, 238, 0.98) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.14);
-    box-shadow: 0 22px 42px rgba(47, 47, 47, 0.06);
+    padding: 2rem 0 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .gantt-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: min(7.5rem, 22vw);
+    height: 1px;
+    background: linear-gradient(90deg, rgba(115, 103, 94, 0.34), rgba(115, 103, 94, 0));
   }
 
   .gantt-header {
@@ -1725,7 +1747,7 @@ const processStructuredData = [
     justify-content: space-between;
     align-items: end;
     gap: 1rem;
-    padding: 0.4rem 0.4rem 1.2rem;
+    padding: 0 0 1.45rem;
   }
 
   .gantt-header h2 {
@@ -1735,23 +1757,26 @@ const processStructuredData = [
   .gantt-legend-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.2rem;
-    padding: 0 0.35rem;
+    gap: 1.2rem;
+    margin-bottom: 1.55rem;
+    padding: 0;
   }
 
   .legend-group {
-    padding: 1rem 1.05rem;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.84);
-    border: 1px solid rgba(115, 103, 94, 0.1);
+    padding: 1rem 0 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.14);
   }
 
   .legend-group > p {
     margin: 0 0 0.8rem;
     color: var(--gray-darkest);
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   .legend-items {
@@ -1768,6 +1793,7 @@ const processStructuredData = [
     display: flex;
     gap: 0.7rem;
     align-items: flex-start;
+    padding-top: 0.15rem;
   }
 
   .legend-item strong,
@@ -1892,20 +1918,23 @@ const processStructuredData = [
 
   .gantt-board {
     overflow-x: auto;
-    padding-bottom: 0.3rem;
+    padding: 1.35rem 0 0.4rem;
+    border-top: 1px solid rgba(115, 103, 94, 0.12);
+    scrollbar-gutter: stable both-edges;
   }
 
   .gantt-axis,
   .gantt-row {
-    min-width: 1500px;
+    min-width: 1460px;
     display: grid;
-    grid-template-columns: minmax(340px, 388px) minmax(460px, 0.88fr) minmax(250px, 292px);
+    grid-template-columns: minmax(318px, 372px) minmax(440px, 0.92fr) minmax(250px, 292px);
     gap: 0.85rem;
     align-items: stretch;
   }
 
   .gantt-axis {
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.95rem;
+    padding-bottom: 0.3rem;
   }
 
   .gantt-axis-stage,
@@ -1919,7 +1948,7 @@ const processStructuredData = [
 
   .gantt-axis-stage,
   .gantt-axis-detail {
-    padding: 0 0.75rem;
+    padding: 0 0.4rem;
     display: flex;
     align-items: center;
   }
@@ -1943,38 +1972,39 @@ const processStructuredData = [
   .gantt-rows {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0;
   }
 
   .gantt-row {
-    padding: 0.95rem;
-    border-radius: 26px;
-    background: rgba(255, 255, 255, 0.94);
-    border: 1px solid rgba(115, 103, 94, 0.12);
-    box-shadow: 0 14px 30px rgba(47, 47, 47, 0.04);
+    padding: 1.25rem 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(115, 103, 94, 0.12);
+    box-shadow: none;
   }
 
   .gantt-row-optional {
-    background: linear-gradient(180deg, rgba(255, 250, 245, 0.96) 0%, rgba(255, 255, 255, 0.94) 100%);
+    background: transparent;
   }
 
   .gantt-stage {
     display: flex;
-    gap: 1rem;
+    gap: 0.9rem;
   }
 
   .gantt-stage-number {
-    flex: 0 0 52px;
-    width: 52px;
-    height: 52px;
-    border-radius: 18px;
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    border-radius: 15px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: var(--white);
     font-weight: 600;
     letter-spacing: 0.04em;
-    box-shadow: 0 12px 20px rgba(47, 47, 47, 0.12);
+    box-shadow: 0 10px 18px rgba(47, 47, 47, 0.1);
   }
 
   .gantt-stage-number-planning {
@@ -2025,8 +2055,8 @@ const processStructuredData = [
   .gantt-stage h3 {
     margin: 0.45rem 0 0;
     font-family: var(--font-serif);
-    font-size: 1.18rem;
-    line-height: 1.45;
+    font-size: clamp(1.16rem, 1.6vw, 1.32rem);
+    line-height: 1.38;
     color: var(--gray-darkest);
     font-weight: 600;
   }
@@ -2060,6 +2090,7 @@ const processStructuredData = [
     display: grid;
     align-items: center;
     min-height: 100%;
+    padding: 0.2rem 0;
   }
 
   .gantt-track-grid {
@@ -2067,10 +2098,10 @@ const processStructuredData = [
   }
 
   .gantt-track-grid span {
-    min-height: 86px;
-    border-radius: 14px;
-    background: linear-gradient(180deg, rgba(245, 240, 235, 0.58) 0%, rgba(238, 241, 243, 0.44) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.05);
+    min-height: 92px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(246, 241, 236, 0.44) 0%, rgba(239, 242, 244, 0.24) 100%);
+    border: 1px solid rgba(115, 103, 94, 0.04);
   }
 
   .gantt-row-planning .gantt-track-grid span {
@@ -2086,13 +2117,13 @@ const processStructuredData = [
     position: absolute;
     left: calc(((var(--start) - 1) / 28) * 100%);
     width: calc((var(--span) / 28) * 100%);
-    min-height: 56px;
-    border-radius: 17px;
+    min-height: 52px;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--white);
-    box-shadow: 0 16px 22px rgba(47, 47, 47, 0.16);
+    box-shadow: 0 12px 18px rgba(47, 47, 47, 0.14);
   }
 
   .gantt-bar-planning {
@@ -2134,15 +2165,16 @@ const processStructuredData = [
 
   .gantt-detail {
     display: grid;
-    gap: 0.9rem;
+    gap: 0.85rem;
     align-content: start;
   }
 
   .gantt-detail-block {
-    padding: 0.95rem 1rem;
-    border-radius: 18px;
-    background: rgba(250, 250, 250, 0.92);
-    border: 1px solid rgba(115, 103, 94, 0.08);
+    padding: 0.2rem 0 0 0.9rem;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
+    border-left: 1px solid rgba(115, 103, 94, 0.12);
   }
 
   .gantt-detail-block ul,
@@ -2216,7 +2248,16 @@ const processStructuredData = [
 
   @media (max-width: 768px) {
     .process-page {
-      padding: 4rem 1.25rem;
+      padding: 4.35rem 1.15rem 4.4rem;
+    }
+
+    .process-hero h1 {
+      font-size: clamp(2.4rem, 11vw, 3.45rem);
+      line-height: 1.12;
+    }
+
+    .process-description {
+      max-width: 100%;
     }
 
     .process-actions,
@@ -2250,20 +2291,46 @@ const processStructuredData = [
       border-radius: 20px;
     }
 
+    .process-stage-overview {
+      margin-top: 2.7rem;
+      padding-top: 1.75rem;
+    }
+
+    .section-heading {
+      margin-bottom: 1.65rem;
+    }
+
+    .flow-grid {
+      padding-top: 1.45rem;
+    }
+
     .gantt-section {
-      padding: 1rem;
-      border-radius: 24px;
+      padding: 1.5rem 0 0;
+    }
+
+    .gantt-header {
+      padding-bottom: 1.2rem;
     }
 
     .gantt-axis,
     .gantt-row {
-      min-width: 1500px;
+      min-width: 1320px;
+      grid-template-columns: minmax(268px, 308px) minmax(392px, 0.9fr) minmax(220px, 256px);
+      gap: 0.75rem;
+    }
+
+    .gantt-board {
+      padding-top: 1.1rem;
     }
 
     .legend-items,
     .schedule-metrics,
     .brief-window-grid {
       grid-template-columns: 1fr;
+    }
+
+    .legend-group {
+      padding-top: 0.9rem;
     }
   }
 </style>

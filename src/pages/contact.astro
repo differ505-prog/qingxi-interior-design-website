@@ -9,6 +9,8 @@ const quickConsultationAction = requirementFormId
 const quickConsultationEnabled = Boolean(quickConsultationAction);
 const siteOrigin = (Astro.site || new URL("https://qingxidesign.tw")).toString();
 const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).toString();
+const contactHeroImage = "/images/portfolio/xizhi-3.jpg";
+const contactFormImage = "/images/portfolio/xizhi-1.jpg";
 ---
 
 <BaseLayout
@@ -20,79 +22,151 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   <section class="contact-page">
     <div class="contact-shell">
       <div class="contact-hero">
-        <div class="contact-copy">
+        <div class="contact-copy reveal-up" data-reveal-delay="0">
           <p class="contact-eyebrow">NEXT STEP</p>
-          <h1>先把需求留下，後面就快很多。</h1>
+          <h1>把想住進去的畫面，先告訴我們。</h1>
           <p class="contact-description">
-            住宅、客變、翻修，都可以先從這裡開始。
+            從格局、光線、材質到預算節奏，先把空間想像說清楚，後面的討論就會更準。
           </p>
 
           <div class="contact-highlights">
-            <span>初步諮詢免費</span>
-            <span>大台北地區服務</span>
+            <span>住宅 / 客變 / 翻修</span>
+            <span>可先線上討論</span>
+            <span>汐止工作室可預約</span>
           </div>
 
-        <div class="contact-credential">
-          <p class="contact-credential-label">PROFESSIONAL ASSURANCE</p>
-          <p class="contact-credential-title">室內裝修工程管理乙級證照</p>
-          <p class="contact-credential-meta">技術士證編號：126-0024871</p>
-          <p class="contact-credential-description">
-            工程與時程也會一起看。
+          <div class="contact-credential">
+            <p class="contact-credential-label">LICENSED PRACTICE</p>
+            <p class="contact-credential-title">室內裝修工程管理乙級證照</p>
+            <p class="contact-credential-meta">技術士證編號：126-0024871</p>
+            <p class="contact-credential-description">
+              不只談風格，也一起把施工與時程條件看清楚。
+            </p>
+          </div>
+        </div>
+
+        <div class="contact-hero-visual-stack reveal-up" data-reveal-delay="120">
+          <figure class="contact-hero-visual">
+            <img
+              src={contactHeroImage}
+              alt="青曦空間設計作品中的客廳與收邊細節"
+              width="1600"
+              height="1200"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+            />
+            <figcaption>
+              <span>CONSULTATION MOOD</span>
+              <strong>先讓空間氣氛與生活節奏被看見，再談做法。</strong>
+            </figcaption>
+          </figure>
+
+          <aside class="contact-aside">
+            <p class="aside-label">CONSULTING FLOW</p>
+            <ol class="aside-steps">
+              <li>先留下空間現況與最在意的生活感</li>
+              <li>再一起確認預算、時程與施工條件</li>
+              <li>合適的話，再安排後續討論或工作室體驗</li>
+            </ol>
+          </aside>
+        </div>
+      </div>
+
+      <section class="contact-ritual reveal-up" data-reveal-delay="40">
+        <div class="contact-ritual-copy">
+          <p class="contact-eyebrow">HOW TO START</p>
+          <h2>先選一個比較舒服的開始方式。</h2>
+          <p>
+            想先快速聊方向，可以直接進 LINE；若你已經整理好需求，也可以直接往下留下空間條件與生活重點。
           </p>
         </div>
+
+        <div class="contact-actions">
+          <a
+            href="https://lin.ee/U1HCeW4"
+            target="_blank"
+            rel="noreferrer"
+            class="contact-card contact-card-primary"
+            data-contact-cta="line"
+          >
+            <div class="card-icon line-color">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"
+                ></path>
+              </svg>
+            </div>
+            <p class="card-label">即時聯繫</p>
+            <h2>加入官方 LINE</h2>
+            <p class="card-description">適合先快速聊需求輪廓、預算方向與合作節奏。</p>
+            <span class="card-link">立即開始聊</span>
+          </a>
+
+          <a
+            href="#quick-form-title"
+            class="contact-card"
+            data-contact-cta="quick-form"
+          >
+            <div class="card-icon form-color">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="64"
+                height="64"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M14 3h7v7"></path>
+                <path d="M10 14 21 3"></path>
+                <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"></path>
+              </svg>
+            </div>
+            <p class="card-label">安靜整理</p>
+            <h2>留下空間條件</h2>
+            <p class="card-description">適合已經有初步想法，想一次把需求與生活重點整理清楚。</p>
+            <span class="card-link">往下填表</span>
+          </a>
         </div>
+      </section>
 
-        <aside class="contact-aside">
-          <p class="aside-label">CONSULTING FLOW</p>
-          <ol class="aside-steps">
-            <li>先留需求</li>
-            <li>再對預算與時程</li>
-            <li>再安排後續討論</li>
-          </ol>
-        </aside>
-      </div>
-
-      <div class="contact-actions">
-        <a
-          href="https://lin.ee/U1HCeW4"
-          target="_blank"
-          rel="noreferrer"
-          class="contact-card contact-card-primary"
-          data-contact-cta="line"
-        >
-          <div class="card-icon line-color">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="64"
-              height="64"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path
-                d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"
-              ></path>
-            </svg>
-          </div>
-          <p class="card-label">即時聯繫</p>
-          <h2>加入官方 LINE</h2>
-          <p class="card-description">適合先快速聊方向。</p>
-          <span class="card-link">立即開始聊</span>
-        </a>
-      </div>
-
-      <section class="quick-form-panel">
+      <section class="quick-form-panel reveal-up" data-reveal-delay="0">
         <div class="quick-form-copy">
-          <p class="quick-form-eyebrow">QUICK CONSULTATION</p>
-          <h2 id="quick-form-title">先留聯絡資訊與需求重點。</h2>
+          <p class="quick-form-eyebrow">CONSULTATION NOTE</p>
+          <h2 id="quick-form-title">先把空間條件與生活感說清楚。</h2>
           <p class="quick-form-description" id="quick-form-description">
-            約 1 分鐘，先確認方向。
+            約 1 分鐘，把最重要的使用情境、預算節奏與時間點留下來，我們後續才知道該從哪裡開始陪你往下走。
           </p>
           <div class="quick-form-highlights">
             <span>約 1 分鐘完成</span>
             <span>先確認方向</span>
+            <span>可銜接完整需求表</span>
           </div>
+          <figure class="quick-form-visual">
+            <img
+              src={contactFormImage}
+              alt="青曦空間設計作品中的餐廚與光線氛圍"
+              width="1600"
+              height="1200"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>
+              <span>SPACE BRIEF</span>
+              <strong>把你在意的光、材質、動線與日常節奏，先留在這裡。</strong>
+            </figcaption>
+          </figure>
           <p class="quick-form-direct-note">
-            需求已整理好，可直接填完整需求表。
+            如果需求已經整理得更完整，也可以先填完下方三項基本資訊，再銜接完整需求表。
           </p>
         </div>
 
@@ -181,7 +255,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
         </div>
       </section>
 
-      <section class="social-panel">
+      <section class="social-panel reveal-up" data-reveal-delay="80">
         <div class="social-copy">
           <p class="social-label">FOLLOW QINGXI</p>
           <h2>也可以先從社群看看青曦。</h2>
@@ -221,7 +295,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
 <style>
   .contact-page {
-    padding: 5rem 1.5rem 4.5rem;
+    padding: 6rem 1.5rem 5rem;
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.06), transparent 24%),
       linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(245, 240, 234, 1) 100%);
@@ -234,18 +308,20 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
   .contact-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 360px);
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.98fr);
+    gap: 2.4rem;
     align-items: end;
+    min-height: max(700px, calc(100svh - 9rem));
   }
 
   .contact-copy h1 {
     margin: 0;
-    font-family: var(--font-serif);
-    font-size: clamp(2.4rem, 4vw, 4.4rem);
-    line-height: 1.22;
-    font-weight: 600;
-    letter-spacing: 0.022em;
+    max-width: 10ch;
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 8vw, 6.8rem);
+    line-height: 1.04;
+    font-weight: 400;
+    letter-spacing: 0.1em;
     color: var(--gray-darkest);
   }
 
@@ -263,12 +339,12 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   }
 
   .contact-description {
-    margin: 1.35rem 0 0;
-    max-width: 43rem;
-    font-size: 1.05rem;
-    line-height: 1.88;
-    letter-spacing: 0.008em;
-    color: var(--gray-medium);
+    margin: 1.55rem 0 0;
+    max-width: 34rem;
+    font-size: 1.1rem;
+    line-height: 1.95;
+    letter-spacing: 0.01em;
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
   }
 
   .contact-highlights {
@@ -281,22 +357,77 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   .contact-highlights span {
     padding: 0.7rem 1rem;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(115, 103, 94, 0.18);
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: var(--gray-dark);
     letter-spacing: 0.04em;
-    box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
+    box-shadow: 0 16px 36px rgba(var(--brand-dark-rgb), 0.06);
+    backdrop-filter: blur(18px);
   }
 
   .contact-credential {
     margin-top: 1.6rem;
-    padding: 1.3rem 1.4rem;
-    border-radius: 24px;
+    padding: 1.6rem 1.7rem;
+    border-radius: 28px;
     background:
-      radial-gradient(circle at top right, rgba(159, 147, 136, 0.07), transparent 34%),
-      linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 241, 236, 1) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.2);
-    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.05);
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 34%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.74) 0%, rgba(246, 241, 236, 0.58) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 24px 56px rgba(var(--brand-dark-rgb), 0.08);
+    backdrop-filter: blur(22px);
+  }
+
+  .contact-hero-visual-stack {
+    display: grid;
+    gap: 1.2rem;
+    align-self: stretch;
+  }
+
+  .contact-hero-visual {
+    position: relative;
+    margin: 0;
+    min-height: 440px;
+    border-radius: 34px;
+    overflow: hidden;
+    box-shadow: 0 32px 90px rgba(var(--brand-dark-rgb), 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .contact-hero-visual img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  .contact-hero-visual figcaption {
+    position: absolute;
+    inset: auto 1.3rem 1.3rem 1.3rem;
+    display: grid;
+    gap: 0.45rem;
+    padding: 1rem 1.05rem;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(18, 18, 18, 0.22), rgba(18, 18, 18, 0.54));
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(24px) saturate(140%);
+  }
+
+  .contact-hero-visual figcaption span,
+  .quick-form-visual figcaption span {
+    font-size: 0.76rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .contact-hero-visual figcaption strong,
+  .quick-form-visual figcaption strong {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1.28;
+    letter-spacing: 0.05em;
   }
 
   .contact-credential-label {
@@ -309,12 +440,12 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
   .contact-credential-title {
     margin: 0.7rem 0 0;
-    font-family: var(--font-serif);
-    font-size: 1.25rem;
-    line-height: 1.46;
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 3vw, 2.9rem);
+    line-height: 1.12;
     color: var(--gray-darkest);
-    letter-spacing: 0.024em;
-    font-weight: 600;
+    letter-spacing: 0.05em;
+    font-weight: 500;
   }
 
   .contact-credential-meta {
@@ -326,18 +457,20 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
   .contact-credential-description {
     margin: 0.7rem 0 0;
-    color: var(--gray-medium);
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
     line-height: 1.85;
   }
 
   .contact-aside {
-    padding: 1.75rem;
-    border-radius: 28px;
+    padding: clamp(1.8rem, 3vw, 2.6rem);
+    border-radius: 32px;
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.09), transparent 32%),
       linear-gradient(135deg, rgba(31, 31, 31, 1) 0%, rgba(73, 64, 57, 1) 100%);
     color: var(--white);
-    box-shadow: 0 26px 60px rgba(17, 17, 17, 0.16);
+    box-shadow: 0 34px 88px rgba(var(--brand-dark-rgb), 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(26px) saturate(140%);
   }
 
   .contact-aside .aside-label {
@@ -353,8 +486,40 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     color: rgba(255, 255, 255, 0.86);
   }
 
+  .contact-ritual {
+    margin-top: 3.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: 1.5rem;
+    align-items: end;
+  }
+
+  .contact-ritual-copy {
+    padding-bottom: 0.8rem;
+  }
+
+  .contact-ritual-copy h2 {
+    margin: 0;
+    max-width: 8ch;
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 5vw, 4.8rem);
+    line-height: 1.06;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--gray-darkest);
+  }
+
+  .contact-ritual-copy p:last-child {
+    margin: 1rem 0 0;
+    max-width: 28rem;
+    line-height: 1.88;
+    color: color-mix(in srgb, var(--gray-darkest) 60%, transparent);
+  }
+
   .contact-actions {
-    margin-top: 3rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
   }
 
   .contact-card {
@@ -363,18 +528,19 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
     display: flex;
     flex-direction: column;
     gap: 0.95rem;
-    padding: 2rem;
-    border-radius: 30px;
+    padding: 2.4rem;
+    border-radius: 34px;
     text-decoration: none;
     color: inherit;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(115, 103, 94, 0.14);
-    box-shadow: 0 22px 45px rgba(47, 47, 47, 0.06);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 28px 64px rgba(var(--brand-dark-rgb), 0.08);
+    backdrop-filter: blur(24px) saturate(135%);
     transition:
-      transform 0.3s ease,
-      box-shadow 0.3s ease,
-      border-color 0.3s ease,
-      background-color 0.3s ease;
+      transform var(--motion-duration) var(--motion-standard),
+      box-shadow var(--motion-duration) var(--motion-standard),
+      border-color var(--motion-duration) var(--motion-standard),
+      background-color var(--motion-duration) var(--motion-standard);
   }
 
   .contact-card::after {
@@ -387,8 +553,8 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
   .contact-card:hover {
     transform: translateY(-6px);
-    border-color: rgba(115, 103, 94, 0.36);
-    box-shadow: 0 28px 60px rgba(115, 103, 94, 0.14);
+    border-color: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 34px 78px rgba(var(--brand-dark-rgb), 0.12);
   }
 
   .contact-card-primary {
@@ -428,19 +594,19 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
   .contact-card h2 {
     margin: 0;
-    font-family: var(--font-serif);
-    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
-    line-height: 1.28;
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    line-height: 1.08;
     color: var(--gray-darkest);
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    font-weight: 400;
+    letter-spacing: 0.07em;
   }
 
   .card-description {
     margin: 0;
-    color: var(--gray-medium);
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
     line-height: 1.8;
-    letter-spacing: 0.008em;
+    letter-spacing: 0.01em;
     max-width: 32rem;
   }
 
@@ -463,35 +629,36 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   }
 
   .quick-form-panel {
-    margin-top: 2.25rem;
-    padding: 2rem;
-    border-radius: 32px;
+    margin-top: 4rem;
+    min-height: clamp(720px, 92svh, 980px);
+    padding: clamp(2rem, 4vw, 3.6rem);
+    border-radius: 34px;
     background:
-      radial-gradient(circle at top right, rgba(159, 147, 136, 0.04), transparent 32%),
-      linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 248, 248, 1) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.16);
-    box-shadow: 0 24px 60px rgba(47, 47, 47, 0.06);
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 32%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(244, 248, 248, 0.68) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 30px 78px rgba(var(--brand-dark-rgb), 0.1);
     display: grid;
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
     gap: 1.5rem;
     align-items: start;
+    backdrop-filter: blur(26px) saturate(135%);
   }
 
   .quick-form-copy h2 {
     margin: 0;
-    font-family: var(--font-serif);
-    font-size: clamp(1.8rem, 2.8vw, 2.8rem);
-    line-height: 1.32;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    font-weight: 500;
+    max-width: 10ch;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 5.6rem);
+    line-height: 1.06;
+    font-weight: 400;
     color: var(--gray-darkest);
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
   }
 
   .quick-form-description {
     margin: 1rem 0 0;
-    color: var(--gray-medium);
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
     line-height: 1.9;
     max-width: 34rem;
   }
@@ -506,25 +673,56 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   .quick-form-highlights span {
     padding: 0.7rem 0.95rem;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px solid rgba(115, 103, 94, 0.18);
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: var(--gray-dark);
     letter-spacing: 0.04em;
-    box-shadow: 0 10px 22px rgba(47, 47, 47, 0.04);
+    box-shadow: 0 16px 36px rgba(var(--brand-dark-rgb), 0.06);
+    backdrop-filter: blur(18px);
+  }
+
+  .quick-form-visual {
+    position: relative;
+    margin: 1.8rem 0 0;
+    border-radius: 28px;
+    overflow: hidden;
+    min-height: 320px;
+    box-shadow: 0 28px 72px rgba(var(--brand-dark-rgb), 0.12);
+  }
+
+  .quick-form-visual img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  .quick-form-visual figcaption {
+    position: absolute;
+    inset: auto 1.1rem 1.1rem 1.1rem;
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.95rem 1rem;
+    border-radius: 22px;
+    background: linear-gradient(180deg, rgba(18, 18, 18, 0.18), rgba(18, 18, 18, 0.48));
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(22px) saturate(140%);
   }
 
   .quick-form-direct-note {
     margin: 1rem 0 0;
-    color: var(--gray-medium);
+    color: color-mix(in srgb, var(--gray-darkest) 58%, transparent);
     line-height: 1.75;
   }
 
   .quick-form-shell {
     padding: 1.5rem;
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(115, 103, 94, 0.14);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 18px 40px rgba(var(--brand-dark-rgb), 0.06);
+    backdrop-filter: blur(22px);
   }
 
   .quick-form-notice {
@@ -667,25 +865,42 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   }
 
   .social-panel {
-    margin-top: 2.25rem;
-    padding: 1.6rem 1.75rem;
-    border-radius: 26px;
-    background: rgba(255, 255, 255, 0.82);
-    border: 1px solid rgba(115, 103, 94, 0.14);
-    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.04);
+    margin-top: 4rem;
+    min-height: clamp(320px, 58svh, 560px);
+    padding: 2.4rem 2.2rem;
+    border-radius: 34px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 28px 70px rgba(var(--brand-dark-rgb), 0.08);
     display: flex;
     justify-content: space-between;
     gap: 1.5rem;
     align-items: center;
+    backdrop-filter: blur(24px);
   }
 
   .social-copy h2 {
     margin: 0;
-    font-family: "Noto Serif TC", serif;
-    font-size: clamp(1.4rem, 2.2vw, 2rem);
-    line-height: 1.45;
-    font-weight: 500;
+    max-width: 9ch;
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 5vw, 4.8rem);
+    line-height: 1.08;
+    font-weight: 400;
     color: var(--gray-darkest);
+    letter-spacing: 0.08em;
+  }
+
+  .reveal-up {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition:
+      opacity 1s var(--motion-standard),
+      transform 1s var(--motion-standard);
+  }
+
+  .reveal-up.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 
   .social-section {
@@ -724,7 +939,7 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
 
   @media (max-width: 900px) {
     .contact-hero,
-    .contact-actions,
+    .contact-ritual,
     .quick-form-panel,
     .social-panel {
       grid-template-columns: 1fr;
@@ -732,14 +947,53 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       align-items: stretch;
     }
 
+    .contact-hero,
+    .quick-form-panel,
+    .social-panel {
+      min-height: auto;
+    }
+
     .social-section {
       justify-content: flex-start;
+    }
+
+    .contact-hero-visual {
+      min-height: 360px;
     }
   }
 
   @media (max-width: 768px) {
     .contact-page {
       padding: 4rem 1.25rem 3.5rem;
+    }
+
+    .contact-copy h1,
+    .contact-ritual-copy h2,
+    .contact-card h2,
+    .quick-form-copy h2,
+    .social-copy h2 {
+      line-height: 1.14;
+    }
+
+    .contact-copy h1 {
+      font-size: clamp(2.45rem, 10.5vw, 3.3rem);
+      letter-spacing: 0.06em;
+    }
+
+    .contact-ritual-copy h2,
+    .quick-form-copy h2 {
+      font-size: clamp(2.15rem, 8.8vw, 3rem);
+      letter-spacing: 0.06em;
+    }
+
+    .contact-card h2 {
+      font-size: clamp(1.9rem, 8vw, 2.7rem);
+      letter-spacing: 0.05em;
+    }
+
+    .social-copy h2 {
+      font-size: clamp(2rem, 8vw, 2.8rem);
+      letter-spacing: 0.06em;
     }
 
     .contact-card,
@@ -758,19 +1012,26 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
       align-items: stretch;
     }
 
+    .contact-actions {
+      grid-template-columns: 1fr;
+    }
+
     .quick-form-submit,
     .quick-form-secondary {
       width: 100%;
     }
 
-    .social-copy h2 {
-      font-size: 1.5rem;
+    .contact-hero-visual,
+    .quick-form-visual {
+      min-height: 260px;
     }
   }
 </style>
 
 <script>
   // @ts-nocheck
+  const contactReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const contactRevealTargets = Array.from(document.querySelectorAll(".reveal-up"));
   const quickConsultationForm = document.getElementById("quick-consultation-form");
   const quickUtmSource = document.getElementById("quick-utm-source");
   const quickUtmMedium = document.getElementById("quick-utm-medium");
@@ -787,6 +1048,30 @@ const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).to
   const quickFormDescription = document.getElementById("quick-form-description");
   const requirementReadyLink = document.querySelector("[data-ready-link='requirement-form']");
   const requirementPrefillStorageKey = "requirementFormPrefill";
+
+  if (contactReducedMotion.matches) {
+    contactRevealTargets.forEach((node) => node.classList.add("is-visible"));
+  } else if (contactRevealTargets.length) {
+    const contactObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const element = entry.target;
+          const delay = Number(element.getAttribute("data-reveal-delay") || "0");
+          window.setTimeout(() => {
+            element.classList.add("is-visible");
+          }, delay);
+          contactObserver.unobserve(element);
+        });
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -8% 0px",
+      },
+    );
+
+    contactRevealTargets.forEach((node) => contactObserver.observe(node));
+  }
 
   function toggleRequirementReadyLink() {
     if (!requirementReadyLink || !quickConsultationForm) return;

@@ -53,50 +53,61 @@ const secondaryMoments = spatialMoments.slice(2);
 
 <style>
   .portfolio-page {
-    padding: 6.5rem 1.5rem 5rem;
+    padding: 7rem 1.5rem 6rem;
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.05), transparent 24%),
       linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 241, 236, 1) 100%);
   }
 
   .portfolio-hero {
-    max-width: 920px;
+    max-width: 1180px;
     margin: 0 auto;
-    text-align: center;
+    min-height: calc(100vh - 8rem);
+    display: grid;
+    grid-template-columns: minmax(320px, 0.94fr) minmax(0, 1.06fr);
+    gap: 1.5rem;
+    align-items: end;
+  }
+
+  .portfolio-hero > * {
+    min-width: 0;
   }
 
   h1 {
     margin: 0;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--gray-darkest);
-    letter-spacing: 0.024em;
-    line-height: 1.24;
-    font-family: var(--font-serif);
-    font-size: clamp(2.4rem, 5vw, 4rem);
+    letter-spacing: 0.1em;
+    line-height: 1.04;
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 8vw, 6.8rem);
   }
   
   .section-subtitle {
     font-size: 0.85rem;
     letter-spacing: 0.22em;
     color: var(--tiffany-dark);
-    text-align: center;
     margin: 0 0 0.8rem;
     font-weight: 600;
   }
 
+  .portfolio-hero-copy {
+    display: grid;
+    align-content: end;
+  }
+
   .portfolio-intro {
-    margin: 1.15rem auto 0;
-    max-width: 48rem;
-    color: var(--gray-medium);
+    margin: 1.5rem 0 0;
+    max-width: 36rem;
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
     line-height: 1.84;
-    letter-spacing: 0.008em;
-    font-size: 1.01rem;
+    letter-spacing: 0.01em;
+    font-size: 1.08rem;
   }
 
   .portfolio-notes {
-    margin: 1.75rem auto 0;
+    margin: 1.75rem 0 0;
     display: flex;
-    justify-content: center;
     flex-wrap: wrap;
     gap: 0.8rem;
     max-width: 760px;
@@ -108,11 +119,12 @@ const secondaryMoments = spatialMoments.slice(2);
     justify-content: center;
     padding: 0.68rem 1rem;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.78);
-    border: 1px solid rgba(115, 103, 94, 0.16);
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: var(--gray-dark);
     letter-spacing: 0.08em;
-    box-shadow: 0 14px 28px rgba(47, 47, 47, 0.04);
+    box-shadow: 0 18px 40px rgba(var(--brand-dark-rgb), 0.06);
+    backdrop-filter: blur(18px);
   }
 
   .portfolio-container {
@@ -120,20 +132,96 @@ const secondaryMoments = spatialMoments.slice(2);
     margin: 0 auto;
   }
 
+  .reveal-up {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition:
+      opacity 1s var(--motion-standard),
+      transform 1s var(--motion-standard);
+    will-change: opacity, transform;
+  }
+
+  .reveal-up.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
   .portfolio-metrics {
-    margin: 2rem auto 0;
+    margin: 2.2rem 0 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     max-width: 880px;
   }
 
+  .portfolio-hero-visual {
+    position: relative;
+    margin: 0;
+    min-height: 100%;
+    overflow: hidden;
+    border-radius: 36px;
+    box-shadow: 0 38px 96px rgba(var(--brand-dark-rgb), 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .portfolio-hero-visual::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(15, 15, 15, 0.1) 0%, rgba(15, 15, 15, 0.38) 100%),
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 34%);
+  }
+
+  .portfolio-hero-visual img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 620px;
+    object-fit: cover;
+  }
+
+  .portfolio-hero-visual figcaption {
+    position: absolute;
+    left: 1.6rem;
+    right: 1.6rem;
+    bottom: 1.6rem;
+    z-index: 1;
+    padding: 1.15rem 1.2rem 1.2rem;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: var(--white);
+    backdrop-filter: blur(18px) saturate(135%);
+  }
+
+  .portfolio-hero-visual span,
+  .portfolio-hero-visual strong {
+    display: block;
+  }
+
+  .portfolio-hero-visual span {
+    font-size: 0.76rem;
+    letter-spacing: 0.18em;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .portfolio-hero-visual strong {
+    margin-top: 0.55rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.2vw, 2.15rem);
+    font-weight: 500;
+    line-height: 1.24;
+    letter-spacing: 0.06em;
+  }
+
   .portfolio-metric {
-    padding: 1.2rem 1rem;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.84);
-    border: 1px solid rgba(115, 103, 94, 0.14);
-    box-shadow: 0 18px 35px rgba(47, 47, 47, 0.05);
+    padding: 1.45rem 1.3rem;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(246, 241, 236, 0.52) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 46px rgba(var(--brand-dark-rgb), 0.06);
+    backdrop-filter: blur(20px) saturate(135%);
   }
 
   .portfolio-metric strong,
@@ -155,11 +243,12 @@ const secondaryMoments = spatialMoments.slice(2);
   }
 
   .featured-showcase {
-    margin-top: 4rem;
+    margin-top: 2rem;
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
     gap: 2rem;
     align-items: center;
+    min-height: 100vh;
   }
 
   .featured-showcase > * {
@@ -169,9 +258,10 @@ const secondaryMoments = spatialMoments.slice(2);
   .featured-media {
     position: relative;
     overflow: hidden;
-    border-radius: 30px;
+    border-radius: 34px;
     background: var(--gray-bg);
-    box-shadow: 0 30px 70px rgba(47, 47, 47, 0.12);
+    box-shadow: 0 36px 96px rgba(var(--brand-dark-rgb), 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
   .featured-media img {
@@ -183,13 +273,15 @@ const secondaryMoments = spatialMoments.slice(2);
   }
 
   .featured-copy {
-    padding: 2rem;
-    border-radius: 28px;
+    padding: clamp(2rem, 4vw, 3.5rem);
+    border-radius: 34px;
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.09), transparent 28%),
       linear-gradient(135deg, rgba(27, 27, 27, 1) 0%, rgba(41, 41, 41, 1) 100%);
     color: var(--white);
-    box-shadow: 0 26px 60px rgba(17, 17, 17, 0.16);
+    box-shadow: 0 34px 88px rgba(var(--brand-dark-rgb), 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(26px) saturate(140%);
   }
 
   .featured-label {
@@ -201,18 +293,19 @@ const secondaryMoments = spatialMoments.slice(2);
 
   .featured-copy h2 {
     margin: 0;
-    font-size: clamp(1.7rem, 2.5vw, 2.4rem);
-    font-family: var(--font-serif);
-    font-weight: 600;
-    line-height: 1.28;
-    letter-spacing: 0.024em;
+    max-width: 9ch;
+    font-size: clamp(2.8rem, 5vw, 4.8rem);
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: 0.08em;
   }
 
   .featured-copy p {
-    margin: 1rem 0 0;
-    color: rgba(255, 255, 255, 0.78);
+    margin: 1.3rem 0 0;
+    color: rgba(255, 255, 255, 0.64);
     line-height: 1.82;
-    letter-spacing: 0.008em;
+    letter-spacing: 0.01em;
   }
 
   .featured-actions {
@@ -234,9 +327,9 @@ const secondaryMoments = spatialMoments.slice(2);
     letter-spacing: 0.08em;
     transition:
       transform 0.25s ease,
-      background-color 0.25s ease,
-      border-color 0.25s ease,
-      color 0.25s ease;
+      background-color var(--motion-duration-fast) var(--motion-standard),
+      border-color var(--motion-duration-fast) var(--motion-standard),
+      color var(--motion-duration-fast) var(--motion-standard);
   }
 
   .featured-link {
@@ -262,27 +355,30 @@ const secondaryMoments = spatialMoments.slice(2);
   }
 
   .moments-section {
-    margin-top: 4rem;
+    margin-top: 2rem;
+    min-height: 100vh;
+    display: grid;
+    align-content: center;
   }
 
   .section-heading {
     max-width: 760px;
-    margin-bottom: 1.75rem;
+    margin-bottom: 2.5rem;
   }
 
   .section-heading h2 {
     margin: 0;
-    font-size: clamp(1.9rem, 3vw, 2.8rem);
-    font-family: var(--font-serif);
-    font-weight: 600;
-    line-height: 1.32;
-    letter-spacing: 0.02em;
+    font-size: clamp(3.2rem, 6vw, 5.8rem);
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: 0.08em;
     color: var(--gray-darkest);
   }
 
   .section-heading p {
-    margin: 0.9rem 0 0;
-    color: var(--gray-medium);
+    margin: 1.2rem 0 0;
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
     line-height: 1.85;
   }
 
@@ -313,9 +409,11 @@ const secondaryMoments = spatialMoments.slice(2);
   .moment-card {
     margin: 0;
     overflow: hidden;
-    border-radius: 28px;
+    border-radius: 30px;
     background: var(--gray-bg);
     position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 48px rgba(var(--brand-dark-rgb), 0.08);
   }
 
   .moment-card img {
@@ -324,8 +422,7 @@ const secondaryMoments = spatialMoments.slice(2);
     max-width: 100%;
     height: var(--moment-height);
     object-fit: cover;
-    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    box-shadow: 0 18px 40px rgba(47, 47, 47, 0.08);
+    transition: transform 1s var(--motion-standard);
   }
 
   .moment-card:hover img {
@@ -373,11 +470,12 @@ const secondaryMoments = spatialMoments.slice(2);
     grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.05fr);
     gap: 1.5rem;
     align-items: center;
-    padding: 1.4rem;
-    border-radius: 28px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 241, 236, 1) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.16);
-    box-shadow: 0 18px 38px rgba(47, 47, 47, 0.06);
+    padding: clamp(1.6rem, 3vw, 2.6rem);
+    border-radius: 30px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(246, 241, 236, 0.56) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 24px 56px rgba(var(--brand-dark-rgb), 0.08);
+    backdrop-filter: blur(22px) saturate(135%);
   }
 
   .pool-feature > * {
@@ -429,44 +527,50 @@ const secondaryMoments = spatialMoments.slice(2);
   .pool-feature h3 {
     margin: 0.7rem 0 0;
     color: var(--gray-darkest);
-    font-size: clamp(1.45rem, 2.5vw, 2rem);
-    font-family: 'Noto Serif TC', serif;
-    font-weight: 500;
-    line-height: 1.45;
+    font-size: clamp(2.2rem, 4vw, 3.8rem);
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: 0.08em;
   }
 
   .pool-feature p:last-child {
     margin: 0.85rem 0 0;
-    color: var(--gray-medium);
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
     line-height: 1.85;
   }
 
   .portfolio-cta {
-    margin-top: 4rem;
-    padding: 2.5rem;
-    border-radius: 28px;
+    margin-top: 5rem;
+    min-height: 100vh;
+    padding: clamp(2.5rem, 5vw, 4rem);
+    border-radius: 34px;
     background:
-      radial-gradient(circle at top right, rgba(159, 147, 136, 0.05), transparent 30%),
-      linear-gradient(135deg, rgba(243, 245, 246, 1) 0%, rgba(255, 255, 255, 1) 100%);
-    border: 1px solid rgba(115, 103, 94, 0.18);
-    box-shadow: 0 20px 40px rgba(47, 47, 47, 0.06);
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 30%),
+      linear-gradient(135deg, rgba(243, 245, 246, 0.8) 0%, rgba(255, 255, 255, 0.68) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 32px 84px rgba(var(--brand-dark-rgb), 0.1);
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) auto;
     gap: 1.5rem;
     align-items: center;
+    backdrop-filter: blur(26px) saturate(135%);
   }
 
   .portfolio-cta h2 {
     margin: 0;
-    font-size: clamp(1.8rem, 3vw, 2.6rem);
-    font-family: 'Noto Serif TC', serif;
-    font-weight: 500;
+    max-width: 10ch;
+    font-size: clamp(3rem, 6vw, 5.4rem);
+    font-family: var(--font-display);
+    font-weight: 400;
     color: var(--gray-darkest);
+    line-height: 1.08;
+    letter-spacing: 0.08em;
   }
 
   .portfolio-cta p {
-    margin: 0.85rem 0 0;
-    color: var(--gray-medium);
+    margin: 1.25rem 0 0;
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
     line-height: 1.85;
     max-width: 42rem;
   }
@@ -482,7 +586,10 @@ const secondaryMoments = spatialMoments.slice(2);
     color: var(--white);
     border: 1px solid rgba(170, 159, 149, 0.24);
     letter-spacing: 0.08em;
-    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    transition:
+      transform var(--motion-duration-fast) var(--motion-standard),
+      background-color var(--motion-duration-fast) var(--motion-standard),
+      border-color var(--motion-duration-fast) var(--motion-standard);
   }
 
   .portfolio-cta a:hover {
@@ -492,6 +599,7 @@ const secondaryMoments = spatialMoments.slice(2);
 
   @media (max-width: 960px) {
     .portfolio-metrics,
+    .portfolio-hero,
     .featured-showcase,
     .portfolio-cta {
       grid-template-columns: 1fr;
@@ -522,9 +630,52 @@ const secondaryMoments = spatialMoments.slice(2);
       padding: 6rem 1.25rem 4rem;
     }
 
+    .portfolio-hero,
+    .featured-showcase,
+    .moments-section,
+    .portfolio-cta {
+      min-height: auto;
+    }
+
+    h1,
+    .section-heading h2,
+    .featured-copy h2,
+    .pool-feature h3,
+    .portfolio-cta h2 {
+      line-height: 1.14;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 10vw, 3.4rem);
+      letter-spacing: 0.06em;
+    }
+
+    .portfolio-hero-visual {
+      border-radius: 24px;
+    }
+
+    .portfolio-hero-visual img {
+      min-height: 320px;
+    }
+
+    .portfolio-hero-visual figcaption {
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      padding: 0.95rem 1rem 1rem;
+    }
+
     .featured-copy,
     .portfolio-cta {
       padding: 1.6rem;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(2.4rem, 10vw, 3.4rem);
+    }
+
+    .portfolio-cta h2 {
+      font-size: clamp(2.4rem, 10vw, 3.4rem);
     }
   }
 </style>
@@ -536,32 +687,49 @@ const secondaryMoments = spatialMoments.slice(2);
   pageType="collection"
 >
   <div class="portfolio-page">
-    <header class="portfolio-hero">
-      <h6 class="section-subtitle">CURATED WORK</h6>
-      <h1>精選作品</h1>
-      <p class="portfolio-intro">
-        以住宅為主，也收錄商空與戶外規劃，讓你直接看完成後的樣子。
-      </p>
-      <div class="portfolio-notes">
-        {editorialNotes.map((note) => (
-          <span>{note}</span>
-        ))}
+    <header class="portfolio-hero reveal-up" data-reveal-delay="0">
+      <div class="portfolio-hero-copy">
+        <h6 class="section-subtitle">CURATED WORK</h6>
+        <h1>精選作品</h1>
+        <p class="portfolio-intro">
+          以住宅為主，也收錄商空與戶外規劃，讓你直接看完成後的樣子。
+        </p>
+        <div class="portfolio-notes">
+          {editorialNotes.map((note) => (
+            <span>{note}</span>
+          ))}
+        </div>
+        <div class="portfolio-metrics">
+          <article class="portfolio-metric">
+            <strong>住宅案例</strong>
+            <span>直接看主要空間完工照。</span>
+          </article>
+          <article class="portfolio-metric">
+            <strong>前後對照</strong>
+            <span>更快判斷是不是你要的方向。</span>
+          </article>
+        </div>
       </div>
-      <div class="portfolio-metrics">
-        <article class="portfolio-metric">
-          <strong>住宅案例</strong>
-          <span>直接看主要空間完工照。</span>
-        </article>
-        <article class="portfolio-metric">
-          <strong>前後對照</strong>
-          <span>更快判斷是不是你要的方向。</span>
-        </article>
-      </div>
+      <figure class="portfolio-hero-visual">
+        <img
+          src={featuredProject.coverImage}
+          alt={featuredProject.title}
+          width="1600"
+          height="1200"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
+        <figcaption>
+          <span>{featuredProject.label}</span>
+          <strong>先讓空間照片說話，再決定要不要深入看案例。</strong>
+        </figcaption>
+      </figure>
     </header>
 
     <div class="portfolio-container">
       <section class="featured-showcase">
-        <figure class="featured-media">
+        <figure class="featured-media reveal-up" data-reveal-delay="0">
           <img
             src={featuredProject.coverImage}
             alt={featuredProject.title}
@@ -574,7 +742,7 @@ const secondaryMoments = spatialMoments.slice(2);
           />
         </figure>
 
-        <div class="featured-copy">
+        <div class="featured-copy reveal-up" data-reveal-delay="120">
           <p class="featured-label">{featuredProject.label}</p>
           <h2>先看住宅完工後的樣子</h2>
           <p>
@@ -593,7 +761,7 @@ const secondaryMoments = spatialMoments.slice(2);
       </section>
 
       <section class="moments-section">
-        <div class="section-heading">
+        <div class="section-heading reveal-up" data-reveal-delay="0">
           <h2>看看不同空間的實際照片</h2>
           <p>收錄住宅、商空與戶外照片，讓你更快找到偏好的空間感。</p>
         </div>
@@ -601,7 +769,7 @@ const secondaryMoments = spatialMoments.slice(2);
         <div class="moments-stack">
           <div class="moments-row moments-row-primary">
             {primaryMoments.map((moment, index) => (
-              <figure class={`moment-card ${index === 0 ? 'is-wide' : 'is-portrait'}`}>
+              <figure class={`moment-card reveal-up ${index === 0 ? 'is-wide' : 'is-portrait'}`} data-reveal-delay={String(index * 90)}>
                 <img
                   src={moment.image}
                   alt={moment.alt}
@@ -616,7 +784,7 @@ const secondaryMoments = spatialMoments.slice(2);
 
           <div class="moments-row moments-row-secondary">
             {secondaryMoments.map((moment, index) => (
-              <figure class={`moment-card ${index === 0 ? 'is-intimate' : 'is-balanced'}`}>
+              <figure class={`moment-card reveal-up ${index === 0 ? 'is-intimate' : 'is-balanced'}`} data-reveal-delay={String(index * 90)}>
                 <img
                   src={moment.image}
                   alt={moment.alt}
@@ -631,7 +799,7 @@ const secondaryMoments = spatialMoments.slice(2);
         </div>
 
         <div class="capability-stack">
-          <article class="pool-feature">
+          <article class="pool-feature reveal-up" data-reveal-delay="80">
             <figure class="pool-feature-media">
               <img
                 src={poolFeature.image}
@@ -650,7 +818,7 @@ const secondaryMoments = spatialMoments.slice(2);
             </div>
           </article>
 
-          <article class="pool-feature">
+          <article class="pool-feature reveal-up" data-reveal-delay="140">
             <figure class="pool-feature-media">
               <img
                 src={commercialFeature.image}
@@ -671,7 +839,7 @@ const secondaryMoments = spatialMoments.slice(2);
         </div>
       </section>
 
-      <section class="portfolio-cta">
+      <section class="portfolio-cta reveal-up" data-reveal-delay="0">
         <div>
           <h2>如果你已經看出偏好，下一步就直接講需求。</h2>
           <p>
@@ -683,3 +851,32 @@ const secondaryMoments = spatialMoments.slice(2);
     </div>
   </div>
 </BaseLayout>
+
+<script is:inline>
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const portfolioRevealTargets = Array.from(document.querySelectorAll(".reveal-up"));
+
+  if (reducedMotion.matches) {
+    portfolioRevealTargets.forEach((node) => node.classList.add("is-visible"));
+  } else if (portfolioRevealTargets.length) {
+    const portfolioObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const element = entry.target;
+          const delay = Number(element.getAttribute("data-reveal-delay") || "0");
+          window.setTimeout(() => {
+            element.classList.add("is-visible");
+          }, delay);
+          portfolioObserver.unobserve(element);
+        });
+      },
+      {
+        threshold: 0.15,
+        rootMargin: "0px 0px -8% 0px",
+      },
+    );
+
+    portfolioRevealTargets.forEach((node) => portfolioObserver.observe(node));
+  }
+</script>
