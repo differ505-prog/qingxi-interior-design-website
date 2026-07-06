@@ -1,0 +1,221 @@
+---
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
+
+const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "full-room-renovation-budget-breakdown-and-quote-guide",
+  {
+    includeEditorialRefreshStamp: true,
+  },
+);
+const articleDetailImage = "/images/blog/full-room-renovation-budget-breakdown-detail.png";
+const articleSceneImage = "/images/blog/full-room-renovation-budget-breakdown-scene.png";
+---
+
+<EditorialArticleLayout
+  {...articleLayoutProps}
+  structuredData={articleStructuredData}
+>
+  <p class="article-lead">
+    老屋翻新的預算編列，往往是屋主與設計端最需要凝聚共識，卻也最容易產生落差的環節。許多超支與工程延宕，並不是因為表面材料過度奢華，而是來自對報價單結構的誤解，以及對現況判讀的輕忽。
+  </p>
+
+  <p>
+    在著手規劃格局與風格之前，學會拆解全室預算，並看懂報價單背後的隱蔽工程項目，是確保工程順利、居住長久安定，且有效預防超支的首要任務。
+  </p>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">預算原則</p>
+    <h3 class="article-insight-title">先把屋況風險與隱蔽工程盤清，再談格局與表面材料，預算才不會一路失焦。</h3>
+    <p>
+      看懂報價單的重點，不是先比單價高低，而是先確認拆除、清運、防水、水電與泥作等底層工程是否被完整列出。看不見的地方若寫得太薄，後面幾乎一定要補。
+    </p>
+  </div>
+
+  <h2>屋況盤點的尺度：報價單精準度的基石</h2>
+
+  <p>
+    沒有精準的屋況盤點，報價單就只是一張看似完整、實際卻缺乏防禦力的數字表。判斷預算應如何分配，第一步不是看裝修看起來有多舊，而是看空間體質到底衰退到什麼程度。
+  </p>
+
+  <p>
+    一般而言，當住宅屋齡超過 15 至 20 年時，就應把結構裂縫、防水層、水電管線、採光通風，以及隔音與外部環境干擾這五個面向，一併列入翻新前的重點盤點清單。達到這個屋齡門檻的物件，即使表層裝修看似完好，其隱蔽工程往往也已接近或超過安全使用週期。
+  </p>
+
+  <blockquote>
+    屋況若沒有先被看清，任何看似便宜的報價，都可能只是把真正的成本延後到拆除之後才出現。
+  </blockquote>
+
+  <h2>預算拆解盲點：報價單實戰檢核對照</h2>
+
+  <p>
+    在沒有客觀盤點基準的情況下，預算很容易流向立即顯效的視覺工程，反而壓縮了維繫空間體質的安全項目。以下整理老屋翻新初期最常見的預算盲點，並結合報價單實戰關鍵字，協助您檢核手上的報價單是否具備足夠深度。
+  </p>
+
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <thead>
+          <tr>
+            <th>評估面向</th>
+            <th>常見預算盲點</th>
+            <th>務實判斷基準與檢核關鍵字</th>
+            <th>超支風險提醒</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>管線更新</td>
+            <td>沒有明顯漏水或跳電，就先沿用舊管線省預算。</td>
+            <td>20 年以上水電路應視為必做。請檢視報價單是否列出「全室抽換線」、「無熔絲開關（NFB）升級」、「新增專用迴路」。</td>
+            <td>忽視暗管老化，日後一旦故障，就得破壞新裝修返工，補救成本通常成倍增加。</td>
+          </tr>
+          <tr>
+            <td>防水工程</td>
+            <td>只在已出現壁癌或漏水的位置做局部防水塗刷。</td>
+            <td>衛浴與迎風面外牆應優先全面重置。請檢視報價單是否有「素地整理（打底）」、「防水彈泥塗刷（標明道數）」、「角隅抗裂網」。</td>
+            <td>局部修補容易在新舊防水層交界再度破口，漏水位置轉移後，修繕往往變成無底洞。</td>
+          </tr>
+          <tr>
+            <td>格局變動</td>
+            <td>預算優先放在拆牆與放大公領域，基礎修繕留到後面再說。</td>
+            <td>格局變動會牽涉新舊結構與地坪銜接。請檢視報價單是否列出「見磚打除」、「廢棄物清運（車趟）」、「泥作粗胚打底」的足額預算。</td>
+            <td>若核心結構與防水沒有先穩住，任何格局調整都可能放大既有缺陷，導致追加工程。</td>
+          </tr>
+          <tr>
+            <td>預算佔比</td>
+            <td>進口磚、特殊塗料與木作飾面等表面建材，吃掉總預算一半以上。</td>
+            <td>老屋翻新的基礎工程，通常應占總預算的 40% 至 60%。報價單的厚度，應先集中在拆除、水電、泥作與防水。</td>
+            <td>本末倒置的配置，入住後會被頻繁修繕反覆干擾，最終總花費通常高過原始預算。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="article-reference-table-note">
+      青曦視角：報價單的總價高低，往往取決於看不見的地方做得多深。判讀時，請優先檢視隱蔽工程與拆除清運是否羅列詳盡，而不是只盯著面材單價。
+    </p>
+  </div>
+
+  <h2>風險徵兆檢核：決定報價單規模的關鍵</h2>
+
+  <p>
+    預算是否能採取局部修補，以降低報價總額，取決於現場是否存在高風險徵兆。若現場同時出現兩至三類以上高風險訊號，就不宜再接受只做局部修補的報價建議。
+  </p>
+
+  <div class="article-check-grid">
+    <div class="article-check-item">
+      <strong>大面積壁癌或反覆漏水</strong>
+      <p>這通常表示滲水來源並未被處理，只做表面修補只會延後問題，而不會真正結案。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>配電盤老化焦痕或無接地線</strong>
+      <p>電力系統已落後現代用電需求時，就不適合再用局部增補心態處理。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>窗框周圍明顯滲水</strong>
+      <p>這類邊界問題通常會同時牽涉窗體、水密與外牆節點，不是單點補膠就能解決。</p>
+    </div>
+    <div class="article-check-item">
+      <strong>地坪隆起或高低差異常</strong>
+      <p>地坪若已不穩，後續鋪面與格局調整都要更保守，否則很容易在施工中途追加泥作與找平成本。</p>
+    </div>
+  </div>
+
+  <p>
+    反之，只有在高風險徵兆偏低、主要水電系統仍穩定，且問題只集中於一至兩個局部區域時，局部翻修與保留既有裝修的預算編列，才比較有成立空間。
+  </p>
+
+  <figure class="article-figure">
+    <img src={articleDetailImage} alt="老屋管線盤點與配電箱更新示意" loading="lazy" />
+    <figcaption>
+      報價單若沒有把配電盤、暗管與用水路徑寫清楚，往往代表真正的更新深度還沒有被完整反映。
+    </figcaption>
+  </figure>
+
+  <h2>確立預算順序：預防超支的三階段資金投放邏輯</h2>
+
+  <p>
+    為確保預算花在刀口上，報價單的項目排序與資金投放，應嚴格遵守由內而外、由底層至表層的優先順序。刪減預算時，也應依照同一套邏輯取捨，而不是平均砍項目。
+  </p>
+
+  <div class="article-step-flow">
+    <article class="article-step-card">
+      <p class="article-step-index">01</p>
+      <h3>安全風險排除</h3>
+      <p>先處理老舊電線抽換、配電盤升級、瓦斯與熱水器安全、結構裂縫補強等不可妥協的底線。</p>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">02</p>
+      <h3>滲漏與隱蔽工程更新</h3>
+      <p>再處理冷熱水管全室更新、防水層重作、排水坡度與通風修正，延續空間壽命。</p>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">03</p>
+      <h3>格局與表面美感</h3>
+      <p>最後才安排動線重整、收納系統、木地板、磁磚、塗料與燈光氛圍等可彈性調整項目。</p>
+    </article>
+  </div>
+
+  <div class="article-card-grid">
+    <div class="article-card">
+      <p class="article-card-kicker">階段一</p>
+      <h3>安全風險排除是預算底線</h3>
+      <ul>
+        <li>老舊電線全面抽換、配電盤換新與安培數升級。</li>
+        <li>瓦斯管線與熱水器位置的安全檢核與重配。</li>
+        <li>結構性裂縫補強與承重牆確認。</li>
+      </ul>
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">階段二</p>
+      <h3>滲漏與隱蔽工程決定壽命</h3>
+      <ul>
+        <li>冷熱水管全面更新，並優先採用穩定耐用的管材系統。</li>
+        <li>全室防水工程落實素地打底、防水彈泥與止水節點施作。</li>
+        <li>排水坡度與通風路徑重整，避免異味、積水與黴害反覆發生。</li>
+      </ul>
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">階段三</p>
+      <h3>格局與美感以餘裕調整</h3>
+      <ul>
+        <li>空間尺度重新劃分與動線梳理。</li>
+        <li>收納系統配置，包括系統櫃與必要木作。</li>
+        <li>木地板、磁磚、塗料與照明氛圍等表面材質優化。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">判讀提醒</p>
+    <h3 class="article-insight-title">若報價單前段太薄、後段太華麗，通常不是划算，而是風險被藏起來了。</h3>
+    <p>
+      成熟的老屋翻新預算，前期一定會花很多篇幅在拆除、清運、水電、泥作與防水。若大多數費用都堆在可見飾面，後續追加幾乎只是時間問題。
+    </p>
+  </div>
+
+  <div class="article-gallery">
+    <figure class="article-figure">
+      <img src={articleSceneImage} alt="老屋基礎工程與衛浴防水順序示意" loading="lazy" />
+      <figcaption>
+        防水、排水與基礎泥作的順序一旦釐清，後續格局與表面材質才有穩定的施工基底。
+      </figcaption>
+    </figure>
+    <figure class="article-figure">
+      <img src={articleImage} alt="老屋預算拆解與報價單判讀封面圖" loading="lazy" />
+      <figcaption>
+        真正成熟的預算分配，重點不是哪裡看起來最漂亮，而是哪些底層工程能避免未來持續返工。
+      </figcaption>
+    </figure>
+  </div>
+
+  <h2>結語：把預算放回空間真正的底層秩序</h2>
+
+  <p>
+    老屋翻新的本質，不只是更新表面，而是一場對建築體質的深度整理。透過理性的現況判讀、精準的報價單拆解與紀律分明的預算排序，才能在有限資源下，把工程風險降到最低。
+  </p>
+
+  <blockquote>
+    真正好的報價單，不是看起來最便宜的那一張，而是能在施工前就把風險說清楚、把底層工程寫完整，讓未來的居住不必一直為今天省下的費用付出代價。
+  </blockquote>
+</EditorialArticleLayout>

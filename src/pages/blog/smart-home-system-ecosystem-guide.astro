@@ -1,50 +1,20 @@
 ---
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
-import { getStaticBlogPost } from "../../lib/blog-catalog";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
 
-const articleMeta = getStaticBlogPost("smart-home-system-ecosystem-guide");
-const articleTitle = articleMeta.title;
-const articleDescription = articleMeta.summary;
-const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
-const articleModifiedTime = "2026-07-02T00:00:00+08:00";
-const articleImage = articleMeta.coverImage;
+const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "smart-home-system-ecosystem-guide",
+  {
+    modifiedTime: "2026-07-02T00:00:00+08:00",
+    includeEditorialRefreshStamp: true,
+  },
+);
 const articleDetailImage = "/images/blog/smart-home-system-ecosystem-guide-detail.png";
 const articleSequenceImage = "/images/blog/smart-home-system-ecosystem-guide-sequence.png";
-const articleStructuredData = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: articleTitle,
-    description: articleDescription,
-    image: [`https://qingxidesign.tw${articleImage}`],
-    datePublished: articlePublishedTime,
-    dateModified: articleModifiedTime,
-    articleSection: articleMeta.track,
-    keywords: articleMeta.tags.join(", "),
-    author: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    mainEntityOfPage: "https://qingxidesign.tw/blog/smart-home-system-ecosystem-guide",
-  },
-];
 ---
 <EditorialArticleLayout
-  title={articleTitle}
-  description={articleDescription}
-  ogImage={articleImage}
-  publishedTime={articlePublishedTime}
-  modifiedTime={articleModifiedTime}
+  {...articleLayoutProps}
   structuredData={articleStructuredData}
-  track={articleMeta.track}
-  chapter={articleMeta.chapter}
-  siteCategory={articleMeta.siteCategory}
-  tags={articleMeta.tags}
-  editorialRefreshStamp={articleMeta.editorialRefreshStamp}
 >
   <p class="article-lead">
     在著手規劃全屋智能時，多數屋主面臨的第一道難關，往往不是預算，而是海量的技術名詞。當 Apple Home、Aqara、Home Assistant、Zigbee 與 Matter 同時出現在眼前，原本應該讓生活更從容的系統，往往在起點就變成一場複雜的 IT 工程。

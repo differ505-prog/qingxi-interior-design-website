@@ -1,48 +1,16 @@
 ---
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
-import { getStaticBlogPost } from "../../lib/blog-catalog";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
 
-const articleMeta = getStaticBlogPost("old-house-renovation-demolition-and-masonry-sequence");
-const articleTitle = articleMeta.title;
-const articleDescription = articleMeta.summary;
-const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
-const articleImage = articleMeta.coverImage;
+const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "old-house-renovation-demolition-and-masonry-sequence",
+);
 const articleDetailImage = "/images/blog/old-house-demolition-masonry-detail.png";
 const articleSequenceImage = "/images/blog/old-house-demolition-masonry-sequence.png";
-const articleStructuredData = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: articleTitle,
-    description: articleDescription,
-    image: [articleImage],
-    datePublished: articlePublishedTime,
-    dateModified: articlePublishedTime,
-    articleSection: articleMeta.track,
-    keywords: articleMeta.tags.join(", "),
-    author: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    mainEntityOfPage: "https://qingxidesign.tw/blog/old-house-renovation-demolition-and-masonry-sequence",
-  },
-];
 ---
 <EditorialArticleLayout
-  title={articleTitle}
-  description={articleDescription}
-  ogImage={articleImage}
-  publishedTime={articlePublishedTime}
-  modifiedTime={articlePublishedTime}
+  {...articleLayoutProps}
   structuredData={articleStructuredData}
-  track={articleMeta.track}
-  chapter={articleMeta.chapter}
-  siteCategory={articleMeta.siteCategory}
-  tags={articleMeta.tags}
 >
       <p class="article-lead">
         老屋翻新，本質上是一場空間秩序的重置。當我們褪去歲月留下的表層，面對建築最真實的肌理時，基礎工程的嚴謹度，將直接決定未來十年、甚至二十年居住的安定感。

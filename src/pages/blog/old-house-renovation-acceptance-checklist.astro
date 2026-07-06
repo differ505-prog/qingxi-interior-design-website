@@ -1,50 +1,20 @@
 ---
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
-import { getStaticBlogPost } from "../../lib/blog-catalog";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
 
-const articleMeta = getStaticBlogPost("old-house-renovation-acceptance-checklist");
-const articleTitle = articleMeta.title;
-const articleDescription = articleMeta.summary;
-const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
-const articleModifiedTime = "2026-07-02T00:00:00+08:00";
-const articleImage = articleMeta.coverImage;
+const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "old-house-renovation-acceptance-checklist",
+  {
+    modifiedTime: "2026-07-02T00:00:00+08:00",
+    includeEditorialRefreshStamp: true,
+  },
+);
 const articleDetailImage = "/images/blog/old-house-renovation-acceptance-checklist-detail.png";
 const articleSceneImage = "/images/blog/old-house-renovation-acceptance-checklist-scene.png";
-const articleStructuredData = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: articleTitle,
-    description: articleDescription,
-    image: [`https://qingxidesign.tw${articleImage}`],
-    datePublished: articlePublishedTime,
-    dateModified: articleModifiedTime,
-    articleSection: articleMeta.track,
-    keywords: articleMeta.tags.join(", "),
-    author: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    mainEntityOfPage: "https://qingxidesign.tw/blog/old-house-renovation-acceptance-checklist",
-  },
-];
 ---
 <EditorialArticleLayout
-  title={articleTitle}
-  description={articleDescription}
-  ogImage={articleImage}
-  publishedTime={articlePublishedTime}
-  modifiedTime={articleModifiedTime}
+  {...articleLayoutProps}
   structuredData={articleStructuredData}
-  track={articleMeta.track}
-  chapter={articleMeta.chapter}
-  siteCategory={articleMeta.siteCategory}
-  tags={articleMeta.tags}
-  editorialRefreshStamp={articleMeta.editorialRefreshStamp}
 >
   <p class="article-lead">
     老屋翻新的完工驗收，不僅是檢查空間有沒有做完，更是確認未來十年能否住得穩、住得安心的最後一道關卡。和新成屋偏重外觀瑕疵不同，老屋更需要用量化標準去檢核水電、防水、泥作與櫃體是否真的落地。

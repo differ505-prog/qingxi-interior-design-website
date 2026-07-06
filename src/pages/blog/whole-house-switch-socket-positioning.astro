@@ -1,46 +1,14 @@
 ---
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
-import { getStaticBlogPost } from "../../lib/blog-catalog";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
 
-const articleMeta = getStaticBlogPost("whole-house-switch-socket-positioning");
-const articleTitle = articleMeta.title;
-const articleDescription = articleMeta.summary;
-const articlePublishedTime = `${articleMeta.date}T00:00:00+08:00`;
-const articleImage = articleMeta.coverImage;
-const articleStructuredData = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: articleTitle,
-    description: articleDescription,
-    image: [articleImage],
-    datePublished: articlePublishedTime,
-    dateModified: articlePublishedTime,
-    articleSection: articleMeta.track,
-    keywords: articleMeta.tags.join(", "),
-    author: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "青曦空間設計",
-    },
-    mainEntityOfPage: "https://qingxidesign.tw/blog/whole-house-switch-socket-positioning",
-  },
-];
+const { articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "whole-house-switch-socket-positioning",
+);
 ---
 <EditorialArticleLayout
-  title={articleTitle}
-  description={articleDescription}
-  ogImage={articleImage}
-  publishedTime={articlePublishedTime}
-  modifiedTime={articlePublishedTime}
+  {...articleLayoutProps}
   structuredData={articleStructuredData}
-  track={articleMeta.track}
-  chapter={articleMeta.chapter}
-  siteCategory={articleMeta.siteCategory}
-  tags={articleMeta.tags}
 >
       <p class="article-lead">水電工程是裝修的隱蔽工程，如同人體的神經與血脈，深藏在牆體與地板之下。而開關與插座的定位，則是這套系統真正與生活接觸的介面，是居住者每天都會反覆使用的細節。</p>
       
