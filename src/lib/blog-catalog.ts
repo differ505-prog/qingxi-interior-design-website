@@ -159,6 +159,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     subchapter: "屋況盤點",
     tags: ["老屋翻新", "屋況盤點", "結構裂縫", "水電更新", "氣密窗", "樓板隔音", "檢核表"],
     coverImage: "/images/blog/old-house-condition-assessment-cover.png",
+    editorialRefreshStamp: "2026-07-06",
   },
   {
     title: "發包合約與工班比價：老屋翻新的責任界線與付款條款",

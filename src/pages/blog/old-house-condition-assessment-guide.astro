@@ -4,6 +4,10 @@ import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
 
 const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
   "old-house-condition-assessment-guide",
+  {
+    includePublisherLogo: true,
+    includeEditorialRefreshStamp: true,
+  },
 );
 const articleUtilityDetailImage = "/images/blog/old-house-condition-assessment-utility-detail.png";
 const articleSpaceLightImage = "/images/blog/old-house-condition-assessment-space-light.png";
