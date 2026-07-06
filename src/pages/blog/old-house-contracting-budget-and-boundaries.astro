@@ -1,0 +1,171 @@
+---
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
+
+const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "old-house-contracting-budget-and-boundaries",
+  {
+    publishedTime: "2026-07-06T17:43:00.000Z",
+    modifiedTime: "2026-07-06T17:43:00.000Z",
+    includePublisherLogo: true,
+    includeEditorialRefreshStamp: true,
+  },
+);
+
+const articleDetailImage = "/images/blog/old-house-contracting-budget-and-boundaries-detail.png";
+---
+
+<EditorialArticleLayout
+  {...articleLayoutProps}
+  structuredData={articleStructuredData}
+>
+  <p class="article-lead">
+    在老屋翻新的歷程中，從確認設計圖面到實際動工，中間橫亙著一段極度考驗決策品質的階段——發包。許多屋主在拿到報價單時，往往只著眼於總價的高低，卻忽略了隱藏在數字背後的工法差異、材料規格與責任界線。
+  </p>
+
+  <p>
+    發包與合約，本質上是一場關於「風險管理」的共識建立。一份健康的發包合約，不僅是付款的依據，更是釐清施工邊界、避免後續糾紛的安定力量。本文將從預算尺度、比價邏輯到合約防線，為老屋翻新的發包階段提供具體的決策框架。
+  </p>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">核心觀念</p>
+    <h3 class="article-insight-title">發包不是挑選最低價，<br class="hidden md:block" />而是購買一份可預測、有保障的施工承諾。</h3>
+    <p>
+      老屋發包一旦在報價單模糊地帶妥協，後續追加的金額與停工成本，往往遠超初期比價時省下的差額。
+    </p>
+  </div>
+
+  <h2>建立預算尺度：老屋翻新的隱蔽工程門檻</h2>
+  <p>
+    在進入工班比價之前，必須先對老屋翻新的資金結構有務實的認知。老屋與新成屋最大的差異，在於看不見的「隱蔽工程」與「基礎工程」。若老屋需要同步處理拆除、水電管線重拉、全室防水補強與泥作平整等隱蔽工程，基礎工程與隱蔽工程合計常會落在整體預算的 35% 至 55%。
+  </p>
+  <p>
+    這意味著，在尚未挑選任何表材、櫃體與軟裝之前，已有近半的預算必須投入於空間的體質重整。理解這個比例區間，是判讀報價單的第一步；若某份老屋報價單的基礎工程占比畸低，往往暗示著漏項、工法省略，或是預留了龐大的追加空間。
+  </p>
+
+  <h2>報價單判讀與比價邏輯</h2>
+  <p>
+    取得報價單後，比價絕非單純比較總金額。有效的比價，必須建立在「基準一致」的前提下。
+  </p>
+
+  <h3>1. 報價單的拆分粒度</h3>
+  <p>
+    一份可讀性足夠、能作為合約依據的報價單，至少應能拆出 6 至 8 類主要工項（例如：拆除、泥作、水電、木作、油漆、設備、清運與保護工程）。若報價單僅以「客廳一式」、「浴室翻新一式」等過度打包的方式呈現，將完全喪失比價與日後驗收的客觀標準。要求工項層級不混寫，是保障發包品質的基本門檻。
+  </p>
+
+  <h3>2. 比價份數與對齊基準</h3>
+  <p>
+    同一工法與同一施工範圍下，建議至少比較 2 至 3 份報價，才看得出單價帶、漏項與工法差異。比價時，請務必確保各工班是基於相同的前提條件（如：磁磚尺寸與產地、水電管線品牌、油漆批土次數）進行估算。
+  </p>
+
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <caption>工班比價與報價單檢核對照表</caption>
+        <thead>
+          <tr>
+            <th>檢核維度</th>
+            <th>優質報價單特徵</th>
+            <th>高風險報價單特徵（需釐清）</th>
+            <th>決策提醒與備註</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>工項粒度</strong></td>
+            <td>具備 6-8 類以上明確工種分類。</td>
+            <td>大量使用「一式」、「全室」等模糊字眼。</td>
+            <td>若見「一式」，必須要求廠商在備註欄寫明該式包含的具體坪數、數量或五金件數。</td>
+          </tr>
+          <tr>
+            <td><strong>規格標示</strong></td>
+            <td>明列建材品牌、型號、尺寸與厚度。</td>
+            <td>僅寫「進口磁磚」、「優質乳膠漆」。</td>
+            <td>材料等級直接影響抗老化能力。未標示明確規格，極易在進場後產生認知落差與替換爭議。</td>
+          </tr>
+          <tr>
+            <td><strong>數量單位</strong></td>
+            <td>以坪、才、尺、口（插座）等精確單位計價。</td>
+            <td>單位空白或缺乏實作丈量基準。</td>
+            <td>確認計價單位是否包含合理的損耗率（如磁磚通常含 10% 損耗）。</td>
+          </tr>
+          <tr>
+            <td><strong>清運與保護</strong></td>
+            <td>拆分為「梯間/電梯保護」、「廢棄物車趟清運」。</td>
+            <td>未列出清運費，或與拆除工程混淆。</td>
+            <td>老屋清運成本逐年攀升，漏列此項是發包後最常見的隱形追加來源。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2>責任界線與付款條款的防禦機制</h2>
+  <p>
+    確認報價後，下一步是將共識寫進合約。合約 the 重點在於釐清「誰負責買」、「誰負責裝」以及「何時付款」。
+  </p>
+
+  <h3>劃定發包責任界線</h3>
+  <p>
+    許多屋主為了節省預算，會選擇「自購設備、交由工班安裝」。這種方式雖然具備彈性，但也容易在設備損壞、尺寸不合時出現「責任三不管地帶」。以下為老屋翻新常見的設備與材料，建議在簽約前依據此清單釐清採購與保固歸屬：
+  </p>
+
+  <div class="article-card-grid">
+    <div class="article-card">
+      <p class="article-card-kicker">衛浴與廚具設備</p>
+      <h3>工班統包供應 vs 業主自購交安</h3>
+      <p>
+        <strong>工班統包：</strong>包含進場點收、尺寸核對、安裝與後續漏水/五金保固。責任單一，日後維修對口明確。<br />
+        <strong>業主自購：</strong>業主需自行核對水電管徑位置、掌控送貨時間並現場點收。工班僅負擔安裝工資，若設備本身瑕疵或因尺寸不合導致重工，衍生費用由業主承擔。
+      </p>
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">特殊燈具與智能五金</p>
+      <h3>規格對齊與迴路責任</h3>
+      <p>
+        <strong>工班統包：</strong>由工班確認電壓匹配與承重結構，提供完整迴路測試。<br />
+        <strong>業主自購：</strong>業主需提前提供設備技術手冊給水電工班預留電線與安培數。若因未提早給規格導致無法安裝，業主需負擔修改工資。
+      </p>
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">表材（磁磚/木地板）</p>
+      <h3>損耗估算與物流責任</h3>
+      <p>
+        <strong>工班統包：</strong>包含損耗計算、退補料物流處理、起步條與收邊整合。<br />
+        <strong>業主自購：</strong>業主需自行抓取 10%-15% 損耗量，若施工中途缺料，業主需自行承擔停工等待期與補料運費。
+      </p>
+    </div>
+  </div>
+
+  <h3>付款條款與備援金設定</h3>
+  <p>
+    工程款項應依據施工進度分期支付，常見的比例為：<strong>簽約 30%、泥作水電完成 30%、木作油漆完成 30%、完工驗收 10%</strong>。切忌在工程初期即支付超過 50% 以上的款項。
+  </p>
+  <p>
+    此外，老屋翻新充滿未知的變數。建議在總發包金額之外，先預留總預算的 10% 至 15% 作為風險備援金；若屋況不透明、拆除後變因高，實務上常拉到 15% 至 20%。
+  </p>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">預算控管</p>
+    <h3 class="article-insight-title">老屋預算最常失控的三大風險因子：</h3>
+    <ul>
+      <li><strong>拆除後新增問題：</strong>如壁癌比預期嚴重、隱藏的漏水點、鋼筋外露需結構修補。</li>
+      <li><strong>設備與材質升級：</strong>施工中途臨時決定更換更高階的五金或進口面材。</li>
+      <li><strong>設計變更或尺寸重做：</strong>圖面確認後，施工中途要求更改隔間或新增插座迴路。</li>
+    </ul>
+  </div>
+
+  <p>
+    將這 15% 至 20% 的備援金獨立鎖定，不挪用於初期的裝飾性升級，是確保老屋翻新能順利走完全程、安定完工的最強後盾。
+  </p>
+
+  <figure class="article-figure">
+    <img src={articleDetailImage} alt="工班發包合約與預算比價關鍵要素示意圖" loading="lazy" />
+    <figcaption>將發包權責明確寫入合約，並預留足夠的風險備援金，是老屋翻新順利完工的關鍵。</figcaption>
+  </figure>
+
+  <h2>結語：合約是合作的起點，而非防範的終點</h2>
+  <blockquote>
+    一份合格的發包合約，本質上是利用文字與表格把未來可能發生的摩擦提前化解。當雙方對工法、建材、責任界線與付款節奏有了完全對等的理解，施工過程自然能減少猜疑，回歸工程品質本身。
+  </blockquote>
+</EditorialArticleLayout>

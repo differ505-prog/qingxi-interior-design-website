@@ -161,6 +161,21 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     coverImage: "/images/blog/old-house-condition-assessment-cover.png",
   },
   {
+    title: "發包合約與工班比價：老屋翻新的責任界線與付款條款",
+    slug: "old-house-contracting-budget-and-boundaries",
+    date: "2026-07-06",
+    summary:
+      "老屋翻新發包與合約本質上是一場風險管理的共識建立。本文從基礎工程的預算占比、報價單的拆分粒度，到採購權責界線與分期付款條款，提供完整的防禦機制與檢核對照表。",
+    siteCategory: "老屋翻新",
+    category: "老屋翻新",
+    track: "老屋翻新系",
+    chapter: "預算拆解",
+    subchapter: "發包合約",
+    tags: ["老屋翻新", "裝修預算", "發包合約", "比價邏輯", "責任界線", "付款條款"],
+    coverImage: "/images/blog/old-house-contracting-budget-and-boundaries-cover.png",
+    editorialRefreshStamp: "2026-07-06",
+  },
+  {
     title: "全室預算拆解：報價單判讀與超支預防指南",
     slug: "full-room-renovation-budget-breakdown-and-quote-guide",
     date: "2026-07-04",
