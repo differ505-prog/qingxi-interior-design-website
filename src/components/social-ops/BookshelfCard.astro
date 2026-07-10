@@ -1,0 +1,83 @@
+---
+type CardVariant = 'prompt-library' | 'canned-reply';
+
+interface PromptLibraryEntry {
+  id: string;
+  category: string;
+  title: string;
+  hint: string;
+  note: string;
+  prompt: string;
+}
+
+interface CannedReplyEntry {
+  id: string;
+  category: string;
+  promptTitle: string;
+  promptHint: string;
+  message: string;
+}
+
+interface Props {
+  variant: CardVariant;
+  entry: PromptLibraryEntry | CannedReplyEntry;
+  feedbackId?: string;
+}
+
+const { variant, entry, feedbackId } = Astro.props;
+const isPromptLib = variant === 'prompt-library';
+
+const articleClasses = isPromptLib
+  ? 'bookshelf-card bookshelf-card--prompt bookshelf-prompt-library-card'
+  : 'bookshelf-card bookshelf-card--reply bookshelf-reply-card bookshelf-canned-card bookshelf-canned-card-priority';
+const metaClasses = isPromptLib
+  ? 'bookshelf-card__meta bookshelf-prompt-library-meta'
+  : 'bookshelf-card__meta';
+---
+
+<article class={articleClasses}>
+  <div class={metaClasses}>
+    <span>{entry.category}</span>
+    <strong>{isPromptLib ? entry.title : (entry as CannedReplyEntry).promptTitle}</strong>
+    <em>{isPromptLib ? entry.hint : (entry as CannedReplyEntry).promptHint}</em>
+    {isPromptLib && <p>{entry.note}</p>}
+    {!isPromptLib && <p>{(entry as CannedReplyEntry).message}</p>}
+  </div>
+
+  {isPromptLib && (
+    <div class="bookshelf-pro-prompt-body bookshelf-card__content">
+      <label class="gemini-field bookshelf-prompt-field">
+        <span>可直接送高階 LLM 的 prompt</span>
+        <textarea
+          id={`prompt-library-content-${entry.id}`}
+          class="bookshelf-pro-prompt-content bookshelf-prompt-library-content"
+          rows="16"
+          readonly
+        >{entry.prompt}</textarea>
+      </label>
+      <div class="bookshelf-card__actions bookshelf-actions bookshelf-confirm-actions">
+        <button
+          type="button"
+          id={`copy-prompt-library-${entry.id}`}
+          class="bookshelf-btn bookshelf-btn--primary bookshelf-action bookshelf-action-primary"
+        >
+          複製這份提示詞
+        </button>
+      </div>
+    </div>
+  )}
+
+  {!isPromptLib && (
+    <div class="bookshelf-card__actions bookshelf-actions bookshelf-canned-actions">
+      <button
+        type="button"
+        class="bookshelf-btn bookshelf-btn--primary bookshelf-action bookshelf-action-primary"
+        data-canned-reply-copy-button
+        data-canned-reply-copy={(entry as CannedReplyEntry).message}
+        data-canned-reply-label={(entry as CannedReplyEntry).promptTitle}
+      >
+        複製這則
+      </button>
+    </div>
+  )}
+</article>

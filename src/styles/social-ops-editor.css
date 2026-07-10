@@ -1,0 +1,417 @@
+/**
+ * Social Ops Editor Styles
+ * 
+ * Contains styles for:
+ * - Gemini composer & form fields
+ * - Prompt library fields
+ * - Quest link input fields
+ * - Checkbox inputs
+ * 
+ * This file is imported after social-ops-core.css
+ */
+
+/* ─── Form Fields ─────────────────────────────────────────── */
+
+.gemini-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.gemini-field span {
+  color: rgba(232, 228, 220, 0.68);
+  font-size: 0.86rem;
+}
+
+.gemini-field input,
+.gemini-field select,
+.gemini-field textarea {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: #f2f0eb;
+  padding: 0.9rem 1rem;
+  font: inherit;
+  line-height: 1.65;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.gemini-field input::placeholder,
+.gemini-field select::placeholder,
+.gemini-field textarea::placeholder {
+  color: rgba(230, 228, 222, 0.38);
+}
+
+.gemini-field input:focus,
+.gemini-field select:focus,
+.gemini-field textarea:focus {
+  outline: none;
+  border-color: rgba(247, 246, 241, 0.18);
+  box-shadow: 0 0 0 1px rgba(247, 246, 241, 0.06);
+}
+
+/* Fix A: 鍵盤導航聚焦光環 — 明確區分滑鼠點擊與 Tab 聚焦 */
+.gemini-field input:focus-visible,
+.gemini-field select:focus-visible,
+.gemini-field textarea:focus-visible {
+  outline: none;
+  border-color: rgba(240, 220, 170, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(240, 220, 170, 0.25),
+    0 0 12px rgba(240, 220, 170, 0.08);
+}
+
+.gemini-field-full {
+  grid-column: 1 / -1;
+}
+
+/* ─── Prompt Field ─────────────────────────────────────────── */
+
+.bookshelf-prompt-field textarea {
+  min-height: 168px;
+}
+
+/* ─── Pro Prompt Content ─────────────────────────────────── */
+
+.bookshelf-pro-prompt-body {
+  padding: 0.9rem 0.95rem 0.95rem;
+}
+
+.bookshelf-pro-prompt-content {
+  width: 100%;
+  min-height: 280px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(17, 17, 17, 0.62);
+  color: rgba(238, 235, 229, 0.86);
+  font: inherit;
+  line-height: 1.72;
+  padding: 1rem;
+  resize: vertical;
+}
+
+.bookshelf-pro-prompt-content::placeholder {
+  color: rgba(224, 221, 214, 0.34);
+}
+
+/* ─── Quest Link Field ─────────────────────────────────────── */
+
+.quest-link-field,
+.quest-link-field-row {
+  display: grid;
+}
+
+.quest-link-field {
+  gap: 0.42rem;
+  min-width: 0;
+}
+
+.quest-link-field span {
+  color: rgba(227, 223, 215, 0.68);
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+}
+
+.quest-link-field-row {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.quest-link-field-row > * {
+  min-width: 0;
+}
+
+.quest-link-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.7rem;
+  padding: 0.72rem 0.84rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(15, 15, 15, 0.56);
+  color: #f2f0eb;
+  font: inherit;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.quest-link-field input::placeholder {
+  color: rgba(231, 228, 221, 0.3);
+}
+
+.quest-link-field input:focus {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(20, 20, 20, 0.72);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Checkbox Input ─────────────────────────────────────── */
+
+.quest-check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #dbdbd6;
+}
+
+/* ─── Editor Grid ─────────────────────────────────────────── */
+
+.gemini-editor-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.gemini-editor-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 1rem 1rem 0.95rem;
+}
+
+/* ─── Composer Panel ──────────────────────────────────────── */
+
+.gemini-composer {
+  margin-bottom: 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.025);
+  overflow: hidden;
+  /* Fix A: 暗主題 editor 區塊文字換行 */
+  text-wrap: pretty;
+}
+
+.gemini-composer summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.05rem;
+  color: #f4f2ed;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+/* Fix B: hover 微亮反饋 */
+.gemini-composer summary:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: #faf9f5;
+}
+
+.gemini-composer summary::-webkit-details-marker {
+  display: none;
+}
+
+.gemini-composer summary span {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.gemini-composer summary small {
+  color: rgba(224, 221, 214, 0.58);
+  font-size: 0.82rem;
+  transition: color 0.2s ease;
+}
+
+.gemini-composer[open] summary {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.gemini-composer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding: 0 1rem 1rem;
+}
+
+/* ─── Feedback Messages ──────────────────────────────────── */
+
+.gemini-feedback {
+  min-height: 1.5rem;
+  margin: -0.2rem 0 1rem;
+  color: rgba(233, 231, 225, 0.62);
+  font-size: 0.88rem;
+}
+
+.gemini-feedback.is-success {
+  color: #e8e8e3;
+}
+
+.gemini-feedback.is-warning {
+  color: #d9d2c6;
+}
+
+/* ─── Actions ─────────────────────────────────────────────── */
+
+.gemini-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  /* Fix B: 觸控友善 — 確保按鈕不小於 44px */
+  min-height: 44px;
+}
+
+.gemini-actions-primary {
+  align-items: center;
+}
+
+.gemini-note {
+  margin: -0.25rem 0 0.55rem;
+  color: rgba(233, 231, 225, 0.56);
+  font-size: 0.84rem;
+}
+
+/* ─── Version History ─────────────────────────────────────── */
+
+.gemini-history {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.gemini-version-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.gemini-history-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.gemini-version-item {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(180deg, rgba(55, 55, 54, 0.58), rgba(31, 31, 31, 0.82));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 22px rgba(0, 0, 0, 0.11);
+  overflow: hidden;
+  /* Fix A: 暗主題版本卡片文字換行 */
+  text-wrap: pretty;
+}
+
+.gemini-version-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1rem;
+}
+
+.gemini-version-summary::-webkit-details-marker {
+  display: none;
+}
+
+.gemini-version-summary::after {
+  content: "+";
+  color: rgba(224, 221, 214, 0.62);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.gemini-version-item[open] .gemini-version-summary {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.gemini-version-item[open] .gemini-version-summary::after {
+  content: "−";
+}
+
+.gemini-version-summary strong {
+  color: #f5f3ef;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.gemini-version-body {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.gemini-version-meta {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.gemini-version-meta p,
+.gemini-version-meta small {
+  margin: 0;
+  color: rgba(224, 221, 214, 0.62);
+  line-height: 1.7;
+}
+
+.gemini-version-meta p {
+  font-size: 0.9rem;
+}
+
+.gemini-version-meta small {
+  font-size: 0.82rem;
+  word-break: break-word;
+}
+
+/* ─── History Action Button ───────────────────────────────── */
+
+.history-action-btn {
+  min-height: 40px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #f1efea;
+  font: inherit;
+  cursor: pointer;
+}
+
+.history-action-btn:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Preview Content ─────────────────────────────────────── */
+
+.gemini-preview-content {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: rgba(238, 235, 229, 0.82);
+  font: inherit;
+  line-height: 1.8;
+  max-height: 320px;
+  overflow: auto;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 1120px) {
+  .gemini-editor-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .gemini-editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-link-field-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .quest-link-field-row .quest-link-btn {
+    width: auto;
+  }
+
+  .quest-check-row .quest-link-btn {
+    width: 100%;
+  }
+}
