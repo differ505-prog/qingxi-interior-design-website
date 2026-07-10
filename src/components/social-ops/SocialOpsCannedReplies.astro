@@ -1,4 +1,6 @@
 ---
+import BookshelfCard from "./BookshelfCard.astro";
+
 type CannedReplyEntry = {
   id: string;
   category: string;
@@ -20,27 +22,11 @@ const { replies } = Astro.props;
       <p class="panel-tag">快速工具</p>
       <h2>常見罐頭回覆</h2>
     </div>
-    <p>方便直接複製貼上回覆貼文</p>
+      <p>可直接複製貼上</p>
   </div>
   <div class="bookshelf-reply-grid bookshelf-canned-grid">
     {replies.map((reply) => (
-      <article class="bookshelf-reply-card bookshelf-canned-card bookshelf-canned-card-priority">
-        <span>{reply.category}</span>
-        <strong>{reply.promptTitle}</strong>
-        <em>{reply.promptHint}</em>
-        <p>{reply.message}</p>
-        <div class="bookshelf-actions bookshelf-canned-actions">
-          <button
-            type="button"
-            class="bookshelf-action bookshelp-action-primary"
-            data-canned-reply-copy-button
-            data-canned-reply-copy={reply.message}
-            data-canned-reply-label={reply.promptTitle}
-          >
-            複製這則
-          </button>
-        </div>
-      </article>
+      <BookshelfCard variant="canned-reply" entry={reply} />
     ))}
   </div>
 </section>

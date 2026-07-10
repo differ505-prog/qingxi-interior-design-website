@@ -68,15 +68,15 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
             <div class="form-grid">
               <label class="field">
                 <span>報價標題</span>
-                <input id="quote-title" type="text" placeholder="例如：青曦住宅空間初估單" />
+                <input id="quote-title" type="text" placeholder="報價標題" />
               </label>
               <label class="field">
                 <span>客戶姓名</span>
-                <input id="client-name" type="text" placeholder="例如：王小姐" />
+                <input id="client-name" type="text" placeholder="客戶姓名" />
               </label>
               <label class="field">
                 <span>案件名稱</span>
-                <input id="project-name" type="text" placeholder="例如：林口新成屋裝修" />
+                <input id="project-name" type="text" placeholder="案場名稱" />
               </label>
               <label class="field">
                 <span>空間類型</span>
@@ -137,7 +137,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
               <label class="field">
                 <span>坪數</span>
                 <div class="input-with-suffix">
-                  <input id="project-area" type="number" min="0" step="0.5" placeholder="例如：28" />
+                  <input id="project-area" type="number" min="0" step="0.5" placeholder="室內坪數" />
                   <span>坪</span>
                 </div>
               </label>
@@ -151,11 +151,11 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
               </label>
               <label class="field">
                 <span>報價人</span>
-                <input id="prepared-by" type="text" placeholder="例如：青曦空間設計" />
+                <input id="prepared-by" type="text" placeholder="報價人" />
               </label>
               <label class="field field-full">
                 <span>案件地址 / 備註</span>
-                <input id="project-address" type="text" placeholder="例如：新北市林口區..." />
+                <input id="project-address" type="text" placeholder="案場地址" />
               </label>
               <label class="field field-full">
                 <span>保固說明</span>
@@ -286,7 +286,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
                                 <strong class="item-subtotal">NT$0</strong>
                               </td>
                               <td>
-                                <input class="item-note" type="text" placeholder="例如：含配線與基礎整理" />
+                                <input class="item-note" type="text" placeholder="備註" />
                               </td>
                             </tr>
                           ))}
@@ -371,7 +371,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
               </label>
               <label class="field field-full">
                 <span>前言說明</span>
-                <textarea id="quote-intro" rows="3" placeholder="例如：以下報價依目前討論內容整理，方便先確認預算方向與工項範圍。"></textarea>
+                <textarea id="quote-intro" rows="3" placeholder="引言或備註"></textarea>
               </label>
               <label class="field field-full">
                 <span>報價條款（每行一則）</span>
@@ -410,7 +410,7 @@ const categoryLabelMap = new Map(quoteCategories.map((category) => [category.id,
             </div>
 
             <div class="summary-block">
-              <p class="summary-title">常見漏項提醒</p>
+              <p class="summary-title">漏項提示</p>
               <div id="missing-item-reminders" class="missing-item-list"></div>
             </div>
 

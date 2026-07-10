@@ -1103,7 +1103,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                 <p id="publishing-review-action-hint" class="bookshelf-review-action-hint">{initialDisplayRecommendation?.actionHint ? `${initialDisplayRecommendation.actionHint}｜待高階 LLM 裁定` : "待高階 LLM 裁定"}</p>
                 <div id="publishing-review-blocker" class={`bookshelf-review-blocker ${initialDisplayRecommendation?.collisionRisk === "high" ? "is-visible" : ""}`}>
                   {initialDisplayRecommendation?.collisionRisk === "high"
-                    ? `送審提醒：規則層初篩認為此題與 ${initialDisplayRecommendation.similarArticles?.[0]?.title || "相近舊文"} 靠近，請要求高階 LLM 明確裁定是否整併、改切角，或可直接新發。`
+                    ? `送審提示：規則層初篩認為此題與 ${initialDisplayRecommendation.similarArticles?.[0]?.title || "相近舊文"} 靠近，請高階 LLM 裁定整併、改切角或新發。`
                     : ""}
                 </div>
                 <ul id="publishing-review-similar-list" class="bookshelf-review-similar-list">
@@ -2050,7 +2050,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                   </div>
                   <div id="review-next-topic-blocker" class={`bookshelf-review-blocker ${initialRecommendation?.collisionRisk === "high" ? "is-visible" : ""}`}>
                     {initialRecommendation?.collisionRisk === "high"
-                      ? `送審提醒：規則層初篩認為此題與 ${initialRecommendation.similarArticles?.[0]?.title || "相近舊文"} 靠近，請交由高階 LLM 明確裁定是否整併或改切角。`
+                      ? `送審提示：規則層初篩認為此題與 ${initialRecommendation.similarArticles?.[0]?.title || "相近舊文"} 靠近，請高階 LLM 裁定整併或改切角。`
                       : ""}
                   </div>
                   <ul id="review-next-topic-similar-list" class="bookshelf-review-similar-list">
@@ -6251,7 +6251,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         <p>章節定位：${escapeHtml(article.chapter)} / ${escapeHtml(article.subchapter)}</p>
         <p>規則分數：${article.score}</p>
         <p>初篩理由：${escapeHtml(article.reason || "系統依章節、子章與核心詞彙重疊進行初篩。")}</p>
-        <p>覆核提醒：這不是最終撞題判決，請交由高階 LLM 或人工覆核確認是否真的重疊。</p>
+        <p>覆核提示：非終局裁決，請高階 LLM 或人工確認是否重疊。</p>
       </article>
     `).join("");
   }
@@ -8209,7 +8209,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
               <em>${assets.length} 份資產</em>
             </div>
             <small>${escapeHtml(item.chapter)} / ${escapeHtml(item.subchapter)}</small>
-            ${latestAssetUpdate ? `<p class="bookshelf-confirm-note">最後更新：${escapeHtml(latestAssetUpdate)}｜若 Google Sheets / PDF 已更新，請同步檢查文章是否需要改版。</p>` : ""}
+            ${latestAssetUpdate ? `<p class="bookshelf-confirm-note">最後更新：${escapeHtml(latestAssetUpdate)}｜Google Sheets / PDF 更新後，請同步檢查文章改版需求。</p>` : ""}
             ${assets.length ? `
               <ul class="bookshelf-asset-slot-assets">
                 ${assets.map((asset, index) => `

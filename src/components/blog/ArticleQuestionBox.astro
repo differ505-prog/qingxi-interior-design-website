@@ -372,8 +372,7 @@ const publicArticleQuestionApiUrl = "/api/article-question";
 <section class="article-question-box" aria-label="文章提問表單">
   <div class="article-question-box-head">
     <p>文章延伸提問</p>
-    <h2>看完這篇，還有卡住的地方？</h2>
-    <small>請直接留下疑問，內容將做為青曦後續補充與修訂文章的參考。</small>
+    <h2>看完這篇，有卡住的地方</h2>
   </div>
 
   <div class="article-question-trust-row" aria-label="提問說明">
@@ -391,33 +390,32 @@ const publicArticleQuestionApiUrl = "/api/article-question";
     data-article-url={articlePathname}
   >
     <label class="article-question-field article-question-field--primary">
-      <span>你的問題</span>
-      <textarea name="question" minlength="8" required placeholder="例如：局部翻新如果先不動天花板，預算與工序要注意哪些風險？"></textarea>
+      <span>問題</span>
+      <textarea name="question" minlength="8" required placeholder="例：局部翻新先不動天花板，預算與工序有哪些風險"></textarea>
     </label>
-    <p class="article-question-hint">無須整理成完整需求，簡單一句話即可。</p>
 
     <details class="article-question-meta">
       <summary>
         <span class="article-question-meta-summary-copy">
-          <strong>補充背景或聯絡方式</strong>
-          <small>協助青曦精準理解情境；若留下聯絡方式，將於文章補充或解答時主動回覆。</small>
+          <strong>背景補充</strong>
+          <small>填寫後，青曦將主動回覆</small>
         </span>
         <span class="article-question-meta-summary-toggle">選填</span>
       </summary>
       <div class="article-question-meta-body">
         <label class="article-question-field">
-          <span>補充背景</span>
-          <textarea name="detail" rows="3" placeholder="可補充空間現況、預算範圍、家中成員，或你最卡住的判斷點。"></textarea>
+          <span>背景補充</span>
+          <textarea name="detail" rows="3" placeholder="空間現況、預算範圍、成員或卡住的判斷點"></textarea>
         </label>
 
         <label class="article-question-field">
           <span>稱呼</span>
-          <input type="text" name="submitterName" maxlength="40" placeholder="方便青曦辨識（選填）" />
+          <input type="text" name="submitterName" maxlength="40" placeholder="選填" />
         </label>
 
         <label class="article-question-field">
           <span>聯絡方式</span>
-          <input type="text" name="contactInfo" maxlength="120" placeholder="Line、Email 或手機（選填）" />
+          <input type="text" name="contactInfo" maxlength="120" placeholder="Line / Email / 手機（選填）" />
         </label>
       </div>
     </details>
@@ -458,12 +456,12 @@ const publicArticleQuestionApiUrl = "/api/article-question";
         return;
       }
       if (question.length < 8) {
-        setFeedback("問題至少需要 8 個字，方便青曦判斷重點。", "is-error");
+        setFeedback("問題至少需要 8 個字。", "is-error");
         return;
       }
 
       if (submitButton instanceof HTMLButtonElement) submitButton.disabled = true;
-      setFeedback("正在送出問題...");
+      setFeedback("送出中...");
 
       try {
         const formData = new FormData(form);
@@ -491,7 +489,7 @@ const publicArticleQuestionApiUrl = "/api/article-question";
         }
 
         form.reset();
-        setFeedback(result?.note || "問題已送出，青曦會留作後續整理參考。", "is-success");
+        setFeedback(result?.note || "已收到，青曦將留作整理參考。", "is-success");
       } catch (error) {
         console.error("文章提問送出失敗：", error);
         setFeedback(error instanceof Error ? error.message : "問題送出失敗，請稍後再試。", "is-error");

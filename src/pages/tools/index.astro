@@ -486,9 +486,9 @@ const renovationItemsJson = JSON.stringify(renovationItems);
           <div class="estimator-handoff-card">
             <div class="estimator-handoff-copy">
               <p class="estimator-handoff-eyebrow">BEST NEXT STEP</p>
-              <h3 id="estimator-handoff-title">下一步：帶著估算填需求表</h3>
+              <h3 id="estimator-handoff-title">需求表（含估算試算）</h3>
               <p id="estimator-handoff-description" class="estimator-handoff-description">
-                再補需求、照片與時程，青曦就能接著判斷
+                備齊需求、照片與時程，齊備後即可評估
               </p>
               <div class="estimator-handoff-points">
                 <div class="estimator-handoff-point">
@@ -574,7 +574,7 @@ const renovationItemsJson = JSON.stringify(renovationItems);
                 <div class="report-lead-grid">
                   <label class="report-lead-field">
                     <span>姓名</span>
-                    <input type="text" name="name" placeholder="怎麼稱呼你" required />
+                    <input type="text" name="name" placeholder="姓名" required />
                   </label>
                   <label class="report-lead-field">
                     <span>Line / Email</span>
@@ -2742,16 +2742,16 @@ const renovationItemsJson = JSON.stringify(renovationItems);
       estimatorHandoffPointDescription
     ) {
       if (projectType.value === "design-only") {
-        estimatorHandoffTitle.textContent = "把設計方向整理成完整需求表？";
+        estimatorHandoffTitle.textContent = "需求表（含估算試算）";
         estimatorHandoffDescription.textContent =
-          "把需求、空間痛點與參考風格整理清楚。";
+          "備齊需求、照片與時程，齊備後即可評估";
         estimatorHandoffPointTitle.textContent = "這一步最有效率";
         estimatorHandoffPointDescription.textContent =
           "把需求、參考圖與交付內容先講清楚。";
       } else {
-        estimatorHandoffTitle.textContent = "下一步：帶著估算填需求表";
+        estimatorHandoffTitle.textContent = "需求表（含估算試算）";
         estimatorHandoffDescription.textContent =
-          "再補需求、照片與時程，青曦就能接著判斷。";
+          "備齊需求、照片與時程，齊備後即可評估";
         estimatorHandoffPointTitle.textContent = "這一步最有效率";
         estimatorHandoffPointDescription.textContent =
           "有預算方向後，直接整理需求。";

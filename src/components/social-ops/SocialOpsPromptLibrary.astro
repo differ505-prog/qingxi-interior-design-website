@@ -1,4 +1,6 @@
 ---
+import BookshelfCard from "./BookshelfCard.astro";
+
 type PromptLibraryEntry = {
   id: string;
   category: string;
@@ -13,47 +15,16 @@ interface Props {
   feedbackId?: string;
 }
 
-const {
-  entries,
-  feedbackId = "prompt-library-feedback",
-} = Astro.props;
+const { entries, feedbackId = "prompt-library-feedback" } = Astro.props;
 ---
 
 <section class="bookshelf-prompt-library">
   <div class="bookshelf-preview-head">
     <p>提示詞專區</p>
-    <span>已上移到高頻區，進入內容台後可先做舊文審計、自評或複製常用高階 prompt，再直接接續生文。</span>
   </div>
   <div class="bookshelf-prompt-library-grid">
     {entries.map((entry) => (
-      <article class="bookshelf-prompt-library-card">
-        <div class="bookshelf-prompt-library-meta">
-          <span>{entry.category}</span>
-          <strong>{entry.title}</strong>
-          <em>{entry.hint}</em>
-          <p>{entry.note}</p>
-        </div>
-        <div class="bookshelf-pro-prompt-body">
-          <label class="gemini-field bookshelf-prompt-field">
-            <span>可直接送高階 LLM 的 prompt</span>
-            <textarea
-              id={`prompt-library-content-${entry.id}`}
-              class="bookshelf-pro-prompt-content bookshelf-prompt-library-content"
-              rows="16"
-              readonly
-            >{entry.prompt}</textarea>
-          </label>
-          <div class="bookshelf-actions bookshelf-confirm-actions">
-            <button
-              type="button"
-              id={`copy-prompt-library-${entry.id}`}
-              class="bookshelf-action bookshelp-action-primary"
-            >
-              複製這份提示詞
-            </button>
-          </div>
-        </div>
-      </article>
+      <BookshelfCard variant="prompt-library" entry={entry} />
     ))}
   </div>
   <p id={feedbackId} class="bookshelf-ai-feedback" aria-live="polite"></p>
