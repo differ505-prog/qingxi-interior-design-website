@@ -33,6 +33,23 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
   - 違規項目必須列清單告知使用者，區分「同輪修補」與「下輪議題」兩類，禁止默默累積違規。
   - 「同輪修補」僅限於**同一個元件家族**（如 hero 系統），跨家族（如 hero + section-title）違規列入「下輪議題」並提醒使用者確認，避免單輪 commit 過大。
 
+憲法掃描路徑覆蓋清單 (Scan Scope Lock)：任何條款的 grep 驗證命令，必須掃描以下 5 個目錄，禁止只看 `src/pages/`：
+  1. `src/pages/`（Astro 頁面檔，含後台頁面如 `standard-sop.astro`、`smart-home-quiz.astro`、`requirement-form.astro` 等）
+  2. `src/pages/portfolio/`（作品集頁面）
+  3. `src/components/`（共用元件，如 `HeroCarousel.astro`、`Navigation.astro`、`ProjectCard.astro`）
+  4. `src/components/blog/`（部落格元件）
+  5. `src/layouts/`（Layout 檔，如 `BaseLayout.astro`）
+  6. `src/styles/`（共用 CSS，如 `social-ops-core.css` 4902 行的跨元件樣式）
+
+驗證命令模板 (Verification Command Template)：每條字體憲法條款必須有對應的可執行 grep 命令，列在憲法末尾的「驗證 SOP」段落：
+  - 字距反向律驗證：`grep -rn "letter-spacing: 0\.0[5-9]\|letter-spacing: 0\.1" src/ | grep -v "0\.0[0-4]em\|0\.0[1-2]em\|0\.0[3-4]em"`，列出所有 ≥ 0.05em 的字距，逐一比對對應字級
+  - 襯線行高下限驗證：`grep -rn "font-family: var(--font-display)\|--font-serif" src/ -A 5 | grep -B 2 "line-height:" | grep "line-height: 1\.[0-2]"` 列出所有襯線大字行高
+  - 字級秩序律驗證：`grep -rn "font-size: clamp" src/ | sort` 列出所有 clamp 上限，比對群組
+  - text-wrap balance 驗證：`grep -rn "<h[1-6]" src/ | awk '{print length}'` 列出所有 h 標籤，逐一比對對應 CSS 是否有 `text-wrap: balance`
+  - 任何 grep 命令必須加上 `src/pages/`、`src/components/`、`src/layouts/`、`src/styles/` 多重路徑，**禁止單一目錄掃描**
+
+歷史教訓：第 4-8 輪僅掃描 `src/pages/index.astro`，錯過了 hero h1 在 `HeroCarousel.astro`（5.2rem / 0.1em）、footer h2 在 `BaseLayout.astro`、後台頁面 hero h1 在 `standard-sop.astro` / `requirement-form.astro` 等重大違規。**單一目錄掃描是憲法執行的最大盲區**。
+
 視覺雙側平衡與盲區防堵 (Visual Symmetry & Blindside Lock)：所有 Hero、首屏、Grid 設計必須主動檢查「左右側視覺重量」。禁止出現任何一側空洞、僅有純文字或無裝飾的狀況。對於多欄佈局（≥2 欄），每一欄都必須具備（a）至少一張智慧佔位圖或實景圖、（b）對應的視覺裝飾或 micro-interaction。並依下列規範補強：
   - 圖片缺口的智慧佔位圖必須放置於最重的視覺欄位（通常為 Hero 右側或 Grid 第一列），不可全留白。
   - 桌面版右側欄（無論是卡片、metric、CTA 群組）必須具備完整的視覺閉環，絕不允許「半邊填空」式的設計。

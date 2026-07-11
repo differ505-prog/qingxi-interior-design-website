@@ -34,6 +34,22 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
   - 違規項目必須列清單告知使用者，區分「同輪修補」與「下輪議題」兩類，禁止默默累積違規。
   - 「同輪修補」僅限於同一個元件家族（如 hero 系統），跨家族（如 hero + section-title）違規列入「下輪議題」並提醒使用者確認，避免單輪 commit 過大。
 
+憲法掃描路徑覆蓋清單 (Scan Scope Lock)：任何條款的 grep 驗證命令，必須掃描以下 6 個目錄，禁止只看 `src/pages/`：
+  1. `src/pages/`（Astro 頁面檔，含後台頁面如 `standard-sop.astro`、`smart-home-quiz.astro`、`requirement-form.astro`）
+  2. `src/pages/portfolio/`（作品集頁面）
+  3. `src/components/`（共用元件，如 `HeroCarousel.astro`、`Navigation.astro`、`ProjectCard.astro`）
+  4. `src/components/blog/`（部落格元件）
+  5. `src/layouts/`（Layout 檔，如 `BaseLayout.astro`）
+  6. `src/styles/`（共用 CSS，如 `social-ops-core.css` 跨元件樣式）
+
+驗證命令模板 (Verification Command Template)：每條字體憲法條款必須有對應的可執行 grep 命令：
+  - 字距反向律：`grep -rn "letter-spacing: 0\.0[5-9]\|letter-spacing: 0\.1" src/`，列出所有 ≥ 0.05em 的字距，逐一比對字級
+  - 襯線行高下限：`grep -rn "font-family: var(--font-display)\|--font-serif" src/ -A 5`，檢查 line-height
+  - 字級秩序律：`grep -rn "font-size: clamp" src/ | sort`，列出所有 clamp 上限
+  - text-wrap balance：`grep -rn "<h[1-6]" src/`，列出所有標題比對 CSS 是否有 `text-wrap: balance`
+
+歷史教訓：第 4-8 輪僅掃描 `src/pages/index.astro`，錯過 hero h1 在 `HeroCarousel.astro`、footer h2 在 `BaseLayout.astro`、後台頁 hero h1 在 `standard-sop.astro` / `requirement-form.astro` 等重大違規。單一目錄掃描是憲法執行最大盲區。
+
 視覺雙側平衡與盲區防堵 (Visual Symmetry & Blindside Lock)：所有 Hero、首屏、Grid 設計必須主動檢查「左右側視覺重量」。禁止出現任何一側空洞、僅有純文字或無裝飾的狀況。對於多欄佈局（≥2 欄），每一欄都必須具備（a）至少一張智慧佔位圖或實景圖、（b）對應的視覺裝飾或 micro-interaction。並依下列規範補強：
   - 圖片缺口的智慧佔位圖必須放置於最重的視覺欄位（通常為 Hero 右側或 Grid 第一列），不可全留白。
   - 桌面版右側欄（無論是卡片、metric、CTA 群組）必須具備完整的視覺閉環，絕不允許「半邊填空」式的設計。
