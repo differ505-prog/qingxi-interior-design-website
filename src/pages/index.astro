@@ -76,13 +76,37 @@ const homeStructuredData = [
         </div>
       </div>
       <div class="brand-strip-metrics">
-        <article class="brand-metric">
-          <strong>住宅、商空、智能整合</strong>
-          <span>一起規劃</span>
+        <article class="brand-metric brand-metric-visual">
+          <figure class="brand-metric-image">
+            <img
+              src="https://placehold.co/720x720/f5f0e8/332e29?text=住宅·商交·智能整合%20\n%5B%E7%94%9F%E5%9B%BE%E6%8F%90%E7%A4%BA%E8%A9%9E%EF%BC%9A%E5%8F%B0%E7%81%A3%E9%AB%98%E7%AB%AF%E4%BD%8F%E5%AE%85%E5%A4%A7%E5%BB%88%E6%9D%BE%E5%BC%9B%E9%96%8B%E6%9C%97%E7%85%A7%E7%89%87%20%E7%B1%B3%E7%99%BD%E6%B4%8B%E6%9C%8D%E6%9C%80%E8%BC%95%E9%83%A8%E5%B1%85%20%E6%9D%82%E8%AA%8C%E6%94%9D%E5%BD%B1%E9%A2%A8%E6%A0%BC%5D"
+              alt="青曦空間設計作品主視覺：高端住宅與商空整合作品"
+              width="720"
+              height="720"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+          <div class="brand-metric-text">
+            <strong>住宅、商空、智能整合</strong>
+            <span>一起規劃</span>
+          </div>
         </article>
-        <article class="brand-metric">
-          <strong>大台北服務</strong>
-          <span>即時溝通無落差</span>
+        <article class="brand-metric brand-metric-visual">
+          <figure class="brand-metric-image">
+            <img
+              src="https://placehold.co/720x520/2e2826/f3ede4?text=%E5%A4%A7%E5%8F%B0%E5%8C%97%E6%9C%8D%E5%8B%99%20\n%5B%E7%94%9F%E5%9B%BE%E6%8F%90%E7%A4%BA%E8%A9%9E%EF%BC%9A%E5%A4%A7%E5%8F%B0%E5%8C%97%E5%9C%B0%E5%8D%80%E9%9B%BB%E5%8B%95%E5%B0%8D%E8%AB%87%E5%9C%A8%E5%B7%A5%E5%9C%B0%20%E5%B0%8F%E7%94%A8%E6%BA%9D%E9%80%9A%E4%BA%A4%E6%B5%81%E7%AF%87%E6%9C%89%E7%9A%84%E5%8F%83%E7%89%A9%E7%85%A7%E7%89%87%20%E9%BB%83%E8%89%B2%E6%9C%A8%E8%B3%AA%E6%9C%89%E7%86%B1%E5%BA%A6%5D"
+              alt="青曦團隊於大台北工地現場即時溝通的實際照片"
+              width="720"
+              height="520"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+          <div class="brand-metric-text">
+            <strong>大台北服務</strong>
+            <span>即時溝通無落差</span>
+          </div>
         </article>
       </div>
     </div>
@@ -650,7 +674,7 @@ const homeStructuredData = [
       margin: 0 auto;
       padding: clamp(2rem, 4vw, 3.5rem);
       display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(320px, 440px);
+      grid-template-columns: minmax(0, 1.4fr) minmax(360px, 460px);
       gap: clamp(1.6rem, 3vw, 3rem);
       border-radius: 32px;
       background:
@@ -826,6 +850,50 @@ const homeStructuredData = [
       color: rgba(71, 71, 71, 0.84);
       line-height: 1.7;
       font-size: 0.95rem;
+    }
+
+    .brand-metric-visual {
+      display: grid;
+      grid-template-rows: auto auto;
+      gap: 0.85rem;
+      padding: 0.9rem;
+      overflow: hidden;
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .brand-metric-visual:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 42px rgba(47, 47, 47, 0.08);
+    }
+
+    .brand-metric-image {
+      margin: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      background: var(--art-paper);
+      box-shadow: inset 0 0 0 1px rgba(115, 103, 94, 0.12);
+    }
+
+    .brand-metric-image img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.55s ease;
+    }
+
+    .brand-metric-visual:hover .brand-metric-image img {
+      transform: scale(1.04);
+    }
+
+    .brand-metric-text {
+      padding: 0.35rem 0.35rem 0.45rem;
+    }
+
+    .brand-metric-text strong {
+      margin-bottom: 0.2rem;
     }
 
     /* Smooth scrolling */
