@@ -66,7 +66,28 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
     4. BaseLayout .brand-title 1.16rem / 0.08em → 品牌識別 logo 設計
     5. Navigation .logo 1.5rem / 2px → 品牌識別範疇
     6. footer .brand-subtitle 0.68rem / 0.2em → uppercase tag 合理使用
+    7. index .faq-question 1.8rem / 1.24 行高 → 單行例外（max-width 26ch）
+    8. blog/index 7 處小標籤字距 0.06em-0.12em × 0.74-0.82rem
+      → uppercase 標籤合理使用
+    9. blog/index .library-count 1rem × 0.12em = 1.92px
+      → uppercase + nowrap 標籤合理使用
+    10. renovation-process .process-hero h1 5rem / 1.18 行高
+      → 桌面 hero 單行例外
+    11. contract-studio/sign .document-header h2 2.7rem / 1.24 行高
+      → 字級 < 3rem 邊界合規
+    12. tools/index .calculator-header h1 桌面 5.4rem / 1.18 行高
+      → 單行例外（第 15 輪已修）
+    13. 所有 ≥3rem hero h1/h2 行高 1.18 → 單行例外
   - **新規豁免流程**：發現新的違規需豁免時，必須明確寫出違規值、說明豁免理由、在 commit message 註明、將豁免編號加入憲法附錄。
+
+第 14 輪錯誤記錄與修正 (Round 14 Error Log)：第 14 輪 commit message 自稱「全站字距 SOP 清零」，但實際漏處理 `pages/blog/index.astro` 與 `pages/tools/index.astro` 兩個關鍵檔案的行高違規。第 15 輪立即修正並擴大掃描範圍。教訓：
+  - 任何 commit message 自稱「X 清零」前，必須實際再跑一次完整 grep 驗證，不可憑記憶清點。
+  - 「清零」宣告必須在 commit 內附上 SOP grep 命令的實際輸出作為佐證。
+  - 發現錯誤時立即修正並公開承認，不可在後續 commit 默默帶過。
+
+第三條 SOP — text-wrap balance 驗證：除字距 + 行高 SOP 外，「title 級 h1/h2 必須有 text-wrap: balance」也應驗證：
+  - 對應 grep 命令：grep -rn "<h[1-3]" src/pages/ src/components/ | grep -v "text-wrap"
+  - 此條款為前瞻性 SOP，下輪正式啟動
 
 視覺雙側平衡與盲區防堵 (Visual Symmetry & Blindside Lock)：所有 Hero、首屏、Grid 設計必須主動檢查「左右側視覺重量」。禁止出現任何一側空洞、僅有純文字或無裝飾的狀況。對於多欄佈局（≥2 欄），每一欄都必須具備（a）至少一張智慧佔位圖或實景圖、（b）對應的視覺裝飾或 micro-interaction。並依下列規範補強：
   - 圖片缺口的智慧佔位圖必須放置於最重的視覺欄位（通常為 Hero 右側或 Grid 第一列），不可全留白。

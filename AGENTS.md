@@ -59,14 +59,31 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
   - 例外：editorial 排版風格（無襯線 + 緊密 + 負字距三件套）後台系統（如 social-ops / smart-home 主視覺），可以 line-height 0.86–0.95，但必須在 commit message 註明為有意識的設計選擇。
 
 違規豁免清單制度化 (Exemption Registry Lock)：任何「故意保留的違規」必須登記，並寫在 commit message 與憲法附錄，禁止默默豁免：
-  - **違規豁免登記表**（截至第 14 輪）：
+  - **違規豁免登記表**（截至第 15 輪）：
     1. `social-ops-core.css .hero-copy h1` 5.4rem / 0.92 / -0.06em → 後台 editorial
     2. `smart-home.astro .hero-copy h1` 7rem / 0.92 / -0.065em → editorial
     3. `EditorialArticleLayout .article-lead::first-letter` 4.8rem / 0.86 / 0.06em → CSS drop cap 慣例
     4. `BaseLayout .brand-title` 1.16rem / 0.08em → 品牌識別 logo 設計
     5. `Navigation .logo` 1.5rem / 2px → 品牌識別範疇
     6. `footer .brand-subtitle` 0.68rem / 0.2em → uppercase tag 合理使用
+    7. `index .faq-question` 1.8rem / 1.24 行高 → 單行例外（max-width 26ch）
+    8. `blog/index` 7 處小標籤字距 0.06em-0.12em × 0.74-0.82rem → uppercase 標籤合理使用
+    9. `blog/index .library-count` 1rem × 0.12em = 1.92px → uppercase + nowrap 標籤合理使用
+    10. `renovation-process .process-hero h1` 5rem / 1.18 行高 → 桌面 hero 單行例外
+    11. `contract-studio/sign .document-header h2` 2.7rem / 1.24 行高 → 字級 < 3rem 邊界合規
+    12. `tools/index .calculator-header h1` 桌面 5.4rem / 1.18 行高 → 單行例外（第 15 輪已修）
+    13. 所有 ≥3rem hero h1/h2 行高 1.18（如 HeroCarousel / contact / faq）→ 單行例外（短文案 + max-width）
   - **新規豁免流程**：發現新的違規需豁免時，必須（a）明確寫出違規值、（b）說明豁免理由為設計慣例/品牌識別/技術限制、（c）在 commit message 註明、（d）將豁免編號加入憲法附錄。
+
+第 14 輪錯誤記錄與修正 (Round 14 Error Log)：第 14 輪 commit message 自稱「全站字距 SOP 清零」，但實際漏處理 `pages/blog/index.astro` 與 `pages/tools/index.astro` 兩個關鍵檔案的行高違規。第 15 輪立即修正並擴大掃描範圍。教訓：
+  - 任何 commit message 自稱「X 清零」前，必須實際再跑一次完整 grep 驗證，不可憑記憶清點。
+  - 「清零」宣告必須在 commit 內附上 SOP grep 命令的實際輸出作為佐證。
+  - 發現錯誤時立即修正並公開承認，不可在後續 commit 默默帶過。
+
+第三條 SOP — text-wrap balance 驗證 (Text-Balance SOP)：除字距 + 行高 SOP 外，「title 級 h1/h2 必須有 text-wrap: balance」也應驗證：
+  - 對應 grep 命令：`grep -rn "<h[1-3]" src/pages/ src/components/ | grep -v "text-wrap"` 列出 hero 級標題未套 text-wrap balance
+  - 預期結論：大部分前台 hero 已有 text-wrap: balance，少數後台頁面缺，列為下輪議題
+  - 此條款為**前瞻性 SOP**，本輪未實際執行驗證，下輪正式啟動
 
 視覺雙側平衡與盲區防堵 (Visual Symmetry & Blindside Lock)：所有 Hero、首屏、Grid 設計必須主動檢查「左右側視覺重量」。禁止出現任何一側空洞、僅有純文字或無裝飾的狀況。對於多欄佈局（≥2 欄），每一欄都必須具備（a）至少一張智慧佔位圖或實景圖、（b）對應的視覺裝飾或 micro-interaction。並依下列規範補強：
   - 圖片缺口的智慧佔位圖必須放置於最重的視覺欄位（通常為 Hero 右側或 Grid 第一列），不可全留白。
