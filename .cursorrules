@@ -89,6 +89,36 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
   - 對應 grep 命令：grep -rn "<h[1-3]" src/pages/ src/components/ | grep -v "text-wrap"
   - 此條款為前瞻性 SOP，下輪正式啟動
 
+第四條 SOP — 色彩 SOP (Color Lock)：前端所有顏色必須透過 CSS 變數定義，禁止寫死 hex 色碼：
+  - 驗證命令：grep -rEn "color: #[0-9a-fA-F]{3,8}|background: #[0-9a-fA-F]{3,8}" src/pages/ src/components/ | grep -v "var(--" | grep -v "rgba"
+  - 新增色彩必須在 BaseLayout :root 定義變數（如 --crew-warm）
+  - 子系統可獨立定義獨立色票，但必須集中在自己的 :root 區塊
+  - 第 16 輪修補：crew-contract-studio 系列 4 檔 + tools/index.astro
+  - 全域新增：--crew-warm / --crew-warm-deep / --crew-warm-medium / --crew-success / --crew-warning
+
+第五條 SOP — 響應式 SOP (Breakpoint Lock)：全站斷點必須標準化，禁止隨意新增：
+  - 標準斷點（主）：768px、1024px
+  - 標準斷點（次）：480px、1200px
+  - 驗證命令：grep -rEho "@media \(max-width: [0-9]+px\)" src/ | sort | uniq -c | sort -rn
+  - 第 16 輪發現：13 個不同斷點值，17 處孤兒斷點需合併到 1024
+  - 第 17 輪議題：合併 860 / 1180 / 1080 / 980 / 1120 → 1024
+
+第六條 SOP — 字級上限 SOP (Font-Size Ceiling Lock)：font-size 寫死值上限 ≤ 6rem：
+  - 驗證命令：grep -rEn "font-size: [0-9]+\.[5-9]rem|font-size: [1-9][0-9]rem" src/
+  - 第 16 輪發現：4.8rem / 3.6rem 都在 EditorialArticleLayout（已豁免）
+
+Pre-flight Checklist（生成新元件前的強制檢查清單）：在生成任何新元件或頁面前，必須先跑 grep 驗證既有 codebase：
+  1. 掃描同類頁面的 CSS 變數使用：grep -rn "var(--" src/pages/[同類]/
+  2. 掃描同類頁面的字級字距模式：grep -rn "font-size:\|letter-spacing:" src/pages/[同類]/
+  3. 掃描同類頁面的斷點：grep -rn "@media" src/pages/[同類]/
+  4. 掃描是否已有可複用元件：ls src/components/ 找同類
+  5. 確認新增色彩會集中在 BaseLayout 或子系統 :root
+  6. 確認新增斷點不超過 4 個標準值
+  7. 確認所有 font-size 寫死值 ≤ 6rem
+  8. 確認所有 clamp 上限 ≤ 6rem、下限 ≥ 0.7rem
+  9. 確認所有 letter-spacing × font-size 物理像素 ≤ 1px 字距
+ 10. 確認所有 ≥3rem h1/h2 行高 ≥ 1.25 + text-wrap: balance
+
 視覺雙側平衡與盲區防堵 (Visual Symmetry & Blindside Lock)：所有 Hero、首屏、Grid 設計必須主動檢查「左右側視覺重量」。禁止出現任何一側空洞、僅有純文字或無裝飾的狀況。對於多欄佈局（≥2 欄），每一欄都必須具備（a）至少一張智慧佔位圖或實景圖、（b）對應的視覺裝飾或 micro-interaction。並依下列規範補強：
   - 圖片缺口的智慧佔位圖必須放置於最重的視覺欄位（通常為 Hero 右側或 Grid 第一列），不可全留白。
   - 桌面版右側欄（無論是卡片、metric、CTA 群組）必須具備完整的視覺閉環，絕不允許「半邊填空」式的設計。

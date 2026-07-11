@@ -85,6 +85,39 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
   - 預期結論：大部分前台 hero 已有 text-wrap: balance，少數後台頁面缺，列為下輪議題
   - 此條款為**前瞻性 SOP**，本輪未實際執行驗證，下輪正式啟動
 
+第四條 SOP — 色彩 SOP (Color Lock)：前端所有顏色必須透過 CSS 變數定義，禁止寫死 hex 色碼：
+  - 驗證命令：`grep -rEn "color: #[0-9a-fA-F]{3,8}|background: #[0-9a-fA-F]{3,8}" src/pages/ src/components/ | grep -v "var(--" | grep -v "rgba"`
+  - 新增色彩必須在 BaseLayout :root 定義變數（如 --crew-warm），所有頁面只許使用 var() 引用
+  - 子系統可獨立定義獨立色票，但必須集中在自己的 :root 區塊
+  - 第 16 輪重大發現：crew-contract-studio 系列 4 個檔案 + tools/index.astro 寫死 hex 已全部修補，新增全域 --crew-warm / --crew-warm-deep / --crew-warm-medium / --crew-success / --crew-warning 變數
+  - 豁免：social-ops-core.css 後台 editorial 風格、第 14 輪已登記的寫死 rgba 透明值
+
+第五條 SOP — 響應式 SOP (Breakpoint Lock)：全站斷點必須標準化，禁止隨意新增：
+  - 標準斷點（主）：768px（mobile）、1024px（tablet）
+  - 標準斷點（次）：480px（small mobile）、1200px（large desktop）
+  - 驗證命令：`grep -rEho "@media \(max-width: [0-9]+px\)" src/ | sort | uniq -c | sort -rn`
+  - 第 16 輪掃描結果：13 個不同斷點值，主流為 768px (25) / 900px (13) / 960px (7) / 720px (7)
+  - 違規孤兒斷點清單：860px / 1180px / 1080px / 980px / 1120px（共 17 處需合併）
+  - 豁免：social-ops-core 後台 editorial 風格的特殊斷點（1180 / 1120 / 720）
+  - 第 17 輪議題：將 17 處孤兒斷點合併到 1024
+
+第六條 SOP — 字級上限 SOP (Font-Size Ceiling Lock)：font-size 寫死值上限 ≤ 6rem：
+  - 驗證命令：`grep -rEn "font-size: [0-9]+\.[5-9]rem|font-size: [1-9][0-9]rem" src/`
+  - 第 16 輪掃描結果：4.8rem（EditorialArticleLayout drop cap，已豁免）、3.6rem（EditorialArticleLayout hero，已豁免）
+  - 任何新增字級 ≥ 4rem 必須使用 clamp() 而非寫死
+
+Pre-flight Checklist（生成新元件前的強制檢查清單）：在生成任何新元件或頁面前，必須先跑以下 grep 驗證既有 codebase：
+  1. 掃描同類頁面的 CSS 變數使用：`grep -rn "var(--" src/pages/[同類]/` 確認現有命名
+  2. 掃描同類頁面的字級字距模式：`grep -rn "font-size:\|letter-spacing:" src/pages/[同類]/`
+  3. 掃描同類頁面的斷點：`grep -rn "@media" src/pages/[同類]/`
+  4. 掃描是否已有可複用元件：`ls src/components/` 找同類
+  5. 確認新增色彩會集中在 BaseLayout 或子系統 :root
+  6. 確認新增斷點不超過 4 個標準值
+  7. 確認所有 font-size 寫死值 ≤ 6rem
+  8. 確認所有 clamp 上限 ≤ 6rem、下限 ≥ 0.7rem
+  9. 確認所有 letter-spacing × font-size 物理像素 ≤ 1px 字距
+ 10. 確認所有 ≥3rem h1/h2 行高 ≥ 1.25 + text-wrap: balance
+
 視覺雙側平衡與盲區防堵 (Visual Symmetry & Blindside Lock)：所有 Hero、首屏、Grid 設計必須主動檢查「左右側視覺重量」。禁止出現任何一側空洞、僅有純文字或無裝飾的狀況。對於多欄佈局（≥2 欄），每一欄都必須具備（a）至少一張智慧佔位圖或實景圖、（b）對應的視覺裝飾或 micro-interaction。並依下列規範補強：
   - 圖片缺口的智慧佔位圖必須放置於最重的視覺欄位（通常為 Hero 右側或 Grid 第一列），不可全留白。
   - 桌面版右側欄（無論是卡片、metric、CTA 群組）必須具備完整的視覺閉環，絕不允許「半邊填空」式的設計。
