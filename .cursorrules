@@ -62,7 +62,9 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
 
 字體節奏四原則 (Typography Rhythm Lock)：所有 hero、section-header、smart-case、brand-strip 等區塊中的「襯線 display 大字」（`font-family: var(--font-display)`）必須同時滿足下列四項規範，缺一即視為字體設計缺陷：
   - **字距反向律**：字距（letter-spacing）必須隨字級（font-size）反向調整。`≥3rem` 大字 letter-spacing ≤ 0.02em；`≥2rem` 中型字 letter-spacing ≤ 0.04em；禁止在 `≥2.5rem` 大字使用 `≥0.06em` 字距（會導致字島效應）。
-  - **襯線行高下限**：襯線 display 大字（`var(--font-display)`）最低 `line-height: 1.25`。`line-height < 1.15` 配襯線字會產生字島漂浮；無襯線大字可至 1.05。**例外**：單行短句引言（總字當量 ≤ 12，行數 ≤ 2）的 `philosophy-quote` / `pull-quote` 可降至 1.2，因為短句無字島問題。
+  - **襯線行高下限**：襯線 display 大字（`var(--font-display)`）最低 `line-height: 1.25`。`line-height < 1.15` 配襯線字會產生字島漂浮；無襯線大字可至 1.05。**例外**：
+  - **單行大字**（容器物理寬度下只會渲染成 1 行）：`line-height` 可降至 1.06–1.2，視容器高度設計彈性調整；單行無字島問題。
+  - **雙行短句引言**（總字當量 ≤ 12，行數 ≤ 2）的 `philosophy-quote` / `pull-quote` 可降至 1.2。
   - **中文斷行錨點**：所有中文長句標題（≥18 字）必須套用 `text-wrap: balance`，確保標點「，」「。」永遠落在行尾而非孤兒行首。禁止在中文長句使用硬 `<br>` 作為唯一斷行手段（mobile 排版會崩潰）。
   - **字級秩序律**：全站 `clamp()` 上限必須遵守**相對層級**，區塊分群清楚：
   - **頂級群組**（hero ≥ 3.5rem）：hero 區主標
