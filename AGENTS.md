@@ -50,6 +50,24 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
 
 歷史教訓：第 4-8 輪僅掃描 `src/pages/index.astro`，錯過了 hero h1 在 `HeroCarousel.astro`（5.2rem / 0.1em）、footer h2 在 `BaseLayout.astro`、後台頁面 hero h1 在 `standard-sop.astro` / `requirement-form.astro` 等重大違規。**單一目錄掃描是憲法執行的最大盲區**。
 
+第 13-14 輪 SOP 驗證戰果：第 13 輪首次執行 SOP grep 掃出 22 個大字違規（≥ 3rem × ≥ 0.05em），跨 14 個檔案。第 14 輪擴展到行高 SOP 並拆 2 個 commit，**違規清零至 0 個**。
+
+襯線行高下限 SOP (Serif Line-Height SOP)：除字距條款外，「襯線大字（≥3rem）行高 ≥ 1.25」也必須有對應 grep 命令驗證：
+  - 行高 SOP 命令：`grep -rn "font-family: var(--font-display)\|--font-serif" src/ -A 8 | grep -B 5 "line-height: 1\.[0-2]"` 列出所有襯線大字行高 < 1.25 的違規。
+  - 行高定義：字級 ≥ 3rem 必 ≥ 1.25；字級 < 3rem 必 ≥ 1.32。
+  - 例外：CSS drop cap（如 `.article-lead::first-letter`）的 line-height 必須 < 1 才能讓首字母貼齊下方文字，屬設計慣例，豁免。
+  - 例外：editorial 排版風格（無襯線 + 緊密 + 負字距三件套）後台系統（如 social-ops / smart-home 主視覺），可以 line-height 0.86–0.95，但必須在 commit message 註明為有意識的設計選擇。
+
+違規豁免清單制度化 (Exemption Registry Lock)：任何「故意保留的違規」必須登記，並寫在 commit message 與憲法附錄，禁止默默豁免：
+  - **違規豁免登記表**（截至第 14 輪）：
+    1. `social-ops-core.css .hero-copy h1` 5.4rem / 0.92 / -0.06em → 後台 editorial
+    2. `smart-home.astro .hero-copy h1` 7rem / 0.92 / -0.065em → editorial
+    3. `EditorialArticleLayout .article-lead::first-letter` 4.8rem / 0.86 / 0.06em → CSS drop cap 慣例
+    4. `BaseLayout .brand-title` 1.16rem / 0.08em → 品牌識別 logo 設計
+    5. `Navigation .logo` 1.5rem / 2px → 品牌識別範疇
+    6. `footer .brand-subtitle` 0.68rem / 0.2em → uppercase tag 合理使用
+  - **新規豁免流程**：發現新的違規需豁免時，必須（a）明確寫出違規值、（b）說明豁免理由為設計慣例/品牌識別/技術限制、（c）在 commit message 註明、（d）將豁免編號加入憲法附錄。
+
 視覺雙側平衡與盲區防堵 (Visual Symmetry & Blindside Lock)：所有 Hero、首屏、Grid 設計必須主動檢查「左右側視覺重量」。禁止出現任何一側空洞、僅有純文字或無裝飾的狀況。對於多欄佈局（≥2 欄），每一欄都必須具備（a）至少一張智慧佔位圖或實景圖、（b）對應的視覺裝飾或 micro-interaction。並依下列規範補強：
   - 圖片缺口的智慧佔位圖必須放置於最重的視覺欄位（通常為 Hero 右側或 Grid 第一列），不可全留白。
   - 桌面版右側欄（無論是卡片、metric、CTA 群組）必須具備完整的視覺閉環，絕不允許「半邊填空」式的設計。
