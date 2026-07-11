@@ -53,3 +53,9 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
   - **短網址原則**：佔位圖 URL 長度不得超過 200 字。完整中文 prompt、場景描述、AI 生圖關鍵字禁止塞入 `?text=` 參數；必須改放 HTML `<!-- 註解 -->` 中供開發者複製。
   - **比例一致性**：所有 `<img>` 必須標註 `width` / `height`，且與 `aspect-ratio` CSS 一致；禁止 img 元素與外層容器的長寬比不一致造成 CLS 抖動。
   - **onerror 漸層 Fallback**：任何外部 `<img>` 都必須有 `onerror` 處理函式，載入失敗時切換至 CSS-only 漸層 + 標籤 fallback，避免出現「空白色塊」或「破圖圖示」。
+
+字體節奏四原則 (Typography Rhythm Lock)：所有 hero、section-header、smart-case、brand-strip 等區塊中的「襯線 display 大字」（`font-family: var(--font-display)`）必須同時滿足下列四項規範，缺一即視為字體設計缺陷：
+  - **字距反向律**：字距（letter-spacing）必須隨字級（font-size）反向調整。`≥3rem` 大字 letter-spacing ≤ 0.02em；`≥2rem` 中型字 letter-spacing ≤ 0.04em；禁止在 `≥2.5rem` 大字使用 `≥0.06em` 字距（會導致字島效應）。
+  - **襯線行高下限**：襯線 display 大字（`var(--font-display)`）最低 `line-height: 1.25`。`line-height < 1.15` 配襯線字會產生字島漂浮；無襯線大字可至 1.05。
+  - **中文斷行錨點**：所有中文長句標題（≥18 字）必須套用 `text-wrap: balance`，確保標點「，」「。」永遠落在行尾而非孤兒行首。禁止在中文長句使用硬 `<br>` 作為唯一斷行手段（mobile 排版會崩潰）。
+  - **字級秩序律**：全站 `clamp()` 上限必須遵守 hero (3.5rem) > section-title (3rem) > brand-strip / smart-case (2.5–3.2rem) > body (1rem) 的視覺重量層級；同層級禁止兩個區塊使用相近字級造成主從失序。
