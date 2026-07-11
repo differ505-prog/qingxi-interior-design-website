@@ -49,11 +49,15 @@ const homeStructuredData = [
   <section class="brand-strip">
     <div class="brand-strip-inner">
       <div class="brand-strip-copy">
-        <p class="brand-strip-label">品牌概念</p>
+        <p class="brand-strip-label">
+          <span class="brand-strip-label-bar"></span>
+          品牌概念
+        </p>
         <h2>設計與工程，一起想清楚</h2>
         <p class="brand-strip-intro">
           先對齊需求與預算，再把空間做好。
         </p>
+        <div class="brand-strip-divider" aria-hidden="true"></div>
         <div class="brand-smart-home">
           <p class="brand-smart-home-label">智能家居</p>
           <h3>先把科技放對位置</h3>
@@ -77,7 +81,7 @@ const homeStructuredData = [
       </div>
       <div class="brand-strip-metrics">
         <article class="brand-metric brand-metric-visual">
-          <figure class="brand-metric-image">
+          <figure class="brand-metric-image brand-metric-image-tall">
             <img
               src="https://placehold.co/720x720/f5f0e8/332e29?text=住宅·商交·智能整合%20\n%5B%E7%94%9F%E5%9B%BE%E6%8F%90%E7%A4%BA%E8%A9%9E%EF%BC%9A%E5%8F%B0%E7%81%A3%E9%AB%98%E7%AB%AF%E4%BD%8F%E5%AE%85%E5%A4%A7%E5%BB%88%E6%9D%BE%E5%BC%9B%E9%96%8B%E6%9C%97%E7%85%A7%E7%89%87%20%E7%B1%B3%E7%99%BD%E6%B4%8B%E6%9C%8D%E6%9C%80%E8%BC%95%E9%83%A8%E5%B1%85%20%E6%9D%82%E8%AA%8C%E6%94%9D%E5%BD%B1%E9%A2%A8%E6%A0%BC%5D"
               alt="青曦空間設計作品主視覺：高端住宅與商空整合作品"
@@ -86,10 +90,11 @@ const homeStructuredData = [
               loading="lazy"
               decoding="async"
             />
+            <figcaption class="brand-metric-tag">住宅 · 商空 · 智能整合</figcaption>
           </figure>
           <div class="brand-metric-text">
-            <strong>住宅、商空、智能整合</strong>
-            <span>一起規劃</span>
+            <strong>三種空間，一起規劃</strong>
+            <span>設計、施工、智能整合在同一個節奏推進，避免介面與落地斷層。</span>
           </div>
         </article>
         <article class="brand-metric brand-metric-visual">
@@ -102,6 +107,7 @@ const homeStructuredData = [
               loading="lazy"
               decoding="async"
             />
+            <figcaption class="brand-metric-tag">大台北 · 即時到場</figcaption>
           </figure>
           <div class="brand-metric-text">
             <strong>大台北服務</strong>
@@ -691,6 +697,23 @@ const homeStructuredData = [
       letter-spacing: 0.18em;
       font-size: 0.8rem;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .brand-strip-label-bar {
+      display: inline-block;
+      width: 28px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--tiffany-primary), transparent);
+    }
+
+    .brand-strip-divider {
+      margin: 1.4rem 0 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(115, 103, 94, 0.28) 0%, rgba(115, 103, 94, 0) 60%);
     }
 
     .brand-strip-copy h2 {
@@ -873,6 +896,11 @@ const homeStructuredData = [
       aspect-ratio: 16 / 10;
       background: var(--art-paper);
       box-shadow: inset 0 0 0 1px rgba(115, 103, 94, 0.12);
+      position: relative;
+    }
+
+    .brand-metric-image-tall {
+      aspect-ratio: 4 / 5;
     }
 
     .brand-metric-image img {
@@ -886,6 +914,30 @@ const homeStructuredData = [
 
     .brand-metric-visual:hover .brand-metric-image img {
       transform: scale(1.04);
+    }
+
+    .brand-metric-tag {
+      position: absolute;
+      left: 0.7rem;
+      bottom: 0.7rem;
+      margin: 0;
+      padding: 0.36rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(20, 20, 20, 0.55);
+      backdrop-filter: blur(12px);
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 0.74rem;
+      letter-spacing: 0.16em;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .brand-metric-visual:hover .brand-metric-tag,
+    .brand-metric-visual:focus-within .brand-metric-tag {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .brand-metric-text {
