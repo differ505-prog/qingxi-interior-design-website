@@ -11,6 +11,15 @@ type RiskMeta = {
 type ProjectTypeKey = "old-house" | "new-home";
 
 const ganttWeeks = Array.from({ length: 28 }, (_, index) => index + 1);
+
+// 階段標籤：4 個寬標籤取代 28 個 W 標籤
+// 雙層結構保留時間錨點（W 範圍）+ 每週 track 視覺對齊
+const ganttPhaseLabels = [
+  { key: "planning", label: "前期規劃", start: 1, end: 9 },
+  { key: "kickoff", label: "開工與基礎", start: 10, end: 15 },
+  { key: "surface", label: "表面完成", start: 16, end: 19 },
+  { key: "handoff", label: "收尾整合", start: 20, end: 28 },
+] as const;
 const toneLegend = [
   {
     key: "planning",
@@ -1033,7 +1042,17 @@ const processStructuredData = [
           <div class="gantt-axis" aria-hidden="true">
             <div class="gantt-axis-stage">工項</div>
             <div class="gantt-axis-grid">
-              {ganttWeeks.map((week) => <span data-axis-week={week}>W{week}</span>)}
+              {ganttPhaseLabels.map((phase) => (
+                <span
+                  class="gantt-axis-phase"
+                  data-axis-phase-start={phase.start}
+                  data-axis-phase-end={phase.end}
+                  style={`--phase-start:${phase.start}; --phase-end:${phase.end};`}
+                >
+                  <strong>{phase.label}</strong>
+                  <small>W{phase.start}–W{phase.end}</small>
+                </span>
+              ))}
             </div>
             <div class="gantt-axis-detail">前置與產出</div>
           </div>
@@ -1950,6 +1969,49 @@ const processStructuredData = [
     gap: 0.45rem;
   }
 
+  .gantt-axis-grid {
+    gap: 0;
+  }
+
+  .gantt-axis-phase {
+    grid-column: var(--phase-start) / span calc(var(--phase-end) - var(--phase-start) + 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    padding: 0.55rem 0.4rem 0.4rem;
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(180deg, rgba(115, 103, 94, 0.06) 0%, rgba(115, 103, 94, 0) 100%);
+    border-top: 1px solid rgba(115, 103, 94, 0.22);
+    border-left: 1px solid rgba(115, 103, 94, 0.08);
+    color: var(--gray-medium);
+  }
+
+  .gantt-axis-phase:last-child {
+    border-right: 1px solid rgba(115, 103, 94, 0.08);
+  }
+
+  .gantt-axis-phase strong {
+    color: var(--gray-darkest);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .gantt-axis-phase small {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--gray-medium);
+  }
+
+  @media (max-width: 1180px) {
+    .gantt-axis-phase small {
+      display: none;
+    }
+  }
+
   .gantt-axis-grid span {
     text-align: center;
   }
@@ -2345,7 +2407,7 @@ const processStructuredData = [
     const stageRows = Array.from(document.querySelectorAll("[data-stage-id]"));
     const modeButtons = Array.from(document.querySelectorAll("[data-schedule-mode]"));
     const projectTypeButtons = Array.from(document.querySelectorAll(".project-type-button"));
-    const axisWeekNodes = Array.from(document.querySelectorAll("[data-axis-week]"));
+    const axisPhaseNodes = Array.from(document.querySelectorAll("[data-axis-phase-start]"));
     const trackWeekNodes = Array.from(document.querySelectorAll("[data-track-week]"));
     const defaultSummary = summaryNode?.textContent || "";
     let scheduleMode = "baseline";
@@ -2468,9 +2530,11 @@ const processStructuredData = [
 
       setBriefFlexTags(config.flexStageTitles);
 
-      axisWeekNodes.forEach((node) => {
-        const week = Number(node.getAttribute("data-axis-week") || 0);
-        node.classList.toggle("is-outside-range", week > config.totalWeeks);
+      axisPhaseNodes.forEach((node) => {
+        const start = Number(node.getAttribute("data-axis-phase-start") || 0);
+        const end = Number(node.getAttribute("data-axis-phase-end") || 0);
+        const isOutside = end > config.totalWeeks;
+        node.classList.toggle("is-outside-range", isOutside);
       });
 
       trackWeekNodes.forEach((node) => {
