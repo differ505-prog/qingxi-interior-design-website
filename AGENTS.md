@@ -48,3 +48,8 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
   不得以「純視覺」包裝而無實際可驗證的信任背書，避免落入裝飾性空洞。
 
 色彩變數鎖定強化 (Color Variable Lock++)：所有 CSS 顏色（含漸層 stop、陰影 rgba）必須優先取用既有的 CSS 變數（`var(--tiffany-primary)`、`var(--gray-darkest)` 等）。禁止在 `style` 中寫死色碼或使用 `var(--xxx, #fallback)` 的 fallback 形式（除非該變數已在 `:root` 定義並驗證存在）。每頁交付前必須 grep 確認無 hardcoded hex。
+
+圖片健壯性三原則 (Image Robustness Triple Lock)：所有外部佔位圖（包括 placehold.co、Unsplash、CDN 圖床）必須同時具備下列三層防護，缺一不可：
+  - **短網址原則**：佔位圖 URL 長度不得超過 200 字。完整中文 prompt、場景描述、AI 生圖關鍵字禁止塞入 `?text=` 參數；必須改放 HTML `<!-- 註解 -->` 中供開發者複製。
+  - **比例一致性**：所有 `<img>` 必須標註 `width` / `height`，且與 `aspect-ratio` CSS 一致；禁止 img 元素與外層容器的長寬比不一致造成 CLS 抖動。
+  - **onerror 漸層 Fallback**：任何外部 `<img>` 都必須有 `onerror` 處理函式，載入失敗時切換至 CSS-only 漸層 + 標籤 fallback，避免出現「空白色塊」或「破圖圖示」。
