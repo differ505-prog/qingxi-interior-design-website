@@ -80,15 +80,18 @@ const homeStructuredData = [
         </div>
       </div>
       <div class="brand-strip-metrics">
+        <!-- 圖 01：AI 生圖提示詞（複製給 Midjourney / DALL-E）
+             "Taiwan high-end residential living room, soft natural light, minimalist walnut wood floor, beige linen sofa, indoor plant, neutral warm tones, editorial interior photography, ultra-realistic, 8k, shallow depth of field --ar 4:5" -->
         <article class="brand-metric brand-metric-visual">
           <figure class="brand-metric-image brand-metric-image-tall">
             <img
-              src="https://placehold.co/720x720/f5f0e8/332e29?text=住宅·商交·智能整合%20\n%5B%E7%94%9F%E5%9B%BE%E6%8F%90%E7%A4%BA%E8%A9%9E%EF%BC%9A%E5%8F%B0%E7%81%A3%E9%AB%98%E7%AB%AF%E4%BD%8F%E5%AE%85%E5%A4%A7%E5%BB%88%E6%9D%BE%E5%BC%9B%E9%96%8B%E6%9C%97%E7%85%A7%E7%89%87%20%E7%B1%B3%E7%99%BD%E6%B4%8B%E6%9C%8D%E6%9C%80%E8%BC%95%E9%83%A8%E5%B1%85%20%E6%9D%82%E8%AA%8C%E6%94%9D%E5%BD%B1%E9%A2%A8%E6%A0%BC%5D"
-              alt="青曦空間設計作品主視覺：高端住宅與商空整合作品"
+              src="https://placehold.co/720x900/f5f0e8/332e29?text=IMG-01%0A%E4%BD%8F%E5%AE%85%C2%B7%E5%95%86%E7%A9%BA%C2%B7%E6%99%BA%E8%83%BD%E6%95%B4%E5%90%88"
+              alt="青曦空間設計 — 住宅·商空·智能整合作品主視覺（智慧佔位圖 01）"
               width="720"
-              height="720"
+              height="900"
               loading="lazy"
               decoding="async"
+              onerror="this.style.display='none';this.parentElement.classList.add('img-fallback');this.parentElement.setAttribute('data-fallback-label','住宅 · 商空 · 智能整合');"
             />
             <figcaption class="brand-metric-tag">住宅 · 商空 · 智能整合</figcaption>
           </figure>
@@ -97,15 +100,18 @@ const homeStructuredData = [
             <span>設計、施工、智能整合在同一個節奏推進，避免介面與落地斷層。</span>
           </div>
         </article>
+        <!-- 圖 02：AI 生圖提示詞
+             "Taipei construction site on-site meeting, interior designer and contractor reviewing blueprints, warm afternoon light, candid documentary photography, muted earth tones, photojournalistic style --ar 16:10" -->
         <article class="brand-metric brand-metric-visual">
           <figure class="brand-metric-image">
             <img
-              src="https://placehold.co/720x520/2e2826/f3ede4?text=%E5%A4%A7%E5%8F%B0%E5%8C%97%E6%9C%8D%E5%8B%99%20\n%5B%E7%94%9F%E5%9B%BE%E6%8F%90%E7%A4%BA%E8%A9%9E%EF%BC%9A%E5%A4%A7%E5%8F%B0%E5%8C%97%E5%9C%B0%E5%8D%80%E9%9B%BB%E5%8B%95%E5%B0%8D%E8%AB%87%E5%9C%A8%E5%B7%A5%E5%9C%B0%20%E5%B0%8F%E7%94%A8%E6%BA%9D%E9%80%9A%E4%BA%A4%E6%B5%81%E7%AF%87%E6%9C%89%E7%9A%84%E5%8F%83%E7%89%A9%E7%85%A7%E7%89%87%20%E9%BB%83%E8%89%B2%E6%9C%A8%E8%B3%AA%E6%9C%89%E7%86%B1%E5%BA%A6%5D"
-              alt="青曦團隊於大台北工地現場即時溝通的實際照片"
-              width="720"
-              height="520"
+              src="https://placehold.co/960x600/2e2826/f3ede4?text=IMG-02%0A%E5%A4%A7%E5%8F%B0%E5%8C%97%C2%B7%E5%8D%B3%E6%99%82%E5%88%B0%E5%A0%B4"
+              alt="青曦團隊於大台北工地現場即時溝通的實際照片（智慧佔位圖 02）"
+              width="960"
+              height="600"
               loading="lazy"
               decoding="async"
+              onerror="this.style.display='none';this.parentElement.classList.add('img-fallback');this.parentElement.setAttribute('data-fallback-label','大台北 · 即時到場');"
             />
             <figcaption class="brand-metric-tag">大台北 · 即時到場</figcaption>
           </figure>
@@ -894,7 +900,9 @@ const homeStructuredData = [
       border-radius: 14px;
       overflow: hidden;
       aspect-ratio: 16 / 10;
-      background: var(--art-paper);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%),
+        linear-gradient(135deg, rgba(115, 103, 94, 0.16) 0%, rgba(47, 47, 47, 0.08) 100%);
       box-shadow: inset 0 0 0 1px rgba(115, 103, 94, 0.12);
       position: relative;
     }
@@ -910,6 +918,33 @@ const homeStructuredData = [
       object-fit: cover;
       object-position: center;
       transition: transform 0.55s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-metric-image.img-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.22), transparent 55%),
+        linear-gradient(135deg, rgba(115, 103, 94, 0.22) 0%, rgba(47, 47, 47, 0.14) 100%);
+    }
+
+    .brand-metric-image.img-fallback::before {
+      content: attr(data-fallback-label);
+      font-size: 0.95rem;
+      letter-spacing: 0.18em;
+      color: rgba(47, 47, 47, 0.62);
+      text-align: center;
+      padding: 0 1rem;
+      line-height: 1.6;
+    }
+
+    .brand-metric-image-tall.img-fallback::before {
+      writing-mode: vertical-rl;
+      letter-spacing: 0.32em;
+      font-size: 1rem;
     }
 
     .brand-metric-visual:hover .brand-metric-image img {
