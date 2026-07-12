@@ -847,7 +847,7 @@ const processStructuredData = [
     <div class="process-shell">
       <header class="process-hero">
         <p class="process-eyebrow">Renovation Roadmap</p>
-        <h1>從接洽到交屋，整套時程一次看懂。</h1>
+        <h1>從接洽到交屋<br />整套時程一次看懂</h1>
         <p class="process-description">
           把前期提案到完工交屋全部放進同一張甘特圖，也能依屋況基準換算每個節點的大致時間。
         </p>
@@ -1209,7 +1209,7 @@ const processStructuredData = [
     font-size: clamp(2.85rem, 5.6vw, 5rem);
     line-height: 1.18;
     letter-spacing: 0.01em;
-    text-wrap: balance;
+    text-wrap: pretty;
   }
 
   .process-description,
@@ -1407,7 +1407,7 @@ const processStructuredData = [
   .schedule-tools,
   .process-brief,
   .process-notes {
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
   .brief-card,
@@ -1926,17 +1926,14 @@ const processStructuredData = [
   }
 
   .gantt-board {
-    overflow-x: auto;
     padding: 1.35rem 0 0.4rem;
     border-top: 1px solid rgba(115, 103, 94, 0.12);
-    scrollbar-gutter: stable both-edges;
   }
 
   .gantt-axis,
   .gantt-row {
-    min-width: 1460px;
     display: grid;
-    grid-template-columns: minmax(318px, 372px) minmax(440px, 0.92fr) minmax(250px, 292px);
+    grid-template-columns: minmax(290px, 320px) minmax(0, 1fr) minmax(260px, 300px);
     gap: 0.85rem;
     align-items: stretch;
   }
@@ -1944,6 +1941,26 @@ const processStructuredData = [
   .gantt-axis {
     margin-bottom: 0.95rem;
     padding-bottom: 0.3rem;
+  }
+
+  .gantt-axis-stage {
+    position: sticky;
+    left: 0;
+    z-index: 4;
+    background: rgba(255, 255, 255, 0.985);
+    backdrop-filter: blur(8px);
+    padding: 0 0.85rem 0 0.2rem;
+    box-shadow: 8px 0 12px -8px rgba(47, 47, 47, 0.08);
+  }
+
+  .gantt-axis-detail {
+    position: sticky;
+    right: 0;
+    z-index: 4;
+    background: rgba(255, 255, 255, 0.985);
+    backdrop-filter: blur(8px);
+    padding: 0 0.2rem 0 0.85rem;
+    box-shadow: -8px 0 12px -8px rgba(47, 47, 47, 0.08);
   }
 
   .gantt-axis-stage,
@@ -2043,6 +2060,13 @@ const processStructuredData = [
   .gantt-stage {
     display: flex;
     gap: 0.9rem;
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.985);
+    backdrop-filter: blur(8px);
+    padding: 0 0.85rem 0 0.2rem;
+    box-shadow: 8px 0 12px -8px rgba(47, 47, 47, 0.08);
   }
 
   .gantt-stage-number {
@@ -2139,14 +2163,20 @@ const processStructuredData = [
 
   .gantt-track {
     position: relative;
-    display: grid;
-    align-items: center;
+    display: block;
     min-height: 100%;
     padding: 0.2rem 0;
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+    min-width: 520px;
   }
 
   .gantt-track-grid {
-    align-self: stretch;
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(28, minmax(0, 1fr));
+    gap: 0.45rem;
+    min-width: 880px;
   }
 
   .gantt-track-grid span {
@@ -2219,6 +2249,13 @@ const processStructuredData = [
     display: grid;
     gap: 0.85rem;
     align-content: start;
+    position: sticky;
+    right: 0;
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.985);
+    backdrop-filter: blur(8px);
+    padding: 0 0.2rem 0 0.85rem;
+    box-shadow: -8px 0 12px -8px rgba(47, 47, 47, 0.08);
   }
 
   .gantt-detail-block {
