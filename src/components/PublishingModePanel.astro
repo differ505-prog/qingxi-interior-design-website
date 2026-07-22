@@ -38,9 +38,16 @@ const backupTitles = Array.isArray(modeRecommendation?.backupTitles) ? modeRecom
           <strong>補後 {modeRecommendation.coverageAfter}%</strong>
         </div>
       </article>
-      <div class="bookshelf-actions bookshelf-confirm-actions">
-        <button type="button" class="bookshelf-action" data-copy-next-topic-brief={modeOption.value}>複製補位資訊</button>
-      </div>
+        <div class="bookshelf-actions bookshelf-confirm-actions">
+          <button
+            type="button"
+            class="bookshelf-action"
+            data-adopt-and-prompt={modeOption.value}
+            title="採用這個長線推薦標題，並自動把建議書系 / 章節 / 子章節帶進 Pro 生文提示詞"
+          >
+            採用這個標題並產生提示詞
+          </button>
+        </div>
       <details class="bookshelf-mini-fold">
         <summary>
           <span>備選與說明</span>

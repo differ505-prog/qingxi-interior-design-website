@@ -10864,9 +10864,28 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
   document.addEventListener("click", async (event) => {
     const target = event.target instanceof HTMLElement
-      ? event.target.closest("[data-copy-next-topic-brief],[data-reset-publishing-checklist],[data-apply-replenish-title]")
+      ? event.target.closest("[data-copy-next-topic-brief],[data-reset-publishing-checklist],[data-apply-replenish-title],[data-adopt-and-prompt]")
       : null;
     if (!(target instanceof HTMLElement)) return;
+
+    if (target.hasAttribute("data-adopt-and-prompt")) {
+      const mode = target.dataset.adoptAndPrompt || currentTopicMode;
+      const recommendation = getPrimaryReviewRecommendation(mode);
+      if (!recommendation) {
+        setFeedback("目前還沒有可採用的長線推薦標題。", "is-warning");
+        return;
+      }
+      const nextTitle = getDisplayTitle(recommendation);
+      articlePresetTitle = nextTitle;
+      applyArticlePresetTitleToField();
+      persistArticlePresetTitle();
+      clearArticleTopicDecision();
+      clearArticleProFinalizePrompt();
+      renderArticleComposerPanel();
+      setWorkspacePane("content", { scrollTarget: "article-topic-shell" });
+      setFeedback(`已置入本輪題目：「${nextTitle || "未命名題目"}」，現在可以產生 Pro 生文提示詞。`, "is-success");
+      return;
+    }
 
     if (target.hasAttribute("data-copy-next-topic-brief")) {
       const mode = target.dataset.copyNextTopicBrief || currentTopicMode;
