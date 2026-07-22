@@ -970,10 +970,15 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                       <p id="weekly-panel-note" class="panel-inline-note">本週還差 3 輪主任務</p>
                     </div>
                     <div class="panel-heading-actions">
-                      <button type="button" id="force-refresh-weekly-ops" class="bookshelf-action ops-inline-action">
-                        強制刷新本週任務
+                      <button
+                        type="button"
+                        id="reset-current-run-checkboxes"
+                        class="bookshelf-action ops-inline-action"
+                        title="適用於打錯想重來，或想解鎖今天已完成的本輪"
+                      >
+                        重置本輪操作痕跡
                       </button>
-                      <p>保留既有進度，只解鎖下一輪主任務，方便手動補按。</p>
+                      <p>清掉勾選、連結、與完成標記；XP、連勝、終身完成數保留不變。</p>
                     </div>
                   </div>
                   <div id="quest-grid" class="quest-grid"></div>
@@ -3828,23 +3833,53 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     setFeedback(message, mode);
   }
 
-  function resetWeeklyOpsState(message = "已保留本週進度並解鎖下一輪主任務。", mode = "is-warning") {
-    const lockedRunIndex = state.weekly.runs.findIndex((run) => isRunLockedUntilNextDay(run));
-    if (lockedRunIndex === -1) {
-      setFeedback(
-        getCompletedRunCount() >= WEEKLY_TARGET
-          ? "本週已經 3 / 3 全部完成，這顆按鈕不會重置既有進度。"
-          : "目前本週任務已是可操作狀態，不需要另外刷新。",
-        getCompletedRunCount() >= WEEKLY_TARGET ? "is-success" : "is-warning",
-      );
+  function resetCurrentRunCheckboxes(
+    message = "本輪操作痕跡已重置，可重新勾選；XP、連勝、終身完成數保留不變。",
+    mode = "is-warning",
+  ) {
+    const activeRunIndex = getActiveRunIndex();
+    const run = state.weekly.runs[activeRunIndex];
+    if (!run) {
+      setFeedback("找不到本輪任務，本週狀態可能異常。", "is-warning");
       return;
     }
 
-    state.weekly.runs[lockedRunIndex] = {
-      ...state.weekly.runs[lockedRunIndex],
+    if (
+      !run.actionOutreach && !run.actionOutreachFallback && !run.actionImageGeneration
+      && !run.actionWebsite && !run.actionGoogleBusiness && !run.actionThreads
+      && !run.actionLocalCommunity && !run.actionFacadeMaintenance
+      && !run.completedAt && !run.linkStash.gemini && !run.linkStash.website
+      && !run.linkStash.googleBusiness && !run.linkStash.threads
+      && !run.linkStash.localCommunity && !run.linkStash.facadeMaintenance
+    ) {
+      setFeedback("本輪已是未操作狀態，不需要重置痕跡。", "is-warning");
+      return;
+    }
+
+    state.weekly.runs[activeRunIndex] = {
+      ...run,
+      actionOutreach: false,
+      actionOutreachFallback: false,
+      actionImageGeneration: false,
+      actionWebsite: false,
+      actionGoogleBusiness: false,
+      actionThreads: false,
+      actionLocalCommunity: false,
+      actionFacadeMaintenance: false,
+      linkStash: {
+        gemini: "",
+        website: "",
+        googleBusiness: "",
+        threads: "",
+        localCommunity: "",
+        facadeMaintenance: "",
+      },
       completedAt: "",
-      rewardClaimed: false,
+      distributionChannel: null,
+      phase: 0,
+      rewardClaimed: run.rewardClaimed,
     };
+
     saveState();
     rerender();
     setFeedback(message, mode);
@@ -10783,8 +10818,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     resetDailyOpsState("已強制刷新今日主動獵殺任務，現在可重新勾選。", "is-warning");
   });
 
-  document.getElementById("force-refresh-weekly-ops")?.addEventListener("click", () => {
-    resetWeeklyOpsState("已保留本週進度，並解鎖下一輪主任務，現在可繼續補按。", "is-warning");
+  document.getElementById("reset-current-run-checkboxes")?.addEventListener("click", () => {
+    resetCurrentRunCheckboxes();
   });
 
   document.getElementById("reset-social-ops")?.addEventListener("click", () => {
