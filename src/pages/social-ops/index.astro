@@ -951,32 +951,32 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
           <button type="button" class="book-workflow-pill" data-workflow-target="publishing-review-board" data-workflow-step="1">
             <span class="book-workflow-pill-index">STEP 01</span>
             <span class="book-workflow-pill-label">看題</span>
-            <span class="book-workflow-pill-hint">掃描出版清單</span>
+            <span class="book-workflow-pill-hint">看 KPI 進度條與整併新發清單</span>
           </button>
           <button type="button" class="book-workflow-pill" data-workflow-target="article-topic-shell" data-workflow-step="2">
             <span class="book-workflow-pill-index">STEP 02</span>
             <span class="book-workflow-pill-label">決題</span>
-            <span class="book-workflow-pill-hint">鎖定本週題目</span>
+            <span class="book-workflow-pill-hint">看本輪採用題與章節落位</span>
           </button>
           <button type="button" class="book-workflow-pill" data-workflow-target="article-pro-prompt-shell" data-workflow-step="3">
             <span class="book-workflow-pill-index">STEP 03</span>
             <span class="book-workflow-pill-label">生文</span>
-            <span class="book-workflow-pill-hint">產 Pro 生文提示詞</span>
+            <span class="book-workflow-pill-hint">複製 Pro 生文提示詞</span>
           </button>
-          <button type="button" class="book-workflow-pill" data-workflow-target="publishing-review-board" data-workflow-step="4">
+          <button type="button" class="book-workflow-pill" data-workflow-target="publishing-review-prompt-trigger-row" data-workspace-pane="content" data-workflow-step="4">
             <span class="book-workflow-pill-index">STEP 04</span>
             <span class="book-workflow-pill-label">覆核</span>
-            <span class="book-workflow-pill-hint">送 LLM 驗收草稿</span>
+            <span class="book-workflow-pill-hint">把候選送高階 LLM 覆核</span>
           </button>
-          <button type="button" class="book-workflow-pill" data-workflow-target="publishing-review-board" data-workflow-step="5">
+          <button type="button" class="book-workflow-pill" data-workflow-target="renovation-knowhow-board" data-workspace-pane="knowledge" data-workflow-step="5">
             <span class="book-workflow-pill-index">STEP 05</span>
             <span class="book-workflow-pill-label">入庫</span>
-            <span class="book-workflow-pill-hint">存進知識庫</span>
+            <span class="book-workflow-pill-hint">把草稿歸檔到知識庫</span>
           </button>
-          <button type="button" class="book-workflow-pill" data-workflow-target="publishing-review-prompt-content" data-workflow-step="6">
+          <button type="button" class="book-workflow-pill" data-workflow-target="publishing-review-prompt-fold" data-workspace-pane="content" data-workflow-step="6">
             <span class="book-workflow-pill-index">STEP 06</span>
             <span class="book-workflow-pill-label">出版閉環</span>
-            <span class="book-workflow-pill-hint">一次帶出 6 段提示詞</span>
+            <span class="book-workflow-pill-hint">展開閉環覆核稿折疊面板</span>
           </button>
         </div>
         <div class="book-workflow-tools">
@@ -1284,7 +1284,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                   </div>
                 </details>
               </section>
-              <div class="bookshelf-actions bookshelf-confirm-actions">
+              <div id="publishing-review-prompt-trigger-row" class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
                 <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製送高階 LLM 覆核包</button>
                 <button type="button" id="copy-publishing-review-outline" class="bookshelf-action">複製出版清單摘要</button>
@@ -1308,7 +1308,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                 </div>
                 <div id="publishing-review-title-pool" class="bookshelf-review-title-pool-list"></div>
               </section>
-              <details class="bookshelf-mini-fold">
+              <details id="publishing-review-prompt-fold" class="bookshelf-mini-fold">
                 <summary>
                   <span>查看閉環覆核稿</span>
                   <small>手動複製備援</small>
@@ -1331,6 +1331,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                   <p>本題動態決題</p>
                   <span id="article-topic-label">尚未決題</span>
                 </div>
+                <p class="bookshelf-confirm-step-hint">
+                  這區只顯示決題結果，不接受輸入<br />
+                  真正的入口在 STEP 04 覆核區的「進階輸入 → AI 快速判題」
+                </p>
                 <div class="bookshelf-confirm-grid">
                   <article class="bookshelf-confirm-card">
                     <span>決題模式</span>
@@ -12017,18 +12021,35 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }, 1500);
   }
 
+  /* 若 target 是 <details> 或藏在 <details> 內，先展開父 details 再回傳可見元素 */
+  function revealWorkflowTarget(targetId) {
+    const target = document.getElementById(targetId);
+    if (!target) return null;
+    let cursor = target;
+    // 向上找最近未展開的 details，自動展開
+    while (cursor && cursor !== document.body) {
+      if (cursor.tagName === "DETAILS" && !cursor.open) {
+        cursor.open = true;
+      }
+      cursor = cursor.parentElement;
+    }
+    return target;
+  }
+
   document.querySelectorAll(".book-workflow-pill").forEach((pill) => {
     pill.addEventListener("click", (event) => {
       event.preventDefault();
       const targetId = pill.dataset.workflowTarget;
       if (!targetId) return;
+      // 允許每顆 pill 決定要切到哪個 pane，預設內容台
+      const pane = pill.dataset.workspacePane || "content";
 
-      // 1. 切到內容台 tab
-      setWorkspacePane("content", { persist: true, scrollTarget: targetId });
+      // 1. 切到指定 pane
+      setWorkspacePane(pane, { persist: true });
 
-      // 2. 延遲一點點等 tab 切換顯示後再捲動 + 高亮
+      // 2. 延遲一點點等 tab 切換顯示後再展開 + 捲動 + 高亮
       setTimeout(() => {
-        const target = document.getElementById(targetId);
+        const target = revealWorkflowTarget(targetId);
         if (!target) return;
         target.scrollIntoView({ behavior: "smooth", block: "start" });
         highlightWorkflowTarget(targetId);
@@ -12043,10 +12064,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       const targetId = tool.dataset.workflowLink;
       if (!targetId) return;
 
-      setWorkspacePane("content", { persist: true, scrollTarget: targetId });
+      setWorkspacePane("content", { persist: true });
 
       setTimeout(() => {
-        const target = document.getElementById(targetId);
+        const target = revealWorkflowTarget(targetId);
         if (!target) return;
         target.scrollIntoView({ behavior: "smooth", block: "start" });
         highlightWorkflowTarget(targetId);

@@ -1496,6 +1496,17 @@
     line-height: 1.7;
   }
 
+  .bookshelf-confirm-step-hint {
+    color: rgba(240, 220, 180, 0.78);
+    font-size: 0.82rem;
+    line-height: 1.7;
+    margin: 0.6rem 0 0.9rem;
+    padding: 0.6rem 0.85rem;
+    border-left: 2px solid rgba(196, 168, 122, 0.42);
+    background: rgba(196, 168, 122, 0.04);
+    border-radius: 6px;
+  }
+
   .article-preset-title-preview {
     border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.08);
