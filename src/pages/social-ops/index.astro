@@ -12075,15 +12075,39 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
   });
 
-  /* 出書工作流 — 2 複製動作 pill（直接觸發既有複製按鈕 + 揭示 + toast 反饋） */
+  /* 出書工作流 — 2 複製動作 pill（直接觸發既有複製按鈕 + 揭示 + toast 反饋）
+     ACTION 1 增加時序補償：若 articleProFinalizePrompt 還沒備好，
+     先自動走「一鍵備好 Pro 生文包」流程，再觸發複製按鈕。 */
   document.querySelectorAll(".book-workflow-pill[data-workflow-action='copy-and-reveal']").forEach((pill) => {
-    pill.addEventListener("click", (event) => {
+    pill.addEventListener("click", async (event) => {
       event.preventDefault();
       const buttonId = pill.dataset.workflowTargetButton;
       const revealId = pill.dataset.workflowReveal;
       if (!buttonId) return;
 
       setWorkspacePane("content", { persist: true });
+
+      // 步驟 A：ACTION 1 時序補償（僅對應 ACTION 1，按下後若生文包尚未備好，
+      // 自動跑一鍵備好流程，等 articleProFinalizePrompt 被填入才繼續）
+      if (buttonId === "copy-pro-finalize-prompt-inline") {
+        const needPrep = typeof articleProFinalizePrompt !== "string" || !articleProFinalizePrompt.trim();
+        if (needPrep) {
+          const prepBtn = document.getElementById("run-article-ai-flow-highfreq");
+          if (prepBtn instanceof HTMLButtonElement) {
+            setFeedback("生文包尚未備好，先幫你跑一鍵備好流程...", "is-warning");
+            try { prepBtn.click(); } catch (err) { console.error("觸發一鍵備好失敗：", err); }
+            const deadline = Date.now() + 30000;
+            while (Date.now() < deadline && (!articleProFinalizePrompt || !articleProFinalizePrompt.trim())) {
+              await new Promise((r) => setTimeout(r, 200));
+            }
+            if (!articleProFinalizePrompt || !articleProFinalizePrompt.trim()) {
+              setFeedback("一鍵備好流程逾時或失敗，請到「生文起稿台」手動按一次「一鍵備好 Pro 生文包」。", "is-error");
+              showWorkflowToast("生文包備好逾時，請重試");
+              return;
+            }
+          }
+        }
+      }
 
       setTimeout(() => {
         // 1. 觸發既有複製按鈕（複製 + 既有成功訊息）
