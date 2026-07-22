@@ -60,6 +60,27 @@ export interface PublicationBookProposal {
   bookTitle: string;
   subtitle: string;
   positioning: string;
+  readerProfile?: PublicationReaderProfile;
+  boundaries?: PublicationBookBoundaries;
+  styleGuide?: PublicationStyleGuide;
+}
+
+export interface PublicationReaderProfile {
+  primaryReader: string;
+  secondaryReader: string;
+  excludedReaders: string;
+  topThreePains: string[];
+}
+
+export interface PublicationBookBoundaries {
+  topics: string[];
+  audiences: string[];
+}
+
+export interface PublicationStyleGuide {
+  bannedWords: string[];
+  bannedPatterns: string[];
+  voiceRules: string[];
 }
 
 export type PublicationNodeKind = "core" | "case" | "qa" | "form" | "project";
@@ -194,6 +215,37 @@ const publicationBookProposalOverrides: Record<string, PublicationBookProposal> 
     bookTitle: "老屋翻新全拆解",
     subtitle: "從屋況盤點、預算控管到完工避雷的實戰指南",
     positioning: "把屋況判讀、預算控管、基礎工程、空間重整與完工避雷整成一本可支撐 6-8 萬字出版體量的老屋翻新實戰指南。",
+    readerProfile: {
+      primaryReader: "40-55 歲老屋屋主，第一次買房後 15-25 年面臨翻修；",
+      secondaryReader: "30-40 歲接手老家、想了解老屋風險的二代屋主。",
+      excludedReaders: "投資客、自地自建、追求風格美學的設計愛好者。",
+      topThreePains: [
+        "預算抓不準，怕被追加",
+        "找不到可信任的工班，怕被偷工",
+        "不知道哪些項目重要、哪些可以省，怕白花錢",
+      ],
+    },
+    boundaries: {
+      topics: ["預售屋客變", "新成屋裝修", "商空規劃", "美學風格評比", "單一品牌型錄比較", "家電型號評比"],
+      audiences: ["投資客裝修", "商業空間業主", "餐飲業者", "自地自建", "新成屋客變"],
+    },
+    styleGuide: {
+      bannedWords: ["優質", "專業", "頂尖", "一流", "完善", "全方位", "量身打造", "完美", "卓越", "首選", "頂級", "最推薦", "最強"],
+      bannedPatterns: [
+        "X 個重點 / X 招搞定",
+        "大解密 / 大公開",
+        "你最容易忽略的 N 件事",
+        "怎麼做 / 如何做 + 動詞",
+        "結論段「希望對你有幫助」",
+        "先堆疊空泛形容詞再寫主題的開頭",
+      ],
+      voiceRules: [
+        "數字必須有前提條件與使用情境，不可只寫單一絕對值",
+        "若涉及費用，只能寫保守區間、條件差異、風險門檻",
+        "必須區分「安全底層、隱蔽工程、表面美感」三層優先順序",
+        "段落開頭必須具備具體判斷錨點，不可只寫「很多人在問」",
+      ],
+    },
   },
   "預售屋客變系": {
     trackTitle: "預售屋客變系",
