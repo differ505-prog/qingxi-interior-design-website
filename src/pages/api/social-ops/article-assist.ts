@@ -40,7 +40,7 @@ function normalizeArticleAssistContent(content: string) {
 
 function resolveArticleAssistModel(mode: string, env: Record<string, string | undefined>) {
   if (mode === "topic") {
-    return env.GEMINI_TOPIC_MODEL || env.GEMINI_PRO_MODEL || "gemini-2.5-pro";
+    return env.GEMINI_TOPIC_MODEL || env.GEMINI_FLASH_MODEL || "gemini-2.5-flash";
   }
   return env.GEMINI_FLASH_MODEL || "gemini-2.5-flash";
 }
@@ -98,7 +98,7 @@ export const POST: APIRoute = async ({ request }) => {
           generationConfig: {
             temperature: mode === "metadata" ? 0.1 : mode === "quick" ? 0.2 : mode === "topic" ? 0.2 : 0.6,
             topP: 0.9,
-            maxOutputTokens: mode === "metadata" ? 900 : mode === "topic" ? 2200 : mode === "quick" ? 1800 : 6000,
+            maxOutputTokens: mode === "metadata" ? 900 : mode === "topic" ? 4096 : mode === "quick" ? 1800 : 6000,
           },
         }),
       },
