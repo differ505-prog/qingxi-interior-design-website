@@ -9002,7 +9002,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
   function buildArticleAiTimeoutMessage(mode) {
     if (mode === "topic") {
-      return "Gemini Pro 本題動態決題逾時，請再試一次。";
+      return "Gemini Flash 本題動態決題逾時，請再試一次。";
     }
     if (mode === "metadata") {
       return "主書系、章節與標題補齊逾時，已保留目前判題結果。";
@@ -10378,8 +10378,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         const errorMessage = result?.error === "GEMINI_API_KEY_MISSING"
           ? "尚未設定 GEMINI_API_KEY，暫時無法做本題動態決題。"
           : result?.error === "GEMINI_RATE_LIMITED"
-            ? `Gemini Pro 目前達到額度上限${Number.isFinite(result?.retryAfterSeconds) ? `，約 ${result.retryAfterSeconds} 秒後再試。` : "，請稍後再試。"}`
-            : "Gemini Pro 目前無法完成本題動態決題，請稍後再試。";
+            ? `Gemini Flash 目前達到額度上限${Number.isFinite(result?.retryAfterSeconds) ? `，約 ${result.retryAfterSeconds} 秒後再試。` : "，請稍後再試。"}`
+            : "Gemini Flash 目前無法完成本題動態決題，請稍後再試。";
         setFeedback(errorMessage, "is-warning");
         setArticleAiFeedback(errorMessage, "is-warning");
         return null;
@@ -10393,9 +10393,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         setArticleAiFeedback(timeoutMessage, "is-warning");
         return null;
       }
-      console.error("Gemini Pro 本題動態決題失敗：", error);
-      setFeedback("Gemini Pro 連線失敗，暫時無法完成本題動態決題。", "is-warning");
-      setArticleAiFeedback("Gemini Pro 連線失敗，暫時無法完成本題動態決題。", "is-warning");
+      console.error("Gemini Flash 本題動態決題失敗：", error);
+      setFeedback("Gemini Flash 連線失敗，暫時無法完成本題動態決題。", "is-warning");
+      setArticleAiFeedback("Gemini Flash 連線失敗，暫時無法完成本題動態決題。", "is-warning");
       return null;
     }
   }
