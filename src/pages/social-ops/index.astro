@@ -7333,6 +7333,61 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       .join("\n");
   }
 
+  function resolveArticleLandingData(aiConfirmData = {}, aiDraftBlock = "") {
+    const aiEmpty = (value) => !value || value === "尚未判定";
+    const seed = getRecommendedArticleSeed();
+    const recommendation = seed?.recommendation;
+    const focusTrack = seed?.focusTrack;
+    const fallbackFromDecision = {
+      category: articleTopicDecision?.category
+        || recommendation?.category
+        || focusTrack?.title
+        || aiConfirmData.category
+        || "老屋翻新",
+      track: articleTopicDecision?.track
+        || recommendation?.trackTitle
+        || focusTrack?.title
+        || aiConfirmData.track
+        || publishingFocusTrackTitle,
+      chapter: articleTopicDecision?.chapter
+        || recommendation?.chapter
+        || aiConfirmData.chapter
+        || "現況判讀",
+      subchapter: articleTopicDecision?.subchapter
+        || recommendation?.subchapter
+        || "",
+      title: articleTopicDecision?.title
+        || recommendation?.primaryTitle
+        || recommendation?.bookTitle
+        || aiConfirmData.title
+        || "尚未判定",
+    };
+    const presetTitle = articlePresetTitle.trim();
+    const resolvedTitle = presetTitle && presetTitle !== fallbackFromDecision.title
+      ? presetTitle
+      : (aiEmpty(aiConfirmData.title) ? fallbackFromDecision.title : aiConfirmData.title);
+    const resolvedCategory = aiEmpty(aiConfirmData.category) ? fallbackFromDecision.category : aiConfirmData.category;
+    const resolvedTrack = aiEmpty(aiConfirmData.track) ? fallbackFromDecision.track : aiConfirmData.track;
+    const resolvedChapter = aiEmpty(aiConfirmData.chapter) ? fallbackFromDecision.chapter : aiConfirmData.chapter;
+    const usedFallback =
+      presetTitle === resolvedTitle && presetTitle
+      || (aiEmpty(aiConfirmData.title) && fallbackFromDecision.title !== "尚未判定")
+      || (aiEmpty(aiConfirmData.track) && Boolean(fallbackFromDecision.track))
+      || (aiEmpty(aiConfirmData.chapter) && Boolean(fallbackFromDecision.chapter))
+      || (aiEmpty(aiConfirmData.category) && Boolean(fallbackFromDecision.category));
+    return {
+      confirmData: {
+        category: resolvedCategory,
+        track: resolvedTrack,
+        chapter: resolvedChapter,
+        title: resolvedTitle,
+        invalid: aiConfirmData.invalid,
+        conflictKeyword: aiConfirmData.conflictKeyword,
+      },
+      usedFallback,
+    };
+  }
+
   function buildProRelatedArticleContext(confirmData, aiDraftBlock = "") {
     const resolvedTrack = confirmData.track || findTrackFromText(aiDraftBlock) || "老屋翻新系";
     const resolvedChapter = confirmData.chapter || inferChapterFromTrack(resolvedTrack, confirmData.title, aiDraftBlock);
@@ -7929,11 +7984,16 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   function buildProFinalizePrompt(problemText = "", aiDraft = "") {
     const questionBlock = problemText.trim() || "（請在此貼上本輪生文前置包）";
     const aiDraftBlock = aiDraft.trim() || "（請先貼上 Gemini Flash 產出的結構化判題結果）";
-    const confirmData = getArticleConfirmData(aiDraftBlock);
+    const aiConfirmData = getArticleConfirmData(aiDraftBlock);
+    const resolvedLanding = resolveArticleLandingData(aiConfirmData, aiDraftBlock);
+    const confirmData = resolvedLanding.confirmData;
     const decision = getArticleAiDecision(aiDraftBlock);
     const relatedArticleContext = buildProRelatedArticleContext(confirmData, aiDraftBlock);
     const gapContext = buildProGapContext(confirmData, aiDraftBlock);
     const structuredDataContext = buildStructuredBookDataContext(confirmData, questionBlock, aiDraftBlock);
+    const sourcesNote = resolvedLanding.usedFallback
+      ? `\n（提示詞的正式落地資訊改為採用 presetTitle / articleTopicDecision / 系統推薦，並非沿用 AI 結果，可避免題目改寫後提示詞仍參照舊標題。）`
+      : "";
 
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
@@ -7960,7 +8020,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       `判題結論：${decision.title}`,
       `建議動作：${decision.action}`,
       `相似舊文：${decision.similar}`,
-      `回覆視角：${decision.angle}`,
+      `回覆視角：${decision.angle}` + sourcesNote,
       "",
       relatedArticleContext,
       "",
