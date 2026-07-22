@@ -940,68 +940,53 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         </div>
       </section>
 
-      <!-- 出書工作流 Bar：3 動作 + 3 查閱入口 + 3 工具卡（兩層模型） -->
+      <!-- 出書工作流 Bar：2 複製動作 + 3 狀態視圖 + 1 離開入口（總數 6，每顆都有具體行為） -->
       <section class="ops-panel book-workflow" id="book-workflow-bar" aria-label="出書工作流">
         <div class="book-workflow-head">
           <p class="panel-tag">出書工作流</p>
-          <h2>採取題、覆核稿、出印刷，三步一條龍</h2>
-          <p>動作走 3 步、入口查 3 顆、工具列 3 個；點任一元件會切到內容台並捲到對應位置</p>
+          <h2>兩個提示詞，複製即用</h2>
+          <p>起稿包送 LLM 生文、覆核包送 LLM 校稿；其餘三顆是狀態視圖，純讀不做事</p>
         </div>
 
-        <!-- 第一層：3 動作 pill（純可執行，點下去都是真實互動） -->
-        <div class="book-workflow-steps" role="group" aria-label="出書工作流 3 動作">
-          <button type="button" class="book-workflow-pill book-workflow-pill-action" data-workflow-target="article-topic-input-zone" data-workflow-action="focus-and-scroll" data-workflow-step="1">
-            <span class="book-workflow-pill-index">STEP 1</span>
-            <span class="book-workflow-pill-label">判題</span>
-            <span class="book-workflow-pill-hint">貼社團問題、按 AI 快速判題</span>
+        <!-- 第一層：2 複製動作 pill（直接觸發既有複製按鈕，點下去馬上有真實反饋） -->
+        <div class="book-workflow-steps" role="group" aria-label="出書工作流 2 動作">
+          <button type="button" class="book-workflow-pill book-workflow-pill-action" data-workflow-action="copy-and-reveal" data-workflow-target-button="copy-pro-finalize-prompt-inline" data-workflow-reveal="article-pro-prompt-shell" data-workflow-step="1">
+            <span class="book-workflow-pill-index">ACTION 1</span>
+            <span class="book-workflow-pill-label">複製起稿包</span>
+            <span class="book-workflow-pill-hint">Pro 生文提示詞，貼去 LLM 生草稿</span>
           </button>
-          <button type="button" class="book-workflow-pill book-workflow-pill-action" data-workflow-target="publishing-review-prompt-trigger-row" data-workflow-action="highlight-primary" data-workflow-step="2">
-            <span class="book-workflow-pill-index">STEP 2</span>
-            <span class="book-workflow-pill-label">覆核</span>
-            <span class="book-workflow-pill-hint">送候選給高階 LLM 校稿</span>
-          </button>
-          <button type="button" class="book-workflow-pill book-workflow-pill-action" data-workflow-target="publishing-review-prompt-fold" data-workflow-action="reveal-and-highlight" data-workflow-step="3">
-            <span class="book-workflow-pill-index">STEP 3</span>
-            <span class="book-workflow-pill-label">出版</span>
-            <span class="book-workflow-pill-hint">展開閉環稿、複製發佈通知</span>
+          <button type="button" class="book-workflow-pill book-workflow-pill-action" data-workflow-action="copy-and-reveal" data-workflow-target-button="copy-publishing-review-prompt" data-workflow-reveal="article-pro-prompt-details" data-workflow-step="2">
+            <span class="book-workflow-pill-index">ACTION 2</span>
+            <span class="book-workflow-pill-label">複製覆核包</span>
+            <span class="book-workflow-pill-hint">出版閉環覆核稿，貼去 LLM 校稿</span>
           </button>
         </div>
 
-        <!-- 第二層：3 查閱入口（純讀取，不算工作流步驟） -->
-        <div class="book-workflow-readonly" role="group" aria-label="出書狀態查閱 3 入口">
+        <!-- 第二層：3 狀態視圖入口（純讀，不做事） -->
+        <div class="book-workflow-readonly" role="group" aria-label="出書狀態視圖 3 入口">
           <a class="book-workflow-readonly-link" href="#publishing-review-board" data-workflow-link="publishing-review-board">
             <span class="book-workflow-readonly-icon" aria-hidden="true">📋</span>
-            <span class="book-workflow-readonly-label">出版清單狀態</span>
-            <span class="book-workflow-readonly-hint">KPI 與整併清單</span>
+            <span class="book-workflow-readonly-label">出版清單</span>
+            <span class="book-workflow-readonly-hint">看 KPI 與整併候選</span>
           </a>
           <a class="book-workflow-readonly-link" href="#article-topic-shell" data-workflow-link="article-topic-shell">
             <span class="book-workflow-readonly-icon" aria-hidden="true">📝</span>
-            <span class="book-workflow-readonly-label">採用題結果</span>
-            <span class="book-workflow-readonly-hint">本題、章節、落位</span>
+            <span class="book-workflow-readonly-label">採用題</span>
+            <span class="book-workflow-readonly-hint">本題、章節、子章節落位</span>
           </a>
           <a class="book-workflow-readonly-link" href="#article-ai-result-shell" data-workflow-link="article-ai-result-shell">
             <span class="book-workflow-readonly-icon" aria-hidden="true">🤖</span>
-            <span class="book-workflow-readonly-label">AI 結果紀錄</span>
-            <span class="book-workflow-readonly-hint">上次判題與生文備援</span>
+            <span class="book-workflow-readonly-label">AI 決策</span>
+            <span class="book-workflow-readonly-hint">上次判題結論與建議動作</span>
           </a>
         </div>
 
-        <!-- 第三層：3 工具卡（外部參考入口，純跳轉） -->
+        <!-- 第三層：1 外部入口（明確告知離開） -->
         <div class="book-workflow-tools">
-          <a class="book-workflow-tool" href="#publishing-review-title-pool" data-workflow-link="publishing-review-title-pool">
-            <span class="book-workflow-tool-icon" aria-hidden="true">📚</span>
-            <p class="book-workflow-tool-name">未來出版標題池</p>
-            <p class="book-workflow-tool-desc">把所有待補子章補成完整標題池，交給高階 LLM 排優先順序</p>
-          </a>
-          <a class="book-workflow-tool" href="#publishing-review-board" data-workflow-link="publishing-review-board">
-            <span class="book-workflow-tool-icon" aria-hidden="true">✍️</span>
-            <p class="book-workflow-tool-name">送審覆核包</p>
-            <p class="book-workflow-tool-desc">複製出版清單摘要、送高階 LLM 做書稿閉環覆核</p>
-          </a>
-          <a class="book-workflow-tool" href="#article-ai-result-shell" data-workflow-link="article-ai-result-shell">
-            <span class="book-workflow-tool-icon" aria-hidden="true">🧾</span>
-            <p class="book-workflow-tool-name">出版快照回看</p>
-            <p class="book-workflow-tool-desc">回看上一輪 LLM 覆核回傳與發行記錄</p>
+          <a class="book-workflow-tool book-workflow-tool-external" href="https://gemini.google.com/" target="_blank" rel="noreferrer">
+            <span class="book-workflow-tool-icon" aria-hidden="true">🌐</span>
+            <p class="book-workflow-tool-name">開 Gemini</p>
+            <p class="book-workflow-tool-desc">複製完提示詞後，到 Gemini 貼上、貼回覆核稿</p>
           </a>
         </div>
       </section>
@@ -1219,12 +1204,11 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                 </div>
               </section>
               <SocialOpsPromptLibrary entries={promptLibraryEntries} />
-              <div id="article-topic-input-zone" class="book-workflow-target-zone">
-                <section class="bookshelf-review-composer">
-                  <div class="bookshelf-preview-head">
-                    <p>高頻生文起稿台</p>
-                    <span>直接貼本輪預設題目，系統會先整理情境摘要並直送一鍵生文；完整前置包與備援操作降到次層</span>
-                  </div>
+              <section class="bookshelf-review-composer">
+                <div class="bookshelf-preview-head">
+                  <p>高頻生文起稿台</p>
+                  <span>直接貼本輪預設題目，系統會先整理情境摘要並直送一鍵生文；完整前置包與備援操作降到次層</span>
+                </div>
                 <div
                   id="article-preset-title-preview"
                   class="article-preset-title-preview"
@@ -1292,8 +1276,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     <p class="bookshelf-prompt-note">高頻主路徑只保留情境摘要與一鍵生文；完整前置包與備援操作在需要時再展開。</p>
                   </div>
                 </details>
-                </section>
-              </div>
+              </section>
               <div id="publishing-review-prompt-trigger-row" class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
                 <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製送高階 LLM 覆核包</button>
@@ -1341,9 +1324,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                   <p>本題動態決題</p>
                   <span id="article-topic-label">尚未決題</span>
                 </div>
-                <p class="bookshelf-confirm-step-hint">
-                  這區只顯示判題結果；輸入入口在 STEP 1 判題區，覆核動作在 STEP 2
-                </p>
+                <p class="bookshelf-confirm-step-hint">這區顯示本輪採用題與章節落位，純讀不輸入</p>
                 <div class="bookshelf-confirm-grid">
                   <article class="bookshelf-confirm-card">
                     <span>決題模式</span>
@@ -12048,78 +12029,82 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   /* 出書工作流 — sticky bar offset，讓捲動停留位置避開工作流條 */
   const WORKFLOW_STICKY_OFFSET = 96;
 
-  /* 出書工作流 — 取得 zone 內第一個可聚焦輸入元素（input / textarea） */
-  function focusFirstInputInZone(zone) {
-    if (!zone) return;
-    const input = zone.querySelector("input:not([type='hidden']), textarea");
-    if (input instanceof HTMLElement) {
-      input.focus({ preventScroll: true });
+  /* 出書工作流 — 捲動 + 展開 details，統一給 pill / readonly link 共用 */
+  function scrollAndRevealTo(targetId) {
+    const target = revealWorkflowTarget(targetId);
+    if (!target) return null;
+    if (target instanceof HTMLDetailsElement && !target.open) {
+      target.open = true;
     }
+    const rect = target.getBoundingClientRect();
+    const targetY = window.scrollY + rect.top - WORKFLOW_STICKY_OFFSET;
+    window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
+    return target;
   }
 
-  /* 出書工作流 — 在指定容器內找出 primary 按鈕並 highlight */
-  function highlightPrimaryInZone(zone) {
-    if (!zone) return;
-    const primary = zone.querySelector(".bookhelp-action-primary");
-    if (!(primary instanceof HTMLElement)) return;
-    primary.classList.remove("bookshelf-action-focus");
-    void primary.offsetWidth;
-    primary.classList.add("bookshelf-action-focus");
-    setTimeout(() => {
-      primary.classList.remove("bookshelf-action-focus");
-    }, 2500);
+  /* 出書工作流 — Toast（右下浮動提示 + ESC 關閉） */
+  let workflowToastTimer = null;
+  function showWorkflowToast(message) {
+    let toast = document.getElementById("book-workflow-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "book-workflow-toast";
+      toast.className = "book-workflow-toast";
+      toast.setAttribute("role", "status");
+      toast.setAttribute("aria-live", "polite");
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.remove("is-hidden");
+    toast.classList.add("is-visible");
+    if (workflowToastTimer) clearTimeout(workflowToastTimer);
+    workflowToastTimer = setTimeout(() => {
+      toast.classList.remove("is-visible");
+      toast.classList.add("is-hidden");
+    }, 3000);
   }
 
-  /* 出書工作流 — 在指定容器內展開所有未開 details */
-  function expandDetailsInZone(zone) {
-    if (!zone) return;
-    zone.querySelectorAll("details").forEach((detail) => {
-      if (!detail.open) detail.open = true;
-    });
-  }
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      const toast = document.getElementById("book-workflow-toast");
+      if (toast && toast.classList.contains("is-visible")) {
+        toast.classList.remove("is-visible");
+        toast.classList.add("is-hidden");
+        if (workflowToastTimer) clearTimeout(workflowToastTimer);
+      }
+    }
+  });
 
-  document.querySelectorAll(".book-workflow-pill").forEach((pill) => {
+  /* 出書工作流 — 2 複製動作 pill（直接觸發既有複製按鈕 + 揭示 + toast 反饋） */
+  document.querySelectorAll(".book-workflow-pill[data-workflow-action='copy-and-reveal']").forEach((pill) => {
     pill.addEventListener("click", (event) => {
       event.preventDefault();
-      const targetId = pill.dataset.workflowTarget;
-      if (!targetId) return;
-      const pane = pill.dataset.workspacePane || "content";
-      const action = pill.dataset.workflowAction || "scroll";
+      const buttonId = pill.dataset.workflowTargetButton;
+      const revealId = pill.dataset.workflowReveal;
+      if (!buttonId) return;
 
-      setWorkspacePane(pane, { persist: true });
+      setWorkspacePane("content", { persist: true });
 
       setTimeout(() => {
-        const target = revealWorkflowTarget(targetId);
-        if (!target) return;
-
-        // 1. 任何動作都先展開 zone 內所有 details（避免藏在折疊裡的東西看不到）
-        expandDetailsInZone(target);
-
-        // 2. 計算捲動位置，避開 sticky 工作流條
-        const rect = target.getBoundingClientRect();
-        const targetY = window.scrollY + rect.top - WORKFLOW_STICKY_OFFSET;
-        window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
-
-        // 3. 依 data-workflow-action 執行對應互動
-        switch (action) {
-          case "focus-and-scroll":
-            focusFirstInputInZone(target);
-            highlightWorkflowTarget(targetId);
-            break;
-          case "highlight-primary":
-            highlightPrimaryInZone(target);
-            break;
-          case "reveal-and-highlight":
-            highlightWorkflowTarget(targetId);
-            break;
-          default:
-            highlightWorkflowTarget(targetId);
+        // 1. 觸發既有複製按鈕（複製 + 既有成功訊息）
+        const button = document.getElementById(buttonId);
+        if (button instanceof HTMLButtonElement) {
+          button.click();
         }
+
+        // 2. 捲動到對應提示詞區（如果 reveal 指定）
+        if (revealId) {
+          scrollAndRevealTo(revealId);
+        }
+
+        // 3. 顯示 toast 反饋（pill 自己說「複製什麼」）
+        const label = pill.querySelector(".book-workflow-pill-label")?.textContent?.trim() || "已複製";
+        showWorkflowToast(`${label} — 已送出剪貼簿`);
       }, 120);
     });
   });
 
-  /* 出書工作流 — 查閱入口（第二層 icon link）：切 tab + 捲動 + 高亮 */
+  /* 出書工作流 — 3 狀態視圖入口（純讀，切 tab + 捲動 + highlight） */
   document.querySelectorAll(".book-workflow-readonly-link[data-workflow-link]").forEach((link) => {
     link.addEventListener("click", (event) => {
       event.preventDefault();
@@ -12129,12 +12114,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       setWorkspacePane("content", { persist: true });
 
       setTimeout(() => {
-        const target = revealWorkflowTarget(targetId);
-        if (!target) return;
-        expandDetailsInZone(target);
-        const rect = target.getBoundingClientRect();
-        const targetY = window.scrollY + rect.top - WORKFLOW_STICKY_OFFSET;
-        window.scrollTo({ top: Math.max(0, targetY), behavior: "smooth" });
+        scrollAndRevealTo(targetId);
         highlightWorkflowTarget(targetId);
       }, 120);
     });
