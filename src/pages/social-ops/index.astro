@@ -9824,6 +9824,22 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     return isLocked;
   }
 
+  function getArticlePresetTitleConflictMessage(content = articleAiResult) {
+    if (!articlePresetTitle.trim() || !content.trim()) return "";
+    const confirmData = getArticleConfirmData(content);
+    const aiTitle = confirmData.title;
+    if (!aiTitle || aiTitle === "尚未判定") return "";
+    if (articlePresetTitle.trim() === aiTitle.trim()) return "";
+    const subchapter = (() => {
+      try {
+        return inferSubchapterFromTrack(confirmData.track || "", confirmData.chapter || "", confirmData.title || "", content || "");
+      } catch (error) {
+        return confirmData.chapter || "本輪章節";
+      }
+    })();
+    return `已手動採用「${articlePresetTitle.trim()}」作為本輪預設題目，與目前 AI 判題結果「${aiTitle}（${subchapter}）」不同；按下「複製 Pro 生文提示詞」將以手動題目為主，並同步送出書系 / 章節資訊。`;
+  }
+
   function renderArticleSyncGuard(content = articleAiResult) {
     const shell = document.getElementById("article-sync-guard");
     const title = document.getElementById("article-sync-guard-title");
@@ -9833,22 +9849,25 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const syncState = getTopicStateSyncState(content, currentTopicMode);
     const chronologyMessage = getChronologyWarningMessage(syncState.expectedCandidate, focusTrack);
     const dependencyMessage = getDependencyLockMessage(syncState.expectedCandidate, focusTrack);
+    const presetConflictMessage = getArticlePresetTitleConflictMessage(content);
     const isLocked = Boolean(chronologyMessage || dependencyMessage || syncState.fatal);
     if (shell instanceof HTMLElement) {
-      shell.hidden = !content.trim();
+      shell.hidden = !content.trim() && !presetConflictMessage;
       shell.classList.toggle("is-alert", isLocked);
     }
     if (title instanceof HTMLElement) {
-      title.textContent = chronologyMessage
-        ? "前置工程章節尚未穩固，禁止跳躍發布"
-        : dependencyMessage
-          ? "章節內依賴順序未滿足，已鎖定確認動作"
-        : syncState.fatal
-          ? "候選、問題與落地資訊不同步，已鎖定確認動作"
-          : "本輪送審候選與落地資訊已同步";
+      title.textContent = presetConflictMessage
+        ? "已採用新題目並等待下一次提示詞生成"
+        : chronologyMessage
+          ? "前置工程章節尚未穩固，禁止跳躍發布"
+          : dependencyMessage
+            ? "章節內依賴順序未滿足，已鎖定確認動作"
+            : syncState.fatal
+              ? "候選、問題與落地資訊不同步，已鎖定確認動作"
+              : "本輪送審候選與落地資訊已同步";
     }
     if (note instanceof HTMLElement) {
-      note.textContent = chronologyMessage || dependencyMessage || syncState.message;
+      note.textContent = presetConflictMessage || chronologyMessage || dependencyMessage || syncState.message;
     }
     return isLocked;
   }
