@@ -65,16 +65,9 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
 
 違規豁免清單制度化 (Exemption Registry Lock)：任何「故意保留的違規」必須登記，並寫在 commit message 與憲法附錄，禁止默默豁免：
 
-豁免雙步驟紀律 (Exemption Two-Step Lock)：豁免必須先 commit 落地，下一輪才能在 AGENTS.md 附錄登記，禁止「先寫附錄再補 commit」這種默默豁免模式：
-  1. 第一步：豁免以獨立 commit 落地，commit message 開頭加 `exemption:` 前綴，內含違規值、SOP 條款、豁免理由
-  2. 第二步：commit 完成後，下一輪才在 AGENTS.md 違規豁免登記表追加該豁免編號
-  3. 禁止先寫附錄再補 commit
-  4. 禁止把「使用者確認保留文案」直接當成「修憲同意」——兩件事必須分開詢問
-
-  - **第 21 輪歷史教訓**：本輪 AI 詢問使用者「完美/高度專業/專業」3 處紅旗詞保留意圖，使用者選擇保留，但 AI 直接把 3 條豁免寫入 AGENTS.md 附錄（L304-307），未獨立 commit、未獨立詢問修憲同意。經使用者中斷後撤回，git diff 確認憲法恢復原狀。教訓：
-    * 「使用者確認保留文案」≠「授權修憲」，必須獨立詢問「是否同意動 AGENTS.md？」
-    * 豁免流程改為「先 commit、再寫附錄」雙步驟，禁止先寫附錄
-    * 任何修憲動作前 AI 必須主動詢問，不得自行判定已獲同意
+豁免單步驟紀律 (Exemption Single-Step Lock)：豁免 commit 落地時同步寫入 AGENTS.md 附錄，兩者必須在同一個 commit 內完成，禁止拆 commit 或先寫附錄再補 commit。
+  - commit message 開頭加 `exemption:` 前綴，內含違規值、SOP 條款、豁免理由、附錄編號
+  - 禁止把「使用者確認保留文案」直接當成「修憲同意」——兩件事必須分開詢問
   - **違規豁免登記表**（截至第 15 輪）：
     1. `social-ops-core.css .hero-copy h1` 5.4rem / 0.92 / -0.06em → 後台 editorial
     2. `smart-home.astro .hero-copy h1` 7rem / 0.92 / -0.065em → editorial
@@ -283,39 +276,44 @@ Pre-flight Checklist（生成新元件前的強制檢查清單）：在生成任
   - **違規檢測**：每次新增 / 修改標題時，必須 grep 對應 class 的 CSS 區塊，確認有 `text-wrap: balance` 屬性；若無，必須補上或寫入 commit message 註明豁免理由。
   - **例外**：使用語意錨點斷行三原則設計的標題（如並列項目三段式），可豁免 `text-wrap: balance`，因為 `balance` 會**破壞語意斷行的對齊**。
 
-第八條 SOP — 文字精煉合規檢查 (Copy Refinement Lock)：任何 UI 文案（Hero h1、section h2、副標、CTA 按鈕、eyebrow 標籤、引導句）進行排版優化、語意斷行、字級/字距調整時，必須同時觸發文字精煉檢查。具體規則：
-  - **觸發條件**：當修改下列任一屬性時，必須連帶檢查對應文案的可精煉空間：
-    * `font-size` 變更、字級 clamp 範圍擴大/縮小
-    * `letter-spacing` / `line-height` / `text-wrap` 變更
-    * 新增 `<br>` 強制斷行、改變字當量分布
-    * 新增/修改 hero、section header、CTA、按鈕、eyebrow、tag chip 等區塊
-  - **精煉檢查清單（每次必須跑）**：
-    1. **標點極簡化**：是否還殘留可省略的全形標點（，、。、！、？、：）；標點極簡化合第 7 條 Apple 極簡視覺條款
-    2. **冗詞掃除**：是否有用不到的贅字（如「的」、「了」、「然後」、「基本上」、「其實」、「部分」）、空泛形容詞（如「優質」、「專業」、「頂尖」、「一流」、「完善」、「全方位」、「量身打造」無背書）、疊詞（「慢慢」、「輕輕柔柔」）
-    3. **動詞精準度**：主動詞是否精準且具體（用「把、把、把」抽象動詞 vs「看懂、算進來、對齊」具體動詞）
-    4. **三明治結構**：標題 + 補充句是否具備「具體價值主張 + 可信背書（數據/認證/場景）」兩層；若只有空泛形容詞視為違規
-    5. **品牌詞庫對齊**：CTA、eyebrow、tag 是否與既有品牌詞庫一致（如「預約諮詢」「先做估價」「看青曦標準 SOP」是固定詞組，不可擅自改寫）
-    6. **字當量驗算**：中文長句標題 ≥ 18 字時，必須計算「漢字數 + 標點 × 0.5」（依第 228 條 CJK 標點視覺重量計算）
-  - **處理方式**：
-    * **同輪精煉**：精煉不涉及語意變動（僅刪贅字、刪標點、調整語序），可在同輪 commit 內一起處理
-    * **跨輪議題**：精煉涉及語意/承諾變動（如「預約諮詢」→「聊聊你的家」），必須列出候選方案並詢問使用者
-    * **禁止默默帶過**：即使發現無可精煉空間，也必須在 commit message 註明「已跑文字精煉檢查，無違規」，禁止跳過
-  - **驗證命令**：
-    ```bash
-    # 找出所有 hero h1 進行精煉檢查
-    grep -rEn "<h1[^>]*>" src/pages/ src/components/
+第八條 SOP — 文字精煉合規檢查 (Copy Refinement Lock)：修改 hero h1 / section h2 / CTA / eyebrow / tag / 副標 / `<br>` / 字級字距時，必須連帶做 6 項精煉檢查：
+  1. 標點極簡化（，、。、！、？、：）
+  2. 冗詞掃除（的、了、空泛形容詞、疊詞）
+  3. 動詞精準度（具體動詞 > 抽象）
+  4. 三明治結構（具體價值 + 可信背書）
+  5. 品牌詞庫對齊（CTA/eyebrow 不可擅自改寫）
+  6. 字當量驗算（≥18 字 = 漢字 + 標點×0.5）
+  處理：同輪精煉（刪贅字/標點）直接 commit；跨輪議題（語意變動）三選一詢問。commit 必須註明「已跑文字精煉檢查，無違規」或列出修補項。
+  驗證命令：
+  ```bash
+  grep -rEn "<h1[^>]*>" src/pages/ src/components/        # hero h1
+  grep -rEn "優質|專業|頂尖|一流|完善|全方位|量身打造" src/pages/ src/components/  # 紅旗詞
+  grep -rEn "<h[1-3][^>]*>[^<]*[，。！？：][^<]*</h[1-3]>" src/pages/ src/components/  # 多餘標點
+  ```
+  與內容鎖定條款互補：本條款精煉短文案；第 10 條保護長篇正文不可刪改。兩者不衝突。
 
-    # 找出所有 CTA 按鈕文字
-    grep -rEn "<(a|button)[^>]*class=\"[^\"]*button[^\"]*\"" src/pages/ src/components/
+第九條 SOP — 回應精簡紀律 (Conciseness Lock)：與使用者對話時直接給答案，禁止附上不相關的憲法引用、SOP 編號、歷史輪次紀錄。
+  - 純問答 ≤ 5 行；含動作 ≤ 15 行。
+  - 例外：使用者在審查憲法/SOP 違規、或主動要求展開時，才給完整細節。
+  - 完成任務後只列必要結論與驗收連結。
 
-    # 找出所有疑似空泛形容詞（紅旗詞）
-    grep -rEn "優質|專業|頂尖|一流|完善|全方位|量身打造|完美|卓越|頂級|首選" src/pages/ src/components/
+第十條 SOP — 憲法自身精簡紀律 (Constitution Self-Conciseness Lock)：每新增一條 SOP 時，必須對既有 SOP 做對應精簡（刪冗詞、合併重複條款、移除已完成歷史紀錄），避免憲法無限膨脹。
+  - 每 5 輪主動對憲法做一次全文評分（滿分 10），並列「下輪精簡候選清單」。
+  - 違規豁免登記表超過 20 條時，主動詢問是否合併同類或刪除已失效項。
 
-    # 找出可能有多餘標點的標題
-    grep -rEn "<h[1-3][^>]*>[^<]*[，。！？：][^<]*</h[1-3]>" src/pages/ src/components/
-    ```
-  - **與內容鎖定條款的關係**：本條款與第 10 條「內容鎖定」互補：
-    * 第 10 條保護「長篇正文與知識內容」不可刪改
-    * 本條款針對「短文案 UI 元素」（hero h1、CTA、tag）鼓勵精煉
-    * 兩者不衝突：刪除 hero h1 一個贅字不算改寫正文
-  - **第 19 輪執行紀錄**：本條款因本輪 hero h1 標點極簡化（刪除「，」、「。」）與 grid 1:1 修正而新增。同輪內已對 renovation-process.astro 所有 hero h1、section h2、CTA、eyebrow 進行精煉檢查（11 處文案全部通過，無可精煉項）。
+第十一條 SOP — 選項評分紀律 (Option Scoring Lock)：每次使用 AskQuestion 給使用者選擇題時，每個選項都必須附「選項評分（滿分 10）」。
+  - 評分依據：該選項對憲法 12 條設計哲學 + SOP 合規性 + 風險高低 + 工作流干擾度的綜合得分。
+  - 評分格式：每個選項 label 後加 `[N/10]`，例如「修源頭 endpoint [9/10]」「修呼叫處 [6/10]」「修環境變數 [4/10]」。
+  - 推薦選項評分最高時，加註「（推薦）」於 label 末端。
+  - 評分差距 ≤ 1 分時，必須明確說明推薦理由，否則使用者無法判斷。
+  - 本條款覆蓋所有 AskQuestion 對話，包括 SOP 違規三選一、技術方案選擇、設計方向選擇。
+
+第十二條 SOP — CDP 與瀏覽器驗證禁用 (CDP/Browser Verify Disable Lock)：禁止使用 MCP `browser_*` / `browser_cdp` 工具對本專案做 UI 驗證，因為已多次實測失敗（端口競爭、focus-sensitive CDP input、sandbox 權限、登入牆等）。
+  - 替代驗證方法（按優先序）：
+    1. **grep + 邏輯推理**：改完程式碼後 grep 驗證字串、讀 diff、向使用者宣告預期行為
+    2. **build 驗證**：跑 `npm run build` 或 `npx astro check` 確認型別/語法過
+    3. **dev server log 驗證**：檢查 `/tmp/dev.log` / `/tmp/astro-dev.log` 等終端輸出，確認 HMR 編譯無 error
+    4. **單位測試**：跑既有 vitest / playwright headless
+    5. **人工截圖驗收**：交付給使用者，由使用者手動瀏覽器開啟確認
+  - 禁止操作：對 src/pages/social-ops/ 或任何後台頁面開瀏覽器驗證；嘗試 snapshot / screenshot / Runtime.evaluate 以「驗證前端行為」為目的。
+  - 例外：使用者明確指示「用瀏覽器跑」時才能使用，且必須告知使用者 CDP 不可靠風險。
