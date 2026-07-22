@@ -2261,6 +2261,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   const PUBLISHING_REVIEW_FILTER_KEY = "qingxi-publishing-review-filter-v1";
   const PUBLISHING_TITLE_POOL_REVIEW_KEY = "qingxi-publishing-title-pool-review-v1";
   const PUBLISHING_REVIEW_SNAPSHOT_KEY = "qingxi-publishing-review-snapshot-v1";
+  const PUBLISHING_REVIEW_SNAPSHOT_VERSION = 1;
   const TOPIC_MODE_KEY = "qingxi-topic-mode-v1";
   const WORKSPACE_PANE_KEY = "qingxi-workspace-pane-v1";
   const GEMINI_RECENT_LIMIT = 10;
@@ -6749,6 +6750,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     if (!focusTrack) return null;
 
     return {
+      schemaVersion: PUBLISHING_REVIEW_SNAPSHOT_VERSION,
       savedAt: new Date().toISOString(),
       mode,
       modeLabel: modeState?.label || mode,
@@ -6792,6 +6794,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== "object") return null;
+      if (parsed.schemaVersion !== PUBLISHING_REVIEW_SNAPSHOT_VERSION) {
+        console.warn("出版覆核快照版本不符，自動忽略舊版資料。");
+        return null;
+      }
       return parsed;
     } catch (error) {
       console.error("讀取出版覆核快照失敗：", error);
@@ -6813,6 +6819,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
     const lines = [
       "【上次覆核快照】",
+      `- 快照 schema 版本：v${snapshot.schemaVersion ?? "未標示"}（當前使用版本：v${PUBLISHING_REVIEW_SNAPSHOT_VERSION}）`,
       `- 快照時間：${snapshot.savedAt || "未記錄"}`,
       `- 快照模式：${snapshot.modeLabel || snapshot.mode}`,
       `- 快照書目：${snapshot.bookTitle || "（未定義）"}`,
@@ -7151,6 +7158,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
   function saveTopicMode() {
     localStorage.setItem(TOPIC_MODE_KEY, currentTopicMode);
+    savePublishingReviewSnapshot(currentTopicMode);
   }
 
   function renderTopicModePanels() {
@@ -11303,6 +11311,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   });
 
   document.getElementById("clear-publishing-review-snapshot")?.addEventListener("click", () => {
+    const confirmed = window.confirm(
+      "確定要清除上次覆核快照嗎？\n\n清除後，下一輪覆核將不再附帶『上次覆核對照』段，LLM 無法參考前一次的決策軌跡。",
+    );
+    if (!confirmed) return;
     clearPublishingReviewSnapshot();
     setPublishingReviewFeedback("已清除上次覆核快照；下一輪覆核將不再附帶對照資料。", "is-warning");
   });
