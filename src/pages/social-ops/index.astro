@@ -1158,6 +1158,16 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                   <p>高頻生文起稿台</p>
                   <span>直接貼本輪預設題目，系統會先整理情境摘要並直送一鍵生文；完整前置包與備援操作降到次層</span>
                 </div>
+                <div
+                  id="article-preset-title-preview"
+                  class="article-preset-title-preview"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <span class="article-preset-title-preview-eyebrow">即將發布標題</span>
+                  <strong id="article-preset-title-preview-title" class="article-preset-title-preview-title">尚未設定</strong>
+                  <em id="article-preset-title-preview-reason" class="article-preset-title-preview-reason">尚未設定標題，發布前請先輸入或自動決題</em>
+                </div>
                 <label class="gemini-field bookshelf-prompt-field">
                   <span>本輪預設題目</span>
                   <input
@@ -8328,6 +8338,38 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     field.placeholder = getResolvedArticlePresetTitle() || "例如：屋況盤點與範圍界定總表";
   }
 
+  function getResolvedArticlePresetTitleReason() {
+    if (articlePresetTitle.trim()) {
+      return { state: "user", label: "採用你的輸入" };
+    }
+    if (articleTopicDecision?.title) {
+      return { state: "decision", label: "採用本輪動態決題" };
+    }
+    const fallback = getDisplayTitle(getRecommendedArticleSeed().recommendation);
+    if (fallback) {
+      return { state: "ai", label: "採用 AI 系統推薦" };
+    }
+    return { state: "empty", label: "尚未設定標題，發布前請先輸入或自動決題" };
+  }
+
+  function renderArticlePresetTitlePreview() {
+    const root = document.getElementById("article-preset-title-preview");
+    const titleEl = document.getElementById("article-preset-title-preview-title");
+    const reasonEl = document.getElementById("article-preset-title-preview-reason");
+    if (!(root instanceof HTMLElement) || !(titleEl instanceof HTMLElement) || !(reasonEl instanceof HTMLElement)) {
+      return;
+    }
+    const resolvedTitle = getResolvedArticlePresetTitle();
+    const reason = getResolvedArticlePresetTitleReason();
+    const isOverLength = resolvedTitle.length > 50;
+    titleEl.textContent = resolvedTitle || "尚未設定";
+    reasonEl.textContent = isOverLength
+      ? `${reason.label}｜標題偏長（${resolvedTitle.length} 字），建議精簡到 50 字以內`
+      : reason.label;
+    root.dataset.state = reason.state;
+    root.dataset.overLength = isOverLength ? "true" : "false";
+  }
+
   function persistArticleSourceQuestion() {
     const field = document.getElementById("article-source-question");
     if (!(field instanceof HTMLTextAreaElement)) return "";
@@ -8470,6 +8512,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
     renderArticleTopicDecision();
     renderArticleComposerPanel();
+    renderArticlePresetTitlePreview();
   }
 
   function renderArticleTopicDecision() {
@@ -8995,6 +9038,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       ? "目前前置包已包含真實社團問題；高階 LLM 可沿用、微調或改題。"
       : "目前未貼入真實社團問題，前置包會先用出版落位與情境摘要補足起稿資訊。";
     applyArticlePresetTitleToField();
+    renderArticlePresetTitlePreview();
     renderPublishingAssetSlots();
     renderCrossSeriesLock();
   }
@@ -10181,6 +10225,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     articleTopicDecision = parsed;
     saveArticleTopicDecision();
     renderArticleTopicDecision();
+    renderArticlePresetTitlePreview();
     const topicDecisionFeedbackMode = parsed.invalid || isAssetMergeAction(parsed.finalAction) ? "is-warning" : "is-success";
     setArticleAiFeedback(
       parsed.invalid
@@ -10961,6 +11006,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       clearArticleTopicDecision();
       clearArticleProFinalizePrompt();
       renderArticleComposerPanel();
+      renderArticlePresetTitlePreview();
       setWorkspacePane("content", { scrollTarget: "article-topic-shell" });
       setFeedback(`已置入本輪題目：「${nextTitle || "未命名題目"}」，現在可以產生 Pro 生文提示詞。`, "is-success");
       return;
@@ -10983,6 +11029,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       clearArticleTopicDecision();
       clearArticleProFinalizePrompt();
       renderArticleComposerPanel();
+      renderArticlePresetTitlePreview();
       setWorkspacePane("content", { scrollTarget: "article-topic-shell" });
       setFeedback(`已置入本輪題目：「${articlePresetTitle || "未命名題目"}」。`, "is-success");
       return;
@@ -11634,6 +11681,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       clearArticleProFinalizePrompt();
     }
     renderArticleComposerPanel();
+    renderArticlePresetTitlePreview();
   });
 
   document.getElementById("publishing-asset-slot-target")?.addEventListener("change", () => {
