@@ -3823,6 +3823,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
   function resetDailyOpsState(message = "今日主動獵殺任務已刷新。", mode = "is-warning") {
     state.daily = createDailyOps();
+    saveState();
     rerender();
     setFeedback(message, mode);
   }
@@ -3844,6 +3845,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       completedAt: "",
       rewardClaimed: false,
     };
+    saveState();
     rerender();
     setFeedback(message, mode);
   }
