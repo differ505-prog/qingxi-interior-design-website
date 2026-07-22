@@ -5106,6 +5106,91 @@
   text-wrap: pretty;
 }
 
+/* 工作流 STEP — 本輪預設題目輸入（與下方雙向同步，作為 PREP / ACTION 1 的真實輸入源） */
+.book-workflow-step-input {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem 0.6rem;
+  border-radius: 14px;
+  border: 1px solid rgba(220, 217, 210, 0.12);
+  background: rgba(20, 20, 19, 0.5);
+}
+
+.book-workflow-input-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(220, 217, 210, 0.72);
+}
+
+.book-workflow-input-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  color: rgba(196, 168, 122, 0.7);
+}
+
+.book-workflow-input-text {
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: rgba(244, 242, 237, 0.88);
+}
+
+.book-workflow-input-field {
+  width: 100%;
+  min-width: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(220, 217, 210, 0.18);
+  background: rgba(8, 8, 8, 0.55);
+  color: rgba(244, 242, 237, 0.94);
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.book-workflow-input-field::placeholder {
+  color: rgba(220, 217, 210, 0.4);
+}
+
+.book-workflow-input-field:hover {
+  border-color: rgba(196, 168, 122, 0.32);
+}
+
+.book-workflow-input-field:focus,
+.book-workflow-input-field:focus-visible {
+  outline: none;
+  border-color: rgba(196, 168, 122, 0.58);
+  background: rgba(12, 12, 12, 0.7);
+}
+
+.book-workflow-input-field.is-synced {
+  border-color: rgba(120, 184, 140, 0.4);
+  background: rgba(20, 32, 22, 0.6);
+}
+
+.book-workflow-input-hint {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: rgba(220, 217, 210, 0.52);
+  text-wrap: pretty;
+}
+
+.book-workflow-input-hint.is-warning {
+  color: rgba(212, 168, 84, 0.92);
+}
+
 /* 流程 pill 條 */
 .book-workflow-steps {
   display: flex;

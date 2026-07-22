@@ -949,7 +949,22 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         </div>
 
         <!-- 第一層：2 複製動作 pill（直接觸發既有複製按鈕，點下去馬上有真實反饋） -->
-        <div class="book-workflow-steps" role="group" aria-label="出書工作流 2 動作">
+        <div class="book-workflow-step-input" role="group" aria-label="本輪預設題目輸入">
+          <label class="book-workflow-input-label" for="workflow-article-preset-title">
+            <span class="book-workflow-input-eyebrow">STEP</span>
+            <span class="book-workflow-input-text">本輪預設題目</span>
+          </label>
+          <input
+            id="workflow-article-preset-title"
+            class="book-workflow-input-field"
+            type="text"
+            placeholder="例如：屋況盤點與範圍界定總表"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <p class="book-workflow-input-hint" id="workflow-article-preset-title-state">與下方「高頻生文起稿台」雙向同步；決定 PREP 與 ACTION 1 真的生文題目。</p>
+        </div>
+        <div class="book-workflow-steps" role="group" aria-label="出書工作流 3 動作 + 1 預備">
           <button type="button" class="book-workflow-pill book-workflow-pill-action" data-workflow-action="copy-and-reveal" data-workflow-target-button="copy-pro-finalize-prompt-inline" data-workflow-reveal="article-pro-prompt-shell" data-workflow-step="1">
             <span class="book-workflow-pill-index">ACTION 1</span>
             <span class="book-workflow-pill-label">複製起稿包</span>
@@ -11362,6 +11377,50 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     feedback.textContent = message;
   }
 
+  // 工作流 STEP 標題輸入：與下方 article-preset-title 雙向同步
+  // 規則：上方 input 觸發下方 input 的 input event（重用既有 handler）
+  // 下方 input 觸發由既有 handler 反向同步到上方（syncWorkflowPresetTitleFromBelow）
+  const workflowPresetTitleInput = document.getElementById("workflow-article-preset-title");
+  const workflowPresetTitleHint = document.getElementById("workflow-article-preset-title-state");
+
+  function syncWorkflowPresetTitleFromBelow() {
+    if (!(workflowPresetTitleInput instanceof HTMLInputElement)) return;
+    const belowField = document.getElementById("article-preset-title");
+    const belowValue = belowField instanceof HTMLInputElement ? belowField.value : "";
+    if (workflowPresetTitleInput.value !== belowValue) {
+      workflowPresetTitleInput.value = belowValue;
+    }
+    workflowPresetTitleInput.classList.toggle("is-synced", Boolean(belowValue.trim()));
+    if (workflowPresetTitleHint instanceof HTMLElement) {
+      workflowPresetTitleHint.classList.toggle("is-warning", !belowValue.trim());
+      workflowPresetTitleHint.textContent = belowValue.trim()
+        ? "✓ 與下方同步中；PREP 與 ACTION 1 將以此題目生文"
+        : "尚未填題目；PREP 跑出來會是空文，建議先輸入";
+    }
+  }
+
+  // 初始：讀 localStorage 的題目（若下方 input 是空白的，從 articlePresetTitle 抓）
+  function initializeWorkflowPresetTitle() {
+    if (!(workflowPresetTitleInput instanceof HTMLInputElement)) return;
+    const belowField = document.getElementById("article-preset-title");
+    const initialValue =
+      belowField instanceof HTMLInputElement && belowField.value
+        ? belowField.value
+        : (articlePresetTitle || "");
+    workflowPresetTitleInput.value = initialValue;
+    syncWorkflowPresetTitleFromBelow();
+  }
+
+  workflowPresetTitleInput?.addEventListener("input", () => {
+    const belowField = document.getElementById("article-preset-title");
+    if (!(belowField instanceof HTMLInputElement)) return;
+    belowField.value = workflowPresetTitleInput.value;
+    // 觸發既有 input handler：clearArticleTopicDecision + 預覽刷新 + persistArticlePresetTitle
+    belowField.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+
+  initializeWorkflowPresetTitle();
+
   document.getElementById("copy-article-context-summary")?.addEventListener("click", async () => {
     const result = await copyText(buildArticleContextSummary(), "已複製情境摘要。");
     const feedback = getCopyFeedbackState(result, "已複製情境摘要。", "已開啟手動複製視窗，可直接複製情境摘要。");
@@ -11928,6 +11987,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
     renderArticleComposerPanel();
     renderArticlePresetTitlePreview();
+    syncWorkflowPresetTitleFromBelow();
   });
 
   document.getElementById("publishing-asset-slot-target")?.addEventListener("change", () => {
