@@ -5154,6 +5154,15 @@
   color: inherit;
 }
 
+.book-workflow-pill-hint {
+  font-size: 0.7rem;
+  line-height: 1.35;
+  letter-spacing: 0;
+  color: rgba(220, 217, 210, 0.52);
+  font-weight: 400;
+  text-wrap: balance;
+}
+
 /* 工具卡片 3 欄 */
 .book-workflow-tools {
   display: grid;
