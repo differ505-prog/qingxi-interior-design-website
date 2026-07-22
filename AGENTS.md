@@ -58,7 +58,23 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
   - 例外：CSS drop cap（如 `.article-lead::first-letter`）的 line-height 必須 < 1 才能讓首字母貼齊下方文字，屬設計慣例，豁免。
   - 例外：editorial 排版風格（無襯線 + 緊密 + 負字距三件套）後台系統（如 social-ops / smart-home 主視覺），可以 line-height 0.86–0.95，但必須在 commit message 註明為有意識的設計選擇。
 
+後台 editorial 例外單項豁免鎖定 (Editorial Exception Lock)：後台 editorial 風格的設計例外不得跨 SOP 串聯豁免，每條豁免必須獨立登記到違規豁免登記表。具體邊界：
+  - 後台頁面可獨立於前台色彩紀律（允許 rgba 透明值），但仍須遵守本子系統 :root 變數（不豁免色彩變數鎖定）。
+  - 後台頁面可放寬行高（0.86–0.95），但字距 SOP 不豁免（editorial 仍須字距反向律）。
+  - 後台頁面可用 1180 / 1120 / 720 斷點，但單一後台系統的孤兒斷點不得超過 3 個。
+
 違規豁免清單制度化 (Exemption Registry Lock)：任何「故意保留的違規」必須登記，並寫在 commit message 與憲法附錄，禁止默默豁免：
+
+豁免雙步驟紀律 (Exemption Two-Step Lock)：豁免必須先 commit 落地，下一輪才能在 AGENTS.md 附錄登記，禁止「先寫附錄再補 commit」這種默默豁免模式：
+  1. 第一步：豁免以獨立 commit 落地，commit message 開頭加 `exemption:` 前綴，內含違規值、SOP 條款、豁免理由
+  2. 第二步：commit 完成後，下一輪才在 AGENTS.md 違規豁免登記表追加該豁免編號
+  3. 禁止先寫附錄再補 commit
+  4. 禁止把「使用者確認保留文案」直接當成「修憲同意」——兩件事必須分開詢問
+
+  - **第 21 輪歷史教訓**：本輪 AI 詢問使用者「完美/高度專業/專業」3 處紅旗詞保留意圖，使用者選擇保留，但 AI 直接把 3 條豁免寫入 AGENTS.md 附錄（L304-307），未獨立 commit、未獨立詢問修憲同意。經使用者中斷後撤回，git diff 確認憲法恢復原狀。教訓：
+    * 「使用者確認保留文案」≠「授權修憲」，必須獨立詢問「是否同意動 AGENTS.md？」
+    * 豁免流程改為「先 commit、再寫附錄」雙步驟，禁止先寫附錄
+    * 任何修憲動作前 AI 必須主動詢問，不得自行判定已獲同意
   - **違規豁免登記表**（截至第 15 輪）：
     1. `social-ops-core.css .hero-copy h1` 5.4rem / 0.92 / -0.06em → 後台 editorial
     2. `smart-home.astro .hero-copy h1` 7rem / 0.92 / -0.065em → editorial
@@ -73,6 +89,8 @@ API 與資安防禦 (Security First)： 若涉及串接第三方 API，嚴禁在
     11. `contract-studio/sign .document-header h2` 2.7rem / 1.24 行高 → 字級 < 3rem 邊界合規
     12. `tools/index .calculator-header h1` 桌面 5.4rem / 1.18 行高 → 單行例外（第 15 輪已修）
     13. 所有 ≥3rem hero h1/h2 行高 1.18（如 HeroCarousel / contact / faq）→ 單行例外（短文案 + max-width）
+    14. `EditorialArticleLayout .article-lead::first-letter` 4.8rem → CSS drop cap 慣例（第六條 SOP 字級上限豁免）
+    15. `EditorialArticleLayout .article-hero h1` 3.6rem → CSS drop cap 慣例（第六條 SOP 字級上限豁免）
   - **新規豁免流程**：發現新的違規需豁免時，必須（a）明確寫出違規值、（b）說明豁免理由為設計慣例/品牌識別/技術限制、（c）在 commit message 註明、（d）將豁免編號加入憲法附錄。
 
 第 14 輪錯誤記錄與修正 (Round 14 Error Log)：第 14 輪 commit message 自稱「全站字距 SOP 清零」，但實際漏處理 `pages/blog/index.astro` 與 `pages/tools/index.astro` 兩個關鍵檔案的行高違規。第 15 輪立即修正並擴大掃描範圍。教訓：

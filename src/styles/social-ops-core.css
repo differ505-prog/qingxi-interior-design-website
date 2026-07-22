@@ -4369,6 +4369,104 @@
     align-items: center;
   }
 
+  .quest-phase-track {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    margin: 0.62rem 0 0;
+    border-radius: 0.6rem;
+    background: rgba(18, 18, 18, 0.32);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .quest-phase-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+  }
+
+  .quest-phase-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.28rem;
+  }
+
+  .quest-phase-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.04);
+    transition: background 0.25s, border-color 0.25s;
+  }
+
+  .quest-phase-step.is-done .quest-phase-dot {
+    background: rgba(203, 195, 181, 0.85);
+    border-color: rgba(203, 195, 181, 0.6);
+  }
+
+  .quest-phase-label {
+    font-size: 0.66rem;
+    letter-spacing: 0.03em;
+    color: rgba(255, 255, 255, 0.28);
+    white-space: nowrap;
+    transition: color 0.25s;
+  }
+
+  .quest-phase-step.is-done .quest-phase-label {
+    color: rgba(203, 195, 181, 0.72);
+  }
+
+  .quest-phase-connector {
+    flex: 1;
+    height: 1.5px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 0 4px;
+    margin-bottom: 1.1rem;
+    transition: background 0.25s;
+  }
+
+  .quest-phase-connector.is-done {
+    background: rgba(203, 195, 181, 0.4);
+  }
+
+  .quest-phase-badge {
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    padding: 0.22rem 0.58rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    transition: background 0.25s, color 0.25s;
+  }
+
+  .quest-phase-badge.is-neutral {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.36);
+  }
+
+  .quest-phase-badge.is-base {
+    background: rgba(76, 148, 175, 0.18);
+    border: 1px solid rgba(76, 148, 175, 0.32);
+    color: rgba(140, 200, 220, 0.9);
+  }
+
+  .quest-phase-badge.is-dist {
+    background: rgba(124, 158, 115, 0.18);
+    border: 1px solid rgba(124, 158, 115, 0.32);
+    color: rgba(165, 205, 155, 0.9);
+  }
+
+  .quest-phase-badge.is-full {
+    background: rgba(203, 195, 181, 0.16);
+    border: 1px solid rgba(203, 195, 181, 0.28);
+    color: rgba(218, 210, 196, 0.92);
+  }
+
   .quest-topline-meta {
     display: flex;
     flex-wrap: wrap;

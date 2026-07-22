@@ -3477,6 +3477,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       },
       rewardClaimed: false,
       completedAt: "",
+      distributionChannel: null, // "threads" | "localCommunity" | null
+      phase: 0, // 0=未開始, 1=基礎完成(圖文+官網+GB), 2=分發完成, 3=全完成
     };
   }
 
@@ -3517,6 +3519,30 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const savedLinkStash = savedRun?.linkStash && typeof savedRun.linkStash === "object"
       ? savedRun.linkStash
       : {};
+
+    // 遷移 distributionChannel（從舊的 actionThreads/actionLocalCommunity 推斷）
+    let distributionChannel = null;
+    if (savedRun?.distributionChannel === "threads" || Boolean(savedRun?.actionThreads)) {
+      distributionChannel = "threads";
+    } else if (savedRun?.distributionChannel === "localCommunity" || Boolean(savedRun?.actionLocalCommunity)) {
+      distributionChannel = "localCommunity";
+    }
+
+    // 根據舊數據計算 phase（向後兼容：沒有 phase 字段時推斷）
+    let phase = 0;
+    const hasBase = migratedImageGeneration && migratedWebsite && Boolean(savedRun?.actionGoogleBusiness);
+    const hasDist = Boolean(savedRun?.actionThreads) || Boolean(savedRun?.actionLocalCommunity);
+    const hasFacade = savedRun?.actionFacadeMaintenance !== undefined
+      ? Boolean(savedRun?.actionFacadeMaintenance)
+      : Boolean(savedRun?.actionInstagram) || Boolean(savedRun?.actionXiaohongshu);
+    if (hasBase && hasDist && hasFacade) {
+      phase = 3;
+    } else if (hasBase && hasDist) {
+      phase = 2;
+    } else if (hasBase) {
+      phase = 1;
+    }
+
     return {
       ...templateRun,
       ...savedRun,
@@ -3532,6 +3558,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       actionFacadeMaintenance: savedRun?.actionFacadeMaintenance !== undefined
         ? Boolean(savedRun?.actionFacadeMaintenance)
         : Boolean(savedRun?.actionInstagram) || Boolean(savedRun?.actionXiaohongshu),
+      distributionChannel,
+      phase: savedRun?.phase !== undefined ? Number(savedRun.phase) : phase,
       linkStash: {
         ...templateRun.linkStash,
         gemini: typeof savedLinkStash?.gemini === "string" ? savedLinkStash.gemini : "",
@@ -3669,12 +3697,30 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
   }
 
+  function isBaseComplete(run) {
+    return run.actionImageGeneration && run.actionWebsite && run.actionGoogleBusiness;
+  }
+
+  function isDistributionComplete(run) {
+    return Boolean(run.actionThreads || run.actionLocalCommunity);
+  }
+
+  function computeRunPhase(run) {
+    const base = isBaseComplete(run);
+    const dist = isDistributionComplete(run);
+    if (!base && !dist) return 0;
+    if (base && !dist) return 1;
+    if (base && dist) {
+      // 全完成（含 facade maintenance）
+      return run.actionFacadeMaintenance ? 3 : 2;
+    }
+    return 0;
+  }
+
   function isRunComplete(run) {
     return isRunOutreachSatisfied(run)
-      && run.actionImageGeneration
-      && run.actionWebsite
-      && run.actionGoogleBusiness
-      && isRunDistributionSatisfied(run);
+      && isBaseComplete(run)
+      && isDistributionComplete(run);
   }
 
   function isDailyOpsComplete(daily = state.daily) {
@@ -3740,6 +3786,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         ...hydratedRun,
         rewardClaimed: false,
         completedAt: "",
+        // carryover 時重置 phase 為 1（基礎已完成），避免跨週停留在 phase 3
+        phase: computeRunPhase(hydratedRun) >= 1 ? 1 : 0,
+        distributionChannel: hydratedRun.actionThreads ? "threads" : hydratedRun.actionLocalCommunity ? "localCommunity" : null,
       };
     });
   }
@@ -3793,6 +3842,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     state.weekly.runs[lockedRunIndex] = {
       ...state.weekly.runs[lockedRunIndex],
       completedAt: "",
+      rewardClaimed: false,
     };
     rerender();
     setFeedback(message, mode);
@@ -3938,12 +3988,15 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       return;
     }
 
+    const runPhase = run.phase !== undefined ? Number(run.phase) : computeRunPhase(run);
     const complete = isRunComplete(run);
     const actionOneComplete = isRunOutreachSatisfied(run);
     const actionTwoComplete = run.actionImageGeneration
       && run.actionWebsite
       && run.actionGoogleBusiness
       && isRunDistributionSatisfied(run);
+    const baseComplete = isBaseComplete(run);
+    const distComplete = isDistributionComplete(run);
     const outreachState = getChoiceState(run.actionOutreach, run.actionOutreachFallback);
     const outreachFallbackState = getChoiceState(run.actionOutreachFallback, run.actionOutreach);
     const threadsState = getChoiceState(run.actionThreads, run.actionLocalCommunity);
@@ -3970,13 +4023,21 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const actionOneNote = actionOneComplete
       ? "這組擇一條件已滿足，另一個選項不用再做。"
       : "這組任務請在「高意圖回覆」與「巡邏無合適發問」之間擇一完成。";
-    const actionTwoNote = actionTwoComplete
-      ? isLockedUntilNextDay
-        ? "這一輪已完成，面板會保留到今天結束，隔天 00:00 後才切換到下一輪。"
-        : "這組任務已滿足，Threads 與在地社群的另一個替代選項可略過。"
-      : run.actionImageGeneration && run.actionWebsite && run.actionGoogleBusiness
-        ? "固定步驟已完成，最後請在 Threads 與在地社群之間擇一完成。"
-        : "先完成官網文章與必要圖檔，再同步 Google 商家，最後在 Threads 與在地社群之間擇一。";
+    const actionTwoNote = runPhase === 0
+      ? "先完成官網文章與必要圖檔，再同步 Google 商家，最後在 Threads 與在地社群之間擇一。"
+      : runPhase === 1
+        ? distComplete
+          ? isLockedUntilNextDay
+            ? "這一輪已完成，面板會保留到今天結束，隔天 00:00 後才切換到下一輪。"
+            : "分發渠道已完成！另一個替代選項可略過。"
+          : "基礎組件完成！請在 Threads 與在地社群之間擇一完成。"
+        : runPhase >= 2
+          ? isLockedUntilNextDay
+            ? "這一輪已完成，面板會保留到今天結束，隔天 00:00 後才切換到下一輪。"
+            : run.actionFacadeMaintenance
+              ? "全完成（含門面維護）！本輪已鎖定，明天可繼續下一輪。"
+              : "行動 2 完成！門面維護為選填，可略過。"
+          : "先完成官網文章與必要圖檔，再同步 Google 商家，最後在 Threads 與在地社群之間擇一。";
     const geminiDraftUrl = normalizeLinkValue(run.linkStash?.gemini);
     const websiteDraftUrl = normalizeLinkValue(run.linkStash?.website);
     const googleBusinessDraftUrl = normalizeLinkValue(run.linkStash?.googleBusiness);
@@ -3993,6 +4054,27 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
             ${!state.weekly.bonusClaimed ? `<span class="quest-reward-badge quest-reward-badge-soft">3 / 3 再 +${WEEKLY_BONUS_XP} XP</span>` : ""}
             <span class="quest-keyword">${progressState}</span>
           </div>
+        </div>
+        <div class="quest-phase-track" aria-label="行動 2 階段進度">
+          <div class="quest-phase-steps">
+            <div class="quest-phase-step ${runPhase >= 1 ? "is-done" : ""}">
+              <span class="quest-phase-dot"></span>
+              <span class="quest-phase-label">圖文</span>
+            </div>
+            <div class="quest-phase-connector ${runPhase >= 2 ? "is-done" : ""}"></div>
+            <div class="quest-phase-step ${runPhase >= 2 ? "is-done" : ""}">
+              <span class="quest-phase-dot"></span>
+              <span class="quest-phase-label">分發</span>
+            </div>
+            <div class="quest-phase-connector ${runPhase >= 3 ? "is-done" : ""}"></div>
+            <div class="quest-phase-step ${runPhase >= 3 ? "is-done" : ""}">
+              <span class="quest-phase-dot"></span>
+              <span class="quest-phase-label">維護</span>
+            </div>
+          </div>
+          <span class="quest-phase-badge ${runPhase === 0 ? "is-neutral" : runPhase === 1 ? "is-base" : runPhase === 2 ? "is-dist" : "is-full"}">
+            ${runPhase === 0 ? "待開始" : runPhase === 1 ? "基礎完成" : runPhase === 2 ? "分發完成" : "全完成"}
+          </span>
         </div>
         <div class="quest-main-list">
           <section class="quest-main ${actionOneComplete ? "is-complete" : ""}">
@@ -10636,6 +10718,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const run = state.weekly.runs[index];
     if (!run || !key) return;
 
+    // 記錄改動前的 phase，用於判斷是否需要階段 toast
+    const prevPhase = run.phase !== undefined ? Number(run.phase) : computeRunPhase(run);
+
     if (key === "actionOutreach" && target.checked) {
       run.actionOutreachFallback = false;
     }
@@ -10644,12 +10729,36 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
     if (key === "actionThreads" && target.checked) {
       run.actionLocalCommunity = false;
+      run.distributionChannel = "threads";
     }
     if (key === "actionLocalCommunity" && target.checked) {
       run.actionThreads = false;
+      run.distributionChannel = "localCommunity";
+    }
+
+    // 取消 distribution 勾選時清除 channel
+    if ((key === "actionThreads" || key === "actionLocalCommunity") && !target.checked) {
+      run.distributionChannel = null;
     }
 
     run[key] = target.checked;
+
+    // 即時計算 phase
+    const newPhase = computeRunPhase(run);
+    run.phase = newPhase;
+
+    // 階段進度即時 toast
+    if (newPhase > prevPhase) {
+      if (newPhase === 1) {
+        setFeedback("✅ 行動 2 基礎組件完成！接下來請完成分發渠道（Threads 或在地社群）。", "is-success");
+      } else if (newPhase === 2) {
+        const channelLabel = run.distributionChannel === "threads" ? "Threads" : "在地社群";
+        setFeedback(`🎉 行動 2 分發完成！本輪核心任務已滿${run.actionFacadeMaintenance ? "" : "（門面維護為選填，可略過）"}。`, "is-success");
+      } else if (newPhase === 3) {
+        setFeedback(`🌟 行動 2 全完成（含門面維護）！本輪已鎖定，明天可繼續下一輪。`, "is-success");
+      }
+    }
+
     maybeClaimRunReward(run);
     rerender();
   });
