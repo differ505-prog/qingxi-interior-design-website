@@ -5199,6 +5199,64 @@
   color: rgba(196, 168, 122, 0.78);
 }
 
+/* PREP pill — 步驟 0 預備階段，與 ACTION 等寬但視覺層級略低（虛線邊框 + 次要色） */
+.book-workflow-pill-prep {
+  border-style: dashed;
+  border-color: rgba(196, 168, 122, 0.22);
+  background: rgba(36, 36, 36, 0.48);
+}
+
+.book-workflow-pill-prep:hover,
+.book-workflow-pill-prep:focus-visible {
+  border-style: solid;
+  border-color: rgba(196, 168, 122, 0.5);
+  background: linear-gradient(
+    135deg,
+    rgba(196, 168, 122, 0.16) 0%,
+    rgba(196, 168, 122, 0.06) 100%
+  );
+}
+
+.book-workflow-pill-prep.is-loading {
+  border-style: solid;
+  border-color: rgba(196, 168, 122, 0.68);
+  pointer-events: none;
+  opacity: 0.78;
+}
+
+.book-workflow-pill-prep.is-done {
+  border-style: solid;
+  border-color: rgba(120, 184, 140, 0.5);
+  background: rgba(36, 60, 44, 0.42);
+}
+
+.book-workflow-pill-prep .book-workflow-pill-index {
+  color: rgba(196, 168, 122, 0.62);
+}
+
+/* PREP 狀態文字反饋 — 緊湊單行，採 text-wrap pretty，置中靠右側 */
+.book-workflow-prep-feedback {
+  margin: 0.4rem 0.4rem 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  letter-spacing: 0;
+  color: rgba(220, 217, 210, 0.68);
+  text-wrap: pretty;
+  min-height: 1.2em;
+}
+
+.book-workflow-prep-feedback.is-warning {
+  color: rgba(212, 168, 84, 0.92);
+}
+
+.book-workflow-prep-feedback.is-error {
+  color: rgba(212, 96, 96, 0.92);
+}
+
+.book-workflow-prep-feedback.is-success {
+  color: rgba(120, 184, 140, 0.92);
+}
+
 /* 第二層：3 查閱入口（純讀取，扁平 icon link） */
 .book-workflow-readonly {
   display: grid;

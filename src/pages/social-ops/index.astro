@@ -960,7 +960,13 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
             <span class="book-workflow-pill-label">複製覆核包</span>
             <span class="book-workflow-pill-hint">出版閉環覆核稿，貼去 LLM 校稿</span>
           </button>
+          <button type="button" id="workflow-prepare-article-package" class="book-workflow-pill book-workflow-pill-action book-workflow-pill-prep" data-workflow-action="prepare-package" data-workflow-step="0">
+            <span class="book-workflow-pill-index">PREP</span>
+            <span class="book-workflow-pill-label">備好 Pro 生文包</span>
+            <span class="book-workflow-pill-hint">先把情境摘要、出版落位、候選題整理好，再複製起稿包</span>
+          </button>
         </div>
+        <p id="workflow-prepare-feedback" class="book-workflow-prep-feedback" aria-live="polite"></p>
 
         <!-- 第二層：3 狀態視圖入口（純讀，不做事） -->
         <div class="book-workflow-readonly" role="group" aria-label="出書狀態視圖 3 入口">
@@ -11322,6 +11328,39 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   document.getElementById("run-article-ai-flow-highfreq")?.addEventListener("click", async () => {
     await runArticleAiFlow();
   });
+
+  // 工作流內嵌 PREP pill：直接呼叫 runArticleAiFlow（不走 .click() 觸發舊按鈕，避免 DOM 雙依賴）
+  const workflowPrepareBtn = document.getElementById("workflow-prepare-article-package");
+  const workflowPrepareFeedback = document.getElementById("workflow-prepare-feedback");
+  workflowPrepareBtn?.addEventListener("click", async () => {
+    if (workflowPrepareBtn.classList.contains("is-loading")) return;
+    setWorkflowPrepareState(workflowPrepareBtn, workflowPrepareFeedback, "loading", "正在備好 Pro 生文包...");
+    try {
+      await runArticleAiFlow();
+      setWorkflowPrepareState(workflowPrepareBtn, workflowPrepareFeedback, "done", "✓ 生文包已備好，下方按「複製起稿包」即可送出");
+    } catch (err) {
+      console.error("工作流 PREP 備好失敗：", err);
+      setWorkflowPrepareState(workflowPrepareBtn, workflowPrepareFeedback, "error", "備好失敗，可到「高頻生文起稿台」重試或展開下方進階輸入");
+    }
+  });
+
+  function setWorkflowPrepareState(btn, feedback, state, message) {
+    if (state === "loading") {
+      btn.classList.add("is-loading");
+      btn.classList.remove("is-done");
+      feedback.classList.remove("is-warning", "is-error", "is-success");
+    } else if (state === "done") {
+      btn.classList.remove("is-loading");
+      btn.classList.add("is-done");
+      feedback.classList.remove("is-warning", "is-error");
+      feedback.classList.add("is-success");
+    } else if (state === "error") {
+      btn.classList.remove("is-loading", "is-done");
+      feedback.classList.remove("is-success", "is-warning");
+      feedback.classList.add("is-error");
+    }
+    feedback.textContent = message;
+  }
 
   document.getElementById("copy-article-context-summary")?.addEventListener("click", async () => {
     const result = await copyText(buildArticleContextSummary(), "已複製情境摘要。");
