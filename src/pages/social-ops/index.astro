@@ -1282,6 +1282,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
                 <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製送高階 LLM 覆核包</button>
                 <button type="button" id="copy-publishing-review-outline" class="bookshelf-action">複製出版清單摘要</button>
+                <button type="button" id="clear-publishing-review-snapshot" class="bookshelf-action bookshelp-action-ghost">清除上次覆核快照</button>
               </div>
               <p id="publishing-review-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
               <p id="publishing-review-filter-note" class="bookshelf-confirm-note">目前顯示全部章節與已上線文章。</p>
@@ -2259,6 +2260,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   const PUBLISHING_CHECKLIST_KEY = "qingxi-publishing-checklist-v1";
   const PUBLISHING_REVIEW_FILTER_KEY = "qingxi-publishing-review-filter-v1";
   const PUBLISHING_TITLE_POOL_REVIEW_KEY = "qingxi-publishing-title-pool-review-v1";
+  const PUBLISHING_REVIEW_SNAPSHOT_KEY = "qingxi-publishing-review-snapshot-v1";
   const TOPIC_MODE_KEY = "qingxi-topic-mode-v1";
   const WORKSPACE_PANE_KEY = "qingxi-workspace-pane-v1";
   const GEMINI_RECENT_LIMIT = 10;
@@ -6561,6 +6563,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "若你認為規則層有誤判、過度保守、排序失真或文案誤導，必須直接在給 IDE 的提示詞中寫出規則層該怎麼改。",
       "【跨輪覆核提醒】",
       "本提示詞為同一規則層的連續覆核循環之一。每一輪覆核前，請先假設「上一輪你給的具體建議」可能已影響規則層的下一步走向；若本輪送審素材因此改變，請視為跨輪連鎖反應，而非規則層邏輯錯誤，除非有明確矛盾。",
+      formatPublishingReviewSnapshotForPrompt(),
       "【讀者畫像：請以這群人為唯一服務對象】",
       `- 主要讀者：${bookProposal?.readerProfile?.primaryReader || "（未定義）"}`,
       `- 次要讀者：${bookProposal?.readerProfile?.secondaryReader || "（未定義）"}`,
@@ -6735,6 +6738,114 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       PUBLISHING_REVIEW_FILTER_KEY,
       JSON.stringify({ showUnpublishedOnly: publishingReviewShowUnpublishedOnly }),
     );
+  }
+
+  function capturePublishingReviewSnapshot(mode = currentTopicMode) {
+    const modeState = getCurrentTopicModeState(mode);
+    const focusTrack = modeState?.publishingDashboard?.focusTrack;
+    const recommendation = getPrimaryReviewRecommendation(mode);
+    const topCandidates = getTopPriorityRecommendations(mode, 3);
+    const bookProposal = getBookProposal(mode);
+    if (!focusTrack) return null;
+
+    return {
+      savedAt: new Date().toISOString(),
+      mode,
+      modeLabel: modeState?.label || mode,
+      bookTitle: bookProposal?.bookTitle || focusTrack.title,
+      bookSubtitle: bookProposal?.subtitle || "尚未定義",
+      focusTrackTitle: focusTrack.title,
+      coverageRate: focusTrack.coverageRate,
+      remainingToBaseline: focusTrack.remainingToBaseline,
+      primaryCandidate: recommendation
+        ? {
+            title: getPublishingReviewCandidateDisplayTitle(recommendation),
+            chapter: recommendation.chapter,
+            subchapter: recommendation.subchapter,
+            category: recommendation.category,
+            reason: getPublishingReviewCandidateReason(recommendation),
+            collisionRisk: recommendation.collisionRisk,
+            collisionReason: recommendation.collisionReason,
+            similarArticles: (recommendation.similarArticles || []).map((article) => ({
+              title: article.title,
+              score: article.score,
+            })),
+          }
+        : null,
+      topThreeTitles: topCandidates.map((candidate) => getPublishingReviewCandidateDisplayTitle(candidate)),
+    };
+  }
+
+  function savePublishingReviewSnapshot(mode = currentTopicMode) {
+    try {
+      const snapshot = capturePublishingReviewSnapshot(mode);
+      if (!snapshot) return;
+      localStorage.setItem(PUBLISHING_REVIEW_SNAPSHOT_KEY, JSON.stringify(snapshot));
+    } catch (error) {
+      console.error("儲存出版覆核快照失敗：", error);
+    }
+  }
+
+  function loadPublishingReviewSnapshot() {
+    try {
+      const raw = localStorage.getItem(PUBLISHING_REVIEW_SNAPSHOT_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return null;
+      return parsed;
+    } catch (error) {
+      console.error("讀取出版覆核快照失敗：", error);
+      return null;
+    }
+  }
+
+  function clearPublishingReviewSnapshot() {
+    try {
+      localStorage.removeItem(PUBLISHING_REVIEW_SNAPSHOT_KEY);
+    } catch (error) {
+      console.error("清除出版覆核快照失敗：", error);
+    }
+  }
+
+  function formatPublishingReviewSnapshotForPrompt() {
+    const snapshot = loadPublishingReviewSnapshot();
+    if (!snapshot) return "";
+
+    const lines = [
+      "【上次覆核快照】",
+      `- 快照時間：${snapshot.savedAt || "未記錄"}`,
+      `- 快照模式：${snapshot.modeLabel || snapshot.mode}`,
+      `- 快照書目：${snapshot.bookTitle || "（未定義）"}`,
+      `- 快照時主書完成度：${typeof snapshot.coverageRate === "number" ? `${snapshot.coverageRate}%` : "未記錄"}（還差 ${snapshot.remainingToBaseline ?? "?"} 篇）`,
+    ];
+
+    if (snapshot.primaryCandidate) {
+      const pc = snapshot.primaryCandidate;
+      lines.push(
+        `- 快照時的純新文章候選：${pc.title || "（未記錄）"}`,
+        `  章節定位：${pc.chapter} / ${pc.subchapter} / ${pc.category}`,
+        `  規則層初篩：${pc.collisionRisk}｜${pc.collisionReason || "（無說明）"}`,
+      );
+      if (pc.similarArticles?.length) {
+        lines.push(`  規則初篩相近題：${pc.similarArticles.map((article) => `${article.title}（${article.score}）`).join(" / ")}`);
+      }
+    } else {
+      lines.push("- 快照時無純新文章候選。");
+    }
+
+    if (snapshot.topThreeTitles?.length) {
+      lines.push(`- 快照時的 Top 3：${snapshot.topThreeTitles.join(" / ")}`);
+    } else {
+      lines.push("- 快照時無 Top 3。");
+    }
+
+    lines.push(
+      "",
+      "請把這份快照視為『上一次你自己給 IDE 的建議是否真的被規則層吸收』的對照基準。",
+      "若本輪送審素材因此改變，請視為跨輪連鎖反應而非規則層邏輯錯誤；除非有明確矛盾。",
+    );
+
+    return lines.join("\n");
   }
 
   function loadPublishingReviewFilter() {
@@ -10573,6 +10684,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
   async function copyPublishingReviewPromptWithFallback() {
     const text = buildPublishingReviewPrompt();
+    savePublishingReviewSnapshot();
     const textarea = document.getElementById("publishing-review-prompt-content");
     if (textarea instanceof HTMLTextAreaElement) {
       textarea.value = text;
@@ -11188,6 +11300,11 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     );
     setFeedback(feedback.message, feedback.mode);
     setPublishingReviewFeedback(feedback.message, feedback.mode);
+  });
+
+  document.getElementById("clear-publishing-review-snapshot")?.addEventListener("click", () => {
+    clearPublishingReviewSnapshot();
+    setPublishingReviewFeedback("已清除上次覆核快照；下一輪覆核將不再附帶對照資料。", "is-warning");
   });
 
   document.getElementById("run-article-ai-flow-highfreq")?.addEventListener("click", async () => {
