@@ -983,6 +983,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
             <span class="workflow-gemini-icon" aria-hidden="true">🌐</span>
             <span class="workflow-gemini-text">等待生文完成...</span>
           </button>
+          <button type="button" id="workflow-copy-retry-btn" class="book-workflow-copy-retry-btn" hidden aria-label="重新複製 Pro 生文提示詞">
+            <span class="workflow-copy-retry-icon" aria-hidden="true">📋</span>
+            <span class="workflow-copy-retry-text">重新複製提示詞</span>
+          </button>
         </div>
       </section>
 
@@ -8854,6 +8858,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     });
     // workflow bar 進度行同步鏡像
     const workflowFeedback = document.getElementById("workflow-stage-feedback");
+    const retryBtn = document.getElementById("workflow-copy-retry-btn");
     if (workflowFeedback instanceof HTMLElement) {
       if (message) {
         workflowFeedback.textContent = message;
@@ -8862,6 +8867,13 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       } else {
         workflowFeedback.textContent = "";
         workflowFeedback.hidden = true;
+      }
+    }
+    // 自動偵測「未完成自動複製」的 feedback，顯示/隱藏備援按鈕
+    if (retryBtn instanceof HTMLElement) {
+      const isCopyFailure = /未完成自動複製|自動複製失敗|瀏覽器未完成|複製時發生問題/.test(message);
+      if (isCopyFailure) {
+        retryBtn.hidden = false;
       }
     }
   }
@@ -12338,4 +12350,25 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   document.getElementById("workflow-gemini-btn")?.addEventListener("click", () => {
     window.open("https://gemini.google.com/", "_blank", "noopener,noreferrer");
   });
+
+  /* 「重新複製」按鈕：觸發既有 Pro 生文提示詞複製（失敗時啟用，成功後隱藏） */
+  document.getElementById("workflow-copy-retry-btn")?.addEventListener("click", async () => {
+    const btn = document.getElementById("workflow-copy-retry-btn");
+    const sourceState = getSafeResolvedArticleSourcePackage();
+    const successMessage = "已重新複製 Pro 生文提示詞。";
+    const result = await copyText(sourceState.packageText, successMessage, {
+      fallbackToPrompt: false,
+    });
+    if (result === "clipboard") {
+      if (btn instanceof HTMLElement) btn.hidden = true;
+      setArticleAiFeedback("已重新複製 Pro 生文提示詞。", "is-success");
+    } else {
+      revealArticleProPrompt();
+      document.getElementById("article-pro-prompt-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setArticleAiFeedback("自動複製失敗，請直接展開下方內容手動複製。", "is-warning");
+    }
+  });
+
+  /* runArticleAiFlow 完成後：顯示「重新複製」按鈕（若自動複製失敗）*/
+  /* 掛鉤在 setArticleAiFeedback 內，自動偵測「未完成自動複製」的 feedback */
 </script>

@@ -5531,6 +5531,9 @@
 /* 去 Gemini 按鈕行 */
 .book-workflow-gemini-row {
   margin-top: 0.6rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .book-workflow-gemini-btn {
@@ -5580,6 +5583,34 @@
   border-color: rgba(212, 96, 96, 0.55);
   color: rgba(212, 96, 96, 0.88);
   cursor: pointer;
+}
+
+/* 重新複製備援按鈕 */
+.book-workflow-copy-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(231, 198, 126, 0.3);
+  background: rgba(231, 198, 126, 0.06);
+  color: rgba(231, 198, 126, 0.75);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.14s ease;
+}
+
+.book-workflow-copy-retry-btn:hover,
+.book-workflow-copy-retry-btn:focus-visible {
+  background: rgba(231, 198, 126, 0.12);
+  border-color: rgba(231, 198, 126, 0.55);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.book-workflow-copy-retry-btn:active {
+  transform: translateY(0);
 }
 
 .book-workflow-gemini-icon {
