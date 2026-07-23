@@ -1150,7 +1150,14 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
               <p>主線只留判題、生文與名錄。</p>
             </div>
 
-            <section id="publishing-review-board" class="bookshelf-confirm bookshelf-review-board">
+            <details id="publishing-review-board" class="bookshelf-confirm bookshelf-review-board" data-default-folded="true">
+              <summary class="ops-fold-summary">
+                <div>
+                  <p class="panel-tag">出版覆核</p>
+                  <h2>規則層覆核細節</h2>
+                </div>
+                <small>疑義時再展開</small>
+              </summary>
               <!-- 入口分流 Banner：根據 sessionStorage 判斷使用者從哪裡進入 -->
               <div id="publishing-review-entry-banner" class="bookshelf-review-entry-banner" hidden aria-live="polite">
                 <span class="bookshelf-review-entry-icon" aria-hidden="true">📍</span>
@@ -1391,7 +1398,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                 </div>
               </details>
               <p class="bookshelf-confirm-note">清單中已上線官網文章會自動以橫線與降低透明度標示；未劃線者代表仍屬待補或下一篇候選。</p>
-            </section>
+            </details>
 
             <div id="article-topic-shell" class="bookshelf-confirm" hidden>
                 <div class="bookshelf-preview-head">
@@ -12887,5 +12894,17 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
   }
 
+  /* 預設折疊 data-default-folded="true" 的 <details>：載入時強制關閉 open 屬性。
+     使用者手動展開後，狀態保留到該頁 session；重新整理時回到預設折疊。 */
+  function applyDefaultFoldedState() {
+    document.querySelectorAll("details[data-default-folded='true']").forEach((node) => {
+      if (node instanceof HTMLDetailsElement) {
+        node.removeAttribute("open");
+        node.dataset.defaultFoldedApplied = "1";
+      }
+    });
+  }
+
   initBookshelfEntryBanner();
+  applyDefaultFoldedState();
 </script>
