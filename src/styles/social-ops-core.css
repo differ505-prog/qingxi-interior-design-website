@@ -5342,6 +5342,98 @@
   color: rgba(120, 184, 140, 0.92);
 }
 
+/* 純新文章 Top1 strip — 由 initialTopPriorityRecommendations server-side 驅動，點進跳到採用題 */
+.book-workflow-top1-strip {
+  padding: 0.45rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(220, 217, 210, 0.1);
+  background: rgba(16, 16, 15, 0.55);
+}
+
+.book-workflow-top1-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 10px;
+  padding: 0.35rem 0.45rem;
+  margin: -0.35rem -0.45rem;
+  transition: background 0.18s ease;
+}
+
+.book-workflow-top1-link:hover,
+.book-workflow-top1-link:focus-visible {
+  background: rgba(220, 217, 210, 0.06);
+}
+
+.book-workflow-top1-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.book-workflow-top1-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(196, 168, 122, 0.92);
+  background: rgba(196, 168, 122, 0.1);
+  border: 1px solid rgba(196, 168, 122, 0.28);
+  border-radius: 5px;
+  padding: 0.1rem 0.38rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.book-workflow-top1-chapter {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  letter-spacing: 0;
+  color: rgba(220, 217, 210, 0.62);
+  font-style: normal;
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.book-workflow-top1-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: rgba(244, 242, 237, 0.9);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.book-workflow-top1-more {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(220, 217, 210, 0.6);
+  background: rgba(220, 217, 210, 0.1);
+  border: 1px solid rgba(220, 217, 210, 0.18);
+  border-radius: 6px;
+  padding: 0.1rem 0.4rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.book-workflow-top1-empty {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: rgba(220, 217, 210, 0.44);
+  text-align: center;
+  margin: 0;
+}
+
 /* 第二層：3 查閱入口（純讀取，扁平 icon link） */
 .book-workflow-readonly {
   display: grid;

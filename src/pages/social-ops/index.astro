@@ -983,6 +983,24 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         </div>
         <p id="workflow-prepare-feedback" class="book-workflow-prep-feedback" aria-live="polite"></p>
 
+        <!-- 第三層：純新文章 Top1 入口（由 initialTopPriorityRecommendations server-side computed 驅動） -->
+        <div class="book-workflow-top1-strip" role="region" aria-label="純新文章 Top 1">
+          {initialTopPriorityRecommendations.length > 0 ? (
+            <a class="book-workflow-top1-link" href="#article-topic-shell">
+              <div class="book-workflow-top1-meta">
+                <span class="book-workflow-top1-badge">{`Top 1`}</span>
+                <em class="book-workflow-top1-chapter">{`${getPublicationChapterDisplayTitle(initialTopPriorityRecommendations[0].chapter)} / ${initialTopPriorityRecommendations[0].subchapter}`}</em>
+              </div>
+              <strong class="book-workflow-top1-title">{initialTopPriorityRecommendations[0].primaryTitle || initialTopPriorityRecommendations[0].webTitle || initialTopPriorityRecommendations[0].bookTitle || "尚未命名"}</strong>
+              {initialTopPriorityRecommendations.length > 1 && (
+                <span class="book-workflow-top1-more">+{initialTopPriorityRecommendations.length - 1} 項</span>
+              )}
+            </a>
+          ) : (
+            <p class="book-workflow-top1-empty">目前尚無純新文章 Top 候選</p>
+          )}
+        </div>
+
         <!-- 第二層：3 狀態視圖入口（純讀，不做事） -->
         <div class="book-workflow-readonly" role="group" aria-label="出書狀態視圖 3 入口">
           <a class="book-workflow-readonly-link" href="#publishing-review-board" data-workflow-link="publishing-review-board">
@@ -1204,26 +1222,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                   </div>
                 </details>
               </article>
-              <section class="bookshelf-review-top3">
-                <div class="bookshelf-preview-head">
-                  <p>純新文章軌道 Top 3（已排除整併／資產化）</p>
-                  <span>這裡只列暫時仍留在 New_Publish 池的候選；若高階 LLM 判定應整併或資產化，必須先移出新文章軌道再重排</span>
-                </div>
-                <div id="publishing-review-top3" class="bookshelf-review-top3-list">
-                  {initialTopPriorityRecommendations.length
-                    ? initialTopPriorityRecommendations.map((candidate, index) => (
-                      <article class={`bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}`}>
-                        <div class="bookshelf-review-top3-head">
-                          <span>{`Top ${index + 1}`}</span>
-                          <em>{`${getPublicationChapterDisplayTitle(candidate.chapter)} / ${candidate.subchapter}`}</em>
-                        </div>
-                        <strong>{candidate.primaryTitle || candidate.webTitle || candidate.bookTitle || "尚未命名"}</strong>
-                        <p>{candidate.reason}</p>
-                      </article>
-                    ))
-                    : <p class="bookshelf-confirm-note">目前尚無可用的送審 Top 3 候選。</p>}
-                </div>
-              </section>
+              <div id="publishing-review-top3" class="bookshelf-review-top3-list" aria-hidden="true" hidden></div>
               <SocialOpsPromptLibrary entries={promptLibraryEntries} />
               <section class="bookshelf-review-composer">
                 <div class="bookshelf-preview-head">
