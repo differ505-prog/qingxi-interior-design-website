@@ -983,22 +983,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         </div>
         <p id="workflow-prepare-feedback" class="book-workflow-prep-feedback" aria-live="polite"></p>
 
-        <!-- 第三層：純新文章 Top1 入口（由 initialTopPriorityRecommendations server-side computed 驅動） -->
-        <div class="book-workflow-top1-strip" role="region" aria-label="純新文章 Top 1">
-          {initialTopPriorityRecommendations.length > 0 ? (
-            <a class="book-workflow-top1-link" href="#article-topic-shell">
-              <div class="book-workflow-top1-meta">
-                <span class="book-workflow-top1-badge">{`Top 1`}</span>
-                <em class="book-workflow-top1-chapter">{`${getPublicationChapterDisplayTitle(initialTopPriorityRecommendations[0].chapter)} / ${initialTopPriorityRecommendations[0].subchapter}`}</em>
-              </div>
-              <strong class="book-workflow-top1-title">{initialTopPriorityRecommendations[0].primaryTitle || initialTopPriorityRecommendations[0].webTitle || initialTopPriorityRecommendations[0].bookTitle || "尚未命名"}</strong>
-              {initialTopPriorityRecommendations.length > 1 && (
-                <span class="book-workflow-top1-more">+{initialTopPriorityRecommendations.length - 1} 項</span>
-              )}
-            </a>
-          ) : (
-            <p class="book-workflow-top1-empty">目前尚無純新文章 Top 候選</p>
-          )}
+        <!-- 第三層：純新文章 Top 1~3（MutationObserver 同步啞容器的 client-side 渲染結果） -->
+        <div id="workflow-top1-strip" class="book-workflow-top1-strip" role="region" aria-label="純新文章 Top 1~3" aria-live="polite">
+          <p class="workflow-top1-loading" id="workflow-top1-loading">自動選題中...</p>
         </div>
 
         <!-- 第二層：3 狀態視圖入口（純讀，不做事） -->
@@ -12259,4 +12246,50 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       }, 120);
     });
   });
+
+  /* 純新文章 Top 1~3 — MutationObserver 同步啞容器的 client-side 渲染結果到 workflow bar strip */
+  (function initWorkflowTop1Sync() {
+    const source = document.getElementById("publishing-review-top3");
+    const target = document.getElementById("workflow-top1-strip");
+    if (!(source instanceof HTMLElement) || !(target instanceof HTMLElement)) return;
+
+    function sync() {
+      const firstCard = source.querySelector("article.bookshelf-review-top3-card");
+      if (!firstCard) {
+        const empty = source.querySelector(".bookshelf-review-empty-state");
+        if (empty) {
+          target.innerHTML = '<p class="workflow-top1-empty">尚無純新文章 Top 候選</p>';
+        } else {
+          target.innerHTML = '<p class="workflow-top1-loading" id="workflow-top1-loading">自動選題中...</p>';
+        }
+        return;
+      }
+      const totalCount = source.querySelectorAll("article.bookshelf-review-top3-card").length;
+      const isPrimary = firstCard.classList.contains("is-primary");
+      const badgeEl = firstCard.querySelector(".bookshelf-review-top3-head span");
+      const chapterEl = firstCard.querySelector(".bookshelf-review-top3-head em");
+      const titleEl = firstCard.querySelector("strong");
+      const badgeText = badgeEl?.textContent?.trim() || "Top 1";
+      const chapterText = chapterEl?.textContent?.trim() || "";
+      const titleText = titleEl?.textContent?.trim() || "尚未命名";
+      const moreText = totalCount > 1 ? `+${totalCount - 1} 項` : "";
+      target.innerHTML = `
+        <a class="workflow-top1-link" href="#article-topic-shell">
+          <div class="workflow-top1-meta">
+            <span class="workflow-top1-badge ${isPrimary ? "is-primary" : ""}">${badgeText}</span>
+            <em class="workflow-top1-chapter">${chapterText}</em>
+          </div>
+          <strong class="workflow-top1-title">${titleText}</strong>
+          ${moreText ? `<span class="workflow-top1-more">${moreText}</span>` : ""}
+        </a>
+      `;
+    }
+
+    sync();
+
+    const observer = new MutationObserver(() => {
+      sync();
+    });
+    observer.observe(source, { childList: true, subtree: true, characterData: true });
+  })();
 </script>

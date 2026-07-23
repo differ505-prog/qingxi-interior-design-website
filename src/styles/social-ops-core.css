@@ -5342,12 +5342,32 @@
   color: rgba(120, 184, 140, 0.92);
 }
 
-/* 純新文章 Top1 strip — 由 initialTopPriorityRecommendations server-side 驅動，點進跳到採用題 */
+/* 純新文章 Top1~3 strip — MutationObserver 同步啞容器的 client-side 渲染結果 */
 .book-workflow-top1-strip {
   padding: 0.45rem 0.85rem;
   border-radius: 12px;
   border: 1px solid rgba(220, 217, 210, 0.1);
   background: rgba(16, 16, 15, 0.55);
+  min-height: 3rem;
+}
+
+.book-workflow-top1-strip:empty {
+  min-height: 2.6rem;
+}
+
+.workflow-top1-loading {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: rgba(220, 217, 210, 0.44);
+  text-align: center;
+  margin: 0;
+  animation: workflowTop1Pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes workflowTop1Pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.75; }
 }
 
 .book-workflow-top1-link {
@@ -5425,7 +5445,13 @@
   white-space: nowrap;
 }
 
-.book-workflow-top1-empty {
+.book-workflow-top1-badge.is-primary {
+  color: rgba(231, 198, 126, 0.95);
+  background: rgba(231, 198, 126, 0.12);
+  border-color: rgba(231, 198, 126, 0.35);
+}
+
+.workflow-top1-empty {
   font-size: 0.8rem;
   line-height: 1.5;
   letter-spacing: 0;
