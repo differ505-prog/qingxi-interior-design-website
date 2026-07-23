@@ -228,7 +228,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     chapter: "基礎工程",
     subchapter: "防水地坪",
     tags: ["老屋翻新", "防水工程", "地坪翻新", "隱蔽工程", "泥作打底", "閉水測試"],
-    coverImage: "/images/blog/old-house-waterproofing-and-flooring-standards-cover.png",
+    coverImage: "/images/blog/老屋防水地坪基準-封面主圖.jpeg",
     editorialRefreshStamp: "2026-07-23",
   },
   {
