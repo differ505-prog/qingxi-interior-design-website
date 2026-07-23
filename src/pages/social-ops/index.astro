@@ -975,6 +975,14 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
           </div>
           <!-- 進度行：setArticleAiFeedback 的同步鏡像 -->
           <p id="workflow-stage-feedback" class="workflow-stage-feedback" aria-live="polite" hidden></p>
+          <!-- 覆核提示詞 feedback：setPublishingReviewFeedback 的 workflow bar 著床點 -->
+          <p id="workflow-review-prompt-feedback" class="workflow-stage-feedback" aria-live="polite" hidden></p>
+          <!-- 內嵌 action：直接複製 LLM 覆核提示詞 -->
+          <div class="workflow-top3-actions">
+            <button type="button" id="workflow-copy-review-prompt" class="workflow-inline-action">
+              📋 複製書籍目錄覆核稿
+            </button>
+          </div>
         </div>
 
         <!-- 去 Gemini 按鈕（點卡完成後啟用） -->
@@ -8898,10 +8906,23 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   }
 
   function setPublishingReviewFeedback(message, mode = "") {
+    // 底部 shell（原有用法）
     const shell = document.getElementById("publishing-review-feedback");
-    if (!(shell instanceof HTMLElement)) return;
-    shell.className = `bookshelf-ai-feedback ${mode}`.trim();
-    shell.textContent = message;
+    if (shell instanceof HTMLElement) {
+      shell.className = `bookshelf-ai-feedback ${mode}`.trim();
+      shell.textContent = message;
+    }
+    // workflow bar 同步鏡像（新著床點）
+    const wfFeedback = document.getElementById("workflow-review-prompt-feedback");
+    if (wfFeedback instanceof HTMLElement) {
+      if (message) {
+        wfFeedback.textContent = message;
+        wfFeedback.hidden = false;
+        wfFeedback.className = `workflow-stage-feedback ${mode}`.trim();
+      } else {
+        wfFeedback.hidden = true;
+      }
+    }
   }
 
   function spotlightActionButton(id) {
@@ -11295,6 +11316,19 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       { manualFallbackMessage: "瀏覽器未完成自動複製，已開啟手動複製視窗。" },
     );
     const feedback = getCopyFeedbackState(result, "已複製出版清單摘要。", "已開啟手動複製視窗，可直接複製出版清單摘要。");
+    setFeedback(feedback.message, feedback.mode);
+    setPublishingReviewFeedback(feedback.message, feedback.mode);
+  });
+
+  // workflow bar 內嵌：複製 LLM 覆核提示詞（直接呼叫現有函式）
+  document.getElementById("workflow-copy-review-prompt")?.addEventListener("click", async () => {
+    const result = await copyPublishingReviewPromptWithFallback();
+    const feedback = getCopyFeedbackState(
+      result,
+      "已複製出版閉環覆核稿。",
+      "已展開並選取閉環覆核稿；若瀏覽器未完成自動複製，直接按 Cmd + C 即可。",
+      "複製失敗，已展開閉環覆核稿，請直接手動複製。",
+    );
     setFeedback(feedback.message, feedback.mode);
     setPublishingReviewFeedback(feedback.message, feedback.mode);
   });

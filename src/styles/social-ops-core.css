@@ -5646,6 +5646,40 @@
   color: rgba(212, 96, 96, 0.92);
 }
 
+/* workflow bar 內嵌：複製 LLM 覆核提示詞 action chip */
+.workflow-top3-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.workflow-inline-action {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(196, 168, 122, 0.78);
+  background: transparent;
+  border: 1px solid rgba(196, 168, 122, 0.28);
+  border-radius: 6px;
+  padding: 0.22rem 0.55rem;
+  cursor: pointer;
+  transition: color 0.14s ease, border-color 0.14s ease, background 0.14s ease, transform 0.13s ease;
+  letter-spacing: 0.02em;
+}
+
+.workflow-inline-action:hover,
+.workflow-inline-action:focus-visible {
+  color: rgba(196, 168, 122, 1);
+  border-color: rgba(196, 168, 122, 0.55);
+  background: rgba(196, 168, 122, 0.08);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.workflow-inline-action:active {
+  transform: translateY(0);
+}
+
 /* Top 3 卡片：當 button 時的 pointer + hover */
 .workflow-top3-card {
   cursor: pointer;
