@@ -29,6 +29,11 @@ interface StaticBlogArticlePageOptions {
   modifiedTime?: string;
   includePublisherLogo?: boolean;
   includeEditorialRefreshStamp?: boolean;
+  /**
+   * 外部 LLM 输出一整篇图文 HTML 時，直接傳入含【圖說】標記的 HTML。
+   * 系統會自動呼叫 processBlogContent() 轉換為語意化的 figure 結構。
+   */
+  htmlContent?: string;
 }
 
 interface StaticBlogArticleLayoutProps {
@@ -53,6 +58,12 @@ export interface StaticBlogArticlePageData {
   articleModifiedTime: string;
   articleStructuredData: Record<string, unknown>[];
   articleLayoutProps: StaticBlogArticleLayoutProps;
+  /**
+   * 經 processBlogContent() 處理過的 HTML 內容。
+   * 用於外部 LLM 直接输出一整篇图文文章的场景，
+   * 包含【圖說】标记的 HTML 会被自动转换为 <figure> + <figcaption> 结构。
+   */
+  articleHtmlContent?: string;
 }
 
 export const DEFAULT_BLOG_COVER_IMAGE =
@@ -308,6 +319,49 @@ function toAbsoluteUrl(value: string) {
     : new URL(value, SITE_ORIGIN).toString();
 }
 
+export function processBlogContent(html: string): string {
+  let result = html;
+
+  // 1. 移除 img wrapper 內的浮水印覆蓋元素
+  result = result.replace(
+    /<!--\s*AI-Generated watermark overlay\s*-->\s*<span[^>]*class="watermark-cover[^"]*"[^>]*><\/span>/gi,
+    "",
+  );
+
+  // 2. 移除獨立的浮水印遮罩 span
+  result = result.replace(
+    /<span[^>]*class="[^"]*watermark[^"]*"[^>]*>[\s\S]*?<\/span>/gi,
+    "",
+  );
+
+  // 3. 轉換【圖說】標記為 <figure> 結構
+  result = result.replace(
+    /【圖說】\s*(<img[^>]*>)\s*([^\n<](?:[^\n<]*(?!\n\n|<[a-z]))*)/gi,
+    (_match, imgTag, caption) => {
+      const cleanCaption = caption.trim();
+      const srcMatch = imgTag.match(/src="([^"]*)"/);
+      const altMatch = imgTag.match(/alt="([^"]*)"/);
+      const src = srcMatch ? srcMatch[1] : "";
+      const alt = altMatch ? altMatch[1] : cleanCaption;
+      return `<figure class="article-figure"><img src="${src}" alt="${alt}" loading="lazy" /><figcaption>${cleanCaption}</figcaption></figure>`;
+    },
+  );
+
+  // 4. 對已存在但缺少 class="article-figure" 的 <figure> 補上 class
+  result = result.replace(
+    /<figure(?![^>]*class="article-figure")/gi,
+    '<figure class="article-figure"',
+  );
+
+  // 5. 對缺少 <figcaption> 的 figure 自動從 alt 補上
+  result = result.replace(
+    /(<figure class="article-figure">[\s\S]*?<img[^>]*alt="([^"]*)"[^>]*>)(?![\s\S]*?<figcaption>)/gi,
+    (_match, prefix, alt) => `${prefix}<figcaption>${alt}</figcaption>`,
+  );
+
+  return result;
+}
+
 export function getStaticBlogArticlePage(
   slug: string,
   {
@@ -315,6 +369,7 @@ export function getStaticBlogArticlePage(
     modifiedTime,
     includePublisherLogo = false,
     includeEditorialRefreshStamp = false,
+    htmlContent,
   }: StaticBlogArticlePageOptions = {},
 ): StaticBlogArticlePageData {
   const articleMeta = getStaticBlogPost(slug);
@@ -376,6 +431,8 @@ export function getStaticBlogArticlePage(
     articleLayoutProps.editorialRefreshStamp = articleMeta.editorialRefreshStamp;
   }
 
+  const articleHtmlContent = htmlContent ? processBlogContent(htmlContent) : undefined;
+
   return {
     articleMeta,
     articleTitle,
@@ -385,5 +442,6 @@ export function getStaticBlogArticlePage(
     articleModifiedTime,
     articleStructuredData,
     articleLayoutProps,
+    articleHtmlContent,
   };
 }
