@@ -973,6 +973,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
           <div id="workflow-top3-cards" class="workflow-top3-cards">
             <p class="workflow-top3-loading">自動選題中...</p>
           </div>
+          <!-- 進度行：setArticleAiFeedback 的同步鏡像 -->
+          <p id="workflow-stage-feedback" class="workflow-stage-feedback" aria-live="polite" hidden></p>
         </div>
 
         <!-- 去 Gemini 按鈕（點卡完成後啟用） -->
@@ -8850,6 +8852,18 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       shell.className = `bookshelf-ai-feedback ${mode}`.trim();
       shell.textContent = message;
     });
+    // workflow bar 進度行同步鏡像
+    const workflowFeedback = document.getElementById("workflow-stage-feedback");
+    if (workflowFeedback instanceof HTMLElement) {
+      if (message) {
+        workflowFeedback.textContent = message;
+        workflowFeedback.hidden = false;
+        workflowFeedback.className = `workflow-stage-feedback ${mode}`.trim();
+      } else {
+        workflowFeedback.textContent = "";
+        workflowFeedback.hidden = true;
+      }
+    }
   }
 
   function setPromptLibraryFeedback(message, mode = "") {

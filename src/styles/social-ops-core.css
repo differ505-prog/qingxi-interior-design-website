@@ -5595,6 +5595,26 @@
   50% { opacity: 0.55; }
 }
 
+/* Top 3 面板內的進度文字行 */
+.workflow-stage-feedback {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(220, 217, 210, 0.55);
+}
+
+.workflow-stage-feedback.is-success {
+  color: rgba(120, 184, 140, 0.92);
+}
+
+.workflow-stage-feedback.is-warning {
+  color: rgba(231, 198, 126, 0.88);
+}
+
+.workflow-stage-feedback.is-error {
+  color: rgba(212, 96, 96, 0.92);
+}
+
 /* Top 3 卡片：當 button 時的 pointer + hover */
 .workflow-top3-card {
   cursor: pointer;
