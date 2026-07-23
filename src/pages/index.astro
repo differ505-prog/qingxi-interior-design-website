@@ -80,20 +80,20 @@ const homeStructuredData = [
         </div>
       </div>
       <div class="brand-strip-metrics">
-        <!-- 圖 01：AI 生圖提示詞（複製給 Midjourney / DALL-E）
-             "Taiwan high-end residential living room, soft natural light, minimalist walnut wood floor, beige linen sofa, indoor plant, neutral warm tones, editorial interior photography, ultra-realistic, 8k, shallow depth of field --ar 4:5" -->
-        <article class="brand-metric brand-metric-visual">
-          <figure class="brand-metric-image brand-metric-image-tall">
+        <!-- 圖 01：青曦作品 — 住宅中島客廳實景（橫向 16:10）
+             後續替換更廣景時可改為 hero-2.jpg -->
+        <article class="brand-metric brand-metric-visual brand-metric-visual-lead">
+          <figure class="brand-metric-image brand-metric-image-lead">
             <img
-              src="https://placehold.co/720x900/f5f0e8/332e29?text=IMG-01%0A%E4%BD%8F%E5%AE%85%C2%B7%E5%95%86%E7%A9%BA%C2%B7%E6%99%BA%E8%83%BD%E6%95%B4%E5%90%88"
-              alt="青曦空間設計 — 住宅·商空·智能整合作品主視覺（智慧佔位圖 01）"
-              width="720"
-              height="900"
+              src="/images/brand/island-living-room.jpeg"
+              alt="青曦空間設計作品 — 開放式中島客廳，落地窗引入大台北住宅的自然光"
+              width="1320"
+              height="825"
               loading="lazy"
               decoding="async"
-              onerror="this.style.display='none';this.parentElement.classList.add('img-fallback');this.parentElement.setAttribute('data-fallback-label','住宅 · 商空 · 智能整合');"
+              onerror="this.style.display='none';this.parentElement.classList.add('img-fallback');this.parentElement.setAttribute('data-fallback-label','住宅中島客廳');"
             />
-            <figcaption class="brand-metric-tag">住宅 · 商空 · 智能整合</figcaption>
+            <figcaption class="brand-metric-tag">住宅實景 · 中島客廳</figcaption>
           </figure>
           <div class="brand-metric-text">
             <strong>三種空間，一起規劃</strong>
@@ -917,8 +917,20 @@ const homeStructuredData = [
       position: relative;
     }
 
-    .brand-metric-image-tall {
-      aspect-ratio: 4 / 5;
+    /* IMG-01：橫向主視覺卡（搭配中島客廳等寬景照）
+       - 寬度跟 h2 一樣用 viewport-based clamp，避免縮窄視窗時圖相對字爆衝
+       - 容器寬度 = clamp(280, 38vw, 460)，同節奏同步縮放 */
+    .brand-metric-image-lead {
+      aspect-ratio: 16 / 10;
+      width: clamp(280px, 38vw, 460px);
+      max-width: 100%;
+      margin-left: auto;
+    }
+
+    .brand-metric-visual-lead {
+      /* 主視覺卡放大 padding 強化存在感 */
+      padding: 1.4rem 1.4rem 1.5rem;
+      gap: 1rem;
     }
 
     .brand-metric-image img {
@@ -951,10 +963,10 @@ const homeStructuredData = [
       line-height: 1.6;
     }
 
-    .brand-metric-image-tall.img-fallback::before {
-      writing-mode: vertical-rl;
-      letter-spacing: 0.32em;
-      font-size: 1rem;
+    .brand-metric-image-lead.img-fallback::before {
+      writing-mode: horizontal-tb;
+      letter-spacing: 0.18em;
+      font-size: 0.95rem;
     }
 
     .brand-metric-visual:hover .brand-metric-image img {
@@ -1596,8 +1608,19 @@ const homeStructuredData = [
         gap: 0.85rem;
       }
 
+      .brand-metric-image-lead {
+        /* 窄容器時改為雙欄各半寬，但仍維持 viewport clamp 防暴衝 */
+        width: 100%;
+        max-width: clamp(220px, 46vw, 320px);
+      }
+
       .brand-metric-visual {
         padding: 0.7rem;
+      }
+
+      .brand-metric-visual-lead {
+        padding: 0.8rem;
+        gap: 0.8rem;
       }
 
       .brand-metric strong {
