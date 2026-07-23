@@ -5670,10 +5670,39 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     return [...forced, ...remainder].slice(0, Math.max(1, limit));
   }
 
+  /* Top 3 分類去重：round-robin 各分類取 1 篇，湊滿 limit；不足 limit 才在同一分類內遞補 */
+  function pickDiverseByCategory(candidates, limit) {
+    const safeLimit = Math.max(1, Number(limit) || 1);
+    const pool = Array.isArray(candidates) ? candidates : [];
+    if (pool.length === 0) return [];
+
+    const byCategory = new Map();
+    for (const candidate of pool) {
+      const key = candidate?.category || "未分類";
+      if (!byCategory.has(key)) byCategory.set(key, []);
+      byCategory.get(key).push(candidate);
+    }
+
+    const result = [];
+    const keys = Array.from(byCategory.keys());
+    let cursor = 0;
+    while (result.length < safeLimit) {
+      const bucket = byCategory.get(keys[cursor]);
+      if (bucket && bucket.length > 0) {
+        result.push(bucket.shift());
+      }
+      cursor = (cursor + 1) % keys.length;
+      if (result.length === 0) break;
+      const allEmpty = keys.every((k) => byCategory.get(k).length === 0);
+      if (allEmpty) break;
+    }
+    return result;
+  }
+
   function getDirectTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
     const candidates = getRankedTopicCandidates(mode, 20)
       .filter((candidate) => candidate?.workflowAction === "New_Publish");
-    return sortTopPriorityCandidates(candidates, limit);
+    return pickDiverseByCategory(sortTopPriorityCandidates(candidates, candidates.length), limit);
   }
 
   function getTopPriorityRecommendationResolution(mode = currentTopicMode, limit = 3) {
@@ -5697,7 +5726,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         seen.add(title);
         return true;
       });
-    const mergedCandidates = sortTopPriorityCandidates([...directCandidates, ...fallbackCandidates], safeLimit);
+    const mergedCandidates = pickDiverseByCategory(
+      sortTopPriorityCandidates([...directCandidates, ...fallbackCandidates], directCandidates.length + fallbackCandidates.length),
+      safeLimit
+    );
     return {
       candidates: mergedCandidates,
       directCandidates,
@@ -5911,7 +5943,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       `;
     }
     return candidates.map((candidate, index) => `
-      <article class="bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}">
+      <article class="bookshelf-review-top3-card ${index === 0 ? "is-primary" : ""}" data-top3-category="${escapeHtml(candidate.category || "未分類")}">
         <div class="bookshelf-review-top3-head">
           <span>${resolution.autoReplenished || (resolution.partiallyAutoReplenished && index >= resolution.directCandidates.length) ? `Auto Top ${index + 1}` : `Top ${index + 1}`}</span>
           <em>${escapeHtml(getPublicationChapterLabel(candidate.chapter))} / ${escapeHtml(candidate.subchapter)}</em>
@@ -12647,16 +12679,18 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         const badgeEl = card.querySelector(".bookshelf-review-top3-head span");
         const chapterEl = card.querySelector(".bookshelf-review-top3-head em");
         const titleEl = card.querySelector("strong");
+        const categoryText = card.getAttribute("data-top3-category") || "未分類";
         const badgeText = badgeEl?.textContent?.trim() || "Top";
         const chapterText = chapterEl?.textContent?.trim() || "";
         const titleText = titleEl?.textContent?.trim() || "尚未命名";
         return `
-          <button type="button" class="workflow-top3-card ${isPrimary ? "is-primary" : ""}" data-workflow-top3-action="use" data-top3-title="${titleText.replace(/"/g, "&quot;")}" aria-label="採用「${titleText}」進入生文流程">
+          <button type="button" class="workflow-top3-card ${isPrimary ? "is-primary" : ""}" data-workflow-top3-action="use" data-top3-title="${titleText.replace(/"/g, "&quot;")}" data-top3-category="${categoryText.replace(/"/g, "&quot;")}" aria-label="採用「${titleText}」進入生文流程（分類：${categoryText}）">
             <div class="workflow-top3-card-meta">
               <span class="workflow-top3-badge ${isPrimary ? "is-primary" : ""}">${badgeText}</span>
               <em class="workflow-top3-chapter">${chapterText}</em>
             </div>
             <strong class="workflow-top3-title">${titleText}</strong>
+            <em class="workflow-top3-category">${categoryText}</em>
           </button>
         `;
       }).join("");
@@ -12677,6 +12711,11 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
     const title = card.getAttribute("data-top3-title");
     if (!title) return;
+
+    /* 互斥：移除所有其他卡片的 hint 態，只保留當前卡片為最後選中 */
+    document.getElementById("workflow-top3-cards")
+      ?.querySelectorAll(".workflow-top3-card.is-shift-hint")
+      .forEach((el) => { if (el !== card) el.classList.remove("is-shift-hint"); });
 
     /* 從卡片 DOM 萃取候選章節資訊（用於綁定章節覆寫） */
     const chapterEl = card.querySelector(".workflow-top3-chapter");
