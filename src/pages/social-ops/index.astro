@@ -7378,6 +7378,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     return [
       "你是青曦空間設計的內容總編、出版策劃與第一線接案設計師。",
       "現在只做『本題動態決題』，不是直接寫文章。",
+      articlePresetTitle.trim()
+        ? `【綁定標題】本輪已由使用者指定標題為「${articlePresetTitle.trim()}」，請以此為準，專注於章節落位、工作流判定與整併池整理，不得生成或建議替代標題。`
+        : "",
       "網站端只負責把完整出版上下文、既有文章、規則層提名候選與本輪私訊情境整理給你。",
       "你要親自決定誰正式進入整併池，並在扣掉整併題後，重排剩餘優先文章。",
       "規則層提名不是最終判決；若你認為它漏抓、誤抓、排序失真，都可以直接推翻。",
@@ -8176,10 +8179,20 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       console.error("解析 Pro 提示詞判題摘要失敗，改用預設值：", error);
     }
 
+    const forcedTitle = articlePresetTitle.trim()
+      || confirmData.title
+      || decision.title
+      || "尚未判定";
+    confirmData = { ...confirmData, title: forcedTitle };
+    decision = { ...decision, title: forcedTitle };
+
     const structuredDataContext = buildStructuredBookDataContext(confirmData, questionBlock, aiDraftBlock);
 
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
+      forcedTitle && articlePresetTitle.trim()
+        ? `【綁定標題】本輪已由使用者指定標題為「${forcedTitle}」，請以此為準，不得擅自修改或提出替代標題。`
+        : "",
       "請根據下方本輪生文前置包與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
       "這篇文章不是一次性流量稿，而是未來要整理成書的內容資產；請一開始就用『可發布、可收錄、可長期保存』的標準寫作。",
@@ -8276,9 +8289,17 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       ? `\n（提示詞的正式落地資訊改為採用 presetTitle / articleTopicDecision / 系統推薦，並非沿用 AI 結果，可避免題目改寫後提示詞仍參照舊標題。）`
       : "";
 
+    const forcedTitle = articlePresetTitle.trim()
+      || confirmData.title
+      || articleTopicDecision?.title
+      || "尚未判定";
+
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
       "你現在不是只在寫一篇官網文章，而是在替一套未來可集結成書的內容系統，完成其中一個可長期保存的章節單元。",
+      forcedTitle && articlePresetTitle.trim()
+        ? `【綁定標題】本輪已由使用者指定標題為「${forcedTitle}」，請以此為準，不得擅自修改或提出替代標題。`
+        : "",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場、業配腔或短影音口語稿。",
       "請把『這篇文未來一定會被納入書稿』視為硬性前提，而不是可有可無的附帶備註。",
       "請把整份輸出都寫成可直接放進 Gemini 內建 Canvas 的單一完整 Markdown 文件，方便後續在同一份 Canvas 內繼續編修，而不是零碎片段。",
@@ -8297,7 +8318,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       `網站分類：${confirmData.category}`,
       `主書系：${confirmData.track}`,
       `章節定位：${confirmData.chapter}`,
-      `文章標題：${confirmData.title}`,
+      `文章標題：${forcedTitle}`,
       `判題結論：${decision.title}`,
       `建議動作：${decision.action}`,
       `相似舊文：${decision.similar}`,
@@ -8343,9 +8364,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "- 請優先根據上方既有文章清單，思考如何與同書系其他文章互補，而不是只判斷能不能發布。",
       "",
       "C. 【發布版標題】",
-      "- 給出 1 個最推薦正式發布標題。",
-      "- 再補 2 個備選標題。",
-      "- 標題要兼顧品牌質感與 SEO，不要俗氣聳動，也不要像短促廣告標語。",
+      forcedTitle && articlePresetTitle.trim()
+        ? `- 本輪已由使用者指定標題，請直接採用：${forcedTitle}`
+        : "- 請根據文章內容給出 1 個最推薦正式發布標題，再補 2 個備選標題。",
       "",
       "D. 【正式發布摘要】",
       "- 請輸出 120-160 字摘要，可直接作為知識分享摘要或 meta description 草稿。",
@@ -8858,7 +8879,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
   function getArticleTopicAssetMergeMessage(decision = articleTopicDecision) {
     if (!decision || !isAssetMergeAction(decision.finalAction)) return "";
-    const title = decision.title || decision.topCandidateTitle || "本題";
+    const title = articlePresetTitle.trim() || decision.title || decision.topCandidateTitle || "本題";
     const target = decision.assetMergeTarget ? `建議掛載：${decision.assetMergeTarget}` : "請改回既有文章或資產槽處理，不另開新文。";
     return `Gemini Pro 判定「${title}」應整併為既有文章資產。${target}`;
   }
@@ -10607,10 +10628,12 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       };
     }
 
-    const title = summarizeDecisionTitle(content);
+    const rawTitle = summarizeDecisionTitle(content);
+    const forcedTitle = articlePresetTitle.trim()
+      || rawTitle;
     return {
-      title,
-      action: summarizeDecisionAction(title),
+      title: forcedTitle,
+      action: summarizeDecisionAction(forcedTitle),
       similar: summarizeDecisionSimilar(content),
       angle: summarizeDecisionAngle(content),
     };
@@ -10684,6 +10707,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     if (!parsed) {
       setArticleAiFeedback("本題動態決題格式不完整，先改用固定骨架繼續。", "is-warning");
       return null;
+    }
+
+    if (articlePresetTitle.trim()) {
+      parsed.title = articlePresetTitle.trim();
     }
 
     articleTopicDecision = parsed;
