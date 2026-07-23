@@ -5933,6 +5933,30 @@
   pointer-events: none;
 }
 
+/* Top 3 卡片：Shift+Click hint 提示 */
+.workflow-top3-card.is-shift-hint {
+  border-color: rgba(231, 198, 126, 0.45) !important;
+  background: rgba(231, 198, 126, 0.1) !important;
+  box-shadow: 0 0 0 1px rgba(231, 198, 126, 0.2) inset;
+}
+
+.workflow-top3-card.is-shift-hint::after {
+  content: "⇧ 已預填，按 ↵ Enter 或 ⇧+Click 啟動";
+  display: block;
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+  color: rgba(231, 198, 126, 0.75);
+  margin-top: 0.18rem;
+  animation: shift-hint-fade 4s ease forwards;
+}
+
+@keyframes shift-hint-fade {
+  0%   { opacity: 0; transform: translateY(2px); }
+  10%  { opacity: 1; transform: translateY(0); }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* Toast — 右下浮動複製反饋 */
 .book-workflow-toast {
   position: fixed;
