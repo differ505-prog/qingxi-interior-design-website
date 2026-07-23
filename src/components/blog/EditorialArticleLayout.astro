@@ -17,6 +17,7 @@ interface Props {
   kicker?: string;
   dek?: string;
   coverAlt?: string;
+  coverCaption?: string;
   backHref?: string;
   backLabel?: string;
   htmlContent?: string;
@@ -37,6 +38,7 @@ const {
   kicker = "Qingxi Journal",
   dek = description,
   coverAlt = title,
+  coverCaption,
   backHref = "/blog",
   backLabel = "← 返回知識分享",
   htmlContent,
@@ -238,6 +240,18 @@ const privateQuestionPoolHref = articleSlug
     aspect-ratio: 16 / 10;
     object-fit: cover;
     background-color: var(--art-paper);
+  }
+
+  .article-cover figcaption,
+  .article-cover-caption {
+    max-width: 32rem;
+    margin: 0.85rem auto 0;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    line-height: 1.72;
+    color: #8a837b;
+    text-align: center;
+    letter-spacing: 0.01em;
   }
 
   .article-content {
@@ -1055,6 +1069,7 @@ const privateQuestionPoolHref = articleSlug
         decoding="async"
         fetchpriority="high"
       />
+      {coverCaption && <figcaption class="article-cover-caption">{coverCaption}</figcaption>}
     </figure>
 
     {
