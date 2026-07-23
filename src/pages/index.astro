@@ -89,7 +89,10 @@ const homeStructuredData = [
         </div>
       </div>
       <div class="brand-strip-metrics">
-        <!-- 圖 01：青曦作品 — 住宅中島客廳實景（橫向 16:10）
+        <!-- 圖 01：青曦作品 — 住宅中島客廳實景
+             原始檔：青曦自有作品（業主授權使用）
+             原始尺寸：2752x1536 (16:9)
+             顯示策略：object-fit: cover 配合 object-position: center 略偏下，保留中島與窗景
              後續替換更廣景時可改為 hero-2.jpg -->
         <article class="brand-metric brand-metric-visual brand-metric-visual-lead">
           <figure class="brand-metric-image brand-metric-image-lead">
@@ -100,6 +103,7 @@ const homeStructuredData = [
               height="825"
               loading="lazy"
               decoding="async"
+              style="object-fit: cover; object-position: center 55%;"
               onerror="this.style.display='none';this.parentElement.classList.add('img-fallback');this.parentElement.setAttribute('data-fallback-label','住宅中島客廳');"
             />
             <figcaption class="brand-metric-tag">住宅實景 · 中島客廳</figcaption>
@@ -110,9 +114,10 @@ const homeStructuredData = [
           </div>
         </article>
         <!-- 圖 02：青曦團隊於大台北工地現場即時溝通
-             原始檔：Gemini AI 生成 / 1138x854 (4:3)
+             原始檔：青曦自有作品（Gemini AI 生成補強構圖參考）
+             原始尺寸：1138x854 (4:3)
              顯示策略：object-fit: cover 裁成 16:10 框（保留中央人物）
-             原始圖片路徑（供後續替換參考）：/Users/liangzhiwei/Desktop/Gemini_Generated_Image_vr7h6evr7h6evr7h.jpeg -->
+             檔名由 Gemini 預設改名為 site-visit.jpeg 進入 /images/brand/ -->
         <article class="brand-metric brand-metric-visual">
           <figure class="brand-metric-image">
             <img

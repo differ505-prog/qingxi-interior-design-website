@@ -323,3 +323,33 @@ Pre-flight Checklist（生成新元件前的強制檢查清單）：在生成任
     5. **人工截圖驗收**：交付給使用者，由使用者手動瀏覽器開啟確認
   - 禁止操作：對 src/pages/social-ops/ 或任何後台頁面開瀏覽器驗證；嘗試 snapshot / screenshot / Runtime.evaluate 以「驗證前端行為」為目的。
   - 例外：使用者明確指示「用瀏覽器跑」時才能使用，且必須告知使用者 CDP 不可靠風險。
+
+第十三條 SOP — 實景圖生命週期 (Asset Provenance Lock)：當 `placehold.co` 智慧佔位圖被實景圖取代時，必須同時完成下列 5 項，避免 AI 圖 / 客戶圖 / 自有圖混雜無法追溯：
+ 1. **目錄分流**：實景圖依性質進三類目錄，禁止混放
+    - `/images/brand/` — 品牌素材（logo、團隊照、辦公室）
+    - `/images/portfolio/` — 作品集實景（按專案分類）
+    - `/images/home/` — 首頁內容圖（hero 配圖、metric 卡用圖）
+ 2. **命名語意化**：檔名採 `<subject>-<scene>.{jpeg|jpg|png}`，例如 `site-visit.jpeg`、`island-living-room.jpeg`；禁止保留 AI 平台預設檔名（`Gemini_Generated_Image_xxxxx.jpeg`、`Midjourney_xxx.png`）。
+ 3. **比例裁切策略**：實景原始比例與 CSS 框比例不一致時，**必須**用 `object-fit: cover` 配合明確 `object-position`（百分比或方位關鍵字），禁止用 `contain` 留黑邊。
+ 4. **原始檔追溯註解**：HTML `<img>` 上方註解必須註明（a）原始檔路徑（b）原始尺寸（c）裁切焦點策略，範例：
+    ```html
+    <!-- 圖 02：工地現場實景
+         原始檔：/Users/.../Gemini_xxx.jpeg
+         原始尺寸：1138x854 (4:3)
+         顯示策略：object-fit: cover + object-position: center 38% -->
+    ```
+ 5. **alt 文字清理**：實景圖上線後必須移除「智慧佔位圖」「AI 生圖提示詞」等佔位時代標籤；alt 改寫為實際場景描述。
+
+驗證命令：
+```bash
+# 找出未清理的 AI 平台預設檔名或殘留佔位圖
+grep -rEn "Gemini_Generated|Midjourney_|DALL-E_|placehold\.co" src/pages/ src/components/ src/layouts/
+
+# 找出缺 object-fit 的實景圖（cover / contain / scale-down 任一）
+grep -rEn "<img" src/pages/ src/components/ src/layouts/ | grep -v "object-fit"
+
+# 找出實景圖缺原始檔追溯註解（上游 5 行內無「原始檔」字樣）
+grep -rB 5 "<img" src/pages/ src/components/ src/layouts/ | grep -v "原始檔"
+```
+
+**第 19 輪執行紀錄**：首次落地由 `site-visit.jpeg`（Gemini AI 工地現場）觸發，同輪掃描發現 `island-living-room.jpeg` 缺原始檔追溯註解，已補上。`qingxi-logo*.png` 屬品牌自有原創，符合規範無需追溯。
