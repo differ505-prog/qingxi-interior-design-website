@@ -365,6 +365,7 @@ const privateQuestionPoolHref = articleSlug
   }
 
   .article-content :global(.article-figure) {
+    position: relative;
     margin: 2.45rem 0 2.7rem;
   }
 
@@ -381,6 +382,17 @@ const privateQuestionPoolHref = articleSlug
     color: #8a837b;
     text-align: center;
     letter-spacing: 0.01em;
+  }
+
+  .article-content :global(.article-figure .watermark-cover) {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 5rem;
+    height: 1.6rem;
+    background: white;
+    border-radius: 2px;
+    pointer-events: none;
   }
 
   .article-content :global(.article-gallery) {

@@ -1,0 +1,143 @@
+---
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
+
+const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "old-house-waterproofing-and-flooring-standards",
+  {
+    publishedTime: "2026-07-23T00:00:00.000Z",
+    modifiedTime: "2026-07-23T00:00:00.000Z",
+    includePublisherLogo: true,
+    includeEditorialRefreshStamp: true,
+  },
+);
+
+const articleDetailImage = "/images/blog/old-house-waterproofing-and-flooring-standards-detail.png";
+const articleSceneImage = "/images/blog/old-house-waterproofing-and-flooring-standards-scene.png";
+---
+
+<EditorialArticleLayout
+  {...articleLayoutProps}
+  structuredData={articleStructuredData}
+>
+  <p class="article-lead">
+    在老屋翻新的討論中，我們常聽見對於木地板紋理、磁磚拼花的熱烈探討；然而，真正決定一片地坪能安穩踩踏多少年的關鍵，往往是那些在完工後完全看不見的隱蔽工程。
+  </p>
+
+  <p>
+    當住宅屋齡超過 15 至 20 年時，通常就應把水電管線、配電箱與全室防水條件列入優先盤點清單，而不是只看表面材質是否仍能使用。老屋的地坪翻新，從來不是單純的「覆蓋」或「替換」，它是一次重新檢視建築體質、修復結構滲漏，並為未來的居住安全打下基準的過程。
+  </p>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">數字觀念</p>
+    <h3 class="article-insight-title">老屋隱蔽工程的代價，往往吃掉整體預算的 30% 至 45%。</h3>
+    <p>
+      若進一步抓取絕對金額，以一間 1.5 坪的老屋衛浴為例，從剔除見底、重拉管線到防水層重作，單間隱蔽工程的基礎起步價通常落在 8 萬至 12 萬元區間。這份代價之所以必要，是因為老屋的地坪下方往往埋藏著錯綜複雜的變數——無論是早期工法留下的洩水坡度不足、防水層因地震與老化產生的龜裂，或是為高功率設備（如廚房加熱設備、暖風乾燥機）必須沿地坪或牆角重拉的分路管線，都需要在泥作進場前徹底解決。若為了節省隱蔽工程的費用而妥協，未來任何微小的滲漏或地面彭拱，都將帶來十倍以上的修復成本。
+    </p>
+  </div>
+
+  <h2>開工前的底線：老屋地坪的 4 大盤點面向</h2>
+  <p>
+    在決定地坪材質與動工之前，基礎工程必須有一套嚴謹的檢視順序。老屋水電與基礎工程開工前，至少要先盤點以下 4 個面向，以界定真實的工程範圍：
+  </p>
+
+  <h3>1. 屋齡與前次翻修紀錄</h3>
+  <p>
+    確認建築原始屋齡，以及過去是否曾有過局部修繕。若前次翻修未曾重整衛浴與陽台防水，則本次翻新必須將該區域的剔除與重作列為必要項目。
+  </p>
+
+  <h3>2. 配電與管線路徑現況</h3>
+  <p>
+    確認既有冷熱水管、糞管與排水管的走向。若需位移，地坪必須具備足夠的厚度與洩水坡度空間；同時，重拉的電氣管線若走地坪，也需確認管線槽的保護措施。
+  </p>
+
+  <h3>3. 漏水與壁癌風險</h3>
+  <p>
+    檢查與地坪相接的牆角（特別是迎風面、窗框下、衛浴共用牆）是否有水漬或白華現象。地坪防水必須與牆面防水形成連續的防護盆（俗稱防水墩），不可斷點。
+  </p>
+
+  <h3>4. 結構平整度與高低差</h3>
+  <p>
+    盤點各空間的原始地坪高低差。老屋常見客廳與餐廳存在幾公分的落差，或是衛浴門檻過高；這些都需要在泥作打底階段重新抓水平，為後續的無障礙設計或木地板鋪設做準備。
+  </p>
+
+  <div class="article-gallery">
+    <figure class="article-figure">
+      <img src={articleSceneImage} alt="老屋地坪翻新前的結構現況評估" loading="lazy" />
+      <!-- AI-Generated watermark overlay -->
+      <span class="watermark-cover" aria-hidden="true"></span>
+      <figcaption>老屋地坪翻新前的結構現況評估</figcaption>
+    </figure>
+  </div>
+
+  <h2>防水與地坪施作基準：工程檢核模組</h2>
+  <p>
+    為了確保隱蔽工程的施作品質，以下整理老屋防水修復與地坪打底的施作基準。這份對照表可作為施工前與工班對齊標準、施工中進行節點驗收的實務工具。
+  </p>
+
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <caption>老屋防水與地坪施作檢核基準表</caption>
+        <thead>
+          <tr>
+            <th>施作階段</th>
+            <th>核心檢核基準</th>
+            <th>潛在風險與防範說明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>拆除與見底</strong></td>
+            <td>濕區（衛浴、陽台、廚房）必須剔除至結構層（RC 層）；乾區需評估是否全拆或保留見底。</td>
+            <td>若未見底即施作防水，舊有含水層會導致新防水層失效。拆除時需注意不可傷及樓板結構與既有主管線。</td>
+          </tr>
+          <tr>
+            <td><strong>素地整理與角隅</strong></td>
+            <td>結構面需徹底清掃、吸塵，不可有粉塵與鬆動物；牆地交接處（角隅）需施作導角或不織布抗裂補強。</td>
+            <td>灰塵會導致防水材附著力大幅下降；角隅是地震應力集中處，最易龜裂漏水，必須強化抗拉扯能力。</td>
+          </tr>
+          <tr>
+            <td><strong>防水層塗佈</strong></td>
+            <td>至少塗佈 2 至 3 道防水材（如彈性水泥），每道需等待完全乾燥才能塗下一道；塗刷方向需互相垂直。</td>
+            <td>嚴禁為趕工而在未乾透時連續塗佈。牆面防水高度建議衛浴達 180cm 以上或至頂，廚房與陽台至少 120cm。</td>
+          </tr>
+          <tr>
+            <td><strong>積水測試（閉水）</strong></td>
+            <td>防水層乾燥後，需將排水孔封堵，放水深約 2-3 公分，進行至少 48 至 72 小時的積水測試。</td>
+            <td>這是泥作覆蓋前最後的檢驗關卡。需同步觀察水位是否下降，並請樓下鄰居協助確認天花板無滲漏。</td>
+          </tr>
+          <tr>
+            <td><strong>泥作打底與整平</strong></td>
+            <td>濕區需精準抓出洩水坡度（通常為 1/50 至 1/100）；乾區需使用雷射水平儀確認全室平整度（落差小於 3mm）。</td>
+            <td>洩水坡度不足將導致長期積水生黴；乾區平整度若超標，未來鋪設木地板將產生異音或接縫翹起。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">材料選用提醒</p>
+    <h3 class="article-insight-title">防水材料必須依情境對症下藥。</h3>
+    <p>
+      迎水面（如衛浴牆地、陽台）應優先選用具微抗拉伸能力的彈性水泥或 PU 塗膜；背水面（如地下室、壁癌牆）則適用能深入毛細孔結晶的矽酸質。無論選用何者，檢驗重點皆在於「膜厚」是否足夠，以及每一道塗刷的「乾燥等待期」是否被確實執行。
+    </p>
+  </div>
+
+  <div class="article-gallery">
+    <figure class="article-figure">
+      <img src={articleDetailImage} alt="老屋防水與地坪施作檢核流程圖" loading="lazy" />
+      <!-- AI-Generated watermark overlay -->
+      <span class="watermark-cover" aria-hidden="true"></span>
+      <figcaption>老屋防水修復與地坪打底施作流程圖</figcaption>
+    </figure>
+  </div>
+
+  <h2>結語：看不見的安定，才禁得起時間考驗</h2>
+  <blockquote>
+    <p>
+      高級的居住體驗，從來不只是視覺上的極簡與優雅，更在於腳踏實地時那份不被干擾的安定感。當我們理解老屋翻新中，將近一半的預算與心力都必須投注在這些日後看不見的基礎工程時，我們便能更從容地面對裝修的取捨。把防水做足、把地坪整平，為空間打下一個健康、穩固的基底，這才是老屋得以再陪伴我們下一個二十年的真正關鍵。
+    </p>
+  </blockquote>
+</EditorialArticleLayout>

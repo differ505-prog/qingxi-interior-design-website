@@ -206,6 +206,21 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     coverImage: "/images/blog/living-room-budget-cover.png",
   },
   {
+    title: "防水地坪：老屋防水修復與地坪施作基準",
+    slug: "old-house-waterproofing-and-flooring-standards",
+    date: "2026-07-23",
+    summary:
+      "老屋翻新中，地坪的價值在於底下看不見的防水與平整度。當屋齡超過 15 至 20 年，地坪翻新往往伴隨管線與防水挑戰。本文拆解防水修復與地坪施作核心基準，幫助在隱蔽工程中，將預算花在建築的安定底氣上。",
+    siteCategory: "老屋翻新",
+    category: "老屋翻新",
+    track: "老屋翻新系",
+    chapter: "基礎工程",
+    subchapter: "防水地坪",
+    tags: ["老屋翻新", "防水工程", "地坪翻新", "隱蔽工程", "泥作打底", "閉水測試"],
+    coverImage: "/images/blog/old-house-waterproofing-and-flooring-standards-cover.png",
+    editorialRefreshStamp: "2026-07-23",
+  },
+  {
     title: "畫出家的神經系統——全屋開關與插座的最適定位",
     slug: "whole-house-switch-socket-positioning",
     date: "2025-11-12",
