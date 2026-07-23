@@ -964,6 +964,67 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
           <p class="book-workflow-input-hint" id="workflow-article-preset-title-state">自動同步到高頻起稿台；直接點 Top 3 卡片可跳過此步</p>
         </div>
 
+        <!-- 5 階段狀態燈 + 動態狀態面板（初始顯示 idle，流程中與完成後保持可見） -->
+        <div id="workflow-state-machine" class="workflow-state-machine" aria-label="工作流狀態指示">
+          <div class="workflow-state-track" role="list" aria-label="流程階段指示">
+            <span class="workflow-state-step" data-step="topic-decision" role="listitem">
+              <span class="workflow-state-dot" aria-hidden="true"></span>
+              <span class="workflow-state-label">決題</span>
+            </span>
+            <span class="workflow-state-sep" aria-hidden="true">›</span>
+            <span class="workflow-state-step" data-step="ai-analysis" role="listitem">
+              <span class="workflow-state-dot" aria-hidden="true"></span>
+              <span class="workflow-state-label">AI分析</span>
+            </span>
+            <span class="workflow-state-sep" aria-hidden="true">›</span>
+            <span class="workflow-state-step" data-step="copied" role="listitem">
+              <span class="workflow-state-dot" aria-hidden="true"></span>
+              <span class="workflow-state-label">複製完成</span>
+            </span>
+            <span class="workflow-state-sep" aria-hidden="true">›</span>
+            <span class="workflow-state-step" data-step="gemini" role="listitem">
+              <span class="workflow-state-dot" aria-hidden="true"></span>
+              <span class="workflow-state-label">Gemini</span>
+            </span>
+            <span class="workflow-state-sep" aria-hidden="true">›</span>
+            <span class="workflow-state-step" data-step="complete" role="listitem">
+              <span class="workflow-state-dot" aria-hidden="true"></span>
+              <span class="workflow-state-label">完成</span>
+            </span>
+          </div>
+          <!-- 動態狀態面板：根據 flowStage 動態切換 -->
+          <div id="workflow-state-panel" class="workflow-state-panel" aria-live="polite" aria-label="當前狀態詳情">
+            <!-- idle 閒置面板（初始或完成後） -->
+            <div id="wsp-idle" class="workflow-state-content is-idle">
+              <p class="workflow-state-hint">點上方 Top 3 卡片，或輸入題目後按 Enter 開始</p>
+            </div>
+            <!-- running 運行面板 -->
+            <div id="wsp-running" class="workflow-state-content is-running" hidden>
+              <p id="wsp-running-message" class="workflow-state-running-msg"></p>
+            </div>
+            <!-- success 成功面板 -->
+            <div id="wsp-success" class="workflow-state-content is-success" hidden>
+              <p id="wsp-success-message" class="workflow-state-success-msg"></p>
+            </div>
+            <!-- error 失敗面板 -->
+            <div id="wsp-error" class="workflow-state-content is-error" hidden>
+              <p id="wsp-error-reason" class="workflow-state-error-reason"></p>
+              <div class="workflow-state-recovery-row">
+                <span class="workflow-state-recovery-label">嘗試以下步驟：</span>
+                <button type="button" id="workflow-recover-retry-copy" class="workflow-recover-btn">
+                  重新複製提示詞
+                </button>
+                <button type="button" id="workflow-recover-retry-ai" class="workflow-recover-btn">
+                  重跑 AI 判題
+                </button>
+                <button type="button" id="workflow-recover-reset" class="workflow-recover-btn is-ghost">
+                  強制重置本輪
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- 純新文章 Top 1~3（點卡即觸發完整流程） -->
         <div id="workflow-top3-panel" class="workflow-top3-panel" aria-live="polite">
           <div class="workflow-top3-header">
@@ -1090,6 +1151,12 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
             </div>
 
             <section id="publishing-review-board" class="bookshelf-confirm bookshelf-review-board">
+              <!-- 入口分流 Banner：根據 sessionStorage 判斷使用者從哪裡進入 -->
+              <div id="publishing-review-entry-banner" class="bookshelf-review-entry-banner" hidden aria-live="polite">
+                <span class="bookshelf-review-entry-icon" aria-hidden="true">📍</span>
+                <p id="publishing-review-entry-text" class="bookshelf-review-entry-text"></p>
+                <a href="#book-workflow-bar" class="bookshelf-review-entry-link">滾回上方工作流卡片</a>
+              </div>
               <div class="bookshelf-preview-head">
                 <p>出版閉環覆核</p>
                 <span>高頻區：舊文修復軌道與純新文章軌道分流檢查，避免整併任務混入新文順位</span>
@@ -1239,7 +1306,6 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                   </label>
                 </div>
                 <div class="bookshelf-actions bookshelf-confirm-actions">
-                  <button type="button" id="copy-article-context-summary" class="bookshelf-action">複製情境摘要</button>
                   <button type="button" id="run-article-ai-flow-highfreq" class="bookshelf-action bookshelp-action-primary">一鍵備好 Pro 生文包</button>
                 </div>
                 <p id="article-composer-feedback" class="bookshelf-ai-feedback" aria-live="polite"></p>
@@ -1250,6 +1316,12 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     <small>低頻時再展開</small>
                   </summary>
                   <div class="bookshelf-pro-prompt-body">
+                    <div class="bookshelf-actions bookshelf-mini-actions">
+                      <button type="button" id="copy-article-context-summary" class="bookshelf-action">複製情境摘要</button>
+                      <button type="button" id="run-article-ai-quick" class="bookshelf-action">AI 快速判題</button>
+                      <button type="button" id="run-article-ai-draft" class="bookshelf-action">Flash 生成長稿（備援）</button>
+                      <button type="button" id="clear-article-question" class="bookshelf-action">清空真實問題</button>
+                    </div>
                     <label class="gemini-field bookshelf-prompt-field">
                       <span>真實社團問題（選填）</span>
                       <textarea
@@ -1269,9 +1341,6 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     </label>
                     <div class="bookshelf-actions bookshelf-mini-actions">
                       <button type="button" id="copy-article-prep-package" class="bookshelf-action">複製完整前置包</button>
-                      <button type="button" id="run-article-ai-quick" class="bookshelf-action">AI 快速判題</button>
-                      <button type="button" id="run-article-ai-draft" class="bookshelf-action">Flash 生成長稿（備援）</button>
-                      <button type="button" id="clear-article-question" class="bookshelf-action">清空真實問題</button>
                     </div>
                     <p class="bookshelf-prompt-note">高頻主路徑只保留情境摘要與一鍵生文；完整前置包與備援操作在需要時再展開。</p>
                   </div>
@@ -1279,7 +1348,12 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
               </section>
               <div id="publishing-review-prompt-trigger-row" class="bookshelf-actions bookshelf-confirm-actions">
                 <button type="button" id="toggle-publishing-review-unpublished" class="bookshelf-action">只看未發佈</button>
-                <button type="button" id="copy-publishing-review-prompt" class="bookshelf-action bookshelp-action-primary">複製送高階 LLM 覆核包</button>
+                <button
+                  type="button"
+                  id="copy-publishing-review-prompt"
+                  class="bookshelf-action bookshelp-action-primary"
+                  title="與上方工作流卡片的「📋 複製書籍目錄覆核稿」相同；此按鈕用於直接在此頁操作場景"
+                >複製本輪出版覆核包</button>
                 <button type="button" id="copy-publishing-review-outline" class="bookshelf-action">複製出版清單摘要</button>
                 <button type="button" id="clear-publishing-review-snapshot" class="bookshelf-action bookshelp-action-ghost">清除上次覆核快照</button>
               </div>
@@ -8840,6 +8914,166 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     renderArticleAiResult();
   }
 
+  // ── 工作流狀態機 ──────────────────────────────────────────────
+
+  // 5 個視覺階段：idle → topic-decision → ai-analysis → copied → gemini → complete
+  const WORKFLOW_STEPS = [
+    { id: "topic-decision", label: "決題" },
+    { id: "ai-analysis",    label: "AI分析" },
+    { id: "copied",        label: "複製完成" },
+    { id: "gemini",        label: "Gemini" },
+    { id: "complete",      label: "完成" },
+  ];
+
+  // 舊式 feedback 行（仍保留給其他地方用）
+  let _workflowLegacyFeedback = "";
+
+  function showWorkflowStateMachine() {
+    const el = document.getElementById("workflow-state-machine");
+    if (el) el.hidden = false;
+  }
+
+  function hideWorkflowStateMachine() {
+    const el = document.getElementById("workflow-state-machine");
+    if (el) el.hidden = true;
+  }
+
+  function _updateStateDots(currentStepId) {
+    const container = document.getElementById("workflow-state-machine");
+    if (!container) return;
+    const stepEls = container.querySelectorAll("[data-step]");
+    stepEls.forEach((el) => {
+      const stepId = el.getAttribute("data-step");
+      const idx = WORKFLOW_STEPS.findIndex((s) => s.id === stepId);
+      const curIdx = WORKFLOW_STEPS.findIndex((s) => s.id === currentStepId);
+      el.classList.remove("is-done", "is-current", "is-error");
+      if (idx < curIdx) {
+        el.classList.add("is-done");
+      } else if (idx === curIdx) {
+        el.classList.add("is-current");
+      }
+    });
+  }
+
+  function _showPanel(panelId) {
+    ["idle", "running", "success", "error"].forEach((id) => {
+      const el = document.getElementById(`wsp-${id}`);
+      if (el) el.hidden = id !== panelId;
+    });
+  }
+
+  // 驅動狀態機：每個 runArticleAiFlow 內的 flowStage 變化都 call 這個
+  function updateWorkflowState(stage, opts = {}) {
+    const { errorReason = "", successMessage = "" } = opts;
+    showWorkflowStateMachine();
+
+    const stageToStep = {
+      "idle":               -1,
+      "topic-decision":      0,
+      "flash-quick":        1,
+      "metadata-enrich":    1,
+      "save-ai-result":     1,
+      "render-ai-result":   1,
+      "build-source-package":1,
+      "prepare-pro-prompt":  1,
+      "copy-pro-prompt":    2,
+      "gemini":             3,
+      "complete":           4,
+    };
+
+    const stepIdx = stageToStep[stage] ?? -1;
+    const stepId = stepIdx >= 0 ? WORKFLOW_STEPS[stepIdx].id : "topic-decision";
+
+    _updateStateDots(stepId);
+
+    if (stage === "idle") {
+      _showPanel("idle");
+      const hint = document.getElementById("wsp-idle");
+      if (hint) {
+        const p = hint.querySelector(".workflow-state-hint");
+        if (p) p.textContent = "點上方 Top 3 卡片，或輸入題目後按 Enter 開始";
+      }
+      hideWorkflowStateMachine();
+      return;
+    }
+
+    if (stage === "complete") {
+      _showPanel("success");
+      const msgEl = document.getElementById("wsp-success-message");
+      if (msgEl) msgEl.textContent = successMessage || "本輪完成，Pro 生文提示詞已就緒。";
+      const stepEls = document.querySelectorAll("[data-step]");
+      stepEls.forEach((el) => {
+        el.classList.remove("is-current", "is-error");
+        el.classList.add("is-done");
+      });
+      // 卡片 chip 出現
+      const chip = document.getElementById("workflow-copy-review-prompt");
+      if (chip) chip.parentElement.hidden = false;
+      return;
+    }
+
+    if (stage === "error") {
+      _showPanel("error");
+      const reasonEl = document.getElementById("wsp-error-reason");
+      if (reasonEl) reasonEl.textContent = errorReason || "流程中斷，請根據下方步驟恢復。";
+      // 找出當前亮的燈，設為 error 狀態
+      const container = document.getElementById("workflow-state-machine");
+      if (container) {
+        const cur = container.querySelector(".is-current");
+        if (cur) {
+          cur.classList.remove("is-current");
+          cur.classList.add("is-error");
+        }
+      }
+      return;
+    }
+
+    // running 狀態
+    _showPanel("running");
+    const msgEl = document.getElementById("wsp-running-message");
+    if (msgEl) {
+      const runningMessages = {
+        "topic-decision":     "動態決題中...",
+        "flash-quick":        "AI 快速分析中...",
+        "metadata-enrich":    "補齊章節與標題...",
+        "save-ai-result":     "寫入工作台...",
+        "render-ai-result":   "整理判題結果...",
+        "build-source-package":"備好生文前置包...",
+        "prepare-pro-prompt": "備好 Pro 生文提示詞...",
+        "copy-pro-prompt":    "複製提示詞至剪貼簿...",
+      };
+      msgEl.textContent = runningMessages[stage] || "處理中...";
+    }
+  }
+
+  // Recovery 按鈕掛鉤
+  function initWorkflowRecoveryButtons() {
+    document.getElementById("workflow-recover-retry-copy")?.addEventListener("click", async () => {
+      const result = await copyPublishingReviewPromptWithFallback();
+      if (result) {
+        updateWorkflowState("copied", { successMessage: "已重新複製 Pro 生文提示詞。" });
+        document.getElementById("workflow-gemini-btn")?.removeAttribute("disabled");
+      } else {
+        updateWorkflowState("error", { errorReason: "重新複製失敗，請稍後再試。" });
+      }
+    });
+
+    document.getElementById("workflow-recover-retry-ai")?.addEventListener("click", () => {
+      updateWorkflowState("idle");
+      runArticleAiFlow();
+    });
+
+    document.getElementById("workflow-recover-reset")?.addEventListener("click", () => {
+      updateWorkflowState("idle");
+      clearArticleAiResultState();
+      clearArticleProFinalizePrompt();
+      document.getElementById("workflow-article-preset-title")?.setAttribute("value", "");
+      document.getElementById("workflow-gemini-btn")?.setAttribute("disabled", "");
+      const chip = document.getElementById("workflow-copy-review-prompt");
+      if (chip) chip.parentElement.hidden = true;
+    });
+  }
+
   function loadArticleProFinalizePrompt() {
     try {
       articleProFinalizePrompt = localStorage.getItem(ARTICLE_PRO_FINALIZE_PROMPT_KEY) || "";
@@ -10588,31 +10822,46 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
   async function runArticleAiFlow() {
     setArticleAiBusy(true);
+    showWorkflowStateMachine();
     setArticleAiFeedback("一鍵流程啟動中：先做本題動態決題，再判題並備好 Pro 生文提示詞...", "is-success");
     let flowStage = "topic-decision";
+    updateWorkflowState(flowStage);
 
     try {
       flowStage = "topic-decision";
+      updateWorkflowState(flowStage);
       const decision = await ensureArticleTopicDecision(currentTopicMode);
-      if (handleArticleTopicAssetMergeStop(decision)) return;
+      if (handleArticleTopicAssetMergeStop(decision)) {
+        updateWorkflowState("idle");
+        return;
+      }
       flowStage = "flash-quick";
+      updateWorkflowState(flowStage);
       const quickContent = await requestArticleAi("quick");
-      if (!quickContent) return;
+      if (!quickContent) {
+        updateWorkflowState("error", { errorReason: "AI 分析失敗或未取得內容。" });
+        return;
+      }
 
       flowStage = "metadata-enrich";
+      updateWorkflowState(flowStage);
       articleAiResult = await enrichArticleMetadataIfNeeded(quickContent, "quick");
       articleAiMode = "quick";
       clearArticleProFinalizePrompt();
       setArticleAiFeedback("結果整理完成，正在寫入工作台...", "is-success");
       flowStage = "save-ai-result";
+      updateWorkflowState(flowStage);
       const saved = saveArticleAiResult();
       flowStage = "render-ai-result";
+      updateWorkflowState(flowStage);
       renderArticleAiResult();
 
       flowStage = "build-source-package";
+      updateWorkflowState(flowStage);
       const sourceState = getSafeResolvedArticleSourcePackage();
       setArticleAiFeedback("結果已整理，正在備好 Pro 生文提示詞...", "is-success");
       flowStage = "prepare-pro-prompt";
+      updateWorkflowState(flowStage);
       const promptState = prepareProFinalizePrompt(sourceState.packageText);
       const storageOk = saved && promptState.saved;
       setArticleAiFeedback(
@@ -10620,9 +10869,17 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         storageOk ? "is-success" : "is-warning",
       );
       flowStage = "copy-pro-prompt";
+      updateWorkflowState(flowStage);
       const copyState = await copyText(promptState.prompt, "已完成判題並複製 Pro 生文提示詞。", {
         fallbackToPrompt: false,
       });
+
+      // 啟用 Gemini 按鈕
+      const geminiBtn = document.getElementById("workflow-gemini-btn");
+      if (geminiBtn) geminiBtn.removeAttribute("disabled");
+      const geminiText = geminiBtn?.querySelector(".workflow-gemini-text");
+      if (geminiText) geminiText.textContent = "複製完成，前往 Gemini";
+
       if (copyState === "clipboard") {
         const finalMessage = promptState.usedFallback
           ? (storageOk ? "已完成判題並複製 Pro 生文提示詞（穩定版）。" : "已完成判題並複製 Pro 生文提示詞（穩定版），但本機暫存寫入失敗。")
@@ -10631,6 +10888,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
             : "已完成判題並複製 Pro 生文提示詞，但本機暫存寫入失敗。";
         setFeedback(finalMessage, storageOk ? "is-success" : "is-warning");
         setArticleAiFeedback(finalMessage, storageOk ? "is-success" : "is-warning");
+        updateWorkflowState("complete", { successMessage: finalMessage });
       } else {
         revealArticleProPrompt();
         document.getElementById("article-pro-prompt-shell")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -10644,6 +10902,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
             : "已完成判題，Pro 生文提示詞也已備好，但本機暫存或自動複製未完成；目前頁面仍可直接展開下方內容手動複製。";
         setFeedback(fallbackMessage, "is-warning");
         setArticleAiFeedback(fallbackMessage, "is-warning");
+        // 仍算完成，差別只是需手動複製
+        updateWorkflowState("complete", { successMessage: "已完成判題（需手動複製 Pro 生文提示詞）。" });
       }
     } catch (error) {
       console.error(`一鍵流程整理失敗（stage: ${flowStage}）：`, error);
@@ -10654,6 +10914,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         spotlightActionButton("copy-pro-finalize-prompt-inline");
         setFeedback("判題已完成，Pro 生文提示詞也已備好，但後續流程中斷；可直接展開下方內容手動複製。", "is-warning");
         setArticleAiFeedback("判題已完成，Pro 生文提示詞也已備好，但後續流程中斷；可直接展開下方內容手動複製。", "is-warning");
+        updateWorkflowState("error", { errorReason: "流程中斷，但 Pro 生文提示詞已備好，可直接手動複製。" });
         return;
       }
       const stageMessageMap = {
@@ -10665,6 +10926,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       const fallbackMessage = stageMessageMap[flowStage] || "判題已完成，但備好 Pro 生文提示詞時發生問題，請重試一次。";
       setFeedback(fallbackMessage, "is-warning");
       setArticleAiFeedback(fallbackMessage, "is-warning");
+      updateWorkflowState("error", { errorReason: fallbackMessage });
     } finally {
       setArticleAiBusy(false);
     }
@@ -12415,6 +12677,34 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
   });
 
-  /* runArticleAiFlow 完成後：顯示「重新複製」按鈕（若自動複製失敗）*/
-  /* 掛鉤在 setArticleAiFeedback 內，自動偵測「未完成自動複製」的 feedback */
+  /* 啟動工作流狀態機 Recovery 按鈕 */
+  initWorkflowRecoveryButtons();
+
+  /* ── 功能池入口分流 ─────────────────────────────────────── */
+  function initBookshelfEntryBanner() {
+    const banner = document.getElementById("publishing-review-entry-banner");
+    const entryText = document.getElementById("publishing-review-entry-text");
+    const fromWorkflow = sessionStorage.getItem("from-workflow-card");
+    const isDirectEntry = window.location.hash === "#bookshelf-board" && !fromWorkflow;
+
+    if (isDirectEntry || fromWorkflow) {
+      if (banner && entryText) {
+        banner.hidden = false;
+        if (fromWorkflow) {
+          entryText.textContent = "你正從工作流卡片返回，此頁顯示出版覆核詳細結果。";
+        } else {
+          entryText.textContent = "你是直接從內容書架進入的，完整自動流程在上方工作流卡片。";
+        }
+      }
+    }
+    // 卡片 chip 點了後標記
+    const cardChip = document.getElementById("workflow-copy-review-prompt");
+    if (cardChip) {
+      cardChip.addEventListener("click", () => {
+        sessionStorage.setItem("from-workflow-card", "1");
+      });
+    }
+  }
+
+  initBookshelfEntryBanner();
 </script>
