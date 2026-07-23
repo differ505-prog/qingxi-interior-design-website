@@ -2436,6 +2436,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   ];
   let articleSourceQuestion = "";
   let articlePresetTitle = "";
+  let articlePresetChapter = "";
+  let articlePresetSubchapter = "";
   let articleTopicDecision = null;
   let articleAiResult = "";
   let articleAiMode = "";
@@ -7381,6 +7383,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       articlePresetTitle.trim()
         ? `【綁定標題】本輪已由使用者指定標題為「${articlePresetTitle.trim()}」，請以此為準，專注於章節落位、工作流判定與整併池整理，不得生成或建議替代標題。`
         : "",
+      articlePresetChapter.trim()
+        ? `【綁定章節】本輪已由系統指定章節定位為「${articlePresetChapter.trim()}${articlePresetSubchapter.trim() ? " / " + articlePresetSubchapter.trim() : ""}」，請以此為準，不得擅自改動主書系、章節或子章節。若有候選標題與本輪指定標題相同，請直接採用該候選的落位。`
+        : "",
       "網站端只負責把完整出版上下文、既有文章、規則層提名候選與本輪私訊情境整理給你。",
       "你要親自決定誰正式進入整併池，並在扣掉整併題後，重排剩餘優先文章。",
       "規則層提名不是最終判決；若你認為它漏抓、誤抓、排序失真，都可以直接推翻。",
@@ -7638,7 +7643,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         || aiConfirmData.chapter
         || "現況判讀",
       subchapter: articleTopicDecision?.subchapter
-        || recommendation?.subchapter
+        || (articlePresetChapter.trim() ? "" : recommendation?.subchapter)
         || "",
       title: articleTopicDecision?.title
         || recommendation?.primaryTitle
@@ -7647,14 +7652,21 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         || "尚未判定",
     };
     const presetTitle = articlePresetTitle.trim();
+    const presetChapter = articlePresetChapter.trim();
+    const presetSubchapter = articlePresetSubchapter.trim();
     const resolvedTitle = presetTitle && presetTitle !== fallbackFromDecision.title
       ? presetTitle
       : (aiEmpty(aiConfirmData.title) ? fallbackFromDecision.title : aiConfirmData.title);
     const resolvedCategory = aiEmpty(aiConfirmData.category) ? fallbackFromDecision.category : aiConfirmData.category;
     const resolvedTrack = aiEmpty(aiConfirmData.track) ? fallbackFromDecision.track : aiConfirmData.track;
-    const resolvedChapter = aiEmpty(aiConfirmData.chapter) ? fallbackFromDecision.chapter : aiConfirmData.chapter;
+    const resolvedChapter = presetChapter
+      || (aiEmpty(aiConfirmData.chapter) ? fallbackFromDecision.chapter : aiConfirmData.chapter);
+    const resolvedSubchapter = presetSubchapter
+      || (presetChapter ? "" : (aiEmpty(aiConfirmData.subchapter) ? fallbackFromDecision.subchapter : aiConfirmData.subchapter));
     const usedFallback =
       presetTitle === resolvedTitle && presetTitle
+      || (presetChapter && !aiEmpty(presetChapter) && articleTopicDecision?.chapter !== presetChapter)
+      || (presetSubchapter && !aiEmpty(presetSubchapter) && articleTopicDecision?.subchapter !== presetSubchapter)
       || (aiEmpty(aiConfirmData.title) && fallbackFromDecision.title !== "尚未判定")
       || (aiEmpty(aiConfirmData.track) && Boolean(fallbackFromDecision.track))
       || (aiEmpty(aiConfirmData.chapter) && Boolean(fallbackFromDecision.chapter))
@@ -7664,6 +7676,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         category: resolvedCategory,
         track: resolvedTrack,
         chapter: resolvedChapter,
+        subchapter: resolvedSubchapter,
         title: resolvedTitle,
         invalid: aiConfirmData.invalid,
         conflictKeyword: aiConfirmData.conflictKeyword,
@@ -8186,13 +8199,29 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     confirmData = { ...confirmData, title: forcedTitle };
     decision = { ...decision, title: forcedTitle };
 
+    const forcedChapter = articlePresetChapter.trim();
+    const forcedSubchapter = articlePresetSubchapter.trim();
+    if (forcedChapter) {
+      confirmData = { ...confirmData, chapter: forcedChapter, subchapter: forcedSubchapter };
+      decision = { ...decision, chapter: forcedChapter, subchapter: forcedSubchapter };
+    }
+
     const structuredDataContext = buildStructuredBookDataContext(confirmData, questionBlock, aiDraftBlock);
+
+    const bindingNote = (forcedTitle || forcedChapter)
+      ? [
+          forcedTitle && articlePresetTitle.trim()
+            ? `【綁定標題】本輪已由使用者指定標題為「${forcedTitle}」，請以此為準，不得擅自修改或提出替代標題。`
+            : "",
+          forcedChapter
+            ? `【綁定章節】本輪已由系統指定章節定位為「${forcedChapter}${forcedSubchapter ? " / " + forcedSubchapter : ""}」，請以此為準，不得擅自改動主書系、章節或子章節。`
+            : "",
+        ].filter(Boolean).join("\n")
+      : "";
 
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
-      forcedTitle && articlePresetTitle.trim()
-        ? `【綁定標題】本輪已由使用者指定標題為「${forcedTitle}」，請以此為準，不得擅自修改或提出替代標題。`
-        : "",
+      bindingNote,
       "請根據下方本輪生文前置包與 Gemini Flash 判題結果，直接產出一篇可正式發布在官網、且未來能自然收進書稿章節的高品質文章。",
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場或業配腔。",
       "這篇文章不是一次性流量稿，而是未來要整理成書的內容資產；請一開始就用『可發布、可收錄、可長期保存』的標準寫作。",
@@ -8207,7 +8236,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "【目前工作台解析出的正式落地資訊】",
       `網站分類：${confirmData.category}`,
       `主書系：${confirmData.track}`,
-      `章節定位：${confirmData.chapter}`,
+      `章節定位：${confirmData.chapter}${confirmData.subchapter ? " / " + confirmData.subchapter : ""}`,
       `文章標題：${confirmData.title}`,
       `判題結論：${decision.title}`,
       `建議動作：${decision.action}`,
@@ -8294,12 +8323,23 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       || articleTopicDecision?.title
       || "尚未判定";
 
+    const forcedChapter = articlePresetChapter.trim();
+    const forcedSubchapter = articlePresetSubchapter.trim();
+    const bindingNote = (forcedTitle || forcedChapter)
+      ? [
+          forcedTitle && articlePresetTitle.trim()
+            ? `【綁定標題】本輪已由使用者指定標題為「${forcedTitle}」，請以此為準，不得擅自修改或提出替代標題。`
+            : "",
+          forcedChapter
+            ? `【綁定章節】本輪已由系統指定章節定位為「${forcedChapter}${forcedSubchapter ? " / " + forcedSubchapter : ""}」，請以此為準，不得擅自改動主書系、章節或子章節。`
+            : "",
+        ].filter(Boolean).join("\n")
+      : "";
+
     return [
       "你是青曦空間設計的內容總編、正式撰稿編輯，也是未來出版書稿的統稿者。",
       "你現在不是只在寫一篇官網文章，而是在替一套未來可集結成書的內容系統，完成其中一個可長期保存的章節單元。",
-      forcedTitle && articlePresetTitle.trim()
-        ? `【綁定標題】本輪已由使用者指定標題為「${forcedTitle}」，請以此為準，不得擅自修改或提出替代標題。`
-        : "",
+      bindingNote,
       "品牌調性固定：高級、極簡、安定、耐看、不油、不賣弄，不要寫成內容農場、業配腔或短影音口語稿。",
       "請把『這篇文未來一定會被納入書稿』視為硬性前提，而不是可有可無的附帶備註。",
       "請把整份輸出都寫成可直接放進 Gemini 內建 Canvas 的單一完整 Markdown 文件，方便後續在同一份 Canvas 內繼續編修，而不是零碎片段。",
@@ -8354,8 +8394,12 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       "請你輸出以下內容，並嚴格依照順序：",
       "",
       "A. 【文章策略確認】",
-      "- 請先用 2-4 句確認這篇文章最適合切入的主軸。",
-      "- 要明確說出：這篇文在這套書稿中扮演什麼補位角色，適合放在哪一章脈絡下閱讀。",
+      forcedChapter
+        ? `- 本輪已由系統指定章節定位為「${forcedChapter}${forcedSubchapter ? " / " + forcedSubchapter : ""}」，請以此為準，說明這篇文章在此章節下的切入主軸與補位角色。`
+        : "- 請先用 2-4 句確認這篇文章最適合切入的主軸。",
+      forcedChapter
+        ? ""
+        : "- 要明確說出：這篇文在這套書稿中扮演什麼補位角色，適合放在哪一章脈絡下閱讀。",
       "- 若 Flash 的主書系、章節或標題不夠精準，可以微調，但不要整個偏離原始問題。",
       "",
       "B. 【重複風險覆核】",
@@ -10712,6 +10756,12 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     if (articlePresetTitle.trim()) {
       parsed.title = articlePresetTitle.trim();
     }
+    if (articlePresetChapter.trim()) {
+      parsed.chapter = articlePresetChapter.trim();
+      if (articlePresetSubchapter.trim()) {
+        parsed.subchapter = articlePresetSubchapter.trim();
+      }
+    }
 
     articleTopicDecision = parsed;
     saveArticleTopicDecision();
@@ -12628,6 +12678,13 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const title = card.getAttribute("data-top3-title");
     if (!title) return;
 
+    /* 從卡片 DOM 萃取候選章節資訊（用於綁定章節覆寫） */
+    const chapterEl = card.querySelector(".workflow-top3-chapter");
+    const chapterText = chapterEl?.textContent?.trim() || "";
+    const chapterParts = chapterText.split(" / ").map((s) => s.trim());
+    const chapter = chapterParts[0] || "";
+    const subchapter = chapterParts.slice(1).join(" / ") || "";
+
     /* 填標題到 workflow input（並同步到下方 article-preset-title） */
     const workflowInput = document.getElementById("workflow-article-preset-title");
     const belowInput = document.getElementById("article-preset-title");
@@ -12643,6 +12700,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       belowInput.value = title;
       belowInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
+
+    /* 同步章節綁定資訊 */
+    articlePresetChapter = chapter;
+    articlePresetSubchapter = subchapter;
 
     /* 單擊：僅預填，卡片進 hint 態 */
     if (!e.shiftKey) {
