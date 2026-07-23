@@ -699,6 +699,8 @@ const homeStructuredData = [
       border: 1px solid rgba(255, 255, 255, 0.15);
       box-shadow: 0 28px 72px rgba(var(--brand-dark-rgb), 0.1);
       backdrop-filter: blur(28px) saturate(140%);
+      container-type: inline-size;
+      container-name: brand-strip;
     }
 
     .brand-strip-label {
@@ -1584,11 +1586,32 @@ const homeStructuredData = [
     }
 
     /* Responsive Styles */
-    @media (max-width: 1024px) {
+    @container brand-strip (max-width: 760px) {
       .brand-strip-inner {
         grid-template-columns: 1fr;
       }
 
+      .brand-strip-metrics {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 0.85rem;
+      }
+
+      .brand-metric-visual {
+        padding: 0.7rem;
+      }
+
+      .brand-metric strong {
+        font-size: 0.96rem;
+        letter-spacing: 0.04em;
+      }
+
+      .brand-metric span {
+        font-size: 0.88rem;
+        line-height: 1.6;
+      }
+    }
+
+    @media (max-width: 1024px) {
       .about-container {
         gap: 3rem;
       }
