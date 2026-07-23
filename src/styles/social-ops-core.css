@@ -5320,144 +5320,152 @@
 }
 
 /* PREP 狀態文字反饋 — 緊湊單行，採 text-wrap pretty，置中靠右側 */
-.book-workflow-prep-feedback {
-  margin: 0.4rem 0.4rem 0;
-  font-size: 0.78rem;
-  line-height: 1.45;
-  letter-spacing: 0;
-  color: rgba(220, 217, 210, 0.68);
-  text-wrap: pretty;
-  min-height: 1.2em;
-}
 
-.book-workflow-prep-feedback.is-warning {
-  color: rgba(212, 168, 84, 0.92);
-}
-
-.book-workflow-prep-feedback.is-error {
-  color: rgba(212, 96, 96, 0.92);
-}
-
-.book-workflow-prep-feedback.is-success {
-  color: rgba(120, 184, 140, 0.92);
-}
-
-/* 純新文章 Top1~3 strip — MutationObserver 同步啞容器的 client-side 渲染結果 */
-.book-workflow-top1-strip {
-  padding: 0.45rem 0.85rem;
-  border-radius: 12px;
+/* 純新文章 Top 1~3 + PREP feedback 面板 */
+.workflow-top3-panel {
+  padding: 0.5rem 0.85rem 0.55rem;
+  border-radius: 14px;
   border: 1px solid rgba(220, 217, 210, 0.1);
   background: rgba(16, 16, 15, 0.55);
-  min-height: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
 }
 
-.book-workflow-top1-strip:empty {
-  min-height: 2.6rem;
+.workflow-top3-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
-.workflow-top1-loading {
+.workflow-top3-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(220, 217, 210, 0.65);
+  text-transform: uppercase;
+}
+
+.workflow-top3-hint {
+  font-size: 0.68rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: rgba(220, 217, 210, 0.38);
+}
+
+.workflow-top3-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.workflow-top3-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(220, 217, 210, 0.09);
+  background: rgba(220, 217, 210, 0.025);
+}
+
+.workflow-top3-card.is-primary {
+  border-color: rgba(231, 198, 126, 0.25);
+  background: rgba(231, 198, 126, 0.06);
+}
+
+.workflow-top3-card-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.workflow-top3-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(220, 217, 210, 0.65);
+  background: rgba(220, 217, 210, 0.1);
+  border: 1px solid rgba(220, 217, 210, 0.2);
+  border-radius: 4px;
+  padding: 0.08rem 0.32rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.workflow-top3-badge.is-primary {
+  color: rgba(231, 198, 126, 0.95);
+  background: rgba(231, 198, 126, 0.14);
+  border-color: rgba(231, 198, 126, 0.35);
+}
+
+.workflow-top3-chapter {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: rgba(220, 217, 210, 0.52);
+  font-style: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-top3-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
+  color: rgba(244, 242, 237, 0.88);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.workflow-top3-card.is-primary .workflow-top3-title {
+  color: rgba(244, 242, 237, 0.96);
+}
+
+.workflow-top3-loading,
+.workflow-top3-empty {
   font-size: 0.8rem;
   line-height: 1.5;
   letter-spacing: 0;
-  color: rgba(220, 217, 210, 0.44);
+  color: rgba(220, 217, 210, 0.4);
   text-align: center;
   margin: 0;
-  animation: workflowTop1Pulse 1.6s ease-in-out infinite;
 }
 
-@keyframes workflowTop1Pulse {
+.workflow-top3-loading {
+  animation: workflowTop3Pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes workflowTop3Pulse {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 0.75; }
 }
 
-.book-workflow-top1-link {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  text-decoration: none;
-  color: inherit;
-  border-radius: 10px;
-  padding: 0.35rem 0.45rem;
-  margin: -0.35rem -0.45rem;
-  transition: background 0.18s ease;
-}
-
-.book-workflow-top1-link:hover,
-.book-workflow-top1-link:focus-visible {
-  background: rgba(220, 217, 210, 0.06);
-}
-
-.book-workflow-top1-meta {
-  display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
-  flex-shrink: 0;
-}
-
-.book-workflow-top1-badge {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: rgba(196, 168, 122, 0.92);
-  background: rgba(196, 168, 122, 0.1);
-  border: 1px solid rgba(196, 168, 122, 0.28);
-  border-radius: 5px;
-  padding: 0.1rem 0.38rem;
-  line-height: 1.4;
-  white-space: nowrap;
-}
-
-.book-workflow-top1-chapter {
+/* PREP feedback（已移入 workflow-top3-panel） */
+.workflow-prep-feedback {
   font-size: 0.78rem;
-  line-height: 1.35;
-  letter-spacing: 0;
-  color: rgba(220, 217, 210, 0.62);
-  font-style: normal;
-  max-width: 14ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.book-workflow-top1-title {
-  font-size: 0.92rem;
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: 0;
-  color: rgba(244, 242, 237, 0.9);
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.book-workflow-top1-more {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: rgba(220, 217, 210, 0.6);
-  background: rgba(220, 217, 210, 0.1);
-  border: 1px solid rgba(220, 217, 210, 0.18);
-  border-radius: 6px;
-  padding: 0.1rem 0.4rem;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.book-workflow-top1-badge.is-primary {
-  color: rgba(231, 198, 126, 0.95);
-  background: rgba(231, 198, 126, 0.12);
-  border-color: rgba(231, 198, 126, 0.35);
-}
-
-.workflow-top1-empty {
-  font-size: 0.8rem;
   line-height: 1.5;
   letter-spacing: 0;
-  color: rgba(220, 217, 210, 0.44);
+  color: rgba(220, 217, 210, 0.55);
   text-align: center;
   margin: 0;
+}
+
+.workflow-prep-feedback.is-success {
+  color: rgba(120, 184, 140, 0.92);
+}
+
+.workflow-prep-feedback.is-error {
+  color: rgba(212, 96, 96, 0.92);
+}
+
+.workflow-prep-feedback.is-warning {
+  color: rgba(231, 198, 126, 0.88);
 }
 
 /* 第二層：3 查閱入口（純讀取，扁平 icon link） */
@@ -5676,6 +5684,16 @@
   .book-workflow-pill {
     flex: 0 0 auto;
     min-width: 130px;
+  }
+
+  .workflow-top3-cards {
+    overflow-x: auto;
+    scrollbar-width: none;
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+
+  .workflow-top3-cards::-webkit-scrollbar {
+    display: none;
   }
 
   .book-workflow-tools {

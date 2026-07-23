@@ -981,11 +981,17 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
             <span class="book-workflow-pill-hint">先把情境摘要、出版落位、候選題整理好，再複製起稿包</span>
           </button>
         </div>
-        <p id="workflow-prepare-feedback" class="book-workflow-prep-feedback" aria-live="polite"></p>
 
-        <!-- 第三層：純新文章 Top 1~3（MutationObserver 同步啞容器的 client-side 渲染結果） -->
-        <div id="workflow-top1-strip" class="book-workflow-top1-strip" role="region" aria-label="純新文章 Top 1~3" aria-live="polite">
-          <p class="workflow-top1-loading" id="workflow-top1-loading">自動選題中...</p>
+        <!-- 純新文章 Top 1~3 + PREP feedback（由 client-side MutationObserver 同步渲染） -->
+        <div id="workflow-top3-panel" class="workflow-top3-panel" aria-live="polite">
+          <div class="workflow-top3-header">
+            <span class="workflow-top3-label">純新文章 Top 3</span>
+            <span class="workflow-top3-hint">已排除整併／資產化</span>
+          </div>
+          <div id="workflow-top3-cards" class="workflow-top3-cards">
+            <p class="workflow-top3-loading">自動選題中...</p>
+          </div>
+          <p id="workflow-prepare-feedback" class="workflow-prep-feedback" aria-live="polite"></p>
         </div>
 
         <!-- 第二層：3 狀態視圖入口（純讀，不做事） -->
@@ -12247,42 +12253,39 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     });
   });
 
-  /* 純新文章 Top 1~3 — MutationObserver 同步啞容器的 client-side 渲染結果到 workflow bar strip */
-  (function initWorkflowTop1Sync() {
+  /* 純新文章 Top 1~3 — MutationObserver 同步啞容器的 client-side 渲染結果到 workflow bar */
+  (function initWorkflowTop3Sync() {
     const source = document.getElementById("publishing-review-top3");
-    const target = document.getElementById("workflow-top1-strip");
+    const target = document.getElementById("workflow-top3-cards");
     if (!(source instanceof HTMLElement) || !(target instanceof HTMLElement)) return;
 
     function sync() {
-      const firstCard = source.querySelector("article.bookshelf-review-top3-card");
-      if (!firstCard) {
+      const cards = source.querySelectorAll("article.bookshelf-review-top3-card");
+      if (cards.length === 0) {
         const empty = source.querySelector(".bookshelf-review-empty-state");
-        if (empty) {
-          target.innerHTML = '<p class="workflow-top1-empty">尚無純新文章 Top 候選</p>';
-        } else {
-          target.innerHTML = '<p class="workflow-top1-loading" id="workflow-top1-loading">自動選題中...</p>';
-        }
+        target.innerHTML = empty
+          ? '<p class="workflow-top3-empty">尚無純新文章 Top 候選</p>'
+          : '<p class="workflow-top3-loading">自動選題中...</p>';
         return;
       }
-      const totalCount = source.querySelectorAll("article.bookshelf-review-top3-card").length;
-      const isPrimary = firstCard.classList.contains("is-primary");
-      const badgeEl = firstCard.querySelector(".bookshelf-review-top3-head span");
-      const chapterEl = firstCard.querySelector(".bookshelf-review-top3-head em");
-      const titleEl = firstCard.querySelector("strong");
-      const badgeText = badgeEl?.textContent?.trim() || "Top 1";
-      const chapterText = chapterEl?.textContent?.trim() || "";
-      const titleText = titleEl?.textContent?.trim() || "尚未命名";
-      const moreText = totalCount > 1 ? `+${totalCount - 1} 項` : "";
-      target.innerHTML = `
-        <a class="workflow-top1-link" href="#article-topic-shell">
-          <div class="workflow-top1-meta">
-            <span class="workflow-top1-badge ${isPrimary ? "is-primary" : ""}">${badgeText}</span>
-            <em class="workflow-top1-chapter">${chapterText}</em>
+      target.innerHTML = Array.from(cards).map((card) => {
+        const isPrimary = card.classList.contains("is-primary");
+        const badgeEl = card.querySelector(".bookshelf-review-top3-head span");
+        const chapterEl = card.querySelector(".bookshelf-review-top3-head em");
+        const titleEl = card.querySelector("strong");
+        const badgeText = badgeEl?.textContent?.trim() || "Top";
+        const chapterText = chapterEl?.textContent?.trim() || "";
+        const titleText = titleEl?.textContent?.trim() || "尚未命名";
+        return `
+          <div class="workflow-top3-card ${isPrimary ? "is-primary" : ""}">
+            <div class="workflow-top3-card-meta">
+              <span class="workflow-top3-badge ${isPrimary ? "is-primary" : ""}">${badgeText}</span>
+              <em class="workflow-top3-chapter">${chapterText}</em>
+            </div>
+            <strong class="workflow-top3-title">${titleText}</strong>
           </div>
-          <strong class="workflow-top1-title">${titleText}</strong>
-          ${moreText ? `<span class="workflow-top1-more">${moreText}</span>` : ""}
-        </a>
-      `;
+        `;
+      }).join("");
     }
 
     sync();
