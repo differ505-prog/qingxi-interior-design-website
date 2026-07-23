@@ -1189,24 +1189,36 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                   <p>高頻生文起稿台</p>
                   <span>直接貼本輪預設題目，系統會先整理情境摘要並直送一鍵生文；完整前置包與備援操作降到次層</span>
                 </div>
-                <div
-                  id="article-preset-title-preview"
-                  class="article-preset-title-preview"
-                  role="status"
-                  aria-live="polite"
-                >
-                  <span class="article-preset-title-preview-eyebrow">即將發布標題</span>
-                  <strong id="article-preset-title-preview-title" class="article-preset-title-preview-title">尚未設定</strong>
-                  <em id="article-preset-title-preview-reason" class="article-preset-title-preview-reason">尚未設定標題，發布前請先輸入或自動決題</em>
-                </div>
-                <label class="gemini-field bookshelf-prompt-field">
-                  <span>本輪預設題目</span>
-                  <input
-                    id="article-preset-title"
-                    type="text"
-                    placeholder="例如：屋況盤點與範圍界定總表"
-                  />
-                </label>
+                <details class="bookshelf-mini-fold">
+                  <summary>
+                    <span>即將發布標題</span>
+                    <small>預覽</small>
+                  </summary>
+                  <div
+                    id="article-preset-title-preview"
+                    class="article-preset-title-preview"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    <span class="article-preset-title-preview-eyebrow">即將發布標題</span>
+                    <strong id="article-preset-title-preview-title" class="article-preset-title-preview-title">尚未設定</strong>
+                    <em id="article-preset-title-preview-reason" class="article-preset-title-preview-reason">尚未設定標題，發布前請先輸入或自動決題</em>
+                  </div>
+                </details>
+                <details class="bookshelf-mini-fold">
+                  <summary>
+                    <span>本輪預設題目</span>
+                    <small>直接輸入</small>
+                  </summary>
+                  <label class="gemini-field bookshelf-prompt-field">
+                    <span>本輪預設題目</span>
+                    <input
+                      id="article-preset-title"
+                      type="text"
+                      placeholder="例如：屋況盤點與範圍界定總表"
+                    />
+                  </label>
+                </details>
                 <div class="bookshelf-review-composer-grid">
                   <label class="gemini-field bookshelf-prompt-field">
                     <span>情境摘要</span>
