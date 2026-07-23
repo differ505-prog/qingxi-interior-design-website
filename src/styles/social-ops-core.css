@@ -5528,6 +5528,102 @@
   text-wrap: balance;
 }
 
+/* 去 Gemini 按鈕行 */
+.book-workflow-gemini-row {
+  margin-top: 0.6rem;
+}
+
+.book-workflow-gemini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 10px;
+  border: 1px dashed rgba(196, 168, 122, 0.25);
+  background: transparent;
+  color: rgba(220, 217, 210, 0.38);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: not-allowed;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.14s ease;
+  width: 100%;
+}
+
+.book-workflow-gemini-btn:disabled {
+  cursor: not-allowed;
+}
+
+.book-workflow-gemini-btn.is-pending {
+  border-style: solid;
+  border-color: rgba(196, 168, 122, 0.45);
+  color: rgba(231, 198, 126, 0.65);
+  animation: workflowGeminiPulse 1.4s ease-in-out infinite;
+}
+
+.book-workflow-gemini-btn.is-done {
+  border-style: solid;
+  border-color: rgba(120, 184, 140, 0.55);
+  background: rgba(120, 184, 140, 0.1);
+  color: rgba(120, 184, 140, 0.95);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.book-workflow-gemini-btn.is-done:hover,
+.book-workflow-gemini-btn.is-done:focus-visible {
+  transform: translateY(-1px);
+  background: rgba(120, 184, 140, 0.16);
+}
+
+.book-workflow-gemini-btn.is-error {
+  border-style: solid;
+  border-color: rgba(212, 96, 96, 0.55);
+  color: rgba(212, 96, 96, 0.88);
+  cursor: pointer;
+}
+
+.book-workflow-gemini-icon {
+  font-size: 1rem;
+}
+
+.book-workflow-gemini-text {
+  font-size: 0.9rem;
+}
+
+@keyframes workflowGeminiPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* Top 3 卡片：當 button 時的 pointer + hover */
+.workflow-top3-card {
+  cursor: pointer;
+  text-align: left;
+  background: transparent;
+  border: 1px solid rgba(220, 217, 210, 0.1);
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.14s ease;
+}
+
+.workflow-top3-card:hover,
+.workflow-top3-card:focus-visible {
+  background: rgba(52, 52, 50, 0.78);
+  border-color: rgba(196, 168, 122, 0.32);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.workflow-top3-card:active {
+  transform: translateY(0);
+}
+
+.workflow-top3-card.is-loading {
+  opacity: 0.6;
+  cursor: wait;
+  pointer-events: none;
+}
+
 /* Toast — 右下浮動複製反饋 */
 .book-workflow-toast {
   position: fixed;

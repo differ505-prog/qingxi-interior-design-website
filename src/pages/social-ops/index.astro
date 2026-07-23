@@ -940,86 +940,47 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         </div>
       </section>
 
-      <!-- 出書工作流 Bar：2 複製動作 + 3 狀態視圖 + 1 離開入口（總數 6，每顆都有具體行為） -->
+      <!-- 出書工作流 Bar：精簡版 — 標題輸入 + Top 3 卡片 + 去 Gemini 按鈕 -->
       <section class="ops-panel book-workflow" id="book-workflow-bar" aria-label="出書工作流">
         <div class="book-workflow-head">
           <p class="panel-tag">出書工作流</p>
-          <h2>兩個提示詞，複製即用</h2>
-          <p>起稿包送 LLM 生文、覆核包送 LLM 校稿；其餘三顆是狀態視圖，純讀不做事</p>
+          <h2>點題目，自動生文</h2>
+          <p>Top 3 是系統初排候選，點了直接走完整流程</p>
         </div>
 
-        <!-- 第一層：2 複製動作 pill（直接觸發既有複製按鈕，點下去馬上有真實反饋） -->
+        <!-- 本輪預設題目輸入（可手動覆寫，雙向同步到下方起稿台） -->
         <div class="book-workflow-step-input" role="group" aria-label="本輪預設題目輸入">
           <label class="book-workflow-input-label" for="workflow-article-preset-title">
-            <span class="book-workflow-input-eyebrow">STEP</span>
-            <span class="book-workflow-input-text">本輪預設題目</span>
+            <span class="book-workflow-input-eyebrow">題目</span>
           </label>
           <input
             id="workflow-article-preset-title"
             class="book-workflow-input-field"
             type="text"
-            placeholder="例如：屋況盤點與範圍界定總表"
+            placeholder="手動輸入題目，或直接點下方 Top 3 卡片"
             autocomplete="off"
             spellcheck="false"
           />
-          <p class="book-workflow-input-hint" id="workflow-article-preset-title-state">與下方「高頻生文起稿台」雙向同步；決定 PREP 與 ACTION 1 真的生文題目。</p>
-        </div>
-        <div class="book-workflow-steps" role="group" aria-label="出書工作流 3 動作 + 1 預備">
-          <button type="button" class="book-workflow-pill book-workflow-pill-action" data-workflow-action="copy-and-reveal" data-workflow-target-button="copy-pro-finalize-prompt-inline" data-workflow-reveal="article-pro-prompt-shell" data-workflow-step="1">
-            <span class="book-workflow-pill-index">ACTION 1</span>
-            <span class="book-workflow-pill-label">複製起稿包</span>
-            <span class="book-workflow-pill-hint">Pro 生文提示詞，貼去 LLM 生草稿</span>
-          </button>
-          <button type="button" class="book-workflow-pill book-workflow-pill-action" data-workflow-action="copy-and-reveal" data-workflow-target-button="copy-publishing-review-prompt" data-workflow-reveal="article-pro-prompt-details" data-workflow-step="2">
-            <span class="book-workflow-pill-index">ACTION 2</span>
-            <span class="book-workflow-pill-label">複製覆核包</span>
-            <span class="book-workflow-pill-hint">出版閉環覆核稿，貼去 LLM 校稿</span>
-          </button>
-          <button type="button" id="workflow-prepare-article-package" class="book-workflow-pill book-workflow-pill-action book-workflow-pill-prep" data-workflow-action="prepare-package" data-workflow-step="0">
-            <span class="book-workflow-pill-index">PREP</span>
-            <span class="book-workflow-pill-label">備好 Pro 生文包</span>
-            <span class="book-workflow-pill-hint">先把情境摘要、出版落位、候選題整理好，再複製起稿包</span>
-          </button>
+          <p class="book-workflow-input-hint" id="workflow-article-preset-title-state">自動同步到高頻起稿台；直接點 Top 3 卡片可跳過此步</p>
         </div>
 
-        <!-- 純新文章 Top 1~3 + PREP feedback（由 client-side MutationObserver 同步渲染） -->
+        <!-- 純新文章 Top 1~3（點卡即觸發完整流程） -->
         <div id="workflow-top3-panel" class="workflow-top3-panel" aria-live="polite">
           <div class="workflow-top3-header">
             <span class="workflow-top3-label">純新文章 Top 3</span>
-            <span class="workflow-top3-hint">已排除整併／資產化</span>
+            <span class="workflow-top3-hint">已排除整併／資產化候選，點卡即開始生文</span>
           </div>
           <div id="workflow-top3-cards" class="workflow-top3-cards">
             <p class="workflow-top3-loading">自動選題中...</p>
           </div>
-          <p id="workflow-prepare-feedback" class="workflow-prep-feedback" aria-live="polite"></p>
         </div>
 
-        <!-- 第二層：3 狀態視圖入口（純讀，不做事） -->
-        <div class="book-workflow-readonly" role="group" aria-label="出書狀態視圖 3 入口">
-          <a class="book-workflow-readonly-link" href="#publishing-review-board" data-workflow-link="publishing-review-board">
-            <span class="book-workflow-readonly-icon" aria-hidden="true">📋</span>
-            <span class="book-workflow-readonly-label">出版清單</span>
-            <span class="book-workflow-readonly-hint">看 KPI 與整併候選</span>
-          </a>
-          <a class="book-workflow-readonly-link" href="#article-topic-shell" data-workflow-link="article-topic-shell">
-            <span class="book-workflow-readonly-icon" aria-hidden="true">📝</span>
-            <span class="book-workflow-readonly-label">採用題</span>
-            <span class="book-workflow-readonly-hint">本題、章節、子章節落位</span>
-          </a>
-          <a class="book-workflow-readonly-link" href="#article-ai-result-shell" data-workflow-link="article-ai-result-shell">
-            <span class="book-workflow-readonly-icon" aria-hidden="true">🤖</span>
-            <span class="book-workflow-readonly-label">AI 決策</span>
-            <span class="book-workflow-readonly-hint">上次判題結論與建議動作</span>
-          </a>
-        </div>
-
-        <!-- 第三層：1 外部入口（明確告知離開） -->
-        <div class="book-workflow-tools">
-          <a class="book-workflow-tool book-workflow-tool-external" href="https://gemini.google.com/" target="_blank" rel="noreferrer">
-            <span class="book-workflow-tool-icon" aria-hidden="true">🌐</span>
-            <p class="book-workflow-tool-name">開 Gemini</p>
-            <p class="book-workflow-tool-desc">複製完提示詞後，到 Gemini 貼上、貼回覆核稿</p>
-          </a>
+        <!-- 去 Gemini 按鈕（點卡完成後啟用） -->
+        <div class="book-workflow-gemini-row">
+          <button type="button" id="workflow-gemini-btn" class="book-workflow-gemini-btn" disabled aria-label="複製完成後前往 Gemini 發布">
+            <span class="workflow-gemini-icon" aria-hidden="true">🌐</span>
+            <span class="workflow-gemini-text">等待生文完成...</span>
+          </button>
         </div>
       </section>
 
@@ -12253,7 +12214,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     });
   });
 
-  /* 純新文章 Top 1~3 — MutationObserver 同步啞容器的 client-side 渲染結果到 workflow bar */
+  /* ============================================================
+     純新文章 Top 1~3 — MutationObserver 同步 + 點擊觸發完整生文流程
+     ============================================================ */
   (function initWorkflowTop3Sync() {
     const source = document.getElementById("publishing-review-top3");
     const target = document.getElementById("workflow-top3-cards");
@@ -12277,13 +12240,13 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         const chapterText = chapterEl?.textContent?.trim() || "";
         const titleText = titleEl?.textContent?.trim() || "尚未命名";
         return `
-          <div class="workflow-top3-card ${isPrimary ? "is-primary" : ""}">
+          <button type="button" class="workflow-top3-card ${isPrimary ? "is-primary" : ""}" data-workflow-top3-action="use" data-top3-title="${titleText.replace(/"/g, "&quot;")}" aria-label="採用「${titleText}」進入生文流程">
             <div class="workflow-top3-card-meta">
               <span class="workflow-top3-badge ${isPrimary ? "is-primary" : ""}">${badgeText}</span>
               <em class="workflow-top3-chapter">${chapterText}</em>
             </div>
             <strong class="workflow-top3-title">${titleText}</strong>
-          </div>
+          </button>
         `;
       }).join("");
     }
@@ -12295,4 +12258,70 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     });
     observer.observe(source, { childList: true, subtree: true, characterData: true });
   })();
+
+  /* Top 3 卡片點擊：填標題 → 觸發 PREP 流程 → 完成後顯示「去 Gemini」 */
+  document.getElementById("workflow-top3-cards")?.addEventListener("click", async (e) => {
+    const card = (e.target).closest("[data-workflow-top3-action='use']");
+    if (!card) return;
+
+    const title = card.getAttribute("data-top3-title");
+    if (!title) return;
+
+    /* 1. 填標題到 workflow input（並同步到下方 article-preset-title） */
+    const workflowInput = document.getElementById("workflow-article-preset-title");
+    const belowInput = document.getElementById("article-preset-title");
+    if (workflowInput instanceof HTMLInputElement) {
+      workflowInput.value = title;
+      workflowInput.classList.add("is-synced");
+      if (workflowInput.nextElementSibling instanceof HTMLElement) {
+        workflowInput.nextElementSibling.textContent = "✓ 已填入題目，正在備好 Pro 生文包...";
+        workflowInput.nextElementSibling.classList.remove("is-warning");
+      }
+    }
+    if (belowInput instanceof HTMLInputElement) {
+      belowInput.value = title;
+      belowInput.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    /* 2. 卡片進入 loading 狀態 */
+    card.classList.add("is-loading");
+
+    /* 3. 顯示「去 Gemini」按鈕（完成後才啟用） */
+    const geminiBtn = document.getElementById("workflow-gemini-btn");
+    const geminiLink = document.getElementById("workflow-gemini-link");
+    if (geminiBtn instanceof HTMLButtonElement) {
+      geminiBtn.disabled = true;
+      geminiBtn.classList.add("is-pending");
+      geminiBtn.classList.remove("is-done");
+    }
+
+    try {
+      /* 4. 觸發完整 PREP → copy 流程 */
+      await runArticleAiFlow();
+
+      /* 5. 完成後啟用「去 Gemini」按鈕 */
+      if (geminiBtn instanceof HTMLButtonElement) {
+        geminiBtn.disabled = false;
+        geminiBtn.classList.remove("is-pending");
+        geminiBtn.classList.add("is-done");
+        geminiBtn.textContent = "✓ 已複製。 去 Gemini 發布 →";
+        geminiBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    } catch (err) {
+      console.error("Top 3 卡片觸發生文流程失敗：", err);
+      if (geminiBtn instanceof HTMLButtonElement) {
+        geminiBtn.disabled = false;
+        geminiBtn.classList.remove("is-pending");
+        geminiBtn.textContent = "流程中斷，可直接去 Gemini 發布 →";
+        geminiBtn.classList.add("is-error");
+      }
+    } finally {
+      card.classList.remove("is-loading");
+    }
+  });
+
+  /* 「去 Gemini」按鈕：直接開啟 Gemini（假設剪貼簿已有提示詞） */
+  document.getElementById("workflow-gemini-btn")?.addEventListener("click", () => {
+    window.open("https://gemini.google.com/", "_blank", "noopener,noreferrer");
+  });
 </script>
