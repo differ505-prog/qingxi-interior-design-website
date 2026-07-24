@@ -1064,7 +1064,14 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
           <div class="workspace-pane is-active" data-workspace-pane="operations">
             <div class="ops-task-layout">
               <div class="ops-task-main">
-                <section id="daily-ops-board" class="ops-panel quest-board">
+                <details id="daily-ops-board" class="ops-panel quest-board" data-default-folded="true">
+                  <summary class="ops-fold-summary">
+                    <div>
+                      <p class="panel-tag">日常任務</p>
+                      <h2>主動獵殺</h2>
+                    </div>
+                    <small>展開查看</small>
+                  </summary>
                   <div class="panel-heading">
                     <div>
                       <p class="panel-tag">日常任務</p>
@@ -1079,9 +1086,16 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     </div>
                   </div>
                   <div id="daily-quest-grid" class="quest-grid"></div>
-                </section>
+                </details>
 
-                <section id="quest-board" class="ops-panel quest-board">
+                <details id="quest-board" class="ops-panel quest-board" data-default-folded="true">
+                  <summary class="ops-fold-summary">
+                    <div>
+                      <p class="panel-tag">任務 6</p>
+                      <h2>高意圖社群回覆與低成本分發</h2>
+                    </div>
+                    <small>展開查看</small>
+                  </summary>
                   <div class="panel-heading">
                     <div>
                       <p class="panel-tag">任務 6</p>
@@ -1101,7 +1115,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
                     </div>
                   </div>
                   <div id="quest-grid" class="quest-grid"></div>
-                </section>
+                </details>
               </div>
 
               <aside class="ops-side ops-task-side">

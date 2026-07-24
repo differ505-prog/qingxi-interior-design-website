@@ -16,7 +16,14 @@ interface Props {
 const { replies } = Astro.props;
 ---
 
-<section class="ops-panel bookshelf-canned-replies bookshelf-canned-replies-priority ops-canned-sidebar">
+<details class="ops-panel bookshelf-canned-replies bookshelf-canned-replies-priority ops-canned-sidebar" data-default-folded="true">
+  <summary class="ops-fold-summary">
+    <div>
+      <p class="panel-tag">快速工具</p>
+      <h2>常見罐頭回覆</h2>
+    </div>
+    <small>展開查看</small>
+  </summary>
   <div class="panel-heading panel-heading-compact">
     <div>
       <p class="panel-tag">快速工具</p>
@@ -29,4 +36,4 @@ const { replies } = Astro.props;
       <BookshelfCard variant="canned-reply" entry={reply} />
     ))}
   </div>
-</section>
+</details>
