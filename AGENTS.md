@@ -448,3 +448,87 @@ grep -rEn "優質|專業|頂尖|一流|完善|全方位|量身打造|高品質|�
 - 「點題目，自動生文」= 「，自動」緊湊語氣（動作動詞起手）
 - social-ops 「優質廠商筆記」= 後台功能模組命名（資料表名稱），非行銷文案，不適用「優質」黑名單
 - social-ops 「絕對無法越權」= 資安技術用語（RLS Row Level Security），非情緒動詞
+
+### H. 第 22 輪擴展：頁面白名單建立（防漏掃機制）
+
+第 20-21 輪連續兩輪漏掃 8 個頁面（preview-login / coming-soon / crew-intake / policies / standard-sop-print / social-ops-login / quote-studio / r），這次掃完確認全部合規。本輪新增「頁面掃描白名單」，未來 SOP 驗證必須對白名單內所有頁面 grep，**禁止只掃「常見頁面」**。
+
+**全站 .astro 頁面白名單（28 個，分類列舉）**：
+
+**前台公開頁（10 個）**：
+1. `src/pages/index.astro`
+2. `src/pages/contact.astro`
+3. `src/pages/faq.astro`
+4. `src/pages/policies.astro`
+5. `src/pages/smart-home.astro`
+6. `src/pages/smart-home-quiz.astro`
+7. `src/pages/standard-sop.astro`
+8. `src/pages/standard-sop-print.astro`（列印版）
+9. `src/pages/portfolio/index.astro`
+10. `src/pages/portfolio/xizhi-zhongxing-rd.astro`（作品集案例）
+
+**前台風控頁（4 個）**：
+11. `src/pages/coming-soon.astro`
+12. `src/pages/404.astro`
+13. `src/pages/preview-login.astro`
+14. `src/pages/consultation-thank-you.astro`
+
+**前台表單頁（2 個）**：
+15. `src/pages/requirement-form.astro`
+16. `src/pages/crew-intake.astro`
+
+**前台工具頁（1 個）**：
+17. `src/pages/renovation-process.astro`
+
+**後台登入頁（2 個）**：
+18. `src/pages/social-ops-login.astro`
+19. `src/pages/preview-login.astro`（共用）
+
+**後台子系統（5 個目錄 = 多檔）**：
+20. `src/pages/social-ops/**`
+21. `src/pages/crew-contract-studio/**`
+22. `src/pages/contract-studio/**`
+23. `src/pages/quote-studio/**`
+24. `src/pages/tools/**`
+
+**blog 子系統（豁免）**：
+25. `src/pages/blog/**`（h2/h3 標題豁免本 SOP，受內容鎖定條款保護）
+
+**動態路由（3 個）**：
+26. `src/pages/llms.txt.ts`（LLM 索引，文字內容）
+27. `src/pages/robots.txt.ts`
+28. `src/pages/sitemap.xml.ts`
+
+**驗證命令（必須包含全部白名單）**：
+```bash
+# 第八條 SOP 完整 grep（前台公開 + 風控 + 表單 + 工具）
+grep -rEn "<h[12][^>]*>[^<]+[。！？]</h[1-3]>" \
+  src/pages/index.astro \
+  src/pages/contact.astro \
+  src/pages/faq.astro \
+  src/pages/policies.astro \
+  src/pages/smart-home.astro \
+  src/pages/smart-home-quiz.astro \
+  src/pages/standard-sop.astro \
+  src/pages/standard-sop-print.astro \
+  src/pages/portfolio/index.astro \
+  src/pages/portfolio/xizhi-zhongxing-rd.astro \
+  src/pages/coming-soon.astro \
+  src/pages/404.astro \
+  src/pages/preview-login.astro \
+  src/pages/consultation-thank-you.astro \
+  src/pages/requirement-form.astro \
+  src/pages/crew-intake.astro \
+  src/pages/renovation-process.astro \
+  src/pages/quote-studio/ \
+  src/pages/tools/
+
+# 後台 hero h1（獨立掃描，因內容性質不同）
+grep -rEn "<h1[^>]*>[^<]+</h1>" \
+  src/pages/social-ops/index.astro \
+  src/pages/crew-contract-studio/ \
+  src/pages/contract-studio/ \
+  src/pages/social-ops-login.astro
+```
+
+**禁止掃描簡化版**（如 `grep -rEn "..." src/pages/index.astro`）— 此為第 4-8 輪漏掃的根因，本 SOP 明文禁止。
