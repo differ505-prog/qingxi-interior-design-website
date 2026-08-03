@@ -532,3 +532,48 @@ grep -rEn "<h1[^>]*>[^<]+</h1>" \
 ```
 
 **禁止掃描簡化版**（如 `grep -rEn "..." src/pages/index.astro`）— 此為第 4-8 輪漏掃的根因，本 SOP 明文禁止。
+
+### I. 第 23 輪擴展：alt 與 meta description SOP
+
+本輪發現兩類前幾輪 SOP 未覆蓋的 SEO / a11y 違規：
+
+**alt 文案改善（8 處）**：
+- `crew-contract-studio/sign.astro` + `final/[id].astro` + `records/[id].astro` 的 `<img id="signed-record-image" alt="簽名圖像" />` 過於空泛（語音閱讀器會逐字唸出）
+  → 改為 `alt="工班簽署人手寫簽名"`（說明主體與動作）
+- `contract-studio/sign.astro` + `final/[id].astro` + `records/[id].astro` 同樣問題
+  → 改為 `alt="客戶簽署人手寫簽名"`（區分工班 vs 客戶情境）
+- `portfolio/[slug].astro:63` 的 `alt="作品圖片"` 無資訊
+  → 改為 `alt={image.alt || `${project.title} - 案例圖片`}`（動態 fallback）
+- `portfolio/xizhi-zhongxing-rd.astro:267` 的 `<img ... alt="" />` 空 alt（lightbox 容器）
+  → 改為 `alt="作品放大檢視圖片"`（保留為裝飾性但不空）
+
+**meta description 句尾句號（12 處）**：
+- Google SEO 最佳實踐：meta description 結尾**不該用句號**
+  - 句號會被 SERP 截斷顯示
+  - 字數計算浪費（中文「。」佔 1 字元）
+  - 視覺上不像摘要結尾
+- 本輪移除 12 個前台頁面的句尾「。」
+- 後台頁面有 `noindex={true}` 仍保留句尾（不影響 SEO）
+
+**驗證命令**：
+```bash
+# alt 為「簽名圖像」（語意空泛）
+grep -rEn 'alt="簽名圖像"' src/pages/
+
+# alt 為「作品圖片」（語意空泛）
+grep -rEn 'alt="作品圖片"' src/pages/
+
+# alt 為空字串
+grep -rEn '<img[^>]*alt=""' src/pages/
+
+# 前台頁面 description 句尾句號（排除後台 noindex）
+for f in src/pages/index.astro src/pages/contact.astro src/pages/faq.astro \
+  src/pages/smart-home.astro src/pages/smart-home-quiz.astro src/pages/standard-sop.astro \
+  src/pages/standard-sop-print.astro src/pages/portfolio/index.astro \
+  src/pages/consultation-thank-you.astro src/pages/requirement-form.astro \
+  src/pages/crew-intake.astro src/pages/renovation-process.astro src/pages/tools/index.astro; do
+  grep -Hn 'description="[^"]\+。"' "$f" 2>/dev/null
+done
+```
+
+**注意**：本 SOP 不適用於 `noindex={true}` 的後台頁面（crew-contract-studio / contract-studio / social-ops / preview-login / social-ops-login / quote-studio）。後台 description 句尾句號保留。

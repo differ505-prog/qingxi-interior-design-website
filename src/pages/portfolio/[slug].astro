@@ -60,7 +60,7 @@ const projectStructuredData = [
       <h2 class="text-2xl font-bold mb-6">作品圖集</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {project.gallery.map(image => (
-          <img src={image} alt="作品圖片" class="w-full h-64 object-cover rounded-lg shadow-md" />
+          <img src={image} alt={image.alt || `${project.title} - 案例圖片`} class="w-full h-64 object-cover rounded-lg shadow-md" />
         ))}
       </div>
     </div>
