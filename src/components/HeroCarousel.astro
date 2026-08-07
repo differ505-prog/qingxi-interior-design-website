@@ -138,10 +138,10 @@ const slides = fallbackSlides.map((item) => ({
   .hero-carousel {
     position: relative;
     width: 100%;
-    min-height: 100vh;
+    min-height: 100dvh;
     margin-top: -80px;
     overflow: hidden;
-    background: #1f2831;
+    background: var(--gray-darkest);
     display: flex;
     align-items: flex-end;
   }
@@ -307,6 +307,17 @@ const slides = fallbackSlides.map((item) => ({
     transform: translateY(-2px);
   }
 
+  .hero-button:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .hero-button:focus-visible,
+  .carousel-btn:focus-visible,
+  .hero-featured-card:focus-visible {
+    outline: 2px solid var(--white);
+    outline-offset: 4px;
+  }
+
   .hero-button-primary {
     background: linear-gradient(135deg, var(--gray-darkest) 0%, var(--tiffany-dark) 100%);
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -424,6 +435,25 @@ const slides = fallbackSlides.map((item) => ({
     right: 30px;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-slide,
+    .carousel-slide[data-state="active"] .carousel-image,
+    .hero-button,
+    .hero-featured-card,
+    .carousel-btn {
+      transition: none;
+    }
+
+    .carousel-slide[data-state="active"] .carousel-image,
+    .carousel-slide.zoomIn .carousel-image,
+    .carousel-slide.zoomOut .carousel-image,
+    .carousel-slide.panLeft .carousel-image,
+    .carousel-slide.panRight .carousel-image,
+    .carousel-slide.kenBurns .carousel-image {
+      transform: none;
+    }
+  }
+
   @media (max-width: 768px) {
     .hero-carousel {
       min-height: 78vh;
@@ -490,6 +520,7 @@ const slides = fallbackSlides.map((item) => ({
     const nextBtn = document.querySelector(".carousel-btn.next");
     const slideDuration = 7000;
     const fadeDuration = 1100;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     if (slides.length <= 1) return;
 
@@ -551,7 +582,7 @@ const slides = fallbackSlides.map((item) => ({
 
     function startAutoPlay() {
       stopAutoPlay();
-      if (document.hidden) return;
+      if (document.hidden || reducedMotion.matches) return;
       autoPlayInterval = window.setInterval(nextSlide, slideDuration);
     }
 

@@ -145,7 +145,6 @@ const homeStructuredData = [
   <section class="about-section">
     <div class="about-container">
       <div class="about-header" data-animate="left">
-        <h6 class="section-subtitle">品牌介紹</h6>
         <h2 class="section-title">青曦空間設計</h2>
         <p class="about-tagline">把美感做成能久住的日常</p>
         <p class="about-intro">深耕大台北，專注住宅、商空與智能整合。</p>
@@ -325,7 +324,6 @@ const homeStructuredData = [
   <section class="smart-case-section">
     <div class="smart-case-container">
       <div class="section-header smart-case-header">
-        <h6 class="section-subtitle">智能家居</h6>
         <h2 class="section-title">把智能科技整合進空間設計流程</h2>
         <p class="smart-case-intro">
           從弱電配置到使用情境，為您一次規劃到位。
@@ -528,7 +526,6 @@ const homeStructuredData = [
   <section class="testimonial-section">
     <div class="testimonial-container">
       <div class="section-header">
-        <h6 class="section-subtitle">服務承諾</h6>
         <h2 class="section-title">合作中的感受</h2>
       </div>
 
@@ -563,7 +560,7 @@ const homeStructuredData = [
   <section class="consult-section">
     <div class="consult-shell">
       <div class="consult-copy">
-        <p class="section-subtitle consult-subtitle">下一步</p>
+        <p class="consult-subtitle">下一步</p>
         <p class="consult-kicker">Closing Edit</p>
         <h2 class="consult-title">如果方向已經對了，就用最舒服的方式開始</h2>
         <p class="consult-description">
@@ -604,9 +601,8 @@ const homeStructuredData = [
   <section class="faq-section">
     <div class="faq-container">
       <div class="faq-header">
-        <div class="section-header faq-header-main">
-          <h6 class="section-subtitle">FAQ</h6>
-          <h2 class="section-title">先把最常卡住的 3 件事看完</h2>
+<div class="section-header faq-header-main">
+        <h2 class="section-title">先把最常卡住的 3 件事看完</h2>
           <p class="faq-intro">費用、時程與合作範圍，先有輪廓，再決定要不要往下聊。</p>
         </div>
         <aside class="faq-home-note">
@@ -709,7 +705,7 @@ const homeStructuredData = [
       display: grid;
       grid-template-columns: minmax(0, 1.4fr) minmax(360px, 460px);
       gap: clamp(1.6rem, 3vw, 3rem);
-      border-radius: 32px;
+      border-radius: 28px;
       background:
         radial-gradient(circle at top right, rgba(159, 147, 136, 0.1), transparent 30%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(246, 241, 236, 0.54) 100%);
@@ -859,12 +855,21 @@ const homeStructuredData = [
       color: var(--white);
       text-decoration: none;
       letter-spacing: 0.08em;
-      transition: transform 0.25s ease, background-color 0.25s ease;
+      transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     .brand-smart-home-link:hover {
       transform: translateY(-2px);
       background: var(--gray-dark);
+    }
+
+    .brand-smart-home-link:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .brand-smart-home-link:focus-visible {
+      outline: 2px solid var(--gray-darkest);
+      outline-offset: 3px;
     }
 
     .brand-smart-home-link-secondary {
@@ -963,7 +968,7 @@ const homeStructuredData = [
 
     .brand-metric-image {
       margin: 0;
-      border-radius: 14px;
+      border-radius: 16px;
       overflow: hidden;
       aspect-ratio: 16 / 10;
       background:
@@ -1139,8 +1144,8 @@ const homeStructuredData = [
       padding: clamp(2.5rem, 5vw, 4rem);
       background:
         radial-gradient(circle at top left, rgba(159, 147, 136, 0.04), transparent 30%),
-        linear-gradient(135deg, #342f2b 0%, #292521 100%);
-      border-radius: 32px;
+        linear-gradient(135deg, var(--gray-darkest) 0%, #292521 100%);
+      border-radius: 28px;
       color: var(--white);
       position: relative;
       overflow: hidden;
@@ -1198,7 +1203,7 @@ const homeStructuredData = [
     .stat-item {
       text-align: left;
       padding: 1.5rem 1.35rem;
-      border-radius: 22px;
+      border-radius: 20px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(10px);
@@ -1768,7 +1773,7 @@ const homeStructuredData = [
 
       .brand-strip-inner {
         padding: 1.5rem;
-        border-radius: 22px;
+        border-radius: 16px;
       }
 
       .brand-strip-label,
@@ -1812,7 +1817,7 @@ const homeStructuredData = [
       .brand-smart-home {
         margin-top: 1.1rem;
         padding: 1rem;
-        border-radius: 18px;
+        border-radius: 16px;
       }
 
       .brand-smart-home-actions,
@@ -1839,7 +1844,7 @@ const homeStructuredData = [
 
       .site-proof-copy,
       .site-proof-photo {
-        border-radius: 18px;
+        border-radius: 16px;
       }
 
       .site-proof-copy {
@@ -1876,7 +1881,7 @@ const homeStructuredData = [
       .smart-case-card,
       .workflow-content,
       .consult-shell {
-        border-radius: 20px;
+        border-radius: 16px;
       }
 
       .smart-case-summary,
@@ -1906,7 +1911,7 @@ const homeStructuredData = [
 
       .stat-item {
         padding: 1.35rem 1.05rem;
-        border-radius: 18px;
+        border-radius: 16px;
       }
 
       .stat-number {
@@ -1968,7 +1973,7 @@ const homeStructuredData = [
 
       .consult-note {
         padding: 1.25rem 1.2rem;
-        border-radius: 22px;
+        border-radius: 16px;
       }
 
       .consult-actions {
@@ -2601,7 +2606,7 @@ const homeStructuredData = [
       max-width: 1280px;
       margin: 0 auto;
       padding: clamp(2.4rem, 5vw, 4rem);
-      border-radius: 34px;
+      border-radius: 28px;
       background:
         radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 30%),
         linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(244, 248, 248, 0.68) 100%);
@@ -2858,7 +2863,7 @@ const homeStructuredData = [
 
       .consult-note {
         padding: 1.25rem 1.2rem;
-        border-radius: 22px;
+        border-radius: 16px;
       }
 
       .consult-actions {
@@ -2924,6 +2929,21 @@ const homeStructuredData = [
         threshold: 0.2,
         rootMargin: "0px 0px -50px 0px",
       };
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const instantIn = (target) => {
+        target.classList.add("animate-in");
+        target.style.transition = "none";
+        target.style.transform = "none";
+        target.style.opacity = "1";
+      };
+
+      if (reducedMotion) {
+        document.querySelectorAll("[data-animate]").forEach((el) => {
+          if (el instanceof HTMLElement) instantIn(el);
+        });
+        return;
+      }
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
