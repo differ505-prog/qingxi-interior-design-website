@@ -940,7 +940,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         </div>
       </section>
 
-      <!-- 出書工作流 Bar：精簡版 — 標題輸入 + Top 3 卡片 + 去 Gemini 按鈕 -->
+      <!-- 出書工作流 Bar：精簡版 / 標題輸入 + Top 3 卡片 + 去 Gemini 按鈕 -->
       <section class="ops-panel book-workflow" id="book-workflow-bar" aria-label="出書工作流">
         <div class="book-workflow-head">
           <p class="panel-tag">出書工作流</p>
@@ -12639,7 +12639,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
 
         // 3. 顯示 toast 反饋（pill 自己說「複製什麼」）
         const label = pill.querySelector(".book-workflow-pill-label")?.textContent?.trim() || "已複製";
-        showWorkflowToast(`${label} — 已送出剪貼簿`);
+        showWorkflowToast(`${label}，已送出剪貼簿`);
       }, 120);
     });
   });

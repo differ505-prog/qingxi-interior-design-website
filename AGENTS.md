@@ -577,3 +577,47 @@ done
 ```
 
 **注意**：本 SOP 不適用於 `noindex={true}` 的後台頁面（crew-contract-studio / contract-studio / social-ops / preview-login / social-ops-login / quote-studio）。後台 description 句尾句號保留。
+
+### J. 第 24 輪擴展：em-dash / en-dash 黑名單（對齊 taste skill 9.G）
+
+**禁用範圍**：全站 UI 可見文案（前台 + 後台 + blog）禁止出現 `—`（em-dash U+2014）與 `–`（en-dash U+2013）。
+
+**原因**：taste skill 第 9.G 條明文「em-dash is the single most-violated Tell」，全面禁用為業界紀律。本輪對齊掃出 18 處違規，已全清。
+
+**替換規則**：
+- 句中停頓 `A——B` → 改寫為 `A，B` 或拆兩句
+- 標題章節 `黃金律——動線` → 改為 `黃金律：動線` 或語意換行
+- 圖說 / alt `作品 — 客廳` → 改為 `作品 / 客廳` 或 `作品，客廳`
+- 範圍表示 `W1–W9` → 改為 `W1-W9`（hyphen 連字號）
+
+**豁免**：
+- `social-ops/**/*.astro` 內部的 CSS / JS 註解、`/[\s,...–—:：]+/` 這類 regex 字元類內部的 em-dash / en-dash（屬程式碼內部字元，非 UI 文字）。
+- `social-ops-core.css` 與 `social-ops-editor.css` 區塊註解（同上理由）。
+- 品牌語法對比句：「不只是 X，而是 Y」、「不只看圖，也看現場」、「不是 X，而是 Y」（與 taste skill 品牌語法豁免一致）。
+
+**驗證命令**：
+```bash
+# UI 可見 em-dash / en-dash（排除 JS 註解 / regex 字元類）
+grep -rEn "—|–" src/pages/ src/components/ src/layouts/ src/components/blog/ src/styles/ \
+  | grep -v "social-ops/" \
+  | grep -v "social-ops-core\.css" \
+  | grep -v "social-ops-editor\.css"
+# 期望：無輸出（清零）
+
+# 全站掃（不排除）：應只剩 social-ops CSS/JS 註解 + regex 字元類
+grep -rEn "—|–" src/pages/ src/components/ src/layouts/ src/components/blog/ src/styles/ | wc -l
+# 期望：≤ 15（social-ops 內部註解，數量穩定）
+```
+
+**第 24 輪執行紀錄**：掃描 18 處 em-dash + 1 處 en-dash，9 處 UI 違規、9 處 JS/CSS 註解豁免。替換明細：
+- `index.astro:92` HTML 註解
+- `index.astro:101` alt 文案
+- `index.astro:157` `quote-dash` 元素
+- `old-house-waterproofing-and-flooring-standards.astro:36` 內文停頓
+- `old-house-contracting-budget-and-boundaries.astro:23` 內文停頓
+- `whole-house-switch-socket-positioning.astro:17, 30` 兩處 h2 章節標題
+- `social-ops/index.astro:943` HTML 註解
+- `renovation-process.astro:1053` `W1–W9` en-dash → hyphen
+
+驗證：`grep -rEn "—|–" src/ | grep -v "social-ops" | grep -v "social-ops-core" | grep -v "social-ops-editor"` 輸出 0 行。
+
