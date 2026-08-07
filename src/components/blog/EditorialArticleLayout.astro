@@ -1029,6 +1029,11 @@ const privateQuestionPoolHref = articleSlug
   modifiedTime={modifiedTime}
   structuredData={structuredData}
 >
+  <Fragment slot="head">
+    <meta property="article:author" content="青曦空間設計" />
+    <meta property="article:section" content={siteCategory} />
+    {tags.map((tag: string) => <meta property="article:tag" content={tag} />)}
+  </Fragment>
   <article
     class={articleShellClass}
     data-qingxi-refresh={editorialRefreshStamp}

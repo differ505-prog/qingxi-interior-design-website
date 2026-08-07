@@ -413,6 +413,30 @@ export function getStaticBlogArticlePage(
       publisher,
       mainEntityOfPage: toAbsoluteUrl(`/blog/${slug}`),
     },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "首頁",
+          item: toAbsoluteUrl("/"),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "知識分享",
+          item: toAbsoluteUrl("/blog"),
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: articleTitle,
+          item: toAbsoluteUrl(`/blog/${slug}`),
+        },
+      ],
+    },
   ];
 
   const articleLayoutProps: StaticBlogArticleLayoutProps = {
