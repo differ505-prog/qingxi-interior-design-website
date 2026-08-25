@@ -2,14 +2,16 @@
 import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
 import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
 
-const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+const { articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
   "old-house-renovation-warranty-boundaries",
   {
     modifiedTime: "2026-08-25T00:00:00+08:00",
     includeEditorialRefreshStamp: true,
   },
 );
+const articleCoverImage = "/images/blog/old-house-renovation-warranty-boundaries-cover.png";
 const articleSceneImage = "/images/blog/old-house-renovation-warranty-boundaries-scene.png";
+const articleDetailImage = "/images/blog/old-house-renovation-warranty-boundaries-detail.png";
 ---
 
 <EditorialArticleLayout
@@ -24,11 +26,13 @@ const articleSceneImage = "/images/blog/old-house-renovation-warranty-boundaries
     許多糾紛，都發生在完工交屋到保固期滿這段期間。屋主容易認為剛裝潢好有問題就是施工瑕疵，而廠商則可能以老屋體質不良或自然耗損為由推拖。要避免陷入各說各話的泥沼，關鍵在於交屋前建立明確的保固界線，並理解修繕責任的歸屬邏輯。這篇文章將為你拆解老屋翻新的驗收尺度、缺失分級，以及常見爭議的判斷基準。
   </p>
 
-  <!-- 圖 01：老屋翻新完工現場 -->
-  <!-- AI生圖提示詞：Taiwanese old apartment renovation completion scene, newly renovated living room with clean walls and warm wooden flooring, afternoon light streaming through windows, slight construction dust visible on floor edges, mid-century modern furniture partially moved in, soft shadows, warm neutral tones, realistic photography style -->
+  <!-- 圖 01：老屋翻新完工現場實景
+  原始檔：/Users/liangzhiwei/Desktop/老屋完工驗收責任釐清/延伸情境圖.png
+  原始尺寸：依客戶提供
+  顯示策略：object-fit: cover + object-position: center -->
   <figure class="article-figure">
     <img
-      src="https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200&q=80"
+      src={articleDetailImage}
       alt="老屋翻新完工後的客廳，光線從窗戶進入，空間煥然一新"
       loading="lazy"
     />
@@ -106,11 +110,13 @@ const articleSceneImage = "/images/blog/old-house-renovation-warranty-boundaries
     </article>
   </div>
 
-  <!-- 圖 02：缺失分級示意 -->
-  <!-- AI生圖提示詞：Construction defect classification diagram on clean white background, three-level priority icons with red orange yellow color coding, simple flat illustration style, professional documentation aesthetic -->
+  <!-- 圖 02：缺失分級示意
+  原始檔：/Users/liangzhiwei/Desktop/老屋完工驗收責任釐清/老屋驗收缺失檢查-內文輔圖.png
+  原始尺寸：依客戶提供
+  顯示策略：object-fit: cover + object-position: center -->
   <figure class="article-figure">
     <img
-      src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&q=80"
+      src={articleSceneImage}
       alt="老屋翻新驗收時的缺失分級處理流程"
       loading="lazy"
     />
