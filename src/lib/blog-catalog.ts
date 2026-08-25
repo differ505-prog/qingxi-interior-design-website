@@ -188,6 +188,21 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     editorialRefreshStamp: "2026-07-06",
   },
   {
+    title: "保固界線：老屋修繕責任與保固邊界",
+    slug: "old-house-renovation-warranty-boundaries",
+    date: "2026-08-25",
+    summary:
+      "老屋翻新完工，最怕遇到「漏水誰處理」、「裂縫算誰的」等責任歸屬爭議。本文帶你釐清老屋修繕的保固界線，拆解5大驗收面向，並建立缺失分級與處理流程。透過明確的權責劃分與合理的檢核機制，讓你不再陷入「自然耗損」與「施工瑕疵」的爭論泥沼，安心享受翻新後的美好生活。",
+    siteCategory: "老屋翻新",
+    category: "老屋翻新",
+    track: "老屋翻新系",
+    chapter: "完工避雷",
+    subchapter: "保固界線",
+    tags: ["老屋翻新", "保固責任", "驗收重點", "缺失分級", "修繕爭議", "完工驗收"],
+    coverImage: "/images/blog/old-house-renovation-warranty-boundaries-cover.png",
+    editorialRefreshStamp: "2026-08-25",
+  },
+  {
     title: "全室預算拆解：報價單判讀與超支預防指南",
     slug: "full-room-renovation-budget-breakdown-and-quote-guide",
     date: "2026-07-04",

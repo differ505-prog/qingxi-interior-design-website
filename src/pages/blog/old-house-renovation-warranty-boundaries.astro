@@ -1,0 +1,234 @@
+---
+import EditorialArticleLayout from "../../components/blog/EditorialArticleLayout.astro";
+import { getStaticBlogArticlePage } from "../../lib/blog-catalog";
+
+const { articleImage, articleLayoutProps, articleStructuredData } = getStaticBlogArticlePage(
+  "old-house-renovation-warranty-boundaries",
+  {
+    modifiedTime: "2026-08-25T00:00:00+08:00",
+    includeEditorialRefreshStamp: true,
+  },
+);
+const articleSceneImage = "/images/blog/old-house-renovation-warranty-boundaries-scene.png";
+---
+
+<EditorialArticleLayout
+  {...articleLayoutProps}
+  structuredData={articleStructuredData}
+>
+  <p class="article-lead">
+    老屋翻新的尾聲，往往是屋主心情最複雜的時刻。看著煥然一新的空間，滿心期待入住，卻又隱隱擔憂：萬一之後漏水怎麼辦？牆壁出現裂縫，廠商會負責嗎？
+  </p>
+
+  <p>
+    許多糾紛，都發生在完工交屋到保固期滿這段期間。屋主容易認為剛裝潢好有問題就是施工瑕疵，而廠商則可能以老屋體質不良或自然耗損為由推拖。要避免陷入各說各話的泥沼，關鍵在於交屋前建立明確的保固界線，並理解修繕責任的歸屬邏輯。這篇文章將為你拆解老屋翻新的驗收尺度、缺失分級，以及常見爭議的判斷基準。
+  </p>
+
+  <!-- 圖 01：老屋翻新完工現場 -->
+  <!-- AI生圖提示詞：Taiwanese old apartment renovation completion scene, newly renovated living room with clean walls and warm wooden flooring, afternoon light streaming through windows, slight construction dust visible on floor edges, mid-century modern furniture partially moved in, soft shadows, warm neutral tones, realistic photography style -->
+  <figure class="article-figure">
+    <img
+      src="https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200&q=80"
+      alt="老屋翻新完工後的客廳，光線從窗戶進入，空間煥然一新"
+      loading="lazy"
+    />
+    <figcaption>
+      老屋翻新完工後的空間，表面上煥然一新，但真正的考驗往往從交屋那一刻才正式開始。
+    </figcaption>
+  </figure>
+
+  <h2>5大驗收面向：建立責任釐清的基礎</h2>
+
+  <p>
+    驗收，是釐清修繕責任的第一道防線。老屋翻新的驗收不該只是看順眼就好，實務上建議至少應涵蓋以下 5 大核心面向，並留下書面或影像紀錄，作為日後保固的依據：
+  </p>
+
+  <div class="article-check-grid">
+    <div class="article-check-item">
+      <strong>水路（給排水）</strong>
+      <p>水壓是否穩定？排水是否順暢？有無阻塞或逆流？</p>
+    </div>
+    <div class="article-check-item">
+      <strong>防水（防漏）</strong>
+      <p>衛浴、陽台、窗框周邊是否確實防水？試水測試是否通過？</p>
+    </div>
+    <div class="article-check-item">
+      <strong>電工（電力）</strong>
+      <p>迴路配置是否正確？插座、開關功能是否正常？負載測試是否過關？</p>
+    </div>
+    <div class="article-check-item">
+      <strong>泥作（結構與表面）</strong>
+      <p>牆面平整度、磁磚是否有空鼓、裂縫或色差？</p>
+    </div>
+    <div class="article-check-item">
+      <strong>木作與五金（機能與外觀）</strong>
+      <p>櫃體門片開合是否順暢？鉸鏈、滑軌等五金配件是否穩固？表面貼皮或烤漆是否完整？</p>
+    </div>
+  </div>
+
+  <p>
+    確實掌握這 5 大面向，在交屋當下抓出問題，就能大幅減少日後的保固爭議。
+  </p>
+
+  <h2>缺失優先級：3級風險分類與處理原則</h2>
+
+  <p>
+    面對驗收時發現的缺失，不要急著將所有問題混為一談，要求廠商立刻全部解決。這不僅容易耗損雙方信任，也可能延誤真正重要的修繕進度。建議將缺失分為 3 級優先順序：
+  </p>
+
+  <div class="article-step-flow">
+    <article class="article-step-card">
+      <p class="article-step-index">1</p>
+      <div>
+        <h3>安全與結構性問題（必須立即處理）</h3>
+        <p>
+          水管漏水、電線短路跳電、防水層失效、结构性裂縫。這類問題絕對不能妥協，在徹底解決並複驗通過前，不應同意交屋，更不可撥付尾款。
+        </p>
+      </div>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">2</p>
+      <div>
+        <h3>功能性不良（交屋前應修正）</h3>
+        <p>
+          門窗無法緊閉、排水緩慢、插座無電、抽屜卡頓。要求廠商提出明確的修繕時程，並在交屋前或雙方協議的期限內完成修正。
+        </p>
+      </div>
+    </article>
+    <article class="article-step-card">
+      <p class="article-step-index">3</p>
+      <div>
+        <h3>外觀與細節瑕疵（可列入尾項補修）</h3>
+        <p>
+          油漆輕微色差或刷痕、矽利康收邊不平整、木皮微小刮傷。可整理成清單，雙方簽名確認後先行交屋，並約定期限由廠商一次性集中補足。
+        </p>
+      </div>
+    </article>
+  </div>
+
+  <!-- 圖 02：缺失分級示意 -->
+  <!-- AI生圖提示詞：Construction defect classification diagram on clean white background, three-level priority icons with red orange yellow color coding, simple flat illustration style, professional documentation aesthetic -->
+  <figure class="article-figure">
+    <img
+      src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&q=80"
+      alt="老屋翻新驗收時的缺失分級處理流程"
+      loading="lazy"
+    />
+    <figcaption>
+      驗收時發現的缺失，依安全、功能與外觀分為三級處理優先順序，能讓交屋流程更有條理，也減少雙方的認知落差。
+    </figcaption>
+  </figure>
+
+  <h2>完工覆核節點：3階段把關，降低漏驗風險</h2>
+
+  <p>
+    為確保驗收品質，完工交屋前建議保留 3 個覆核節點，層層把關：
+  </p>
+
+  <div class="article-insight-panel">
+    <p class="article-insight-label">三階段覆核</p>
+    <h3 class="article-insight-title">工班自驗 → 屋主初驗（Punch List）→ 修繕後總複驗</h3>
+    <p>
+      初驗發現漏水，廠商修補後，至少應有 1 次完整的複驗測試（如再次蓄水 48 小時）；若首輪修補後仍有疑慮，實務上常需進入第 2 次複驗，絕對不能只看表面乾燥就簽收。
+    </p>
+  </div>
+
+  <div class="article-card-grid">
+    <div class="article-card">
+      <p class="article-card-kicker">節點一</p>
+      <h3>工班自驗</h3>
+      <p>工程退場前，由施工團隊進行初步檢查與清潔，是最容易被跳過的一步。</p>
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">節點二</p>
+      <h3>屋主與設計端初驗</h3>
+      <p>屋主會同第三方驗屋或設計師進行全面檢查，列出缺失清單（Punch List）。</p>
+    </div>
+    <div class="article-card">
+      <p class="article-card-kicker">節點三</p>
+      <h3>修繕後總複驗</h3>
+      <p>針對初驗缺失進行確認，並檢查修繕過程是否造成二次損壞。</p>
+    </div>
+  </div>
+
+  <h2>工具書模組：常見爭議責任歸屬判斷基準</h2>
+
+  <p>
+    老屋翻新最常遇到這是施工瑕疵還是自然現象的爭議。以下整理了常見問題的判斷基準，供屋主在保固期內與廠商溝通時參考：
+  </p>
+
+  <div class="article-reference-table-wrap">
+    <div class="article-reference-table-scroll">
+      <table class="article-reference-table">
+        <thead>
+          <tr>
+            <th>爭議項目</th>
+            <th>常見現象</th>
+            <th>判斷基準與責任歸屬</th>
+            <th>備註提醒</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>牆面裂縫</td>
+            <td>新砌磚牆或隔間牆出現細微髮絲紋</td>
+            <td>
+              多屬自然物理現象。台灣氣候潮濕且地震頻繁，熱脹冷縮與建材異材質交接處易產生細紋。若非結構性龜裂，通常屬自然耗損，部分廠商會在保固期內提供一次免費補漆。
+            </td>
+            <td>
+              若裂縫寬度大於 2mm 或呈階梯狀、交叉狀，應請專業人員評估是否為結構受損或施工不當（如未確實植筋或批土）。
+            </td>
+          </tr>
+          <tr>
+            <td>浴室漏水</td>
+            <td>交屋後數月，樓下反應天花板漏水</td>
+            <td>
+              需釐清漏水源頭。若經測試確認為此次翻新施作的水管破裂或防水層失效，屬施工瑕疵，廠商應負完全修繕責任。若為老屋原有管線或大樓公共管線漏水，則非廠商責任。
+            </td>
+            <td>
+              漏水問題應優先止損，並會同廠商或第三方抓漏釐清責任，切勿自行找人修繕後再要求原廠商買單，易生爭議。
+            </td>
+          </tr>
+          <tr>
+            <td>磁磚空鼓</td>
+            <td>敲擊地壁磚有空心聲</td>
+            <td>
+              視面積與比例而定。零星局部的空心聲不一定會造成脫落。但若單塊磁磚空鼓面積過大，或大面積出現空鼓，則屬施工瑕疵（如泥漿不飽滿），廠商應予更換。
+            </td>
+            <td>
+              驗收時可使用打診棒輕敲，記錄空鼓位置，並依合約約定的容許值與廠商協商處理方式。
+            </td>
+          </tr>
+          <tr>
+            <td>櫃體變形</td>
+            <td>木作或系統櫃層板彎曲</td>
+            <td>
+              視使用狀況而定。若層板跨距過大（超過 80-90cm 未加支撐）導致正常使用下變形，屬設計或施工瑕疵。若因放置過重物品超出層板承重限制而變形，則屬人為使用不當。
+            </td>
+            <td>
+              溝通設計時，應主動告知櫃體的預計收納物，以便設計師規劃適當的板材厚度與跨距支撐。
+            </td>
+          </tr>
+          <tr>
+            <td>五金生鏽</td>
+            <td>衛浴或廚房五金配件出現鏽斑</td>
+            <td>
+              多屬環境與保養問題。若使用環境長期潮濕、未維持通風，或使用強酸鹼清潔劑清洗，即使是不鏽鋼也可能生鏽，此屬人為或環境因素。除非能證明五金材質不符約定，否則多不屬保固範圍。
+            </td>
+            <td>
+              潮濕區應挑選抗氧化能力較佳的五金材質，並保持良好通風與正確的清潔習慣。
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="article-reference-table-note">
+    保固，是建立在合理使用與明確權責基礎上的信任機制。理解保固界線，並不是為了在交屋時與廠商針鋒相對，而是為了在問題發生時，能有一套客觀的標準來解決爭議，讓老屋翻新真正成為美好生活的起點。
+  </p>
+
+  <blockquote>
+    老屋翻新的保固界線，不是一場屋主與廠商的攻防戰，而是一套讓雙方都能安心的共同語言。有了這套語言，缺失不再是被情緒左右的泥沼，而是可以被精準定義、分類與處理的具體問題。
+  </blockquote>
+</EditorialArticleLayout>
