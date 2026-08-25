@@ -199,7 +199,7 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     chapter: "完工避雷",
     subchapter: "保固界線",
     tags: ["老屋翻新", "保固責任", "驗收重點", "缺失分級", "修繕爭議", "完工驗收"],
-    coverImage: "/images/blog/old-house-renovation-warranty-boundaries-cover.png",
+    coverImage: "/images/blog/old-house-renovation-warranty-boundaries-cover.jpeg",
     editorialRefreshStamp: "2026-08-25",
   },
   {
