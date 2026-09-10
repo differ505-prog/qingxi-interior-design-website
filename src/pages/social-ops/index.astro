@@ -5702,11 +5702,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const pool = Array.isArray(candidates) ? candidates : [];
     if (pool.length === 0) return [];
 
-    // 取候選的唯一 key：用「chapter||subchapter||displayTitle」避免同候選重複
-    // 注意：若 getDisplayTitle 回傳 "尚未產生"，必須強制降級為 chapter+subchapter，否則所有無標題候選會被 Set 錯誤去重為 1 篇
+    // 用 chapter+subchapter+title 作為唯一 key，避免 title 相同但 chapter 不同被誤判重複
     const candidateKey = (candidate) => {
       const title = getDisplayTitle(candidate);
-      return title !== "尚未產生" ? title : `${candidate.chapter || ""}||${candidate.subchapter || ""}`;
+      return `${candidate?.chapter || ""}||${candidate?.subchapter || ""}||${title}`;
     };
     const seenKeys = new Set();
     const deduped = [];
@@ -5718,24 +5717,33 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
     if (deduped.length === 0) return [];
 
-    const byCategory = new Map();
-    for (const candidate of deduped) {
-      const key = candidate?.category || "未分類";
-      if (!byCategory.has(key)) byCategory.set(key, []);
-      byCategory.get(key).push(candidate);
-    }
+    // 策略：diversity round-robin
+    // - 多 category：round-robin 各 category 確保多樣性
+    // - 單 category：退化為 chapter-level round-robin
+    const buildGrouping = (level = "category") => {
+      const grouping = new Map();
+      for (const candidate of deduped) {
+        const key = level === "category"
+          ? (candidate?.category || "未分類")
+          : (candidate?.chapter || "未分章");
+        if (!grouping.has(key)) grouping.set(key, []);
+        grouping.get(key).push(candidate);
+      }
+      return grouping;
+    };
 
-    /* round-robin 取候選：
-     * - 多 bucket：依序輪流從各 bucket 取一個，確保多樣性
-     * - 單 bucket：直接依序取，不做 round-robin（否則只會從單 bucket 取到第 1 個就結束）
-     * - 用 bucketIndices 追蹤讀取位置，避免修改 deduped 原陣列
+    /* 真正的 round-robin：
+     * - 多 bucket：每次 outer loop 從各 bucket 依序取 1 個 → 保證多樣性
+     * - 單 bucket：bucket 內連續取出（idx 累加），因為 keys 只有 1 個，
+     *   outer loop 每次都從同一 bucket 取下一個
+     * - 用 read index 避免破壞 deduped 原陣列
      */
     const pickRoundRobin = (grouping) => {
       const result = [];
       const keys = Array.from(grouping.keys());
       const bucketIndices = new Map(Array.from(grouping.entries()).map(([k]) => [k, 0]));
       while (result.length < safeLimit) {
-        let found = false;
+        let pickedInThisRound = 0;
         for (const key of keys) {
           if (result.length >= safeLimit) break;
           const bucket = grouping.get(key);
@@ -5743,27 +5751,18 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
           if (bucket && idx < bucket.length) {
             result.push(bucket[idx]);
             bucketIndices.set(key, idx + 1);
-            found = true;
+            pickedInThisRound += 1;
           }
         }
-        if (!found) break; // 所有 bucket 都已取完
+        if (pickedInThisRound === 0) break;
       }
       return result;
     };
 
-    let picked;
-    if (byCategory.size > 1) {
-      picked = pickRoundRobin(byCategory);
-    } else {
-      // 單 category（focus track）：退化為 chapter-level round-robin
-      const byChapter = new Map();
-      for (const candidate of deduped) {
-        const key = candidate?.chapter || "未分章";
-        if (!byChapter.has(key)) byChapter.set(key, []);
-        byChapter.get(key).push(candidate);
-      }
-      picked = pickRoundRobin(byChapter);
-    }
+    const grouping = buildGrouping("category");
+    let picked = grouping.size > 1
+      ? pickRoundRobin(grouping)
+      : pickRoundRobin(buildGrouping("chapter"));
 
     // diversity 不足時，從原始 pool 剩餘按原排序補滿，保證 Top 3 永遠湊滿 3 篇
     if (picked.length < safeLimit) {
@@ -5789,6 +5788,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const safeLimit = Math.max(1, limit);
     const directCandidates = getDirectTopPriorityRecommendations(mode, safeLimit);
     console.debug(`[TopPriority] directCandidates=${directCandidates.length} safeLimit=${safeLimit}`);
+    directCandidates.forEach((c, i) => {
+      console.debug(`  direct[${i}] ch=${c?.chapter} sub=${c?.subchapter} title=${getDisplayTitle(c)}`);
+    });
     if (directCandidates.length >= safeLimit) {
       console.debug(`[TopPriority] 直接返回 ${directCandidates.length} 個候選`);
       return {
@@ -5808,18 +5810,26 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         seen.add(key);
         return true;
       });
-    console.debug(`[TopPriority] fallbackCandidates=${fallbackCandidates.length} seen=${seen.size}`);
+    console.debug(`[TopPriority] focus-track fallbackCandidates=${fallbackCandidates.length} seen=${seen.size}`);
+    fallbackCandidates.forEach((c, i) => {
+      console.debug(`  fb[${i}] ch=${c?.chapter} sub=${c?.subchapter} title=${getDisplayTitle(c)}`);
+    });
 
     /* 第二層 fallback：focus track 內的 New_Publish 候選不足時，
        從全部候選（非 focus track）中取 New_Publish 來補足 Top 3 */
-    if (fallbackCandidates.length < safeLimit - directCandidates.length) {
-      const allCandidates = getRankedTopicCandidates(mode, 30)
+    const stillNeed = safeLimit - directCandidates.length - fallbackCandidates.length;
+    if (stillNeed > 0) {
+      const allCandidates = getRankedTopicCandidates(mode, 50)
         .filter((candidate) => candidate?.workflowAction === "New_Publish")
         .filter((candidate) => !isAssetLikeReviewCandidate(candidate));
+      console.debug(`[TopPriority] stillNeed=${stillNeed} allCandidates (after filter)=${allCandidates.length}`);
       const extraFromAll = allCandidates
         .filter((candidate) => !seen.has(getUniqueCandidateKey(candidate)))
-        .slice(0, (safeLimit - directCandidates.length) - fallbackCandidates.length);
+        .slice(0, stillNeed);
       console.debug(`[TopPriority] 第二層 fallback: 從 allCandidates 取 ${extraFromAll.length} 個補足`);
+      extraFromAll.forEach((c, i) => {
+        console.debug(`  extra[${i}] ch=${c?.chapter} sub=${c?.subchapter} title=${getDisplayTitle(c)}`);
+      });
       fallbackCandidates = [...fallbackCandidates, ...extraFromAll];
     }
 
@@ -5829,8 +5839,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     );
     console.debug(`[TopPriority] mergedCandidates=${mergedCandidates.length} 最終結果`);
     mergedCandidates.forEach((c, i) => {
-      console.debug(`  [${i}] ch=${c?.chapter} sub=${c?.subchapter} title=${getDisplayTitle(c)}`);
+      console.debug(`  merged[${i}] ch=${c?.chapter} sub=${c?.subchapter} title=${getDisplayTitle(c)}`);
     });
+    console.debug(`[TopPriority] 完整候選池大小: direct=${directCandidates.length} fallback=${fallbackCandidates.length} → merged=${mergedCandidates.length}`);
     return {
       candidates: mergedCandidates,
       directCandidates,
