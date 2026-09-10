@@ -1826,6 +1826,7 @@ function buildRecommendationFromCandidate(
     articleCountInSubchapter: number;
     coverageBefore: number;
     coverageAfter: number;
+    stage?: PublishingStage;
   },
   focusTrackTitle: string,
   mode: PublishingTopicMode,
@@ -1883,11 +1884,12 @@ function buildRecommendationFromCandidate(
     duplicateFormAssetTriggered ||
     topSimilarArticle?.subchapter === candidate.subchapter,
   );
-  const collisionRisk: NextTopicRecommendation["collisionRisk"] = canBeHighRisk && topSemanticScore >= 60
-    ? "high"
-    : topSemanticScore >= 35
-      ? "medium"
-      : "low";
+  const collisionRisk: NextTopicRecommendation["collisionRisk"] = (() => {
+    const stageForRisk = candidate.stage || getPublishingStage(candidate.coverageBefore);
+    const riskThresholds = getPublishingThresholds(stageForRisk);
+    if (canBeHighRisk && topSemanticScore >= riskThresholds.collisionMergeMin) return "high";
+    return topSemanticScore > riskThresholds.reviseAngleMin ? "medium" : "low";
+  })();
   const collisionReason = mergeTriggered
     ? mergeDirective?.note || "這個主題已與既有文章形成整併關係，較適合合併而非另開新題。"
     : mergeBackedAssetTriggered
@@ -2046,6 +2048,11 @@ function buildRecommendationCandidates(
           return null;
         }
         const totalSubchapters = track.chapters.reduce((sum, item) => sum + item.subchapters.length, 0);
+        const stageCoverageRate = totalSubchapters
+          ? Math.round((trackEntries.length / totalSubchapters) * 100)
+          : 0;
+        const stage = getPublishingStage(stageCoverageRate);
+        const thresholds = getPublishingThresholds(stage);
         const completedSubchapters = track.chapters.reduce(
           (sum, item) =>
             sum + item.subchapters.filter((child) =>
@@ -2101,9 +2108,9 @@ function buildRecommendationCandidates(
         const topSemanticScore = buildSimilarArticleMatches(entries, track.title, chapter.title, subchapter.title)[0]?.score || 0;
         const collisionPenalty = subchapterEntries.length > 0
           ? 90
-          : topSemanticScore >= 60
+          : topSemanticScore >= thresholds.collisionMergeMin
             ? 240
-            : topSemanticScore >= 35
+            : topSemanticScore > thresholds.reviseAngleMin
               ? 76
               : 0;
         const oldHousePriorityBoost = track.title === publishingFocusTrackTitle
@@ -2148,6 +2155,7 @@ function buildRecommendationCandidates(
           articleCountInSubchapter: subchapterEntries.length,
           coverageBefore,
           coverageAfter,
+          stage,
           score,
         };
       }),
