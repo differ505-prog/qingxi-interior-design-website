@@ -5602,10 +5602,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     renderPublishingReviewBoard();
   }
 
-  function getRankedTopicCandidates(mode = currentTopicMode, limit = 6) {
+  function getRankedTopicCandidates(mode = currentTopicMode, limit = 6, ignoreFocusTrack = false) {
     const modeState = getCurrentTopicModeState(mode);
     const focusTrack = modeState?.publishingDashboard?.focusTrack;
-    const focusTrackTitle = modeState?.publishingDashboard?.focusTrack?.title;
+    const focusTrackTitle = ignoreFocusTrack ? null : modeState?.publishingDashboard?.focusTrack?.title;
     const allCandidates = Array.isArray(modeState?.nextTopicCandidates) ? modeState.nextTopicCandidates : [];
     const primaryRecommendation = modeState?.nextRecommendedTopic || null;
     const filtered = focusTrackTitle
@@ -5819,7 +5819,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
        從全部候選（非 focus track）中取 New_Publish 來補足 Top 3 */
     const stillNeed = safeLimit - directCandidates.length - fallbackCandidates.length;
     if (stillNeed > 0) {
-      const allCandidates = getRankedTopicCandidates(mode, 50)
+      const allCandidates = getRankedTopicCandidates(mode, 50, true)
         .filter((candidate) => candidate?.workflowAction === "New_Publish")
         .filter((candidate) => !isAssetLikeReviewCandidate(candidate));
       console.debug(`[TopPriority] stillNeed=${stillNeed} allCandidates (after filter)=${allCandidates.length}`);
