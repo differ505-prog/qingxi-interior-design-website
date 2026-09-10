@@ -5796,13 +5796,26 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
 
     const seen = new Set(directCandidates.map((candidate) => getDisplayTitle(candidate)));
-    const fallbackCandidates = getPureNewPublishFallbackCandidates(mode, safeLimit * 2)
+    let fallbackCandidates = getPureNewPublishFallbackCandidates(mode, safeLimit * 2)
       .filter((candidate) => {
         const title = getDisplayTitle(candidate);
         if (seen.has(title)) return false;
         seen.add(title);
         return true;
       });
+
+    /* 第二層 fallback：focus track 內的 New_Publish 候選不足時，
+       從全部候選（非 focus track）中取 New_Publish 來補足 Top 3 */
+    if (fallbackCandidates.length < safeLimit - directCandidates.length) {
+      const allCandidates = getRankedTopicCandidates(mode, 30)
+        .filter((candidate) => candidate?.workflowAction === "New_Publish")
+        .filter((candidate) => !isAssetLikeReviewCandidate(candidate));
+      const extraFromAll = allCandidates
+        .filter((candidate) => !seen.has(getDisplayTitle(candidate)))
+        .slice(0, (safeLimit - directCandidates.length) - fallbackCandidates.length);
+      fallbackCandidates = [...fallbackCandidates, ...extraFromAll];
+    }
+
     const mergedCandidates = pickDiverseByCategory(
       sortTopPriorityCandidates([...directCandidates, ...fallbackCandidates], directCandidates.length + fallbackCandidates.length),
       safeLimit
