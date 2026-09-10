@@ -322,7 +322,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "專案節點",
             keywords: ["初勘流程", "估價前", "決策順序", "判讀流程", "是否開工", "專案節點", "開工前"],
             nodeKind: "project",
-            titleOverride: "初勘至開工的決策沙盤推演",
+            titleOverride: "專案時程：初勘至開工的決策沙盤推演",
           },
           {
             title: "案例解析",
@@ -358,7 +358,7 @@ export const bookshelfTrackPlans: BookshelfTrackPlan[] = [
             title: "追加風險",
             keywords: ["追加", "超支", "爆預算", "變更多", "加價"],
             nodeKind: "core",
-            titleOverride: "變更、漏項與超支的預防策略",
+            titleOverride: "追加風險：變更、漏項與超支的預防策略",
           },
           {
             title: "案例解析",
