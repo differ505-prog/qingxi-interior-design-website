@@ -2556,7 +2556,20 @@ export function getNextRecommendedTopic(
   mode: PublishingTopicMode = "publishing",
 ): NextTopicRecommendation | null {
   const entries = buildBookshelfEntries(posts);
-  const best = buildRecommendationCandidates(entries, focusTrackTitle, mode)[0];
-  if (!best) return buildForcedFallbackCandidate(entries, focusTrackTitle, mode);
+  const candidateList = buildRecommendationCandidates(entries, focusTrackTitle, mode);
+  const mountedTitles = collectMountedTitles(entries);
+  const filteredCandidates = candidateList.filter((candidate) => {
+    const candidateTitle = buildBookTopicTitle(candidate.trackTitle, candidate.chapter, candidate.subchapter);
+    if (!candidateTitle) return true;
+    return !isCrossChapterDuplicate(candidateTitle, mountedTitles);
+  });
+  const best = filteredCandidates[0];
+  if (!best) {
+    const fallback = buildForcedFallbackCandidate(entries, focusTrackTitle, mode);
+    if (!fallback) return null;
+    const fallbackTitle = fallback.primaryTitle || fallback.webTitle || fallback.bookTitle || "";
+    const fallbackCollides = fallbackTitle && isCrossChapterDuplicate(fallbackTitle, mountedTitles);
+    return fallbackCollides ? null : fallback;
+  }
   return buildRecommendationFromCandidate(entries, best, focusTrackTitle, mode);
 }
