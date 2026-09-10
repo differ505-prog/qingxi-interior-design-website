@@ -2366,6 +2366,11 @@ function buildForcedFallbackCandidate(
     ? Math.round(((completedSubchapters + (subchapterEntries.length ? 0 : 1)) / totalSubchapters) * 100)
     : coverageBefore;
 
+  // 時序硬門檻：fallback 若違反時序（例如第四章 <25% 時推進第五章），直接回 null
+  if (isCandidateBlockedByChronology(fallbackTrackTitle, fallbackChapterTitle, trackEntries)) {
+    return null;
+  }
+
   return buildRecommendationFromCandidate(
     entries,
     {
@@ -2450,8 +2455,37 @@ function collectMountedTitles(entries: BookshelfEntry[]): Set<string> {
   for (const entry of entries) {
     if (entry.title) titles.add(entry.title);
     if (entry.chapter) titles.add(entry.chapter);
+    if (entry.subchapter) titles.add(entry.subchapter);
   }
   return titles;
+}
+
+// 語意意圖錨點：同組內任兩 term 同時存在於候選 AND 已上線，視為意圖重疊
+const SEMANTIC_INTENT_PAIRS: ReadonlyArray<readonly [string, string]> = [
+  ["初勘", "屋況"],
+  ["排查", "判斷"],
+  ["翻新", "盤點"],
+  ["拆除", "清運"],
+  ["水電", "管線"],
+  ["泥作", "防水"],
+  ["驗收", "點交"],
+  ["追加", "超支"],
+  ["保固", "糾紛"],
+  ["格局", "動線"],
+  ["收納", "櫃體"],
+];
+
+function hasSharedSemanticIntent(left: string, right: string): boolean {
+  for (const [a, b] of SEMANTIC_INTENT_PAIRS) {
+    const leftHasA = left.includes(a);
+    const leftHasB = left.includes(b);
+    const rightHasA = right.includes(a);
+    const rightHasB = right.includes(b);
+    if ((leftHasA && rightHasA) || (leftHasA && rightHasB) || (leftHasB && rightHasA) || (leftHasB && rightHasB)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function isCrossChapterDuplicate(candidateTitle: string, mountedTitles: Set<string>): boolean {
@@ -2465,6 +2499,7 @@ function isCrossChapterDuplicate(candidateTitle: string, mountedTitles: Set<stri
     if (normalizedCandidate.includes(normalizedMounted) || normalizedMounted.includes(normalizedCandidate)) {
       return true;
     }
+    if (hasSharedSemanticIntent(normalizedCandidate, normalizedMounted)) return true;
     const overlap = computeBigramOverlap(normalizedCandidate, normalizedMounted);
     if (overlap >= 0.8) return true;
   }
