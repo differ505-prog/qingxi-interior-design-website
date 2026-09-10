@@ -1181,6 +1181,7 @@ function buildTitlePoolItem(
   chapterTitle: string,
   subchapterTitle: string,
   recommendedTopic: NextTopicRecommendation | null,
+  stage: PublishingStage = "mid",
 ): PublicationTitlePoolItem {
   const titleSet = getTopicTitleSet(trackTitle, chapterTitle, subchapterTitle);
   const subchapterPlan = getTrackPlan(trackTitle)?.chapters
@@ -1199,7 +1200,8 @@ function buildTitlePoolItem(
     entry.subchapter === subchapterTitle
   ));
   const topSemanticScore = buildSimilarArticleMatches(entries, trackTitle, chapterTitle, subchapterTitle)[0]?.score || 0;
-  const collisionMergeNeeded = !hasPublishedEntry && topSemanticScore >= 60;
+  const thresholds = getPublishingThresholds(stage);
+  const collisionMergeNeeded = !hasPublishedEntry && topSemanticScore >= thresholds.collisionMergeMin;
   const mergeNeeded = Boolean(
     mergeDirective &&
     mergeDirective.targetSubchapter === subchapterTitle &&
@@ -1225,7 +1227,7 @@ function buildTitlePoolItem(
       ? "Published_Reference"
     : assetIntentTriggered || mergeBackedTheoryReady
       ? "Merge_into_Asset"
-    : topSemanticScore > 35
+    : topSemanticScore > thresholds.reviseAngleMin
       ? "Revise_Angle"
       : "New_Publish";
   const statusTag = mergeNeeded
@@ -1290,9 +1292,10 @@ function buildChapterTitlePool(
   trackTitle: string,
   chapterPlan: BookshelfChapterPlan,
   recommendedTopic: NextTopicRecommendation | null,
+  stage: PublishingStage = "mid",
 ) {
   return chapterPlan.subchapters.map((subchapter) => (
-    buildTitlePoolItem(entries, trackTitle, chapterPlan.title, subchapter.title, recommendedTopic)
+    buildTitlePoolItem(entries, trackTitle, chapterPlan.title, subchapter.title, recommendedTopic, stage)
   ));
 }
 
@@ -1621,6 +1624,33 @@ export function getPublishingCoverageSummary(posts: PublishingCatalogPost[] = []
   };
 }
 
+/* 出版生命週期判定：用於動態調整 New_Publish 與 collision 閾值
+ * 早期（<40%）：放寬碰撞判定，鼓勵先發新文
+ * 中期（40-75%）：標準閾值
+ * 晚期（>75%）：嚴格保護既有文章，盡量走整併／改切角
+ */
+export type PublishingStage = "early" | "mid" | "late";
+
+export function getPublishingStage(coverageRate = 0): PublishingStage {
+  if (coverageRate < 40) return "early";
+  if (coverageRate <= 75) return "mid";
+  return "late";
+}
+
+/* Stage-aware 閾值集中點：所有 workflowAction 判定都讀這裡，避免散落魔術數字
+ * 早期放寬碰撞判定（>35 → >55），避免少數相似舊文把候選全部踢到 Revise_Angle
+ * 晚期不放寬（維持 35），因書稿已接近完成，保護既有文章優先
+ */
+export function getPublishingThresholds(stage: PublishingStage) {
+  if (stage === "early") {
+    return { reviseAngleMin: 55, collisionMergeMin: 75 };
+  }
+  if (stage === "late") {
+    return { reviseAngleMin: 35, collisionMergeMin: 60 };
+  }
+  return { reviseAngleMin: 35, collisionMergeMin: 60 };
+}
+
 export function getPublishingDashboard(
   posts: PublishingCatalogPost[] = [],
   focusTrackTitle = publishingFocusTrackTitle,
@@ -1630,6 +1660,11 @@ export function getPublishingDashboard(
   const tracks = bookshelfTrackPlans.map((track) => {
     const rawTrackEntries = entries.filter((entry) => entry.trackTitle === track.title);
     const trackEntries = getEffectiveTrackEntries(rawTrackEntries);
+    const trackTotalSubchapters = track.chapters.reduce((sum, c) => sum + c.subchapters.length, 0);
+    const trackCoverageRate = trackTotalSubchapters
+      ? Math.round((trackEntries.length / trackTotalSubchapters) * 100)
+      : 0;
+    const stage = getPublishingStage(trackCoverageRate);
     const chapterGaps = track.chapters.map((chapter) => {
       const chapterEntries = trackEntries.filter((entry) => entry.chapter === chapter.title);
       const mergeDirective = getPublicationMergeDirective(track.title, chapter.title);
@@ -1651,7 +1686,7 @@ export function getPublishingDashboard(
         .map((subchapter) => subchapter.title);
 
       const recommendedTopic = getChapterRecommendedTopicFromEntries(entries, track.title, chapter.title, focusTrackTitle, mode);
-      const titlePool = buildChapterTitlePool(entries, track.title, chapter, recommendedTopic);
+      const titlePool = buildChapterTitlePool(entries, track.title, chapter, recommendedTopic, stage);
       return {
         chapter: chapter.title,
         articleCount: chapterEntries.length,
