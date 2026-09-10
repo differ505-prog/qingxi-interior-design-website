@@ -5703,7 +5703,11 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     if (pool.length === 0) return [];
 
     // 取候選的唯一 key：用「chapter||subchapter||displayTitle」避免同候選重複
-    const candidateKey = (candidate) => getDisplayTitle(candidate) || `${candidate.chapter || ""}||${candidate.subchapter || ""}`;
+    // 注意：若 getDisplayTitle 回傳 "尚未產生"，必須強制降級為 chapter+subchapter，否則所有無標題候選會被 Set 錯誤去重為 1 篇
+    const candidateKey = (candidate) => {
+      const title = getDisplayTitle(candidate);
+      return title !== "尚未產生" ? title : `${candidate.chapter || ""}||${candidate.subchapter || ""}`;
+    };
     const seenKeys = new Set();
     const deduped = [];
     for (const candidate of pool) {
@@ -6008,7 +6012,22 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
               <span>${index === 0 ? "同章補充（建議）" : "下一章主幹"}</span>
               <em>${escapeHtml(getPublicationChapterLabel(candidate.chapter))} / ${escapeHtml(candidate.subchapter)}</em>
             </div>
-            <strong>${escapeHtml(getDisplayTitle(candidate))}</strong>
+            ${(() => {
+              const title = getDisplayTitle(candidate);
+              if (title === "尚未產生") {
+                const chapLabel = getPublicationChapterLabel(candidate.chapter);
+                const subchap = candidate.subchapter;
+                const fallbackText = `[空窗遞補] ${chapLabel} ❯ ${subchap}`;
+                const encodedText = encodeURIComponent(`新題目待生成\n${chapLabel}`);
+                return `
+                  <figure style="margin: 0 -1rem; border-radius: 6px; overflow: hidden; margin-bottom: 0.5rem; height: 120px; flex-shrink: 0;">
+                    <img src="https://placehold.co/600x400/222/eee?text=${encodedText}" alt="佔位圖" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+                  </figure>
+                  <strong>${escapeHtml(fallbackText)}</strong>
+                `;
+              }
+              return `<strong>${escapeHtml(title)}</strong>`;
+            })()}
             <p>${escapeHtml(getPublishingReviewCandidateReason(candidate))}</p>
             <button
               type="button"
@@ -6038,7 +6057,22 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
           <span>${resolution.autoReplenished || (resolution.partiallyAutoReplenished && index >= resolution.directCandidates.length) ? `Auto Top ${index + 1}` : `Top ${index + 1}`}</span>
           <em>${escapeHtml(getPublicationChapterLabel(candidate.chapter))} / ${escapeHtml(candidate.subchapter)}</em>
         </div>
-        <strong>${escapeHtml(getDisplayTitle(candidate))}</strong>
+        ${(() => {
+          const title = getDisplayTitle(candidate);
+          if (title === "尚未產生") {
+            const chapLabel = getPublicationChapterLabel(candidate.chapter);
+            const subchap = candidate.subchapter;
+            const fallbackText = `[空窗遞補] ${chapLabel} ❯ ${subchap}`;
+            const encodedText = encodeURIComponent(`新題目待生成\n${chapLabel}`);
+            return `
+              <figure style="margin: 0 -1rem; border-radius: 6px; overflow: hidden; margin-bottom: 0.5rem; height: 120px; flex-shrink: 0;">
+                <img src="https://placehold.co/600x400/222/eee?text=${encodedText}" alt="佔位圖" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+              </figure>
+              <strong>${escapeHtml(fallbackText)}</strong>
+            `;
+          }
+          return `<strong>${escapeHtml(title)}</strong>`;
+        })()}
         <div class="bookshelf-review-top3-meta">
           <span class="bookshelf-review-semantic-badge is-${getSemanticMatchBadgeData(candidate).state}">${escapeHtml(getSemanticMatchBadgeData(candidate).label)}</span>
           ${(() => {
