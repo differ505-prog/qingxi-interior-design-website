@@ -2162,9 +2162,169 @@ function buildRecommendationCandidates(
     )),
   );
 
-  return candidates
-    .filter((candidate): candidate is NonNullable<typeof candidate> => Boolean(candidate))
-    .sort((left, right) => right.score - left.score);
+  return applyDiversityRerank(
+    candidates.filter((candidate): candidate is NonNullable<typeof candidate> => Boolean(candidate)),
+  ).sort((left, right) => right.score - left.score);
+}
+
+/* Top N 主題多樣性重排（防止讀者疲勞）
+ * 第一層：同 chapter 上限 2（避免連三篇都擠同一章）
+ * 第二層：同主題簇上限 1（避免「預算／報價／拆解」三連發）
+ * 第三層：候選 vs 已選的「標題／備援／子章」關鍵字重疊，Jaccard ≥ 0.5 踢除（雙保險，防止不同章但解法語撞題）
+ * 第四層：放寬 gate 後排序回傳（高分優先）
+ */
+type DiversityCandidate = {
+  trackTitle: string;
+  chapter: string;
+  subchapter: string;
+  category: string;
+  articleCountInTrack: number;
+  articleCountInChapter: number;
+  articleCountInSubchapter: number;
+  coverageBefore: number;
+  coverageAfter: number;
+  stage?: PublishingStage;
+  score: number;
+};
+
+const TOPIC_CLUSTERS: Array<{ id: string; keywords: string[] }> = [
+  { id: "budget_estimate", keywords: ["預算", "報價", "拆解", "估價", "單價", "計價", "價格", "成本"] },
+  { id: "schedule_flow", keywords: ["流程", "時程", "排程", "進度", "時間軸", "階段"] },
+  { id: "contract_sign", keywords: ["合約", "契約", "簽約", "條款", "保固"] },
+  { id: "scope_design", keywords: ["格局", "動線", "收納", "風格", "設計", "規劃"] },
+  { id: "hidden_engineering", keywords: ["水電", "防水", "管線", "隱蔽工程", "基礎工程", "結構"] },
+  { id: "old_house_judgment", keywords: ["老屋", "中古屋", "屋況", "瑕疵", "健檢", "勘驗"] },
+];
+
+/* gate C 用：標題／備援／子章的「中文二元語法單元」切詞
+ * 抽 2~4 字元 n-gram + 中文標點 / 全形空白移除，產出語法 token 集合
+ * 例：「預算分級：老屋翻新的預算配置與報價判讀」
+ *   → {"預算", "算分", "分級", "級老", "老屋", "屋翻", "翻新", "新的", "的預", "預算", "算配", "配置", "置與", "與報", "報價", "價判", "判讀"}
+ *   + 移除單字（避免「的」「了」「與」干擾）
+ */
+function tokenizeDiversityText(text: string): Set<string> {
+  const cleaned = (text || "").replace(/[：:？?、，,。！!（）()「」『』《》\-\s]/g, "");
+  if (cleaned.length < 2) return new Set();
+  const tokens = new Set<string>();
+  for (let n = 2; n <= 4; n += 1) {
+    for (let i = 0; i + n <= cleaned.length; i += 1) {
+      tokens.add(cleaned.slice(i, i + n));
+    }
+  }
+  return tokens;
+}
+
+const STOP_TOKENS = new Set([
+  "預算", "算配", "配置", "置與", "與報", "報價", "價拆", "拆解", "解的", "的重", "重點", "點整", "整理",
+  "整理", "理與", "與判", "判讀", "讀指", "指南", "南的", "的決", "決策", "策框", "框架",
+]);
+
+function pruneStopTokens(tokens: Set<string>): Set<string> {
+  const pruned = new Set<string>();
+  for (const t of tokens) {
+    if (t.length < 2) continue;
+    if (STOP_TOKENS.has(t)) continue;
+    pruned.add(t);
+  }
+  return pruned;
+}
+
+function detectTopicClusters(text: string): string[] {
+  if (!text) return [];
+  const matches: string[] = [];
+  for (const cluster of TOPIC_CLUSTERS) {
+    if (cluster.keywords.some((kw) => text.includes(kw))) matches.push(cluster.id);
+  }
+  return matches;
+}
+
+const KEYWORD_OVERLAP_THRESHOLD = 0.5;
+
+function getCandidateKeywordTokens(candidate: DiversityCandidate): Set<string> {
+  const titleSet = getTopicTitleSet(candidate.trackTitle, candidate.chapter, candidate.subchapter);
+  const merged = [
+    titleSet.webTitle,
+    ...titleSet.backupTitles,
+    candidate.subchapter,
+    candidate.chapter,
+  ].join(" ");
+  return pruneStopTokens(tokenizeDiversityText(merged));
+}
+
+function getKeywordOverlapRatio(left: Set<string>, right: Set<string>): number {
+  if (!left.size || !right.size) return 0;
+  let intersection = 0;
+  const [smaller, larger] = left.size <= right.size ? [left, right] : [right, left];
+  for (const token of smaller) {
+    if (larger.has(token)) intersection += 1;
+  }
+  return intersection / Math.max(1, Math.min(left.size, right.size));
+}
+
+function applyDiversityRerank(candidates: DiversityCandidate[]): DiversityCandidate[] {
+  if (candidates.length <= 1) return candidates;
+
+  const sortedByScore = [...candidates].sort((left, right) => right.score - left.score);
+  const result: DiversityCandidate[] = [];
+  const chapterCounts = new Map<string, number>();
+  const clusterCounts = new Map<string, number>();
+  const resultKeywordTokens: Set<string>[] = [];
+
+  for (const candidate of sortedByScore) {
+    const chapterKey = `${candidate.trackTitle}::${candidate.chapter}`;
+    const currentChapterCount = chapterCounts.get(chapterKey) || 0;
+    const titleSet = getTopicTitleSet(candidate.trackTitle, candidate.chapter, candidate.subchapter);
+    const clusterIds = detectTopicClusters(`${titleSet.webTitle} ${titleSet.backupTitles.join(" ")}`);
+    const candidateTokens = getCandidateKeywordTokens(candidate);
+
+    // gate A：同 chapter 上限 2
+    if (currentChapterCount >= 2) continue;
+
+    // gate B：同主題簇上限 1（取第一個匹配簇）
+    const blockedByCluster = clusterIds.some((id) => (clusterCounts.get(id) || 0) >= 1);
+    if (blockedByCluster) continue;
+
+    // gate C：候選標題/備援/子章 vs 任一已選結果，關鍵字重疊 ≥ 0.5 踢除
+    const overlapHit = resultKeywordTokens.some((existing) => getKeywordOverlapRatio(existing, candidateTokens) >= KEYWORD_OVERLAP_THRESHOLD);
+    if (overlapHit) continue;
+
+    result.push(candidate);
+    chapterCounts.set(chapterKey, currentChapterCount + 1);
+    for (const id of clusterIds) clusterCounts.set(id, (clusterCounts.get(id) || 0) + 1);
+    resultKeywordTokens.push(candidateTokens);
+  }
+
+  // 放寬 gate：若結果太少（<3），先放掉 gate C（關鍵字重疊），保留 A/B
+  if (result.length < 3) {
+    const takenKeys = new Set(result.map((c) => `${c.trackTitle}::${c.chapter}::${c.subchapter}`));
+    const remaining = sortedByScore.filter((c) => !takenKeys.has(`${c.trackTitle}::${c.chapter}::${c.subchapter}`));
+    const relaxedChapterCounts = new Map<string, number>();
+    for (const c of result) {
+      const key = `${c.trackTitle}::${c.chapter}`;
+      relaxedChapterCounts.set(key, (relaxedChapterCounts.get(key) || 0) + 1);
+    }
+    const relaxedClusterCounts = new Map<string, number>();
+    for (const c of result) {
+      const ts = getTopicTitleSet(c.trackTitle, c.chapter, c.subchapter);
+      for (const id of detectTopicClusters(`${ts.webTitle} ${ts.backupTitles.join(" ")}`)) {
+        relaxedClusterCounts.set(id, (relaxedClusterCounts.get(id) || 0) + 1);
+      }
+    }
+    for (const candidate of remaining) {
+      if (result.length >= 3) break;
+      const chapterKey = `${candidate.trackTitle}::${candidate.chapter}`;
+      const ts = getTopicTitleSet(candidate.trackTitle, candidate.chapter, candidate.subchapter);
+      const clusterIds = detectTopicClusters(`${ts.webTitle} ${ts.backupTitles.join(" ")}`);
+      // 放寬階段 A：放掉 cluster gate，只保留 chapter ≤ 3
+      if ((relaxedChapterCounts.get(chapterKey) || 0) >= 3) continue;
+      result.push(candidate);
+      takenKeys.add(`${candidate.trackTitle}::${candidate.chapter}::${candidate.subchapter}`);
+      relaxedChapterCounts.set(chapterKey, (relaxedChapterCounts.get(chapterKey) || 0) + 1);
+      for (const id of clusterIds) relaxedClusterCounts.set(id, (relaxedClusterCounts.get(id) || 0) + 1);
+    }
+  }
+
+  return result;
 }
 
 function buildForcedFallbackCandidate(
