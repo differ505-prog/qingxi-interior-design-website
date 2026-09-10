@@ -173,7 +173,12 @@ export interface PublishingTopicModeOption {
 
 export const publishingFocusTrackTitle = "老屋翻新系";
 export const publicationChapterOrder = ["現況判讀", "預算拆解", "基礎工程", "空間重整", "完工避雷"] as const;
-export const publicationChronologyMinCompletionRate = 25;
+// 完成度門檻（百分比）：前序 chapter 達到此比例後，下一個 chapter 才會被視為可推薦。
+// 設計決策（2026-09-11）：從 25% 放寬至 10%。
+// 原因：確保 Top 3 推薦可涵蓋 ≥ 3 個不同 chapter，緩解讀者疲勞。
+// 10% 代表「寫 1 篇即解鎖下一章推薦池」，兼顧時序紀律與讀者體驗。
+// 若未來 PO 量增長、讀者疲勞指標改善，可調回 15% / 20% / 25%。
+export const publicationChronologyMinCompletionRate = 10;
 export const crossSeriesForbiddenKeywords = ["預售屋", "客變", "新成屋", "商空"] as const;
 export const publicationChapterDisplayTitles: Record<string, string> = {
   "現況判讀": "屋況與範圍盤點",
