@@ -2188,7 +2188,7 @@ type DiversityCandidate = {
 };
 
 const TOPIC_CLUSTERS: Array<{ id: string; keywords: string[] }> = [
-  { id: "budget_estimate", keywords: ["預算", "報價", "拆解", "估價", "單價", "計價", "價格", "成本"] },
+  { id: "budget_estimate", keywords: ["預算", "報價", "拆解", "估價", "單價", "計價", "價格", "成本", "超支", "追加", "漏項", "變更", "預防", "爆預算"] },
   { id: "schedule_flow", keywords: ["流程", "時程", "排程", "進度", "時間軸", "階段"] },
   { id: "contract_sign", keywords: ["合約", "契約", "簽約", "條款", "保固"] },
   { id: "scope_design", keywords: ["格局", "動線", "收納", "風格", "設計", "規劃"] },
