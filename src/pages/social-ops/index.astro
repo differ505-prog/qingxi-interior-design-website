@@ -5726,15 +5726,14 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
 
     /* round-robin 取候選：
-     * - 依序輪流從各 category/chapter bucket 取一個候選
-     * - 改用 splice 取代 shift()，避免修改 deduped 原陣列，確保 fallback 可正常補滿
+     * - 多 bucket：依序輪流從各 bucket 取一個，確保多樣性
+     * - 單 bucket：直接依序取，不做 round-robin（否則只會從單 bucket 取到第 1 個就結束）
+     * - 用 bucketIndices 追蹤讀取位置，避免修改 deduped 原陣列
      */
     const pickRoundRobin = (grouping) => {
       const result = [];
       const keys = Array.from(grouping.keys());
-      const bucketIndices = new Map(grouping.size === 1
-        ? [[keys[0], 0]]  // 單 bucket：固定從 index 0 取，避免破壞剩餘候選供 fallback 使用
-        : Array.from(grouping.entries()).map(([k]) => [k, 0]));
+      const bucketIndices = new Map(Array.from(grouping.entries()).map(([k]) => [k, 0]));
       while (result.length < safeLimit) {
         let found = false;
         for (const key of keys) {
