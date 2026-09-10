@@ -2406,9 +2406,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   const publishingFocusTrackTitle = publishingFocusTrackTitleJson ? JSON.parse(publishingFocusTrackTitleJson) : "";
   const structuredBookDataPacks = bookDataPacksJson ? JSON.parse(bookDataPacksJson) : {};
   const forcedTopPriorityTitles = [
-    "屋況初勘避雷：隱蔽風險排查與檢測要點",
-    "全室預算拆解：報價單判讀與超支預防指南",
-    "水電更新：老屋基礎工程的迴路重整與用電安全",
+    "專案時程：初勘至開工的決策沙盤推演",
+    "收納補強：老屋機能配置與櫃體整合策略",
+    "追加風險：變更、漏項與超支的預防策略",
   ];
   const articleIntakeFields = [
     "主書系",
@@ -5702,14 +5702,26 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const pool = Array.isArray(candidates) ? candidates : [];
     if (pool.length === 0) return [];
 
-    const byCategory = new Map();
+    // 取候選的唯一 key：用「chapter||subchapter||displayTitle」避免同候選重複
+    const candidateKey = (candidate) => getDisplayTitle(candidate) || `${candidate.chapter || ""}||${candidate.subchapter || ""}`;
+    const seenKeys = new Set();
+    const deduped = [];
     for (const candidate of pool) {
+      const key = candidateKey(candidate);
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+      deduped.push(candidate);
+    }
+    if (deduped.length === 0) return [];
+
+    const byCategory = new Map();
+    for (const candidate of deduped) {
       const key = candidate?.category || "未分類";
       if (!byCategory.has(key)) byCategory.set(key, []);
       byCategory.get(key).push(candidate);
     }
 
-    const pickRoundRobin = (grouping, label) => {
+    const pickRoundRobin = (grouping) => {
       const result = [];
       const keys = Array.from(grouping.keys());
       let cursor = 0;
@@ -5726,18 +5738,32 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       return result;
     };
 
+    let picked;
     if (byCategory.size > 1) {
-      return pickRoundRobin(byCategory, "category");
+      picked = pickRoundRobin(byCategory);
+    } else {
+      // 單 category（focus track）：退化為 chapter-level round-robin
+      const byChapter = new Map();
+      for (const candidate of deduped) {
+        const key = candidate?.chapter || "未分章";
+        if (!byChapter.has(key)) byChapter.set(key, []);
+        byChapter.get(key).push(candidate);
+      }
+      picked = pickRoundRobin(byChapter);
     }
 
-    // 單 category（focus track）：退化為 chapter-level round-robin
-    const byChapter = new Map();
-    for (const candidate of pool) {
-      const key = candidate?.chapter || "未分章";
-      if (!byChapter.has(key)) byChapter.set(key, []);
-      byChapter.get(key).push(candidate);
+    // diversity 不足時，從原始 pool 剩餘按原排序補滿，保證 Top 3 永遠湊滿 3 篇
+    if (picked.length < safeLimit) {
+      const pickedSet = new Set(picked.map((candidate) => candidateKey(candidate)));
+      for (const candidate of deduped) {
+        if (picked.length >= safeLimit) break;
+        const key = candidateKey(candidate);
+        if (pickedSet.has(key)) continue;
+        pickedSet.add(key);
+        picked.push(candidate);
+      }
     }
-    return pickRoundRobin(byChapter, "chapter");
+    return picked.slice(0, safeLimit);
   }
 
   function getDirectTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
