@@ -5691,7 +5691,12 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     return [...forced, ...remainder].slice(0, Math.max(1, limit));
   }
 
-  /* Top 3 分類去重：round-robin 各分類取 1 篇，湊滿 limit；不足 limit 才在同一分類內遞補 */
+  /* Top 3 多樣性分桶：
+   * - 多 category 場景：round-robin 各分類取 1 篇（既有行為，防連發同類）
+   * - 單 category 場景（focus track 鎖單一書系）：退化為 round-robin chapter-level
+   *   讓 diversity gate 已保證的「同 chapter ≤ 2」限制實際生效，
+   *   否則單 bucket 只能取 1 次 → Top 永遠湊不滿 3
+   */
   function pickDiverseByCategory(candidates, limit) {
     const safeLimit = Math.max(1, Number(limit) || 1);
     const pool = Array.isArray(candidates) ? candidates : [];
@@ -5704,20 +5709,35 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       byCategory.get(key).push(candidate);
     }
 
-    const result = [];
-    const keys = Array.from(byCategory.keys());
-    let cursor = 0;
-    while (result.length < safeLimit) {
-      const bucket = byCategory.get(keys[cursor]);
-      if (bucket && bucket.length > 0) {
-        result.push(bucket.shift());
+    const pickRoundRobin = (grouping, label) => {
+      const result = [];
+      const keys = Array.from(grouping.keys());
+      let cursor = 0;
+      while (result.length < safeLimit) {
+        const bucket = grouping.get(keys[cursor]);
+        if (bucket && bucket.length > 0) {
+          result.push(bucket.shift());
+        }
+        cursor = (cursor + 1) % keys.length;
+        if (result.length === 0) break;
+        const allEmpty = keys.every((k) => grouping.get(k).length === 0);
+        if (allEmpty) break;
       }
-      cursor = (cursor + 1) % keys.length;
-      if (result.length === 0) break;
-      const allEmpty = keys.every((k) => byCategory.get(k).length === 0);
-      if (allEmpty) break;
+      return result;
+    };
+
+    if (byCategory.size > 1) {
+      return pickRoundRobin(byCategory, "category");
     }
-    return result;
+
+    // 單 category（focus track）：退化為 chapter-level round-robin
+    const byChapter = new Map();
+    for (const candidate of pool) {
+      const key = candidate?.chapter || "未分章";
+      if (!byChapter.has(key)) byChapter.set(key, []);
+      byChapter.get(key).push(candidate);
+    }
+    return pickRoundRobin(byChapter, "chapter");
   }
 
   function getDirectTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
