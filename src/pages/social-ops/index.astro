@@ -5788,7 +5788,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   function getTopPriorityRecommendationResolution(mode = currentTopicMode, limit = 3) {
     const safeLimit = Math.max(1, limit);
     const directCandidates = getDirectTopPriorityRecommendations(mode, safeLimit);
+    console.debug(`[TopPriority] directCandidates=${directCandidates.length} safeLimit=${safeLimit}`);
     if (directCandidates.length >= safeLimit) {
+      console.debug(`[TopPriority] 直接返回 ${directCandidates.length} 個候選`);
       return {
         candidates: directCandidates,
         directCandidates,
@@ -5806,6 +5808,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         seen.add(key);
         return true;
       });
+    console.debug(`[TopPriority] fallbackCandidates=${fallbackCandidates.length} seen=${seen.size}`);
 
     /* 第二層 fallback：focus track 內的 New_Publish 候選不足時，
        從全部候選（非 focus track）中取 New_Publish 來補足 Top 3 */
@@ -5816,6 +5819,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       const extraFromAll = allCandidates
         .filter((candidate) => !seen.has(getUniqueCandidateKey(candidate)))
         .slice(0, (safeLimit - directCandidates.length) - fallbackCandidates.length);
+      console.debug(`[TopPriority] 第二層 fallback: 從 allCandidates 取 ${extraFromAll.length} 個補足`);
       fallbackCandidates = [...fallbackCandidates, ...extraFromAll];
     }
 
@@ -5823,6 +5827,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       sortTopPriorityCandidates([...directCandidates, ...fallbackCandidates], directCandidates.length + fallbackCandidates.length),
       safeLimit
     );
+    console.debug(`[TopPriority] mergedCandidates=${mergedCandidates.length} 最終結果`);
+    mergedCandidates.forEach((c, i) => {
+      console.debug(`  [${i}] ch=${c?.chapter} sub=${c?.subchapter} title=${getDisplayTitle(c)}`);
+    });
     return {
       candidates: mergedCandidates,
       directCandidates,
@@ -6605,8 +6613,30 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   }
 
   function getUniqueCandidateKey(candidate) {
+    // Always include chapter+subchapter to ensure uniqueness, even when titles are identical
     const title = getDisplayTitle(candidate);
-    return title !== "尚未產生" ? title : `${candidate?.chapter || ""}||${candidate?.subchapter || ""}`;
+    return `${candidate?.chapter || ""}||${candidate?.subchapter || ""}||${title}`;
+  }
+
+  // Debug helper: trace pickDiverseByCategory input/output
+  function debugPickDiverseByCategory(candidates, limit, label = "") {
+    const safeLimit = Math.max(1, Number(limit) || 1);
+    const pool = Array.isArray(candidates) ? candidates : [];
+    const deduped = [];
+    const seenKeys = new Set();
+    for (const candidate of pool) {
+      const key = getUniqueCandidateKey(candidate);
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+      deduped.push(candidate);
+    }
+    console.debug(`[debugPickDiverseByCategory ${label}] pool=${pool.length} deduped=${deduped.length} limit=${safeLimit}`);
+    deduped.forEach((c, i) => {
+      console.debug(`  [${i}] ch=${c?.chapter} sub=${c?.subchapter} title=${getDisplayTitle(c)}`);
+    });
+    const picked = pickDiverseByCategory(candidates, limit);
+    console.debug(`[debugPickDiverseByCategory ${label}] result=${picked.length}`, picked.map(c => getDisplayTitle(c)));
+    return picked;
   }
 
   function getPublicationChapterLabel(chapterTitle = "") {
