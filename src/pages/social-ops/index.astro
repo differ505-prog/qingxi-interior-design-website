@@ -5681,11 +5681,11 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const forced = forcedTopPriorityTitles
       .map((title) => candidates.find((candidate) => getDisplayTitle(candidate) === title))
       .filter(Boolean);
-    const seen = new Set(forced.map((candidate) => getDisplayTitle(candidate)));
+    const seen = new Set(forced.map((candidate) => getUniqueCandidateKey(candidate)));
     const remainder = candidates.filter((candidate) => {
-      const title = getDisplayTitle(candidate);
-      if (seen.has(title)) return false;
-      seen.add(title);
+      const key = getUniqueCandidateKey(candidate);
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
     });
     return [...forced, ...remainder].slice(0, Math.max(1, limit));
@@ -5798,12 +5798,12 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       };
     }
 
-    const seen = new Set(directCandidates.map((candidate) => getDisplayTitle(candidate)));
+    const seen = new Set(directCandidates.map((candidate) => getUniqueCandidateKey(candidate)));
     let fallbackCandidates = getPureNewPublishFallbackCandidates(mode, safeLimit * 2)
       .filter((candidate) => {
-        const title = getDisplayTitle(candidate);
-        if (seen.has(title)) return false;
-        seen.add(title);
+        const key = getUniqueCandidateKey(candidate);
+        if (seen.has(key)) return false;
+        seen.add(key);
         return true;
       });
 
@@ -5814,7 +5814,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         .filter((candidate) => candidate?.workflowAction === "New_Publish")
         .filter((candidate) => !isAssetLikeReviewCandidate(candidate));
       const extraFromAll = allCandidates
-        .filter((candidate) => !seen.has(getDisplayTitle(candidate)))
+        .filter((candidate) => !seen.has(getUniqueCandidateKey(candidate)))
         .slice(0, (safeLimit - directCandidates.length) - fallbackCandidates.length);
       fallbackCandidates = [...fallbackCandidates, ...extraFromAll];
     }
@@ -6602,6 +6602,11 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
   function getDisplayTitle(recommendation) {
     if (!recommendation) return "尚未產生";
     return recommendation.primaryTitle || recommendation.webTitle || recommendation.bookTitle || "尚未產生";
+  }
+
+  function getUniqueCandidateKey(candidate) {
+    const title = getDisplayTitle(candidate);
+    return title !== "尚未產生" ? title : `${candidate?.chapter || ""}||${candidate?.subchapter || ""}`;
   }
 
   function getPublicationChapterLabel(chapterTitle = "") {
