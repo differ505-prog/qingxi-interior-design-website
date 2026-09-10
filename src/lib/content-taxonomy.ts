@@ -2445,6 +2445,51 @@ export function getTrackRecommendedTopics(
     .filter((recommendation): recommendation is NextTopicRecommendation => Boolean(recommendation));
 }
 
+function collectMountedTitles(entries: BookshelfEntry[]): Set<string> {
+  const titles = new Set<string>();
+  for (const entry of entries) {
+    if (entry.title) titles.add(entry.title);
+    if (entry.chapter) titles.add(entry.chapter);
+  }
+  return titles;
+}
+
+function isCrossChapterDuplicate(candidateTitle: string, mountedTitles: Set<string>): boolean {
+  if (!candidateTitle || mountedTitles.size === 0) return false;
+  const normalizedCandidate = normalizeSemanticText(candidateTitle);
+  if (!normalizedCandidate) return false;
+  for (const mounted of mountedTitles) {
+    const normalizedMounted = normalizeSemanticText(mounted);
+    if (!normalizedMounted) continue;
+    if (normalizedCandidate === normalizedMounted) return true;
+    if (normalizedCandidate.includes(normalizedMounted) || normalizedMounted.includes(normalizedCandidate)) {
+      return true;
+    }
+    const overlap = computeBigramOverlap(normalizedCandidate, normalizedMounted);
+    if (overlap >= 0.8) return true;
+  }
+  return false;
+}
+
+function computeBigramOverlap(left: string, right: string): number {
+  if (!left || !right) return 0;
+  const leftBigrams = new Set<string>();
+  for (let index = 0; index < left.length - 1; index += 1) {
+    leftBigrams.add(left.slice(index, index + 2));
+  }
+  const rightBigrams = new Set<string>();
+  for (let index = 0; index < right.length - 1; index += 1) {
+    rightBigrams.add(right.slice(index, index + 2));
+  }
+  if (leftBigrams.size === 0 || rightBigrams.size === 0) return 0;
+  let shared = 0;
+  for (const bigram of leftBigrams) {
+    if (rightBigrams.has(bigram)) shared += 1;
+  }
+  const denominator = Math.max(leftBigrams.size, rightBigrams.size);
+  return denominator === 0 ? 0 : shared / denominator;
+}
+
 export function getNextRecommendedTopics(
   posts: PublishingCatalogPost[] = [],
   focusTrackTitle = publishingFocusTrackTitle,
@@ -2452,12 +2497,22 @@ export function getNextRecommendedTopics(
   limit = 6,
 ) {
   const entries = buildBookshelfEntries(posts);
-  const recommendations = buildRecommendationCandidates(entries, focusTrackTitle, mode)
+  const candidateList = buildRecommendationCandidates(entries, focusTrackTitle, mode);
+  const mountedTitles = collectMountedTitles(entries);
+  const filteredCandidates = candidateList.filter((candidate) => {
+    const candidateTitle = buildBookTopicTitle(candidate.trackTitle, candidate.chapter, candidate.subchapter);
+    if (!candidateTitle) return true;
+    return !isCrossChapterDuplicate(candidateTitle, mountedTitles);
+  });
+  const recommendations = filteredCandidates
     .slice(0, Math.max(1, limit))
     .map((candidate) => buildRecommendationFromCandidate(entries, candidate, focusTrackTitle, mode));
   if (recommendations.length) return recommendations;
   const fallback = buildForcedFallbackCandidate(entries, focusTrackTitle, mode);
-  return fallback ? [fallback] : [];
+  if (!fallback) return [];
+  const fallbackTitle = fallback.primaryTitle || fallback.webTitle || fallback.bookTitle || "";
+  const fallbackCollides = fallbackTitle && isCrossChapterDuplicate(fallbackTitle, mountedTitles);
+  return fallbackCollides ? [] : [fallback];
 }
 
 export function getNextRecommendedTopic(
