@@ -5702,14 +5702,26 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const pool = Array.isArray(candidates) ? candidates : [];
     if (pool.length === 0) return [];
 
-    const byCategory = new Map();
+    // 取候選的唯一 key：用「chapter||subchapter||displayTitle」避免同候選重複
+    const candidateKey = (candidate) => getDisplayTitle(candidate) || `${candidate.chapter || ""}||${candidate.subchapter || ""}`;
+    const seenKeys = new Set();
+    const deduped = [];
     for (const candidate of pool) {
+      const key = candidateKey(candidate);
+      if (seenKeys.has(key)) continue;
+      seenKeys.add(key);
+      deduped.push(candidate);
+    }
+    if (deduped.length === 0) return [];
+
+    const byCategory = new Map();
+    for (const candidate of deduped) {
       const key = candidate?.category || "未分類";
       if (!byCategory.has(key)) byCategory.set(key, []);
       byCategory.get(key).push(candidate);
     }
 
-    const pickRoundRobin = (grouping, label) => {
+    const pickRoundRobin = (grouping) => {
       const result = [];
       const keys = Array.from(grouping.keys());
       let cursor = 0;
@@ -5726,18 +5738,32 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       return result;
     };
 
+    let picked;
     if (byCategory.size > 1) {
-      return pickRoundRobin(byCategory, "category");
+      picked = pickRoundRobin(byCategory);
+    } else {
+      // 單 category（focus track）：退化為 chapter-level round-robin
+      const byChapter = new Map();
+      for (const candidate of deduped) {
+        const key = candidate?.chapter || "未分章";
+        if (!byChapter.has(key)) byChapter.set(key, []);
+        byChapter.get(key).push(candidate);
+      }
+      picked = pickRoundRobin(byChapter);
     }
 
-    // 單 category（focus track）：退化為 chapter-level round-robin
-    const byChapter = new Map();
-    for (const candidate of pool) {
-      const key = candidate?.chapter || "未分章";
-      if (!byChapter.has(key)) byChapter.set(key, []);
-      byChapter.get(key).push(candidate);
+    // diversity 不足時，從原始 pool 剩餘按原排序補滿，保證 Top 3 永遠湊滿 3 篇
+    if (picked.length < safeLimit) {
+      const pickedSet = new Set(picked.map((candidate) => candidateKey(candidate)));
+      for (const candidate of deduped) {
+        if (picked.length >= safeLimit) break;
+        const key = candidateKey(candidate);
+        if (pickedSet.has(key)) continue;
+        pickedSet.add(key);
+        picked.push(candidate);
+      }
     }
-    return pickRoundRobin(byChapter, "chapter");
+    return picked.slice(0, safeLimit);
   }
 
   function getDirectTopPriorityRecommendations(mode = currentTopicMode, limit = 3) {
