@@ -71,6 +71,21 @@ export const DEFAULT_BLOG_COVER_IMAGE =
 
 export const staticBlogPosts: BlogCatalogPost[] = [
   {
+    title: "糾紛預防：老屋裝修爭議的溝通節點與證據留存",
+    slug: "old-house-dispute-prevention-inspection-nodes",
+    date: "2026-09-20",
+    summary:
+      "老屋翻新最棘手的爭議，往往源自不可逆工序封閉後的資訊斷裂與主觀臆斷。本文深入拆解老屋水電、防水與泥作等隱蔽工序，確立明確物理檢驗數值（如給水持壓 5~8 kg/cm²、絕緣阻抗 ≥ 1 MΩ），提供兼具法律效力與工地實務的數位存證命名標準；並針對工班經驗主義提供理性溝通話術，搭配三級缺失分流與標準驗收會簽模組，助您在交屋關鍵期化解認知分歧，實現安定交付。",
+    siteCategory: "老屋翻新",
+    category: "老屋翻新",
+    track: "老屋翻新系",
+    chapter: "完工避雷",
+    subchapter: "糾紛預防",
+    tags: ["老屋翻新", "完工避雷", "糾紛預防", "隱蔽工程", "存證留檔", "溝通話術", "驗收會簽"],
+    coverImage: "/images/blog/old-house-dispute-prevention-inspection-nodes-cover.png",
+    editorialRefreshStamp: "2026-09-20",
+  },
+  {
     title: "水電更新：老屋基礎工程的迴路重整與用電安全",
     slug: "old-house-rewiring-and-electrical-safety",
     date: "2026-07-02",
