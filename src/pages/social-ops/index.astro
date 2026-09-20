@@ -8079,7 +8079,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
 
     if (checkKeywords.test(haystack)) {
-      ruleLines.push("5. 若正文談到驗收、檢查、缺失或避雷，請整理成可直接拿來核對的檢查點模組，不可只停留在提醒句。");
+      ruleLines.push("5. 若正文談到驗收、檢查、缺失或避雷，請整理成檢查點模組；每個檢查點必填 5 欄位：量測儀器、數值門檻、單位、依據來源、失敗風險，禁止用『多/少/通常』等空泛詞代替門檻。");
     }
 
     if (ruleLines.length === 2) {
