@@ -2454,13 +2454,11 @@ function collectMountedTitles(entries: BookshelfEntry[]): Set<string> {
   const titles = new Set<string>();
   for (const entry of entries) {
     if (entry.title) titles.add(entry.title);
-    if (entry.chapter) titles.add(entry.chapter);
-    if (entry.subchapter) titles.add(entry.subchapter);
   }
   return titles;
 }
 
-// 語意意圖錨點：同組內任兩 term 同時存在於候選 AND 已上線，視為意圖重疊
+// 語意意圖錨點：同組內兩 term 同時存在於候選 AND 已上線，視為意圖重疊
 const SEMANTIC_INTENT_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ["初勘", "屋況"],
   ["排查", "判斷"],
@@ -2477,11 +2475,9 @@ const SEMANTIC_INTENT_PAIRS: ReadonlyArray<readonly [string, string]> = [
 
 function hasSharedSemanticIntent(left: string, right: string): boolean {
   for (const [a, b] of SEMANTIC_INTENT_PAIRS) {
-    const leftHasA = left.includes(a);
-    const leftHasB = left.includes(b);
-    const rightHasA = right.includes(a);
-    const rightHasB = right.includes(b);
-    if ((leftHasA && rightHasA) || (leftHasA && rightHasB) || (leftHasB && rightHasA) || (leftHasB && rightHasB)) {
+    const leftHasBoth = left.includes(a) && left.includes(b);
+    const rightHasBoth = right.includes(a) && right.includes(b);
+    if (leftHasBoth && rightHasBoth) {
       return true;
     }
   }
@@ -2496,7 +2492,10 @@ function isCrossChapterDuplicate(candidateTitle: string, mountedTitles: Set<stri
     const normalizedMounted = normalizeSemanticText(mounted);
     if (!normalizedMounted) continue;
     if (normalizedCandidate === normalizedMounted) return true;
-    if (normalizedCandidate.includes(normalizedMounted) || normalizedMounted.includes(normalizedCandidate)) {
+    if (
+      normalizedMounted.length >= 8 &&
+      (normalizedCandidate.includes(normalizedMounted) || normalizedMounted.includes(normalizedCandidate))
+    ) {
       return true;
     }
     if (hasSharedSemanticIntent(normalizedCandidate, normalizedMounted)) return true;

@@ -5833,6 +5833,30 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       fallbackCandidates = [...fallbackCandidates, ...extraFromAll];
     }
 
+    /* 第三層 fallback：若仍不足 safeLimit，從 focus track 各章節的 titlePool 中補足 New_Publish/Revise_Angle，確保 Top 3 必滿 3 篇不同主題 */
+    const stillNeedFromPool = safeLimit - directCandidates.length - fallbackCandidates.length;
+    if (stillNeedFromPool > 0) {
+      const modeState = getCurrentTopicModeState(mode);
+      const focusTrack = modeState?.publishingDashboard?.focusTrack;
+      const poolCandidates = (focusTrack?.chapterGaps || []).flatMap((gap) => (
+        (gap.titlePool || [])
+          .filter((item) => ["New_Publish", "Revise_Angle"].includes(item.workflowAction))
+          .filter((item) => !isAssetLikeReviewCandidate(item))
+          .map((item) => ({
+            ...item,
+            trackTitle: focusTrack.title,
+            chapter: gap.chapter,
+            subchapter: item.subchapter,
+            category: item.category || normalizeSiteCategory(focusTrack.title) || "老屋翻新",
+          }))
+      ));
+      const extraFromPool = poolCandidates
+        .filter((candidate) => !seen.has(getUniqueCandidateKey(candidate)))
+        .slice(0, stillNeedFromPool);
+      extraFromPool.forEach((c) => seen.add(getUniqueCandidateKey(c)));
+      fallbackCandidates = [...fallbackCandidates, ...extraFromPool];
+    }
+
     const mergedCandidates = pickDiverseByCategory(
       sortTopPriorityCandidates([...directCandidates, ...fallbackCandidates], directCandidates.length + fallbackCandidates.length),
       safeLimit
