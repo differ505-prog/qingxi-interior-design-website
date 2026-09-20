@@ -1029,7 +1029,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         <div id="workflow-top3-panel" class="workflow-top3-panel" aria-live="polite">
           <div class="workflow-top3-header">
             <span class="workflow-top3-label">純新文章 Top 3</span>
-            <span class="workflow-top3-hint">已排除整併／資產化候選；單擊填題目，按住 ⇧ 再點卡啟動流程</span>
+            <span class="workflow-top3-hint">已排除整併／資產化候選；單擊卡片立即啟動 AI 生文流程</span>
           </div>
           <div id="workflow-top3-cards" class="workflow-top3-cards">
             <p class="workflow-top3-loading">自動選題中...</p>
@@ -1050,7 +1050,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
         <div class="book-workflow-gemini-row">
           <button type="button" id="workflow-gemini-btn" class="book-workflow-gemini-btn" disabled aria-label="複製完成後前往 Gemini 發布">
             <span class="workflow-gemini-icon" aria-hidden="true">🌐</span>
-            <span class="workflow-gemini-text">等待生文完成...</span>
+            <span class="workflow-gemini-text">點擊上方卡片開始生文</span>
           </button>
           <button type="button" id="workflow-copy-retry-btn" class="book-workflow-copy-retry-btn" hidden aria-label="重新複製 Pro 生文提示詞">
             <span class="workflow-copy-retry-icon" aria-hidden="true">📋</span>
@@ -12902,7 +12902,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     observer.observe(source, { childList: true, subtree: true, characterData: true });
   })();
 
-  /* Top 3 卡片：Shift+Click 觸發流程；單擊僅填 input */
+  /* Top 3 卡片：單擊直接觸發完整生文流程 */
   document.getElementById("workflow-top3-cards")?.addEventListener("click", async (e) => {
     const card = (e.target).closest("[data-workflow-top3-action='use']");
     if (!card) return;
@@ -12910,10 +12910,10 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     const title = card.getAttribute("data-top3-title");
     if (!title) return;
 
-    /* 互斥：移除所有其他卡片的 hint 態，只保留當前卡片為最後選中 */
+    /* 互斥：移除所有其他卡片的 loading/hint 態 */
     document.getElementById("workflow-top3-cards")
-      ?.querySelectorAll(".workflow-top3-card.is-shift-hint")
-      .forEach((el) => { if (el !== card) el.classList.remove("is-shift-hint"); });
+      ?.querySelectorAll(".workflow-top3-card")
+      .forEach((el) => { if (el !== card) el.classList.remove("is-shift-hint", "is-loading"); });
 
     /* 從卡片 DOM 萃取候選章節資訊（用於綁定章節覆寫） */
     const chapterEl = card.querySelector(".workflow-top3-chapter");
@@ -12929,7 +12929,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       workflowInput.value = title;
       workflowInput.classList.add("is-synced");
       if (workflowInput.nextElementSibling instanceof HTMLElement) {
-        workflowInput.nextElementSibling.textContent = "✓ 已填入題目，請按 ↵ Enter 或 ⇧+Click 啟動流程";
+        workflowInput.nextElementSibling.textContent = "✓ 已選擇題目，AI 生文流程啟動中...";
         workflowInput.nextElementSibling.classList.remove("is-warning");
       }
     }
@@ -12942,23 +12942,18 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     articlePresetChapter = chapter;
     articlePresetSubchapter = subchapter;
 
-    /* 單擊：僅預填，卡片進 hint 態 */
-    if (!e.shiftKey) {
-      card.classList.add("is-shift-hint");
-      return;
-    }
-
-    /* Shift+Click：觸發完整流程 */
+    /* 單擊卡片立即啟動完整流程 */
     card.classList.add("is-loading");
     card.classList.remove("is-shift-hint");
 
-    /* 顯示「去 Gemini」按鈕（完成後才啟用） */
+    /* 顯示「去 Gemini」按鈕狀態 */
     const geminiBtn = document.getElementById("workflow-gemini-btn");
-    const geminiLink = document.getElementById("workflow-gemini-link");
     if (geminiBtn instanceof HTMLButtonElement) {
       geminiBtn.disabled = true;
       geminiBtn.classList.add("is-pending");
       geminiBtn.classList.remove("is-done");
+      const textSpan = geminiBtn.querySelector(".workflow-gemini-text");
+      if (textSpan) textSpan.textContent = "AI 正在分析生文中，請稍候...";
     }
 
     try {
@@ -12984,7 +12979,7 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     }
   });
 
-  /* workflow input 的 Enter 鍵：若已有題目則觸發 flow（Shift+Click 的鍵盤等效） */
+  /* workflow input 的 Enter 鍵：若已有題目則觸發 flow */
   document.getElementById("workflow-article-preset-title")?.addEventListener("keydown", async (e) => {
     if (e.key !== "Enter" || e.shiftKey) return;
     const workflowInput = e.target instanceof HTMLInputElement ? e.target : null;
@@ -12993,10 +12988,9 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
     /* 避免觸發 form submit */
     e.preventDefault();
 
-    /* 找目前處於 hint 態的卡片，轉為 loading */
+    /* 找對應卡片轉為 loading */
     const cardsContainer = document.getElementById("workflow-top3-cards");
-    const hintedCard = cardsContainer?.querySelector(".workflow-top3-card.is-shift-hint");
-    const card = hintedCard || Array.from(cardsContainer?.querySelectorAll("[data-workflow-top3-action='use']") || []).find((c) => c.getAttribute("data-top3-title") === workflowInput.value.trim());
+    const card = Array.from(cardsContainer?.querySelectorAll("[data-workflow-top3-action='use']") || []).find((c) => c.getAttribute("data-top3-title") === workflowInput.value.trim());
 
     if (card) {
       card.classList.add("is-loading");
@@ -13008,6 +13002,8 @@ const bookDataPacksJson = JSON.stringify(bookDataPacks);
       geminiBtn.disabled = true;
       geminiBtn.classList.add("is-pending");
       geminiBtn.classList.remove("is-done");
+      const textSpan = geminiBtn.querySelector(".workflow-gemini-text");
+      if (textSpan) textSpan.textContent = "AI 正在分析生文中，請稍候...";
     }
 
     try {
