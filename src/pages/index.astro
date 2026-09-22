@@ -711,8 +711,6 @@ const homeStructuredData = [
       border: 1px solid rgba(255, 255, 255, 0.15);
       box-shadow: 0 28px 72px rgba(var(--brand-dark-rgb), 0.1);
       backdrop-filter: blur(28px) saturate(140%);
-      container-type: inline-size;
-      container-name: brand-strip;
     }
 
     .brand-strip-label {
@@ -1651,44 +1649,17 @@ const homeStructuredData = [
       box-shadow: inset 0 0 0 1px rgba(115, 103, 94, 0.14);
     }
 
-    /* Responsive Styles */
-    @container brand-strip (max-width: 760px) {
+    @media (max-width: 1024px) {
       .brand-strip-inner {
         grid-template-columns: 1fr;
+        gap: 2rem;
       }
 
       .brand-strip-metrics {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 0.85rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
       }
 
-      .brand-metric-image-lead {
-        /* 窄容器時改為雙欄各半寬，但仍維持 viewport clamp 防暴衝 */
-        width: 100%;
-        max-width: clamp(220px, 46vw, 320px);
-      }
-
-      .brand-metric-visual {
-        padding: 0.7rem;
-      }
-
-      .brand-metric-visual-lead {
-        padding: 0.8rem;
-        gap: 0.8rem;
-      }
-
-      .brand-metric strong {
-        font-size: 0.96rem;
-        letter-spacing: 0.04em;
-      }
-
-      .brand-metric span {
-        font-size: 0.88rem;
-        line-height: 1.6;
-      }
-    }
-
-    @media (max-width: 1024px) {
       .about-container {
         gap: 3rem;
       }
@@ -1767,6 +1738,18 @@ const homeStructuredData = [
       .brand-strip-inner {
         padding: 1.5rem;
         border-radius: 16px;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .brand-strip-metrics {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .brand-metric-image-lead {
+        max-width: 100%;
+        width: 100%;
       }
 
       .brand-strip-label,
