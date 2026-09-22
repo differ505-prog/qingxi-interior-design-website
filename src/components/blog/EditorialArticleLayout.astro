@@ -725,6 +725,72 @@ const privateQuestionPoolHref = articleSlug
     color: color-mix(in srgb, var(--gray-darkest) 76%, transparent);
   }
 
+  .article-content :global(.article-flow-diagram) {
+    margin: 3.2rem 0 3.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .article-content :global(.flow-row) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .article-content :global(.flow-item) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.85rem 1.1rem;
+    border-radius: 14px;
+    border: 1px solid rgba(164, 171, 160, 0.25);
+    background: linear-gradient(160deg, rgba(255,253,249,0.98), rgba(248,245,239,0.96));
+    box-shadow: 0 4px 16px rgba(58,52,46,0.06);
+    min-width: 100px;
+    max-width: 140px;
+    text-align: center;
+  }
+
+  .article-content :global(.flow-label) {
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    color: var(--gray-darkest);
+    line-height: 1.3;
+  }
+
+  .article-content :global(.flow-sub) {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    color: #7a726a;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+  }
+
+  .article-content :global(.flow-arrow) {
+    color: #a4aba0;
+    padding: 0 0.35rem;
+    flex-shrink: 0;
+  }
+
+  .article-content :global(.flow-branch) {
+    display: flex;
+    justify-content: center;
+    padding: 0.15rem 0;
+  }
+
+  .article-content :global(.flow-arrow-down) {
+    color: #a4aba0;
+    transform: rotate(90deg);
+  }
+
   .article-content :global(.article-reference-table-wrap) {
     margin: 2.2rem 0 2.55rem;
     border-radius: 24px;
@@ -948,6 +1014,28 @@ const privateQuestionPoolHref = articleSlug
 
     .article-content :global(.article-step-flow::after) {
       display: none;
+    }
+
+    .article-content :global(.article-flow-diagram) {
+      margin: 2.2rem 0 2.5rem;
+    }
+
+    .article-content :global(.flow-row) {
+      gap: 0;
+    }
+
+    .article-content :global(.flow-item) {
+      min-width: 72px;
+      max-width: 96px;
+      padding: 0.65rem 0.6rem;
+    }
+
+    .article-content :global(.flow-label) {
+      font-size: 0.75rem;
+    }
+
+    .article-content :global(.flow-arrow) {
+      padding: 0 0.15rem;
     }
 
     .article-content :global(.article-step-card) {

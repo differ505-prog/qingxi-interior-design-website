@@ -130,6 +130,20 @@ export const staticBlogPosts: BlogCatalogPost[] = [
     editorialRefreshStamp: "2026-07-02",
   },
   {
+    title: "櫃體配置：收納效益與起居動線的取捨基準",
+    slug: "storage-circulation-tradeoff",
+    date: "2026-09-22",
+    summary:
+      "老屋翻新時，做滿櫃體常截斷採光並引發水電打鑿與木作追加的骨牌效應。本文解析高頻動線淨寬、紅磚牆抗拔力與調節封板工法，並提供工地放樣速查表，協助你在收納容量與開闊起居間建立長久秩序。",
+    siteCategory: "老屋翻新",
+    category: "老屋翻新",
+    track: "老屋翻新系",
+    chapter: "空間重整",
+    subchapter: "迷思破解",
+    tags: ["老屋翻新", "櫃體配置", "收納動線", "調節封板", "木工施工", "預算控制"],
+    coverImage: "/images/blog/storage-circulation-tradeoff-cover.jpeg",
+  },
+  {
     title: "格局重整：結構、採光與動線的空間配置邏輯",
     slug: "old-house-layout-strategy",
     date: "2026-06-25",
