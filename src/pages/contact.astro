@@ -10,13 +10,13 @@ const quickConsultationEnabled = Boolean(quickConsultationAction);
 const siteOrigin = (Astro.site || new URL("https://qingxidesign.tw")).toString();
 const consultationSuccessURL = new URL("/consultation-thank-you", siteOrigin).toString();
 const contactHeroImage = "/images/portfolio/xizhi-3.jpg";
-const contactFormImage = "/images/portfolio/xizhi-1.jpg";
+const contactFormImage = "/images/portfolio/featured-xizhi.jpg";
 ---
 
 <BaseLayout
   title="聯絡我們 - 青曦空間設計"
   description="預約青曦空間設計諮詢，先留下空間條件、預算方向與時程"
-  ogImage="/images/portfolio/xizhi-1.jpg"
+  ogImage="/images/portfolio/featured-xizhi.jpg"
   pageType="contact"
 >
   <section class="contact-page">
