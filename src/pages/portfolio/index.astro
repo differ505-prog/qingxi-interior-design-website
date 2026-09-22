@@ -9,7 +9,6 @@ const featuredProject = {
   label: 'RESIDENTIAL INTERIOR',
 };
 
-const editorialNotes = ['住宅完工', '前後對照', '商空與戶外'];
 const poolFeature = {
   image: '/images/portfolio/hualien-sherlock-pool.jpg',
   alt: '夜間泳池與建築外觀畫面',
@@ -45,6 +44,53 @@ const spatialMoments = [
 ---
 
 <style>
+  /* ============================================
+     portfolio 定錨系統（Step 1）
+     ============================================ */
+
+  /* ── 字級秩序 4 層級 ── */
+  :root {
+    /* L1 頂級 Hero h1 */
+    --pf-font-h1: clamp(3rem, 6vw, 5rem);
+    --pf-lh-h1: 1.18;
+    --pf-ls-h1: 0.02em;
+
+    /* L2 章節主標（Moments h2 / CTA h2 統一） */
+    --pf-font-h2: clamp(2.4rem, 4.5vw, 4rem);
+    --pf-lh-h2: 1.25;
+    --pf-ls-h2: 0.02em;
+
+    /* L3 卡片標題（Hero figcaption strong / Pool h3 統一） */
+    --pf-font-h3: clamp(1.5rem, 2.4vw, 2rem);
+    --pf-lh-h3: 1.32;
+    --pf-ls-h3: 0.02em;
+
+    /* L4 內文（intro / metric / summary / pool p 統一） */
+    --pf-font-body: 1rem;
+    --pf-lh-body: 1.85;
+
+    /* L5 註腳（Label / caption / metric span 統一） */
+    --pf-font-label: 0.875rem;
+    --pf-lh-label: 1.6;
+    --pf-ls-label: 0.16em;
+  }
+
+  /* ── 圖片長寬比鎖死 ── */
+  :root {
+    --pf-ratio-hero:   16 / 10;
+    --pf-ratio-moment: 4 / 5;
+    --pf-ratio-pool:   16 / 9;
+  }
+
+  /* ── Section 節奏統一 ── */
+  :root {
+    --pf-section-gap: 5rem;
+    --pf-card-radius: 24px;
+    --pf-img-radius:  16px;
+    --pf-shadow-card: 0 20px 48px rgba(var(--brand-dark-rgb), 0.08);
+    --pf-shadow-hero: 0 38px 96px rgba(var(--brand-dark-rgb), 0.16);
+  }
+
   .portfolio-page {
     padding: 7rem 1.5rem 6rem;
     background:
@@ -88,6 +134,29 @@ const spatialMoments = [
   .portfolio-hero-copy {
     display: grid;
     align-content: end;
+    gap: 1.25rem;
+  }
+
+  /* Trust Anchor Row */
+  .trust-anchor-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .trust-item {
+    font-size: var(--pf-font-label);
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
+    letter-spacing: var(--pf-ls-label);
+  }
+  .trust-item strong {
+    color: var(--gray-darkest);
+    font-weight: 600;
+    margin-right: 0.2rem;
+  }
+  .trust-sep {
+    color: var(--tiffany);
+    font-size: 0.7rem;
   }
 
   .portfolio-intro {
@@ -170,8 +239,7 @@ const spatialMoments = [
   .portfolio-hero-visual img {
     display: block;
     width: 100%;
-    height: 100%;
-    min-height: clamp(400px, 60vh, 600px);
+    aspect-ratio: var(--pf-ratio-hero);
     object-fit: cover;
   }
 
@@ -203,10 +271,10 @@ const spatialMoments = [
   .portfolio-hero-visual strong {
     margin-top: 0.55rem;
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 2.2vw, 2.15rem);
-    font-weight: 500;
-    line-height: 1.32;
-    letter-spacing: 0.02em;
+    font-size: var(--pf-font-h3);
+    font-weight: 400;
+    line-height: var(--pf-lh-h3);
+    letter-spacing: var(--pf-ls-h3);
   }
 
   .portfolio-metric {
@@ -237,6 +305,7 @@ const spatialMoments = [
   }
 
   .moments-section {
+    margin-top: var(--pf-section-gap);
     padding: 3rem 0;
   }
 
@@ -247,11 +316,11 @@ const spatialMoments = [
 
   .section-heading h2 {
     margin: 0;
-    font-size: clamp(2.8rem, 5.5vw, 5rem);
+    font-size: var(--pf-font-h2);
     font-family: var(--font-display);
     font-weight: 400;
-    line-height: 1.25;
-    letter-spacing: 0.02em;
+    line-height: var(--pf-lh-h2);
+    letter-spacing: var(--pf-ls-h2);
     color: var(--gray-darkest);
   }
 
@@ -311,7 +380,7 @@ const spatialMoments = [
   .moment-card img {
     display: block;
     width: 100%;
-    height: clamp(220px, 28vw, 320px);
+    aspect-ratio: var(--pf-ratio-moment);
     object-fit: cover;
     transition: transform 1s var(--motion-standard);
   }
@@ -320,30 +389,19 @@ const spatialMoments = [
     transform: scale(1.04);
   }
 
-  .moment-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-  }
-
-  .moment-card:hover::after {
-    opacity: 1;
-  }
+  /* ::after hover 已移除（caption 改 always-visible） */
 
   .moment-card figcaption {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 1rem 1.2rem 1.2rem;
+    padding: 1.2rem 1.4rem 1.4rem;
     color: var(--white);
-    letter-spacing: 0.06em;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    letter-spacing: var(--pf-ls-label);
+    font-size: var(--pf-font-label);
+    line-height: var(--pf-lh-label);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.58) 0%, transparent 60%);
   }
 
   .moment-card:hover figcaption {
@@ -383,7 +441,7 @@ const spatialMoments = [
   .pool-feature-media img {
     display: block;
     width: 100%;
-    height: clamp(180px, 22vw, 280px);
+    aspect-ratio: var(--pf-ratio-pool);
     object-fit: cover;
   }
 
@@ -414,35 +472,35 @@ const spatialMoments = [
   }
 
   .pool-feature-content h3 {
-    margin: 0.7rem 0 0;
+    margin: 0.65rem 0 0;
     color: var(--gray-darkest);
-    font-size: 1.4rem;
+    font-size: var(--pf-font-h3);
     font-family: var(--font-display);
     font-weight: 400;
-    line-height: 1.32;
-    letter-spacing: 0.02em;
+    line-height: var(--pf-lh-h3);
+    letter-spacing: var(--pf-ls-h3);
   }
 
   .pool-feature-content p:last-child {
     margin: 0.6rem 0 0;
-    color: var(--gray-medium);
-    line-height: 1.85;
-    font-size: 0.95rem;
+    color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
+    font-size: var(--pf-font-body);
+    line-height: var(--pf-lh-body);
+    letter-spacing: 0.01em;
   }
 
   .portfolio-cta {
-    margin-top: 5rem;
-    min-height: 100vh;
-    padding: clamp(2.5rem, 5vw, 4rem);
-    border-radius: 34px;
+    margin-top: var(--pf-section-gap);
+    padding: clamp(3rem, 5vw, 5rem);
+    border-radius: var(--pf-card-radius);
     background:
       radial-gradient(circle at top right, rgba(159, 147, 136, 0.08), transparent 30%),
       linear-gradient(135deg, rgba(243, 245, 246, 0.8) 0%, rgba(255, 255, 255, 0.68) 100%);
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 32px 84px rgba(var(--brand-dark-rgb), 0.1);
     display: grid;
-    grid-template-columns: minmax(0, 1.4fr) auto;
-    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2rem;
     align-items: center;
     backdrop-filter: blur(26px) saturate(135%);
   }
@@ -450,19 +508,19 @@ const spatialMoments = [
   .portfolio-cta h2 {
     margin: 0;
     max-width: 10ch;
-    font-size: clamp(3rem, 6vw, 5.4rem);
+    font-size: var(--pf-font-h2);
     font-family: var(--font-display);
     font-weight: 400;
     color: var(--gray-darkest);
-    line-height: 1.25;
-    letter-spacing: 0.02em;
+    line-height: var(--pf-lh-h2);
+    letter-spacing: var(--pf-ls-h2);
   }
 
   .portfolio-cta p {
     margin: 1.25rem 0 0;
     color: color-mix(in srgb, var(--gray-darkest) 62%, transparent);
-    line-height: 1.85;
-    max-width: 42rem;
+    font-size: var(--pf-font-body);
+    line-height: var(--pf-lh-body);
   }
 
   .portfolio-cta a {
@@ -547,6 +605,28 @@ const spatialMoments = [
       flex-direction: column;
     }
   }
+
+  /* ============================================
+     全域收斂（Step 6）
+     ============================================ */
+
+  /* border-radius：4 種 → 2 種 */
+  .portfolio-hero-visual { border-radius: var(--pf-card-radius); }
+  .moment-card          { border-radius: var(--pf-img-radius); }
+  .pool-feature         { border-radius: var(--pf-card-radius); }
+
+  /* section 間距 */
+  .pool-features {
+    margin-top: var(--pf-section-gap);
+  }
+
+  /* 清除廢棄 CSS（已刪除 HTML 但保留的規則） */
+  .portfolio-notes,
+  .portfolio-metrics,
+  .portfolio-metric,
+  .pool-feature-badge {
+    display: none;
+  }
 </style>
 
 <BaseLayout
@@ -563,20 +643,12 @@ const spatialMoments = [
         <p class="portfolio-intro">
           以住宅為主，也收錄商空與戶外規劃，讓你直接看完成後的樣子。
         </p>
-        <div class="portfolio-notes">
-          {editorialNotes.map((note) => (
-            <span>{note}</span>
-          ))}
-        </div>
-        <div class="portfolio-metrics">
-          <article class="portfolio-metric">
-            <strong>住宅案例</strong>
-            <span>直接看主要空間完工照。</span>
-          </article>
-          <article class="portfolio-metric">
-            <strong>前後對照</strong>
-            <span>更快判斷是不是你要的方向。</span>
-          </article>
+        <div class="trust-anchor-row">
+          <span class="trust-item"><strong>8</strong> 年實作</span>
+          <span class="trust-sep" aria-hidden="true">/</span>
+          <span class="trust-item"><strong>36</strong> 件完工</span>
+          <span class="trust-sep" aria-hidden="true">/</span>
+          <span class="trust-item"><strong>北北基桃</strong> 服務區</span>
         </div>
       </div>
       <figure class="portfolio-hero-visual">
@@ -630,7 +702,6 @@ const spatialMoments = [
                 loading="lazy"
                 decoding="async"
               />
-              <span class="pool-feature-badge">POOL DESIGN</span>
             </figure>
             <div class="pool-feature-content">
               <p class="pool-feature-label">OUTDOOR PLANNING</p>
@@ -649,7 +720,6 @@ const spatialMoments = [
                 loading="lazy"
                 decoding="async"
               />
-              <span class="pool-feature-badge">COMMERCIAL SPACE</span>
             </figure>
             <div class="pool-feature-content">
               <p class="pool-feature-label">RESTAURANT DESIGN</p>
