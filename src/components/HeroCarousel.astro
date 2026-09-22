@@ -461,19 +461,19 @@ const slides = fallbackSlides.map((item) => ({
 
   @media (max-width: 768px) {
     .hero-carousel {
-      min-height: 78vh;
+      min-height: 100svh;
     }
 
     .hero-shell {
       width: min(100%, calc(100% - 2rem));
-      padding: 8rem 0 2.5rem;
+      padding: 6.5rem 0 2rem;
       grid-template-columns: 1fr;
       gap: 1.5rem;
     }
 
     .hero-copy h1 {
-      font-size: 2.2rem;
-      line-height: 1.32;
+      font-size: 2rem;
+      line-height: 1.28;
       letter-spacing: 0.02em;
     }
 
@@ -486,6 +486,7 @@ const slides = fallbackSlides.map((item) => ({
       flex-direction: column;
       align-items: stretch;
       width: 100%;
+      margin-top: 1.4rem;
     }
 
     .hero-button {
@@ -495,12 +496,12 @@ const slides = fallbackSlides.map((item) => ({
     }
 
     .hero-featured-card {
-      justify-self: stretch;
-      width: auto;
+      display: none;
     }
 
     .hero-highlights {
       gap: 0.7rem;
+      margin: 1.4rem 0 0;
     }
 
     .carousel-btn {
