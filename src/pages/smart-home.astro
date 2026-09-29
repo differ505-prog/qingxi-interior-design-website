@@ -178,15 +178,22 @@ const workflow = [
           {visualPlaceholders.map((item) => (
             <article class="visual-card reveal-up" data-reveal-delay="90">
               {item.image ? (
-                <div
+                <figure
                   class="visual-frame visual-frame-photo"
-                  style={`background-image: linear-gradient(180deg, rgba(12, 12, 12, 0.08) 0%, rgba(12, 12, 12, 0.22) 100%), url('${item.image}');`}
                   aria-label={item.alt || item.title}
-                  role="img"
                 >
+                  <img
+                    src={item.image}
+                    alt={item.alt || item.title}
+                    width="1600"
+                    height="1000"
+                    loading="lazy"
+                    decoding="async"
+                    onerror="this.style.opacity='0';this.parentElement.classList.add('photo-fallback')"
+                  />
                   <span>{item.tag}</span>
                   <strong>{item.frameLabel || "LIVE PREVIEW"}</strong>
-                </div>
+                </figure>
               ) : (
                 <div class="visual-frame">
                   <span>{item.tag}</span>
@@ -585,30 +592,65 @@ const workflow = [
     overflow: hidden;
     border-style: solid;
     border-color: rgba(27, 27, 27, 0.08);
-    background-position: center;
-    background-size: 102%;
-    background-repeat: no-repeat;
-    align-content: space-between;
+    background:
+      linear-gradient(135deg, rgba(19, 19, 19, 0.88) 0%, rgba(61, 89, 94, 0.88) 100%),
+      radial-gradient(circle at top right, rgba(159, 147, 136, 0.28), transparent 34%);
     box-shadow:
       inset 0 0 0 1px rgba(255, 255, 255, 0.08),
       0 18px 30px rgba(17, 17, 17, 0.08);
     transition:
-      background-size 0.6s ease,
-      filter 0.45s ease,
       box-shadow 0.45s ease,
       border-color 0.45s ease;
   }
 
-  .visual-frame-photo::after {
+  .visual-frame-photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: inherit;
+    z-index: 0;
+    transition:
+      transform 0.6s ease,
+      filter 0.45s ease;
+  }
+
+  .visual-frame-photo span,
+  .visual-frame-photo strong {
+    position: relative;
+    z-index: 2;
+  }
+
+  .visual-frame-photo strong {
+    grid-row: -1;
+    margin-top: 0;
+  }
+
+  /* 漸層遮罩移至 ::before */
+  .visual-frame-photo::before {
     content: "";
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(180deg, rgba(12, 12, 12, 0.04) 0%, rgba(12, 12, 12, 0.28) 100%),
+      linear-gradient(180deg, rgba(12, 12, 12, 0.08) 0%, rgba(12, 12, 12, 0.28) 100%),
       radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 38%);
     opacity: 0.72;
     transition: opacity 0.45s ease;
     pointer-events: none;
+    z-index: 1;
+    border-radius: inherit;
+  }
+
+  /* 移除舊 ::after */
+  .visual-frame-photo::after {
+    content: none;
+  }
+
+  /* 圖片載入失敗 fallback */
+  .visual-frame-photo.photo-fallback img {
+    display: none;
   }
 
   .visual-frame span,
@@ -692,14 +734,17 @@ const workflow = [
     }
 
     .visual-card:hover .visual-frame-photo {
-      background-size: 108%;
-      filter: saturate(1.03) contrast(1.02);
       box-shadow:
         inset 0 0 0 1px rgba(255, 255, 255, 0.12),
         0 24px 36px rgba(17, 17, 17, 0.12);
     }
 
-    .visual-card:hover .visual-frame-photo::after {
+    .visual-card:hover .visual-frame-photo img {
+      transform: scale(1.06);
+      filter: saturate(1.03) contrast(1.02);
+    }
+
+    .visual-card:hover .visual-frame-photo::before {
       opacity: 0.44;
     }
 
