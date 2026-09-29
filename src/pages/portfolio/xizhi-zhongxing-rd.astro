@@ -91,6 +91,8 @@ const drawingBoards = [
     drawingNo: 'DWG-01',
     scale: '1:50',
     date: '2026-03',
+    width: 2560,
+    height: 1707,
   },
   {
     label: 'CEILING & LIGHTING',
@@ -101,6 +103,8 @@ const drawingBoards = [
     drawingNo: 'DWG-02',
     scale: '1:50',
     date: '2026-03',
+    width: 1920,
+    height: 1358,
   },
   {
     label: 'CABINET DETAIL',
@@ -111,6 +115,8 @@ const drawingBoards = [
     drawingNo: 'DWG-03',
     scale: '1:30',
     date: '2026-04',
+    width: 1920,
+    height: 1536,
   },
 ];
 const renovationComparisons = [
@@ -275,8 +281,8 @@ const renovationComparisons = [
               <img
                 src={drawing.image}
                 alt={drawing.alt}
-                width="2560"
-                height="1707"
+                width={drawing.width}
+                height={drawing.height}
                 loading="lazy"
                 decoding="async"
               />
@@ -688,7 +694,7 @@ const renovationComparisons = [
   .drawing-media img {
     display: block;
     width: 100%;
-    aspect-ratio: 3 / 2;
+    height: auto;
     object-fit: contain;
     background: #f7f9f9;
   }
