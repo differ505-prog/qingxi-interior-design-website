@@ -87,21 +87,30 @@ const drawingBoards = [
     title: '平面佈置圖',
     description: '整理空間配置、動線與家具位置，讓日常使用更順手。',
     image: '/images/portfolio/xizhi-zhongxing-rd/layout-plan.jpg',
-    alt: '住宅空間平面佈置圖',
+    alt: '1:50 比例平面配置圖，25 坪空間含家具定位與動線標註',
+    drawingNo: 'DWG-01',
+    scale: '1:50',
+    date: '2026-03',
   },
   {
     label: 'CEILING & LIGHTING',
     title: '天花與照明圖',
     description: '整理天花、燈具與空調位置，讓施工與後續使用都更清楚。',
     image: '/images/portfolio/xizhi-zhongxing-rd/ceiling-lighting-plan.jpg',
-    alt: '住宅空間綜合天花與照明配置圖',
+    alt: '1:50 比例天花與照明配置圖，含燈具、空調室內機與迴路標註',
+    drawingNo: 'DWG-02',
+    scale: '1:50',
+    date: '2026-03',
   },
   {
     label: 'CABINET DETAIL',
     title: '櫃體與立面圖',
     description: '以客廳電視牆為例，整理木作做法與尺寸，讓現場施工更容易對齊。',
     image: '/images/portfolio/xizhi-zhongxing-rd/tv-wall-elevation-reinforcement.jpg',
-    alt: '客廳電視牆補強木作立面圖',
+    alt: '1:30 比例電視牆木作立面圖，含尺寸標註與板材說明',
+    drawingNo: 'DWG-03',
+    scale: '1:30',
+    date: '2026-04',
   },
 ];
 const renovationComparisons = [
@@ -271,6 +280,26 @@ const renovationComparisons = [
                 loading="lazy"
                 decoding="async"
               />
+              <div class="drawing-overlay" aria-hidden="true">
+                <div class="drawing-meta">
+                  <span class="drawing-no">{drawing.drawingNo}</span>
+                  <span class="drawing-scale">{drawing.scale}</span>
+                  <span class="drawing-date">{drawing.date}</span>
+                </div>
+                <a
+                  href={drawing.image}
+                  download
+                  class="drawing-download"
+                  aria-label={`下載 ${drawing.title} 原圖`}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  下載原圖
+                </a>
+              </div>
             </figure>
             <div class="drawing-copy">
               <p class="drawing-label">{drawing.label}</p>
@@ -280,9 +309,16 @@ const renovationComparisons = [
           </article>
         ))}
       </div>
+      <div class="drawing-phase-annotation">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <p>以上圖紙用於裝修前期與施工圖階段，協助師傅對齊做法與尺寸。</p>
+      </div>
     </section>
 
-    <div class="lightbox" id="lightbox">
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="圖片放大檢視">
       <button class="lightbox-close" aria-label="關閉">&times;</button>
       <button class="lightbox-nav lightbox-prev" aria-label="上一張">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -293,6 +329,7 @@ const renovationComparisons = [
       <div class="lightbox-content">
         <img id="lightbox-img" src="" alt="作品放大檢視圖片" />
       </div>
+      <div id="lightbox-caption" class="lightbox-caption"></div>
       <div class="lightbox-counter" id="lightbox-counter"></div>
     </div>
 
@@ -624,7 +661,7 @@ const renovationComparisons = [
 
   .drawing-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.5rem;
   }
 
@@ -641,6 +678,8 @@ const renovationComparisons = [
   }
 
   .drawing-media {
+    position: relative;
+    overflow: hidden;
     margin: 0;
     background: #f7f9f9;
     border-bottom: 1px solid rgba(115, 103, 94, 0.12);
@@ -650,7 +689,101 @@ const renovationComparisons = [
     display: block;
     width: 100%;
     aspect-ratio: 4 / 3;
-    object-fit: cover;
+    object-fit: contain;
+    background: #f7f9f9;
+  }
+
+  /* ---- Drawing Overlay ---- */
+  .drawing-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(18, 22, 26, 0.82) 0%,
+      rgba(18, 22, 26, 0.36) 45%,
+      transparent 70%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1rem 1.1rem;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+
+  .drawing-card:hover .drawing-overlay,
+  .drawing-card:focus-within .drawing-overlay {
+    opacity: 1;
+  }
+
+  .drawing-meta {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+  }
+
+  .drawing-no,
+  .drawing-scale,
+  .drawing-date {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    color: #f0f4f8;
+    font-size: 0.72rem;
+    font-family: var(--font-mono, monospace);
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(4px);
+  }
+
+  .drawing-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    align-self: flex-start;
+    padding: 0.35rem 0.8rem;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #f0f4f8;
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: background 0.18s ease, transform 0.18s ease;
+  }
+
+  .drawing-download:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+  }
+
+  /* ---- Drawing Phase Annotation ---- */
+  .drawing-phase-annotation {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: rgba(115, 103, 94, 0.07);
+    border-radius: 14px;
+    border: 1px solid rgba(115, 103, 94, 0.12);
+    max-width: 680px;
+  }
+
+  .drawing-phase-annotation svg {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    color: var(--tiffany-dark);
+    opacity: 0.65;
+  }
+
+  .drawing-phase-annotation p {
+    margin: 0;
+    color: var(--gray-medium);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    letter-spacing: var(--type-body-tracking);
   }
 
   .drawing-copy {
@@ -837,6 +970,48 @@ const renovationComparisons = [
     letter-spacing: 0.1em;
   }
 
+  .lightbox-caption {
+    position: absolute;
+    bottom: 3.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: rgba(240, 244, 248, 0.8);
+    max-width: 600px;
+    width: 100%;
+    padding: 0 2rem;
+    pointer-events: none;
+  }
+
+  .lightbox-caption:empty {
+    display: none;
+  }
+
+  .lightbox-caption .lightbox-drawing-no {
+    display: block;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--tiffany-primary);
+    margin-bottom: 0.35rem;
+  }
+
+  .lightbox-caption .lightbox-title {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    color: #f0f4f8;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+  }
+
+  .lightbox-caption .lightbox-alt {
+    display: block;
+    font-size: 0.82rem;
+    color: rgba(240, 244, 248, 0.6);
+    line-height: 1.6;
+  }
+
   .contact-section {
     background: var(--gray-darkest);
     color: white;
@@ -988,37 +1163,81 @@ const renovationComparisons = [
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
     const items = document.querySelectorAll('.gallery-item');
+    const drawingCards = document.querySelectorAll('.drawing-card');
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
     const lightboxCounter = document.getElementById('lightbox-counter');
     const closeBtn = document.querySelector('.lightbox-close');
     const prevBtn = document.querySelector('.lightbox-prev');
     const nextBtn = document.querySelector('.lightbox-next');
 
-    const images = Array.from(items)
+    const galleryImages = Array.from(items)
       .map((item) => item.querySelector('img'))
       .filter(Boolean)
-      .map((img) => ({ src: img.src, alt: img.alt }));
+      .map((img) => ({ src: img.src, alt: img.alt, isDrawing: false }));
+
+    const drawingImages = Array.from(drawingCards)
+      .map((card) => card.querySelector('.drawing-media img'))
+      .filter(Boolean)
+      .map((img) => {
+        const card = img.closest('.drawing-card');
+        const drawingNoEl = card?.querySelector('.drawing-no');
+        const titleEl = card?.querySelector('.drawing-copy h3');
+        return {
+          src: img.src,
+          alt: img.alt,
+          isDrawing: true,
+          drawingNo: drawingNoEl?.textContent || '',
+          title: titleEl?.textContent || '',
+        };
+      });
+
+    const allImages = [...galleryImages, ...drawingImages];
     let currentIdx = 0;
 
     function openLightbox(idx) {
       currentIdx = idx;
-      lightboxImg.src = images[idx].src;
-      lightboxImg.alt = images[idx].alt;
-      lightboxCounter.textContent = `${idx + 1} / ${images.length}`;
+      const img = allImages[idx];
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      const isDrawing = img.isDrawing;
+      lightboxCounter.textContent = isDrawing
+        ? `${drawingImages.indexOf(img) + 1} / ${drawingImages.length}`
+        : `${galleryImages.indexOf(img) + 1} / ${galleryImages.length}`;
+      if (isDrawing && img.drawingNo) {
+        lightboxCaption.innerHTML =
+          `<span class="lightbox-drawing-no">${img.drawingNo}</span>` +
+          `<span class="lightbox-title">${img.title}</span>` +
+          `<span class="lightbox-alt">${img.alt}</span>`;
+      } else {
+        lightboxCaption.innerHTML = '';
+      }
       lightbox.classList.add('active');
       document.body.style.overflow = 'hidden';
-      prevBtn.style.display = images.length > 1 ? 'flex' : 'none';
-      nextBtn.style.display = images.length > 1 ? 'flex' : 'none';
+      prevBtn.style.display = isDrawing ? 'none' : (allImages.length > 1 ? 'flex' : 'none');
+      nextBtn.style.display = isDrawing ? 'none' : (allImages.length > 1 ? 'flex' : 'none');
     }
 
     function closeLightbox() {
       lightbox.classList.remove('active');
       document.body.style.overflow = '';
+      lightboxCaption.innerHTML = '';
     }
 
     items.forEach((item, i) => {
       item.addEventListener('click', () => openLightbox(i));
+    });
+
+    drawingCards.forEach((card, i) => {
+      card.style.cursor = 'zoom-in';
+      card.addEventListener('click', () => openLightbox(galleryImages.length + i));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLightbox(galleryImages.length + i);
+        }
+      });
     });
 
     closeBtn?.addEventListener('click', closeLightbox);
@@ -1028,13 +1247,13 @@ const renovationComparisons = [
 
     prevBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
-      currentIdx = (currentIdx - 1 + images.length) % images.length;
+      currentIdx = (currentIdx - 1 + galleryImages.length) % galleryImages.length;
       openLightbox(currentIdx);
     });
 
     nextBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
-      currentIdx = (currentIdx + 1) % images.length;
+      currentIdx = (currentIdx + 1) % galleryImages.length;
       openLightbox(currentIdx);
     });
 
