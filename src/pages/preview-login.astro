@@ -186,7 +186,7 @@ if (Astro.request.method === "POST") {
         font-size: 1rem;
         border: 2px solid var(--gray-bg);
         border-radius: 12px;
-        transition: all 0.3s ease;
+        transition: transform var(--motion-fast) var(--motion-standard), border-color var(--motion-fast) var(--motion-standard), background-color var(--motion-fast) var(--motion-standard);
         font-family: inherit;
     }
 
@@ -210,7 +210,7 @@ if (Astro.request.method === "POST") {
         font-size: 1rem;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: transform var(--motion-fast) var(--motion-standard), background-color var(--motion-fast) var(--motion-standard), box-shadow var(--motion-fast) var(--motion-standard);
         display: flex;
         align-items: center;
         justify-content: center;

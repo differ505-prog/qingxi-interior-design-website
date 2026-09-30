@@ -1,465 +1,382 @@
-# 首頁視覺美學優化 — 實作清單
+# 青曦裝修 Web 視覺審查實作清單
 
-> 來源：視覺美學評審報告（第 24 輪）
-> 目標：修復 Mobile 佈局失效、圖文比例失衡、資訊引導中斷
-> 預估影響：+0.43 / 10
-
----
-
-## 提案 0｜統一卡片圓角 [優先 1]
-
-### 目標
-service-card `border-radius: 24px`、smart-case-card `border-radius: 24px`、testimonial-card `border-radius: 0`。同為卡片元件圓角節奏混亂。
-
-### 修改檔案
-- `src/pages/index.astro`
-
-### 實作步驟
-
-1. 搜尋全站圓角設定：
-   ```bash
-   grep -n "border-radius" src/pages/index.astro | grep -v "9999\|50%"
-   ```
-
-2. 將 `.testimonial-card` 的 `border-radius: 0` 改為 `border-radius: 20px`
-
-3. 將 `.service-card` 的 `border-radius: 24px` 改為 `border-radius: 20px`（全站統一）
-
-4. 將 `.smart-case-card` 的 `border-radius: 24px` 改為 `border-radius: 20px`
-
-5. 驗證：
-   ```bash
-   grep -n "border-radius" src/pages/index.astro | grep -v "9999\|50%"
-   ```
-   預期：所有卡片元件均為 `20px`
+> 依賴順序：① → ② → ③ → ④ → ⑤（不可跳步）
+> 每次 commit 只做一個提案，避免一次 commit 過大難以 revert
 
 ---
 
-## 提案 1｜移除 service-content 固定高度 [優先 2]
+## 提案① — 手機 Hero h1 修正（最高 ROI，優先執行）
 
-### 目標
-`min-height: 250px`（桌面）/ `220px`（手機）在手機 375px 寬度下比例失衡，Icon 區塊被壓縮。
+### ①-1 smart-home.astro — hero h1
 
-### 修改檔案
-- `src/pages/index.astro`
+**檔案**：`src/pages/smart-home.astro`
 
-### 實作步驟
+**目標行**：約 357 行
 
-1. 找到 `.service-content` 定義
+**原碼**：
+```css
+.hero-copy h1 {
+  font-size: clamp(4.2rem, 8vw, 7rem);
+  font-weight: 780;
+  line-height: 0.92;
+  letter-spacing: -0.065em;
+}
+```
 
-2. 將 `min-height: 250px` 改為 `min-height: 200px`
+**新碼**：
+```css
+.hero-copy h1 {
+  font-size: clamp(2.4rem, 7.5vw, 4.2rem);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+}
+```
 
-3. 找到 `@media (max-width: 768px)` 中的 `.service-content` 覆寫
-
-4. 將 `min-height: 220px` 改為 `min-height: 160px`
-
-5. 驗證：
-   ```bash
-   grep -n "service-content" src/pages/index.astro | grep "min-height"
-   ```
-
----
-
-## 提案 2｜修正 testimonial 偏移 [優先 3]
-
-### 目標
-Desktop 12-column：card 2 `margin-top: 3rem`、card 3 `margin-top: 1rem` 造成視覺重心歪斜。改用 CSS `align-self` 或移除偏移。
-
-### 修改檔案
-- `src/pages/index.astro`
-
-### 實作步驟
-
-1. 找到 Desktop 的 `.testimonial-card:nth-child(2)` 和 `.testimonial-card:nth-child(3)`
-
-2. 將：
-   ```css
-   .testimonial-card:nth-child(2) {
-     grid-column: 6 / span 3;
-     margin-top: 3rem;
-   }
-   .testimonial-card:nth-child(3) {
-     grid-column: 9 / -1;
-     margin-top: 1rem;
-   }
-   ```
-   改為（用 `align-self` 取代 `margin-top`）：
-   ```css
-   .testimonial-card:nth-child(2) {
-     grid-column: 6 / span 3;
-     align-self: end;
-     margin-top: 0;
-   }
-   .testimonial-card:nth-child(3) {
-     grid-column: 9 / -1;
-     align-self: center;
-     margin-top: 0;
-   }
-   ```
-
-3. 驗證：確認 Desktop 佈局保持階梯視覺但無 `margin-top` 強制偏移
+**變更摘要**：
+- 上限 7rem → 4.2rem（合 ≤6rem 上限 SOP）
+- 下限 4.2rem → 2.4rem（375px 不再爆行）
+- font-weight 780 → 700（Noto Serif TC 合法最大值）
+- line-height 0.92 → 1.18（舒適行高）
+- letter-spacing -0.065em → -0.02em（合乎字距反向律）
 
 ---
 
-## 提案 3｜手機 padding clamp 化 [優先 4]
+### ①-2 contact.astro — contact-copy h1
 
-### 目標
-桌面用 `clamp(5rem, 9vw, 7.5rem)`，手機固定 `3rem 1.5rem`，大→小螢幕跳躍感明顯。
+**檔案**：`src/pages/contact.astro`
 
-### 修改檔案
-- `src/pages/index.astro`
+**目標行**：約 318 行
 
-### 實作步驟
+**原碼**：
+```css
+.contact-copy h1 {
+  font-size: clamp(4rem, 8vw, 6.8rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+```
 
-1. 找到 `@media (max-width: 768px)` 中所有固定 padding 值：
-   ```bash
-   grep -n "padding: 3rem\|padding: 2.6rem\|padding: 2rem 1.5rem" src/pages/index.astro
-   ```
+**新碼**：
+```css
+.contact-copy h1 {
+  font-size: clamp(2rem, 6.5vw, 4.6rem);
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.025em;
+}
+```
 
-2. 將固定值改為 clamp：
-   - `padding: 3rem 1.5rem` → `padding: clamp(2.5rem, 8vw, 3rem) clamp(1rem, 4vw, 1.5rem)`
-   - `padding: 2.6rem 1.25rem` → `padding: clamp(2rem, 7vw, 2.6rem) clamp(0.85rem, 3.5vw, 1.25rem)`
-
-3. 確認 `.stats-section` 等深色背景區塊的 padding 同步調整
-
-4. 驗證：搜尋 `@media (max-width: 768px)` 區塊中不再有固定 `rem` 值
-
----
-
-## 提案 4｜Consult-title 手機斷點優化 [優先 5]
-
-### 目標
-`clamp(2.8rem, 5.4vw, 4.6rem)` 在 430px 寬度下手機字級與 section-title 差距過大。
-
-### 修改檔案
-- `src/pages/index.astro`
-
-### 實作步驟
-
-1. 找到 `.consult-title` 的 CSS 定義
-
-2. 將：
-   ```css
-   .consult-title {
-     font-size: clamp(2.8rem, 5.4vw, 4.6rem);
-     line-height: 1.1;
-   }
-   ```
-   改為（加 max-width 防止爆行）：
-   ```css
-   .consult-title {
-     font-size: clamp(2rem, 5.4vw, 3.6rem);
-     line-height: 1.18;
-     max-width: 22ch;
-   }
-   ```
-
-3. 確認 Mobile 的 `max-width: none`（若有）已移除
-
-4. 驗證：`grep -n "consult-title" src/pages/index.astro | grep "font-size"`
+**變更摘要**：
+- 上限 6.8rem → 4.6rem（合 ≤6rem 上限）
+- 下限 4rem → 2rem（375px「把想住進去的畫面，先告訴我們」14 字不再爆成 3-4 行）
+- line-height 1.15 → 1.22（舒適行高）
+- letter-spacing -0.03em → -0.025em（字距反向律合規）
 
 ---
 
-## 提案 5｜Gray-darkest 冷化 [優先 6]
+## 提案② — 色彩 SOP 補丁：新增語意狀態色 token
 
-### 目標
-`--gray-darkest: #342f2b` 偏棕，室內設計網站可考慮更冷灰提升專業感。
+### ②-1 BaseLayout.astro — :root 新增狀態色與 LINE token
 
-### 修改檔案
-- `src/layouts/BaseLayout.astro`
+**檔案**：`src/layouts/BaseLayout.astro`
 
-### 實作步驟
+**目標位置**：在 `--tiffany-pale` 定義區塊（約 375 行 `:root` 內）**之前**，新增以下 6 行
 
-1. 找到 `--gray-darkest: #342f2b` 定義（約第 292 行）
+**新增位置**（在 `/* 暖色系... */` 註解區塊之前）：
 
-2. 改為：`--gray-darkest: #2d2d2d;`
+```css
+        /* 語意狀態色（提案②，SOP 補丁） */
+        --state-success: #4f7355;
+        --state-warning: #a87b48;
+        --state-danger:  #b85c52;
+        --state-info:    #5d7e92;
 
-3. 驗證：
-   ```bash
-   grep -n "gray-darkest" src/layouts/BaseLayout.astro | head -5
-   ```
-
----
-
-## 提案 A｜Testimonial Mobile 疊排微調 [優先 2]
-
-### 目標
-Desktop 12-column 階梯佈局（5格→3格→4格 + margin-top 遞增）在 Mobile 失效 → 改為 3-column 等寬但不同 margin-top。
-
-### 修改檔案
-- `src/pages/index.astro`
-
-### 實作步驟
-
-1. 找到 `@media (max-width: 768px)` 區塊（約第 880 行附近）
-
-2. 找到以下目前的 Mobile 覆寫規則並**替換**：
-   ```css
-   /* 原本 */
-   .testimonial-card,
-   .testimonial-card:nth-child(1),
-   .testimonial-card:nth-child(2),
-   .testimonial-card:nth-child(3) {
-     grid-column: auto;
-     margin-top: 0;
-   }
-   .testimonial-grid {
-     grid-template-columns: 1fr;
-   }
-   ```
-   替換為：
-   ```css
-   .testimonial-grid {
-     grid-template-columns: repeat(3, 1fr);
-     gap: 1.2rem;
-   }
-   .testimonial-card {
-     grid-column: span 1;
-     margin-top: 0;
-   }
-   .testimonial-card:nth-child(2) {
-     margin-top: 2.5rem;
-   }
-   .testimonial-card:nth-child(3) {
-     margin-top: 1.2rem;
-   }
-   ```
-
-3. 驗證：搜尋 `testimonial-card` 確保 Desktop 12-column 規則未被破壞（保留 `grid-column: 1 / span 5` 等原有設定）。
+        /* LINE 品牌色（提案②，SOP 補丁） */
+        --line-brand:      #06c755;
+        --line-brand-hover: #05b048;
+```
 
 ---
 
-## 提案 B｜FAQ Mobile 雙欄保留 [優先 1]
+### ②-2 requirement-form.astro — .required 改用 --state-danger
 
-### 目標
-原本「前兩題雙欄、最後一題全寬」的 2+1 節奏在 Mobile 消失 → 改為 Mobile 2-column 雙欄，最後一題佔滿。
+**檔案**：`src/pages/requirement-form.astro`
 
-### 修改檔案
-- `src/pages/index.astro`
+**目標行**：約 1350 行
 
-### 實作步驟
+**原碼**：
+```css
+.required {
+  color: #dd4d4d;
+}
+```
 
-1. 找到 `@media (max-width: 768px)` 區塊中 `.faq-list` 的覆寫
-
-2. 將 `.faq-list` Mobile 覆寫：
-   ```css
-   /* 原本 */
-   .faq-list {
-     grid-template-columns: 1fr;
-   }
-   ```
-   替換為：
-   ```css
-   .faq-list {
-     grid-template-columns: repeat(2, 1fr);
-     gap: 1.2rem;
-   }
-   ```
-
-3. 新增 `.faq-item` Mobile 覆寫（插入同一個 `@media (max-width: 768px)` 區塊）：
-   ```css
-   .faq-item:nth-child(1),
-   .faq-item:nth-child(2) {
-     grid-column: span 1;
-     margin-top: 0;
-   }
-   .faq-item:nth-child(2) {
-     /* 移除 Desktop 的 margin-top */
-     margin-top: 0;
-   }
-   .faq-item:nth-child(3) {
-     grid-column: 1 / -1;
-     margin-top: 0;
-   }
-   ```
-
-4. 調整 `.faq-question` Mobile 字級：
-   - 確認 `.faq-question` 在 Mobile 的 `font-size` 為 `1rem`（確保雙欄時標題不爆版）
-
-5. 驗證：`grep -n "faq-item:nth-child" src/pages/index.astro` 確認兩處均有定義。
+**新碼**：
+```css
+.required {
+  color: var(--state-danger);
+}
+```
 
 ---
 
-## 提案 C｜Smart-case Mobile Grid 保留 [優先 3]
+### ②-3 requirement-form.astro — .line-button 改用 --line-brand
 
-### 目標
-Smart-case-grid 在 Mobile 完全消失（`display: none`），引導資訊中斷 → 改為 `overflow-x-auto` 橫向滑動。
+**檔案**：`src/pages/requirement-form.astro`
 
-### 修改檔案
-- `src/pages/index.astro`
+**目標行**：約 1533 行（`.line-button`）與 1544 行（`.line-button:hover`）
 
-### 實作步驟
+**原碼**：
+```css
+.line-button {
+  background: #06c755;
+  ...
+}
+.line-button:hover {
+  background: #05b048;
+  box-shadow: 0 14px 24px rgba(6, 199, 85, 0.24);
+}
+```
 
-1. 找到 `@media (max-width: 768px)` 區塊中 `.smart-case-shell` 的覆寫
-
-2. 將 `.smart-case-shell` Mobile 覆寫：
-   ```css
-   /* 原本 */
-   .smart-case-shell {
-     grid-template-columns: 1fr;
-   }
-   ```
-   替換為：
-   ```css
-   .smart-case-shell {
-     grid-template-columns: unset;
-     display: flex;
-     flex-direction: column;
-     gap: 1.5rem;
-   }
-   ```
-
-3. 找到 `.smart-case-grid` 的 Mobile 覆寫（若無則新增），插入以下規則：
-   ```css
-   .smart-case-grid {
-     display: flex;
-     overflow-x: auto;
-     gap: 1rem;
-     scroll-snap-type: x mandatory;
-     -webkit-overflow-scrolling: touch;
-     padding-bottom: 0.5rem;
-     /* 隱藏 scrollbar 但保留滑動功能 */
-     scrollbar-width: none; /* Firefox */
-   }
-   .smart-case-grid::-webkit-scrollbar {
-     display: none; /* Chrome/Safari/Edge */
-   }
-   ```
-
-4. 新增 `.smart-case-card` Mobile 覆寫：
-   ```css
-   .smart-case-card {
-     flex: 0 0 280px;
-     scroll-snap-align: start;
-     /* 移除 Desktop 的 grid 樣式，確保 flex 生效 */
-     display: block;
-   }
-   ```
-
-5. 確認 `.smart-case-mobile-note`（Mobile 提示文字）仍存在，作為滑動引導。
-
-6. 驗證：搜尋 `smart-case-grid` 確保 Desktop 仍是 `grid`（`grid-template-columns`）。
+**新碼**：
+```css
+.line-button {
+  background: var(--line-brand);
+  ...
+}
+.line-button:hover {
+  background: var(--line-brand-hover);
+  box-shadow: 0 14px 24px rgba(6, 199, 85, 0.24);
+}
+```
 
 ---
 
-## 提案 D｜Workflow Mobile Timeline 連線裝飾 [優先 4]
+### ②-4 contact.astro — LINE 文字色改用 --line-brand
 
-### 目標
-8 步流程 Mobile 變成 8 個獨立區塊，無視覺連貫性 → 左側加垂直時間軸連線。
+**檔案**：`src/pages/contact.astro`
 
-### 修改檔案
-- `src/pages/index.astro`
+**目標行**：約 580 行
 
-### 實作步驟
+**原碼**：
+```css
+color: #06c755;
+```
 
-1. 找到 `@media (max-width: 768px)` 區塊
-
-2. 新增 `.workflow-item` Mobile 覆寫：
-   ```css
-   .workflow-item {
-     position: relative;
-     padding-left: 2.5rem;
-   }
-   ```
-
-3. 新增 `.workflow-item::before` 偽元素（垂直連線）：
-   ```css
-   .workflow-item::before {
-     content: "";
-     position: absolute;
-     left: 0.65rem;
-     top: 0;
-     bottom: 0;
-     width: 1px;
-     background: linear-gradient(
-       180deg,
-       rgba(115, 103, 94, 0.5) 0%,
-       rgba(115, 103, 94, 0.1) 100%
-     );
-   }
-   ```
-
-4. 新增最後一項隱藏連線：
-   ```css
-   .workflow-item:last-child::before {
-     background: none;
-   }
-   ```
-
-5. 調整 `.workflow-number` Mobile 覆寫：
-   ```css
-   .workflow-number {
-     position: absolute;
-     left: 0;
-     top: 1.1rem;
-     width: 1.5rem;
-     height: 1.5rem;
-     font-size: 0.72rem;
-     background: var(--white);
-     border: 1px solid rgba(115, 103, 94, 0.3);
-     border-radius: 50%;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-   }
-   ```
-
-6. 調整 `.workflow-content` Mobile 覆寫（移除 Desktop 的 `transform`）：
-   ```css
-   .workflow-content {
-     padding: 0;
-     /* 保留 Desktop 原有樣式，確保 Mobile 可讀 */
-   }
-   ```
-
-7. 驗證：搜尋 `workflow-item::before` 確保 Desktop 沒有這個偽元素（避免破壞 Desktop 左右交錯佈局）。
+**新碼**：
+```css
+color: var(--line-brand);
+```
 
 ---
 
-## 驗證清單（全部完成後執行）
+### ②-5 renovation-process.astro — 12 處狀態色收斂
+
+**檔案**：`src/pages/renovation-process.astro`
+
+> 逐一搜尋以下 hex 值，替換為對應 token。若替換後視覺效果有疑慮，停在該行並回報。
+
+| 行範圍（參考） | 原 hex | 替換為 |
+|----------------|--------|--------|
+| ~1873 | `#406443` | `var(--state-success)` |
+| ~1878 | `#9b6f3d` | `var(--state-warning)` |
+| ~1883 | `#8d4b42` | `var(--state-danger)` |
+| ~1894 | `#8b6338` | `var(--state-warning)` |
+| ~1900 | `#446075` | `var(--state-info)` |
+| ~1905 | `#5b5048` | `var(--gray-dark)` |
+| ~1910 | `#3c5f63` | `var(--state-info)` |
+| ~1915 | `#9b6f3d` | `var(--state-warning)` |
+| ~1920 | `#645378` | `var(--art-accent-solid)` |
+| ~1925 | `#2f5342` | `var(--state-success)` |
+
+**執行方式**：
+```bash
+# 先grep確認精確行號
+grep -n "#406443\|#9b6f3d\|#8d4b42\|#8b6338\|#446075\|#5b5048\|#3c5f63\|#645378\|#2f5342" src/pages/renovation-process.astro
+```
+
+---
+
+### ②-6 faq.astro — #8a837b 收斂至 --gray-medium
+
+**檔案**：`src/pages/faq.astro`
+
+**目標行**：約 284 行與 380 行
+
+**搜尋**：`#8a837b`
+
+**替換為**：`var(--gray-medium)`
+
+---
+
+### ②-7 crew-contract-studio/* — 後台子系統 token 化（可選，若時間允許）
+
+**範圍**：`src/pages/crew-contract-studio/` 下所有 `.astro` 檔案
+
+**搜尋命令**：
+```bash
+grep -rEn "background: #fff;color: #[0-9a-fA-F]{3,6}" src/pages/crew-contract-studio/
+```
+
+**原則**：
+- `#fff` → `var(--white)`
+- `#6b4d36` 暖棕系 → `var(--crew-warm-deep)`
+- `#8b6a4d` → `var(--crew-warm)`
+- `#2f241d` → `var(--gray-darkest)`
+
+---
+
+## 提案③ — 設計系統 token 化：圓角 + 動效
+
+### ③-1 BaseLayout.astro — 新增 radius 與 motion token
+
+**檔案**：`src/layouts/BaseLayout.astro`
+
+**新增位置**：在 `--motion-duration-fast` 之後（約 362 行）
+
+```css
+        /* 圓角 token（提案③） */
+        --radius-sm:   8px;
+        --radius-md:   16px;
+        --radius-lg:   24px;
+        --radius-pill: 999px;
+
+        /* 動效時長 token（提案③） */
+        --motion-instant:   0.18s;
+        --motion-fast:      0.32s;
+        --motion-narrative: 0.6s;
+```
+
+**新增說明**：取代目前散落的 0.25/0.3/0.35/0.45/0.55/0.6s 與 14/16/18/20/22/24/26/28/30/32/34/36px
+
+---
+
+### ③-2 全站 transition: all 替換（最重要的一步）
+
+**範圍**：所有含 `transition: all` 的檔案
+
+**搜尋命令**：
+```bash
+grep -rn "transition: all" src/pages/ src/components/ src/layouts/
+```
+
+**替換原則**：
+- `transition: all 0.3s ease;` → `transition: transform var(--motion-fast) var(--motion-standard), opacity var(--motion-fast) var(--motion-standard), background-color var(--motion-fast) var(--motion-standard);`
+- `transition: all 0.6s ease;` → `transition: transform var(--motion-narrative) var(--motion-standard), opacity var(--motion-narrative) var(--motion-standard);`
+- `transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);` → 同上，但 easing 改為 `var(--motion-standard)` 或 `cubic-bezier(0.25, 0.1, 0.25, 1)`
+
+**謹慎處理**：`transition: all` 會影響任何屬性，必須確認每個 context 確實只需要 transform/opacity/bg 這三者。若遇到 input focus / outline / box-shadow 等需要一併動的，補入完整屬性列表。
+
+---
+
+### ③-3 全站 transition 時長收斂
+
+**搜尋命令**：
+```bash
+grep -rn "transition.*[0-9]\.[0-9]*s" src/pages/ src/components/ src/layouts/ | grep -v "var(--motion"
+```
+
+**替換對照**：
+| 原值 | 替換為 |
+|------|--------|
+| `0.25s` | `var(--motion-instant)` 或 `var(--motion-fast)` |
+| `0.3s` / `0.35s` | `var(--motion-fast)` |
+| `0.45s` | `var(--motion-fast)` |
+| `0.55s` / `0.6s` | `var(--motion-narrative)` |
+| `0.9s` | 保留（在 BaseLayout 已定義） |
+
+**例外**：若原值配合的 easing 不是 `ease`，而是 `cubic-bezier` 或 `ease-in-out`，可保留原值但補上對應 `--motion-*` 變數名。
+
+---
+
+### ③-4 全站 border-radius 收斂（目視評估再動）
+
+**搜尋命令**：
+```bash
+grep -rEn "border-radius: [0-9]+px" src/pages/ src/components/ src/layouts/ | sort -t: -k3 -n | uniq
+```
+
+**替換對照**：
+| 原值 | 替換為 |
+|------|--------|
+| `2px` / `4px` / `6px` / `8px` / `12px` | `var(--radius-sm)` |
+| `14px` / `16px` / `18px` / `20px` / `22px` | `var(--radius-md)` |
+| `24px` / `26px` / `28px` / `30px` / `32px` / `34px` / `36px` | `var(--radius-lg)` |
+| `999px` / `50px` | `var(--radius-pill)` |
+
+**注意**：`border-radius: 12px 12px 0 0` 等不對稱圓角保持原值。
+
+---
+
+## 提案④ — 斷點收斂至 4 標準值
+
+### ④-1 斷點現況掃描
 
 ```bash
-# 1. 確認無語法錯誤
-npx astro check src/pages/index.astro
-
-# 2. 確認 grep 無漏網
-grep -n "testimonial-card:nth-child" src/pages/index.astro
-grep -n "faq-item:nth-child" src/pages/index.astro
-grep -n "smart-case-grid" src/pages/index.astro
-grep -n "workflow-item::before" src/pages/index.astro
-
-# 3. 確認 Desktop 原有樣式未被破壞
-grep -n "grid-column: 1 / span 5" src/pages/index.astro  # Testimonial 保留
-grep -n "grid-template-columns: repeat(2, 1fr)" src/pages/index.astro  # FAQ 保留
-grep -n "grid-template-columns: minmax(280px, 360px)" src/pages/index.astro  # Smart-case 保留
+grep -rEho "@media \(max-width: [0-9]+px\)" src/pages/ src/components/ src/layouts/ | sort | uniq -c | sort -rn
 ```
 
----
+### ④-2 遷移對照
 
-## Commit 訊息建議
+| 原斷點 | 遷移至 | 影響檔案（grep 確認） |
+|--------|--------|----------------------|
+| `900px` | `1024px` | 搜尋 `900px` 確認精確行 |
+| `720px` | `768px` | 搜尋 `720px` 確認精確行 |
+| `960px` | `1024px` | 搜尋 `960px` 確認精確行 |
+| `1180px` | `1024px` | 搜尋 `1180px` 確認精確行 |
+| `1120px` | `1024px` | 搜尋 `1120px` 確認精確行 |
+| `640px` | `768px` | 搜尋 `640px` 確認精確行 |
 
-```
-chore: 首頁 Mobile 佈局與視覺節奏優化
-
-- 提案 A：Testimonial Mobile 保留 3-column 疊排韻律（margin-top 遞增）
-- 提案 B：FAQ Mobile 保留 2-column 雙欄（最後一題佔滿）
-- 提案 C：Smart-case Mobile 改為橫向滑動（scroll-snap-type: x）
-- 提案 D：Workflow Mobile 加垂直時間軸連線裝飾
-
-視覺美學評審報告：+0.43/10
-```
-
----
-
-## 預覽方式
-
+**執行方式**：
 ```bash
-npm run dev
-# 開啟 http://localhost:4321/
-# 依序檢查：
-# 1. 首頁 Testimonial 區塊（滑到約 70% 高度）
-# 2. 首頁 FAQ 區塊（滑到約 85% 高度）
-# 3. 首頁 Smart-case 區塊（滑到約 50% 高度）
-# 4. 首頁 Workflow 區塊（滑到約 60% 高度）
-# 每次測試使用 Chrome DevTools 模擬 Mobile（375px 寬度）
+# 逐一確認
+grep -rn "900px" src/pages/ src/components/
+grep -rn "720px" src/pages/ src/components/
+# ...以此類推
 ```
+
+**原則**：
+- 合併時若邏輯衝突（例如 900px 有特殊 padding、768px 有不同 grid），保留更嚴格的（數值小的）。
+- 900px → 1024px 時，若原為「小於 900px」變成「小於 1024px」，覆蓋範圍變大，**先確認視覺效果不受影響**。
+
+### ④-3 保留的 4 標準值（不動）
+
+- `480px` — 小型手機（iPhone SE 等）
+- `768px` — 手機 → 平板
+- `1024px` — 平板 → 桌面
+- `1200px` — 桌面 → 大桌面
+
+---
+
+## 提案⑤ — transition: all 掃除（已含於③-2）
+
+> 提案⑤ 與提案③-2 為同一工作，已納入③-2。
+
+---
+
+## 實作順序總覽
+
+```
+① 手機 Hero h1 修正          → 2 個檔案，2 處改動（高優先）
+② 色彩 token 新增            → BaseLayout :root 新增 6 行
+   ↓
+②.2 ~ ②.7 色彩應用          → 逐一 grep 替換，約 20 處
+   ↓
+③-1 圓角 + 動效 token       → BaseLayout :root 新增 7 行
+   ↓
+③-2 ~ ③-4 系統性收斂        → 全域替換，最大範圍
+   ↓
+④ 斷點收斂                  → 最後執行（因為涉及 media query 重寫）
+```
+
+---
+
+## 執行前必讀
+
+1. **每次提案單獨 commit**：提案① 一個 commit，提案② 一個 commit，提案③ 一個 commit，提案④ 一個 commit
+2. **每個提案執行前先 grep 確認行號**：避免 hardcoded 行號偏移
+3. **替換前先備份**：`git add . && git commit -m "wip: before design system token"`（提案執行前必做）
+4. **build 驗證**：每個提案執行完跑 `npm run build` 確認零 error
+5. **提案③ 破壞面最大**：建議拆成 ③-A（motion token）/ ③-B（radius token）兩個 commit

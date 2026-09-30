@@ -1870,17 +1870,17 @@ const processStructuredData = [
 
   .risk-pill-low {
     background: rgba(72, 107, 76, 0.12);
-    color: #406443;
+    color: var(--state-success);
   }
 
   .risk-pill-medium {
     background: rgba(185, 140, 88, 0.14);
-    color: #9b6f3d;
+    color: var(--state-warning);
   }
 
   .risk-pill-high {
     background: rgba(155, 78, 69, 0.14);
-    color: #8d4b42;
+    color: var(--state-danger);
   }
 
   .legend-badge-required {
@@ -1891,38 +1891,38 @@ const processStructuredData = [
 
   .legend-badge-optional {
     background: rgba(183, 136, 84, 0.12);
-    color: #8b6338;
+    color: var(--state-warning);
     border: 1px dashed rgba(183, 136, 84, 0.28);
   }
 
   .tone-pill-planning {
     background: rgba(68, 96, 117, 0.12);
-    color: #446075;
+    color: var(--state-info);
   }
 
   .tone-pill-base {
     background: rgba(91, 80, 72, 0.12);
-    color: #5b5048;
+    color: var(--gray-dark);
   }
 
   .tone-pill-hidden {
     background: rgba(60, 95, 99, 0.12);
-    color: #3c5f63;
+    color: var(--state-info);
   }
 
   .tone-pill-surface {
     background: rgba(185, 140, 88, 0.14);
-    color: #9b6f3d;
+    color: var(--state-warning);
   }
 
   .tone-pill-install {
     background: rgba(106, 91, 134, 0.14);
-    color: #645378;
+    color: var(--art-accent-solid);
   }
 
   .tone-pill-handoff {
     background: rgba(47, 83, 66, 0.14);
-    color: #2f5342;
+    color: var(--state-success);
   }
 
   .gantt-board {
@@ -2023,7 +2023,7 @@ const processStructuredData = [
     color: var(--gray-medium);
   }
 
-  @media (max-width: 1180px) {
+  @media (max-width: 1024px) {
     .gantt-axis-phase small {
       display: none;
     }
@@ -2320,7 +2320,7 @@ const processStructuredData = [
     letter-spacing: 0.008em;
   }
 
-  @media (max-width: 1180px) {
+  @media (max-width: 1024px) {
     .schedule-tools,
     .process-brief,
     .process-notes,

@@ -926,7 +926,7 @@ const renovationComparisons = [
     align-items: center;
     justify-content: center;
     color: white;
-    transition: all 0.3s ease;
+    transition: transform var(--motion-fast) var(--motion-standard), opacity var(--motion-fast) var(--motion-standard), box-shadow var(--motion-fast) var(--motion-standard);
     z-index: 10;
   }
 
@@ -1067,7 +1067,7 @@ const renovationComparisons = [
     border-radius: 18px;
     text-decoration: none;
     color: white;
-    transition: all 0.3s ease;
+    transition: transform var(--motion-fast) var(--motion-standard), color var(--motion-fast) var(--motion-standard);
   }
 
   .contact-card:hover {
@@ -1083,10 +1083,10 @@ const renovationComparisons = [
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    transition: all 0.3s;
+    transition: transform var(--motion-fast) var(--motion-standard), background-color var(--motion-fast) var(--motion-standard);
   }
 
-  .line-icon { color: #06c755; }
+  .line-icon { color: var(--line-brand); }
   .email-icon { color: var(--tiffany-primary); }
   .form-icon { color: var(--tiffany-light); }
 
