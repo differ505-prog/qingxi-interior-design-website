@@ -977,6 +977,7 @@ const homeStructuredData = [
       border-radius: 16px;
       overflow: hidden;
       aspect-ratio: 16 / 10;
+      position: relative;
       background:
         radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%),
         linear-gradient(135deg, rgba(115, 103, 94, 0.16) 0%, rgba(47, 47, 47, 0.08) 100%);
@@ -992,6 +993,21 @@ const homeStructuredData = [
       width: 100%;
       max-width: 100%;
       margin-left: 0;
+    }
+
+    /* 右側視覺重量補償：漸層底部遮罩增加立體深度 */
+    .brand-metric-image-lead::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(var(--brand-dark-rgb), 0) 50%,
+        rgba(var(--brand-dark-rgb), 0.28) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+      border-radius: inherit;
     }
 
     .brand-metric-visual-lead {
