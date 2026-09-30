@@ -512,10 +512,19 @@ const homeStructuredData = [
         </p>
       </div>
       <figure class="site-proof-photo">
+        <!-- 圖 03：工地現場丈量實景
+             原始檔：青曦自有作品（現場拍攝）
+             原始尺寸：1200x800 (3:2)
+             顯示策略：object-fit: cover 配合 aspect-ratio: 3/2 -->
         <img
           src="/images/home/site-process-1.jpg"
           alt="青曦空間設計工地現場拆改與丈量紀錄"
+          width="1200"
+          height="800"
           loading="lazy"
+          decoding="async"
+          style="aspect-ratio: 3/2; object-fit: cover; object-position: center;"
+          onerror="this.style.display='none';this.parentElement.classList.add('img-fallback');this.parentElement.setAttribute('data-fallback-label','工地現場');"
         />
       </figure>
     </div>
