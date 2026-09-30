@@ -373,11 +373,20 @@ const MAINTENANCE_MODE =
         --motion-fast:      0.32s;
         --motion-narrative: 0.6s;
 
+        /* hover lift token（提案 B）：統一各元件上浮幅度 */
+        --motion-lift-sm: translateY(-2px);
+        --motion-lift-md: translateY(-4px);
+        --motion-lift-lg: translateY(-8px);
+
         /* 語意狀態色（SOP 色彩鎖定） */
         --state-success: #4f7355;
         --state-warning: #a87b48;
         --state-danger:  #b85c52;
         --state-info:    #5d7e92;
+
+        /* chromatic accent（提案 A）：補全站 60-30-10 的第 10% accent 缺口 */
+        --accent-chromatic:      #a87b48;   /* 暖琥珀，與 --state-warning 同一色票 */
+        --accent-chromatic-deep: #8d5b35;  /* 與 --crew-warning 同一色票 */
 
         /* LINE 品牌色 */
         --line-brand:      #06c755;
@@ -627,7 +636,7 @@ const MAINTENANCE_MODE =
       }
 
       .nav-cta:hover {
-        transform: translateY(-2px);
+        transform: var(--motion-lift-sm);
         background: linear-gradient(135deg, rgba(52, 47, 43, 1) 0%, rgba(103, 92, 84, 1) 100%);
         box-shadow: 0 16px 28px rgba(47, 47, 47, 0.18);
       }

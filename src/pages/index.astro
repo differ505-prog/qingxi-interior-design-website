@@ -865,7 +865,7 @@ const homeStructuredData = [
     }
 
     .brand-smart-home-link:hover {
-      transform: translateY(-2px);
+      transform: var(--motion-lift-sm);
       background: var(--gray-dark);
     }
 
@@ -968,7 +968,7 @@ const homeStructuredData = [
     }
 
     .brand-metric-visual:hover {
-      transform: translateY(-2px);
+      transform: var(--motion-lift-sm);
       box-shadow: 0 22px 42px rgba(47, 47, 47, 0.08);
     }
 
@@ -1185,7 +1185,7 @@ const homeStructuredData = [
     .philosophy-quote > p:first-of-type {
       font-size: clamp(1.75rem, 3.4vw, 2.5rem);
       font-weight: 500;
-      line-height: 1.2;
+      line-height: 1.32;
       letter-spacing: 0.02em;
       margin: 0.5rem 0;
       font-family: var(--font-display);
@@ -1395,7 +1395,7 @@ const homeStructuredData = [
     }
 
     .testimonial-card:hover {
-      transform: translateY(-4px);
+      transform: var(--motion-lift-md);
     }
 
     .testimonial-label {
@@ -2059,11 +2059,40 @@ const homeStructuredData = [
 
     .service-grid {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 1.25rem;
       list-style: none;
       padding: 0;
       margin: 0;
+    }
+
+    /* 將第 5 個服務（智能家居 Smart Home）升級為 bento featured card */
+    .service-item:nth-child(5) .service-card {
+      background: linear-gradient(
+        135deg,
+        rgba(168, 123, 72, 0.08) 0%,
+        rgba(246, 241, 236, 0.96) 100%
+      );
+      border-color: rgba(168, 123, 72, 0.28);
+    }
+
+    .service-item:nth-child(5) .service-card::before {
+      background: linear-gradient(
+        135deg,
+        rgba(168, 123, 72, 0.12) 0%,
+        rgba(168, 123, 72, 0.04) 100%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .service-item:nth-child(5) .service-card:hover::before {
+      opacity: 0.15;
+    }
+
+    .service-item:nth-child(5) .service-icon svg {
+      color: var(--accent-chromatic);
+      opacity: 1;
     }
 
     .service-item {
@@ -2113,7 +2142,7 @@ const homeStructuredData = [
     }
 
     .service-card:hover {
-      transform: translateY(-8px);
+      transform: var(--motion-lift-lg);
       box-shadow: 0 18px 34px rgba(47, 47, 47, 0.08);
       border-color: rgba(47, 47, 47, 0.14);
     }
@@ -2172,7 +2201,8 @@ const homeStructuredData = [
     .service-icon svg {
       width: 100%;
       height: 100%;
-      color: var(--gray-medium);
+      color: var(--accent-chromatic);
+      opacity: 0.85;
       transition: transform var(--motion-fast) var(--motion-standard), opacity var(--motion-fast) var(--motion-standard), color var(--motion-fast) var(--motion-standard);
     }
 
@@ -2186,7 +2216,19 @@ const homeStructuredData = [
 
     @media (max-width: 1200px) {
       .service-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .service-item:nth-child(5) .service-card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.96) 0%,
+          rgba(250, 250, 250, 1) 100%
+        );
+        border-color: rgba(115, 103, 94, 0.14);
+      }
+      .service-item:nth-child(5) .service-icon svg {
+        color: var(--accent-chromatic);
+        opacity: 0.85;
       }
     }
 
@@ -2202,6 +2244,20 @@ const homeStructuredData = [
       .service-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1.5rem;
+      }
+
+      /* 手機版取消第 5 卡 featured 樣式，回歸普通卡片 */
+      .service-item:nth-child(5) .service-card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.96) 0%,
+          rgba(250, 250, 250, 1) 100%
+        );
+        border-color: rgba(115, 103, 94, 0.14);
+      }
+      .service-item:nth-child(5) .service-icon svg {
+        color: var(--accent-chromatic);
+        opacity: 0.85;
       }
 
       .service-content {

@@ -385,7 +385,7 @@ const slides = fallbackSlides.map((item) => ({
   }
 
   .hero-featured-card:hover {
-    transform: translateY(-4px);
+    transform: var(--motion-lift-md);
     background: rgba(255, 255, 255, 0.14);
   }
 
@@ -403,7 +403,7 @@ const slides = fallbackSlides.map((item) => ({
   }
 
   .featured-link {
-    color: var(--tiffany-light);
+    color: var(--accent-chromatic);
     font-size: 0.95rem;
     letter-spacing: 0.08em;
   }
@@ -485,16 +485,28 @@ const slides = fallbackSlides.map((item) => ({
     }
 
     .hero-actions {
-      flex-direction: column;
+      flex-direction: row;
       align-items: stretch;
+      gap: 0.6rem;
       width: 100%;
       margin-top: 1.4rem;
+      flex-wrap: wrap;
     }
 
     .hero-button {
-      width: 100%;
       min-width: 0;
-      padding-inline: 1.25rem;
+      padding-inline: 0.5rem;
+    }
+
+    .hero-button-primary {
+      flex: 1.4;
+      background: linear-gradient(135deg, var(--gray-darkest) 0%, var(--tiffany-dark) 100%);
+    }
+
+    .hero-button-secondary {
+      flex: 1;
+      font-size: 0.88rem;
+      padding-inline: 0.5rem;
     }
 
     .hero-featured-card {
