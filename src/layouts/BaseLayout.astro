@@ -368,21 +368,30 @@ const MAINTENANCE_MODE =
         --radius-lg:   24px;
         --radius-pill: 999px;
 
-        /* 動效時長 token（提案③） */
+        /* 動效時長 token */
         --motion-instant:   0.18s;
         --motion-fast:      0.32s;
         --motion-narrative: 0.6s;
+
+        /* hover lift token：統一各元件上浮幅度 */
+        --motion-lift-sm: translateY(-2px);
+        --motion-lift-md: translateY(-4px);
+        --motion-lift-lg: translateY(-8px);
 
         /* hover lift token（提案 B）：統一各元件上浮幅度 */
         --motion-lift-sm: translateY(-2px);
         --motion-lift-md: translateY(-4px);
         --motion-lift-lg: translateY(-8px);
 
-        /* 語意狀態色（SOP 色彩鎖定） */
+        /* 語意狀態色 */
         --state-success: #4f7355;
         --state-warning: #a87b48;
         --state-danger:  #b85c52;
         --state-info:    #5d7e92;
+
+        /* chromatic accent（提案①）：60-30-10 的第 10% accent */
+        --accent-chromatic:      #a87b48;
+        --accent-chromatic-deep: #8d5b35;
 
         /* chromatic accent（提案 A）：補全站 60-30-10 的第 10% accent 缺口 */
         --accent-chromatic:      #a87b48;   /* 暖琥珀，與 --state-warning 同一色票 */
@@ -433,7 +442,7 @@ const MAINTENANCE_MODE =
         background:
           radial-gradient(circle at top, var(--art-accent-glow), transparent 28%),
           radial-gradient(circle at 20% 20%, rgba(159, 147, 136, 0.08), transparent 24%),
-          linear-gradient(180deg, rgba(248, 244, 239, 0.98) 0%, var(--art-paper-deep) 100%);
+          linear-gradient(180deg, rgba(250, 247, 242, 0.98) 0%, var(--art-paper-deep) 100%);
         overflow-x: clip;
       }
 
@@ -475,7 +484,7 @@ const MAINTENANCE_MODE =
         z-index: 1000;
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15), var(--shadow-soft);
         background:
-          linear-gradient(180deg, rgba(248, 244, 239, 0.78) 0%, rgba(245, 240, 234, 0.58) 100%);
+          linear-gradient(180deg, rgba(250, 247, 242, 0.78) 0%, rgba(247, 243, 238, 0.58) 100%);
         backdrop-filter: blur(24px) saturate(140%);
         transition:
           transform var(--motion-duration-fast) var(--motion-standard),
@@ -485,7 +494,7 @@ const MAINTENANCE_MODE =
 
       .site-nav.scrolled {
         background:
-          linear-gradient(180deg, rgba(248, 244, 239, 0.9) 0%, rgba(243, 237, 231, 0.78) 100%);
+          linear-gradient(180deg, rgba(250, 247, 242, 0.9) 0%, rgba(247, 243, 238, 0.78) 100%);
         box-shadow: 0 24px 56px rgba(var(--brand-dark-rgb), 0.12);
       }
 
