@@ -248,7 +248,7 @@ const quizStepsJson = JSON.stringify(quizSteps);
           <h1>先用 5 題生活習慣，快速看出你適合哪種智能家居方案</h1>
           <p class="hero-description">
             如果你覺得智能家居很吸引人，但又擔心太貴、太複雜、不知道自己真正需要什麼，
-            這份快篩會先用生活情境幫你找出最適合的方向。
+            這份快篩會先用生活情境找出最適合的方向。
           </p>
           <div class="hero-highlights">
             <span>約 1 分鐘完成</span>
@@ -277,7 +277,7 @@ const quizStepsJson = JSON.stringify(quizSteps);
             <h2>不是問你想裝哪些設備，而是先看你的生活方式</h2>
             <p>
               對大多數屋主來說，真正的問題不是不知道品牌，而是不知道自己的生活裡到底哪種情境最值得先做。
-              所以這份快篩先幫你找方向，再決定哪些設備值得投入。
+              所以這份快篩先找方向，再決定哪些設備值得投入。
             </p>
           </article>
           <article class="intro-card intro-card-accent">
@@ -348,7 +348,7 @@ const quizStepsJson = JSON.stringify(quizSteps);
           <aside class="result-panel" id="smart-home-result">
             <div class="result-header">
               <p class="result-eyebrow">YOUR RESULT</p>
-              <h2 id="result-title">先完成 5 題，青曦再幫你抓最適合的智能家居方向</h2>
+              <h2 id="result-title">先完成 5 題，找出你的智能家居方向</h2>
               <p class="result-description" id="result-description">
                 這裡會顯示你最適合的情境包、弱電粗估方向與下一步建議。
               </p>
@@ -1194,7 +1194,7 @@ const quizStepsJson = JSON.stringify(quizSteps);
 
   function renderIncompleteState(answeredCount) {
     const remaining = Math.max(0, quizSteps.length - answeredCount);
-    if (resultTitle) resultTitle.textContent = remaining ? `還差 ${remaining} 題，就能看出最適合你的智能家居方向。` : "先完成 5 題，青曦再幫你抓最適合的智能家居方向。";
+    if (resultTitle) resultTitle.textContent = remaining ? `還差 ${remaining} 題，就能看出最適合你的智能家居方向。` : "先完成 5 題，找出你的智能家居方向。";
     if (resultDescription) {
       resultDescription.textContent =
         "完成後會顯示最適合的情境包、智能預算方向、弱電預留粗估與最值得先做的重點。";
