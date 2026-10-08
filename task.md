@@ -1,422 +1,437 @@
-# Round 2 文案減法實作清單（Round Copy Audit — 待執行）
+# 文案精煉實作清單（第五輪覆寫版）
 
-> 本檔案由文案減法體檢（Score 6.0/10）產出。
-> 每一項目為獨立實作單位，可交由低階模型直接照表操課。
-> **操作鐵律**：嚴禁擅自增刪原文意，只做「刪除」或「替換字詞」。
-> **本輪豁免**：所有 `src/pages/blog/*.astro` 內的 article 正文內容一律不動。
+> 掃描範圍：`src/pages/`（不含 `src/pages/blog/` 子目錄）、`src/components/`、`src/layouts/`
+> 執行原則：完全保留 Blog 正文內容（`src/pages/blog/**`），只精煉 UI 層面的標題、副標、按鈕、說明文字、圖說、aria-label
+> ⚠️ 本檔案為上一輪文案體檢報告的實作版，直接照表操課即可。
 
 ---
 
-## 執行前的備份確認
+## 【優先級 A】Zero Replacement（整段刪除，不留任何替代文字）
 
-在開始之前，請在終端執行以下指令，確認 git 狀態乾淨：
+### A-1｜`src/pages/index.astro` — 刪除 consult-note-text 整段
+
+**目標**：consult-note 側邊欄的 `<p>` 純屬按鈕目錄冗餘
+
+| 現況 | 處置 |
+|------|------|
+| `<p class="consult-note-text">聯絡頁、估價或智能家居快篩。</p>` | **整段刪除** |
+
+**搜尋關鍵字**：`consult-note-text`
+
+**操作**：刪除 `<p class="consult-note-text">...</p>` 這一行（HTML 行數請用 IDE 搜尋確認）
+
+**理由**：按鈕群組已有 01/02/03 編號 + `<strong>先進聯絡頁 / 先做估價 / 智能家居快篩` 標題，`<p>` 只是把按鈕翻譯成目錄列表，刪除後視覺更俐落、留白勝於囉唆。
+
+---
+
+### A-2｜`src/pages/portfolio/xizhi-zhongxing-rd.astro` — 刪除 drawing annotation 整段
+
+**目標**：圖紙區底部的 SVG icon + `<p>` 說明文字，屬給工地師傅看的說明，不該出現在面向業主的作品集頁面
+
+| 現況 | 處置 |
+|------|------|
+| `<div class="drawing-phase-annotation">` 及其內含 SVG + `<p>` | **整段 `<div>` 刪除** |
+
+**搜尋關鍵字**：`drawing-phase-annotation`
+
+**操作**：找到 `<div class="drawing-phase-annotation">` 並刪除其開始標籤到 `</div>` 閉合標籤的完整區塊
+
+**理由**：業主不會下工地對尺寸，這段「協助師傅對齊做法與尺寸」是內部施工文件語氣，刪除後作品集頁面專業感提升。
+
+---
+
+### A-3｜`src/pages/index.astro` — 刪除 brand-metric-text span
+
+**目標**：圖卡 strong 標題已足夠，下方的 span 是 jargon 噪音
+
+| 現況 | 處置 |
+|------|------|
+| `brand-metric-visual-lead` 內含 `<strong>三種空間，一起規劃</strong>` 及後方 `<span>設計、施工、智能整合在同一個節奏推進，避免介面與落地斷層。</span>` | **刪除整個 `<span>` 元素** |
+
+**搜尋關鍵字**：`brand-metric-text`
+
+**操作**：刪除包含 `「避免介面與落地斷層」` 的 `<span>` 元素（保留 `<strong>`）
+
+**理由**：
+1. `strong` 標題已完整傳達訊息
+2. `避免介面與落地斷層` 是抽象 jargon，普通業主無法解讀
+3. 同時消除「 jargon + 句尾句號」雙重違規
+
+---
+
+## 【優先級 B】過度解釋自明操作（精簡或砍半）
+
+### B-1｜`src/pages/index.astro` — 刪除 workflow 8 步驟所有 `<p>` 副說明
+
+**目標**：8 個步驟 `<li>` 的 `<p>` 都是把 h3 動詞解釋成白話，屬重複噪音
+
+| 現況 | 處置 |
+|------|------|
+| 共 8 個 `<p>`（`了解需求與預算，釐清設計方向。` / `專業團隊到場，完整記錄空間現況。` / `規劃平面動線與收納整理策略，提供風格、系統櫃配件清單與初步預算。` / `簽訂合約，進入深入規劃階段。` / `繪製 3D 與施工圖，確認每個細節。` / `依最終設計與選材，提出透明報價。` / `安排進度，嚴格控管施工品質。` / `陪同驗收，確認細節後交屋。`） | **全部刪除** |
+
+**搜尋關鍵字**：`了解需求與預算，釐清設計方向`
+
+**操作**：
+1. 搜尋上述第一句
+2. 刪除該 `<p>` 及其父層 `<div class="workflow-content">` 內的 `<p>` 標籤（保留 `<p class="workflow-step-kicker">` 和 `<h3>`）
+3. 其餘 7 個步驟重複相同操作
+
+**理由**：
+- h3（`初步接洽 / 現場丈量 / 平面提案...`）已用動詞表達每步意義
+- 按鈕 `<a href="/renovation-process">查看裝修全流程</a>` 已提供深度入口
+- 刪除後流程骨架更俐落
+
+---
+
+### B-2｜`src/pages/requirement-form.astro` — 刪除 form-step-card 的 4 個 `<p>` 副說明
+
+**目標**：step card 的 h3 已是步驟名稱，`<p>` 是把標題翻譯成白話，重複且視覺冗餘
+
+| 現況 | 處置 |
+|------|------|
+| `<p>留下姓名、電話或 LINE</p>`（step 01） | **刪除** |
+| `<p>地址、坪數、預算與時程</p>`（step 02） | **刪除** |
+| `<p>需求配置與生活重點</p>`（step 03） | **刪除** |
+| `<p>若有興趣可以先告訴我們</p>`（step 04） | **刪除** |
+
+**搜尋關鍵字**：`留下姓名、電話或 LINE`
+
+**操作**：搜尋並逐一刪除（4 個 `<p>` 各自獨立，屬同一 pattern）
+
+**理由**：編號 01-04 + h3 已構成完整步驟導覽，`<p>` 是視覺噪音。刪除後 step card 更俐落，層級更清楚。
+
+---
+
+### B-3｜`src/pages/smart-home-quiz.astro` — hero description 三句砍成一句
+
+**目標**：三句疊加削弱衝擊；前半是給工具的自我解釋，應刪除
+
+| 現況 | 處置 |
+|------|------|
+| `<p class="hero-description">`<br>`如果你覺得智能家居很吸引人，但又擔心太貴、太複雜、不知道自己真正需要什麼，`<br>`這份快篩會先用生活情境找出最適合的方向。`<br>`</p>` | **砍→** `<p>5 題生活習慣，找出最值得先做的方向。</p>` |
+
+**搜尋關鍵字**：`如果你覺得智能家居很吸引人`
+
+**操作**：找到該 `<p>` 並完整替換為新內容
+
+**理由**：
+- 刪�：`如果你覺得...太貴、太複雜` — 替工具自我辯護的廢話
+- 保留核心：`5 題 + 找出方向` — 才是真正的使用者價值承諾
+
+---
+
+### B-4｜`src/pages/smart-home-quiz.astro` — 精簡 intro card 第一段
+
+**目標**：前兩句是「把屋主問題重述一遍」的 AI 套路，直接刪掉前半
+
+| 現況 | 處置 |
+|------|------|
+| `<p>`<br>`對大多數屋主來說，真正的問題不是不知道品牌，而是不知道自己的生活裡到底哪種情境最值得先做。`<br>`所以這份快篩先找方向，再決定哪些設備值得投入。`<br>`</p>` | **砍→** `<p>先找方向，再決定哪些設備值得投入。</p>` |
+
+**搜尋關鍵字**：`對大多數屋主來說`
+
+**操作**：找到並替換（只保留後一句的核心承諾）
+
+**理由**：
+- 前半是「說一個大家早就知道的事」的 AI 套路，讀者一眼識破
+- 後半 `先找方向，再決定哪些設備值得投入` 才是真正的差異化敘事
+
+---
+
+### B-5｜`src/pages/smart-home-quiz.astro` — 精簡 intro card 第二段
+
+**目標**：這段描述工具的適用情境，但「這會比直接看設備清單更有幫助」是自明廢話
+
+| 現況 | 處置 |
+|------|------|
+| `<p>`<br>`如果你同時重視空間設計、智能家居、真實材質與施工細節，這會比直接看設備清單更有幫助。`<br>`</p>` | **砍→** `<p>如果你同時重視空間設計、智能家居與施工細節。</p>` |
+
+**搜尋關鍵字**：`這會比直接看設備清單`
+
+**操作**：替換內容（刪除結尾自明句）
+
+**理由**：結尾 `這會比直接看設備清單更有幫助` 是 `刪除測試：刪掉後資訊量不減` 的典型廢話，刪除後反而更有力道。
+
+---
+
+### B-6｜`src/pages/contact.astro` — 精簡 contact-ritual 段落
+
+**目標**：兩個卡片 CTA 已標 LINE / 留下空間條件，段落是冗餘解釋
+
+| 現況 | 處置 |
+|------|------|
+| `想先快速聊方向，可以直接進 LINE；若你已經整理好需求，也可以直接往下留下空間條件與生活重點。` | **砍→** `想先快速聊方向，可以直接進 LINE；已有初步想法，往下填表即可。` |
+
+**搜尋關鍵字**：`想先快速聊方向`
+
+**操作**：找到 `<p>` 內容並替換
+
+**理由**：
+- `可以` 出現兩次，語感拖沓
+- 刪 `直接` 疊加（LINE 連結本身已標「直接」語氣）
+- 結尾 `留下空間條件與生活重點` 改為 `往下填表即可` 更直接
+
+---
+
+## 【優先級 C】subtitle 句尾句號批次清除
+
+### C-1｜`src/pages/index.astro` — 刪除 subtitle/intro/description 共 7 處句尾句號
+
+| # | 行（概算） | class | 現況 | 改後 |
+|---|-----------|-------|------|------|
+| C-1a | ~149 | `about-intro` | `大台北。住宅、商空與智能整合。` | `大台北，住宅、商空與智能整合` |
+| C-1b | ~193 | `service-intro` | `住宅、商空、智能整合。` | `住宅、商空、智能整合` |
+| C-1c | ~402 | `workflow-intro` | `把需求、預算與現場條件，慢慢收斂成真正能落地的空間節奏。` | `把需求、預算與現場條件，慢慢收斂成真正能落地的空間節奏` |
+| C-1d | ~501 | `site-proof-copy` 內 `<p>` | `從丈量、拆改到施工安排，都以現場條件為基礎。` | `從丈量、拆改到施工安排，都以現場條件為基礎` |
+| C-1e | ~535 | `testimonial-text` | `先把生活...開始談風格與做法。` | `先把生活...開始談風格與做法` |
+| C-1f | ~564 | `consult-description` | `把空間狀態、預算感與想改善的生活節奏整理清楚。` | `把空間狀態、預算感與想改善的生活節奏整理清楚` |
+| C-1g | ~600 | `faq-intro` | `費用、時程與合作範圍，先看過再決定。` | `費用、時程與合作範圍，先看過再決定` |
+
+**搜尋關鍵字**（逐一確認）：
+```
+大台北。住宅
+住宅、商空、智能整合。
+慢慢收斂成
+都以現場條件為基礎
+先把生活
+預算感與想改善
+費用、時程與合作範圍
+```
+
+**操作**：逐個搜尋 → 刪除句尾 `。`
+
+**原則**：所有 `<p>` 內文（非 `<h1-h3>` 標題層）的句尾句號都要清除，與 h1/h2 不點句的全站風格一致。
+
+---
+
+### C-2｜`src/pages/contact.astro` — 刪除 5 處句尾句號
+
+| # | 行（概算） | class/位置 | 現況 | 改後 |
+|---|-----------|-----------|------|------|
+| C-2a | ~29 | `contact-description` | `把空間想像說清楚，討論就會更準。` | `把空間想像說清楚，討論就會更準` |
+| C-2b | ~105 | `card-description`（LINE 卡片） | `適合先快速聊需求輪廓、預算方向與合作節奏。` | `適合先快速聊需求輪廓、預算方向與合作節奏` |
+| C-2c | ~133 | `card-description`（表單卡片） | `適合已經有初步想法，想一次把需求與生活重點整理清楚。` | `適合已經有初步想法，想一次把需求與生活重點整理清楚` |
+| C-2d | ~144 | `quick-form-description` | `約 1 分鐘，留下空間現況與方向。` | `約 1 分鐘，留下空間現況與方向` |
+| C-2e | ~162 | `figcaption strong` | `把你在意的光、材質、動線與日常節奏，先留在這裡。` | `把你在意的光、材質、動線與日常節奏，先留在這裡` |
+
+**搜尋關鍵字**（逐一確認）：
+```
+討論就會更準。
+合作節奏。
+整理清楚。
+約 1 分鐘
+把你在意的光
+```
+
+---
+
+### C-3｜`src/pages/requirement-form.astro` — 刪除 2 處句尾句號
+
+| # | 行（概算） | 位置 | 現況 | 改後 |
+|---|-----------|------|------|------|
+| C-3a | ~48 | `form-subtitle` | `先填核心欄位。` | `先填核心欄位` |
+| C-3b | ~126 | `estimator-brief-description` | `送出時會一起帶入。` | `送出時會一起帶入` |
+
+**搜尋關鍵字**：
+```
+先填核心欄位。
+送出時會一起帶入。
+```
+
+---
+
+### C-4｜`src/pages/portfolio/xizhi-zhongxing-rd.astro` — 刪除 4 處句尾句號
+
+| # | 行（概算） | 位置 | 現況 | 改後 |
+|---|-----------|------|------|------|
+| C-4a | ~236 | `comparison-header` 內 `<p>` | `用前後照片對照，更容易看見空間整理完成後的差異。` | `用前後照片對照，更容易看見空間整理完成後的差異` |
+| C-4b | ~274 | `drawing-header` 內 `<p>` | `從平面配置、照明安排到立面細節，讓施工內容更容易理解。` | `從平面配置、照明安排到立面細節，讓施工內容更容易理解` |
+| C-4c | ~346 | `contact-desc` | `歡迎和青曦聊聊你的住宅需求，整理需求、預算與施工安排。` | `歡迎和青曦聊聊你的住宅需求，整理需求、預算與施工安排` |
+
+**搜尋關鍵字**：
+```
+更容易看見空間整理完成後的差異
+讓施工內容更容易理解
+整理需求、預算與施工安排
+```
+
+---
+
+### C-5｜`src/pages/smart-home-quiz.astro` — 刪除 4 處句尾句號
+
+| # | 行（概算） | 位置 | 現況 | 改後 |
+|---|-----------|------|------|------|
+| C-5a | ~353 | `result-description` | `這裡會顯示你最適合的情境包、弱電粗估方向與下一步建議。` | `這裡會顯示你最適合的情境包、弱電粗估方向與下一步建議` |
+| C-5b | ~415 | `result-note` | `完全免費、沒有壓力，但會比單看設備清單更快知道哪些做法適合你。` | `完全免費、沒有壓力，但會比單看設備清單更快知道哪些做法適合你` |
+| C-5c | ~1213 | JS 動態 HTML（`resultFeatures.innerHTML`） | `完成後會看到最適合先做的設備與情境重點。</span>` | `完成後會看到最適合先做的設備與情境重點</span>` |
+
+**搜尋關鍵字**：
+```
+下一步建議。
+更快知道哪些做法適合你。
+最適合先做的情境包、設備方向與到店體驗建議。
+```
+
+**C-5c 特殊操作**：這是 JS 字串內的 HTML 片段，搜尋時使用：
+```
+完成後會看到最適合先做的設備與情境重點。
+```
+在 JS 的 `innerHTML` 字串中找到對應位置，刪除 `。</span>` 中的 `。`
+
+---
+
+## 【優先級 D】jargon 與教學腔清除
+
+### D-1｜`src/pages/tools/index.astro` — 刪除 FAQ 第二題整個 `<p>`
+
+**目標**：`本來就是讓你` 是典型教學腔，整段後三分之二為同義重述
+
+| 現況 | 處置 |
+|------|------|
+| `<p>適合。估價器本來就是讓你在前期先抓預算帶，不需要一次把所有需求都想清楚，之後再透過需求表補完整即可。</p>` | **砍→** `<p>估價器本來就是讓你在前期先抓預算帶。</p>` |
+
+**搜尋關鍵字**：`不需要一次把所有需求都想清楚`
+
+**操作**：找到並替換（刪除 `適合。` 前綴和 `，不需要一次把所有需求都想清楚，之後再透過需求表補完整即可` 後綴）
+
+**理由**：
+- `適合` 在 FAQ 語境中是自明廢話（使用者已經在「使用」估價器）
+- 後三分之二 `不需要一次把所有需求都想清楚...` 是把同一句話換句話說，是 AI 機器人感最強的一段
+
+---
+
+### D-2｜`src/pages/contact.astro` — 精簡 figcaption strong 教學腔
+
+**目標**：`讓空間氣氛與生活節奏被看見` 是被動語態 + 抽象描述
+
+| 現況 | 處置 |
+|------|------|
+| `先讓空間氣氛與生活節奏被看見，再談做法。` | `先把空間氣氛與生活節奏說出來，再談做法。` |
+
+**搜尋關鍵字**：`空間氣氛與生活節奏被看見`
+
+**操作**：替換文字
+
+**理由**：
+- `被看見` 被動語態 → 改 `說出來` 主動語態（施動者是業主）
+- 意義不變但語感更有力量
+
+---
+
+## 【優先級 E】中英空格排版修正
+
+### E-1｜`src/pages/index.astro` — 中英混排空格
+
+| # | 位置 | 現況 | 改後 |
+|---|------|------|------|
+| E-1a | `about-intro` | `大台北。住宅、商空與智能整合。`（中英未空格，且有句號） | `大台北，住宅、商空與智能整合` |
+| E-1b | `brand-metric-image-lead` alt | `青曦空間設計作品，開放式中島客廳，落地窗引入大台北住宅的自然光` | `青曦空間設計作品，開放式中島客廳，落地窗引入大台北 住宅的自然光` |
+| E-1c | `brand-metric-visual` alt | `青曦團隊於大台北工地現場即時溝通的實際照片` | `青曦團隊於大台北 工地現場即時溝通的實際照片` |
+| E-1d | `site-proof-photo` alt | `青曦空間設計工地現場拆改與丈量紀錄` | `青曦空間設計工地現場拆改與丈量紀錄`（无需修改，已无歧义） |
+
+**E-1a 特殊操作**：結合 C-1a 一併執行（刪句號 + 修空格）
+
+**E-1b/E-1c 操作**：`大台北住宅` → `大台北 住宅`（數字與「住宅」間插入半形空格）
+
+**搜尋關鍵字**：`大台北住宅的自然光`
+
+---
+
+## 【優先級 F】手機孤字寡行（Mobile Widow Prevention）
+
+### F-1｜`src/pages/index.astro` — workflow-intro 加 text-wrap
+
+**目標**：`workflow-intro` 在 375px mobile 第二行可能只剩「空間節奏」4 字
+
+| 現況 | 處置 |
+|------|------|
+| `<p class="workflow-intro">把需求、預算與現場條件，慢慢收斂成真正能落地的空間節奏</p>`（CSS 無 text-wrap 控制） | **在 `<style>` 區塊新增** `.workflow-intro { text-wrap: pretty; }` 或直接在 `<p>` 上加 `style="text-wrap: pretty"` |
+
+**搜尋關鍵字**：`workflow-intro`
+
+**操作**：
+1. 找到 `.workflow-intro` CSS 類（若已存在則追加 `text-wrap: pretty`）
+2. 若無獨立 class，在 `<p class="workflow-intro">` 上加 `style="text-wrap: pretty"`
+
+---
+
+### F-2｜`src/pages/contact.astro` — quick-form figcaption strong 加 text-wrap
+
+**目標**：figcaption 在 375px 可能只剩 `先留在這裡。` 4 字
+
+| 現況 | 處置 |
+|------|------|
+| `<strong>把你在意的光、材質、動線與日常節奏，先留在這裡</strong>`（CSS 無 text-wrap 控制） | **在父層 figcaption 或 strong 上加** `style="text-wrap: pretty"` |
+
+**搜尋關鍵字**：`把你在意的光`
+
+**操作**：在 `<figcaption>` 或其內 `<strong>` 上加 `style="text-wrap: pretty"`
+
+---
+
+## 【優先級 G】程式碼清理（零語意副作用）
+
+### G-1｜`src/pages/index.astro` — 刪除 HTML 註解殘留
+
+| 現況 | 處置 |
+|------|------|
+| `<!-- IMG-01：橫向主視覺卡...` 系列冗長註解 | **刪除整段註解** |
+
+**搜尋關鍵字**：`IMG-01：橫向主視覺卡`
+
+**理由**：這些是開發期備註，交代 `clamp` 參數由來，已不再需要。
+
+---
+
+## 禁止修改區域（確認隔離）
+
+以下目錄/檔案 **嚴禁修改**，即使發現問題也要跳過：
+
+```
+src/pages/blog/                    ← 全部（含 index、catalog 描述、article 正文）
+src/pages/blog/**/*.astro         ← 全部
+src/lib/                          ← 全部（.ts 資料層）
+src/styles/                      ← 全部（CSS 檔）
+src/pages/social-ops/            ← 後台系統
+```
+
+---
+
+## 執行順序建議
+
+```
+Step 1：A-1 ~ A-3（Zero Replacement，直接刪除，風險最低）
+Step 2：B-1 ~ B-6（精簡/砍半，涉及 DOM 結構微調）
+Step 3：C-1 ~ C-5（句尾句號清除，純字串處理）
+Step 4：D-1 ~ D-2（jargon/教學腔清除）
+Step 5：E-1（中英空格，中文修正一併在 C-1a 執行）
+Step 6：F-1 ~ F-2（手機孤字，CSS 追加一條屬性）
+Step 7：G-1（程式碼註解清理）
+```
+
+---
+
+## 驗證命令（修改完成後執行）
 
 ```bash
-cd /Users/liangzhiwei/bustling-belt
-git status
-```
+# 確認無「讓你」殘留（UI 層面，排除 social-ops）
+grep -rn "讓你" src/pages/index.astro src/pages/contact.astro src/pages/portfolio/ src/pages/tools/index.astro src/pages/smart-home-quiz.astro src/pages/requirement-form.astro
 
-若終端輸出包含 `Changes not staged for commit`，請先 commit 或 stash，避免修改被覆蓋。
+# 確認無「幫你」殘留（UI 層面）
+grep -rn "幫你" src/pages/index.astro src/pages/contact.astro src/pages/portfolio/ src/pages/tools/index.astro src/pages/smart-home-quiz.astro src/pages/requirement-form.astro
 
----
+# 確認無句尾句號（UI 層面 p 標籤，排除 blog）
+grep -rn "<p[^>]*>[^<]*[。]</p>" src/pages/index.astro src/pages/contact.astro src/pages/portfolio/ src/pages/tools/index.astro src/pages/smart-home-quiz.astro src/pages/requirement-form.astro
 
-## 實作總覽
-
-| 分類 | 動作 | 數量 |
-|------|------|------|
-| A | 整段刪除（100% Deletion） | 2 處 |
-| B | 精簡文字（替換） | 3 處 |
-| C | CSS balance 補強（手機斷行防 orphan） | 3 處 |
-
----
-
-## 【A】整段刪除（100% Deletion）
-
-### A-1｜index.astro — 刪除 `.smart-case-mobile-note` 整段
-
-**檔案**：`src/pages/index.astro`
-
-**搜尋字串**：
-```
-smart-case-mobile-note
-```
-
-**預期位置**：約在 line 247 區域
-
-**完整待刪除節點**：
-```astro
-<p class="smart-case-mobile-note">手機版先看重點能力，更多內容可進入智能家居專區。</p>
-```
-
-**實作動作**：將整個 `<p class="smart-case-mobile-note">...</p>` 標籤刪除。
-
-**為什麼刪除**：
-- 使用者自己知道正在用手機，「進入專區」按鈕已存在下方
-- 「手機版先看重點能力」是純 meta 廢話，無新資訊
-- 留白比文字更乾淨
-
-**驗證**：
-```bash
-grep -n "smart-case-mobile-note" src/pages/index.astro
-# 預期輸出：0 行
+# 預期結果：0 行（驗證失敗代表殘留未清乾淨）
 ```
 
 ---
 
-### A-2｜smart-home.astro — 刪除 `.section-heading > p:last-child` 整段
-
-**檔案**：`src/pages/smart-home.astro`
-
-**搜尋字串**：
-```
-不是單純展示設備，而是直接看見入住後的使用感
-```
-
-**預期位置**：約在 line 122 區域
-
-**完整待刪除節點**：
-```astro
-<p>
-  不是單純展示設備，而是直接看見入住後的使用感。
-</p>
-```
-
-**實作動作**：將整個 `<p>...</p>` 標籤刪除。
-
-**為什麼刪除**：
-- 上方 h2「把智能家居的使用感與空間感一起看見」已完整宣告同件事
-- 此段是 h2 的同義改寫，屬自明性廢話
-- 刪除後讓視覺更乾淨，不干擾下方 visual-grid
-
-**驗證**：
-```bash
-grep -n "不是單純展示設備" src/pages/smart-home.astro
-# 預期輸出：0 行
-```
-
----
-
-## 【B】精簡文字（替換）
-
-### B-1｜smart-home.astro — 精簡 positioning-card-dark 內文
-
-**檔案**：`src/pages/smart-home.astro`
-
-**搜尋字串**：
-```
-很多智能家居不好用
-```
-
-**預期位置**：約在 line 135-136 區域（`.positioning-card-dark` 內的 `<p>` 段落）
-
-**完整待替換節點（Before）**：
-```astro
-<p>
-  很多智能家居不好用，不是設備不夠新，而是空間、佈線與控制邏輯沒有一起規劃。
-  青曦會在設計階段先整合這些條件，讓系統更順手。
-</p>
-```
-
-**替換為（After）**：
-```astro
-<p>
-  不是設備不夠新，是空間、佈線與控制邏輯沒有一起規劃。
-</p>
-```
-
-**改動說明**：
-| 原文 | 修改後 | 理由 |
-|------|--------|------|
-| 很多智能家居不好用（鋪墊句） | 刪除 | 無新資訊，直接從核心切入 |
-| 不是設備不夠新，而是空間、佈線與控制邏輯沒有一起規劃 | 保留，精簡開頭 | 核心洞察保留 |
-| 青曦會在設計階段先整合這些條件，讓系統更順手（湊字尾） | 刪除 | 「讓系統更順手」是湊字，「整合」在上半句已隱含 |
-
----
-
-### B-2｜index.astro — 精簡 `.consult-description` 尾句
-
-**檔案**：`src/pages/index.astro`
-
-**搜尋字串**：
-```
-下一步自然會更準
-```
-
-**預期位置**：約在 line 432 區域（`.consult-description` 段落）
-
-**完整待替換節點（Before）**：
-```astro
-<p class="consult-description">
-  不一定要立刻決定全部。先把目前的空間狀態、預算感與想改善的生活節奏整理清楚，下一步自然會更準。
-</p>
-```
-
-**替換為（After）**：
-```astro
-<p class="consult-description">
-  把空間狀態、預算感與想改善的生活節奏整理清楚。
-</p>
-```
-
-**改動說明**：
-| 原文 | 修改後 | 理由 |
-|------|--------|------|
-| 不一定要立刻決定全部 | 刪除 | 上方 h2「方向對了，就用最舒服的方式起步」已宣告 |
-| 先把目前的空間狀態、預算感與想改善的生活節奏整理清楚 | 保留主句 | 核心 action anchor |
-| 下一步自然會更準（湊字尾） | 刪除 | CTA 按鈕「先進聯絡頁」已完成此動作敘述 |
-
----
-
-### B-3｜faq.astro — 精簡 answer 5（保固說明）
-
-**檔案**：`src/pages/faq.astro`
-
-**搜尋字串**：
-```
-提供一年工程保固
-```
-
-**預期位置**：約在 line 31 區域（faqItems array 內第 5 項 answer）
-
-**完整待替換節點（Before）**：
-```astro
-answer: "提供一年工程保固。保固期內若有施工瑕疵，會協助安排修復。",
-```
-
-**替換為（After）**：
-```astro
-answer: "一年工程保固；期間施工瑕疵協助修復。",
-```
-
-**改動說明**：
-| 原文 | 修改後 | 理由 |
-|------|--------|------|
-| 提供一年工程保固（冗詞「提供」） | 一年工程保固 | 「提供」是自明動詞，直接講事實 |
-| 保固期內若有施工瑕疵，會協助安排修復（冗詞「若」「會」） | 期間施工瑕疵協助修復 | 「期間」取代「保固期內」；刪「會」「安排」湊字 |
-
----
-
-## 【C】CSS balance 補強（手機斷行防 orphan）
-
-### C-1｜faq.astro — 為 hero h1 加入 `text-wrap: balance`
-
-**檔案**：`src/pages/faq.astro`
-
-**搜尋字串**：
-```
-<h1>把合作前最常卡住的事，先安靜看清楚</h1>
-```
-
-**預期位置**：line ~26（`<h1>` 標籤）
-
-**完整待替換節點（Before）**：
-```astro
-<h1>把合作前最常卡住的事，先安靜看清楚</h1>
-```
-
-**替換為（After）**：
-```astro
-<h1 style="text-wrap: balance;">把合作前最常卡住的事，先安靜看清楚</h1>
-```
-
-**為什麼需要**：
-- h1 為 14 字當量（漢字 13 + 標點 0.5×2）
-- 在 375px 窄螢幕下摺行後易出現 orphan「事，先安靜看清楚」
-- `text-wrap: balance` 讓瀏覽器自動平衡行長，避免孤字
-
----
-
-### C-2｜faq.astro — 為 `.faq-curation-copy h2` 加入 `text-wrap: balance`
-
-**檔案**：`src/pages/faq.astro`
-
-**搜尋字串**：
-```
-不是要你一次懂完，而是先知道合作節奏合不合
-```
-
-**預期位置**：約在 line 75 區域
-
-**完整待替換節點（Before）**：
-```astro
-<h2>不是要你一次懂完，而是先知道合作節奏合不合</h2>
-```
-
-**替換為（After）**：
-```astro
-<h2 style="text-wrap: balance;">不是要你一次懂完，而是先知道合作節奏合不合</h2>
-```
-
-**為什麼需要**：
-- h2 為 19 字當量（漢字 17 + 標點 0.5×4）
-- 字級 3-4.8rem，窄螢幕下摺行 orphan 風險高
-- `text-wrap: balance` 保護「不是要你一次懂完」不被孤單拆行
-
----
-
-### C-3｜smart-home.astro — 為 hero h1 加入 `text-wrap: balance`
-
-**檔案**：`src/pages/smart-home.astro`
-
-**搜尋字串**：
-```
-<h1>把智能家居做成真正好用的生活系統</h1>
-```
-
-**預期位置**：約在 line 64 區域
-
-**完整待替換節點（Before）**：
-```astro
-<h1>把智能家居做成真正好用的生活系統</h1>
-```
-
-**替換為（After）**：
-```astro
-<h1 style="text-wrap: balance;">把智能家居做成真正好用的生活系統</h1>
-```
-
-**為什麼需要**：
-- h1 為 14 字當量（漢字 13 + 標點 0.5×2）
-- 桌面版可單行，手機 375px 折行後易 orphan
-- `text-wrap: balance` 讓行長自動平衡
-
----
-
-## 實作順序建議（每個 commit 獨立可 revert）
-
-### Commit 1：整段刪除 A 組
-包含：**A-1, A-2**
-
-```bash
-git add src/pages/index.astro src/pages/smart-home.astro
-git commit -m "refactor(copy): 整段刪除 2 處自明性廢話
-
-- index: 刪除 smart-case-mobile-note（純 meta廢話）
-- smart-home: 刪除 section-heading p（h2已宣告同件事）
-
-驗證：
-grep -n \"smart-case-mobile-note|不是單純展示設備\" src/pages/index.astro src/pages/smart-home.astro
-# 預期：0 行"
-```
-
-### Commit 2：精簡文字 B 組
-包含：**B-1, B-2, B-3**
-
-```bash
-git add src/pages/smart-home.astro src/pages/index.astro src/pages/faq.astro
-git commit -m "refactor(copy): 精簡 positioning-card / consult-desc / 保固 answer
-
-- smart-home positioning-card-dark: 刪鋪墊句+湊字尾，60字→22字
-- index consult-description: 刪h2已宣告語+湊字尾，45字→22字
-- faq answer 5: 刪冗詞「提供」「會」「安排」，純事實陳述
-
-驗證：
-grep -n \"很多智能家居不好用|下一步自然會更準|提供一年工程保固\" src/pages/smart-home.astro src/pages/index.astro src/pages/faq.astro
-# 預期：0 行"
-```
-
-### Commit 3：CSS balance C 組
-包含：**C-1, C-2, C-3**
-
-```bash
-git add src/pages/faq.astro src/pages/smart-home.astro
-git commit -m "fix(typography): 為 3 個 14+ 字當量 h1/h2 補 text-wrap balance
-
-- faq hero h1: 14 字當量，375px 易 orphan
-- faq curation h2: 19 字當量，含「不是X而是Y」句型
-- smart-home hero h1: 14 字當量，窄螢幕折行保護
-
-驗證：
-grep -n \"text-wrap: balance\" src/pages/faq.astro src/pages/smart-home.astro
-# 預期：本次新增 3 處"
-```
-
----
-
-## 實作完成後的驗證 SOP
-
-### 1. 確認差異範圍合理
-
-```bash
-git diff --stat HEAD~3..HEAD
-```
-
-預期：**減少行數為主**（刪除多於新增），淨變動約 -15 到 -30 行。
-
-### 2. 確認無新增 AI 套話
-
-```bash
-grep -rEn "優質|專業|頂尖|一流|完善|全方位|量身打造|不是.*而是" src/pages/ src/components/ src/layouts/ | grep -v "social-ops/" | grep -v "/blog/" | grep -v "css-palette\|design-token"
-```
-
-預期：本次修改後 `不是.*而是` 句型從 4 處降至 2 處（`index.astro brand-strip-intro` + `smart-home.astro CTA h2` 屬品牌語氣慣例，保留）。
-
-### 3. 確認 h1/h2/h3 無尾句點
-
-```bash
-grep -rEn "<h[1-3][^>]*>[^<]+[。！?？]</h[1-3]>" src/pages/ src/components/ src/layouts/ | grep -v "/blog/"
-```
-
-預期：**0 行**
-
-### 4. 確認本期變更清單 8 項全數完成
-
-```bash
-for term in "smart-case-mobile-note" "不是單純展示設備" "很多智能家居不好用" "下一步自然會更準" "提供一年工程保固" "把合作前最常卡住的事，先安靜看清楚" "不是要你一次懂完" "把智能家居做成真正好用的生活系統"; do
-  count=$(grep -rEn "$term" src/pages/ 2>/dev/null | grep -v "/blog/" | wc -l)
-  echo "$term: $count"
-done
-```
-
-預期每項：`0`
-
-### 5. build 驗證（必跑）
-
-```bash
-cd /Users/liangzhiwei/bustling-belt
-npm run build 2>&1 | tail -20
-```
-
-預期：無錯誤，build 成功。
-
-### 6. dev server 驗證（選跑）
-
-```bash
-tail -30 /tmp/astro-dev.log 2>/dev/null
-```
-
-預期：HMR 編譯無 error。
-
----
-
-## 本次實作不涵蓋的範圍
-
-以下內容**不在此次實作範圍內**，保持原樣不動：
-
-- ✅ **所有 `src/pages/blog/*.astro` 內的 article 正文內容**（使用者明確豁免）
-- ✅ `src/pages/social-ops/index.astro`（後台系統，editorial 風格例外）
-- ✅ CSS 樣式（非文案相關，但 balance inline style 例外）
-- ✅ 圖片 alt 屬性（非此次審計範圍）
-- ✅ SEO meta description（非此次審計範圍）
-- ✅ 9 種斷點合併議題（下輪處理）
-- ✅ 5+ 檔案硬寫 hex 色彩鎖修補（下輪處理）
-
----
-
-## 變更清單總表
-
-| # | 檔案 | 行 | 動作 | Before 摘要 | After 摘要 |
-|---|------|----|------|-------------|------------|
-| A-1 | index.astro | ~247 | 整段刪除 | `<p class="smart-case-mobile-note">手機版先看重點能力...</p>` | （無） |
-| A-2 | smart-home.astro | ~122 | 整段刪除 | `<p>不是單純展示設備，而是直接看見...</p>` | （無） |
-| B-1 | smart-home.astro | ~135-136 | 精簡替換 | positioning-card-dark p（60+ 字） | 「不是設備不夠新，是空間、佈線與控制邏輯沒有一起規劃。」（22 字） |
-| B-2 | index.astro | ~432 | 精簡替換 | consult-description（45 字） | 「把空間狀態、預算感與想改善的生活節奏整理清楚。」（22 字） |
-| B-3 | faq.astro | ~31 | 精簡替換 | 「提供一年工程保固。保固期內若有施工瑕疵，會協助安排修復。」 | 「一年工程保固；期間施工瑕疵協助修復。」 |
-| C-1 | faq.astro | ~26 | CSS balance | `<h1>...</h1>` | `<h1 style="text-wrap: balance;">...</h1>` |
-| C-2 | faq.astro | ~75 | CSS balance | `<h2>...</h2>` | `<h2 style="text-wrap: balance;">...</h2>` |
-| C-3 | smart-home.astro | ~64 | CSS balance | `<h1>...</h1>` | `<h1 style="text-wrap: balance;">...</h1>` |
-
----
-
-*本清單由文案減法體檢（Round Copy Audit, Score 6.0/10）產出。*
-*操作鐵律：只刪不增；blog 正文 / social-ops 後台 / CSS 顏色與斷點 豁免。*
+## 憲法和諮詢記錄覆寫說明
+
+本輪文案體檢報告（新覆寫版）與舊版 `task.md` 的差異：
+- **舊版**（task.md 前幾輪）：僅覆蓋 A-1~A-5（整段砍掉）、B-1~B-4（教學腔置換）、C-1~C-3（情緒動詞）、D-1~D-2（標點）
+- **新版（本檔）**：新增 Zero Replacement A-2、A-3；新增 B-5、B-6；C-5 新增 JS 動態 HTML；D-1 改為 `tools/index.astro` 而非 `smart-home-quiz.astro`；新增 E-1（中英空格）、F-1~F-2（手機孤字）、G-1（註解清理）
+- **B-3 覆寫**：`smart-home-quiz.astro:251` 從 `青曦再幫你` 改為「直接砍前半保留後半」，是更徹底的處理
+- **C-5c 新增**：本次首次發現 JS 動態 HTML 字串內的句號殘留，舊版未覆蓋
