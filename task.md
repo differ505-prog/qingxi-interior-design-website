@@ -1,570 +1,422 @@
-# 文案精煉落地清單（第 21 輪）
+# Round 2 文案減法實作清單（Round Copy Audit — 待執行）
 
-> 來源：第 20 輪文案體檢報告 → 所有提案 A-1~A-3 / B-1~B-5 / C-1~C-3 全部落地
-> 執行範圍：`src/pages/index.astro`（主要）、`src/layouts/BaseLayout.astro`（1 處）
-> 執行原則：每個 commit 只做 1 個提案；逐案 grep 驗證；commit message 前綴 `copy-prune:`
-
----
-
-## Commit 總覽
-
-| # | 提案 | 類型 | 檔案 | 主要變更 |
-|---|------|------|------|----------|
-| 1 | A-1 | 整段刪除 | `index.astro` | 移除 `.workflow-editor-note` aside（完整 HTML 塊） |
-| 2 | A-2 | 整段刪除 | `index.astro` | 移除 `.faq-home-note` aside（完整 HTML 塊） |
-| 3 | A-3 | 整段刪除 | `index.astro` | 移除 `.faq-curation` 整塊（eyebrow + p） |
-| 4 | B-1 | 精簡 | `BaseLayout.astro` | footer `.footer-brand p` 從 71 字砍至 25 字 |
-| 5 | B-2 | 精簡 | `index.astro` | `.workflow-summary-note` 從 43 字當量砍至 24 字 |
-| 6 | B-3 | 精簡 | `index.astro` | `.consult-note-text` 從 38 字砍至 11 字 |
-| 7 | B-4 | 精簡 | `index.astro` | smart-case card h3：拿掉「讓」字 + 順手修鄰近「協助」段落 |
-| 8 | B-5 | 精簡 | `index.astro` | `.quote-detail` 拿掉「的」字 |
-| 9 | C-1 | 移除 eyebrow | `index.astro` | 移除 `.consult-kicker`（Closing Edit）|
-| 10 | C-2 | 移除 eyebrow | `index.astro` | 移除 `.workflow-summary-label`（Flow Snapshot）|
-| 11 | C-3 | 移除 eyebrow | `faq.astro` | 移除 `.faq-curation-note` eyebrow（Consultation Edit）|
-| 12 | — | 全域驗證 | 全域 | grep 無殘留驗證 |
+> 本檔案由文案減法體檢（Score 6.0/10）產出。
+> 每一項目為獨立實作單位，可交由低階模型直接照表操課。
+> **操作鐵律**：嚴禁擅自增刪原文意，只做「刪除」或「替換字詞」。
+> **本輪豁免**：所有 `src/pages/blog/*.astro` 內的 article 正文內容一律不動。
 
 ---
 
-## Commit 1 — A-1：移除 `.workflow-editor-note` aside
+## 執行前的備份確認
+
+在開始之前，請在終端執行以下指令，確認 git 狀態乾淨：
+
+```bash
+cd /Users/liangzhiwei/bustling-belt
+git status
+```
+
+若終端輸出包含 `Changes not staged for commit`，請先 commit 或 stash，避免修改被覆蓋。
+
+---
+
+## 實作總覽
+
+| 分類 | 動作 | 數量 |
+|------|------|------|
+| A | 整段刪除（100% Deletion） | 2 處 |
+| B | 精簡文字（替換） | 3 處 |
+| C | CSS balance 補強（手機斷行防 orphan） | 3 處 |
+
+---
+
+## 【A】整段刪除（100% Deletion）
+
+### A-1｜index.astro — 刪除 `.smart-case-mobile-note` 整段
 
 **檔案**：`src/pages/index.astro`
-**行號**：第 410–413 行
 
-### 變更對照
-
-| 項目 | Before | After |
-|------|--------|-------|
-| HTML 結構 | 完整 `<aside class="workflow-editor-note">...</aside>` | **整段移除** |
-| CSS | `.workflow-editor-note` 樣式規則（3 處參照） | **保留 CSS，孤兒規則無害** |
-
-### 實作步驟
-
-**步驟 1**：確認目標範圍（行 410–413）
-```bash
-sed -n '408,416p' src/pages/index.astro
+**搜尋字串**：
 ```
-預期輸出：
+smart-case-mobile-note
+```
+
+**預期位置**：約在 line 247 區域
+
+**完整待刪除節點**：
 ```astro
-        </div>
-        <aside class="workflow-editor-note">
-          <p class="workflow-editor-label">Project Rhythm</p>
-          <p>青曦不把流程寫成制式 SOP，而是讓每一步都回到現場條件、生活方式與後續施工判斷。</p>
-        </aside>
-      </div>
+<p class="smart-case-mobile-note">手機版先看重點能力，更多內容可進入智能家居專區。</p>
 ```
 
-**步驟 2**：執行刪除
+**實作動作**：將整個 `<p class="smart-case-mobile-note">...</p>` 標籤刪除。
 
-**old_string**（精確全文）：
-```astro
-        <aside class="workflow-editor-note">
-          <p class="workflow-editor-label">Project Rhythm</p>
-          <p>青曦不把流程寫成制式 SOP，而是讓每一步都回到現場條件、生活方式與後續施工判斷。</p>
-        </aside>
-```
+**為什麼刪除**：
+- 使用者自己知道正在用手機，「進入專區」按鈕已存在下方
+- 「手機版先看重點能力」是純 meta 廢話，無新資訊
+- 留白比文字更乾淨
 
-**new_string**：
-（空白）
-
-**步驟 3**：驗證已移除
+**驗證**：
 ```bash
-grep -n "workflow-editor-note\|Project Rhythm" src/pages/index.astro
+grep -n "smart-case-mobile-note" src/pages/index.astro
+# 預期輸出：0 行
 ```
-預期：0 行（HTML 已移除；CSS 樣式規則仍在但無引用，屬於無害孤兒）
-
-**Commit message**：`copy-prune: index 移除 workflow-editor-note aside（整段刪除，留白優於自嗨後記）`
 
 ---
 
-## Commit 2 — A-2：移除 `.faq-home-note` aside
+### A-2｜smart-home.astro — 刪除 `.section-heading > p:last-child` 整段
+
+**檔案**：`src/pages/smart-home.astro`
+
+**搜尋字串**：
+```
+不是單純展示設備，而是直接看見入住後的使用感
+```
+
+**預期位置**：約在 line 122 區域
+
+**完整待刪除節點**：
+```astro
+<p>
+  不是單純展示設備，而是直接看見入住後的使用感。
+</p>
+```
+
+**實作動作**：將整個 `<p>...</p>` 標籤刪除。
+
+**為什麼刪除**：
+- 上方 h2「把智能家居的使用感與空間感一起看見」已完整宣告同件事
+- 此段是 h2 的同義改寫，屬自明性廢話
+- 刪除後讓視覺更乾淨，不干擾下方 visual-grid
+
+**驗證**：
+```bash
+grep -n "不是單純展示設備" src/pages/smart-home.astro
+# 預期輸出：0 行
+```
+
+---
+
+## 【B】精簡文字（替換）
+
+### B-1｜smart-home.astro — 精簡 positioning-card-dark 內文
+
+**檔案**：`src/pages/smart-home.astro`
+
+**搜尋字串**：
+```
+很多智能家居不好用
+```
+
+**預期位置**：約在 line 135-136 區域（`.positioning-card-dark` 內的 `<p>` 段落）
+
+**完整待替換節點（Before）**：
+```astro
+<p>
+  很多智能家居不好用，不是設備不夠新，而是空間、佈線與控制邏輯沒有一起規劃。
+  青曦會在設計階段先整合這些條件，讓系統更順手。
+</p>
+```
+
+**替換為（After）**：
+```astro
+<p>
+  不是設備不夠新，是空間、佈線與控制邏輯沒有一起規劃。
+</p>
+```
+
+**改動說明**：
+| 原文 | 修改後 | 理由 |
+|------|--------|------|
+| 很多智能家居不好用（鋪墊句） | 刪除 | 無新資訊，直接從核心切入 |
+| 不是設備不夠新，而是空間、佈線與控制邏輯沒有一起規劃 | 保留，精簡開頭 | 核心洞察保留 |
+| 青曦會在設計階段先整合這些條件，讓系統更順手（湊字尾） | 刪除 | 「讓系統更順手」是湊字，「整合」在上半句已隱含 |
+
+---
+
+### B-2｜index.astro — 精簡 `.consult-description` 尾句
 
 **檔案**：`src/pages/index.astro`
-**行號**：第 616–619 行
 
-### 變更對照
-
-| 項目 | Before | After |
-|------|--------|-------|
-| HTML 結構 | 完整 `<aside class="faq-home-note">...</aside>` | **整段移除** |
-| CSS | `.faq-home-note` 等 3 個樣式規則 | **保留 CSS，孤兒無害** |
-
-### 實作步驟
-
-**步驟 1**：確認目標範圍
-```bash
-sed -n '614,622p' src/pages/index.astro
+**搜尋字串**：
 ```
-預期輸出：
+下一步自然會更準
+```
+
+**預期位置**：約在 line 432 區域（`.consult-description` 段落）
+
+**完整待替換節點（Before）**：
 ```astro
-        <aside class="faq-home-note">
-          <p class="faq-home-note-label">Consult Notes</p>
-          <p>這裡不是完整說明書，而是正式諮詢前最常需要先對齊的三個起點。</p>
-        </aside>
+<p class="consult-description">
+  不一定要立刻決定全部。先把目前的空間狀態、預算感與想改善的生活節奏整理清楚，下一步自然會更準。
+</p>
 ```
 
-**步驟 2**：執行刪除
-
-**old_string**：
+**替換為（After）**：
 ```astro
-        <aside class="faq-home-note">
-          <p class="faq-home-note-label">Consult Notes</p>
-          <p>這裡不是完整說明書，而是正式諮詢前最常需要先對齊的三個起點。</p>
-        </aside>
+<p class="consult-description">
+  把空間狀態、預算感與想改善的生活節奏整理清楚。
+</p>
 ```
 
-**new_string**：（空白）
-
-**步驟 3**：驗證
-```bash
-grep -n "faq-home-note\|Consult Notes" src/pages/index.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: index 移除 faq-home-note aside（整段刪除，FAQ 標題已自明）`
+**改動說明**：
+| 原文 | 修改後 | 理由 |
+|------|--------|------|
+| 不一定要立刻決定全部 | 刪除 | 上方 h2「方向對了，就用最舒服的方式起步」已宣告 |
+| 先把目前的空間狀態、預算感與想改善的生活節奏整理清楚 | 保留主句 | 核心 action anchor |
+| 下一步自然會更準（湊字尾） | 刪除 | CTA 按鈕「先進聯絡頁」已完成此動作敘述 |
 
 ---
 
-## Commit 3 — A-3：移除 `.faq-curation` 整塊
-
-**檔案**：`src/pages/index.astro`
-**行號**：第 622–625 行
-
-### 變更對照
-
-| 項目 | Before | After |
-|------|--------|-------|
-| HTML 結構 | 完整 `<div class="faq-curation">` + eyebrow + p | **整段移除** |
-| CSS | `.faq-curation` + `.faq-curation-label` 樣式 | **保留 CSS，孤兒無害** |
-
-### 實作步驟
-
-**步驟 1**：確認目標範圍
-```bash
-sed -n '620,628p' src/pages/index.astro
-```
-預期輸出：
-```astro
-      <div class="faq-curation">
-        <p class="faq-curation-label">Quick Read</p>
-        <p>如果三題看完，大方向已經對得上，再進完整 FAQ 或直接聯絡就好。</p>
-      </div>
-```
-
-**步驟 2**：執行刪除
-
-**old_string**：
-```astro
-      <div class="faq-curation">
-        <p class="faq-curation-label">Quick Read</p>
-        <p>如果三題看完，大方向已經對得上，再進完整 FAQ 或直接聯絡就好。</p>
-      </div>
-```
-
-**new_string**：（空白）
-
-**步驟 3**：驗證
-```bash
-grep -n "faq-curation\|Quick Read" src/pages/index.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: index 移除 faq-curation 區塊（整段刪除，CTA 雙入口已足）`
-
----
-
-## Commit 4 — B-1：精簡 footer brand 段落
-
-**檔案**：`src/layouts/BaseLayout.astro`
-**行號**：第 1031 行
-
-### 變更對照
-
-| 項目 | Before（71 字） | After（25 字） |
-|------|-----------------|----------------|
-| 內容 | 「專注於大台北住宅與商業空間規劃。從設計提案、系統櫃收納配置到工程落地整合，以安定、耐看的空間語言，精準回應每位屋主的生活方式。」 | **「大台北住宅與商空，從設計到工程一起整合。」** |
-
-### 實作步驟
-
-**步驟 1**：確認目標
-```bash
-grep -n "專注於大台北住宅與商業空間" src/layouts/BaseLayout.astro
-```
-
-**步驟 2**：替換
-
-**old_string**：
-```astro
-              <p>
-                專注於大台北住宅與商業空間規劃。從設計提案、系統櫃收納配置到工程落地整合，以安定、耐看的空間語言，精準回應每位屋主的生活方式。
-              </p>
-```
-
-**new_string**：
-```astro
-              <p>
-                大台北住宅與商空，從設計到工程一起整合。
-              </p>
-```
-
-**步驟 3**：驗證
-```bash
-grep -n "專注於大台北住宅\|精準回應每位屋主" src/layouts/BaseLayout.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: BaseLayout footer brand p 從 71 字砍至 25 字，移除 AI 招牌尾句`
-
----
-
-## Commit 5 — B-2：精簡 `.workflow-summary-note`
-
-**檔案**：`src/pages/index.astro`
-**行號**：第 424–426 行
-
-### 變更對照
-
-| 項目 | Before（43 字當量） | After（24 字） |
-|------|---------------------|-----------------|
-| 內容 | 「從第一次接洽開始，流程會沿著需求收斂、方案確認、報價簽約到施工驗收推進，不讓每一步只剩片段資訊。」 | **「需求收斂、方案確認、報價簽約到施工驗收，依序推進。」** |
-
-### 實作步驟
-
-**步驟 1**：確認目標
-```bash
-sed -n '423,428p' src/pages/index.astro
-```
-
-**步驟 2**：替換
-
-**old_string**：
-```astro
-        <p class="workflow-summary-note">
-          從第一次接洽開始，流程會沿著需求收斂、方案確認、報價簽約到施工驗收推進，不讓每一步只剩片段資訊。
-        </p>
-```
-
-**new_string**：
-```astro
-        <p class="workflow-summary-note">
-          需求收斂、方案確認、報價簽約到施工驗收，依序推進。
-        </p>
-```
-
-**步驟 3**：驗證
-```bash
-grep -n "從第一次接洽開始\|不讓每一步只剩片段" src/pages/index.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: index workflow-summary-note 從 43 字砍至 24 字`
-
----
-
-## Commit 6 — B-3：精簡 `.consult-note-text`
-
-**檔案**：`src/pages/index.astro`
-**行號**：第 580 行
-
-### 變更對照
-
-| 項目 | Before（38 字） | After（11 字） |
-|------|-----------------|----------------|
-| 內容 | 「青曦把開始分成三種節奏。想先聊方向、先估一輪，或先判斷智能整合是否需要，都可以各自開始。」 | **「三種節奏，先選一個開始。」** |
-
-### 實作步驟
-
-**步驟 1**：確認目標
-```bash
-sed -n '578,582p' src/pages/index.astro
-```
-
-**步驟 2**：替換
-
-**old_string**：
-```astro
-        <p class="consult-note-text">青曦把開始分成三種節奏。想先聊方向、先估一輪，或先判斷智能整合是否需要，都可以各自開始。</p>
-```
-
-**new_string**：
-```astro
-        <p class="consult-note-text">三種節奏，先選一個開始。</p>
-```
-
-**步驟 3**：驗證
-```bash
-grep -n "青曦把開始分成三種節奏" src/pages/index.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: index consult-note-text 從 38 字砍至 11 字`
-
----
-
-## Commit 7 — B-4：smart-case card 精簡 + 順手修鄰近「協助」
-
-**檔案**：`src/pages/index.astro`
-**行號**：第 358–362 行（第一張 smart-case-card）
-
-### 變更對照
-
-| # | 位置 | Before | After |
-|---|------|--------|-------|
-| 7a | h3（行 358） | 「整理 Home Assistant 規則，**讓**回家模式更快上線」 | **「整理 Home Assistant 規則，回家模式更快上線」** |
-| 7b | p（行 360–361） | 「**協助**整理需求、撰寫規則與排查整合問題，**讓**回家、離家、睡眠與節能模式更快落地。」 | **「整理需求、撰寫規則與排查整合問題，讓回家、離家、睡眠與節能模式更快落地。」** |
-
-### 實作步驟
-
-**步驟 1**：確認目標
-```bash
-sed -n '356,364p' src/pages/index.astro
-```
-
-**步驟 2**：替換（一次性替換整個 article 區塊）
-
-**old_string**：
-```astro
-            <h3>整理 Home Assistant 規則，讓回家模式更快上線</h3>
-            <p>
-              協助整理需求、撰寫規則與排查整合問題，
-              讓回家、離家、睡眠與節能模式更快落地。
-            </p>
-```
-
-**new_string**：
-```astro
-            <h3>整理 Home Assistant 規則，回家模式更快上線</h3>
-            <p>
-              整理需求、撰寫規則與排查整合問題，
-              讓回家、離家、睡眠與節能模式更快落地。
-            </p>
-```
-
-**步驟 3**：驗證「協助」是否已清除
-```bash
-grep -n "協助" src/pages/index.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: index smart-case card h3 拿掉「讓」+ 移除「協助」主動句海`
-
----
-
-## Commit 8 — B-5：精簡 `.quote-detail`
-
-**檔案**：`src/pages/index.astro`
-**行號**：第 157 行
-
-### 變更對照
-
-| 項目 | Before | After |
-|------|--------|-------|
-| 內容 | 「設計不是堆漂亮詞，而是把生活整理得**更好住**。」 | **「設計不是堆漂亮詞，是把生活整理得更好住。」** |
-
-### 實作步驟
-
-**步驟 1**：確認目標
-```bash
-grep -n "設計不是堆漂亮詞" src/pages/index.astro
-```
-
-**步驟 2**：替換
-
-**old_string**：
-```astro
-          <p class="quote-detail">設計不是堆漂亮詞，而是把生活整理得更好住。</p>
-```
-
-**new_string**：
-```astro
-          <p class="quote-detail">設計不是堆漂亮詞，是把生活整理得更好住。</p>
-```
-
-**步驟 3**：驗證
-```bash
-grep -n "設計不是堆漂亮詞，而是" src/pages/index.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: index quote-detail 拿掉「的」字，語感更俐落`
-
----
-
-## Commit 9 — C-1：移除 `.consult-kicker`（Closing Edit）
-
-**檔案**：`src/pages/index.astro`
-**行號**：第 572 行
-
-### 實作步驟
-
-**步驟 1**：確認目標
-```bash
-sed -n '570,575p' src/pages/index.astro
-```
-
-**步驟 2**：刪除該行
-
-**old_string**：
-```astro
-        <p class="consult-kicker">Closing Edit</p>
-```
-
-**new_string**：（空白，該行刪除）
-
-**步驟 3**：驗證
-```bash
-grep -n "Closing Edit" src/pages/index.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: index 移除 consult-kicker eyebrow（Closing Edit，讀者無感知）`
-
----
-
-## Commit 10 — C-2：移除 `.workflow-summary-label`（Flow Snapshot）
-
-**檔案**：`src/pages/index.astro`
-**行號**：第 417 行
-
-### 實作步驟
-
-**步驟 1**：確認目標
-```bash
-sed -n '415,420p' src/pages/index.astro
-```
-
-**步驟 2**：刪除該行
-
-**old_string**：
-```astro
-        <p class="workflow-summary-label">Flow Snapshot</p>
-```
-
-**new_string**：（空白，該行刪除）
-
-**步驟 3**：驗證
-```bash
-grep -n "Flow Snapshot" src/pages/index.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: index 移除 workflow-summary-label eyebrow（Flow Snapshot，讀者無感知）`
-
----
-
-## Commit 11 — C-3：移除 faq.astro `.faq-curation-note` eyebrow
+### B-3｜faq.astro — 精簡 answer 5（保固說明）
 
 **檔案**：`src/pages/faq.astro`
-**行號**：需先確認行號
 
-### 實作步驟
-
-**步驟 1**：確認行號
-```bash
-grep -n "Consultation Edit\|faq-curation-note" src/pages/faq.astro
+**搜尋字串**：
+```
+提供一年工程保固
 ```
 
-**步驟 2**：確認目標文字（預期格式）
+**預期位置**：約在 line 31 區域（faqItems array 內第 5 項 answer）
+
+**完整待替換節點（Before）**：
 ```astro
-        <p class="faq-curation-label">Consultation Edit</p>
+answer: "提供一年工程保固。保固期內若有施工瑕疵，會協助安排修復。",
 ```
-或
+
+**替換為（After）**：
 ```astro
-        <p class="faq-curation-note">Consultation Edit</p>
+answer: "一年工程保固；期間施工瑕疵協助修復。",
 ```
 
-**步驟 3**：替換（eyebrow 改為「閱讀提醒」或直接移除）
-
-**選項 A — 改為功能性標籤（推薦）**：
-**old_string**：
-```astro
-        <p class="faq-curation-label">Consultation Edit</p>
-```
-**new_string**：
-```astro
-        <p class="faq-curation-label">閱讀提醒</p>
-```
-
-**選項 B — 整段移除**（若該 aside 為純 eyebow 無內文）：
-直接刪除整個 aside 區塊（請先 grep 確認範圍）
-
-**步驟 4**：驗證
-```bash
-grep -n "Consultation Edit" src/pages/faq.astro
-```
-預期：0 行
-
-**Commit message**：`copy-prune: faq 移除 Consultation Edit eyebrow，改為「閱讀提醒」`
+**改動說明**：
+| 原文 | 修改後 | 理由 |
+|------|--------|------|
+| 提供一年工程保固（冗詞「提供」） | 一年工程保固 | 「提供」是自明動詞，直接講事實 |
+| 保固期內若有施工瑕疵，會協助安排修復（冗詞「若」「會」） | 期間施工瑕疵協助修復 | 「期間」取代「保固期內」；刪「會」「安排」湊字 |
 
 ---
 
-## Commit 12 — 全域驗證
+## 【C】CSS balance 補強（手機斷行防 orphan）
 
-**執行時間**：所有 commit 完成後，最後一次跑完整 grep 驗證
+### C-1｜faq.astro — 為 hero h1 加入 `text-wrap: balance`
 
-### 驗證指令（按優先序）
+**檔案**：`src/pages/faq.astro`
+
+**搜尋字串**：
+```
+<h1>把合作前最常卡住的事，先安靜看清楚</h1>
+```
+
+**預期位置**：line ~26（`<h1>` 標籤）
+
+**完整待替換節點（Before）**：
+```astro
+<h1>把合作前最常卡住的事，先安靜看清楚</h1>
+```
+
+**替換為（After）**：
+```astro
+<h1 style="text-wrap: balance;">把合作前最常卡住的事，先安靜看清楚</h1>
+```
+
+**為什麼需要**：
+- h1 為 14 字當量（漢字 13 + 標點 0.5×2）
+- 在 375px 窄螢幕下摺行後易出現 orphan「事，先安靜看清楚」
+- `text-wrap: balance` 讓瀏覽器自動平衡行長，避免孤字
+
+---
+
+### C-2｜faq.astro — 為 `.faq-curation-copy h2` 加入 `text-wrap: balance`
+
+**檔案**：`src/pages/faq.astro`
+
+**搜尋字串**：
+```
+不是要你一次懂完，而是先知道合作節奏合不合
+```
+
+**預期位置**：約在 line 75 區域
+
+**完整待替換節點（Before）**：
+```astro
+<h2>不是要你一次懂完，而是先知道合作節奏合不合</h2>
+```
+
+**替換為（After）**：
+```astro
+<h2 style="text-wrap: balance;">不是要你一次懂完，而是先知道合作節奏合不合</h2>
+```
+
+**為什麼需要**：
+- h2 為 19 字當量（漢字 17 + 標點 0.5×4）
+- 字級 3-4.8rem，窄螢幕下摺行 orphan 風險高
+- `text-wrap: balance` 保護「不是要你一次懂完」不被孤單拆行
+
+---
+
+### C-3｜smart-home.astro — 為 hero h1 加入 `text-wrap: balance`
+
+**檔案**：`src/pages/smart-home.astro`
+
+**搜尋字串**：
+```
+<h1>把智能家居做成真正好用的生活系統</h1>
+```
+
+**預期位置**：約在 line 64 區域
+
+**完整待替換節點（Before）**：
+```astro
+<h1>把智能家居做成真正好用的生活系統</h1>
+```
+
+**替換為（After）**：
+```astro
+<h1 style="text-wrap: balance;">把智能家居做成真正好用的生活系統</h1>
+```
+
+**為什麼需要**：
+- h1 為 14 字當量（漢字 13 + 標點 0.5×2）
+- 桌面版可單行，手機 375px 折行後易 orphan
+- `text-wrap: balance` 讓行長自動平衡
+
+---
+
+## 實作順序建議（每個 commit 獨立可 revert）
+
+### Commit 1：整段刪除 A 組
+包含：**A-1, A-2**
 
 ```bash
-# 1. 確認無「為您」AI 味
-grep -rn "為您" src/pages/ src/layouts/ | grep -v "social-ops/"
-# 預期：0 行
+git add src/pages/index.astro src/pages/smart-home.astro
+git commit -m "refactor(copy): 整段刪除 2 處自明性廢話
 
-# 2. 確認無情緒動詞黑名單
-grep -rEn "負責到底|用心|完美融合|絕對|最優|全方位|量身打造" src/pages/ src/layouts/ | grep -v "/blog/"
-# 預期：0 行
+- index: 刪除 smart-case-mobile-note（純 meta廢話）
+- smart-home: 刪除 section-heading p（h2已宣告同件事）
 
-# 3. 確認無「協助」殘留
-grep -rn "協助" src/pages/index.astro src/pages/smart-home.astro
-# 預期：0 行
+驗證：
+grep -n \"smart-case-mobile-note|不是單純展示設備\" src/pages/index.astro src/pages/smart-home.astro
+# 預期：0 行"
+```
 
-# 4. 確認無 em-dash / en-dash（social-ops 內部例外）
-grep -rEn "—|–" src/pages/ src/layouts/ | grep -v "social-ops/"
-# 預期：0 行
+### Commit 2：精簡文字 B 組
+包含：**B-1, B-2, B-3**
 
-# 5. 確認無「Project Rhythm / Flow Snapshot / Closing Edit / Consultation Edit」編輯家具
-grep -rEn "Project Rhythm|Flow Snapshot|Closing Edit|Consultation Edit" src/pages/ src/layouts/
-# 預期：0 行
+```bash
+git add src/pages/smart-home.astro src/pages/index.astro src/pages/faq.astro
+git commit -m "refactor(copy): 精簡 positioning-card / consult-desc / 保固 answer
 
-# 6. 確認無 h1/h2/h3 句尾句號（本輪只修 UI 頁面，不含 blog 內文）
-grep -rEn "<h[1-3][^>]*>[^<]+[。！]</h[1-3]>" src/pages/index.astro src/pages/contact.astro src/layouts/BaseLayout.astro
-# 預期：0 行
+- smart-home positioning-card-dark: 刪鋪墊句+湊字尾，60字→22字
+- index consult-description: 刪h2已宣告語+湊字尾，45字→22字
+- faq answer 5: 刪冗詞「提供」「會」「安排」，純事實陳述
 
-# 7. 確認無「workflow-editor-note / faq-home-note / faq-curation」殘留
-grep -rn "workflow-editor-note\|faq-home-note\|faq-curation" src/pages/index.astro
-# 預期：0 行
+驗證：
+grep -n \"很多智能家居不好用|下一步自然會更準|提供一年工程保固\" src/pages/smart-home.astro src/pages/index.astro src/pages/faq.astro
+# 預期：0 行"
+```
+
+### Commit 3：CSS balance C 組
+包含：**C-1, C-2, C-3**
+
+```bash
+git add src/pages/faq.astro src/pages/smart-home.astro
+git commit -m "fix(typography): 為 3 個 14+ 字當量 h1/h2 補 text-wrap balance
+
+- faq hero h1: 14 字當量，375px 易 orphan
+- faq curation h2: 19 字當量，含「不是X而是Y」句型
+- smart-home hero h1: 14 字當量，窄螢幕折行保護
+
+驗證：
+grep -n \"text-wrap: balance\" src/pages/faq.astro src/pages/smart-home.astro
+# 預期：本次新增 3 處"
 ```
 
 ---
 
-## 執行摘要（落地後預期）
+## 實作完成後的驗證 SOP
 
-| 指標 | 執行前 | 執行後 |
-|------|--------|--------|
-| UI 頁面（index + contact + BaseLayout）大標句尾句號 | 0 | 0（已堅守） |
-| 情緒動詞黑名單命中 | 0 | 0 |
-| 「為您」AI 味 | 2 處 | 0 |
-| 「協助」被動句 | 1 處（+ smart-home 5 處） | 0 |
-| 編輯家具（Project Rhythm 等） | 5 處 | 0 |
-| `workflow-editor-note` aside | 1 塊 | 0 |
-| `faq-home-note` aside | 1 塊 | 0 |
-| `faq-curation` 區塊 | 1 塊 | 0 |
-| footer brand p 字數 | 71 字 | 25 字 |
-| 總削減字數 | — | 約 250+ 字（11 個提案合計） |
+### 1. 確認差異範圍合理
+
+```bash
+git diff --stat HEAD~3..HEAD
+```
+
+預期：**減少行數為主**（刪除多於新增），淨變動約 -15 到 -30 行。
+
+### 2. 確認無新增 AI 套話
+
+```bash
+grep -rEn "優質|專業|頂尖|一流|完善|全方位|量身打造|不是.*而是" src/pages/ src/components/ src/layouts/ | grep -v "social-ops/" | grep -v "/blog/" | grep -v "css-palette\|design-token"
+```
+
+預期：本次修改後 `不是.*而是` 句型從 4 處降至 2 處（`index.astro brand-strip-intro` + `smart-home.astro CTA h2` 屬品牌語氣慣例，保留）。
+
+### 3. 確認 h1/h2/h3 無尾句點
+
+```bash
+grep -rEn "<h[1-3][^>]*>[^<]+[。！?？]</h[1-3]>" src/pages/ src/components/ src/layouts/ | grep -v "/blog/"
+```
+
+預期：**0 行**
+
+### 4. 確認本期變更清單 8 項全數完成
+
+```bash
+for term in "smart-case-mobile-note" "不是單純展示設備" "很多智能家居不好用" "下一步自然會更準" "提供一年工程保固" "把合作前最常卡住的事，先安靜看清楚" "不是要你一次懂完" "把智能家居做成真正好用的生活系統"; do
+  count=$(grep -rEn "$term" src/pages/ 2>/dev/null | grep -v "/blog/" | wc -l)
+  echo "$term: $count"
+done
+```
+
+預期每項：`0`
+
+### 5. build 驗證（必跑）
+
+```bash
+cd /Users/liangzhiwei/bustling-belt
+npm run build 2>&1 | tail -20
+```
+
+預期：無錯誤，build 成功。
+
+### 6. dev server 驗證（選跑）
+
+```bash
+tail -30 /tmp/astro-dev.log 2>/dev/null
+```
+
+預期：HMR 編譯無 error。
 
 ---
 
-## 確認清單（等我勾選）
+## 本次實作不涵蓋的範圍
 
-- [ ] Commit 1：A-1 移除 workflow-editor-note aside
-- [ ] Commit 2：A-2 移除 faq-home-note aside
-- [ ] Commit 3：A-3 移除 faq-curation 區塊
-- [ ] Commit 4：B-1 footer brand p 精簡（71→25 字）
-- [ ] Commit 5：B-2 workflow-summary-note 精簡
-- [ ] Commit 6：B-3 consult-note-text 精簡（38→11 字）
-- [ ] Commit 7：B-4 smart-case card h3 + 移除「協助」
-- [ ] Commit 8：B-5 quote-detail 拿掉「的」
-- [ ] Commit 9：C-1 移除 Closing Edit eyebrow
-- [ ] Commit 10：C-2 移除 Flow Snapshot eyebrow
-- [ ] Commit 11：C-3 faq Consultation Edit（選 A 或 B）
-- [ ] Commit 12：全域 grep 驗證
+以下內容**不在此次實作範圍內**，保持原樣不動：
 
-> **注意**：本清單一經確認，我會嚴格依序執行 12 個 commit，每個 commit 前綴 `copy-prune:`，請在 commit 完成後自行用 `git log --oneline` 確認。
+- ✅ **所有 `src/pages/blog/*.astro` 內的 article 正文內容**（使用者明確豁免）
+- ✅ `src/pages/social-ops/index.astro`（後台系統，editorial 風格例外）
+- ✅ CSS 樣式（非文案相關，但 balance inline style 例外）
+- ✅ 圖片 alt 屬性（非此次審計範圍）
+- ✅ SEO meta description（非此次審計範圍）
+- ✅ 9 種斷點合併議題（下輪處理）
+- ✅ 5+ 檔案硬寫 hex 色彩鎖修補（下輪處理）
+
+---
+
+## 變更清單總表
+
+| # | 檔案 | 行 | 動作 | Before 摘要 | After 摘要 |
+|---|------|----|------|-------------|------------|
+| A-1 | index.astro | ~247 | 整段刪除 | `<p class="smart-case-mobile-note">手機版先看重點能力...</p>` | （無） |
+| A-2 | smart-home.astro | ~122 | 整段刪除 | `<p>不是單純展示設備，而是直接看見...</p>` | （無） |
+| B-1 | smart-home.astro | ~135-136 | 精簡替換 | positioning-card-dark p（60+ 字） | 「不是設備不夠新，是空間、佈線與控制邏輯沒有一起規劃。」（22 字） |
+| B-2 | index.astro | ~432 | 精簡替換 | consult-description（45 字） | 「把空間狀態、預算感與想改善的生活節奏整理清楚。」（22 字） |
+| B-3 | faq.astro | ~31 | 精簡替換 | 「提供一年工程保固。保固期內若有施工瑕疵，會協助安排修復。」 | 「一年工程保固；期間施工瑕疵協助修復。」 |
+| C-1 | faq.astro | ~26 | CSS balance | `<h1>...</h1>` | `<h1 style="text-wrap: balance;">...</h1>` |
+| C-2 | faq.astro | ~75 | CSS balance | `<h2>...</h2>` | `<h2 style="text-wrap: balance;">...</h2>` |
+| C-3 | smart-home.astro | ~64 | CSS balance | `<h1>...</h1>` | `<h1 style="text-wrap: balance;">...</h1>` |
+
+---
+
+*本清單由文案減法體檢（Round Copy Audit, Score 6.0/10）產出。*
+*操作鐵律：只刪不增；blog 正文 / social-ops 後台 / CSS 顏色與斷點 豁免。*
